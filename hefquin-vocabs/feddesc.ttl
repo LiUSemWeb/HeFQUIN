@@ -73,6 +73,12 @@ fd:Wrapper a owl:Class ;
 
 ### ===== PROPERTY DECLARATIONS =====
 
+fd:serviceURI a rdf:Property ;
+    rdfs:domain fd:FederationMember ;
+    rdfs:range  xsd:anyURI ;
+    rdfs:label "service URI"@en ;
+    rdfs:comment "The URI via which the federation member is identified in a SERVICE clause."@en .
+
 fd:interface a rdf:Property ;
     rdfs:domain fd:FederationMember ;
     rdfs:range  fd:Interface ;

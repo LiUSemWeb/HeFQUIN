@@ -17,6 +17,7 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
@@ -63,189 +64,188 @@ public class FederationDescriptionReader
 	public FederationCatalog parseFedDescr( final Model fd ) {
 		final Map<String, FederationMember> membersByURI = new HashMap<>();
 
-		// Iterate over all federation members mentioned in the description
-		addFederationMembers( fd.listResourcesWithProperty(RDF.type, FDVocab.FederationMember),
-		                      fd, membersByURI );
-		addFederationMembers( fd.listResourcesWithProperty(RDF.type, FDVocab.WrappedFederationMember),
-		                      fd, membersByURI );
+		final StmtIterator it = fd.listStatements(null, FDVocab.serviceURI, (RDFNode) null);
+		while ( it.hasNext() ) {
+			final Statement st = it.next();
+			final Resource fedMember = st.getSubject();
+			final String serviceURI = getAsURIString( st.getObject() );
+
+			if ( serviceURI == null ) {
+				throw new IllegalArgumentException( "Illegal serviceURI value: " + st.getObject().toString() );
+			}
+
+			membersByURI.put( serviceURI,
+			                  createFederationMember(fedMember, serviceURI, fd) );
+		}
 
 		return new FederationCatalogImpl(membersByURI);
 	}
 
-	protected void addFederationMembers( final ResIterator fedMembers,
-	                                     final Model fd,
-	                                     final Map<String, FederationMember> membersByURI ) {
-		while ( fedMembers.hasNext() ) {
-			final Resource fedMember = fedMembers.next();
-			final VocabularyMapping vocabMap = parseVocabMapping(fedMember, fd);
+	protected FederationMember createFederationMember( final Resource fedMember,
+	                                                   final String serviceURI,
+	                                                   final Model fd ) {
+		final VocabularyMapping vocabMap = parseVocabMapping(fedMember, fd);
 
-			final Resource iface = fedMember.getProperty(FDVocab.interface_).getResource();
-			final RDFNode ifaceType = fd.getRequiredProperty(iface, RDF.type).getObject();
+		final Resource iface = fedMember.getProperty(FDVocab.interface_).getResource();
+		final RDFNode ifaceType = fd.getRequiredProperty(iface, RDF.type).getObject();
 
-			// Check the type of interface
-			if ( ifaceType.equals(FDVocab.SPARQLEndpointInterface) )
-			{
-				final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
-				if ( ! endpointAddressesIterator.hasNext() )
-					throw new IllegalArgumentException("SPARQL endpointAddress is required!");
+		// Check the type of interface
+		if ( ifaceType.equals(FDVocab.SPARQLEndpointInterface) )
+		{
+			final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
+			if ( ! endpointAddressesIterator.hasNext() )
+				throw new IllegalArgumentException("SPARQL endpointAddress is required!");
 
-				final RDFNode addr = endpointAddressesIterator.next().getObject();
+			final RDFNode addr = endpointAddressesIterator.next().getObject();
 
-				if ( endpointAddressesIterator.hasNext() )
-					throw new IllegalArgumentException("More Than One SPARQL endpointAddress!");
+			if ( endpointAddressesIterator.hasNext() )
+				throw new IllegalArgumentException("More Than One SPARQL endpointAddress!");
 
-				final String addrStr = getAsURIString(addr);
-				if ( addrStr == null ) {
+			final String addrStr = getAsURIString(addr);
+			if ( addrStr == null ) {
+				throw new IllegalArgumentException();
+			}
+
+			return createSPARQLEndpoint(addrStr, vocabMap);
+		}
+		else if ( ifaceType.equals(FDVocab.TPFInterface) )
+		{
+			final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FDVocab.exampleFragmentAddress);
+			if ( ! exampleFragmentAddressesIterator.hasNext() )
+				throw new IllegalArgumentException("TPF exampleFragmentAddress is required!");
+
+			final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
+
+			if ( exampleFragmentAddressesIterator.hasNext() )
+				throw new IllegalArgumentException("More Than One TPF exampleFragmentAddress!");
+
+			final String addrStr = getAsURIString(addr);
+			if ( addrStr == null ) {
+				throw new IllegalArgumentException();
+			}
+
+			return createTPFServer(addrStr, vocabMap);
+		}
+		else if ( ifaceType.equals(FDVocab.brTPFInterface) )
+		{
+			final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FDVocab.exampleFragmentAddress);
+			if ( ! exampleFragmentAddressesIterator.hasNext() )
+				throw new IllegalArgumentException("brTPF exampleFragmentAddress is required!");
+
+			final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
+
+			if ( exampleFragmentAddressesIterator.hasNext() )
+				throw new IllegalArgumentException("More Than One brTPF exampleFragmentAddress!");
+
+			final String addrStr = getAsURIString(addr);
+			if ( addrStr == null ) {
+				throw new IllegalArgumentException();
+			}
+
+			return createBRTPFServer(addrStr, vocabMap);
+		}
+		else if ( ifaceType.equals(FDVocab.BoltInterface) )
+		{
+			if ( vocabMap != null )
+				throw new IllegalArgumentException("Neo4j endpoints cannot have a vocabulary mapping.");
+
+			final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
+			if ( ! endpointAddressesIterator.hasNext() )
+				throw new IllegalArgumentException("Bolt endpointAddress is required!");
+
+			final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+			if ( endpointAddressesIterator.hasNext() )
+				throw new IllegalArgumentException("More Than One Bolt endpointAddress!");
+
+			final String addrStr = getAsURIString(addr);
+			if ( addrStr == null ) {
+				throw new IllegalArgumentException();
+			}
+
+			return createNeo4jServer(addrStr);
+		}
+		else if ( ifaceType.equals(FDVocab.GraphQLEndpointInterface) )
+		{
+			if ( vocabMap != null )
+				throw new IllegalArgumentException("GraphQL endpoints cannot have a vocabulary mapping.");
+
+			final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
+			if ( ! endpointAddressesIterator.hasNext() )
+				throw new IllegalArgumentException("GraphQL endpointAddress is required!");
+
+			final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+			if ( endpointAddressesIterator.hasNext() )
+				throw new IllegalArgumentException("More Than One GraphQL endpointAddress!");
+
+			final String addrStr = getAsURIString(addr);
+			if ( addrStr == null ) {
+				throw new IllegalArgumentException();
+			}
+
+			return createGraphQLServer(addrStr);
+		}
+		else if ( ifaceType.equals(FDVocab.RESTInterface) )
+		{
+			if ( vocabMap != null )
+				throw new IllegalArgumentException("REST APIs cannot have a vocabulary mapping.");
+
+			final RDFNode addr = ModelUtils.getSingleMandatoryProperty( iface, FDVocab.endpointAddress );
+
+			final String addrStr = getAsURIString(addr);
+			if ( addrStr == null ) {
+				throw new IllegalArgumentException();
+			}
+
+			final Resource queryParamsList = ModelUtils.getSingleMandatoryResourceProperty( iface, FDVocab.queryParameters );
+			if ( ! queryParamsList.canAs(RDFList.class) )
+				throw new IllegalArgumentException( FDVocab.queryParameters.getLocalName() + " property of " + iface.toString() + " should be a list." );
+
+			final Iterator<RDFNode> queryParamsIterator = queryParamsList.as( RDFList.class ).iterator();
+			final List<RESTEndpoint.Parameter> params = new ArrayList<>();
+			while ( queryParamsIterator.hasNext() ) {
+				final RDFNode x = queryParamsIterator.next();
+				if ( ! x.isResource() )
+					throw new IllegalArgumentException( "One of the query parameters of " + iface.toString() + " is not a resource (but, probably, a literal instead)." );
+
+				final Resource p = x.asResource();
+				final String name = ModelUtils.getSingleMandatoryProperty_XSDString(p, FDVocab.paramName);
+				final String type = getAsURIString( ModelUtils.getSingleMandatoryProperty(p, FDVocab.paramType) );
+				if ( type == null )
 					throw new IllegalArgumentException();
+
+				final RDFDatatype dt;
+				if ( XSDDatatype.XSDstring.getURI().equals(type) ) {
+					dt = XSDDatatype.XSDstring;
+				}
+				else if ( XSDDatatype.XSDinteger.getURI().equals(type) ) {
+					dt = XSDDatatype.XSDinteger;
+				}
+				else if ( XSDDatatype.XSDfloat.getURI().equals(type) ) {
+					dt = XSDDatatype.XSDfloat;
+				}
+				else if ( XSDDatatype.XSDdouble.getURI().equals(type) ) {
+					dt = XSDDatatype.XSDdouble;
+				}
+				else {
+					throw new IllegalArgumentException("Unexpected data type for query parameter: " +  type.toString() );
 				}
 
-				final FederationMember fm = createSPARQLEndpoint(addrStr, vocabMap);
-				membersByURI.put(addrStr, fm);
+				final RESTEndpoint.Parameter param = new RESTEndpoint.Parameter() {
+					@Override public String getName() { return name; }
+					@Override public RDFDatatype getType() { return dt; }
+				};
+
+				params.add(param);
 			}
-			else if ( ifaceType.equals(FDVocab.TPFInterface) )
-			{
-				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FDVocab.exampleFragmentAddress);
-				if ( ! exampleFragmentAddressesIterator.hasNext() )
-					throw new IllegalArgumentException("TPF exampleFragmentAddress is required!");
 
-				final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
+			final Resource wrapper = ModelUtils.getSingleMandatoryResourceProperty( fedMember, FDVocab.wrapper );
 
-				if ( exampleFragmentAddressesIterator.hasNext() )
-					throw new IllegalArgumentException("More Than One TPF exampleFragmentAddress!");
-
-				final String addrStr = getAsURIString(addr);
-				if ( addrStr == null ) {
-					throw new IllegalArgumentException();
-				}
-
-				final FederationMember fm = createTPFServer(addrStr, vocabMap);
-				membersByURI.put(addrStr, fm);
-			}
-			else if ( ifaceType.equals(FDVocab.brTPFInterface) )
-			{
-				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FDVocab.exampleFragmentAddress);
-				if ( ! exampleFragmentAddressesIterator.hasNext() )
-					throw new IllegalArgumentException("brTPF exampleFragmentAddress is required!");
-
-				final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
-
-				if ( exampleFragmentAddressesIterator.hasNext() )
-					throw new IllegalArgumentException("More Than One brTPF exampleFragmentAddress!");
-
-				final String addrStr = getAsURIString(addr);
-				if ( addrStr == null ) {
-					throw new IllegalArgumentException();
-				}
-
-				final FederationMember fm = createBRTPFServer(addrStr, vocabMap);
-				membersByURI.put(addrStr, fm);
-			}
-			else if ( ifaceType.equals(FDVocab.BoltInterface) )
-			{
-				if ( vocabMap != null )
-					throw new IllegalArgumentException("Neo4j endpoints cannot have a vocabulary mapping.");
-
-				final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
-				if ( ! endpointAddressesIterator.hasNext() )
-					throw new IllegalArgumentException("Bolt endpointAddress is required!");
-
-				final RDFNode addr = endpointAddressesIterator.next().getObject();
-
-				if ( endpointAddressesIterator.hasNext() )
-					throw new IllegalArgumentException("More Than One Bolt endpointAddress!");
-
-				final String addrStr = getAsURIString(addr);
-				if ( addrStr == null ) {
-					throw new IllegalArgumentException();
-				}
-
-				final FederationMember fm = createNeo4jServer(addrStr);
-				membersByURI.put(addrStr, fm);
-			}
-			else if ( ifaceType.equals(FDVocab.GraphQLEndpointInterface) )
-			{
-				if ( vocabMap != null )
-					throw new IllegalArgumentException("GraphQL endpoints cannot have a vocabulary mapping.");
-
-				final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
-				if ( ! endpointAddressesIterator.hasNext() )
-					throw new IllegalArgumentException("GraphQL endpointAddress is required!");
-
-				final RDFNode addr = endpointAddressesIterator.next().getObject();
-
-				if ( endpointAddressesIterator.hasNext() )
-					throw new IllegalArgumentException("More Than One GraphQL endpointAddress!");
-
-				final String addrStr = getAsURIString(addr);
-				if ( addrStr == null ) {
-					throw new IllegalArgumentException();
-				}
-
-				final FederationMember fm = createGraphQLServer(addrStr);
-				membersByURI.put(addrStr, fm);
-			}
-			else if ( ifaceType.equals(FDVocab.RESTInterface) )
-			{
-				if ( vocabMap != null )
-					throw new IllegalArgumentException("REST APIs cannot have a vocabulary mapping.");
-
-				final RDFNode addr = ModelUtils.getSingleMandatoryProperty( iface, FDVocab.endpointAddress );
-
-				final String addrStr = getAsURIString(addr);
-				if ( addrStr == null ) {
-					throw new IllegalArgumentException();
-				}
-
-				final Resource queryParamsList = ModelUtils.getSingleMandatoryResourceProperty( iface, FDVocab.queryParameters );
-				if ( ! queryParamsList.canAs(RDFList.class) )
-					throw new IllegalArgumentException( FDVocab.queryParameters.getLocalName() + " property of " + iface.toString() + " should be a list." );
-
-				final Iterator<RDFNode> queryParamsIterator = queryParamsList.as( RDFList.class ).iterator();
-				final List<RESTEndpoint.Parameter> params = new ArrayList<>();
-				while ( queryParamsIterator.hasNext() ) {
-					final RDFNode x = queryParamsIterator.next();
-					if ( ! x.isResource() )
-						throw new IllegalArgumentException( "One of the query parameters of " + iface.toString() + " is not a resource (but, probably, a literal instead)." );
-
-					final Resource p = x.asResource();
-					final String name = ModelUtils.getSingleMandatoryProperty_XSDString(p, FDVocab.paramName);
-					final String type = getAsURIString( ModelUtils.getSingleMandatoryProperty(p, FDVocab.paramType) );
-					if ( type == null )
-						throw new IllegalArgumentException();
-
-					final RDFDatatype dt;
-					if ( XSDDatatype.XSDstring.getURI().equals(type) ) {
-						dt = XSDDatatype.XSDstring;
-					}
-					else if ( XSDDatatype.XSDinteger.getURI().equals(type) ) {
-						dt = XSDDatatype.XSDinteger;
-					}
-					else if ( XSDDatatype.XSDfloat.getURI().equals(type) ) {
-						dt = XSDDatatype.XSDfloat;
-					}
-					else if ( XSDDatatype.XSDdouble.getURI().equals(type) ) {
-						dt = XSDDatatype.XSDdouble;
-					}
-					else {
-						throw new IllegalArgumentException("Unexpected data type for query parameter: " +  type.toString() );
-					}
-
-					final RESTEndpoint.Parameter param = new RESTEndpoint.Parameter() {
-						@Override public String getName() { return name; }
-						@Override public RDFDatatype getType() { return dt; }
-					};
-
-					params.add(param);
-				}
-
-				final Resource wrapper = ModelUtils.getSingleMandatoryResourceProperty( fedMember, FDVocab.wrapper );
-
-				final FederationMember fm = createWrappedRESTEndpoint(addrStr, params);
-				membersByURI.put(addrStr, fm);
-			}
-			else {
-				throw new IllegalArgumentException( ifaceType.toString() );
-			}
+			return createWrappedRESTEndpoint(addrStr, params);
+		}
+		else {
+			throw new IllegalArgumentException( ifaceType.toString() );
 		}
 	}
 

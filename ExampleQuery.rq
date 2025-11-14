@@ -1,5 +1,6 @@
 PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
 PREFIX owl:    <http://www.w3.org/2002/07/owl#>
 PREFIX dbo:    <http://dbpedia.org/ontology/>
 PREFIX ex:     <http://example.org/>
@@ -19,10 +20,11 @@ PREFIX ex:     <http://example.org/>
 #}
 
 SELECT * WHERE {
-	BIND ( 52.52 AS ?lat )
-	BIND ( 13.41 AS ?long )
+	BIND ( "52.52"^^xsd:double AS ?lat )
+	BIND ( "13.41"^^xsd:double AS ?long )
 	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
 	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat, ?long, ?req) {
+	#SERVICE <https://api.open-meteo.com/v1/forecast/WithFixedParams> {
 		?x ex:temperature ?temp .
 		?x ex:windSpeed ?wind .
 	}
