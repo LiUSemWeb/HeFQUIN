@@ -1,0 +1,126 @@
+package se.liu.ida.hefquin.federation.members.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.ResultSet;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
+import se.liu.ida.hefquin.federation.members.RESTEndpoint;
+import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
+import se.liu.ida.hefquin.jenaintegration.HeFQUINConstants;
+
+public class WrappedRESTEndpointImpl extends RESTEndpointImpl
+                                     implements WrappedRESTEndpoint
+{
+	public WrappedRESTEndpointImpl( final String url, final List<RESTEndpoint.Parameter> params ) {
+		super(url, params);
+	}
+
+	@Override
+	public String toString() { return "Wrapped REST endpoint at " + url; }
+
+	@Override
+	public boolean equals( final Object o ) {
+		return super.equals(o);
+	}
+
+	@Override
+	public List<SolutionMapping> evaluatePatternOverRDFView( final SPARQLGraphPattern pattern,
+	                                                         final String data )
+			throws DataConversionException
+	{
+		final Dataset ds = convertResponseDataIntoRDF(data, pattern);
+
+		final Query q = new Query();
+		q.setQuerySelectType();
+		q.setQueryResultStar(true);
+		q.setQueryPattern( QueryPatternUtils.convertToJenaElement(pattern) );
+
+		final QueryExecution qe = QueryExecution
+				.dataset(ds)
+				.query(q)
+				.set(HeFQUINConstants.sysExecuteWithJena, true)
+				.build();
+
+		final ResultSet rs = qe.execSelect();
+		final List<SolutionMapping> solmaps = new ArrayList<>();
+		while ( rs.hasNext() ) {
+			final SolutionMapping sm = new SolutionMappingImpl( rs.nextBinding() );
+			solmaps.add(sm);
+		}
+
+		rs.close();
+
+		return solmaps;
+	}
+
+	/**
+	 * Assuming the given string is the content of a response retrieved
+	 * when issuing a request to this REST endpoint, this method returns
+	 * an RDF view of this content.
+	 * <p>
+	 * A SPARQL graph pattern can be passed as an optional parameter to let
+	 * the wrapper know which pattern is intended to be evaluated over the
+	 * returned data. Some wrapper implementations may use this pattern to
+	 * reduce their effort of converting the retrieved data into RDF by
+	 * considering only the conversion rules that may produce RDF triples
+	 * relevant to the given pattern. Wrapper implementations that do so
+	 * have to guarantee that this does not have any effect on the result
+	 * of evaluating the given pattern over the returned RDF triples.
+	 *
+	 * @param data - the content of a response retrieved via a
+	 *               successful request to this REST endpoint
+	 * @param pattern - the pattern that is intended to be evaluated over
+	 *                  the returned RDF data; may be {@code null}
+	 * @return an RDF dataset that represents the given data
+	 * @throws DataConversionException if the conversion into RDF fails
+	 */
+	public Dataset convertResponseDataIntoRDF( final String data,
+	                                           final SPARQLGraphPattern pattern )
+			throws DataConversionException
+	{
+		final ObjectMapper mapper = new ObjectMapper();
+		final JsonNode rootNode;
+		try {
+			rootNode = mapper.readTree(data);
+		}
+		catch ( final JsonProcessingException e ) {
+			throw new DataConversionException( "Failure parsing a JSON response: " + e.getMessage(), e );
+		}
+
+		final JsonNode currentNode = rootNode.get("current");
+		final JsonNode tempNode = currentNode.get("temperature_2m");
+		final JsonNode windNode = currentNode.get("wind_speed_10m");
+
+		final double temp = tempNode.asDouble();
+		final double wind = windNode.asDouble();
+
+		final Dataset ds = DatasetFactory.create();
+		final Graph g = ds.asDatasetGraph().getDefaultGraph();
+		final Node bn = NodeFactory.createBlankNode();
+		g.add( bn,
+		       NodeFactory.createURI("http://example.org/temperature"),
+		       NodeFactory.createLiteralByValue(temp) );
+		g.add( bn,
+		       NodeFactory.createURI("http://example.org/windSpeed"),
+		       NodeFactory.createLiteralByValue(wind) );
+
+		return ds;
+	}
+
+}

@@ -9,6 +9,8 @@ public interface RESTEndpoint extends FederationMember
 	/** Returns the URL of this REST endpoint. */
 	String getURL();
 
+	int getNumberOfParameters();
+
 	Iterable<Parameter> getParameters();
 
 	public interface Parameter {

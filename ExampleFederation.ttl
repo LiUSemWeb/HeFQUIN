@@ -24,12 +24,13 @@ ex:europaSPARQL
                      fd:endpointAddress <https://data.europa.eu/sparql> ] .
 
 ex:openMeteo
-      a            fd:FederationMember ;
+      a            fd:WrappedFederationMember ;
       fd:interface [ a                  fd:RESTInterface ;
                      fd:endpointAddress <https://api.open-meteo.com/v1/forecast> ;
                      fd:queryParameters ( [ fd:paramName "latitude" ; fd:paramType xsd:float ]
                                           [ fd:paramName "longitude" ; fd:paramType xsd:float ]
-                                          [ fd:paramName "current" ; fd:paramType xsd:string ] ) ] .
+                                          [ fd:paramName "current" ; fd:paramType xsd:string ] ) ] ;
+      fd:wrapper [ a rdf:Resource ].
 
 #ex:neo4jTest
 #      a            fd:FederationMember ;

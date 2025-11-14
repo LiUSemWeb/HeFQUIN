@@ -17,12 +17,13 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.SPARQLOverRESTRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
-import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
+import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
 import java.util.Objects;
 
@@ -87,7 +88,7 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		else if ( fm instanceof BRTPFServer brtpf && req instanceof BindingsRestrictedTriplePatternRequest brtpreq ) {
 			return new ExecOpRequestBRTPF(brtpreq, brtpf, collectExceptions, qpInfo);
 		}
-		else if ( fm instanceof RESTEndpoint ep && req instanceof SPARQLRequest sreq ) {
+		else if ( fm instanceof WrappedRESTEndpoint ep && req instanceof SPARQLOverRESTRequest sreq ) {
 			return new ExecOpRequestOther(sreq, ep, collectExceptions, qpInfo);
 		}
 		else
@@ -108,7 +109,15 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
-			return ( lop instanceof LogicalOpRequest );
+			if ( lop instanceof LogicalOpRequest reqOp ) {
+				if ( reqOp.getRequest() instanceof SPARQLOverRESTRequest req ) {
+					return ( req.getParamVars() == null || req.getParamVars().isEmpty() );
+				}
+				else
+					return true;
+			}
+			else
+				return false;
 		}
 
 		@Override

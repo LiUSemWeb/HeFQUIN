@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -94,6 +93,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 				continue;
 			}
 
+			if ( req == null )
+				continue;
+
 			final CompletableFuture<RespType> futureResponse;
 			try {
 				futureResponse = issueRequest( req, execCxt.getFederationAccessMgr() );
@@ -175,22 +177,21 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 		public void accept( final RespType response ) {
 			// if extractSolMaps throws an UnsupportedOperationDueToRetrievalError, we want to create an
 			// ExecOpExecutionException and pass this exception to recordExceptionCaughtDuringExecution
-			final Iterable<SolutionMapping> solutionMappings;
+			final Iterable<SolutionMapping> solmaps;
 			try {
-				solutionMappings = extractSolMaps( response );
+				solmaps = extractSolMaps( response );
 			} catch( UnsupportedOperationDueToRetrievalError e ) {
 				final ExecOpExecutionException ex = new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, op );
 				recordExceptionCaughtDuringExecution( ex );
 				return;
 			}
 
-			for ( final SolutionMapping fetchedSM : solutionMappings ) {
-				final SolutionMapping out = SolutionMappingUtils.merge( sm, fetchedSM );
-				sink.send( out );
-			}
+			processExtractedSolMaps(solmaps);
 		}
 
 		protected abstract Iterable<SolutionMapping> extractSolMaps( RespType response ) throws UnsupportedOperationDueToRetrievalError;
+
+		protected abstract void processExtractedSolMaps( final Iterable<SolutionMapping> solmaps );
 	}
 
 }

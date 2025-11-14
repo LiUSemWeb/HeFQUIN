@@ -22,6 +22,9 @@ public class RESTEndpointImpl extends BaseForFederationMember
 	public String getURL() { return url; }
 
 	@Override
+	public int getNumberOfParameters() { return params.size(); }
+
+	@Override
 	public Iterable<Parameter> getParameters() { return params; }
 
 	@Override

@@ -6,42 +6,34 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpLookupJoinViaWrapper;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
-import se.liu.ida.hefquin.federation.members.WrappedFederationMember;
-import se.liu.ida.hefquin.federation.wrappers.MaterializingWrapper;
-import se.liu.ida.hefquin.federation.wrappers.Wrapper;
+import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
 /**
  * A physical operator that .. TODO
  */
-public class PhysicalOpBindJoinViaMaterializingWrapper extends BaseForPhysicalOpSingleInputJoin
+public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInputJoin
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected PhysicalOpBindJoinViaMaterializingWrapper( final LogicalOpGPAdd lop ) {
+	protected PhysicalOpLookupJoinViaWrapper( final LogicalOpGPAdd lop ) {
 		super(lop);
 
 		// checks
 		assert lop.hasParameterVariables();
-		assert lop.getFederationMember() instanceof WrappedFederationMember;
-
-		// further checks
-		final WrappedFederationMember wfm = (WrappedFederationMember) lop.getFederationMember();
-		final Wrapper wrapper = wfm.getWrapper();
-		assert wrapper instanceof MaterializingWrapper;
-		assert wrapper.isSupportedPattern( lop.getPattern() );
-		assert wrapper.isSupportedNumberOfArguments( lop.numberOfParameterVariables() );
+		assert lop.getFederationMember() instanceof WrappedRESTEndpoint;
 	}
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpBindJoinViaMaterializingWrapper oo && oo.lop.equals(lop);
+		return o instanceof PhysicalOpLookupJoinViaWrapper oo && oo.lop.equals(lop);
 	}
 
 	@Override
@@ -50,14 +42,11 @@ public class PhysicalOpBindJoinViaMaterializingWrapper extends BaseForPhysicalOp
 	                                       final ExpectedVariables ... inputVars )
 	{
 		final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
-		final WrappedFederationMember wfm = (WrappedFederationMember) gpAdd.getFederationMember();
-		final MaterializingWrapper wrapper = (MaterializingWrapper) wfm.getWrapper();
+		final WrappedRESTEndpoint ep = (WrappedRESTEndpoint) gpAdd.getFederationMember();
 
-		gpAdd.getPattern();
-		gpAdd.getParameterVariables();
-
-// TODO
-		return null;
+		return new ExecOpLookupJoinViaWrapper( gpAdd.getPattern(),
+		                                       gpAdd.getParameterVariables(),
+		                                       ep, collectExceptions, qpInfo );
 	}
 
 	@Override
@@ -67,7 +56,7 @@ public class PhysicalOpBindJoinViaMaterializingWrapper extends BaseForPhysicalOp
 
 	@Override
 	public String toString() {
-		return "> wrapper-based bind join " + "(" + getID() + ") " +  lop.toString();
+		return "> wrapper-based lookup join " + "(" + getID() + ") " +  lop.toString();
 	}
 
 	public static class Factory implements PhysicalOpFactory
@@ -79,10 +68,9 @@ public class PhysicalOpBindJoinViaMaterializingWrapper extends BaseForPhysicalOp
 
 			if(    lop instanceof LogicalOpGPAdd gpAdd
 			    && gpAdd.hasParameterVariables()
-			    && gpAdd.getFederationMember() instanceof WrappedFederationMember wfm
-			    && wfm.getWrapper() instanceof MaterializingWrapper wrapper
-			    && wrapper.isSupportedNumberOfArguments(gpAdd.numberOfParameterVariables())
-			    && wrapper.isSupportedPattern(gpAdd.getPattern()) ) {
+			    && gpAdd.getFederationMember() instanceof WrappedRESTEndpoint ep
+			    && ep.getNumberOfParameters() == gpAdd.getParameterVariables().size()
+			    && ep.isSupportedPattern(gpAdd.getPattern()) ) {
 				// check that each of the parameter variables is certainly bound
 				final Set<Var> certainInputVars = inputVars[0].getCertainVariables();
 				for ( final Var v : gpAdd.getParameterVariables() ) {
@@ -97,9 +85,9 @@ public class PhysicalOpBindJoinViaMaterializingWrapper extends BaseForPhysicalOp
 		}
 
 		@Override
-		public PhysicalOpBindJoinViaMaterializingWrapper create( final UnaryLogicalOp lop ) {
+		public PhysicalOpLookupJoinViaWrapper create( final UnaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
-				return new PhysicalOpBindJoinViaMaterializingWrapper(op);
+				return new PhysicalOpLookupJoinViaWrapper(op);
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );

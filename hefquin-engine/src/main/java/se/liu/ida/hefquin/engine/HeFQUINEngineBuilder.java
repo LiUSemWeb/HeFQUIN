@@ -33,7 +33,7 @@ import se.liu.ida.hefquin.federation.catalog.FederationDescriptionReader;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 import se.liu.ida.hefquin.jenaext.sparql.engine.main.QueryEngineMainForHeFQUIN;
 import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
-import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
+import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINEngineConstants;
 import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
 /**
@@ -237,7 +237,7 @@ public class HeFQUINEngineBuilder
 		final OpExecutorFactory factory = new OpExecutorFactory() {
 			@Override
 			public OpExecutor create( final ExecutionContext execCxt ) {
-				final Boolean b = execCxt.getContext().get( HeFQUINConstants.sysExecuteWithJena );
+				final Boolean b = execCxt.getContext().get( HeFQUINEngineConstants.sysExecuteWithJena );
 				if ( b != null && b == true )
 					return OpExecutor.stdFactory.create(execCxt);
 

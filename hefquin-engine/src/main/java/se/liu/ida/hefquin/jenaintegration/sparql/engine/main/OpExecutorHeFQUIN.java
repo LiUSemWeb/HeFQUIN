@@ -6,6 +6,7 @@ import org.apache.jena.query.QueryExecException;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVisitorBase;
 import org.apache.jena.sparql.algebra.op.*;
+import org.apache.jena.sparql.algebra.table.Table1;
 import org.apache.jena.sparql.algebra.walker.WalkerVisitorSkipService;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.QueryIterator;
@@ -20,7 +21,7 @@ import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl;
-import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
+import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINEngineConstants;
 
 public class OpExecutorHeFQUIN extends OpExecutor
 {
@@ -159,8 +160,8 @@ public class OpExecutorHeFQUIN extends OpExecutor
 				opForStage = op;
 			}
 			else {
-				// TODO: apply binding to op
-				throw new UnsupportedOperationException();
+				final OpTable opTable = OpTable.create( new Table1(binding) );
+				opForStage = OpJoin.create(opTable, op);
 			}
 
 			final MaterializingQueryResultSinkImpl sink = new MaterializingQueryResultSinkImpl();
@@ -173,7 +174,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 				throw new QueryExecException("Processing the query operator using HeFQUIN failed.", ex);
 			}
 
-			execCxt.getContext().set( HeFQUINConstants.sysQProcStatsAndExceptions,
+			execCxt.getContext().set( HeFQUINEngineConstants.sysQProcStatsAndExceptions,
 			                          statsAndExceptions );
 
 			return new WrappingQueryIterator( sink.getSolMapsIter() );

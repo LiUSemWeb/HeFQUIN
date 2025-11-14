@@ -34,9 +34,9 @@ import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.impl.BRTPFServerImpl;
 import se.liu.ida.hefquin.federation.members.impl.GraphQLEndpointImpl;
 import se.liu.ida.hefquin.federation.members.impl.Neo4jServerImpl;
-import se.liu.ida.hefquin.federation.members.impl.RESTEndpointImpl;
 import se.liu.ida.hefquin.federation.members.impl.SPARQLEndpointImpl;
 import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
+import se.liu.ida.hefquin.federation.members.impl.WrappedRESTEndpointImpl;
 import se.liu.ida.hefquin.jenaext.ModelUtils;
 import se.liu.ida.hefquin.vocabulary.FDVocab;
 
@@ -64,7 +64,17 @@ public class FederationDescriptionReader
 		final Map<String, FederationMember> membersByURI = new HashMap<>();
 
 		// Iterate over all federation members mentioned in the description
-		final ResIterator fedMembers = fd.listResourcesWithProperty(RDF.type, FDVocab.FederationMember);
+		addFederationMembers( fd.listResourcesWithProperty(RDF.type, FDVocab.FederationMember),
+		                      fd, membersByURI );
+		addFederationMembers( fd.listResourcesWithProperty(RDF.type, FDVocab.WrappedFederationMember),
+		                      fd, membersByURI );
+
+		return new FederationCatalogImpl(membersByURI);
+	}
+
+	protected void addFederationMembers( final ResIterator fedMembers,
+	                                     final Model fd,
+	                                     final Map<String, FederationMember> membersByURI ) {
 		while ( fedMembers.hasNext() ) {
 			final Resource fedMember = fedMembers.next();
 			final VocabularyMapping vocabMap = parseVocabMapping(fedMember, fd);
@@ -225,16 +235,15 @@ public class FederationDescriptionReader
 					params.add(param);
 				}
 
-				final FederationMember fm = createRESTEndpoint(addrStr, params);
+				final Resource wrapper = ModelUtils.getSingleMandatoryResourceProperty( fedMember, FDVocab.wrapper );
+
+				final FederationMember fm = createWrappedRESTEndpoint(addrStr, params);
 				membersByURI.put(addrStr, fm);
 			}
 			else {
 				throw new IllegalArgumentException( ifaceType.toString() );
 			}
-
 		}
-
-		return new FederationCatalogImpl(membersByURI);
 	}
 
 	/**
@@ -314,10 +323,10 @@ public class FederationDescriptionReader
 		return new GraphQLEndpointImpl(uri, schema);
 	}
 
-	protected FederationMember createRESTEndpoint( final String uri,
+	protected FederationMember createWrappedRESTEndpoint( final String uri,
 	                                               final List<RESTEndpoint.Parameter> params ) {
 		verifyExpectedURI(uri);
-		return new RESTEndpointImpl(uri, params);
+		return new WrappedRESTEndpointImpl(uri, params);
 	}
 
 	/**
