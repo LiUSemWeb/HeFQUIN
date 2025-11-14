@@ -9,17 +9,23 @@ import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.Quality;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNullaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedInput;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFixedInput;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.members.RDFBasedFederationMember;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINALITY;
 
@@ -71,14 +77,29 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		// Without any relevant nullary subplans there is nothing to do here.
 		if ( subPlans.isEmpty() ) return;
 
-		// As input for method that adds cardinality estimates to the
-		// extracted subplans, obtain the request operator and the
-		// QueryPlanningInfo object of each of these subplans.
+		// As input for the method that adds cardinality estimates to
+		// the extracted subplans, obtain the request operator and the
+		// QueryPlanningInfo object of each of these subplans (and,
+		// also, handle the special case of fixed-input operators).
 		final List<LogicalOpRequest<?,?>> reqOps  = new ArrayList<>( subPlans.size() );
 		final List<QueryPlanningInfo> infoObjs    = new ArrayList<>( subPlans.size() );
-		for ( final LogicalPlan subPlan : subPlans ) {
-			reqOps.add( (LogicalOpRequest<?,?>) subPlan.getRootOperator() );
-			infoObjs.add( subPlan.getQueryPlanningInfo() );
+		for ( final LogicalPlan subPlan : subPlans )
+		{
+			final LogicalOperator rootOp = subPlan.getRootOperator();
+			if (    rootOp instanceof LogicalOpRequest reqOp
+			     && reqOp.getFederationMember() instanceof RDFBasedFederationMember ) {
+				reqOps.add( reqOp );
+				infoObjs.add( subPlan.getQueryPlanningInfo() );
+			}
+			else if ( rootOp instanceof LogicalOpRequest reqOp ) {
+				addCardinalityForRequestViaWrapper( subPlan.getQueryPlanningInfo(), reqOp );
+			}
+			else if ( rootOp instanceof LogicalOpFixedInput finOp ) {
+				addCardinalityForFixedInputOps( subPlan.getQueryPlanningInfo() );
+			}
+			else {
+				throw new IllegalArgumentException( "Unexpected type of operator: " + rootOp.getClass().getName() );
+			}
 		}
 
 		// Now we are ready to add the cardinality estimates.
@@ -101,13 +122,22 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 
 		// As input for method that adds cardinality estimates to the
 		// extracted subplans, obtain the request operator and the
-		// QueryPlanningInfo object of each of these subplans.
+		// QueryPlanningInfo object of each of these subplans (and,
+		// also, handle the special case of fixed-input operators).
 		final List<LogicalOpRequest<?,?>> reqOps  = new ArrayList<>( subPlans.size() );
 		final List<QueryPlanningInfo> infoObjs    = new ArrayList<>( subPlans.size() );
 		for ( final PhysicalPlan subPlan : subPlans ) {
-			final PhysicalOpRequest<?,?> popReq = (PhysicalOpRequest<?,?>) subPlan.getRootOperator();
-			reqOps.add( popReq.getLogicalOperator() );
-			infoObjs.add( subPlan.getQueryPlanningInfo() );
+			final PhysicalOperator rootOp = subPlan.getRootOperator();
+			if ( rootOp instanceof PhysicalOpRequest reqOp ) {
+				reqOps.add( reqOp.getLogicalOperator() );
+				infoObjs.add( subPlan.getQueryPlanningInfo() );
+			}
+			else if ( rootOp instanceof PhysicalOpFixedInput finOp ) {
+				addCardinalityForFixedInputOps( subPlan.getQueryPlanningInfo() );
+			}
+			else {
+				throw new IllegalArgumentException( "Unexpected type of operator: " + rootOp.getClass().getName() );
+			}
 		}
 
 		// Now we are ready to add the cardinality estimates.
@@ -212,6 +242,32 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 			infoObj.addProperty( QueryPlanProperty.maxCardinality(maxCardValue,
 			                                                      maxCardQuality) );
 		}
+	}
+
+	/**
+	 * Populates the given {@link QueryPlanningInfo} object with cardinality
+	 * information, assuming that this object is for a plan with a request
+	 * operator that has a wrapped endpoint as its federation member.
+	 */
+	protected void addCardinalityForRequestViaWrapper( final QueryPlanningInfo qpInfo,
+	                                                   final LogicalOpRequest<?,?> reqOp ) {
+		assert reqOp.getFederationMember() instanceof WrappedRESTEndpoint;
+
+		qpInfo.addProperty( QueryPlanProperty.cardinality(99, Quality.PURE_GUESS) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(Integer.MAX_VALUE, Quality.MIN_OR_MAX_POSSIBLE) );
+	}
+
+	/**
+	 * Populates the given {@link QueryPlanningInfo} object with cardinality
+	 * information, assuming that this object is for a plan with a fixed-input
+	 * operator (see {@link LogicalOpFixedInput}).
+	 */
+	protected void addCardinalityForFixedInputOps( final QueryPlanningInfo qpInfo ) {
+		// Fixed-input operators produce exactly one solution mapping.
+		qpInfo.addProperty( QueryPlanProperty.cardinality(1, Quality.ACCURATE) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(1, Quality.ACCURATE) );
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(1, Quality.ACCURATE) );
 	}
 
 	/**

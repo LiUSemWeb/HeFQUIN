@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.io.PrintStream;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.sparql.core.Var;
@@ -105,18 +106,6 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( "  - parameter variables:" );
-			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) op.getLogicalOperator();
-			if ( gpAdd.hasParameterVariables() ) {
-				for ( final Var v : gpAdd.getParameterVariables() )
-					out.append( " " + v.toString() );
-			}
-			else {
-				out.append( " none" );
-			}
-			out.append( System.lineSeparator() );
 
 			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
@@ -377,6 +366,9 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelStringForOpDetail + "  - solmap: " + op.getLogicalOperator().getSolutionMapping().toString() );
 			out.append( System.lineSeparator() );
 
+			printExpectedVariables( indentLevelStringForOpDetail );
+			printQueryPlanningInfo( indentLevelStringForOpDetail );
+
 			out.append( indentLevelStringForOpDetail );
 			out.append( System.lineSeparator() );
 		}
@@ -399,19 +391,40 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			final LogicalOperator lop = pop.getLogicalOperator();
 			final FederationMember fm;
 			final SPARQLGraphPattern gp;
+			final List<Var> paramVars;
 			if ( lop instanceof LogicalOpGPAdd addOp ) {
 				fm = addOp.getFederationMember();
 				gp = addOp.getPattern();
+
+				if ( addOp.hasParameterVariables() )
+					paramVars = addOp.getParameterVariables();
+				else
+					paramVars = null;
 			}
 			else if ( lop instanceof LogicalOpGPOptAdd addOp ) {
 				fm = addOp.getFederationMember();
 				gp = addOp.getPattern();
+				paramVars = null;
 			}
 			else {
 				throw new IllegalArgumentException( "Unexpected logical operator: " + lop.getClass().getName() );
 			}
 
 			printFederationMember( fm, indentLevelStringForOpDetail + singleBase, out );
+
+			if ( pop instanceof PhysicalOpLookupJoinViaWrapper ) {
+				out.append( indentLevelStringForOpDetail + singleBase );
+				out.append( "  - parameter variables:" );
+				if ( paramVars != null ) {
+					for ( final Var v : paramVars )
+						out.append( " " + v.toString() );
+				}
+				else {
+					out.append( " none" );
+				}
+				out.append( System.lineSeparator() );
+			}
+
 			printSPARQLGraphPattern( gp, indentLevelStringForOpDetail + singleBase );
 		}
 	}

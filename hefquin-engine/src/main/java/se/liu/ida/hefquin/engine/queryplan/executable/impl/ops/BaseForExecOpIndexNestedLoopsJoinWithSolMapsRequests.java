@@ -18,9 +18,10 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<Query
 {
 	public BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests( final QueryType query,
 	                                                             final MemberType fm,
+	                                                             final int batchSize,
 	                                                             final boolean collectExceptions,
 	                                                             final QueryPlanningInfo qpInfo ) {
-		super(query, fm, collectExceptions, qpInfo);
+		super(query, fm, batchSize, collectExceptions, qpInfo);
 	}
 
 	@Override

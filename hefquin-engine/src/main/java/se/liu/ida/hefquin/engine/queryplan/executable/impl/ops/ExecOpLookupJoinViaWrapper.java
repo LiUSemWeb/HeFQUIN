@@ -11,9 +11,9 @@ import org.apache.jena.sparql.exec.http.Params;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
@@ -33,6 +33,10 @@ public class ExecOpLookupJoinViaWrapper
 {
 	protected final List<Var> paramVars;
 
+	// statistics
+	private long numberOfOutputMappingsProduced = 0L;
+	private int numberOfDataConversionExceptions = 0;
+
 	public ExecOpLookupJoinViaWrapper( final SPARQLGraphPattern pattern,
 	                                   final List<Var> paramVars,
 	                                   final WrappedRESTEndpoint fm,
@@ -49,8 +53,12 @@ public class ExecOpLookupJoinViaWrapper
 
 	@Override
 	protected RESTRequest createRequest( final SolutionMapping sm )
-			throws VariableByBlankNodeSubstitutionException
 	{
+// TODO: Use a cache for cases in which otherwise the same request would be created and issued multiple times.
+		if ( paramVars == null ) {
+			return new RESTRequestImpl( fm.getURL() );
+		}
+
 		final Params params = Params.create();
 
 		final Iterator<RESTEndpoint.Parameter> itParamDecl = fm.getParameters().iterator();
@@ -92,6 +100,7 @@ public class ExecOpLookupJoinViaWrapper
 					return fm.evaluatePatternOverRDFView(query, data);
 				}
 				catch ( final DataConversionException e ) {
+					numberOfDataConversionExceptions++;
 					throw new UnsupportedOperationDueToRetrievalError("Converting the reponse of a REST request into RDF failed.", e, null, fm);
 				}
 			}
@@ -102,10 +111,26 @@ public class ExecOpLookupJoinViaWrapper
 					if ( SolutionMappingUtils.compatible(fetchedSM, sm) ) {
 						final SolutionMapping out = SolutionMappingUtils.merge(sm, fetchedSM);
 						sink.send(out);
+						numberOfOutputMappingsProduced++;
 					}
 				}
 			}
 		};
+	}
+
+	@Override
+	public void resetStats() {
+		super.resetStats();
+		numberOfOutputMappingsProduced = 0L;
+		numberOfDataConversionExceptions = 0;
+	}
+
+	@Override
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "numberOfDataConversionExceptions",  numberOfDataConversionExceptions );
+		s.put( "numberOfOutputMappingsProduced",    numberOfOutputMappingsProduced );
+		return s;
 	}
 
 }

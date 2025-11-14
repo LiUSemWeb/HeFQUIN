@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
@@ -27,7 +28,6 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 		super(lop);
 
 		// checks
-		assert lop.hasParameterVariables();
 		assert lop.getFederationMember() instanceof WrappedRESTEndpoint;
 	}
 
@@ -44,8 +44,14 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 		final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
 		final WrappedRESTEndpoint ep = (WrappedRESTEndpoint) gpAdd.getFederationMember();
 
+		final List<Var> paramVars;
+		if ( gpAdd.hasParameterVariables() )
+			paramVars = gpAdd.getParameterVariables();
+		else
+			paramVars = null;
+
 		return new ExecOpLookupJoinViaWrapper( gpAdd.getPattern(),
-		                                       gpAdd.getParameterVariables(),
+		                                       paramVars,
 		                                       ep, collectExceptions, qpInfo );
 	}
 
@@ -67,21 +73,31 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 			assert inputVars.length == 1;
 
 			if(    lop instanceof LogicalOpGPAdd gpAdd
-			    && gpAdd.hasParameterVariables()
 			    && gpAdd.getFederationMember() instanceof WrappedRESTEndpoint ep
-			    && ep.getNumberOfParameters() == gpAdd.getParameterVariables().size()
-			    && ep.isSupportedPattern(gpAdd.getPattern()) ) {
-				// check that each of the parameter variables is certainly bound
-				final Set<Var> certainInputVars = inputVars[0].getCertainVariables();
-				for ( final Var v : gpAdd.getParameterVariables() ) {
-					if ( ! certainInputVars.contains(v) )
+			    && ep.isSupportedPattern(gpAdd.getPattern()) )
+			{
+				if ( gpAdd.hasParameterVariables() ) {
+					final List<Var> paramVars = gpAdd.getParameterVariables();
+
+					if ( ep.getNumberOfParameters() != paramVars.size() )
 						return false;
+
+					// check that each of the parameter variables is certainly bound
+					final Set<Var> certainInputVars = inputVars[0].getCertainVariables();
+					for ( final Var v : gpAdd.getParameterVariables() ) {
+						if ( ! certainInputVars.contains(v) )
+							return false;
+					}
+
+					return true;
 				}
-
-				return true;
+				else {
+					return ( ep.getNumberOfParameters() == 0 );
+				}
 			}
-
-			return false;
+			else {
+				return false;
+			}
 		}
 
 		@Override

@@ -113,6 +113,7 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLOverRESTReque
 		numberOfOutputMappingsProduced = 0L;
 	}
 
+	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
 		s.put( "requestExecTime",                Long.valueOf( timeAtExecEnd - timeAfterResponse ) );

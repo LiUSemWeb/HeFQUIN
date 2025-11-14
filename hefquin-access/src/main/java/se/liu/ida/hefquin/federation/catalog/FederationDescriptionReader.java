@@ -223,6 +223,9 @@ public class FederationDescriptionReader
 					else if ( XSDDatatype.XSDfloat.getURI().equals(type) ) {
 						dt = XSDDatatype.XSDfloat;
 					}
+					else if ( XSDDatatype.XSDdouble.getURI().equals(type) ) {
+						dt = XSDDatatype.XSDdouble;
+					}
 					else {
 						throw new IllegalArgumentException("Unexpected data type for query parameter: " +  type.toString() );
 					}
