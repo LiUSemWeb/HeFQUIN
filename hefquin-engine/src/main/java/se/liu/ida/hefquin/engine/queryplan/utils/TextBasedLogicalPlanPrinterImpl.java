@@ -242,6 +242,9 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 			out.append( indentLevelStringForOpDetail + "  - solmap: " + op.getSolutionMapping().toString() );
 			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail );
+			out.append( System.lineSeparator() );
 		}
 
 		@Override

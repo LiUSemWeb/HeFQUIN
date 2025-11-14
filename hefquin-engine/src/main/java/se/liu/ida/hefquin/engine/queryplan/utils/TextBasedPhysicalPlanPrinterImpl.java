@@ -100,8 +100,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
-		public void visit( final PhysicalOpBindJoinViaMaterializingWrapper op ) {
-			out.append( indentLevelString + "wrapper-based bind join (" + op.getID() + ") " );
+		public void visit( final PhysicalOpLookupJoinViaWrapper op ) {
+			out.append( indentLevelString + "wrapper-based lookup join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
@@ -363,6 +363,19 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 			printExpectedVariables( indentLevelStringForOpDetail );
 			printQueryPlanningInfo( indentLevelStringForOpDetail );
+
+			out.append( indentLevelStringForOpDetail );
+			out.append( System.lineSeparator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpFixedInput op ) {
+			out.append( indentLevelString + "in (" + op.getID() + ")" );
+			out.append( System.lineSeparator() );
+			printLogicalOperator( op, indentLevelStringForOpDetail, out, np );
+
+			out.append( indentLevelStringForOpDetail + "  - solmap: " + op.getLogicalOperator().getSolutionMapping().toString() );
+			out.append( System.lineSeparator() );
 
 			out.append( indentLevelStringForOpDetail );
 			out.append( System.lineSeparator() );
