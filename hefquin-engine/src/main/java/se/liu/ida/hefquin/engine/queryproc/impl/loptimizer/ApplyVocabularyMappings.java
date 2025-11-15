@@ -60,7 +60,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				return inputPlan;
 			}
 		}
-		else if ( rootOp instanceof LogicalOpFixedInput inputOp )
+		else if ( rootOp instanceof LogicalOpFixedInput )
 		{
 			return inputPlan;
 		}
