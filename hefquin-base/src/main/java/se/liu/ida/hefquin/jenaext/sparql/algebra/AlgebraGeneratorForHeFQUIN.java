@@ -10,6 +10,12 @@ import org.apache.jena.sparql.util.Context;
 import se.liu.ida.hefquin.jenaext.sparql.algebra.op.OpServiceWithParams;
 import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementServiceWithParams;
 
+/**
+ * This class is an extension of Jena's {@link AlgebraGenerator} that
+ * correctly handles {@link ElementService} objects that are of type
+ * {@link ElementServiceWithParams}. These objects are converted into
+ * {@link OpServiceWithParams} objects.
+ */
 public class AlgebraGeneratorForHeFQUIN extends AlgebraGenerator
 {
 	protected final Context context;

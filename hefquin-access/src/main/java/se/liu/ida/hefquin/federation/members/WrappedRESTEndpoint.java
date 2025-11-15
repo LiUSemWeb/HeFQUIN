@@ -5,6 +5,11 @@ import java.util.List;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 
+/**
+ * This interface represents a REST endpoint for which HeFQUIN has a wrapper
+ * via which it is possible evaluate SPARQL graph patterns over an RDF view
+ * of the data obtained from this endpoint.
+ */
 public interface WrappedRESTEndpoint extends RESTEndpoint
 {
 	/**
@@ -23,6 +28,7 @@ public interface WrappedRESTEndpoint extends RESTEndpoint
 	 */
 	List<SolutionMapping> evaluatePatternOverRDFView( SPARQLGraphPattern pattern, String data )
 			throws DataConversionException;
+
 
 	public static class DataConversionException extends Exception {
 		private static final long serialVersionUID = -296979419386626032L;

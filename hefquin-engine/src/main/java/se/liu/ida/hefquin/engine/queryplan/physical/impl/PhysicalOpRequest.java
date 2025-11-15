@@ -108,12 +108,12 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
-			return ( lop instanceof LogicalOpRequest reqOp );
+			return ( lop instanceof LogicalOpRequest );
 		}
 
 		@Override
 		public PhysicalOpRequest<?, ?> create( final NullaryLogicalOp lop ) {
-			if ( lop instanceof  LogicalOpRequest<?,?> op ) {
+			if ( lop instanceof LogicalOpRequest<?,?> op ) {
 				return new PhysicalOpRequest<>(op);
 			}
 

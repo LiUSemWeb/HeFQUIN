@@ -9,20 +9,36 @@ import org.apache.jena.sparql.algebra.op.OpService;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.util.NodeIsomorphismMap;
 
+/**
+ * This class extends {@link OpService} to represent SERVICE clauses that
+ * use PARAMS(...), which is a HeFQUIN-specific extension to SERVICE.
+ */
 public class OpServiceWithParams extends OpService
 {
 	protected final List<Var> paramVars;
 
-	public OpServiceWithParams( final Node serviceNode,
+	/**
+	 * @param n - the service node, an IRI or a variable
+	 * @param subOp - represents the graph pattern inside the SERVICE clause
+	 * @param silent - {@code true} if the SERVICE clause has the SILENT keyword
+	 * @param paramVars - the variables listed inside PARAMS(...)
+	 */
+	public OpServiceWithParams( final Node n,
 	                            final Op subOp,
 	                            final boolean silent,
 	                            final List<Var> paramVars ) {
-		super(serviceNode, subOp, silent);
+		super(n, subOp, silent);
 
 		assert paramVars != null;
 		this.paramVars = paramVars;
 	}
 
+	/**
+	 * Returns the variables listed inside the PARAMS(...) part of the
+	 * SERVICE clause.
+	 *
+	 * @return the variables from the PARAMS(...) part
+	 */
 	public List<Var> getParamVars() {
 		return paramVars;
 	}
@@ -34,7 +50,7 @@ public class OpServiceWithParams extends OpService
 
 	@Override
 	public boolean equalTo( final Op other, final NodeIsomorphismMap labelMap ) {
-		if ( super.equalTo(other, labelMap) == false )
+		if ( ! super.equalTo(other, labelMap) )
 			return false;
 
 		return    other instanceof OpServiceWithParams owp

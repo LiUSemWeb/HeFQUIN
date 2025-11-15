@@ -44,6 +44,12 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 	                                                         final String data )
 			throws DataConversionException
 	{
+		// The idea of this implementation is to materialize the RDF view of
+		// the given data (i.e., convert the data into an RDF graph) and, then
+		// query the RDF view with a SELECT * query that has the given graph
+		// pattern as its WHERE clause, by using the Jena query execution
+		// machinery.
+
 		final Dataset ds = convertResponseDataIntoRDF(data, pattern);
 
 		final Query q = new Query();
