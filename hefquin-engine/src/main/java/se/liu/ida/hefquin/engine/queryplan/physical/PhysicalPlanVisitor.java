@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 public interface PhysicalPlanVisitor
 {
 	void visit( PhysicalOpRequest<?,?> op );
-	void visit( PhysicalOpFixedInput op );
+	void visit( PhysicalOpFixedSolMap op );
 
 	void visit( PhysicalOpBindJoinBRTPF op );
 	void visit( PhysicalOpBindJoinWithVALUES op );

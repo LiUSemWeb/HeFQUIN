@@ -17,7 +17,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedInput;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
@@ -60,7 +60,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				return inputPlan;
 			}
 		}
-		else if ( rootOp instanceof LogicalOpFixedInput )
+		else if ( rootOp instanceof LogicalOpFixedSolMap )
 		{
 			return inputPlan;
 		}

@@ -237,7 +237,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		}
 
 		@Override
-		public void visit( final LogicalOpFixedInput op ) {
+		public void visit( final LogicalOpFixedSolMap op ) {
 			printLogicalOperatorBase( op, indentLevelString, out, np );
 			out.append( System.lineSeparator() );
 

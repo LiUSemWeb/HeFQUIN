@@ -122,7 +122,7 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpRequest<?,?> op )  { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpFixedInput op )    { subplanCount++; }
+		public void visit( final LogicalOpFixedSolMap op )   { subplanCount++; }
 
 		@Override
 		public void visit( final LogicalOpGPAdd op )         { subplanCount++; }

@@ -12,12 +12,12 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.Quality;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNullaryRoot;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedInput;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFixedInput;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
@@ -94,7 +94,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 			else if ( rootOp instanceof LogicalOpRequest reqOp ) {
 				addCardinalityForRequestViaWrapper( subPlan.getQueryPlanningInfo(), reqOp );
 			}
-			else if ( rootOp instanceof LogicalOpFixedInput finOp ) {
+			else if ( rootOp instanceof LogicalOpFixedSolMap finOp ) {
 				addCardinalityForFixedInputOps( subPlan.getQueryPlanningInfo() );
 			}
 			else {
@@ -132,7 +132,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 				reqOps.add( reqOp.getLogicalOperator() );
 				infoObjs.add( subPlan.getQueryPlanningInfo() );
 			}
-			else if ( rootOp instanceof PhysicalOpFixedInput finOp ) {
+			else if ( rootOp instanceof PhysicalOpFixedSolMap finOp ) {
 				addCardinalityForFixedInputOps( subPlan.getQueryPlanningInfo() );
 			}
 			else {
@@ -261,7 +261,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 	/**
 	 * Populates the given {@link QueryPlanningInfo} object with cardinality
 	 * information, assuming that this object is for a plan with a fixed-input
-	 * operator (see {@link LogicalOpFixedInput}).
+	 * operator (see {@link LogicalOpFixedSolMap}).
 	 */
 	protected void addCardinalityForFixedInputOps( final QueryPlanningInfo qpInfo ) {
 		// Fixed-input operators produce exactly one solution mapping.

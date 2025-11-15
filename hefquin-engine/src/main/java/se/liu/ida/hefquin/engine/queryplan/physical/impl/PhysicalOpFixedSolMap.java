@@ -10,21 +10,21 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutable
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedInput;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class PhysicalOpFixedInput extends BaseForQueryPlanOperator
-                                  implements NullaryPhysicalOpForLogicalOp
+public class PhysicalOpFixedSolMap extends BaseForQueryPlanOperator
+                                   implements NullaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected final LogicalOpFixedInput lop;
+	protected final LogicalOpFixedSolMap lop;
 
-	protected PhysicalOpFixedInput( final LogicalOpFixedInput lop ) {
+	protected PhysicalOpFixedSolMap( final LogicalOpFixedSolMap lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}
@@ -34,7 +34,7 @@ public class PhysicalOpFixedInput extends BaseForQueryPlanOperator
 		if ( o == this )
 			return true;
 
-		return o instanceof PhysicalOpFixedInput in && in.lop.equals(lop);
+		return o instanceof PhysicalOpFixedSolMap in && in.lop.equals(lop);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class PhysicalOpFixedInput extends BaseForQueryPlanOperator
 
 
 	@Override
-	public LogicalOpFixedInput getLogicalOperator() {
+	public LogicalOpFixedSolMap getLogicalOperator() {
 		return lop;
 	}
 
@@ -75,13 +75,13 @@ public class PhysicalOpFixedInput extends BaseForQueryPlanOperator
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
-			return lop instanceof LogicalOpFixedInput;
+			return lop instanceof LogicalOpFixedSolMap;
 		}
 
 		@Override
-		public PhysicalOpFixedInput create( final NullaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpFixedInput op ) {
-				return new PhysicalOpFixedInput(op);
+		public PhysicalOpFixedSolMap create( final NullaryLogicalOp lop ) {
+			if ( lop instanceof LogicalOpFixedSolMap op ) {
+				return new PhysicalOpFixedSolMap(op);
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );

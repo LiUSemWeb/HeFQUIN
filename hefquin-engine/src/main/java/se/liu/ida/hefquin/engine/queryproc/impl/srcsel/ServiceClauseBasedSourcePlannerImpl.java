@@ -166,7 +166,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 		final Binding sm = jenaOp.getTable().rows().next();
 		final SolutionMapping solmap = new SolutionMappingImpl(sm);
-		final LogicalOpFixedInput rootOp = new LogicalOpFixedInput(solmap);
+		final LogicalOpFixedSolMap rootOp = new LogicalOpFixedSolMap(solmap);
 		return new LogicalPlanWithNullaryRootImpl(rootOp);
 	}
 

@@ -8,7 +8,7 @@ public class LogicalPlanVisitorBase implements LogicalPlanVisitor
 	public void visit( final LogicalOpRequest<?,?> op )      {}
 
 	@Override
-	public void visit( final LogicalOpFixedInput op )        {}
+	public void visit( final LogicalOpFixedSolMap op )       {}
 
 	@Override
 	public void visit( final LogicalOpGPAdd op )             {}

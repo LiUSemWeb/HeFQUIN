@@ -77,7 +77,7 @@ _:bListOfHeuristics
 _:bListOfPhysicalOpFactories
     ec:elementsTypeName "se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory" ;
     ec:elements (
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFixedInput$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFixedSolMap$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind$Factory" ]

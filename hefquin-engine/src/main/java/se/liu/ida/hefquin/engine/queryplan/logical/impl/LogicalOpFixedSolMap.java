@@ -10,13 +10,13 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 
-public class LogicalOpFixedInput extends BaseForQueryPlanOperator
-                                 implements NullaryLogicalOp
+public class LogicalOpFixedSolMap extends BaseForQueryPlanOperator
+                                  implements NullaryLogicalOp
 {
 	protected final SolutionMapping sm;
 	protected final ExpectedVariables expectedVars;
 
-	public LogicalOpFixedInput( final SolutionMapping sm ) {
+	public LogicalOpFixedSolMap( final SolutionMapping sm ) {
 		assert sm!= null;
 
 		this.sm = sm;
@@ -39,7 +39,7 @@ public class LogicalOpFixedInput extends BaseForQueryPlanOperator
 		if ( o == this )
 			return true;
 
-		if (    o instanceof LogicalOpFixedInput fin
+		if (    o instanceof LogicalOpFixedSolMap fin
 		     && fin.getSolutionMapping().equals(sm) )
 			return true;
 
@@ -53,8 +53,8 @@ public class LogicalOpFixedInput extends BaseForQueryPlanOperator
 
 	@Override
 	public String toString(){
-		return "fin" + " (" + getID() + ")"
-		       + "\t - sm (" + sm.toString() + ")";
+		return "sm" + " (" + getID() + ")"
+		       + "\t " + sm.toString();
 	}
 
 	@Override

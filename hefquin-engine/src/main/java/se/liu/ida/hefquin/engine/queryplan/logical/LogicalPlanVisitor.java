@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 public interface LogicalPlanVisitor
 {
 	void visit( final LogicalOpRequest<?,?> op );
-	void visit( final LogicalOpFixedInput op );
+	void visit( final LogicalOpFixedSolMap op );
 
 	void visit( final LogicalOpGPAdd op );
 	void visit( final LogicalOpGPOptAdd op );

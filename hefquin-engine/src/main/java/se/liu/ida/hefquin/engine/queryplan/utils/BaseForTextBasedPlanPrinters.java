@@ -165,7 +165,7 @@ public class BaseForTextBasedPlanPrinters
 		public void visit( final LogicalOpRequest<?, ?> op )    { out.append("req"); }
 
 		@Override
-		public void visit( final LogicalOpFixedInput op )       { out.append("in"); }
+		public void visit( final LogicalOpFixedSolMap op )      { out.append("sm"); }
 
 		@Override
 		public void visit( final LogicalOpGPAdd op )            { out.append("gpAdd"); }

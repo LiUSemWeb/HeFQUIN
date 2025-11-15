@@ -361,8 +361,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
-		public void visit( final PhysicalOpFixedInput op ) {
-			out.append( indentLevelString + "in (" + op.getID() + ")" );
+		public void visit( final PhysicalOpFixedSolMap op ) {
+			out.append( indentLevelString + "sm (" + op.getID() + ")" );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail, out, np );
 
