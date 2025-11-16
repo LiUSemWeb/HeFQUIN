@@ -207,79 +207,79 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	protected static class UnsupportedOpFinder extends OpVisitorBase
 	{
-		protected boolean unsupportedOpFound = false;
+		protected Op unsupportedOp = null;
 
-		public boolean unsupportedOpFound() { return unsupportedOpFound; }
+		public boolean unsupportedOpFound() { return unsupportedOp != null; }
 
-		@Override public void visit(OpBGP opBGP)                  {}
+		public Op getUnsupportedOp() { return unsupportedOp; }
 
-		@Override public void visit(OpQuadPattern quadPattern)    { unsupportedOpFound = true; }
+		@Override public void visit(OpBGP op)          {}
 
-	    @Override public void visit(OpQuadBlock quadBlock)        { unsupportedOpFound = true; }
+		@Override public void visit(OpQuadPattern op)  { unsupportedOp = op; }
 
-	    @Override public void visit(OpTriple opTriple)            { unsupportedOpFound = true; }
+		@Override public void visit(OpQuadBlock op)    { unsupportedOp = op; }
 
-	    @Override public void visit(OpQuad opQuad)                { unsupportedOpFound = true; }
+		@Override public void visit(OpTriple op)       { unsupportedOp = op; }
 
-	    @Override public void visit(OpPath opPath)                { unsupportedOpFound = true; }
+		@Override public void visit(OpQuad op)         { unsupportedOp = op; }
 
-	    @Override public void visit(OpProcedure opProc)           { unsupportedOpFound = true; }
+		@Override public void visit(OpPath op)         { unsupportedOp = op; }
 
-	    @Override public void visit(OpPropFunc opPropFunc)        { unsupportedOpFound = true; }
+		@Override public void visit(OpProcedure op)    { unsupportedOp = op; }
 
-	    @Override public void visit(OpJoin opJoin)                {} // supported
+		@Override public void visit(OpPropFunc op)     { unsupportedOp = op; }
 
-	    @Override public void visit(OpSequence opSequence)        {} // supported
+		@Override public void visit(OpJoin op)         {} // supported
 
-	    @Override public void visit(OpDisjunction opDisjunction)  { unsupportedOpFound = true; }
+		@Override public void visit(OpSequence op)     {} // supported
 
-		@Override public void visit(OpLeftJoin opLeftJoin)        {} // supported
+		@Override public void visit(OpDisjunction op)  { unsupportedOp = op; }
 
-	    @Override public void visit(OpConditional opCond)         {} // supported
+		@Override public void visit(OpLeftJoin op)     {} // supported
 
-	    @Override public void visit(OpMinus opMinus)              { unsupportedOpFound = true; }
+		@Override public void visit(OpConditional op)  {} // supported
 
-	    @Override public void visit(OpUnion opUnion)              {} // supported
+		@Override public void visit(OpMinus op)        { unsupportedOp = op; }
 
-	    @Override public void visit(OpFilter opFilter)            {} // supported
+		@Override public void visit(OpUnion op)        {} // supported
 
-	    @Override public void visit(OpGraph opGraph)              { unsupportedOpFound = true; }
+		@Override public void visit(OpFilter op)       {} // supported
 
-	    @Override public void visit(OpService opService)          {} // supported
+		@Override public void visit(OpGraph op)        { unsupportedOp = op; }
 
-	    @Override public void visit(OpDatasetNames dsNames)       { unsupportedOpFound = true; }
+		@Override public void visit(OpService op)      {} // supported
 
-	    @Override public void visit(OpTable opTable)              { unsupportedOpFound = true; }
+		@Override public void visit(OpDatasetNames op) { unsupportedOp = op; }
 
-	    @Override public void visit(OpExt opExt)                  { unsupportedOpFound = true; }
+		@Override public void visit(OpTable op)        {} // supported
 
-	    @Override public void visit(OpNull opNull)                { unsupportedOpFound = true; }
+		@Override public void visit(OpExt op)          { unsupportedOp = op; }
 
-	    @Override public void visit(OpLabel opLabel)              { unsupportedOpFound = true; }
+		@Override public void visit(OpNull op)         { unsupportedOp = op; }
 
-	    @Override public void visit(OpAssign opAssign)            { unsupportedOpFound = true; }
+		@Override public void visit(OpLabel op)        { unsupportedOp = op; }
 
-	    @Override public void visit(OpExtend opExtend)            {} // supported
+		@Override public void visit(OpAssign op)       { unsupportedOp = op; }
 
-	    @Override public void visit(OpUnfold opUnfold)            { unsupportedOpFound = true; }
+		@Override public void visit(OpExtend op)       {} // supported
 
-	    //@Override public void visit(OpFind opFind)                { unsupportedOpFound = true; }
+		@Override public void visit(OpUnfold op)       { unsupportedOp = op; }
 
-	    @Override public void visit(OpList opList)                { unsupportedOpFound = true; }
+		@Override public void visit(OpList op)         { unsupportedOp = op; }
 
-	    @Override public void visit(OpOrder opOrder)              { unsupportedOpFound = true; }
+		@Override public void visit(OpOrder op)        { unsupportedOp = op; }
 
-	    @Override public void visit(OpProject opProject)          { unsupportedOpFound = true; }
+		@Override public void visit(OpProject op)      { unsupportedOp = op; }
 
-	    @Override public void visit(OpDistinct opDistinct)        { unsupportedOpFound = true; }
+		@Override public void visit(OpDistinct op)     { unsupportedOp = op; }
 
-	    @Override public void visit(OpReduced opReduced)          { unsupportedOpFound = true; }
+		@Override public void visit(OpReduced op)      { unsupportedOp = op; }
 
-	    @Override public void visit(OpSlice opSlice)              { unsupportedOpFound = true; }
+		@Override public void visit(OpSlice op)        { unsupportedOp = op; }
 
-	    @Override public void visit(OpGroup opGroup)              { unsupportedOpFound = true; }
+		@Override public void visit(OpGroup op)        { unsupportedOp = op; }
 
-	    @Override public void visit(OpTopN opTop)                 { unsupportedOpFound = true; }
+		@Override public void visit(OpTopN op)         { unsupportedOp = op; }
 	}
 
 }

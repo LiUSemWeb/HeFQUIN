@@ -109,24 +109,41 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForJoin( final List<Op> ops,
 	                                         final QueryProcContext ctxt ) {
 		// Convert the list of Op objects into a multiway join,
-		// but ignore OpServiceWithParams objects in this step
-		// (but collect them for the next step).
-		final List<OpServiceWithParams> opSWP = new ArrayList<>();
+		// but ignore OpServiceWithParams objects in this step,
+		// as well as OpExtend objects that have an OpTable with
+		// the empty solution mapping as their sub-operator (but
+		// collect them for the next step).
+		final List<OpServiceWithParams> collectedOpSWP = new ArrayList<>();
+		final List<OpExtend> collectedOpExtend = new ArrayList<>();
 		final List<LogicalPlan> subPlans = new ArrayList<>();
 		for ( final Op subOp : ops ) {
 			if ( subOp instanceof OpServiceWithParams opService )
-				opSWP.add(opService);
+				collectedOpSWP.add(opService);
+			else if (    subOp instanceof OpExtend opExtend
+			          && opExtend.getSubOp() instanceof OpTable opTable
+			          && opTable.isJoinIdentity() )
+				collectedOpExtend.add(opExtend);
 			else
 				subPlans.add( createPlan(subOp, ctxt) );
 		}
 
-		if ( subPlans.isEmpty() )
+		if ( subPlans.isEmpty() && collectedOpExtend.isEmpty() )
 			throw new IllegalArgumentException( "Unsupported SERVICE clause: group graph patterns that begin with a SERVICE clause with PARAMS are not supported yet." );
 
-		LogicalPlan plan = mergeIntoMultiwayJoin(subPlans);
+		LogicalPlan plan;
+		if ( ! subPlans.isEmpty() )
+			plan = mergeIntoMultiwayJoin(subPlans);
+		else
+			plan = createPlan( OpTable.unit(), ctxt );
+
+		// Now handle the collected OpExtend objects.
+		for ( final OpExtend opExtend : collectedOpExtend ) {
+			final LogicalOpBind lop = new LogicalOpBind( opExtend.getVarExprList() );
+			plan = new LogicalPlanWithUnaryRootImpl(lop, plan);
+		}
 
 		// Now handle the collected OpServiceWithParams objects.
-		for ( final OpServiceWithParams opService : opSWP ) {
+		for ( final OpServiceWithParams opService : collectedOpSWP ) {
 			plan = createPlanForServiceWithParams(opService, plan, ctxt);
 		}
 

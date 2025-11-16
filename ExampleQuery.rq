@@ -20,11 +20,11 @@ PREFIX ex:     <http://example.org/>
 #	}
 #}
 
-SELECT * WHERE {
-	SERVICE <https://api.open-meteo.com/v1/forecast/WithFixedParams> {
-		?x ex:temperature ?temp .
-		?x ex:windSpeed ?wind . }
-}
+#SELECT * WHERE {
+#	SERVICE <https://api.open-meteo.com/v1/forecast/WithFixedParams> {
+#		?x ex:temperature ?temp .
+#		?x ex:windSpeed ?wind . }
+#}
 
 #SELECT * WHERE {
 #	BIND ( "52.52"^^xsd:float AS ?lat )
@@ -36,16 +36,16 @@ SELECT * WHERE {
 #	}
 #}
 
-#SELECT * WHERE {
-#	SERVICE <http://dbpedia.org/sparql> {
-#		<http://dbpedia.org/resource/Berlin> geo:lat ?lat ; geo:long ?long .
-#	}
-#	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
-#	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat, ?long, ?req) {
-#		?x ex:temperature ?temp .
-#		?x ex:windSpeed ?wind .
-#	}
-#}
+SELECT * WHERE {
+	SERVICE <http://dbpedia.org/sparql> {
+		<http://dbpedia.org/resource/Berlin> geo:lat ?lat ; geo:long ?long .
+	}
+	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
+	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat, ?long, ?req) {
+		?x ex:temperature ?temp .
+		?x ex:windSpeed ?wind .
+	}
+}
 
 # An example query that must take into account vocabulary mappings
 #SELECT * WHERE {
