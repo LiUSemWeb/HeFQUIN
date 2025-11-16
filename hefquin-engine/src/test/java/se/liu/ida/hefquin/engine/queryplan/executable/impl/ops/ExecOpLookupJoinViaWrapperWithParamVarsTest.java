@@ -21,6 +21,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
@@ -28,7 +29,7 @@ import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.federation.members.impl.WrappedRESTEndpointImpl;
 
-public class ExecOpLookupJoinViaWrapperTest extends ExecOpTestBase
+public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 {
 	@Test
 	public void paramVarsAreTheOnlyJoinVars() throws ExecutionException {
@@ -40,7 +41,7 @@ public class ExecOpLookupJoinViaWrapperTest extends ExecOpTestBase
 
 		final Var v = Var.alloc("v");
 
-		final ExecOpLookupJoinViaWrapper op = createOperatorForTest(query, List.of(v) );
+		final UnaryExecutableOp op = createOperatorForTest( query, List.of(v) );
 
 		final Node lit = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
 		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(v, lit);
@@ -79,7 +80,7 @@ public class ExecOpLookupJoinViaWrapperTest extends ExecOpTestBase
 		final Var v = Var.alloc("v");
 		final Var t = Var.alloc("t");
 
-		final ExecOpLookupJoinViaWrapper op = createOperatorForTest(query, List.of(v) );
+		final UnaryExecutableOp op = createOperatorForTest( query, List.of(v) );
 
 		final Node litForV = NodeFactory.createLiteralDT( "0.1", XSDDatatype.XSDdouble );
 		final Node litForT = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
@@ -120,7 +121,7 @@ public class ExecOpLookupJoinViaWrapperTest extends ExecOpTestBase
 		final Var v = Var.alloc("v");
 		final Var t = Var.alloc("t");
 
-		final ExecOpLookupJoinViaWrapper op = createOperatorForTest(query, List.of(v) );
+		final UnaryExecutableOp op = createOperatorForTest( query, List.of(v) );
 
 		final Node litForV = NodeFactory.createLiteralDT( "0.1", XSDDatatype.XSDdouble );
 		final Node litForT = NodeFactory.createLiteralDT( "0.0", XSDDatatype.XSDdouble );
@@ -138,119 +139,27 @@ public class ExecOpLookupJoinViaWrapperTest extends ExecOpTestBase
 		assertFalse( it.hasNext() );
 	}
 
-	@Test
-	public void noParamVarsAndNoJoinVars() throws ExecutionException {
-		final String query =
-				  "SELECT * WHERE {"
-				+ " ?x <http://example.org/temperature> ?t ."
-				+ "}";
-
-		final ExecOpLookupJoinViaWrapper op = createOperatorForTest(query, null);
-
-		final Var v = Var.alloc("v");
-		final Node lit = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
-		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(v, lit);
-
-		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext cxt = getExecContextForTests(null);
-
-		op.process(smIn, sink, cxt);
-		op.concludeExecution(sink, cxt);
-
-		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
-		assertTrue( it.hasNext() );
-
-		final Binding smOut = it.next().asJenaBinding();
-		assertEquals( 3, smOut.size() );
-
-		assertFalse( it.hasNext() );
-	}
-
-	@Test
-	public void noParamVarsButOneJoinVar1() throws ExecutionException {
-		final String query =
-				  "SELECT * WHERE {"
-				+ " ?x <http://example.org/temperature> ?t ."
-				+ "}";
-
-		final ExecOpLookupJoinViaWrapper op = createOperatorForTest(query, null);
-
-		final Var t = Var.alloc("t");
-		final Node lit = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
-		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(t, lit);
-
-		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext cxt = getExecContextForTests(null);
-
-		op.process(smIn, sink, cxt);
-		op.concludeExecution(sink, cxt);
-
-		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
-		assertTrue( it.hasNext() );
-
-		final Binding smOut = it.next().asJenaBinding();
-		assertEquals( 2, smOut.size() );
-
-		assertFalse( it.hasNext() );
-	}
-
-	@Test
-	public void noParamVarsButOneJoinVar2() throws ExecutionException {
-		// The difference to the previous test (noParamVarsButOneJoinVar1)
-		// is that the value that the input solution mapping has for the variable
-		// that is also mentioned in the graph pattern of the operator is not
-		// the same as the value that shall be obtained for the pattern; hence,
-		// the input solution mapping is not compatible with the solution mapping
-		// obtained for the pattern.
-
-		final String query =
-				  "SELECT * WHERE {"
-				+ " ?x <http://example.org/temperature> ?t ."
-				+ "}";
-
-		final ExecOpLookupJoinViaWrapper op = createOperatorForTest(query, null);
-
-		final Var t = Var.alloc("t");
-		final Node lit = NodeFactory.createLiteralDT( "0.0", XSDDatatype.XSDdouble );
-		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(t, lit);
-
-		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext cxt = getExecContextForTests(null);
-
-		op.process(smIn, sink, cxt);
-		op.concludeExecution(sink, cxt);
-
-		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
-		assertFalse( it.hasNext() );
-	}
-
 
 	// -------- helpers ----------
 
-	protected ExecOpLookupJoinViaWrapper createOperatorForTest( final String query,
-	                                                            final List<Var> paramVarsOfEndpoint ) {
+	protected UnaryExecutableOp createOperatorForTest( final String query,
+	                                                   final List<Var> paramVarsOfEndpoint ) {
+		assert paramVarsOfEndpoint.size() == 1;
+
 		final Element el = QueryFactory.create(query).getQueryPattern();
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
 
-		final WrappedRESTEndpoint ep;
-		if ( paramVarsOfEndpoint != null && ! paramVarsOfEndpoint.isEmpty() ) {
-			assert paramVarsOfEndpoint.size() == 1;
+		final RESTEndpoint.Parameter param = new RESTEndpoint.Parameter() {
+			@Override public String getName() { return "lat"; }
+			@Override public RDFDatatype getType() { return XSDDatatype.XSDdouble; }
+		};
 
-			final RESTEndpoint.Parameter param = new RESTEndpoint.Parameter() {
-				@Override public String getName() { return "lat"; }
-				@Override public RDFDatatype getType() { return XSDDatatype.XSDdouble; }
-			};
+		final WrappedRESTEndpoint ep = new WrappedRESTEndpointImpl("http://example.org/", List.of(param) );
 
-			ep = new WrappedRESTEndpointImpl("http://example.org/", List.of(param) );
-		}
-		else {
-			ep = new WrappedRESTEndpointImpl("http://example.org/", null);
-		}
-
-		return new ExecOpLookupJoinViaWrapper( pattern,
-		                                       paramVarsOfEndpoint,
-		                                       ep,
-		                                       false,
-		                                       null );
+		return new ExecOpLookupJoinViaWrapperWithParamVars( pattern,
+		                                                    paramVarsOfEndpoint,
+		                                                    ep,
+		                                                    false,
+		                                                    null );
 	}
 }

@@ -7,7 +7,8 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpLookupJoinViaWrapper;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpLookupJoinViaWrapperWithParamVars;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpLookupJoinViaWrapperWithoutParamVars;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
@@ -44,15 +45,17 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 		final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
 		final WrappedRESTEndpoint ep = (WrappedRESTEndpoint) gpAdd.getFederationMember();
 
-		final List<Var> paramVars;
 		if ( gpAdd.hasParameterVariables() )
-			paramVars = gpAdd.getParameterVariables();
+			return new ExecOpLookupJoinViaWrapperWithParamVars( gpAdd.getPattern(),
+			                                                    gpAdd.getParameterVariables(),
+			                                                    ep,
+			                                                    collectExceptions,
+			                                                    qpInfo );
 		else
-			paramVars = null;
-
-		return new ExecOpLookupJoinViaWrapper( gpAdd.getPattern(),
-		                                       paramVars,
-		                                       ep, collectExceptions, qpInfo );
+			return new ExecOpLookupJoinViaWrapperWithoutParamVars( gpAdd.getPattern(),
+			                                                       ep,
+			                                                       collectExceptions,
+			                                                       qpInfo );
 	}
 
 	@Override

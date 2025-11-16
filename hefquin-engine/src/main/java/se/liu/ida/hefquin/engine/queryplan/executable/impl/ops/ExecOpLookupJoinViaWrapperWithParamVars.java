@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint.DataConversionException;
 
-public class ExecOpLookupJoinViaWrapper
+public class ExecOpLookupJoinViaWrapperWithParamVars
 		extends BaseForExecOpIndexNestedLoopsJoinWithRequests<SPARQLGraphPattern,
 		                                                      WrappedRESTEndpoint,
 		                                                      RESTRequest,
@@ -37,11 +37,11 @@ public class ExecOpLookupJoinViaWrapper
 	private long numberOfOutputMappingsProduced = 0L;
 	private int numberOfDataConversionExceptions = 0;
 
-	public ExecOpLookupJoinViaWrapper( final SPARQLGraphPattern pattern,
-	                                   final List<Var> paramVars,
-	                                   final WrappedRESTEndpoint fm,
-	                                   final boolean collectExceptions,
-	                                   final QueryPlanningInfo qpInfo ) {
+	public ExecOpLookupJoinViaWrapperWithParamVars( final SPARQLGraphPattern pattern,
+	                                                final List<Var> paramVars,
+	                                                final WrappedRESTEndpoint fm,
+	                                                final boolean collectExceptions,
+	                                                final QueryPlanningInfo qpInfo ) {
 		super(pattern, fm, collectExceptions, qpInfo);
 
 		assert paramVars != null || fm.getNumberOfParameters() == 0;
