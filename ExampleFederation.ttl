@@ -27,8 +27,8 @@ ex:openMeteo
       fd:serviceURI <https://api.open-meteo.com/v1/forecast> ;
       fd:interface [ a                  fd:RESTInterface ;
                      fd:endpointAddress <https://api.open-meteo.com/v1/forecast> ;
-                     fd:queryParameters ( [ fd:paramName "latitude" ; fd:paramType xsd:double ]
-                                          [ fd:paramName "longitude" ; fd:paramType xsd:double ]
+                     fd:queryParameters ( [ fd:paramName "latitude" ; fd:paramType xsd:float ]
+                                          [ fd:paramName "longitude" ; fd:paramType xsd:float ]
                                           [ fd:paramName "current" ; fd:paramType xsd:string ] ) ] ;
       fd:wrapper [ a rdf:Resource ] .
 
