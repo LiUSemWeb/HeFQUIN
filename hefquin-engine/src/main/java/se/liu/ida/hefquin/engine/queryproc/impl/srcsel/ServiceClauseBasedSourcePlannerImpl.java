@@ -97,24 +97,40 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			throw new IllegalArgumentException( "empty sequence of operators" );
 		}
 
-		// convert the sequence of Op objects into a multiway join
-		final List<LogicalPlan> subPlans = new ArrayList<>();
-		for ( final Op subOp : jenaOp.getElements() ) {
-			subPlans.add( createPlan(subOp, ctxt) );
-		}
-		return mergeIntoMultiwayJoin(subPlans);
+		return createPlanForJoin( jenaOp.getElements(), ctxt );
 	}
 
 	protected LogicalPlan createPlanForJoin( final OpJoin jenaOp,
 	                                         final QueryProcContext ctxt ) {
-		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), ctxt );
+		final List<Op> ops = List.of( jenaOp.getLeft(), jenaOp.getRight() );
+		return createPlanForJoin(ops, ctxt);
+	}
 
-		if ( jenaOp.getRight() instanceof OpServiceWithParams opService )
-			return createPlanForServiceWithParams(opService, leftSubPlan, ctxt);
-		else {
-			final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), ctxt );
-			return mergeIntoMultiwayJoin(leftSubPlan,rightSubPlan);
+	protected LogicalPlan createPlanForJoin( final List<Op> ops,
+	                                         final QueryProcContext ctxt ) {
+		// Convert the list of Op objects into a multiway join,
+		// but ignore OpServiceWithParams objects in this step
+		// (but collect them for the next step).
+		final List<OpServiceWithParams> opSWP = new ArrayList<>();
+		final List<LogicalPlan> subPlans = new ArrayList<>();
+		for ( final Op subOp : ops ) {
+			if ( subOp instanceof OpServiceWithParams opService )
+				opSWP.add(opService);
+			else
+				subPlans.add( createPlan(subOp, ctxt) );
 		}
+
+		if ( subPlans.isEmpty() )
+			throw new IllegalArgumentException( "Unsupported SERVICE clause: group graph patterns that begin with a SERVICE clause with PARAMS are not supported yet." );
+
+		LogicalPlan plan = mergeIntoMultiwayJoin(subPlans);
+
+		// Now handle the collected OpServiceWithParams objects.
+		for ( final OpServiceWithParams opService : opSWP ) {
+			plan = createPlanForServiceWithParams(opService, plan, ctxt);
+		}
+
+		return plan;
 	}
 
 	protected LogicalPlan createPlanForLeftJoin( final OpLeftJoin jenaOp,
