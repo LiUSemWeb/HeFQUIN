@@ -1,0 +1,87 @@
+package se.liu.ida.hefquin.mappings.algebra.ops;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.jena.atlas.lib.Pair;
+
+import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
+import se.liu.ida.hefquin.mappings.algebra.MappingTuple;
+import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
+import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
+
+public class MappingOpJoin extends BaseForMappingOperator
+{
+	protected final MappingOperator subOp1;
+	protected final MappingOperator subOp2;
+	protected final Set<Pair<String,String>> J;
+
+	protected final Set<String> schema;
+	protected final boolean valid;
+
+	public MappingOpJoin( final MappingOperator subOp1,
+	                      final MappingOperator subOp2,
+	                      final Set<Pair<String,String>> J ) {
+		assert subOp1 != null;
+		assert subOp2 != null;
+		assert J != null;
+
+		this.subOp1 = subOp1;
+		this.subOp2 = subOp2;
+		this.J = J;
+
+		final Set<String> schemaOfSubOp1 = subOp1.getSchema();
+		final Set<String> schemaOfSubOp2 = subOp2.getSchema();
+
+		schema = new HashSet<>();
+		schema.addAll(schemaOfSubOp1);
+		schema.addAll(schemaOfSubOp2);
+
+		if ( schema.size() != schemaOfSubOp1.size()+schemaOfSubOp2.size() ) {
+			valid = false;
+		}
+		else if ( ! subOp1.isValid() ) {
+			valid = false;
+		}
+		else if ( ! subOp2.isValid() ) {
+			valid = false;
+		}
+		else {
+			valid = isValid(J, schemaOfSubOp1, schemaOfSubOp2);
+		}
+	}
+
+	protected static boolean isValid( final Set<Pair<String,String>> J,
+	                                  final Set<String> schemaOfSubOp1,
+	                                  final Set<String> schemaOfSubOp2 ) {
+		for ( final Pair<String,String> j : J ) {
+			if ( ! schemaOfSubOp1.contains(j.getLeft()) ) return false;
+			if ( ! schemaOfSubOp2.contains(j.getRight()) ) return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public Set<String> getSchema() {
+		return schema;
+	}
+
+	@Override
+	public boolean isValid() {
+		return valid;
+	}
+
+	@Override
+	public boolean isValidInput( final Map<SourceReference, DataObject> srMap ) {
+		return subOp1.isValidInput(srMap) && subOp2.isValidInput(srMap);
+	}
+
+	@Override
+	public Iterator<MappingTuple> evaluate( final Map<SourceReference, DataObject> srMap ) {
+		// TODO
+		throw new UnsupportedOperationException();
+	}
+}
