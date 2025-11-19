@@ -56,15 +56,13 @@ public class MappingOpExtract< DDS extends DataObject,
 		schema = P.keySet();
 	}
 
-	@Override
-	public Set<String> getSchema() {
-		return schema;
-	}
+	public SourceReference getSourceReference() { return sr; }
 
 	@Override
-	public boolean isValid() {
-		return true;
-	}
+	public Set<String> getSchema() { return schema; }
+
+	@Override
+	public boolean isValid() { return true; }
 
 	@Override
 	public boolean isValidInput( final Map<SourceReference, DataObject> srMap ) {
