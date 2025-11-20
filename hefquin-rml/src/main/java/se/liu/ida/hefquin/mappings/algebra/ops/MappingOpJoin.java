@@ -1,14 +1,13 @@
 package se.liu.ida.hefquin.mappings.algebra.ops;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.atlas.lib.Pair;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
-import se.liu.ida.hefquin.mappings.algebra.MappingTuple;
+import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
 
@@ -80,7 +79,7 @@ public class MappingOpJoin extends BaseForMappingOperator
 	}
 
 	@Override
-	public Iterator<MappingTuple> evaluate( final Map<SourceReference, DataObject> srMap ) {
+	public MappingRelation evaluate( final Map<SourceReference, DataObject> srMap ) {
 		// TODO
 		throw new UnsupportedOperationException();
 	}

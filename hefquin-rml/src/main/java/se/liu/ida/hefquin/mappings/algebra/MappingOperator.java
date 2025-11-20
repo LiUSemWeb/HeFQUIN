@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.mappings.algebra;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,5 +21,5 @@ public interface MappingOperator
 
 	boolean isValidInput( Map<SourceReference,DataObject> srMap );
 
-	Iterator<MappingTuple> evaluate( Map<SourceReference,DataObject> srMap );
+	MappingRelation evaluate( Map<SourceReference,DataObject> srMap );
 }

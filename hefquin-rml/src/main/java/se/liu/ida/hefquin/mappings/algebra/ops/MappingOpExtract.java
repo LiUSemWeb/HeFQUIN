@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.mappings.algebra.ops;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,10 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.base.query.Query;
-import se.liu.ida.hefquin.mappings.algebra.MappingTuple;
+import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
+import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
+import se.liu.ida.hefquin.mappings.algebra.impl.MappingRelationImplWithColumnLayout;
+import se.liu.ida.hefquin.mappings.algebra.impl.MappingRelationImplWithoutTuples;
 import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceType;
@@ -71,56 +74,104 @@ public class MappingOpExtract< DDS extends DataObject,
 	}
 
 	@Override
-	public Iterator<MappingTuple> evaluate( final Map<SourceReference, DataObject> srMap ) {
+	public MappingRelation evaluate( final Map<SourceReference, DataObject> srMap ) {
 		final DataObject d = srMap.get(sr);
 		@SuppressWarnings("unchecked")
 		final DDS dd = (DDS) d;
-		return new MyIterator(dd);
+
+		return new MyMappingRelation(dd);
 	}
 
-	protected class MyIterator implements Iterator<MappingTuple> {
+	protected class MyMappingRelation implements MappingRelation {
+		protected final List<String> schema;
+		protected MappingRelationCursor cursor;
+
+		public MyMappingRelation( final DDS d ) {
+			schema = Arrays.asList(attributesOfP);
+			cursor = new MyCursor(this, d);
+		}
+
+		@Override
+		public List<String> getSchema() { return schema; }
+
+		@Override
+		public MappingRelationCursor getCursor() {
+			if ( cursor == null )
+				throw new UnsupportedOperationException();
+
+			final MappingRelationCursor c = cursor;
+			cursor = null;
+			return c;
+		}
+	}
+
+	protected class MyCursor implements MappingRelationCursor {
+		protected final MappingRelation r;
 		protected final DDS d;
 
 		protected Iterator<DC1> itContextObjs = null;
-		protected Iterator<MappingTuple> itResultPart = null;
+		protected MappingRelationCursor currentCursor = null;
+		protected MappingRelationCursor nextCursor = null;
 
-		public MyIterator( final DDS d ) { this.d = d; }
+		public MyCursor( final MappingRelation r, final DDS d ) {
+			this.r = r;
+			this.d = d;
+		}
 
+		@Override
+		public MappingRelation getMappingRelation() { return r; }
+
+		@Override
+		public Node getValueOfCurrentTuple( final int idxOfAttribute ) {
+			if ( currentCursor == null )
+				throw new NoSuchElementException();
+
+			return currentCursor.getValueOfCurrentTuple(idxOfAttribute);
+		}
+
+		@Override
 		public boolean hasNext() {
 			if ( itContextObjs == null ) {
 				itContextObjs = type.eval(query, d).iterator();
-			}
 
-			while ( itResultPart == null || ! itResultPart.hasNext() ) {
-				if ( ! itContextObjs.hasNext() ) {
-					return false;
-				}
+				if ( ! itContextObjs.hasNext() ) return false;
 
 				final DC1 cxtObj = itContextObjs.next();
-				final List<MappingTuple> X_d = determineMappingTuples(d, cxtObj);
+				currentCursor = createMappingRelation(d, cxtObj).getCursor();
+				nextCursor = currentCursor;
+			}
 
-				itResultPart = ( X_d == null ) ? null : X_d.iterator();
+			while ( ! currentCursor.hasNext() && ! nextCursor.hasNext() ) {
+				if ( ! itContextObjs.hasNext() ) return false;
+
+				final DC1 cxtObj = itContextObjs.next();
+				nextCursor = createMappingRelation(d, cxtObj).getCursor();
 			}
 
 			return true;
 		}
 
-		public MappingTuple next() {
-			if ( ! hasNext() ) throw new NoSuchElementException();
+		@Override
+		public void advance() {
+			if ( ! hasNext() )
+				throw new UnsupportedOperationException();
 
-			return itResultPart.next();
+			if ( ! currentCursor.hasNext() )
+				currentCursor = nextCursor;
+
+			currentCursor.advance();
 		}
 	}
 
-	protected List<MappingTuple> determineMappingTuples( final DDS d, final DC1 cxtObj ) {
+	protected MappingRelation createMappingRelation( final DDS d, final DC1 cxtObj ) {
 		final List<Node[]> valsPerAttr = determineValuesPerAttribute(d, cxtObj);
 
-		if ( valsPerAttr == null || valsPerAttr.isEmpty() )
-			return null;
+		if ( valsPerAttr == null ) {
+			return new MappingRelationImplWithoutTuples(attributesOfP);
+		}
 
-		final List<MappingTuple> result = new ArrayList<>();
-		createMappingTuples( attributesOfP.length - 1, valsPerAttr, new HashMap<>(), result );
-		return result;
+		final Node[][] columns = new MappingRelationCreator(valsPerAttr).getTuples();
+		return MappingRelationImplWithColumnLayout.createBasedOnColumns(attributesOfP, columns);
 	}
 
 	protected List<Node[]> determineValuesPerAttribute( final DDS d, final DC1 cxtObj ) {
@@ -145,32 +196,43 @@ public class MappingOpExtract< DDS extends DataObject,
 		return result;
 	}
 
-	protected void createMappingTuples( final int i,
-	                                    final List<Node[]> valsPerAttr,
-	                                    final Map<String, Node> current,
-	                                    final List<MappingTuple> result ) {
-		final Node[] ithValues = valsPerAttr.get(i);
-		for ( int j = 0; j < ithValues.length; j++ ) {
-			current.put( attributesOfP[i], ithValues[j] );
+	protected static class MappingRelationCreator {
+		protected final List<Node[]> valsPerAttr;
+		protected final Node[][] tuples;
 
-			if ( i > 0 ) {
-				createMappingTuples(i-1, valsPerAttr, current, result);
-			}
-			else {
-				final Map<String, Node> copy = new HashMap<>(current);
-				final MappingTuple t = createMappingTuple(copy);
-				result.add(t);
+		protected int idxOfCurrentRow = 0;
+
+		public MappingRelationCreator( final List<Node[]> valsPerAttr ) {
+			this.valsPerAttr = valsPerAttr;
+
+			int length = 1;
+			for ( final Node[] ithValues : valsPerAttr )
+				length *= ithValues.length;
+
+			this.tuples = new Node[ valsPerAttr.size() ][ length ];
+
+			final Node[] currentTuple = new Node[ valsPerAttr.size() ];
+			populateTuples( valsPerAttr.size() - 1, currentTuple );
+		}
+
+		protected void populateTuples( final int col,
+		                               final Node[] currentTuple ) {
+			final Node[] ithValues = valsPerAttr.get(col);
+			for ( int j = 0; j < ithValues.length; j++ ) {
+				currentTuple[col] = ithValues[j];
+
+				if ( col > 0 ) {
+					populateTuples(col-1, currentTuple);
+				}
+				else {
+					for ( int idxOfAttribute = 0; idxOfAttribute < tuples.length; idxOfAttribute++ )
+						tuples[idxOfAttribute][idxOfCurrentRow] = currentTuple[idxOfAttribute];
+
+					idxOfCurrentRow++;
+				}
 			}
 		}
-	}
 
-	protected MappingTuple createMappingTuple( final Map<String, Node> map ) {
-		return new MappingTuple() {
-			@Override
-			public Node getValue( final String attr ) { return map.get(attr); }
-			@Override
-			public Set<String> getSchema() { return schema; }
-		};
+		public Node[][] getTuples() { return tuples; }
 	}
-
 }

@@ -1,12 +1,15 @@
 package se.liu.ida.hefquin.mappings.algebra.ops;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceType;
@@ -63,6 +66,38 @@ public class BaseForMappingOperatorTests
 		public Node cast( final TestDataObject3 d ) {
 			return d.n;
 		}
+	}
+
+	/**
+	 * This operator simply returns the tuples given to its constructor.
+	 */
+	static class ConstantMappingOperatorForTests extends BaseForMappingOperator {
+		protected final MappingRelation r;
+
+		public ConstantMappingOperatorForTests( final MappingRelation r ) {
+			this.r = r;
+		}
+
+		@Override
+		public Set<String> getSchema() {
+			return new HashSet<>( r.getSchema() );
+		}
+
+		@Override
+		public boolean isValid() {
+			return true;
+		}
+
+		@Override
+		public boolean isValidInput( final Map<SourceReference, DataObject> srMap ) {
+			return true;
+		}
+
+		@Override
+		public MappingRelation evaluate( final Map<SourceReference, DataObject> srMap ) {
+			return r;
+		}
+		
 	}
 
 	static class MappingOpExtractForTests extends MappingOpExtract<TestDataObject1,

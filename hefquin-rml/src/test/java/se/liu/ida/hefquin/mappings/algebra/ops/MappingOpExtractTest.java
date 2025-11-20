@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,7 +13,8 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.mappings.algebra.MappingTuple;
+import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
+import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
 import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
 
@@ -83,8 +84,10 @@ public class MappingOpExtractTest extends BaseForMappingOperatorTests
 		final Map<SourceReference, DataObject> srMap = new HashMap<>();
 		srMap.put( op.getSourceReference(), d1 );
 
-		final Iterator<MappingTuple> it = op.evaluate(srMap);
-		assertFalse( it.hasNext() );
+		final MappingRelation r = op.evaluate(srMap);
+		final MappingRelationCursor c = r.getCursor();
+
+		assertFalse( c.hasNext() );
 	}
 
 	@Test
@@ -100,8 +103,10 @@ public class MappingOpExtractTest extends BaseForMappingOperatorTests
 		final Map<SourceReference, DataObject> srMap = new HashMap<>();
 		srMap.put( op.getSourceReference(), d1 );
 
-		final Iterator<MappingTuple> it = op.evaluate(srMap);
-		assertFalse( it.hasNext() );
+		final MappingRelation r = op.evaluate(srMap);
+		final MappingRelationCursor c = r.getCursor();
+
+		assertFalse( c.hasNext() );
 	}
 
 	@Test
@@ -119,14 +124,15 @@ public class MappingOpExtractTest extends BaseForMappingOperatorTests
 		final Map<SourceReference, DataObject> srMap = new HashMap<>();
 		srMap.put( op.getSourceReference(), d1 );
 
-		final Iterator<MappingTuple> it = op.evaluate(srMap);
-		assertTrue( it.hasNext() );
+		final MappingRelation r = op.evaluate(srMap);
+		final MappingRelationCursor c = r.getCursor();
 
-		final MappingTuple t = it.next();
-		assertEquals( Set.of("attr1"), t.getSchema() );
-		assertTrue( t.getValue("attr1") == bnode );
+		assertTrue( c.hasNext() );
+		c.advance();
 
-		assertFalse( it.hasNext() );
+		assertTrue( c.getValueOfCurrentTuple(0) == bnode );
+
+		assertFalse( c.hasNext() );
 	}
 
 	@Test
@@ -146,19 +152,23 @@ public class MappingOpExtractTest extends BaseForMappingOperatorTests
 		final Map<SourceReference, DataObject> srMap = new HashMap<>();
 		srMap.put( op.getSourceReference(), d1 );
 
-		final Iterator<MappingTuple> it = op.evaluate(srMap);
-		assertTrue( it.hasNext() );
+		final MappingRelation r = op.evaluate(srMap);
+		final MappingRelationCursor c = r.getCursor();
 
-		final Node value1 = it.next().getValue("attr1");
+		assertTrue( c.hasNext() );
+		c.advance();
+
+		final Node value1 = c.getValueOfCurrentTuple(0);
 		assertTrue( value1 == bnodeA || value1 == bnodeB );
 
-		assertTrue( it.hasNext() );
+		assertTrue( c.hasNext() );
+		c.advance();
 
-		final Node value2 = it.next().getValue("attr1");
+		final Node value2 = c.getValueOfCurrentTuple(0);
 		assertTrue( value2 == bnodeA || value2 == bnodeB );
 		assertTrue( value2 != value1 );
 
-		assertFalse( it.hasNext() );
+		assertFalse( c.hasNext() );
 	}
 
 	@Test
@@ -181,19 +191,23 @@ public class MappingOpExtractTest extends BaseForMappingOperatorTests
 		final Map<SourceReference, DataObject> srMap = new HashMap<>();
 		srMap.put( op.getSourceReference(), d1 );
 
-		final Iterator<MappingTuple> it = op.evaluate(srMap);
-		assertTrue( it.hasNext() );
+		final MappingRelation r = op.evaluate(srMap);
+		final MappingRelationCursor c = r.getCursor();
 
-		final Node value1 = it.next().getValue("attr1");
+		assertTrue( c.hasNext() );
+		c.advance();
+
+		final Node value1 = c.getValueOfCurrentTuple(0);
 		assertTrue( value1 == bnodeA || value1 == bnodeB );
 
-		assertTrue( it.hasNext() );
+		assertTrue( c.hasNext() );
+		c.advance();
 
-		final Node value2 = it.next().getValue("attr1");
+		final Node value2 = c.getValueOfCurrentTuple(0);
 		assertTrue( value2 == bnodeA || value2 == bnodeB );
 		assertTrue( value2 != value1 );
 
-		assertFalse( it.hasNext() );
+		assertFalse( c.hasNext() );
 	}
 
 	@Test
@@ -212,14 +226,16 @@ public class MappingOpExtractTest extends BaseForMappingOperatorTests
 		final Map<SourceReference, DataObject> srMap = new HashMap<>();
 		srMap.put( op.getSourceReference(), d1 );
 
-		final Iterator<MappingTuple> it = op.evaluate(srMap);
-		assertTrue( it.hasNext() );
+		final MappingRelation r = op.evaluate(srMap);
+		final MappingRelationCursor c = r.getCursor();
 
-		final MappingTuple t = it.next();
-		assertEquals( Set.of("attr1", "attr2"), t.getSchema() );
-		assertTrue( t.getValue("attr1") == bnode );
+		assertTrue( c.hasNext() );
+		c.advance();
 
-		assertFalse( it.hasNext() );
+		assertTrue( c.getValueOfCurrentTuple(0) == bnode );
+		assertTrue( c.getValueOfCurrentTuple(1) == bnode );
+
+		assertFalse( c.hasNext() );
 	}
 
 	@Test
@@ -240,48 +256,46 @@ public class MappingOpExtractTest extends BaseForMappingOperatorTests
 		final Map<SourceReference, DataObject> srMap = new HashMap<>();
 		srMap.put( op.getSourceReference(), d1 );
 
-		final Iterator<MappingTuple> it = op.evaluate(srMap);
-		assertTrue( it.hasNext() );
+		final MappingRelation r = op.evaluate(srMap);
+		final MappingRelationCursor c = r.getCursor();
 
-		final MappingTuple t1 = it.next();
-		assertEquals( Set.of("attr1", "attr2"), t1.getSchema() );
-		final Node value11 = t1.getValue("attr1");
-		final Node value12 = t1.getValue("attr2");
+		assertTrue( c.hasNext() );
+		c.advance();
+
+		final Node value11 = c.getValueOfCurrentTuple(0);
+		final Node value12 = c.getValueOfCurrentTuple(1);
 		assertTrue( value11 == bnodeA || value11 == bnodeB );
 		assertTrue( value12 == bnodeA || value12 == bnodeB );
 		final int sameValue1 = ( value11 == value12 ) ? 1 : 0;
 
-		assertTrue( it.hasNext() );
+		assertTrue( c.hasNext() );
+		c.advance();
 
-		final MappingTuple t2 = it.next();
-		assertEquals( Set.of("attr1", "attr2"), t1.getSchema() );
-		final Node value21 = t2.getValue("attr1");
-		final Node value22 = t2.getValue("attr2");
+		final Node value21 = c.getValueOfCurrentTuple(0);
+		final Node value22 = c.getValueOfCurrentTuple(1);
 		assertTrue( value21 == bnodeA || value21 == bnodeB );
 		assertTrue( value22 == bnodeA || value22 == bnodeB );
 		final int sameValue2 = ( value21 == value22 ) ? 1 : 0;
 
-		assertTrue( it.hasNext() );
+		assertTrue( c.hasNext() );
+		c.advance();
 
-		final MappingTuple t3 = it.next();
-		assertEquals( Set.of("attr1", "attr2"), t3.getSchema() );
-		final Node value31 = t3.getValue("attr1");
-		final Node value32 = t3.getValue("attr2");
+		final Node value31 = c.getValueOfCurrentTuple(0);
+		final Node value32 = c.getValueOfCurrentTuple(1);
 		assertTrue( value31 == bnodeA || value31 == bnodeB );
 		assertTrue( value32 == bnodeA || value32 == bnodeB );
 		final int sameValue3 = ( value31 == value32 ) ? 1 : 0;
 
-		assertTrue( it.hasNext() );
+		assertTrue( c.hasNext() );
+		c.advance();
 
-		final MappingTuple t4 = it.next();
-		assertEquals( Set.of("attr1", "attr2"), t4.getSchema() );
-		final Node value41 = t4.getValue("attr1");
-		final Node value42 = t4.getValue("attr2");
+		final Node value41 = c.getValueOfCurrentTuple(0);
+		final Node value42 = c.getValueOfCurrentTuple(1);
 		assertTrue( value41 == bnodeA || value41 == bnodeB );
 		assertTrue( value42 == bnodeA || value42 == bnodeB );
 		final int sameValue4 = ( value41 == value42 ) ? 1 : 0;
 
-		assertFalse( it.hasNext() );
+		assertFalse( c.hasNext() );
 
 		assertEquals( 2, sameValue1 + sameValue2 + sameValue3 + sameValue4 );
 	}
@@ -307,27 +321,66 @@ public class MappingOpExtractTest extends BaseForMappingOperatorTests
 		final Map<SourceReference, DataObject> srMap = new HashMap<>();
 		srMap.put( op.getSourceReference(), d1 );
 
-		final Iterator<MappingTuple> it = op.evaluate(srMap);
-		assertTrue( it.hasNext() );
+		final MappingRelation r = op.evaluate(srMap);
+		final MappingRelationCursor c = r.getCursor();
 
-		final MappingTuple t1 = it.next();
-		assertEquals( Set.of("attr1", "attr2"), t1.getSchema() );
-		final Node value11 = t1.getValue("attr1");
-		final Node value12 = t1.getValue("attr2");
+		assertTrue( c.hasNext() );
+		c.advance();
+
+		final Node value11 = c.getValueOfCurrentTuple(0);
+		final Node value12 = c.getValueOfCurrentTuple(1);
 		assertTrue( value11 == bnodeA || value11 == bnodeB );
 		assertTrue( value12 == bnodeA || value12 == bnodeB );
 		assertTrue( value11 == value12 );
 
-		assertTrue( it.hasNext() );
+		assertTrue( c.hasNext() );
+		c.advance();
 
-		final MappingTuple t2 = it.next();
-		assertEquals( Set.of("attr1", "attr2"), t1.getSchema() );
-		final Node value21 = t2.getValue("attr1");
-		final Node value22 = t2.getValue("attr2");
+		final Node value21 = c.getValueOfCurrentTuple(0);
+		final Node value22 = c.getValueOfCurrentTuple(1);
 		assertTrue( value21 == bnodeA || value21 == bnodeB );
 		assertTrue( value22 == bnodeA || value22 == bnodeB );
 		assertTrue( value21 == value22 );
 
-		assertFalse( it.hasNext() );
+		assertFalse( c.hasNext() );
+	}
+
+	@Test
+	public void evaluate_FourAttrs_OneCxtObjWithOneSubObj() {
+		final Map<String, TestQuery> P = new HashMap<>();
+		P.put( "attr1", new TestQuery() );
+		P.put( "attr2", new TestQuery() );
+		P.put( "attr3", new TestQuery() );
+		P.put( "attr4", new TestQuery() );
+
+		final MappingOpExtractForTests op = new MappingOpExtractForTests(P);
+
+		final Node bnode = NodeFactory.createBlankNode();
+		final TestDataObject3 d3 = new TestDataObject3(bnode);
+		final TestDataObject2 d2 = new TestDataObject2(d3);
+		final TestDataObject1 d1 = new TestDataObject1(d2);
+
+		final Map<SourceReference, DataObject> srMap = new HashMap<>();
+		srMap.put( op.getSourceReference(), d1 );
+
+		final MappingRelation r = op.evaluate(srMap);
+
+		final List<String> schema = r.getSchema();
+		assertEquals( 4, schema.size() );
+		assertTrue( schema.contains("attr1") );
+		assertTrue( schema.contains("attr2") );
+		assertTrue( schema.contains("attr3") );
+		assertTrue( schema.contains("attr4") );
+
+		final MappingRelationCursor c = r.getCursor();
+		assertTrue( c.hasNext() );
+		c.advance();
+
+		assertTrue( c.getValueOfCurrentTuple(0) == bnode );
+		assertTrue( c.getValueOfCurrentTuple(1) == bnode );
+		assertTrue( c.getValueOfCurrentTuple(2) == bnode );
+		assertTrue( c.getValueOfCurrentTuple(3) == bnode );
+
+		assertFalse( c.hasNext() );
 	}
 }
