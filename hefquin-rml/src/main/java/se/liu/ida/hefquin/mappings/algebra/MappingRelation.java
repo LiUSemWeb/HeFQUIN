@@ -2,6 +2,10 @@ package se.liu.ida.hefquin.mappings.algebra;
 
 import java.util.List;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Node_Ext;
+import org.apache.jena.shared.PrefixMapping;
+
 public interface MappingRelation
 {
 	/**
@@ -15,5 +19,19 @@ public interface MappingRelation
 	List<String> getSchema();
 
 	MappingRelationCursor getCursor();
+
+
+	/**
+	 * To be used as the error symbol in mapping relations.
+	 */
+	static Node errorNode = new Node_Ext<Integer>(0) {
+		@Override
+		public String toString() { return "error symbol"; }
+
+		@Override
+		public String toString( final PrefixMapping pmap ) {
+			throw new UnsupportedOperationException();
+		}
+	};
 
 }
