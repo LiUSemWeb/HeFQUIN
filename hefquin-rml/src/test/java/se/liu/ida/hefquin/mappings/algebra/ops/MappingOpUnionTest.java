@@ -48,17 +48,17 @@ public class MappingOpUnionTest extends BaseForMappingOperatorTests
 	}
 
 	@Test
-	public void evaluate_ColumnInput_FirstAttribute() {
-		final String[] schema = { "attr1", "attr2" };
-
-		final Node[] t1 = { NodeFactory.createBlankNode(),
-		                    NodeFactory.createBlankNode() };
-		final MappingRelation input1 = new MappingRelationImplWithTupleLayout(schema, t1);
+	public void evaluate_SameInputSchema() {
+		final String[] schema1 = { "attr1", "attr2" };
+		final Node[] t1 = { NodeFactory.createLiteralString("attr1Value1"),
+		                    NodeFactory.createLiteralString("attr2Value1") };
+		final MappingRelation input1 = new MappingRelationImplWithTupleLayout(schema1, t1);
 		final MappingOperator subOp1 = new ConstantMappingOperatorForTests(input1);
 
-		final Node[] t2 = { NodeFactory.createBlankNode(),
-		                    NodeFactory.createBlankNode() };
-		final MappingRelation input2 = new MappingRelationImplWithTupleLayout(schema, t2);
+		final String[] schema2 = { "attr1", "attr2" };
+		final Node[] t2 = { NodeFactory.createLiteralString("attr1Value2"),
+		                    NodeFactory.createLiteralString("attr2Value2") };
+		final MappingRelation input2 = new MappingRelationImplWithTupleLayout(schema2, t2);
 		final MappingOperator subOp2 = new ConstantMappingOperatorForTests(input2);
 
 		final MappingOpUnion op = new MappingOpUnion(subOp1, subOp2);
@@ -69,19 +69,64 @@ public class MappingOpUnionTest extends BaseForMappingOperatorTests
 		assertTrue( schemaOut.contains("attr1") );
 		assertTrue( schemaOut.contains("attr2") );
 
+		final int attr1Idx = schemaOut.indexOf("attr1");
+		final int attr2Idx = schemaOut.indexOf("attr2");
+
 		final MappingRelationCursor c = rOut.getCursor();
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t1[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t1[1] );
+		assertEquals( "attr1Value1", c.getValueOfCurrentTuple(attr1Idx).getLiteralLexicalForm() );
+		assertEquals( "attr2Value1", c.getValueOfCurrentTuple(attr2Idx).getLiteralLexicalForm() );
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t2[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t2[1] );
+		assertEquals( "attr1Value2", c.getValueOfCurrentTuple(attr1Idx).getLiteralLexicalForm() );
+		assertEquals( "attr2Value2", c.getValueOfCurrentTuple(attr2Idx).getLiteralLexicalForm() );
+
+		assertFalse( c.hasNext() );
+	}
+
+	@Test
+	public void evaluate_DifferentInputSchemas() {
+		final String[] schema1 = { "attr1", "attr2" };
+		final Node[] t1 = { NodeFactory.createLiteralString("attr1Value1"),
+		                    NodeFactory.createLiteralString("attr2Value1") };
+		final MappingRelation input1 = new MappingRelationImplWithTupleLayout(schema1, t1);
+		final MappingOperator subOp1 = new ConstantMappingOperatorForTests(input1);
+
+		final String[] schema2 = { "attr2", "attr1" };
+		final Node[] t2 = { NodeFactory.createLiteralString("attr2Value2"),
+		                    NodeFactory.createLiteralString("attr1Value2") };
+		final MappingRelation input2 = new MappingRelationImplWithTupleLayout(schema2, t2);
+		final MappingOperator subOp2 = new ConstantMappingOperatorForTests(input2);
+
+		final MappingOpUnion op = new MappingOpUnion(subOp1, subOp2);
+
+		final MappingRelation rOut = op.evaluate(null);
+		final List<String> schemaOut = rOut.getSchema();
+		assertEquals( 2, schemaOut.size() );
+		assertTrue( schemaOut.contains("attr1") );
+		assertTrue( schemaOut.contains("attr2") );
+
+		final int attr1Idx = schemaOut.indexOf("attr1");
+		final int attr2Idx = schemaOut.indexOf("attr2");
+
+		final MappingRelationCursor c = rOut.getCursor();
+
+		assertTrue( c.hasNext() );
+		c.advance();
+
+		assertEquals( "attr1Value1", c.getValueOfCurrentTuple(attr1Idx).getLiteralLexicalForm() );
+		assertEquals( "attr2Value1", c.getValueOfCurrentTuple(attr2Idx).getLiteralLexicalForm() );
+
+		assertTrue( c.hasNext() );
+		c.advance();
+
+		assertEquals( "attr1Value2", c.getValueOfCurrentTuple(attr1Idx).getLiteralLexicalForm() );
+		assertEquals( "attr2Value2", c.getValueOfCurrentTuple(attr2Idx).getLiteralLexicalForm() );
 
 		assertFalse( c.hasNext() );
 	}

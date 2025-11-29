@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
@@ -102,6 +103,14 @@ public class MappingOpUnion extends BaseForMappingOperator
 
 		protected final Iterator<MappingOperator> subOpIt;
 		protected MappingRelationCursor currentInput = null;
+		/**
+		 * The i-th position in this array corresponds to the i-th
+		 * attribute in the schema of myRelation and the integer at
+		 * that position in the array is the position in of the same
+		 * attribute in the schema of currentInput. As an optimization,
+		 * the array is null if the two schemas coincide.
+		 */
+		protected int[] currentSchemaMapping = null;
 
 		public MyCursor( final MappingRelation myRelation,
 		                 final Map<SourceReference, DataObject> srMap ) {
@@ -120,10 +129,50 @@ public class MappingOpUnion extends BaseForMappingOperator
 					return false;
 				}
 
-				currentInput = subOpIt.next().evaluate(srMap).getCursor();
+				final List<String> prevInputSchema;
+				if ( currentInput == null )
+					prevInputSchema = null;
+				else
+					prevInputSchema = currentInput.getMappingRelation().getSchema();
+
+				final MappingRelation r = subOpIt.next().evaluate(srMap);
+				currentInput = r.getCursor();
+
+				final List<String> nextInputSchema = r.getSchema();
+				if (    currentInput.hasNext()
+				     && ! Objects.equals(prevInputSchema, nextInputSchema) ) {
+					// If the next input schema is different from the
+					// previous one (where the difference should be only
+					// in the order of the attributes, not in terms of
+					// having different attributes), then we need to
+					// update the schema mapping (currentSchemaMapping)
+					// that we will use while consuming the next input
+					// relation. Yet, we do this only if the next input
+					// is nonempty (i.e., currentInput.hasNext() == true).
+					updateSchemaMapping(nextInputSchema);
+				}
 			}
 
 			return true;
+		}
+
+		protected void updateSchemaMapping( final List<String> inputSchema ) {
+			final List<String> mySchema = myRelation.getSchema();
+			if ( mySchema.equals(inputSchema) ) {
+				currentSchemaMapping = null;
+			}
+			else {
+				if ( currentSchemaMapping == null ) {
+					currentSchemaMapping = new int[ mySchema.size() ];
+				}
+
+				int i = 0;
+				for ( final String attr : mySchema ) {
+					final int attrIdxInInputSchema =inputSchema.indexOf(attr);
+					assert attrIdxInInputSchema != -1;
+					currentSchemaMapping[i++] = attrIdxInInputSchema;
+				}
+			}
 		}
 
 		@Override
@@ -136,7 +185,12 @@ public class MappingOpUnion extends BaseForMappingOperator
 
 		@Override
 		public Node getValueOfCurrentTuple( final int idxOfAttribute ) {
-			return currentInput.getValueOfCurrentTuple(idxOfAttribute);
+			if ( currentSchemaMapping == null ) {
+				return currentInput.getValueOfCurrentTuple(idxOfAttribute);
+			}
+
+			final int idxInInput = currentSchemaMapping[idxOfAttribute];
+			return currentInput.getValueOfCurrentTuple(idxInInput);
 		}
 	}
 
