@@ -13,6 +13,10 @@ import se.liu.ida.hefquin.mappings.algebra.exprs.ExtensionFunction;
  */
 public class ExtnFct_Concat implements ExtensionFunction
 {
+	public static final ExtensionFunction instance = new ExtnFct_Concat();
+
+	protected ExtnFct_Concat() {}
+
 	@Override
 	public boolean isCorrectNumberOfArgument( final int n ) {
 		return n > 0;

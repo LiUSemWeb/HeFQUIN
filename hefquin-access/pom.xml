@@ -53,6 +53,12 @@
       <artifactId>hefquin-vocabs</artifactId>
       <version>0.0.8-SNAPSHOT</version>
     </dependency>
+    <!-- hefquin-rml-->
+    <dependency>
+      <groupId>se.liu.research.hefquin</groupId>
+      <artifactId>hefquin-rml</artifactId>
+      <version>0.0.8-SNAPSHOT</version>
+    </dependency>
     <!-- hefquin-pgconnector -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>

@@ -1,20 +1,16 @@
 package se.liu.ida.hefquin.federation.members.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.ResultSet;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
@@ -23,6 +19,20 @@ import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.jenaintegration.HeFQUINConstants;
+import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
+import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
+import se.liu.ida.hefquin.mappings.algebra.MappingRelationUtils;
+import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExprConstant;
+import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExprFunction;
+import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExpression;
+import se.liu.ida.hefquin.mappings.algebra.exprs.fcts.ExtnFct_ToBNode;
+import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpExtend;
+import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
+import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
+import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.algebra.sources.json.JsonObject;
+import se.liu.ida.hefquin.mappings.algebra.sources.json.JsonPathQuery;
+import se.liu.ida.hefquin.mappings.algebra.sources.json.MappingOpExtractJSON;
 
 public class WrappedRESTEndpointImpl extends RESTEndpointImpl
                                      implements WrappedRESTEndpoint
@@ -100,31 +110,37 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 	                                           final SPARQLGraphPattern pattern )
 			throws DataConversionException
 	{
-		final ObjectMapper mapper = new ObjectMapper();
-		final JsonNode rootNode;
-		try {
-			rootNode = mapper.readTree(data);
-		}
-		catch ( final JsonProcessingException e ) {
-			throw new DataConversionException( "Failure parsing a JSON response: " + e.getMessage(), e );
-		}
+		final SourceReference sr = new SourceReference() {};
+		final JsonPathQuery query = new JsonPathQuery("$.current");
 
-		final JsonNode currentNode = rootNode.get("current");
-		final JsonNode tempNode = currentNode.get("temperature_2m");
-		final JsonNode windNode = currentNode.get("wind_speed_10m");
+		final Map<String, JsonPathQuery> P1 = new HashMap<>();
+		final Map<String, JsonPathQuery> P2 = new HashMap<>();
+		P1.put( MappingRelation.oAttr, new JsonPathQuery("temperature_2m") );
+		P2.put( MappingRelation.oAttr, new JsonPathQuery("wind_speed_10m") );
 
-		final double temp = tempNode.asDouble();
-		final double wind = windNode.asDouble();
+		final MappingOperator op1 = new MappingOpExtractJSON(sr, query, P1);
+		final MappingOperator op2 = new MappingOpExtractJSON(sr, query, P2);
 
-		final Dataset ds = DatasetFactory.create();
-		final Graph g = ds.asDatasetGraph().getDefaultGraph();
-		final Node bn = NodeFactory.createBlankNode();
-		g.add( bn,
-		       NodeFactory.createURI("http://example.org/temperature"),
-		       NodeFactory.createLiteralByValue(temp) );
-		g.add( bn,
-		       NodeFactory.createURI("http://example.org/windSpeed"),
-		       NodeFactory.createLiteralByValue(wind) );
+		final Node bnodeLabel = NodeFactory.createLiteralString("b");
+		final ExtendExpression expr = new ExtendExprFunction( ExtnFct_ToBNode.instance,
+		                                                      new ExtendExprConstant(bnodeLabel) );
+		final MappingOperator op1S = new MappingOpExtend(op1, expr, MappingRelation.sAttr);
+		final MappingOperator op2S = new MappingOpExtend(op2, expr, MappingRelation.sAttr);
+
+		final Node uri1 = NodeFactory.createURI("http://example.org/temperature");
+		final Node uri2 = NodeFactory.createURI("http://example.org/windSpeed");
+		final ExtendExpression expr1 = new ExtendExprConstant(uri1);
+		final ExtendExpression expr2 = new ExtendExprConstant(uri2);
+		final MappingOperator op1P = new MappingOpExtend(op1S, expr1, MappingRelation.pAttr);
+		final MappingOperator op2P = new MappingOpExtend(op2S, expr2, MappingRelation.pAttr);
+
+		final MappingOperator op = new MappingOpUnion(op1P, op2P);
+
+		final Map<SourceReference, DataObject> srMap = new HashMap<>();
+		srMap.put( sr, new JsonObject(data) );
+
+		final MappingRelation r = op.evaluate(srMap);
+		final Dataset ds = MappingRelationUtils.convertToRDF(r);
 
 		return ds;
 	}

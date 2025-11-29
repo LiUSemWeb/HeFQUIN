@@ -15,6 +15,10 @@ import se.liu.ida.hefquin.mappings.algebra.exprs.ExtensionFunction;
  */
 public class ExtnFct_ToLiteral implements ExtensionFunction
 {
+	public static final ExtensionFunction instance = new ExtnFct_ToLiteral();
+
+	protected ExtnFct_ToLiteral() {}
+
 	@Override
 	public boolean isCorrectNumberOfArgument( final int n ) {
 		return n == 2;

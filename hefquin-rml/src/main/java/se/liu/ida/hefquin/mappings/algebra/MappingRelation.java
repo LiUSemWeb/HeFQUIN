@@ -34,4 +34,8 @@ public interface MappingRelation
 		}
 	};
 
+	static String sAttr = "s";
+	static String pAttr = "p";
+	static String oAttr = "o";
+	static String gAttr = "g";
 }
