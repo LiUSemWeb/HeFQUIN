@@ -73,8 +73,21 @@ function procFDVocab
          ../hefquin-vocabs/src/main/java/se/liu/ida/hefquin/vocabulary/
 }
 
+function procRMLCore
+{
+    proc https://kg-construct.github.io/rml-resources/ontology.ttl \
+         RMLVocab \
+         "http://w3id.org/rml/" \
+         "se.liu.ida.hefquin.mappings.vocabulary" \
+         ../hefquin-rml/src/main/java/se/liu/ida/hefquin/mappings/vocabulary/
+
+    echo
+    echo "There is a 'Property' named 'null' in the generated Java file, which must still be renamed to 'null_'."
+}
+
 ### Below, uncomment the line for which you want to run the script.
 
-procLPGtoRDF
-procECVocab
-procFDVocab
+#procLPGtoRDF
+#procECVocab
+#procFDVocab
+#procRMLCore

@@ -1,6 +1,7 @@
 PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
 PREFIX fd:     <http://w3id.org/hefquin/feddesc#>
+PREFIX rml:    <http://w3id.org/rml/>
 PREFIX ex:     <http://example.org/>
 
 ex:dbpediaSPARQL
@@ -30,14 +31,37 @@ ex:openMeteo
                      fd:queryParameters ( [ fd:paramName "latitude" ; fd:paramType xsd:float ]
                                           [ fd:paramName "longitude" ; fd:paramType xsd:float ]
                                           [ fd:paramName "current" ; fd:paramType xsd:string ] ) ] ;
-      fd:wrapper [ a rdf:Resource ] .
+      fd:wrapper _:openMeteoWrapper .
 
 ex:openMeteo2
       fd:serviceURI <https://api.open-meteo.com/v1/forecast/WithFixedParams> ;
       fd:interface [ a                  fd:RESTInterface ;
                      fd:endpointAddress <https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m> ;
                      fd:queryParameters () ] ;
-      fd:wrapper [ a rdf:Resource ] .
+      fd:wrapper _:openMeteoWrapper .
+
+_:openMeteoWrapper
+      fd:rmlTriplesMaps ( _:openMeteoTM1 _:openMeteoTM2 ) .
+
+_:openMeteoTM1
+      rml:logicalSource [ rml:source [] ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.current" ] ;
+      rml:subjectMap [ rml:termType rml:BlankNode ;
+                       rml:reference "time" ];
+      rml:predicateObjectMap [ rml:predicate ex:temperature ;
+                               rml:objectMap [ rml:reference "temperature_2m" ] ] .
+
+_:openMeteoTM2
+      rml:logicalSource [ rml:source [] ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.current" ] ;
+      rml:subjectMap [ rml:termType rml:BlankNode ;
+                       rml:reference "time" ];
+      rml:predicateObjectMap [ rml:predicate ex:temperature ;
+                               rml:objectMap [ rml:reference "wind_speed_10m" ] ] .
+
+
 
 #ex:neo4jTest
 #      a            fd:FederationMember ;
