@@ -78,8 +78,8 @@ function procRMLCore
     proc https://kg-construct.github.io/rml-resources/ontology.ttl \
          RMLVocab \
          "http://w3id.org/rml/" \
-         "se.liu.ida.hefquin.mappings.vocabulary" \
-         ../hefquin-rml/src/main/java/se/liu/ida/hefquin/mappings/vocabulary/
+         "se.liu.ida.hefquin.rml.vocabulary" \
+         ../hefquin-rml/src/main/java/se/liu/ida/hefquin/rml/vocabulary/
 
     echo
     echo "There is a 'Property' named 'null' in the generated Java file, which must still be renamed to 'null_'."
