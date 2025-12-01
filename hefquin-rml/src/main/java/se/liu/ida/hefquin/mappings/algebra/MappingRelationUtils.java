@@ -26,7 +26,7 @@ public class MappingRelationUtils
 		final int oIdx = schema.indexOf( MappingRelation.oAttr );
 		// TODO: extend this function to cover the graph component as well
 
-		if ( sIdx == -1 || pIdx != -1 || oIdx != -1 )
+		if ( sIdx == -1 || pIdx == -1 || oIdx == -1 )
 			throw new IllegalArgumentException("The schema of the given mapping relation does not contain all relevant attributes: " + schema.toString() );
 
 		final MappingRelationCursor c = r.getCursor();
