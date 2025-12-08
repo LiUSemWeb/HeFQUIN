@@ -510,5 +510,6 @@ public class RMLVocab {
     
     /** <p>Represents Zip file compression.</p> */
     public static final Resource zip = M_MODEL.createResource( "http://w3id.org/rml/zip" );
-    
+
+    public static final Property constant = M_MODEL.createProperty( "http://w3id.org/rml/constant" );
 }
