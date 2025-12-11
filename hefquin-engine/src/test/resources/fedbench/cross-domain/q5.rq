@@ -5,8 +5,12 @@ PREFIX owl: <http://www.w3.org/2002/07/owl#>
 SELECT ?film ?director ?genre
 WHERE {
    VALUES (?s1 ?s2) { ( <%s> <%s> ) }
-   SERVICE ?s1 { ?film dbo:director  ?director .
-               ?director dbo:nationality dbr:Italy }
-   SERVICE ?s2 { ?x owl:sameAs ?film .
-               ?x <http://data.linkedmdb.org/resource/movie/genre> ?genre }
+   SERVICE ?s1 {
+      ?film dbo:director  ?director .
+      ?director dbo:nationality dbr:Italy
+   }
+   SERVICE ?s2 {
+      ?x owl:sameAs ?film .
+      ?x <http://data.linkedmdb.org/resource/movie/genre> ?genre
+   }
 }

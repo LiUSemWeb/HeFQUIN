@@ -5,7 +5,11 @@ PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
 SELECT ?party ?page WHERE {
    VALUES (?s1 ?s2) { ( <%s> <%s>) }
-   SERVICE ?s1 { dbr:Barack_Obama dbo:party ?party }
-   SERVICE ?s2 { ?x nyt:topicPage ?page .
-               ?x owl:sameAs dbr:Barack_Obama }
+   SERVICE ?s1 {
+      dbr:Barack_Obama dbo:party ?party
+   }
+   SERVICE ?s2 {
+      ?x nyt:topicPage ?page .
+      ?x owl:sameAs dbr:Barack_Obama
+   }
 }

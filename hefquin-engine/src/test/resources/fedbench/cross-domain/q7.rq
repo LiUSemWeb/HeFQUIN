@@ -5,8 +5,12 @@ PREFIX geo: <http://www.geonames.org/ontology#>
 SELECT ?location ?news
 WHERE {
 VALUES (?s1 ?s2){ (<%s> <%s>) (<%s> <%s>) } 
-   SERVICE ?s1 { ?location geo:parentFeature ?parent . 
-                ?y owl:sameAs ?location .
-                ?y nyt:topicPage ?news }
-   SERVICE ?s2 { ?parent geo:name 'California' }
+   SERVICE ?s1 {
+      ?location geo:parentFeature ?parent . 
+      ?y owl:sameAs ?location .
+      ?y nyt:topicPage ?news
+   }
+   SERVICE ?s2 {
+      ?parent geo:name 'California'
+   }
 }
