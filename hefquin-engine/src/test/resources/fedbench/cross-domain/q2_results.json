@@ -1,0 +1,12 @@
+{ "head": {
+    "vars": [ "party" , "page" ]
+  } ,
+  "results": {
+    "bindings": [
+      { 
+        "party": { "type": "uri" , "value": "http://dbpedia.org/resource/Democratic_Party_%28United_States%29" } ,
+        "page": { "type": "uri" , "value": "http://topics.nytimes.com/top/reference/timestopics/people/o/barack_obama/index.html" }
+      }
+    ]
+  }
+}

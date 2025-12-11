@@ -1,0 +1,368 @@
+{ "head": {
+    "vars": [ "predicate" , "object" ]
+  } ,
+  "results": {
+    "bindings": [
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" } ,
+        "object": { "type": "uri" , "value": "http://www.w3.org/2002/07/owl#Thing" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/ontology/Person" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/ontology/Politician" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/ontology/President" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2000/01/rdf-schema#label" } ,
+        "object": { "type": "literal" , "xml:lang": "en" , "value": "Barack Obama" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2002/07/owl#sameAs" } ,
+        "object": { "type": "uri" , "value": "http://data.nytimes.com/47452218948077706853" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:1961_births" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:American_people_of_English_descent" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Columbia_University_alumni" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Current_national_leaders" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Grammy_Award_winners" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Living_people" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Nobel_Peace_Prize_laureates" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Presidents_of_the_United_Nations_Security_Council" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Barack_Obama" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:African_American_memoirists" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:People_from_Honolulu%2C_Hawaii" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:African_American_United_States_presidential_candidates" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:American_civil_rights_lawyers" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:American_legal_academics" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:American_political_writers" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Harvard_Law_School_alumni" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Illinois_Democrats" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:African_American_politicians" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Community_organizers" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Illinois_lawyers" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Punahou_School_alumni" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:United_Church_of_Christ_members" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:African_American_academics" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Illinois_State_Senators" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Politicians_from_Chicago%2C_Illinois" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Presidents_of_the_United_States" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Audio_book_narrators" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Democratic_Party_%28United_States%29_presidential_nominees" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Time_magazine_Persons_of_the_Year" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:United_States_Senators_from_Illinois" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Writers_from_Chicago%2C_Illinois" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:American_Nobel_laureates" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:United_States_presidential_candidates%2C_2008" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Luo_people" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:African_American_lawyers" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Occidental_College_alumni" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:21st-century_presidents_of_the_United_States" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:African_American_United_States_Senators" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:American_people_of_Kenyan_descent" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:Renewable-energy_promoters" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#subject" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Category:University_of_Chicago_Law_School_faculty" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/activeYearsEndDate" } ,
+        "object": { "type": "literal" , "datatype": "http://www.w3.org/2001/XMLSchema#date" , "value": "2004-11-04" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/activeYearsEndDate" } ,
+        "object": { "type": "literal" , "datatype": "http://www.w3.org/2001/XMLSchema#date" , "value": "2008-11-16" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/activeYearsStartDate" } ,
+        "object": { "type": "literal" , "datatype": "http://www.w3.org/2001/XMLSchema#date" , "value": "1997-01-08" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/activeYearsStartDate" } ,
+        "object": { "type": "literal" , "datatype": "http://www.w3.org/2001/XMLSchema#date" , "value": "2005-01-03" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/activeYearsStartDate" } ,
+        "object": { "type": "literal" , "datatype": "http://www.w3.org/2001/XMLSchema#date" , "value": "2009-01-20" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/almaMater" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Occidental_College" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/almaMater" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Columbia_University" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/almaMater" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Harvard_Law_School" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/birthDate" } ,
+        "object": { "type": "literal" , "datatype": "http://www.w3.org/2001/XMLSchema#date" , "value": "1961-08-04" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/birthName" } ,
+        "object": { "type": "literal" , "xml:lang": "en" , "value": "Barack Hussein Obama II" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/birthPlace" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Honolulu" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/child" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Family_of_Barack_Obama%23Immediate_family" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/nationality" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/United_States" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/occupation" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Author" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/occupation" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Lawyer" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/occupation" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Community_organizing" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/occupation" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Constitutional_law" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/orderInOffice" } ,
+        "object": { "type": "literal" , "xml:lang": "en" , "value": "44th" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/orderInOffice" } ,
+        "object": { "type": "literal" , "xml:lang": "en" , "value": "President of the United States" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/party" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Democratic_Party_%28United_States%29" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/region" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Illinois" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/religion" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Christianity" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/residence" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/White_House" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/seniority" } ,
+        "object": { "type": "literal" , "xml:lang": "en" , "value": "United States Senator" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/spouse" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Michelle_Obama" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/successor" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Kwame_Raoul" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/successor" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Roland_Burris" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/thumbnail" } ,
+        "object": { "type": "uri" , "value": "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Official_portrait_of_Barack_Obama.jpg/200px-Official_portrait_of_Barack_Obama.jpg" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://dbpedia.org/ontology/vicePresident" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Joe_Biden" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://xmlns.com/foaf/0.1/depiction" } ,
+        "object": { "type": "uri" , "value": "http://upload.wikimedia.org/wikipedia/commons/e/e9/Official_portrait_of_Barack_Obama.jpg" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" } ,
+        "object": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#Concept" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2002/07/owl#sameAs" } ,
+        "object": { "type": "uri" , "value": "http://data.nytimes.com/obama_barack_per" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2002/07/owl#sameAs" } ,
+        "object": { "type": "uri" , "value": "http://dbpedia.org/resource/Barack_Obama" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2002/07/owl#sameAs" } ,
+        "object": { "type": "uri" , "value": "http://rdf.freebase.com/ns/en.barack_obama" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#inScheme" } ,
+        "object": { "type": "uri" , "value": "http://data.nytimes.com/elements/nytd_per" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://data.nytimes.com/elements/associated_article_count" } ,
+        "object": { "type": "literal" , "datatype": "http://www.w3.org/2001/XMLSchema#int" , "value": "5245" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://data.nytimes.com/elements/first_use" } ,
+        "object": { "type": "literal" , "datatype": "http://www.w3.org/2001/XMLSchema#date" , "value": "2004-09-03" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://data.nytimes.com/elements/latest_use" } ,
+        "object": { "type": "literal" , "datatype": "http://www.w3.org/2001/XMLSchema#date" , "value": "2010-06-14" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://data.nytimes.com/elements/number_of_variants" } ,
+        "object": { "type": "literal" , "datatype": "http://www.w3.org/2001/XMLSchema#int" , "value": "4" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://data.nytimes.com/elements/search_api_query" } ,
+        "object": { "type": "literal" , "value": "http://api.nytimes.com/svc/search/v1/article?query=+nytd_per_facet%3A%5BObama%2C+Barack%5D&rank=newest&fields=abstract,author,body,byline,classifiers_facet,column_facet,date,day_of_week_facet,des_facet,desk_facet,fee,geo_facet,lead_paragraph,material_type_facet,multimedia,nytd_byline,nytd_des_facet,nytd_geo_facet,nytd_lead_paragraph,nytd_org_facet,nytd_per_facet,nytd_section_facet,nytd_title,nytd_works_mentioned_facet,org_facet,page_facet,per_facet,publication_day,publication_month,publication_year,section_page_facet,small_image_height,small_image_url,small_image_width,source_facet,title,url,word_count,works_mentioned_facet" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://data.nytimes.com/elements/topicPage" } ,
+        "object": { "type": "uri" , "value": "http://topics.nytimes.com/top/reference/timestopics/people/o/barack_obama/index.html" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#definition" } ,
+        "object": { "type": "literal" , "xml:lang": "en" , "value": "OVERVIEW\nBarack Hussein Obama was sworn in as the 44th president of the United States on Jan. 20, 2009. The son of a black man from Kenya and a white woman from Kansas, he is the first African-American to ascend to the highest office in the land.\nwhile in the White House. So striking was the unlikeliness of his candidacy that he embraced that aspect, calling himself \"a skinny kid with a funny name\" and making \"change\" the theme for his campaign. insist on handling a personal smartphone , the first to  Internet to decisive political advantage , the first to use the  Sept. 11, 2001 He is also the first new president since terrorists attacked New York and Washington on" }
+      } ,
+      { 
+        "predicate": { "type": "uri" , "value": "http://www.w3.org/2004/02/skos/core#prefLabel" } ,
+        "object": { "type": "literal" , "xml:lang": "en" , "value": "Obama, Barack" }
+      }
+    ]
+  }
+}

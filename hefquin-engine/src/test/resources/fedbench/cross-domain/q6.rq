@@ -1,0 +1,11 @@
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX geo:  <http://www.geonames.org/ontology#>
+
+SELECT ?name ?location ?germany
+WHERE {
+VALUES (?s1 ?s2) { (<%s> <%s>) }
+   SERVICE ?s1 { ?artist foaf:name ?name .
+                        ?artist foaf:based_near ?location }
+   SERVICE ?s2 { ?location geo:parentFeature ?germany .
+                         ?germany geo:name 'Federal Republic of Germany' }
+}

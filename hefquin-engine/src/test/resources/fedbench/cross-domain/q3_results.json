@@ -1,0 +1,18 @@
+{ "head": {
+    "vars": [ "president" , "party" , "page" ]
+  } ,
+  "results": {
+    "bindings": [
+      { 
+        "president": { "type": "uri" , "value": "http://dbpedia.org/resource/Dwight_D._Eisenhower" } ,
+        "party": { "type": "uri" , "value": "http://dbpedia.org/resource/Republican_Party_%28United_States%29" } ,
+        "page": { "type": "uri" , "value": "http://topics.nytimes.com/top/reference/timestopics/people/e/dwight_david_eisenhower/index.html" }
+      } ,
+      { 
+        "president": { "type": "uri" , "value": "http://dbpedia.org/resource/Barack_Obama" } ,
+        "party": { "type": "uri" , "value": "http://dbpedia.org/resource/Democratic_Party_%28United_States%29" } ,
+        "page": { "type": "uri" , "value": "http://topics.nytimes.com/top/reference/timestopics/people/o/barack_obama/index.html" }
+      }
+    ]
+  }
+}

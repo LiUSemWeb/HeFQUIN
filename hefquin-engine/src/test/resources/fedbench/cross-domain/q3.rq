@@ -1,0 +1,13 @@
+PREFIX nyt: <http://data.nytimes.com/elements/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT ?president ?party ?page WHERE {
+   VALUES (?s1 ?s2) { ( <%s> <%s> ) }
+   SERVICE ?s1 { ?president a dbo:President .
+               ?president dbo:nationality dbr:United_States .
+               ?president dbo:party ?party }
+   SERVICE ?s2 { ?x nyt:topicPage ?page .
+               ?x owl:sameAs ?president }
+}

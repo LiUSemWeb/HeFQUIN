@@ -1,0 +1,14 @@
+{ "head": {
+    "vars": [ "actor" , "news" , "s1" , "s2" ]
+  } ,
+  "results": {
+    "bindings": [
+      { 
+        "actor": { "type": "uri" , "value": "http://data.linkedmdb.org/resource/actor/7" } ,
+        "news": { "type": "uri" , "value": "http://topics.nytimes.com/top/reference/timestopics/people/o/rosie_odonnell/index.html" } ,
+        "s1": { "type": "uri" , "value": "http://localhost:8080/sparql/lmdb/" } ,
+        "s2": { "type": "uri" , "value": "http://localhost:8080/sparql/nyt/" }
+      }
+    ]
+  }
+}

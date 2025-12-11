@@ -1,0 +1,12 @@
+PREFIX nyt: <http://data.nytimes.com/elements/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX ex:  <http://localhost/sparql/>
+SELECT ?actor ?news ?s1 ?s2
+WHERE {
+   VALUES (?s1 ?s2) { ( <%s> <%s> ) }
+   SERVICE ?s1 { ?film <http://purl.org/dc/terms/title> 'Tarzan' .
+               ?film <http://data.linkedmdb.org/resource/movie/actor> ?actor .
+               ?actor owl:sameAs ?x }
+   SERVICE ?s2 { ?y owl:sameAs ?x .
+               ?y nyt:topicPage ?news }
+}
