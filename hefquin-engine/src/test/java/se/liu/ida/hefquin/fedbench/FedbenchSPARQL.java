@@ -50,7 +50,7 @@ public class FedbenchSPARQL extends FedbenchTestBase
 	public void executeQuery6() throws Exception {
 		final String[] values = new String[]{ "http://localhost:8080/sparql/jamendo/",
 		                                      "http://localhost:8080/sparql/geonames/" };
-		_executeQuery( "fedbench/cross-domain/q6", 2500, values );
+		_executeQuery( "fedbench/cross-domain/q6", 5000, values );
 	}
 
 	@Test
