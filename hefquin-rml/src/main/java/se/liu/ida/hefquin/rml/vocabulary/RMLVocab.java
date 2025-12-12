@@ -512,4 +512,6 @@ public class RMLVocab {
     public static final Resource zip = M_MODEL.createResource( "http://w3id.org/rml/zip" );
 
     public static final Property constant = M_MODEL.createProperty( "http://w3id.org/rml/constant" );
+
+    public static final Resource defaultGraph = M_MODEL.createResource( "http://w3id.org/rml/defaultGraph" );
 }
