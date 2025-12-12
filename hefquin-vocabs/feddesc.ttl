@@ -144,3 +144,9 @@ fd:wrapper a rdf:Property ;
     rdfs:range  fd:Wrapper ;
     rdfs:label "wrapper"@en ;
     rdfs:comment "The wrapper of a wrapped federation member."@en .
+
+fd:rmlTriplesMaps a rdf:Property ;
+    rdfs:domain fd:Wrapper ;
+    rdfs:range  rdf:List ;
+    rdfs:label "RML triples maps"@en ;
+    rdfs:comment "List of RML triples maps that define the mapping for a wrapper. The elements of such a list are expected to be of type rml:TriplesMap."@en .

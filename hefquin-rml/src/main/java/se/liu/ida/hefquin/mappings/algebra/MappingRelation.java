@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.mappings.algebra;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Node_Ext;
@@ -34,8 +35,9 @@ public interface MappingRelation
 		}
 	};
 
-	static String sAttr = "s";
-	static String pAttr = "p";
-	static String oAttr = "o";
-	static String gAttr = "g";
+	static final String sAttr = "s";
+	static final String pAttr = "p";
+	static final String oAttr = "o";
+	static final String gAttr = "g";
+	static final Set<String> spogAttrs = Set.of( sAttr, pAttr, oAttr, gAttr );
 }

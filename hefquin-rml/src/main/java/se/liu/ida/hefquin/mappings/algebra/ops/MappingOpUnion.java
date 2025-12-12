@@ -17,26 +17,21 @@ import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
 import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
 
-public class MappingOpUnion extends BaseForMappingOperator
+public class MappingOpUnion extends BaseForNaryMappingOperator
 {
-	protected final List<MappingOperator> elements;
-
 	protected final Set<String> schema;
 	protected final boolean valid;
 
-	public MappingOpUnion( final MappingOperator ... elements ) {
-		this( Arrays.asList(elements) );
+	public MappingOpUnion( final MappingOperator ... subOps ) {
+		this( Arrays.asList(subOps) );
 	}
 
-	public MappingOpUnion( final List<MappingOperator> elements ) {
-		assert elements != null;
-		assert elements.size() > 1;
-
-		this.elements = elements;
+	public MappingOpUnion( final List<MappingOperator> subOps ) {
+		super(subOps);
 
 		schema = new HashSet<>();
 		boolean _valid = true;
-		for ( final MappingOperator subOp : elements ) {
+		for ( final MappingOperator subOp : subOps ) {
 			final Set<String> schemaOfSubOp = subOp.getSchema();
 			schema.addAll(schemaOfSubOp);
 
@@ -50,10 +45,6 @@ public class MappingOpUnion extends BaseForMappingOperator
 		valid = _valid;
 	}
 
-	public int size() { return elements.size(); }
-
-	public Iterable<MappingOperator> getElements() { return elements; }
-
 	@Override
 	public Set<String> getSchema() {
 		return schema;
@@ -66,7 +57,7 @@ public class MappingOpUnion extends BaseForMappingOperator
 
 	@Override
 	public boolean isValidInput( final Map<SourceReference, DataObject> srMap ) {
-		for ( final MappingOperator subOp : elements ) {
+		for ( final MappingOperator subOp : subOps ) {
 			if ( ! subOp.isValidInput(srMap) )
 				return false;
 		}
@@ -116,7 +107,7 @@ public class MappingOpUnion extends BaseForMappingOperator
 		                 final Map<SourceReference, DataObject> srMap ) {
 			this.myRelation = myRelation;
 			this.srMap = srMap;
-			subOpIt = elements.iterator();
+			subOpIt = subOps.iterator();
 		}
 
 		@Override

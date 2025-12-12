@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -20,6 +21,7 @@ import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.jenaintegration.HeFQUINConstants;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
+import se.liu.ida.hefquin.mappings.algebra.MappingOperatorUtils;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationUtils;
 import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExprConstant;
@@ -37,8 +39,18 @@ import se.liu.ida.hefquin.mappings.algebra.sources.json.MappingOpExtractJSON;
 public class WrappedRESTEndpointImpl extends RESTEndpointImpl
                                      implements WrappedRESTEndpoint
 {
-	public WrappedRESTEndpointImpl( final String url, final List<RESTEndpoint.Parameter> params ) {
+	protected final MappingOperator mappingExpression;
+	protected final Set<SourceReference> srcRefs;
+
+	public WrappedRESTEndpointImpl( final String url,
+	                                final List<RESTEndpoint.Parameter> params,
+	                                final MappingOperator mappingExpression ) {
 		super(url, params);
+
+		assert mappingExpression != null;
+		this.mappingExpression = mappingExpression;
+
+		srcRefs = MappingOperatorUtils.extractAllSrcRefs(mappingExpression);
 	}
 
 	@Override
@@ -110,6 +122,7 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 	                                           final SPARQLGraphPattern pattern )
 			throws DataConversionException
 	{
+/*
 		final SourceReference sr = new SourceReference() {};
 		final JsonPathQuery query = new JsonPathQuery("$.current");
 
@@ -140,6 +153,16 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 		srMap.put( sr, new JsonObject(data) );
 
 		final MappingRelation r = op.evaluate(srMap);
+*/
+
+		final DataObject dataObj = new JsonObject(data);
+		final Map<SourceReference, DataObject> srMap = new HashMap<>();
+		for ( final SourceReference sr : srcRefs ) {
+			srMap.put(sr, dataObj);
+		}
+
+		final MappingRelation r = mappingExpression.evaluate(srMap);
+
 		final Dataset ds = MappingRelationUtils.convertToRDF(r);
 
 		return ds;

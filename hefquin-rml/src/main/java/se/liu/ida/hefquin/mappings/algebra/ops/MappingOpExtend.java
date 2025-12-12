@@ -16,9 +16,8 @@ import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExpression;
 import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
 
-public class MappingOpExtend extends BaseForMappingOperator
+public class MappingOpExtend extends BaseForUnaryMappingOperator
 {
-	protected final MappingOperator subOp;
 	protected final ExtendExpression expr;
 	protected final String attribute;
 
@@ -28,11 +27,10 @@ public class MappingOpExtend extends BaseForMappingOperator
 	public MappingOpExtend( final MappingOperator subOp,
 	                        final ExtendExpression expr,
 	                        final String attribute ) {
-		assert subOp != null;
+		super(subOp);
 		assert expr != null;
 		assert attribute != null;
 
-		this.subOp = subOp;
 		this.expr = expr;
 		this.attribute = attribute;
 

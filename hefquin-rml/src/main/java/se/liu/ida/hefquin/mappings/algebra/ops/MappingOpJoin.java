@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.mappings.algebra.ops;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,24 +13,26 @@ import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
 
-public class MappingOpJoin extends BaseForMappingOperator
+public class MappingOpJoin extends BaseForBinaryMappingOperator
 {
-	protected final MappingOperator subOp1;
-	protected final MappingOperator subOp2;
-	protected final Set<Pair<String,String>> J;
+	protected final List<Pair<String,String>> J;
 
 	protected final Set<String> schema;
 	protected final boolean valid;
 
+	@SafeVarargs
 	public MappingOpJoin( final MappingOperator subOp1,
 	                      final MappingOperator subOp2,
-	                      final Set<Pair<String,String>> J ) {
-		assert subOp1 != null;
-		assert subOp2 != null;
-		assert J != null;
+	                      final Pair<String,String> ... J ) {
+		this( subOp1, subOp2, Arrays.asList(J) );
+	}
 
-		this.subOp1 = subOp1;
-		this.subOp2 = subOp2;
+	public MappingOpJoin( final MappingOperator subOp1,
+	                      final MappingOperator subOp2,
+	                      final List<Pair<String,String>> J ) {
+		super(subOp1, subOp2);
+
+		assert J != null;
 		this.J = J;
 
 		final Set<String> schemaOfSubOp1 = subOp1.getSchema();
@@ -52,7 +56,7 @@ public class MappingOpJoin extends BaseForMappingOperator
 		}
 	}
 
-	protected static boolean isValid( final Set<Pair<String,String>> J,
+	protected static boolean isValid( final List<Pair<String,String>> J,
 	                                  final Set<String> schemaOfSubOp1,
 	                                  final Set<String> schemaOfSubOp2 ) {
 		for ( final Pair<String,String> j : J ) {

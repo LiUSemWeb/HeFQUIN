@@ -12,6 +12,7 @@ import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
@@ -39,6 +40,11 @@ import se.liu.ida.hefquin.federation.members.impl.SPARQLEndpointImpl;
 import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
 import se.liu.ida.hefquin.federation.members.impl.WrappedRESTEndpointImpl;
 import se.liu.ida.hefquin.jenaext.ModelUtils;
+import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
+import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpProject;
+import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
+import se.liu.ida.hefquin.rml.RML2MappingAlgebra;
+import se.liu.ida.hefquin.rml.RMLParserException;
 import se.liu.ida.hefquin.vocabulary.FDVocab;
 
 public class FederationDescriptionReader
@@ -242,7 +248,37 @@ public class FederationDescriptionReader
 
 			final Resource wrapper = ModelUtils.getSingleMandatoryResourceProperty( fedMember, FDVocab.wrapper );
 
-			return createWrappedRESTEndpoint(addrStr, params);
+			// TODO: Each of the TrMap-expressions created in the following
+			// should be cached to avoid producing it again if another federation
+			// member uses the exact same triples map.
+			final Resource rmlTMsList = ModelUtils.getSingleMandatoryResourceProperty( wrapper, FDVocab.rmlTriplesMaps );
+			if ( ! rmlTMsList.canAs(RDFList.class) )
+				throw new IllegalArgumentException( FDVocab.rmlTriplesMaps.getLocalName() + " property of " + wrapper.toString() + " should be a list." );
+
+			final Iterator<RDFNode> rmTMsIterator = rmlTMsList.as( RDFList.class ).iterator();
+			final Node baseIRI = null;
+			final List<MappingOperator> trMaps = new ArrayList<>();
+			while ( rmTMsIterator.hasNext() ) {
+				final RDFNode tm = rmTMsIterator.next();
+				if ( tm.isResource() ) {
+					final MappingOperator trMap;
+					try {
+						trMap = RML2MappingAlgebra.convert( tm.asResource(),
+						                                    fd,
+						                                    baseIRI );
+					}
+					catch ( final RMLParserException e ) {
+						throw new IllegalArgumentException("There is a problem in the RML mapping for <" + serviceURI + ">: " +  e.getMessage(), e );
+					}
+
+					trMaps.add(trMap);
+				}
+			}
+
+			if ( trMaps.isEmpty() )
+				throw new IllegalArgumentException("The wrapped RESt endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
+
+			return createWrappedRESTEndpoint(addrStr, params, trMaps);
 		}
 		else {
 			throw new IllegalArgumentException( ifaceType.toString() );
@@ -327,9 +363,25 @@ public class FederationDescriptionReader
 	}
 
 	protected FederationMember createWrappedRESTEndpoint( final String uri,
-	                                               final List<RESTEndpoint.Parameter> params ) {
+	                                                      final List<RESTEndpoint.Parameter> params,
+	                                                      final List<MappingOperator> trMaps ) {
 		verifyExpectedURI(uri);
-		return new WrappedRESTEndpointImpl(uri, params);
+
+		assert ! trMaps.isEmpty();
+
+		if ( trMaps.size() == 1 ) {
+			final MappingOperator mappingExpression = trMaps.get(0);
+			return new WrappedRESTEndpointImpl(uri, params, mappingExpression);
+		}
+
+		final MappingOperator[] elmts = new MappingOperator[ trMaps.size() ];
+		int i = 0;
+		for ( final MappingOperator trMapExpr : trMaps ) {
+			elmts[i++] = MappingOpProject.createWithSPOG(trMapExpr);
+		}
+
+		final MappingOperator mappingExpression = new MappingOpUnion(elmts);
+		return new WrappedRESTEndpointImpl(uri, params, mappingExpression);
 	}
 
 	/**

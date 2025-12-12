@@ -74,6 +74,7 @@ import se.liu.ida.hefquin.federation.members.Neo4jServer;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
+import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.federation.members.impl.BaseForFederationMember;
 import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
 
@@ -323,6 +324,50 @@ public abstract class EngineTestBase
 				}
 			}
 			return new TPFResponseForTest(result, this, req);
+		}
+	}
+
+	public static class WrappedRESTEndpointForTest extends FederationMemberBaseForTest
+	                                               implements WrappedRESTEndpoint
+	{
+		protected final List<SolutionMapping> result;
+
+		public WrappedRESTEndpointForTest( final List<SolutionMapping> result ) {
+			super(null);
+			this.result = result;
+		}
+
+		@Override
+		public String getURL() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getNumberOfParameters() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Iterable<Parameter> getParameters() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean supportsMoreThanTriplePatterns() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public List<SolutionMapping> evaluatePatternOverRDFView(
+				final SPARQLGraphPattern pattern,
+				final String data )
+						throws DataConversionException {
+			return result;
 		}
 	}
 

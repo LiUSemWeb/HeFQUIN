@@ -260,7 +260,9 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 			@Override public RDFDatatype getType() { return XSDDatatype.XSDdouble; }
 		};
 
-		final WrappedRESTEndpoint ep = new WrappedRESTEndpointImpl("http://example.org/", List.of(param) );
+		final WrappedRESTEndpoint ep =
+				//new WrappedRESTEndpointImpl("http://example.org/", List.of(param) );
+				new WrappedRESTEndpointForTest();
 
 		return new ExecOpLookupJoinViaWrapperWithParamVars( pattern,
 		                                                    paramVarsOfEndpoint,

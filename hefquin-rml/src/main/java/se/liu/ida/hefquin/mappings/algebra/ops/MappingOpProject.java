@@ -15,20 +15,22 @@ import se.liu.ida.hefquin.mappings.algebra.impl.MappingRelationImplWithColumnLay
 import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
 
-public class MappingOpProject extends BaseForMappingOperator
+public class MappingOpProject extends BaseForUnaryMappingOperator
 {
-	protected final MappingOperator subOp;
 	protected final Set<String> P;
 
 	protected final Set<String> schema;
 	protected final boolean valid;
 
+	public static MappingOpProject createWithSPOG( final MappingOperator subOp ) {
+		return new MappingOpProject( subOp, MappingRelation.spogAttrs );
+	}
+
 	public MappingOpProject( final MappingOperator subOp, final Set<String> P ) {
-		assert subOp != null;
+		super(subOp);
 		assert P != null;
 		assert ! P.isEmpty();
 
-		this.subOp = subOp;
 		this.P = P;
 
 		final Set<String> schemaOfSubOp = subOp.getSchema();
