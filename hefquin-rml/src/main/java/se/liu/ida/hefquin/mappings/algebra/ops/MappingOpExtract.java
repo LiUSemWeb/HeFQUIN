@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.mappings.algebra.MappingOperatorVisitor;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
 import se.liu.ida.hefquin.mappings.algebra.impl.MappingRelationImplWithColumnLayout;
@@ -27,7 +28,7 @@ public class MappingOpExtract< DDS extends DataObject,
        extends BaseForMappingOperator
 {
 	protected final SourceReference sr;
-	protected final SourceType< DDS, DC1, DC2, QL1, QL2> type;
+	protected final SourceType<DDS, DC1, DC2, QL1, QL2> type;
 	protected final QL1 query;
 	protected final String[] attributesOfP;
 	protected final List<QL2> queriesOfP;
@@ -61,11 +62,26 @@ public class MappingOpExtract< DDS extends DataObject,
 
 	public SourceReference getSourceReference() { return sr; }
 
+	public SourceType<DDS, DC1, DC2, QL1, QL2> getSourceType() { return type; }
+
+	public QL1 getQuery() { return query; }
+
+	public int getSizeOfP() { return attributesOfP.length; }
+
+	public String getIthAttributeOfP( final int i ) { return attributesOfP[i]; }
+
+	public Iterable<QL2> getQueriesOfP() { return queriesOfP; }
+
 	@Override
 	public Set<String> getSchema() { return schema; }
 
 	@Override
 	public boolean isValid() { return true; }
+
+	@Override
+	public void visit( final MappingOperatorVisitor visitor ) {
+		visitor.visit(this);
+	}
 
 	@Override
 	public boolean isValidInput( final Map<SourceReference, DataObject> srMap ) {

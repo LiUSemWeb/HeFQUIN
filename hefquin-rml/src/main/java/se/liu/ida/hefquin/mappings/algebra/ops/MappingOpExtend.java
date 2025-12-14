@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
+import se.liu.ida.hefquin.mappings.algebra.MappingOperatorVisitor;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
 import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExpression;
@@ -51,6 +52,10 @@ public class MappingOpExtend extends BaseForUnaryMappingOperator
 		}
 	}
 
+	public String getAttribute() { return attribute; }
+
+	public ExtendExpression getExtendExpression() { return expr; }
+
 	@Override
 	public Set<String> getSchema() {
 		return schema;
@@ -59,6 +64,11 @@ public class MappingOpExtend extends BaseForUnaryMappingOperator
 	@Override
 	public boolean isValid() {
 		return valid;
+	}
+
+	@Override
+	public void visit( final MappingOperatorVisitor visitor ) {
+		visitor.visit(this);
 	}
 
 	@Override

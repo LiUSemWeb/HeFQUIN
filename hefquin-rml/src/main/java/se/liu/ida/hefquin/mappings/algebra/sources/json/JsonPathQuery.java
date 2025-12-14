@@ -26,4 +26,8 @@ public class JsonPathQuery implements Query
 		return jsonPath.getPath();
 	}
 
+	@Override
+	public String toString() {
+		return jsonPath.getPath();
+	}
 }

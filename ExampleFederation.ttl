@@ -51,8 +51,8 @@ _:openMeteoTM1
                           rml:iterator "$.current" ] ;
       rml:subjectMap [ rml:termType rml:BlankNode ;
                        rml:reference "time" ];
-      rml:predicateObjectMap [ rml:predicate ex:temperature ;
-                               rml:objectMap [ rml:reference "temperature_2m" ] ] .
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:temperature ] ;
+                               rml:objectMap [ rml:reference "temperature_2m" ; rml:datatype xsd:double ] ] .
 
 _:openMeteoTM2
       rml:logicalSource [ rml:source _:openMeteoRestEndpoint ;
@@ -60,8 +60,8 @@ _:openMeteoTM2
                           rml:iterator "$.current" ] ;
       rml:subjectMap [ rml:termType rml:BlankNode ;
                        rml:reference "time" ];
-      rml:predicateObjectMap [ rml:predicate ex:temperature ;
-                               rml:objectMap [ rml:reference "wind_speed_10m" ] ] .
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:windSpeed ] ;
+                               rml:objectMap [ rml:reference "wind_speed_10m" ; rml:datatype xsd:double ] ] .
 
 
 

@@ -7,11 +7,13 @@ import static org.junit.Assert.assertTrue;
 import java.util.Iterator;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.syntax.Element;
 import org.junit.Test;
 
@@ -24,7 +26,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediat
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
-import se.liu.ida.hefquin.federation.members.impl.WrappedRESTEndpointImpl;
 
 public class ExecOpLookupJoinViaWrapperWithoutParamVarsTest extends ExecOpTestBase
 {
@@ -121,7 +122,20 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVarsTest extends ExecOpTestBa
 		final Element el = QueryFactory.create(query).getQueryPattern();
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
 
-		final WrappedRESTEndpoint ep = new WrappedRESTEndpointImpl("http://example.org/", null);
+		final String responseData = "dummy";
+		final Graph rdfMockUp = GraphFactory.createDefaultGraph();
+		final Node subj = NodeFactory.createBlankNode();
+		rdfMockUp.add( subj,
+		               NodeFactory.createURI("http://example.org/temperature"),
+		               NodeFactory.createLiteralDT("2.3", XSDDatatype.XSDdouble) );
+		rdfMockUp.add( subj,
+		               NodeFactory.createURI("http://example.org/windSpeed"),
+		               NodeFactory.createLiteralDT("1.0", XSDDatatype.XSDdouble) );
+
+		final WrappedRESTEndpoint ep = new WrappedRESTEndpointForTest(
+				responseData,
+				rdfMockUp,
+				null );
 
 		return new ExecOpLookupJoinViaWrapperWithoutParamVars(pattern, ep, false, null);
 	}

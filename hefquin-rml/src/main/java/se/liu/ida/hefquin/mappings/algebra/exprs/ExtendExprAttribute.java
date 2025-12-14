@@ -27,4 +27,7 @@ public class ExtendExprAttribute implements ExtendExpression
 		return ( n != null) ? n : MappingRelation.errorNode;
 	}
 
+	@Override
+	public String toString() { return attribute; }
+
 }

@@ -28,16 +28,23 @@ public class ExtnFct_ToLiteral implements ExtensionFunction
 	public Node apply( final Node ... args ) {
 		assert args.length == 2;
 
-		if (    args[0].isLiteral()
-		     && args[0].getLiteralDatatype().equals(XSDDatatype.XSDstring)
-		     && args[1].isURI() ) {
-			final String lex = args[0].getLiteralLexicalForm();
+		if ( args[0].isLiteral() && args[1].isURI() ) {
+			final RDFDatatype dtArg1 = args[0].getLiteralDatatype();
 			final RDFDatatype dt = NodeFactory.getType( args[1].getURI() );
 
-			return NodeFactory.createLiteralDT(lex, dt);
+			if ( dtArg1.equals(XSDDatatype.XSDstring) || dtArg1.equals(dt) ) {
+				final String lex = args[0].getLiteralLexicalForm();
+
+				return NodeFactory.createLiteralDT(lex, dt);
+			}
 		}
 
 		return MappingRelation.errorNode;
+	}
+
+	@Override
+	public String toString() {
+		return "toLiteral";
 	}
 
 }

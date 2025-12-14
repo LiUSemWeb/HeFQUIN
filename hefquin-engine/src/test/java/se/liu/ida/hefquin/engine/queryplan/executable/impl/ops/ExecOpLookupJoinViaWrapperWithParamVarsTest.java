@@ -9,11 +9,13 @@ import java.util.List;
 
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.syntax.Element;
 import org.junit.Test;
 
@@ -27,7 +29,6 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
-import se.liu.ida.hefquin.federation.members.impl.WrappedRESTEndpointImpl;
 
 public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 {
@@ -260,9 +261,20 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 			@Override public RDFDatatype getType() { return XSDDatatype.XSDdouble; }
 		};
 
-		final WrappedRESTEndpoint ep =
-				//new WrappedRESTEndpointImpl("http://example.org/", List.of(param) );
-				new WrappedRESTEndpointForTest();
+		final String responseData = "dummy";
+		final Graph rdfMockUp = GraphFactory.createDefaultGraph();
+		final Node subj = NodeFactory.createBlankNode();
+		rdfMockUp.add( subj,
+		               NodeFactory.createURI("http://example.org/temperature"),
+		               NodeFactory.createLiteralDT("2.3", XSDDatatype.XSDdouble) );
+		rdfMockUp.add( subj,
+		               NodeFactory.createURI("http://example.org/windSpeed"),
+		               NodeFactory.createLiteralDT("1.0", XSDDatatype.XSDdouble) );
+
+		final WrappedRESTEndpoint ep = new WrappedRESTEndpointForTest(
+				responseData,
+				rdfMockUp,
+				List.of(param) );
 
 		return new ExecOpLookupJoinViaWrapperWithParamVars( pattern,
 		                                                    paramVarsOfEndpoint,

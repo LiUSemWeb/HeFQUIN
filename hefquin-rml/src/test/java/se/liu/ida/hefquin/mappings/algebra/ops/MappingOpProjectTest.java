@@ -23,7 +23,7 @@ public class MappingOpProjectTest extends BaseForMappingOperatorTests
 	@Test
 	public void getSchema_Valid() {
 		final MappingRelation input = new MappingRelationImplWithoutTuples("attr1", "attr2");
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(input);
+		final MappingOperator subOp = new MappingOpConstant(input);
 
 		final Set<String> P = Set.of("attr1");
 
@@ -36,7 +36,7 @@ public class MappingOpProjectTest extends BaseForMappingOperatorTests
 	@Test
 	public void getSchema_Invalid() {
 		final MappingRelation input = new MappingRelationImplWithoutTuples("attr1", "attr2");
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(input);
+		final MappingOperator subOp = new MappingOpConstant(input);
 
 		final Set<String> P = Set.of("attr1", "attr3");
 
@@ -61,7 +61,7 @@ public class MappingOpProjectTest extends BaseForMappingOperatorTests
 
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation r = MappingRelationImplWithColumnLayout.createBasedOnTuples(s, t1, t2, t3, t4, t5);
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(r);
+		final MappingOperator subOp = new MappingOpConstant(r);
 
 		final Set<String> P = Set.of("attr1");
 
@@ -118,7 +118,7 @@ public class MappingOpProjectTest extends BaseForMappingOperatorTests
 
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation r = MappingRelationImplWithColumnLayout.createBasedOnTuples(s, t1, t2, t3, t4, t5);
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(r);
+		final MappingOperator subOp = new MappingOpConstant(r);
 
 		final Set<String> P = Set.of("attr2");
 
@@ -175,7 +175,7 @@ public class MappingOpProjectTest extends BaseForMappingOperatorTests
 
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation r = MappingRelationImplWithColumnLayout.createBasedOnTuples(s, t1, t2, t3, t4, t5);
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(r);
+		final MappingOperator subOp = new MappingOpConstant(r);
 
 		final Set<String> P = Set.of("attr1", "attr2");
 
@@ -237,7 +237,7 @@ public class MappingOpProjectTest extends BaseForMappingOperatorTests
 
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation r = new MappingRelationImplWithTupleLayout(s, t1, t2, t3, t4, t5);
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(r);
+		final MappingOperator subOp = new MappingOpConstant(r);
 
 		final Set<String> P = Set.of("attr1");
 
@@ -294,7 +294,7 @@ public class MappingOpProjectTest extends BaseForMappingOperatorTests
 
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation r = new MappingRelationImplWithTupleLayout(s, t1, t2, t3, t4, t5);
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(r);
+		final MappingOperator subOp = new MappingOpConstant(r);
 
 		final Set<String> P = Set.of("attr2");
 
@@ -351,7 +351,7 @@ public class MappingOpProjectTest extends BaseForMappingOperatorTests
 
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation r = new MappingRelationImplWithTupleLayout(s, t1, t2, t3, t4, t5);
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(r);
+		final MappingOperator subOp = new MappingOpConstant(r);
 
 		final Set<String> P = Set.of("attr1", "attr2");
 

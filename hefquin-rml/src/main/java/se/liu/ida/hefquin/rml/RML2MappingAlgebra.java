@@ -61,25 +61,45 @@ public class RML2MappingAlgebra
 	                                       final Node baseIRI )
 			throws RMLParserException
 	{
-		// line 4 of Algorithm 1
-		final SourceReference sr = createSourceReference(tm);
-		final JsonPathQuery rootQuery = checkSourceAndGetRootQuery(tm);
-		final Set<String> queryStrings = extractQueries(tm);
-		final Map<String, String> PwithStrings = createPwithStrings(queryStrings);
-		final Map<String, JsonPathQuery> P = createP(PwithStrings, tm);
-		MappingOperator op = new MappingOpExtractJSON(sr, rootQuery, P);
-
 		// lines 5-8 of Algorithm 1
-		final Resource sm, pom, pm, om;
+		// (In contrast to Algorithm 1, we start by getting the term maps
+		//  of the given triples map, because we can use these directly when
+		//  extracting the queries in our implementation of Algorithm 2.
+		//  Additionally, we also check for a possible graph map, a parent
+		//  triples map, and the child and parent map of the corresponding
+		//  join condition.)
+		final Resource sm, pm, om, ptm, gm, jccm, jcpm;
 		try {
 			sm = ModelUtils.getSingleMandatoryResourceProperty( tm, RMLVocab.subjectMap );
-			pom = ModelUtils.getSingleMandatoryResourceProperty( tm, RMLVocab.predicateObjectMap );
+			final Resource pom = ModelUtils.getSingleMandatoryResourceProperty( tm, RMLVocab.predicateObjectMap );
 			pm = ModelUtils.getSingleMandatoryResourceProperty( pom, RMLVocab.predicateMap );
 			om = ModelUtils.getSingleMandatoryResourceProperty( pom, RMLVocab.objectMap );
+
+			final Resource gm1 = ModelUtils.getSingleOptionalResourceProperty(sm, RMLVocab.graphMap);
+			final Resource gm2 = ModelUtils.getSingleOptionalResourceProperty(pom, RMLVocab.graphMap);
+			gm = (gm1 != null) ? gm1 : (gm2 != null) ? gm2 : null;
+
+			ptm = ModelUtils.getSingleOptionalResourceProperty( om, RMLVocab.parentTriplesMap );
+			final Resource jc  = ModelUtils.getSingleOptionalResourceProperty( om, RMLVocab.joinCondition );
+			if ( jc != null ) {
+				jccm = ModelUtils.getSingleMandatoryResourceProperty( jc, RMLVocab.childMap );
+				jcpm = ModelUtils.getSingleMandatoryResourceProperty( jc, RMLVocab.parentMap );
+			}
+			else {
+				jccm  = jcpm = null;
+			}
 		}
 		catch ( final IllegalArgumentException e ) {
 			throw new RMLParserException( e.getMessage() );
 		}
+
+		// line 4 of Algorithm 1
+		final SourceReference sr = createSourceReference(tm);
+		final JsonPathQuery rootQuery = checkSourceAndGetRootQuery(tm);
+		final Set<String> queryStrings = extractQueries(sm, pm, om, jccm, jcpm);
+		final Map<String, String> PwithStrings = createPwithStrings(queryStrings);
+		final Map<String, JsonPathQuery> P = createP(PwithStrings, tm);
+		MappingOperator op = new MappingOpExtractJSON(sr, rootQuery, P);
 
 		// data structure needed for the following steps
 		// (maps query strings to attributes)
@@ -96,20 +116,24 @@ public class RML2MappingAlgebra
 		op = new MappingOpExtend( op, pExt, MappingRelation.pAttr );
 
 		// lines 10-22 of Algorithm 1
-		final Resource ptm;
-		try {
-			ptm = ModelUtils.getSingleOptionalResourceProperty(om, RMLVocab.parentTriplesMap);
-		}
-		catch ( final IllegalArgumentException e ) {
-			throw new RMLParserException( e.getMessage() );
-		}
-
 		if ( ptm != null ) {
 			// lines 12-20 of Algorithm 1
+			final Resource ptm_sm, ptm_pm, ptm_om;
+			try {
+				ptm_sm = ModelUtils.getSingleMandatoryResourceProperty( tm, RMLVocab.subjectMap );
+				final Resource pom = ModelUtils.getSingleMandatoryResourceProperty( tm, RMLVocab.predicateObjectMap );
+				ptm_pm = ModelUtils.getSingleMandatoryResourceProperty( pom, RMLVocab.predicateMap );
+				ptm_om = ModelUtils.getSingleMandatoryResourceProperty( pom, RMLVocab.objectMap );
+			}
+			catch ( final IllegalArgumentException e ) {
+				throw new RMLParserException( e.getMessage() );
+			}
+
 			// - line 12
 			final SourceReference sr2 = createSourceReference(ptm);
 			final JsonPathQuery rootQuery2 = checkSourceAndGetRootQuery(ptm);
-			final Set<String> queryStrings2 = extractQueries(ptm);
+			final Set<String> queryStrings2 = extractQueries( ptm_sm, ptm_pm, ptm_om,
+			                                                  null, null );
 			final Map<String, String> PwithStrings2 = createPwithStrings(queryStrings2);
 			final Map<String, JsonPathQuery> P2 = createP(PwithStrings2, ptm);
 			final MappingOperator op2 = new MappingOpExtractJSON(sr2, rootQuery2, P2);
@@ -168,18 +192,6 @@ public class RML2MappingAlgebra
 			                                                      reversePwithStrings );
 			op = new MappingOpExtend( op, oExt, MappingRelation.oAttr );
 		}
-
-		// preparation for line 23 of Algorithm 1
-		final Resource gm1, gm2;
-		try {
-			gm1 = ModelUtils.getSingleOptionalResourceProperty(sm, RMLVocab.graphMap);
-			gm2 = ModelUtils.getSingleOptionalResourceProperty(pom, RMLVocab.graphMap);
-		}
-		catch ( final IllegalArgumentException e ) {
-			throw new RMLParserException( e.getMessage() );
-		}
-
-		final Resource gm = (gm1 != null) ? gm1 : (gm2 != null) ? gm2 : null;
 
 		// lines 23-26 of Algorithm 1
 		if ( gm != null ) {
@@ -278,66 +290,68 @@ public class RML2MappingAlgebra
 	/**
 	 * This function implements lines 1-10 of Algorithm 2 of the paper.
 	 *
-	 * @param tm
+	 * @param sm - the subject map of a triples map
+	 * @param pm - the predicate map of the same triples map
+	 * @param om - the object map of the same triples map
+	 * @param jccm - the child map of om, may be {@code null}
+	 * @param jcpm - the parent map of om, may be {@code null}
 	 * @return
 	 */
-	public static Set<String> extractQueries( final Resource tm )
+	public static Set<String> extractQueries( final Resource sm,
+	                                          final Resource pm,
+	                                          final Resource om,
+	                                          final Resource jccm,
+	                                          final Resource jcpm )
 	{
 		final Set<String> queries = new HashSet<>();
 
 		// lines 3-4 of Algorithm 2
-		final StmtIterator itRef = tm.listProperties( RMLVocab.reference );
-		while ( itRef.hasNext() ) {
-			final RDFNode o = itRef.next().getObject();
+		extractQueriesOfReferenceValuedExprMap(sm, queries);
+		extractQueriesOfReferenceValuedExprMap(pm, queries);
+		extractQueriesOfReferenceValuedExprMap(om, queries);
+
+		// lines 5-6 of Algorithm 2
+		extractQueriesOfTemplateValuedExprMap(sm, queries);
+		extractQueriesOfTemplateValuedExprMap(pm, queries);
+		extractQueriesOfTemplateValuedExprMap(om, queries);
+
+		if ( jccm != null ) {
+			// lines 7 and 9-10 of Algorithm 2
+			extractQueriesOfReferenceValuedExprMap(jccm, queries);
+			extractQueriesOfTemplateValuedExprMap(jccm, queries);
+		}
+
+		if ( jcpm != null ) {
+			// lines 8 and 9-10 of Algorithm 2
+			extractQueriesOfReferenceValuedExprMap(jcpm, queries);
+			extractQueriesOfTemplateValuedExprMap(jcpm, queries);
+		}
+
+		return queries;
+	}
+
+	public static void extractQueriesOfReferenceValuedExprMap( final Resource termMap,
+	                                                           final Set<String> queries ) {
+		final StmtIterator it = termMap.listProperties( RMLVocab.reference );
+		while ( it.hasNext() ) {
+			final RDFNode o = it.next().getObject();
 			if ( o.isLiteral() ) {
 				final String lex = o.asLiteral().getLexicalForm();
 				queries.add(lex);
 			}
 		}
+	}
 
-		// lines 5-6 of Algorithm 2
-		final StmtIterator itTem = tm.listProperties( RMLVocab.template );
-		while ( itTem.hasNext() ) {
-			final RDFNode o = itTem.next().getObject();
+	public static void extractQueriesOfTemplateValuedExprMap( final Resource termMap,
+	                                                          final Set<String> queries ) {
+		final StmtIterator it = termMap.listProperties( RMLVocab.template );
+		while ( it.hasNext() ) {
+			final RDFNode o = it.next().getObject();
 			if ( o.isLiteral() ) {
 				final String lex = o.asLiteral().getLexicalForm();
 				extractQueriesFromTemplate(lex, queries);
 			}
 		}
-
-		// lines 7 and 9-10 of Algorithm 2
-		final StmtIterator itChl = tm.listProperties( RMLVocab.child );
-		while ( itChl.hasNext() ) {
-			final RDFNode o = itChl.next().getObject();
-			if ( o.isLiteral() ) {
-				final String lex = o.asLiteral().getLexicalForm();
-				queries.add(lex);
-			}
-		}
-
-		// lines 8 and 9-10 of Algorithm 2
-		final StmtIterator itPTM = tm.getModel().listStatements( null,
-		                                                        RMLVocab.parentTriplesMap,
-		                                                        tm );
-		while ( itPTM.hasNext() ) {
-			final Resource om = itPTM.next().getSubject();
-			final StmtIterator itJC = om.listProperties( RMLVocab.joinCondition );
-			while ( itJC.hasNext() ) {
-				final RDFNode jc = itJC.next().getObject();
-				if ( jc.isResource() ) {
-					final StmtIterator itPar = jc.asResource().listProperties( RMLVocab.parent );
-					while ( itPar.hasNext() ) {
-						final RDFNode par = itPar.next().getObject();
-						if ( par.isLiteral() ) {
-							final String lex = par.asLiteral().getLexicalForm();
-							queries.add(lex);
-						}
-					}
-				}
-			}
-		}
-
-		return queries;
 	}
 
 	public static void extractQueriesFromTemplate( final String t,
@@ -372,6 +386,8 @@ public class RML2MappingAlgebra
 			final String a = "a" + i; // fresh attribute name
 			PwithStrings.put(a, queryString);
 			i++;
+
+			//System.out.println( "createPwithStrings: " + a + " -> " + "'" + queryString + "'" );
 		}
 
 		return PwithStrings;
@@ -456,7 +472,7 @@ public class RML2MappingAlgebra
 				final String lex = r.asLiteral().getLexicalForm();
 				final String attr = reverseP.get(lex);
 				if ( attr == null )
-					throw new IllegalArgumentException(); // this shouldn't happen
+					throw new IllegalArgumentException("No attribute for the query: '" + lex + "'"); // this shouldn't happen
 
 				extExpr = new ExtendExprAttribute(attr);
 			}
@@ -528,7 +544,7 @@ public class RML2MappingAlgebra
 			                               new ExtendExprConstant(baseIRI) );
 		}
 		catch ( final IllegalArgumentException e ) {
-			throw new RMLParserException( e.getMessage() );
+			throw new RMLParserException( e.getMessage(), e );
 		}
 	}
 

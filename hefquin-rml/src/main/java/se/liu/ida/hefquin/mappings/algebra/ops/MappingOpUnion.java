@@ -12,6 +12,7 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
+import se.liu.ida.hefquin.mappings.algebra.MappingOperatorVisitor;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
 import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
@@ -53,6 +54,11 @@ public class MappingOpUnion extends BaseForNaryMappingOperator
 	@Override
 	public boolean isValid() {
 		return valid;
+	}
+
+	@Override
+	public void visit( final MappingOperatorVisitor visitor ) {
+		visitor.visit(this);
 	}
 
 	@Override

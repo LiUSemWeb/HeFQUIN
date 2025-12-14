@@ -20,7 +20,7 @@ public abstract class BaseForNaryMappingOperator extends BaseForMappingOperator
 		this.subOps = subOps;
 	}
 
-	public int getNuberOfSubOps() { return subOps.size(); }
+	public int getNumberOfSubOps() { return subOps.size(); }
 
 	public Iterable<MappingOperator> getSubOps() { return subOps; }
 }

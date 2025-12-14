@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.jena.atlas.lib.Pair;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
+import se.liu.ida.hefquin.mappings.algebra.MappingOperatorVisitor;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
 import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
@@ -75,6 +76,11 @@ public class MappingOpJoin extends BaseForBinaryMappingOperator
 	@Override
 	public boolean isValid() {
 		return valid;
+	}
+
+	@Override
+	public void visit( final MappingOperatorVisitor visitor ) {
+		visitor.visit(this);
 	}
 
 	@Override

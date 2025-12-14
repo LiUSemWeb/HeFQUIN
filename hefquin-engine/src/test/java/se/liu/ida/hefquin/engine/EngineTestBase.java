@@ -330,26 +330,40 @@ public abstract class EngineTestBase
 	public static class WrappedRESTEndpointForTest extends FederationMemberBaseForTest
 	                                               implements WrappedRESTEndpoint
 	{
-		protected final List<SolutionMapping> result;
+		//public final String responseData = "{ \"current\": { \"temperature_2m\": 2.3, \"wind_speed_10m\": 1.0 } }";
+		public final String responseData;
+		protected final List<Parameter> params;
 
-		public WrappedRESTEndpointForTest( final List<SolutionMapping> result ) {
-			super(null);
-			this.result = result;
+		public WrappedRESTEndpointForTest( final String responseData,
+		                                   final Graph rdfView,
+		                                   final List<Parameter> params ) {
+			super(rdfView);
+			this.responseData = responseData;
+			this.params = ( params == null ) ? List.of() : params;
+		}
+
+		@Override
+		public List<SolutionMapping> evaluatePatternOverRDFView(
+				final SPARQLGraphPattern pattern,
+				final String data )
+						throws DataConversionException {
+			assert data.equals(responseData);
+			return getSolutions(pattern);
 		}
 
 		@Override
 		public String getURL() {
-			throw new UnsupportedOperationException();
+			return "http://example.org/";
 		}
 
 		@Override
 		public int getNumberOfParameters() {
-			throw new UnsupportedOperationException();
+			return params.size();
 		}
 
 		@Override
 		public Iterable<Parameter> getParameters() {
-			throw new UnsupportedOperationException();
+			return params;
 		}
 
 		@Override
@@ -360,14 +374,6 @@ public abstract class EngineTestBase
 		@Override
 		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
 			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public List<SolutionMapping> evaluatePatternOverRDFView(
-				final SPARQLGraphPattern pattern,
-				final String data )
-						throws DataConversionException {
-			return result;
 		}
 	}
 
@@ -540,7 +546,12 @@ public abstract class EngineTestBase
 		                                                           final RESTEndpoint fm )
 						throws FederationAccessException
 		{
-			final String data = "{ \"current\": { \"temperature_2m\": 2.3, \"wind_speed_10m\": 1.0 } }";
+			final String data;
+			if ( fm instanceof WrappedRESTEndpointForTest ep )
+				data = ep.responseData;
+			else
+				throw new IllegalArgumentException();
+
 			final StringResponse response = new StringResponseImpl(data, fm, req, new Date());
 			return CompletableFuture.completedFuture(response);
 		}

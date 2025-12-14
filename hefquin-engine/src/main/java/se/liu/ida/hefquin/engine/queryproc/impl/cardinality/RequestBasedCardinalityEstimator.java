@@ -94,7 +94,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 			else if ( rootOp instanceof LogicalOpRequest reqOp ) {
 				addCardinalityForRequestViaWrapper( subPlan.getQueryPlanningInfo(), reqOp );
 			}
-			else if ( rootOp instanceof LogicalOpFixedSolMap finOp ) {
+			else if ( rootOp instanceof LogicalOpFixedSolMap ) {
 				addCardinalityForFixedInputOps( subPlan.getQueryPlanningInfo() );
 			}
 			else {
@@ -132,7 +132,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 				reqOps.add( reqOp.getLogicalOperator() );
 				infoObjs.add( subPlan.getQueryPlanningInfo() );
 			}
-			else if ( rootOp instanceof PhysicalOpFixedSolMap finOp ) {
+			else if ( rootOp instanceof PhysicalOpFixedSolMap ) {
 				addCardinalityForFixedInputOps( subPlan.getQueryPlanningInfo() );
 			}
 			else {

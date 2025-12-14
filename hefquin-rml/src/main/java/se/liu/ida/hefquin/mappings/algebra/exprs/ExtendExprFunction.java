@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.mappings.algebra.exprs;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,4 +69,21 @@ public class ExtendExprFunction implements ExtendExpression
 		return fct.apply(args);
 	}
 
+	@Override
+	public String toString() {
+		if ( subExpressions.isEmpty() )
+			return fct.toString() + "()";
+
+		final StringBuilder b = new StringBuilder( fct.toString() + "(" );
+
+		final Iterator<ExtendExpression> it = subExpressions.iterator();
+		while ( it.hasNext() ) {
+			b.append( it.next().toString() );
+			if ( it.hasNext() ) b.append(", ");
+		}
+
+		b.append(")");
+
+		return b.toString();
+	}
 }

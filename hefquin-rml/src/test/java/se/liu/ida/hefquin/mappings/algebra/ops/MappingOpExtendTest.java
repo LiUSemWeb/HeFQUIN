@@ -26,7 +26,7 @@ public class MappingOpExtendTest extends BaseForMappingOperatorTests
 	@Test
 	public void getSchema_Valid() {
 		final MappingRelation input = new MappingRelationImplWithoutTuples("attr1", "attr2");
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(input);
+		final MappingOperator subOp = new MappingOpConstant(input);
 
 		final ExtendExpression expr = new ExtendExprForTests("attr1");
 
@@ -39,7 +39,7 @@ public class MappingOpExtendTest extends BaseForMappingOperatorTests
 	@Test
 	public void getSchema_Invalid1() {
 		final MappingRelation input = new MappingRelationImplWithoutTuples("attr1", "attr2");
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(input);
+		final MappingOperator subOp = new MappingOpConstant(input);
 
 		// the attribute in the expression is not provided by the input relation
 		final ExtendExpression expr = new ExtendExprForTests("attrX");
@@ -53,7 +53,7 @@ public class MappingOpExtendTest extends BaseForMappingOperatorTests
 	@Test
 	public void getSchema_Invalid2() {
 		final MappingRelation input = new MappingRelationImplWithoutTuples("attr1", "attr2");
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(input);
+		final MappingOperator subOp = new MappingOpConstant(input);
 
 		final ExtendExpression expr = new ExtendExprForTests("attr1");
 
@@ -75,7 +75,7 @@ public class MappingOpExtendTest extends BaseForMappingOperatorTests
 
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation r = new MappingRelationImplWithTupleLayout(s, t1, t2);
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(r);
+		final MappingOperator subOp = new MappingOpConstant(r);
 
 		final ExtendExpression expr = new ExtendExprForTests("attr1");
 
@@ -111,7 +111,7 @@ public class MappingOpExtendTest extends BaseForMappingOperatorTests
 
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation r = new MappingRelationImplWithTupleLayout(s, t1, t2);
-		final MappingOperator subOp = new ConstantMappingOperatorForTests(r);
+		final MappingOperator subOp = new MappingOpConstant(r);
 
 		final ExtendExpression expr = new ExtendExprForTests("attr1", "attr2");
 

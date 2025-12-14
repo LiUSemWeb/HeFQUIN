@@ -22,4 +22,6 @@ public class ExtendExprConstant implements ExtendExpression
 	@Override
 	public Node evaluate( final Map<String, Node> assg ) { return constant; }
 
+	@Override
+	public String toString() { return constant.toString(); }
 }

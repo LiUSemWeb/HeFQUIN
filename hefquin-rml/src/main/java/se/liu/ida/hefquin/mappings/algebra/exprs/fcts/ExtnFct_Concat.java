@@ -47,4 +47,9 @@ public class ExtnFct_Concat implements ExtensionFunction
 		return NodeFactory.createLiteralString(result);
 	}
 
+	@Override
+	public String toString() {
+		return "concat";
+	}
+
 }

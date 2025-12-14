@@ -21,5 +21,7 @@ public interface MappingOperator
 
 	boolean isValidInput( Map<SourceReference,DataObject> srMap );
 
+	void visit( MappingOperatorVisitor visitor );
+
 	MappingRelation evaluate( Map<SourceReference,DataObject> srMap );
 }

@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
+import se.liu.ida.hefquin.mappings.algebra.MappingOperatorVisitor;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
 import se.liu.ida.hefquin.mappings.algebra.impl.MappingRelationImplWithColumnLayout;
@@ -48,6 +49,8 @@ public class MappingOpProject extends BaseForUnaryMappingOperator
 		}
 	}
 
+	public Iterable<String> getP() { return P; }
+
 	@Override
 	public Set<String> getSchema() {
 		return schema;
@@ -56,6 +59,11 @@ public class MappingOpProject extends BaseForUnaryMappingOperator
 	@Override
 	public boolean isValid() {
 		return valid;
+	}
+
+	@Override
+	public void visit( final MappingOperatorVisitor visitor ) {
+		visitor.visit(this);
 	}
 
 	@Override

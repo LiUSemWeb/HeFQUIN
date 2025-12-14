@@ -38,4 +38,9 @@ public class ExtnFct_ToBNode implements ExtensionFunction
 		return MappingRelation.errorNode;
 	}
 
+	@Override
+	public String toString() {
+		return "toBNode";
+	}
+
 }

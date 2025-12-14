@@ -55,4 +55,9 @@ public class ExtnFct_ToIRI implements ExtensionFunction
 		return MappingRelation.errorNode;
 	}
 
+	@Override
+	public String toString() {
+		return "toIRI";
+	}
+
 }

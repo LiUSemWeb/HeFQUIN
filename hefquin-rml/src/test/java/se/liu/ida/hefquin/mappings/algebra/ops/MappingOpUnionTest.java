@@ -22,10 +22,10 @@ public class MappingOpUnionTest extends BaseForMappingOperatorTests
 	@Test
 	public void getSchema_Valid() {
 		final MappingRelation input1 = new MappingRelationImplWithoutTuples("attr1", "attr2");
-		final MappingOperator subOp1 = new ConstantMappingOperatorForTests(input1);
+		final MappingOperator subOp1 = new MappingOpConstant(input1);
 
 		final MappingRelation input2 = new MappingRelationImplWithoutTuples("attr1", "attr2");
-		final MappingOperator subOp2 = new ConstantMappingOperatorForTests(input2);
+		final MappingOperator subOp2 = new MappingOpConstant(input2);
 
 		final MappingOpUnion op = new MappingOpUnion(subOp1, subOp2);
 
@@ -36,10 +36,10 @@ public class MappingOpUnionTest extends BaseForMappingOperatorTests
 	@Test
 	public void getSchema_Invalid() {
 		final MappingRelation input1 = new MappingRelationImplWithoutTuples("attr1", "attr2");
-		final MappingOperator subOp1 = new ConstantMappingOperatorForTests(input1);
+		final MappingOperator subOp1 = new MappingOpConstant(input1);
 
 		final MappingRelation input2 = new MappingRelationImplWithoutTuples("attr1", "attr3");
-		final MappingOperator subOp2 = new ConstantMappingOperatorForTests(input2);
+		final MappingOperator subOp2 = new MappingOpConstant(input2);
 
 		final MappingOpUnion op = new MappingOpUnion(subOp1, subOp2);
 
@@ -53,13 +53,13 @@ public class MappingOpUnionTest extends BaseForMappingOperatorTests
 		final Node[] t1 = { NodeFactory.createLiteralString("attr1Value1"),
 		                    NodeFactory.createLiteralString("attr2Value1") };
 		final MappingRelation input1 = new MappingRelationImplWithTupleLayout(schema1, t1);
-		final MappingOperator subOp1 = new ConstantMappingOperatorForTests(input1);
+		final MappingOperator subOp1 = new MappingOpConstant(input1);
 
 		final String[] schema2 = { "attr1", "attr2" };
 		final Node[] t2 = { NodeFactory.createLiteralString("attr1Value2"),
 		                    NodeFactory.createLiteralString("attr2Value2") };
 		final MappingRelation input2 = new MappingRelationImplWithTupleLayout(schema2, t2);
-		final MappingOperator subOp2 = new ConstantMappingOperatorForTests(input2);
+		final MappingOperator subOp2 = new MappingOpConstant(input2);
 
 		final MappingOpUnion op = new MappingOpUnion(subOp1, subOp2);
 
@@ -95,13 +95,13 @@ public class MappingOpUnionTest extends BaseForMappingOperatorTests
 		final Node[] t1 = { NodeFactory.createLiteralString("attr1Value1"),
 		                    NodeFactory.createLiteralString("attr2Value1") };
 		final MappingRelation input1 = new MappingRelationImplWithTupleLayout(schema1, t1);
-		final MappingOperator subOp1 = new ConstantMappingOperatorForTests(input1);
+		final MappingOperator subOp1 = new MappingOpConstant(input1);
 
 		final String[] schema2 = { "attr2", "attr1" };
 		final Node[] t2 = { NodeFactory.createLiteralString("attr2Value2"),
 		                    NodeFactory.createLiteralString("attr1Value2") };
 		final MappingRelation input2 = new MappingRelationImplWithTupleLayout(schema2, t2);
-		final MappingOperator subOp2 = new ConstantMappingOperatorForTests(input2);
+		final MappingOperator subOp2 = new MappingOpConstant(input2);
 
 		final MappingOpUnion op = new MappingOpUnion(subOp1, subOp2);
 
