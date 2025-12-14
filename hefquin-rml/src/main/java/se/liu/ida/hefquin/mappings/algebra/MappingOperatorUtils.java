@@ -24,34 +24,9 @@ public class MappingOperatorUtils
 			return Set.of( e.getSourceReference() );
 		}
 
-		final Set<SourceReference> collection = new HashSet<>();
-		extractAllSrcRefs(op, collection);
-		return collection;
-	}
-
-	public static void extractAllSrcRefs( final MappingOperator op,
-	                                      final Set<SourceReference> collection ) {
-		if ( op instanceof MappingOpExtract e ) {
-			collection.add( e.getSourceReference() );
-		}
-		else if ( op instanceof MappingOpExtend e ) {
-			extractAllSrcRefs( e.getSubOp(), collection );
-		}
-		else if ( op instanceof MappingOpProject p ) {
-			extractAllSrcRefs( p.getSubOp(), collection );
-		}
-		else if ( op instanceof MappingOpJoin j ) {
-			extractAllSrcRefs( j.getSubOp1(), collection );
-			extractAllSrcRefs( j.getSubOp2(), collection );
-		}
-		else if ( op instanceof MappingOpUnion u ) {
-			for ( final MappingOperator subOp : u.getSubOps() ) {
-				extractAllSrcRefs(subOp, collection);
-			}
-		}
-		else {
-			throw new IllegalArgumentException( op.getClass().getName() );
-		}
+		final SrcRefsExtractor extractor = new SrcRefsExtractor();
+		op.visit(extractor);
+		return extractor.extractedSrcRefs;
 	}
 
 	public static void print( final MappingOperator op ) {
@@ -155,4 +130,40 @@ public class MappingOperatorUtils
 		}
 	}
 
+	public static class SrcRefsExtractor implements MappingOperatorVisitor {
+		public final Set<SourceReference> extractedSrcRefs = new HashSet<>();
+
+		@Override
+		public void visit( final MappingOpConstant op ) {
+			// to nothing
+		}
+
+		@Override
+		public void visit( final MappingOpExtract<?, ?, ?, ?, ?> op ) {
+			extractedSrcRefs.add( op.getSourceReference() );
+		}
+
+		@Override
+		public void visit( final MappingOpExtend op ) {
+			op.getSubOp().visit(this);
+		}
+
+		@Override
+		public void visit( final MappingOpProject op ) {
+			op.getSubOp().visit(this);
+		}
+
+		@Override
+		public void visit( final MappingOpJoin op ) {
+			op.getSubOp1().visit(this);
+			op.getSubOp2().visit(this);
+		}
+
+		@Override
+		public void visit( final MappingOpUnion op ) {
+			for ( final MappingOperator subOp : op.getSubOps() ) {
+				subOp.visit(this);
+			}
+		}
+	}
 }
