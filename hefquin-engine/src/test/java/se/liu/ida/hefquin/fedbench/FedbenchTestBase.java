@@ -19,9 +19,7 @@ import org.apache.jena.sparql.resultset.ResultsFormat;
 
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
-import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
-import se.liu.ida.hefquin.engine.UnsupportedQueryException;
 
 /**
  * Base class for FedBench tests.
@@ -43,11 +41,10 @@ public abstract class FedbenchTestBase
 	 *
 	 * @param queryString the SPARQL query to execute
 	 * @return the query result encoded as a SPARQL JSON result string
-	 * @throws UnsupportedQueryException
-	 * @throws IllegalQueryException
+	 * @throws Exception 
 	 */
 	public static String _execute( final String queryString )
-			throws UnsupportedQueryException, IllegalQueryException {
+			throws Exception {
 		final Query query = QueryFactory.create(queryString);
 		final ResultsFormat resultsFormat = ResultsFormat.FMT_RS_JSON;
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -58,10 +55,12 @@ public abstract class FedbenchTestBase
 
 		if ( statsAndExceptions != null ) {
 			if ( statsAndExceptions.getExceptions() != null ) {
+				String msg = "";
 				statsAndExceptions.getExceptions().forEach( c -> {
 					System.err.println( c.getCause() );
 					System.err.println( c.getLocalizedMessage() );
 				} );
+				throw new Exception("Query failed with exceptions.");
 			}
 		}
 
@@ -95,7 +94,7 @@ public abstract class FedbenchTestBase
 		double allowedMax = baseline * (1.0 + tolerance) + slack;
 		if ( actual > allowedMax ) {
 			final String msg = String.format(
-				"Query too slow: actual=%.2fms, baseline=%.2fms, allowedMax=%.2fms",
+				"Query too slow: actual=%dms, baseline=%dms, allowedMax=%.2fms",
 				actual,
 				baseline,
 				allowedMax );
@@ -114,14 +113,10 @@ public abstract class FedbenchTestBase
 	 * @param f        base filename (without extension) for the query and results
 	 * @param baseline baseline execution time in milliseconds
 	 * @param values   optional formatting parameters applied to the query string
-	 * @throws IOException
-	 * @throws IllegalQueryException
-	 * @throws UnsupportedQueryException
-	 *
 	 * @throws Exception
 	 */
 	public void _executeQuery( final String f, final long baseline, final Object[] values )
-			throws IOException, UnsupportedQueryException, IllegalQueryException {
+			throws Exception {
 		String query;
 		try( final InputStream is = getClass().getClassLoader().getResourceAsStream(f + ".rq") ) {
 			query = new String( is.readAllBytes(), StandardCharsets.UTF_8 );
@@ -138,7 +133,12 @@ public abstract class FedbenchTestBase
 		}
 
 		// Validate results
-		assertTrue(resultSetEqual(expected, result));
+		assertTrue(
+			String.format("Mismatch between expected and actual result\n" +
+			              "Expected:\n%s\n" +
+			              "Actual:\n%s\n", expected, result),
+			resultSetEqual(expected, result)
+		);
 		// Assert execution time within range
 		assertWithinTimeBudget(baseline, t1-t0);
 	}

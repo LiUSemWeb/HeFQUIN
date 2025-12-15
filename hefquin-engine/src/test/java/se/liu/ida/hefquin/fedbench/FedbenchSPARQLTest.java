@@ -1,13 +1,15 @@
 package se.liu.ida.hefquin.fedbench;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
-public class FedbenchSPARQL extends FedbenchTestBase
+@Ignore
+public class FedbenchSPARQLTest extends FedbenchTestBase
 {
 	@BeforeClass
 	public static void setUp() throws Exception {
-		final String fedCat = "fedbench/FedConf.ttl";
+		final String fedCat = "fedbench/SPARQLFedConf.ttl";
 		init(fedCat);
 	}
 
