@@ -1,7 +1,7 @@
 PREFIX nyt: <http://data.nytimes.com/elements/>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX ex:  <http://localhost/sparql/>
-SELECT ?actor ?news ?s1 ?s2
+SELECT ?actor ?news
 WHERE {
    VALUES (?s1 ?s2) { ( <%s> <%s> ) }
    SERVICE ?s1 {

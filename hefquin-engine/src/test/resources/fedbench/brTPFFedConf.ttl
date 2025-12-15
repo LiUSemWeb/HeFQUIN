@@ -4,122 +4,63 @@
 @prefix ex:     <http://example.org/> .
 
 ################################
-# TPF endpoints
-################################
-
-ex:chebi-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/chebi/> ] .
-
-ex:dbpedia-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/dbpedia/> ] .
-
-ex:drugbank-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/drugbank/> ] .
-
-ex:geonames-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/geonames/> ] .
-
-ex:jamendo-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/jamendo/> ] .
-
-ex:kegg-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/kegg/> ] .
-
-ex:lmdb-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/lmdb/> ] .
-
-ex:nyt-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/nyt/> ] .
-
-ex:sp2b-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/sp2b/> ] .
-
-ex:swdfood-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/swdfood/> ] .
-
-ex:chebi-tpf
-      a            fd:FederationMember ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/tpf/chebi/> ] .
-
-################################
 # brTPF endpoints
 ################################
 
 ex:chebi-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/chebi/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/chebi/> ] .
 
 ex:dbpedia-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/dbpedia/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/dbpedia/> ] .
 
 ex:drugbank-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/drugbank/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/drugbank/> ] .
 
 ex:geonames-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/geonames/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/geonames/> ] .
 
 ex:jamendo-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/jamendo/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/jamendo/> ] .
 
 ex:kegg-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/kegg/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/kegg/> ] .
 
 ex:lmdb-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/lmdb/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/lmdb/> ] .
 
 ex:nyt-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/nyt/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/nyt/> ] .
 
 ex:sp2b-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/sp2b/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/sp2b/> ] .
 
 ex:swdfood-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/swdfood/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/swdfood/> ] .
 
 ex:chebi-brtpf
       a            fd:FederationMember ;
       fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://localhost:8080/brtpf/chebi/> ] .
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/chebi/> ] .
 
 ################################
 # SPARQL endpoints
