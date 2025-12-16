@@ -7,7 +7,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- (nothing yet)
+-  Initial support for RML-wrapped REST endpoints as federation members ([#486](https://github.com/LiUSemWeb/HeFQUIN/pull/486)).
+
 ### Changed
 - (nothing yet)
 
