@@ -73,8 +73,27 @@ function procFDVocab
          ../hefquin-vocabs/src/main/java/se/liu/ida/hefquin/vocabulary/
 }
 
+function procRMLCore
+{
+    proc https://kg-construct.github.io/rml-resources/ontology.ttl \
+         RMLVocab \
+         "http://w3id.org/rml/" \
+         "se.liu.ida.hefquin.rml.vocabulary" \
+         ../hefquin-rml/src/main/java/se/liu/ida/hefquin/rml/vocabulary/
+
+    echo
+    echo "There is a 'Property' named 'null' in the generated Java file, which must still be renamed to 'null_'."
+
+    echo "Another issue is that the rml:constant property is an annotation property and, thus, not reflected in the Java file. Hence, it needs to be added manually: To this end, add the following line into ../hefquin-rml/src/main/java/se/liu/ida/hefquin/rml/vocabulary/RMLVocab.java"
+    echo "public static final Property constant = M_MODEL.createProperty( \"http://w3id.org/rml/constant\" );"
+
+    echo "Yet another issue is that the rml:defaultGraph URI has not been added to the vocabulary file so far. Hence, it needs to be added manually:"
+    echo "public static final Resource defaultGraph = M_MODEL.createResource( \"http://w3id.org/rml/defaultGraph\" );"
+}
+
 ### Below, uncomment the line for which you want to run the script.
 
-procLPGtoRDF
-procECVocab
-procFDVocab
+#procLPGtoRDF
+#procECVocab
+#procFDVocab
+#procRMLCore

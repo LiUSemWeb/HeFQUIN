@@ -27,12 +27,12 @@ public class FederationDescriptionReaderTest
 				+ "PREFIX ex:     <http://example.org/>\n"
 				+ "\n"
 				+ "ex:dbpediaSPARQL\n"
-				+ "      a            fd:FederationMember ;\n"
+				+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
 				+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
 				+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ] .\n"
 				+ "\n"
 				+ "ex:dbpediaTPF\n"
-				+ "      a            fd:FederationMember ;\n"
+				+ "      fd:serviceURI <http://fragments.dbpedia.org/2016-04/en> ;\n"
 				+ "      fd:interface [ a                         fd:TPFInterface ;\n"
 				+ "                     fd:exampleFragmentAddress <http://fragments.dbpedia.org/2016-04/en> ] .";
 
@@ -62,7 +62,7 @@ public class FederationDescriptionReaderTest
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
-						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
 						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
 						+ "                     fd:endpointAddress <http://dbpedia.org/sparql>, <http://localhost:7474/db/neo4j/tx> ];\n"
 						+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\".";
@@ -88,7 +88,7 @@ public class FederationDescriptionReaderTest
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
-						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
 						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
 						+ "                     fd:exampleFragmentAddress <http://dbpedia.org/sparql>, <http://localhost:7474/db/neo4j/tx> ].\n";
 
@@ -113,7 +113,7 @@ public class FederationDescriptionReaderTest
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaTPF\n"
-						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:serviceURI <http://fragments.dbpedia.org/2016-04/en> ;\n"
 						+ "      fd:interface [ a                  fd:TPFInterface ;\n"
 						+ "                     fd:exampleFragmentAddress <http://fragments.dbpedia.org/2016-04/en>, <http://localhost:7474/db/neo4j/tx> ].\n";
 
@@ -138,7 +138,7 @@ public class FederationDescriptionReaderTest
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaTPF\n"
-						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:serviceURI <http://fragments.dbpedia.org/2016-04/en> ;\n"
 						+ "      fd:interface [ a                  fd:TPFInterface ;\n"
 						+ "                     fd:endpointAddress <http://fragments.dbpedia.org/2016-04/en>, <http://localhost:7474/db/neo4j/tx> ].\n";
 
@@ -163,7 +163,7 @@ public class FederationDescriptionReaderTest
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
-						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
 						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
 						+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ];\n"
 						+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\".";
@@ -185,7 +185,7 @@ public class FederationDescriptionReaderTest
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
-						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
 						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
 						+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ];\n"
 						+ "                     fd:vocabularyMappingsFile \"src/test/resources/dbpedia/vocabularyMappings.nt\".";
@@ -207,7 +207,7 @@ public class FederationDescriptionReaderTest
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
-						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
 						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
 						+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ];\n"
 						+ "                     fd:vocabularyMappingsFile \"dummy/vocab.nt\".";

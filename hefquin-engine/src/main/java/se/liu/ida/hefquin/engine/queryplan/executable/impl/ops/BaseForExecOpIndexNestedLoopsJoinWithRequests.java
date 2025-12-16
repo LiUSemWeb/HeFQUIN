@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -44,12 +43,19 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 	// in parallel, we should use an input block size with which
 	// we can leverage this parallelism. However, I am not sure
 	// yet what a good value is; it probably depends on various
-	// factors, including the load on the server and the degree
-	// of parallelism in the FederationAccessManager.
-	public final static int DEFAULT_BATCH_SIZE = 30;
+	// factors, including the load on the federation member and
+	// the degree of parallelism in the FederationAccessManager.
+	// Notice that this number is essentially the number of
+	// requests issued in parallel (to the same endpoint!).
+	public final static int DEFAULT_BATCH_SIZE = 10;
 
 	protected final QueryType query;
 	protected final MemberType fm;
+
+	// statistics
+	private long numberOfRequestsIssued = 0L;
+	private long sumOfRequestExecutionTimes = 0L;
+	private long sumOfResponseProcTimes = 0L;
 
 	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query,
 	                                                      final MemberType fm,
@@ -94,6 +100,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 				continue;
 			}
 
+			if ( req == null )
+				continue;
+
 			final CompletableFuture<RespType> futureResponse;
 			try {
 				futureResponse = issueRequest( req, execCxt.getFederationAccessMgr() );
@@ -101,6 +110,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
 			}
+
+			numberOfRequestsIssued++;
 
 			// attach the processing of the response obtained for the request
 			final MyResponseProcessor respProc = createResponseProcessor( sm, sink, this );
@@ -147,10 +158,30 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 	}
 
 	@Override
+	public void resetStats() {
+		super.resetStats();
+		numberOfRequestsIssued = 0L;
+		sumOfRequestExecutionTimes = 0L;
+		sumOfResponseProcTimes = 0L;
+	}
+
+	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
-		s.put( "queryAsString",      query.toString() );
-		s.put( "fedMemberAsString",  fm.toString() );
+		s.put( "queryAsString",            query.toString() );
+		s.put( "fedMemberAsString",        fm.toString() );
+		s.put( "numberOfRequestsIssued",   numberOfRequestsIssued );
+
+		double avgRequestExecTime = Double.NaN;
+		double avgResponseProcTimes = Double.NaN;
+		if ( numberOfRequestsIssued > 0L ) {
+			avgRequestExecTime = sumOfRequestExecutionTimes / numberOfRequestsIssued;
+			avgResponseProcTimes = sumOfResponseProcTimes / numberOfRequestsIssued;
+		}
+
+		s.put( "avgRequestExecTime",    avgRequestExecTime );
+		s.put( "avgResponseProcTimes",  avgResponseProcTimes );
+
 		return s;
 	}
 
@@ -173,24 +204,30 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 		@Override
 		public void accept( final RespType response ) {
+			final long time1 = System.currentTimeMillis();
+
 			// if extractSolMaps throws an UnsupportedOperationDueToRetrievalError, we want to create an
 			// ExecOpExecutionException and pass this exception to recordExceptionCaughtDuringExecution
-			final Iterable<SolutionMapping> solutionMappings;
+			final Iterable<SolutionMapping> solmaps;
 			try {
-				solutionMappings = extractSolMaps( response );
+				solmaps = extractSolMaps( response );
 			} catch( UnsupportedOperationDueToRetrievalError e ) {
 				final ExecOpExecutionException ex = new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, op );
 				recordExceptionCaughtDuringExecution( ex );
 				return;
 			}
 
-			for ( final SolutionMapping fetchedSM : solutionMappings ) {
-				final SolutionMapping out = SolutionMappingUtils.merge( sm, fetchedSM );
-				sink.send( out );
-			}
+			processExtractedSolMaps(solmaps);
+
+			final long time2 = System.currentTimeMillis();
+
+			sumOfRequestExecutionTimes += response.getRequestDuration().toMillis();
+			sumOfResponseProcTimes += time2 - time1;
 		}
 
 		protected abstract Iterable<SolutionMapping> extractSolMaps( RespType response ) throws UnsupportedOperationDueToRetrievalError;
+
+		protected abstract void processExtractedSolMaps( final Iterable<SolutionMapping> solmaps );
 	}
 
 }

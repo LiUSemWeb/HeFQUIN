@@ -12,6 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
@@ -35,8 +36,8 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpSymmetricHashJoin
-	           && ((PhysicalOpSymmetricHashJoin) o).lop.equals(lop);
+		return (    o instanceof PhysicalOpSymmetricHashJoin shj
+		         && shj.lop.equals(lop) );
 	}
 
 	@Override
@@ -62,19 +63,36 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
-			// inputVars contains null value?
+			// Generally, binary joins and multiway joins are okay, ...
+			if (    ! (lop instanceof LogicalOpJoin)
+			     && ! (lop instanceof LogicalOpMultiwayJoin) )
+				return false;
+
+			// ... but in the case of a multiway join, it must still be binary.
+			if ( inputVars.length != 2 )
+				return false;
+
+			// Now we also need to check that there is at least one join
+			// variable, for which we first need to ensure that the given
+			// inputVars contain no null value.
 			for ( final ExpectedVariables vars : inputVars ) {
 				if ( vars == null ) return false;
 			}
 
+			// Determine the set of join variables ...
 			final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars);
-			return ( joinVars != null && ! joinVars.isEmpty() && lop instanceof LogicalOpJoin );
+			// ... and check that it is not empty. 
+			return ( ! joinVars.isEmpty() );
 		}
 
 		@Override
 		public PhysicalOpSymmetricHashJoin create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpJoin ) {
-				return new PhysicalOpSymmetricHashJoin( (LogicalOpJoin) lop);
+			if ( lop instanceof LogicalOpJoin join ) {
+				return new PhysicalOpSymmetricHashJoin(join);
+			}
+
+			if ( lop instanceof LogicalOpMultiwayJoin ) {
+				return new PhysicalOpSymmetricHashJoin( LogicalOpJoin.getInstance() );
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );

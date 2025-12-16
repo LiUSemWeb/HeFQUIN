@@ -10,6 +10,8 @@ import org.apache.jena.query.Syntax;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.NotFoundException;
 
+import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
+
 /**
  * Command-line argument module for specifying query-related arguments.
  */
@@ -18,7 +20,7 @@ public class ModQuery extends ModBase
 	protected final ArgDecl queryFileDecl = new ArgDecl( ArgDecl.HasValue, "query", "file" );
 	protected final ArgDecl queryBaseDecl = new ArgDecl( ArgDecl.HasValue, "base" );
 
-	private Syntax querySyntax = Syntax.syntaxARQ; // we need syntaxARQ to get SPARQL-star features
+	private Syntax querySyntax = SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN;
 	private String queryFilename = null;
 	private Query query = null;
 	private String baseURI = null;

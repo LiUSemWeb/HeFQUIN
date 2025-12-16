@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.Triple;
+import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -12,7 +13,6 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
@@ -52,7 +52,9 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 
 			// perform the page request
 			try {
-				currentPage = performPageRequest( pageRequest, execCxt.getFederationAccessMgr() );
+				currentPage = FederationAccessUtils.performRequest( execCxt.getFederationAccessMgr(),
+				                                                    pageRequest,
+				                                                    fm );
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a page request caused an exception.", e, this);
@@ -125,8 +127,6 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 
 
 	protected abstract PageReqType createPageRequest( String nextPageURL );
-
-	protected abstract TPFResponse performPageRequest( PageReqType pageReq, FederationAccessManager fedAccessMgr ) throws FederationAccessException;
 
 	protected abstract Iterator<SolutionMapping> convert( Iterable<Triple> itTriples );
 

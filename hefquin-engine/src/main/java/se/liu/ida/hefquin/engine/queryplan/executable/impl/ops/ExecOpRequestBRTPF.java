@@ -5,13 +5,9 @@ import java.util.Iterator;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.data.utils.TriplesToSolMapsConverter;
-import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 
@@ -27,14 +23,6 @@ public class ExecOpRequestBRTPF extends BaseForExecOpRequestWithTPFPaging<Bindin
 	@Override
 	protected BRTPFRequest createPageRequest( final String nextPageURL ) {
 		return new BRTPFRequestImpl( req.getTriplePattern(), req.getSolutionMappings(), nextPageURL );
-	}
-
-	@Override
-	protected TPFResponse performPageRequest( final BRTPFRequest req,
-	                                          final FederationAccessManager fedAccessMgr )
-			throws FederationAccessException
-	{
-		return FederationAccessUtils.performRequest(fedAccessMgr, req, fm);
 	}
 
 	@Override

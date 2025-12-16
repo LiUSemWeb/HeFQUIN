@@ -15,6 +15,7 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
 public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLogicalOp
 {
@@ -35,8 +36,12 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 		this.fm = fm;
 		this.pattern = pattern;
 
-		if ( paramVars != null && ! paramVars.isEmpty() )
+		if ( paramVars != null && ! paramVars.isEmpty() ) {
+			assert    fm instanceof WrappedRESTEndpoint ep
+			       && ep.getNumberOfParameters() == paramVars.size();
+
 			this.paramVars = paramVars;
+		}
 		else
 			this.paramVars = null;
 	}
@@ -54,21 +59,12 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 
 	/**
 	 * Returns {@code true} if this gpAdd operator has a (nonempty) list of
-	 * variables as parameter. if it has, {@link #getParameterVariables()}
-	 * can be used to access this parameter.
+	 * variables as parameter. If so, {@link #getParameterVariables()} can
+	 * be used to access this parameter.
 	 * 
 	 */
 	public boolean hasParameterVariables() {
 		return paramVars != null && ! paramVars.isEmpty();
-	}
-
-	/**
-	 * Returns the number of parameter variables that this operator has.
-	 * This number is the size of the list that can be accessed via
-	 * {@link #getParameterVariables()}.
-	 */
-	public int numberOfParameterVariables() {
-		return paramVars == null ? 0 : paramVars.size();
 	}
 
 	/**
@@ -80,7 +76,7 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 	 * use {@link #hasParameterVariables()} to ask whether this gpAdd
 	 * operator is this parameter.
 	 */
-	public Iterable<Var> getParameterVariables() {
+	public List<Var> getParameterVariables() {
 		if ( ! hasParameterVariables() )
 			throw new UnsupportedOperationException("Requesting variables of a gpAdd operator that does not have this parameter.");
 

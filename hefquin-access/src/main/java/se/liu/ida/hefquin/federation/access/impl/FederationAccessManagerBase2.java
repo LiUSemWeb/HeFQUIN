@@ -13,6 +13,7 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
@@ -35,17 +36,20 @@ public abstract class FederationAccessManagerBase2 extends FederationAccessManag
 			final SPARQLRequestProcessor reqProcSPARQL,
 			final TPFRequestProcessor reqProcTPF,
 			final BRTPFRequestProcessor reqProcBRTPF,
-			final Neo4jRequestProcessor reqProcNeo4j )
+			final Neo4jRequestProcessor reqProcNeo4j,
+			final RESTRequestProcessor reqProcREST )
 	{
 		assert reqProcSPARQL  != null;
 		assert reqProcTPF     != null;
 		assert reqProcBRTPF   != null;
 		assert reqProcNeo4j	  != null;
+		assert reqProcREST	  != null;
 
 		this.reqProcSPARQL    = reqProcSPARQL;
 		this.reqProcTPF       = reqProcTPF;
 		this.reqProcBRTPF     = reqProcBRTPF;
 
+		reqProcessors.add(reqProcREST);
 		reqProcessors.add(reqProcNeo4j);
 	}
 

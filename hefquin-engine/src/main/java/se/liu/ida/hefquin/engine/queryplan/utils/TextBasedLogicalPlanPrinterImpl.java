@@ -120,7 +120,6 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 			printLogicalOperatorBase( op, indentLevelString, out, np );
 			out.append( System.lineSeparator() );
 			printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
-			printSPARQLGraphPattern( op.getPattern(), indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
 			out.append( "  - parameter variables:" );
@@ -132,6 +131,8 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				out.append( " none" );
 			}
 			out.append( System.lineSeparator() );
+
+			printSPARQLGraphPattern( op.getPattern(), indentLevelStringForOpDetail + singleBase );
 
 			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
@@ -227,6 +228,21 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				out.append( indentLevelStringForOpDetail + "  - request (" + req.hashCode() +  "): " + req.toString() );
 				out.append( System.lineSeparator() );
 			}
+
+			printExpectedVariables( indentLevelStringForOpDetail );
+			printQueryPlanningInfo( indentLevelStringForOpDetail );
+
+			out.append( indentLevelStringForOpDetail );
+			out.append( System.lineSeparator() );
+		}
+
+		@Override
+		public void visit( final LogicalOpFixedSolMap op ) {
+			printLogicalOperatorBase( op, indentLevelString, out, np );
+			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + "  - solmap: " + op.getSolutionMapping().toString() );
+			out.append( System.lineSeparator() );
 
 			printExpectedVariables( indentLevelStringForOpDetail );
 			printQueryPlanningInfo( indentLevelStringForOpDetail );
