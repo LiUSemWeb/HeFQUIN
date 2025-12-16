@@ -21,7 +21,7 @@
             <li>Support for all features of SPARQL 1.1 (where basic graph patterns, group graph patterns (AND), union
                 graph patterns, optional patterns, and filters are supported natively within the HeFQUIN engine, and the
                 other features of SPARQL are supported through integration of the HeFQUIN engine into Apache Jena)</li>
-            <li>So far, support for SPARQL endpoints, TPF, and brTPF
+            <li>So far, support for SPARQL endpoints, TPF and brTPF servers, and REST endpoints (for which an RML mapping needs to be specified)
                 <ul>
                     <li>Work on openCypher Property Graphs ongoing</li>
                     <li>Work on GraphQL APIs ongoing</li>
@@ -37,7 +37,7 @@
                 Relevant physical operators, e.g., hash join, symmetric hash join (SHJ), request-based nested-loops join (NLJ),
                 several variations of bind joins (brTPF-based, UNION-based, FILTER-based, VALUES-based)
             </li>
-            <li>Two execution models (push-based and pull-based)</li>
+            <li>Two execution models: a push-based one with multi-threaded intra-operator parallelism and a pull-based one with (mainly) non-blocking iterators (certainly slower and, thus, primarily for debugging)</li>
             <li>Features for getting an understanding of the internals of the engine:
                 <ul>
                     <li>Printing of logical and physical plans</li>
@@ -46,7 +46,19 @@
                     </li>
                 </ul>
             </li>
-            <li>380+ unit tests</li>
+            <li>1000+ unit tests</li>
+<!--
+            Dec.16, 2025
+            199 in hefquin-base
+             94 in hefquin-access
+            411 in hefquin-engine
+             73 in hefquin-rml
+             10 in hefquin-graphqlconnector
+            175 in hefquin-pgconnector
+             13 in hefquin-cli
+             35 in hefquin-service
+            total: 1010
+-->
         </ul>
 
         <section id="limitations">

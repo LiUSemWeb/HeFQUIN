@@ -70,7 +70,25 @@ SELECT * WHERE {
                 <b>Service IRIs.</b> Both of the two <code>SERVICE</code> clauses in the example query above provide a service IRI (namely,
                     <!--the IRI <code>http://dbpedia.org/sparql</code> of the public <a href="https://www.dbpedia.org/resources/sparql/">DBpedia SPARQL endpoint</a> and the IRI <code>https://query.wikidata.org/sparql</code> of the <a href="https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service">Wikidata SPARQL endpoint</a>).-->
                     <code>http://dbpedia.org/sparql</code> and <code>https://query.wikidata.org/sparql</code>, respectively).
-                With one exception (see below), HeFQUIN expects all <code>SERVICE</code> clauses to be of this form (rather than having a variable in place of the service IRI). The IRIs to be used as such service IRIs are the IRIs specified as a value of either the <code>endpointAddress</code> property or the <code>exampleFragmentAddress</code> property of the federation members mentioned in the <a href="federation_description.html">description of your federation</a>. If your query mentions a service IRI that is not the <code>endpointAddress</code> or the <code>exampleFragmentAddress</code> of any federation member in the federation to be queried, then the HeFQUIN query planner returns an error.
+                With one exception (see below), HeFQUIN expects all <code>SERVICE</code> clauses to be of this form (rather than having a variable in place of the service IRI). The IRIs to be used as such service IRIs are the IRIs specified as a value of the <code>serviceURI</code> property of the federation members mentioned in the <a href="federation_description.html">description of your federation</a>. If your query mentions a service IRI that is not the <code>serviceURI</code> of any federation member in the federation to be queried, then the HeFQUIN query planner returns an error.
+            </p>
+            <p>
+                <b>Service calls with parameters.</b> For federation members for which requests need to be formed by using values for particular parameters (e.g., REST requests with an HTTP URI that contains a <a href="https://en.wikipedia.org/wiki/Query_string">query string</a>), the corresponding <code>SERVICE</code> clauses may contain a <code>PARAMS</code> part as illustrated in the following query.
+            </p>
+            <pre><code class="language-sparql">PREFIX ex:   &lt;http://example.org/>
+
+SELECT * WHERE {
+	BIND ( "52.52"^^xsd:float AS ?lat )
+	BIND ( "13.41"^^xsd:float AS ?long )
+	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
+
+	SERVICE &lt;https://api.open-meteo.com/v1/forecast> PARAMS(?lat, ?long, ?req) {
+		?x ex:temperature ?temp .
+		?x ex:windSpeed ?wind .
+	}
+}</code></pre>
+            <p>
+                Note that the <code>PARAMS</code> keyword is a HeFQUIN-specific extension to SPARQL and is not part of the SPARQL standard. At the moment, it is possible to list only variables within the <code>PARAMS</code> part. The number of variables listed must correspond to the number of query parameters that the <a href="federation_description.html">federation description</a> being used specifies for the corresponding REST endpoint (see the <a href="http://w3id.org/hefquin/feddesc#queryParameters">fd:queryParameters</a> property and a relevant <a href="federation_description.html#REST-endpoint-example">example description</a>), and the values assigned to these variables must be literals with the datatypes specified for the query parameters in the federation description.
             </p>
             <p id="source-assignments-with-values">
                 <b>Providing the service IRIs via <code>VALUES</code> clauses.</b> The only case in which the <code>SERVICE</code> clauses may have a variable in place of a service IRI is in queries in which <code>VALUES</code> clauses are used to specify the service IRIs. In particular, such a query must satisfy the following conditions:
