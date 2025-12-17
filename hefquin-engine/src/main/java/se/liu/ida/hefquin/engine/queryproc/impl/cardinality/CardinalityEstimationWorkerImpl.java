@@ -90,14 +90,14 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		// Since we assume that the nullary plans (which have a request
 		// operator) have all been annotated already, we should never
 		// end up here.
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException( "op.ID():" + op.getID() );
 	}
 
 	@Override
 	public void visit( final LogicalOpFixedSolMap op ) {
 		// Since we assume that the nullary plans (which have a fin operator)
 		// have all been annotated already, we should never end up here.
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException( "op.ID():" + op.getID() );
 	}
 
 	@Override
