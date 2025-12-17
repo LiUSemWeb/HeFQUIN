@@ -53,15 +53,12 @@ public class PhysicalPlanWithUnaryRootImpl extends BaseForQueryPlan
 
 	@Override
 	public boolean equals( final Object o ) {
-		if ( ! (o instanceof PhysicalPlanWithUnaryRoot) )
-			return false; 
-
-		final PhysicalPlanWithUnaryRoot oo = (PhysicalPlanWithUnaryRoot) o;
-		if ( oo == this )
+		if ( o == this )
 			return true;
-		else
-			return oo.getRootOperator().equals(rootOp)
-					&& oo.getSubPlan().equals(subPlan); 
+
+		return (    o instanceof PhysicalPlanWithUnaryRoot oo
+		         && oo.getRootOperator().getID() == rootOp.getID()
+		         && oo.getSubPlan().equals(subPlan) );
 	}
 
 	@Override
