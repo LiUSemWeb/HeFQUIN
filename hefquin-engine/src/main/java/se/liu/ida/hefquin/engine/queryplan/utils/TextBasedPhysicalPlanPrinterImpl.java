@@ -1,447 +1,230 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.core.VarExprList;
-import org.apache.jena.sparql.expr.Expr;
-import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.utils.PlanPrinter;
+import se.liu.ida.hefquin.base.utils.PlanPrinter.PrintablePlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithBinaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithUnaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 
 /**
  * Internally, the functionality of this class is implemented based on
  * a {@link PhysicalPlanVisitor}, which makes sure that we get a compiler
- * error whenever we add a new type of logical operator but forget to
+ * error whenever we add a new type of physical operator but forget to
  * extend this class here to cover that new operator.
  */
 public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinters  implements PhysicalPlanPrinter
-{	
+{
+	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
+
 	@Override
 	public void print( final PhysicalPlan plan, final PrintStream out ) {
-		final OpPrinter opPrinter = new OpPrinter(out);
-		planWalk(plan, 0, 0, 1, opPrinter, "");
-		opPrinter.printFullStringsForGraphPatterns();
+		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		PlanPrinter.print(pp, out);
+		printFullStringsForGraphPatterns(pp, out);
 		out.flush();
 	}
 
-	/**
-	 * This method recursively goes through a plan, and appends specific strings to a print stream.
-	 * @param plan The current plan (root operator) that will be formatted.
-	 * @param planNumber The number of a plan in terms of its super plan.
-	 * @param planLevel The depth of the root operator in a plan.
-	 * @param numberOfSiblings The number of sibling plans of a plan.
-	 * @param opPrinter The helper object for the printing.
-	 */
-	public void planWalk( final PhysicalPlan plan,
-	                      final int planNumber,
-	                      final int planLevel,
-	                      final int numberOfSiblings,
-	                      final OpPrinter opPrinter,
-	                      final String rootOpIndentString ) {
-		final String indentLevelString = getIndentLevelString(planNumber, planLevel, numberOfSiblings, rootOpIndentString);
-		opPrinter.setIndentLevelString(indentLevelString);
-		final String indentLevelStringForOpDetail = getIndentLevelStringForDetail(planNumber, planLevel, numberOfSiblings, plan.numberOfSubPlans(), indentLevelString);
-		opPrinter.setIndentLevelStringForOpDetail(indentLevelStringForOpDetail);
+	public ExtPrintablePlan createPrintablePlan( final PhysicalPlan p ) {
+		pe.graphPattern = null;
+		pe.fullStringForGraphPattern = null;
+		pe.rootOpString = null;
+		pe.props = new ArrayList<>();
 
-		opPrinter.setExpectedVariables( plan.getExpectedVariables() );
-		opPrinter.setQueryPlanningInfo( plan.getQueryPlanningInfo() );
-		plan.getRootOperator().visit(opPrinter);
+		p.getRootOperator().visit(pe);
 
-		for ( int i = 0; i < plan.numberOfSubPlans(); ++i ) {
-			planWalk( plan.getSubPlan(i), i, planLevel+1, plan.numberOfSubPlans(), opPrinter, indentLevelString );
+		final SPARQLGraphPattern graphPattern  = pe.graphPattern;
+		final String fullStringForGraphPattern = pe.fullStringForGraphPattern;
+		final String rootOpString              = pe.rootOpString;
+		final List<String> rootOpProps         = pe.props;
+
+		addPropStrings( p.getExpectedVariables(), rootOpProps );
+		addPropStrings( p.getQueryPlanningInfo(), rootOpProps );
+
+		final List<PrintablePlan> subPlans = createPrintableSubPlans(p);
+
+		return new ExtPrintablePlan( rootOpString, rootOpProps, subPlans,
+		                             graphPattern, fullStringForGraphPattern );
+	}
+
+	public List<PrintablePlan> createPrintableSubPlans( final PhysicalPlan p ) {
+		if ( p instanceof PhysicalPlanWithNullaryRoot ) {
+			return null;
+		}
+		else if ( p instanceof PhysicalPlanWithUnaryRoot u ) {
+			final PrintablePlan pp = createPrintablePlan( u.getSubPlan() );
+			return List.of(pp);
+		}
+		else if ( p instanceof PhysicalPlanWithBinaryRoot b ) {
+			final PrintablePlan pp1 = createPrintablePlan( b.getSubPlan1() );
+			final PrintablePlan pp2 = createPrintablePlan( b.getSubPlan2() );
+			return List.of(pp1, pp2);
+		}
+		else if ( p instanceof PhysicalPlanWithNaryRoot n ) {
+			List<PrintablePlan> subPlans = new ArrayList<>( n.numberOfSubPlans() );
+			final Iterator<PhysicalPlan> it = n.getSubPlans();
+			while ( it.hasNext() ) {
+				final PrintablePlan pp = createPrintablePlan( it.next() );
+				subPlans.add(pp);
+			}
+			return subPlans;
+		}
+		else {
+			throw new IllegalArgumentException( p.getClass().getName() );
 		}
 	}
 
-	protected static class OpPrinter extends OpPrinterBase implements PhysicalPlanVisitor {
 
-		public OpPrinter( final PrintStream out ) {
-			super(out);
-		}
-
-		@Override
-		public void visit( final PhysicalOpBinaryUnion op ) {
-			out.append( indentLevelString + "binary union (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-		}
+	public static class MyPropertiesExtractor
+			extends TextBasedLogicalPlanPrinterImpl.MyPropertiesExtractor
+			implements PhysicalPlanVisitor {
+		/**
+		 * To be used as the root-operator string in
+		 * an {@link ExtPrintablePlan} for the most
+		 * recently visited operator.
+		 */
+		public String rootOpString = null;
 
 		@Override
-		public void visit( final PhysicalOpBindJoinBRTPF op ) {
-			out.append( indentLevelString + "brTPF-based bind join (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpLookupJoinViaWrapper op ) {
-			out.append( indentLevelString + "wrapper-based lookup join (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpBindJoinWithFILTER op ) {
-			out.append( indentLevelString + "FILTER-based bind join (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpBindJoinWithUNION op ) {
-			out.append( indentLevelString + "UNION-based bind join (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpBindJoinWithVALUES op ) {
-			out.append( indentLevelString + "VALUES-based bind join (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpBindJoinWithVALUESorFILTER op ) {
-			out.append( indentLevelString + "VALUES/FILTER-based bind join (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpBindJoinWithBoundJoin op ) {
-			out.append( indentLevelString + "bound join-based bind join (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpFilter op ) {
-			final LogicalOpFilter lop = op.getLogicalOperator();
-
-			out.append( indentLevelString + "filter (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-
-			printExpressions( lop.getFilterExpressions(),
-			                  indentLevelStringForOpDetail + singleBase,
-			                  out );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpBind op ) {
-			final LogicalOpBind lop = op.getLogicalOperator();
-
-			out.append( indentLevelString + "bind (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-
-			final VarExprList bindExpressions = lop.getBindExpressions();
-			for ( Map.Entry<Var, Expr> e : bindExpressions.getExprs().entrySet() ) {
-				final Var var = e.getKey();
-				final Expr expr = e.getValue();
-				out.append( indentLevelStringForOpDetail + singleBase );
-				out.append( "  - " + var.toString() + " <-- " + ExprUtils.fmtSPARQL(expr) );
-				out.append( System.lineSeparator() );
-			}
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpGlobalToLocal op ) {
-			final LogicalOpGlobalToLocal lop = op.getLogicalOperator();
-
-			out.append( indentLevelString + "g2l (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-
-			out.append( indentLevelStringForOpDetail + singleBase + "  - vocab.mapping (" + lop.getVocabularyMapping().hashCode() + ")" );
-			out.append( System.lineSeparator() );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpHashJoin op ) {
-			out.append( indentLevelString + "hash join (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-		}
-
-		@Override
-		public void visit( final PhysicalOpHashRJoin op ) {
-			out.append( indentLevelString + "right-outer hash join (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-		}
-
-		@Override
-		public void visit( final PhysicalOpIndexNestedLoopsJoin op ) {
-			out.append( indentLevelString + "indexNLJ (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpLocalToGlobal op ) {
-			final LogicalOpLocalToGlobal lop = op.getLogicalOperator();
-
-			out.append( indentLevelString + "l2g (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-
-			out.append( indentLevelStringForOpDetail + singleBase + "  - vocab.mapping (" + lop.getVocabularyMapping().hashCode() + ")" );
-			out.append( System.lineSeparator() );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpMultiwayUnion op ) {
-			out.append( indentLevelString + "multiway union (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpNaiveNestedLoopsJoin op ) {
-			out.append( indentLevelString + "naive NLJ (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpParallelMultiLeftJoin op ) {
-			out.append( indentLevelString + "parallel multiway left-outer join (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpRequest<?,?> op ) {
-			out.append( indentLevelString + "req (" + op.getID() + ")" );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail, out, np );
-
-			final LogicalOpRequest<?,?> lop = op.getLogicalOperator();
-			printFederationMember( lop.getFederationMember(), indentLevelStringForOpDetail, out );
-
-			final DataRetrievalRequest req = lop.getRequest();
-			if ( req instanceof SPARQLRequest sreq ) {
-				printSPARQLGraphPattern( sreq.getQueryPattern(), indentLevelStringForOpDetail );
-			}
-			else {
-				out.append( indentLevelStringForOpDetail + "  - request (" + req.hashCode() +  "): " + req.toString() );
-				out.append( System.lineSeparator() );
-			}
-
-			printExpectedVariables( indentLevelStringForOpDetail );
-			printQueryPlanningInfo( indentLevelStringForOpDetail );
-
-			out.append( indentLevelStringForOpDetail );
-			out.append( System.lineSeparator() );
+		public void visit( final PhysicalOpRequest<?, ?> op ) {
+			rootOpString = "req (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpFixedSolMap op ) {
-			out.append( indentLevelString + "sm (" + op.getID() + ")" );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail, out, np );
+			rootOpString = "sm (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
 
-			out.append( indentLevelStringForOpDetail + "  - solmap: " + op.getLogicalOperator().getSolutionMapping().toString() );
-			out.append( System.lineSeparator() );
+		@Override
+		public void visit( final PhysicalOpBindJoinBRTPF op ) {
+			rootOpString = "bind join for brTPF (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
 
-			printExpectedVariables( indentLevelStringForOpDetail );
-			printQueryPlanningInfo( indentLevelStringForOpDetail );
+		@Override
+		public void visit( final PhysicalOpBindJoinWithVALUES op ) {
+			rootOpString = "bind join with VALUES (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
 
-			out.append( indentLevelStringForOpDetail );
-			out.append( System.lineSeparator() );
+		@Override
+		public void visit( final PhysicalOpBindJoinWithUNION op ) {
+			rootOpString = "bind join with UNION (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpBindJoinWithFILTER op ) {
+			rootOpString = "bind join with FILTER (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpBindJoinWithVALUESorFILTER op ) {
+			rootOpString = "bind join with VALUES/FILTER (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpBindJoinWithBoundJoin op ) {
+			rootOpString = "bind join with variable renaming (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpIndexNestedLoopsJoin op ) {
+			rootOpString = "indexNLJ (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpLookupJoinViaWrapper op ) {
+			rootOpString = "wrapper-based lookup join (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpHashJoin op ) {
+			rootOpString = "hash join (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpSymmetricHashJoin op ) {
-			out.append( indentLevelString + "SHJ (" + op.getID() + ") " );
-			out.append( System.lineSeparator() );
-			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
-
-			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
-			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
+			rootOpString = "SHJ (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
 		}
 
-		protected void printOperatorInfoFmAndPattern( final PhysicalOperatorForLogicalOperator pop,
-		                                              final String indentLevelStringForOpDetail ) {
-			final LogicalOperator lop = pop.getLogicalOperator();
-			final FederationMember fm;
-			final SPARQLGraphPattern gp;
-			final List<Var> paramVars;
-			if ( lop instanceof LogicalOpGPAdd addOp ) {
-				fm = addOp.getFederationMember();
-				gp = addOp.getPattern();
-
-				if ( addOp.hasParameterVariables() )
-					paramVars = addOp.getParameterVariables();
-				else
-					paramVars = null;
-			}
-			else if ( lop instanceof LogicalOpGPOptAdd addOp ) {
-				fm = addOp.getFederationMember();
-				gp = addOp.getPattern();
-				paramVars = null;
-			}
-			else {
-				throw new IllegalArgumentException( "Unexpected logical operator: " + lop.getClass().getName() );
-			}
-
-			printFederationMember( fm, indentLevelStringForOpDetail + singleBase, out );
-
-			if ( pop instanceof PhysicalOpLookupJoinViaWrapper ) {
-				out.append( indentLevelStringForOpDetail + singleBase );
-				out.append( "  - parameter variables:" );
-				if ( paramVars != null ) {
-					for ( final Var v : paramVars )
-						out.append( " " + v.toString() );
-				}
-				else {
-					out.append( " none" );
-				}
-				out.append( System.lineSeparator() );
-			}
-
-			printSPARQLGraphPattern( gp, indentLevelStringForOpDetail + singleBase );
+		@Override
+		public void visit( final PhysicalOpNaiveNestedLoopsJoin op ) {
+			rootOpString = "naive NLJ (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
 		}
-	}
 
+		@Override
+		public void visit( final PhysicalOpHashRJoin op ) {
+			rootOpString = "right-outer hash join (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
 
-	protected static void printLogicalOperator( final PhysicalOperatorForLogicalOperator pop,
-	                                            final String indentLevelString,
-	                                            final PrintStream out,
-	                                            final OpNamePrinter lopNP ) {
-		printLogicalOperatorBase( pop.getLogicalOperator(),
-		                          indentLevelString + "  - lop: ",
-		                          out,
-		                          lopNP );
-		out.append( System.lineSeparator() );
+		@Override
+		public void visit( final PhysicalOpParallelMultiLeftJoin op ) {
+			rootOpString = "parallel multiway left-outer join (" + op.getID() + ")";
+		}
+
+		@Override
+		public void visit( final PhysicalOpBinaryUnion op ) {
+			rootOpString = "union (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpMultiwayUnion op ) {
+			rootOpString = "multiway union (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpFilter op ) {
+			rootOpString = "filter (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpBind op ) {
+			rootOpString = "bind (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpLocalToGlobal op ) {
+			rootOpString = "l2g (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpGlobalToLocal op ) {
+			rootOpString = "g2l (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		protected void record( final LogicalOperator lop ) {
+			lop.visit(snc);
+			props.add( "lop: " + snc.name + " (" + lop.getID()  + ")" );
+			lop.visit(this);
+		}
 	}
 
 }
