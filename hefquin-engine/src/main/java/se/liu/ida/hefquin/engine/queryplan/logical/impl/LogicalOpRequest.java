@@ -24,14 +24,12 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 
 	@Override
 	public boolean equals( final Object o ) {
-		if ( ! (o instanceof LogicalOpRequest) )
-			return false;
-
-		final LogicalOpRequest<?,?> oo = (LogicalOpRequest<?,?>) o;
-		if ( oo == this )
+		if ( o == this )
 			return true;
-		else
-			return oo.fm.equals(fm) && oo.req.equals(req); 
+
+		return (    o instanceof LogicalOpRequest oo
+		         && oo.fm.equals(fm)
+		         && oo.req.equals(req) );
 	}
 
 	@Override

@@ -37,27 +37,24 @@ public class LogicalPlanWithNaryRootImpl extends BaseForQueryPlan
 
 	@Override
 	public boolean equals( final Object o ) {
-		if ( ! (o instanceof LogicalPlanWithNaryRoot) )
-			return false; 
-
-		final LogicalPlanWithNaryRoot oo = (LogicalPlanWithNaryRoot) o;
-		if ( oo == this )
+		if ( o == this )
 			return true;
 
-		if ( oo.numberOfSubPlans() != subPlans.size() )
-			return false;
+		if (    o instanceof LogicalPlanWithNaryRoot oo
+		     && oo.getRootOperator().getID() == rootOp.getID()
+		     && oo.numberOfSubPlans() == subPlans.size() )
+		{
+			final Iterator<LogicalPlan> it1 = subPlans.iterator();
+			final Iterator<LogicalPlan> it2 = oo.getSubPlans();
+			while ( it1.hasNext() ) {
+				if ( ! it1.next().equals(it2.next()) )
+					return false;
+			}
 
-		if ( ! oo.getRootOperator().equals(rootOp) )
-			return false;
-
-		final Iterator<LogicalPlan> it1 = subPlans.iterator();
-		final Iterator<LogicalPlan> it2 = oo.getSubPlans();
-		while ( it1.hasNext() ) {
-			if ( ! it1.next().equals(it2.next()) )
-				return false;
+			return true;
 		}
-
-		return true;
+		else
+			return false;
 	}
 
 	@Override
