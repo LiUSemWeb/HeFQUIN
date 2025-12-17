@@ -11,11 +11,14 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -40,7 +43,8 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 	 */
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
-		if ( inputPlan.getRootOperator() instanceof LogicalOpRequest reqOp )
+		final LogicalOperator rootOp = inputPlan.getRootOperator();
+		if ( rootOp instanceof LogicalOpRequest reqOp )
 		{
 			if (    reqOp.getFederationMember() instanceof RDFBasedFederationMember fm
 			     && fm.getVocabularyMapping() != null )
@@ -56,7 +60,13 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				return inputPlan;
 			}
 		}
-		else if ((inputPlan.getRootOperator() instanceof LogicalOpMultiwayJoin) || (inputPlan.getRootOperator() instanceof LogicalOpMultiwayUnion)) {
+		else if ( rootOp instanceof LogicalOpFixedSolMap )
+		{
+			return inputPlan;
+		}
+		else if (    (rootOp instanceof LogicalOpMultiwayJoin)
+		          || (rootOp instanceof LogicalOpMultiwayUnion) )
+		{
 			final List<LogicalPlan> rewrittenSubplans = new ArrayList<>();
 			final Iterator<LogicalPlan> it = ((LogicalPlanWithNaryRoot) inputPlan).getSubPlans();
 			boolean rewritten = false;
@@ -74,18 +84,30 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				return inputPlan;
 			}
 		}
-		else if ( inputPlan.getRootOperator() instanceof LogicalOpFilter filterOp ) {
+		else if ( rootOp instanceof LogicalOpFilter filterOp )
+		{
 			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
 			// TODO: the expressions of 'filterOp' should be rewritten too
 			return new LogicalPlanWithUnaryRootImpl(filterOp, rewrittenSubPlan);
 		}
-		else if ( inputPlan.getRootOperator() instanceof LogicalOpBind bindOp ) {
+		else if ( rootOp instanceof LogicalOpBind bindOp )
+		{
 			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
 			// TODO: the expressions of 'bindOp' should be rewritten too
 			return new LogicalPlanWithUnaryRootImpl(bindOp, rewrittenSubPlan);
 		}
+		else if ( rootOp instanceof LogicalOpGPAdd gpAdd )
+		{
+			if (    gpAdd.getFederationMember() instanceof RDFBasedFederationMember fm
+			     && fm.getVocabularyMapping() != null ) {
+				throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a gpAdd operator with a federation member for which a vocabulary mapping is specified." );
+			}
+				
+			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
+			return new LogicalPlanWithUnaryRootImpl(gpAdd, rewrittenSubPlan);
+		}
 		else {
-			throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a root operator of type: " + inputPlan.getRootOperator().getClass().getName() );
+			throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a root operator of type: " + rootOp.getClass().getName() );
 		}
 	}
 

@@ -23,12 +23,14 @@ import se.liu.ida.hefquin.federation.access.*;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
+import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
@@ -204,8 +206,11 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessor() {
 			@Override public RecordsResponse performRequest(Neo4jRequest req, Neo4jServer fm) { throw new UnsupportedOperationException(); }
 		};
+		final RESTRequestProcessor reqProcREST = new RESTRequestProcessor() {
+			@Override public StringResponse performRequest( RESTRequest req, RESTEndpoint fm ) { throw new UnsupportedOperationException(); }
+		};
 
-		return new AsyncFederationAccessManagerImpl(execServiceForFedAccess, reqProc, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
+		return new AsyncFederationAccessManagerImpl(execServiceForFedAccess, reqProc, reqProcTPF, reqProcBRTPF, reqProcNeo4j, reqProcREST);
 	}
 
 	protected static class FakeRequestProcessorBase

@@ -23,6 +23,11 @@ fd:FederationMember a owl:Class ;
     rdfs:label "Federation Member"@en ;
     rdfs:comment "An entity that is part of the federation and provides data via a specific interface."@en .
 
+fd:WrappedFederationMember a owl:Class ;
+    rdfs:subClassOf fd:FederationMember ;
+    rdfs:label "Wrapped Federation Member"@en ;
+    rdfs:comment "An federation member that is accessed via a wrapper."@en .
+
 fd:Interface a owl:Class ;
     rdfs:label "Interface"@en ;
     rdfs:comment "An interface is a means to issue data retrieval requests to a federation member. This class is a superclass of any kind of interface and should not be used directly within federation descriptions. Concrete types of interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
@@ -62,7 +67,17 @@ fd:GraphQLEndpointInterface a owl:Class ;
     rdfs:label "GraphQL Endpoint Interface"@en ;
     rdfs:comment "An interface to access a federation member via a GraphQL API."@en .
 
+fd:Wrapper a owl:Class ;
+    rdfs:label "Wrapper"@en ;
+    rdfs:comment "A wrapper provides access to federation members that do not support RDF and SPARQL natively."@en .
+
 ### ===== PROPERTY DECLARATIONS =====
+
+fd:serviceURI a rdf:Property ;
+    rdfs:domain fd:FederationMember ;
+    rdfs:range  xsd:anyURI ;
+    rdfs:label "service URI"@en ;
+    rdfs:comment "The URI via which the federation member is identified in a SERVICE clause."@en .
 
 fd:interface a rdf:Property ;
     rdfs:domain fd:FederationMember ;
@@ -93,3 +108,45 @@ fd:mappingConfiguration a rdf:Property ;
     rdfs:range  rdf:Resource ;
     rdfs:label "mapping configuration"@en ;
     rdfs:comment "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, LPG)."@en .
+
+
+
+
+fd:RESTInterface a owl:Class ;
+    rdfs:subClassOf fd:EndpointInterface ;
+    rdfs:label "REST Endpoint Interface"@en ;
+    rdfs:comment "An interface to access a federation member that provides a REST API."@en .
+
+fd:QueryParameter a owl:Class ;
+    rdfs:label "Query Parameter"@en ;
+    rdfs:comment "Declaration of a query parameter for a REST API."@en .
+
+fd:queryParameters a rdf:Property ;
+    rdfs:domain fd:RESTInterface ;
+    rdfs:range  rdf:List ;
+    rdfs:label "query parameters"@en ;
+    rdfs:comment "List of query parameters for a REST API. The elements of such a list are expected to be of type fd:QueryParameter."@en .
+
+fd:paramName a rdf:Property ;
+    rdfs:domain fd:QueryParameter ;
+    rdfs:range  xsd:string ;
+    rdfs:label "name of query parameter"@en ;
+    rdfs:comment "The name of query parameters for a REST API."@en .
+
+fd:paramType a rdf:Property ;
+    rdfs:domain fd:QueryParameter ;
+    rdfs:range  rdf:Resource ;
+    rdfs:label "type of query parameter"@en ;
+    rdfs:comment "The type of query parameters for a REST API, which is expected to be specified as a datatype IRI (e.g., xsd:string, xsd:float)."@en .
+
+fd:wrapper a rdf:Property ;
+    rdfs:domain fd:WrappedFederationMember ;
+    rdfs:range  fd:Wrapper ;
+    rdfs:label "wrapper"@en ;
+    rdfs:comment "The wrapper of a wrapped federation member."@en .
+
+fd:rmlTriplesMaps a rdf:Property ;
+    rdfs:domain fd:Wrapper ;
+    rdfs:range  rdf:List ;
+    rdfs:label "RML triples maps"@en ;
+    rdfs:comment "List of RML triples maps that define the mapping for a wrapper. The elements of such a list are expected to be of type rml:TriplesMap."@en .

@@ -25,6 +25,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -396,8 +398,29 @@ public class SparqlServletTest {
 		final String invalid = "SELECT * WHERE { SERVICE <http://invalid/federation/member> { ?s ?p ?o } }";
 		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_XML, invalid );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			System.err.println( EntityUtils.toString( response.getEntity() ) );
 			assertEquals( 500, response.getStatusLine().getStatusCode() );
+			final String responseContent = EntityUtils.toString( response.getEntity() );
+			assertTrue( responseContent.contains("http://invalid/federation/member") );
+		}
+	}
+
+	@Test
+	public void testUseOfHeFQUINParser() throws Exception {
+		final String validQueryStr = "SELECT * WHERE { BIND (42 AS ?v) SERVICE <http://example.org/> PARAMS(?v) { ?s ?p ?o } }";
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_XML, validQueryStr );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
+			assertEquals( 500, response.getStatusLine().getStatusCode() );
+			final String responseContent = EntityUtils.toString( response.getEntity() );
+			assertFalse( responseContent.contains("PARAMS") );
+			assertTrue( responseContent.contains("example.org") );
+		}
+
+		final String invalidQueryStr = "SELECT * WHERE { SERVICE <http://example.org/> WRONG_KEYWORD(?v) { ?s ?p ?o } }";
+		final HttpPost request2 = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_XML, invalidQueryStr );
+		try ( final CloseableHttpResponse response = httpClient.execute( request2 ) ) {
+			assertEquals( 500, response.getStatusLine().getStatusCode() );
+			final String responseContent = EntityUtils.toString( response.getEntity() );
+			assertTrue( responseContent.contains("WRONG_KEYWORD") );
 		}
 	}
 }

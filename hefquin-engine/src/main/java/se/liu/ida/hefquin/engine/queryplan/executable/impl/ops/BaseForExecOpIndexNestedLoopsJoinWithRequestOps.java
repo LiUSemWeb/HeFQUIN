@@ -37,9 +37,11 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	// in parallel, we should use an input block size with which
 	// we can leverage this parallelism. However, I am not sure
 	// yet what a good value is; it probably depends on various
-	// factors, including the load on the server and the degree
-	// of parallelism in the FederationAccessManager.
-	public final static int DEFAULT_BATCH_SIZE = 30;
+	// factors, including the load on the federation member and
+	// the degree of parallelism in the FederationAccessManager.
+	// Notice that this number is essentially the number of
+	// requests issued in parallel (to the same endpoint!).
+	public final static int DEFAULT_BATCH_SIZE = 10;
 
 	protected final QueryType query;
 	protected final MemberType fm;

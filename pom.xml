@@ -15,6 +15,7 @@
     <module>hefquin-cli</module>
     <module>hefquin-graphqlconnector</module>
     <module>hefquin-pgconnector</module>
+    <module>hefquin-rml</module>
     <module>hefquin-service</module>
   </modules>
 

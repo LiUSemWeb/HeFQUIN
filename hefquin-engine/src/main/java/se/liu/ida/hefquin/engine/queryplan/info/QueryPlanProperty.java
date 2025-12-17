@@ -150,4 +150,19 @@ public class QueryPlanProperty
 	 */
 	public Quality getQuality() { return quality; }
 
+	@Override
+	public String toString() {
+		// Note that the query plan printer relies on this implementation.
+		final StringBuilder b = new StringBuilder( type.name + " = " + value );
+		switch ( quality ) {
+		case PURE_GUESS:                   b.append(" (pure guess)"); break;
+		case MIN_OR_MAX_POSSIBLE:          b.append(" (min or max possible)"); break;
+		case ESTIMATE_BASED_ON_ESTIMATES:  b.append(" (estimate based on estimates)"); break;
+		case ESTIMATE_BASED_ON_ACCURATES:  b.append(" (estimate based on accurates)"); break;
+		case DIRECT_ESTIMATE:              b.append(" (direct estimate)"); break;
+		case ACCURATE:                     b.append(" (accurate)"); break;
+		}
+
+		return b.toString();
+	}
 }

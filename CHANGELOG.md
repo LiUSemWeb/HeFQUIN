@@ -7,9 +7,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- (nothing yet)
+-  Initial support for RML-wrapped REST endpoints as federation members ([#486](https://github.com/LiUSemWeb/HeFQUIN/pull/486)).
 ### Changed
-- (nothing yet)
+-  Reimplementation of the printers for logical and for physical plans ([#487](https://github.com/LiUSemWeb/HeFQUIN/pull/487)).
 
 
 ## [0.0.7] - 2025-11-03

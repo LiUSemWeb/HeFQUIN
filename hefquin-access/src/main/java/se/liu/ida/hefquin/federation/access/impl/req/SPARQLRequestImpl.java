@@ -73,14 +73,10 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 	@Override
 	public String toString(){
-		if ( query != null ) {
-			return query.toString();
-		}
-		else if ( pattern != null ){
-			return pattern.toString();
-		}
+		if ( query != null )
+			return "SPARQLRequest with query: " + query.toString();
 		else
-			return "The query pattern of SPARQLRequest is null";
+			return "SPARQLRequest with pattern: " + pattern.toString();
 	}
 
 }

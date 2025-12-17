@@ -1,25 +1,84 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
+import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
-public class ExecOpRequestSPARQL extends BaseForExecOpSolMapsRequest<SPARQLRequest, SPARQLEndpoint>
+public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
+                                 MemberType extends FederationMember>
+                extends BaseForExecOpRequest<ReqType,MemberType>
 {
-	public ExecOpRequestSPARQL( final SPARQLRequest req,
-	                            final SPARQLEndpoint fm,
+	private long timeAfterResponse = 0L;
+	private long solMapsRetrieved = 0L;
+	private long numberOfOutputMappingsProduced = 0L;
+
+	public ExecOpRequestSPARQL( final ReqType req,
+	                            final MemberType fm,
 	                            final boolean collectExceptions,
 	                            final QueryPlanningInfo qpInfo ) {
 		super(req, fm, collectExceptions, qpInfo);
 	}
 
 	@Override
-	protected SolMapsResponse performRequest( final FederationAccessManager fedAccessMgr ) throws FederationAccessException {
-		return FederationAccessUtils.performRequest(fedAccessMgr, req, fm);
+	protected final void _execute( final IntermediateResultElementSink sink, final ExecutionContext execCxt )
+		throws ExecOpExecutionException
+	{
+		final SolMapsResponse response;
+		try {
+			response = FederationAccessUtils.performRequest( execCxt.getFederationAccessMgr(), req, fm );
+		}
+		catch ( final FederationAccessException e ) {
+			throw new ExecOpExecutionException( "Performing the request caused an exception.", e, this );
+		}
+
+		timeAfterResponse = System.currentTimeMillis();
+		try {
+			solMapsRetrieved = response.getSize();
+		} catch ( final UnsupportedOperationDueToRetrievalError e ) {
+			throw new ExecOpExecutionException( "Accessing the response size caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+		}
+
+		process(response, sink);
 	}
 
+	protected void process( final SolMapsResponse response, final IntermediateResultElementSink sink )
+		throws ExecOpExecutionException
+	{
+		final Iterable<SolutionMapping> solutionMappings;
+		try {
+			solutionMappings = response.getResponseData();
+		}
+		catch ( final UnsupportedOperationDueToRetrievalError e ) {
+			throw new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+		}
+
+		final int cnt = sink.send(solutionMappings);
+		numberOfOutputMappingsProduced += cnt;
+	}
+
+	@Override
+	public void resetStats() {
+		super.resetStats();
+		timeAfterResponse = 0L;
+		solMapsRetrieved = 0L;
+		numberOfOutputMappingsProduced = 0L;
+	}
+
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "requestExecTime",                Long.valueOf( timeAtExecEnd - timeAfterResponse ) );
+		s.put( "responseProcTime",               Long.valueOf( timeAfterResponse - timeAtExecStart ) );
+		s.put( "solMapsRetrieved",               Long.valueOf( solMapsRetrieved ) );
+		s.put( "numberOfOutputMappingsProduced", Long.valueOf( numberOfOutputMappingsProduced ) );
+		return s;
+	}
 }

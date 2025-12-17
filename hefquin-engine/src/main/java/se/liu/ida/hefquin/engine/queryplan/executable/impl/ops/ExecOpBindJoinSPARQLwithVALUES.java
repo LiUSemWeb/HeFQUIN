@@ -92,7 +92,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 		// Create the request operator using the combined pattern.
 		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
 		final SPARQLRequest request = new SPARQLRequestImpl(patternForReq);
-		return new ExecOpRequestSPARQL(request, fm, false, null);
+		return new ExecOpRequestSPARQL<>(request, fm, false, null);
 	}
 
 	public static Element createValuesClause( final Set<Binding> solMaps ) {

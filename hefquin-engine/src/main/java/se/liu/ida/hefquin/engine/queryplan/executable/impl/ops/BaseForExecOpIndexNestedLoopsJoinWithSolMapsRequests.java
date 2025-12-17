@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -17,9 +18,10 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<Query
 {
 	public BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests( final QueryType query,
 	                                                             final MemberType fm,
+	                                                             final int batchSize,
 	                                                             final boolean collectExceptions,
 	                                                             final QueryPlanningInfo qpInfo ) {
-		super(query, fm, collectExceptions, qpInfo);
+		super(query, fm, batchSize, collectExceptions, qpInfo);
 	}
 
 	@Override
@@ -32,6 +34,14 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<Query
 			protected Iterable<SolutionMapping> extractSolMaps( final SolMapsResponse response )
 					throws UnsupportedOperationDueToRetrievalError {
 				return response.getResponseData();
+			}
+
+			@Override
+			protected void processExtractedSolMaps( final Iterable<SolutionMapping> solmaps ) {
+				for ( final SolutionMapping fetchedSM : solmaps ) {
+					final SolutionMapping out = SolutionMappingUtils.merge( sm, fetchedSM );
+					sink.send( out );
+				}
 			}
 		};
 	}

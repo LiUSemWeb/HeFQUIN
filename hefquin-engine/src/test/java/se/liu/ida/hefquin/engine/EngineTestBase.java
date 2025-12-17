@@ -55,21 +55,26 @@ import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.federation.access.Neo4jRequest;
+import se.liu.ida.hefquin.federation.access.RESTRequest;
 import se.liu.ida.hefquin.federation.access.RecordsResponse;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.federation.access.StringResponse;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.StringResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
+import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
+import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.federation.members.impl.BaseForFederationMember;
 import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
 
@@ -322,6 +327,56 @@ public abstract class EngineTestBase
 		}
 	}
 
+	public static class WrappedRESTEndpointForTest extends FederationMemberBaseForTest
+	                                               implements WrappedRESTEndpoint
+	{
+		//public final String responseData = "{ \"current\": { \"temperature_2m\": 2.3, \"wind_speed_10m\": 1.0 } }";
+		public final String responseData;
+		protected final List<Parameter> params;
+
+		public WrappedRESTEndpointForTest( final String responseData,
+		                                   final Graph rdfView,
+		                                   final List<Parameter> params ) {
+			super(rdfView);
+			this.responseData = responseData;
+			this.params = ( params == null ) ? List.of() : params;
+		}
+
+		@Override
+		public List<SolutionMapping> evaluatePatternOverRDFView(
+				final SPARQLGraphPattern pattern,
+				final String data )
+						throws DataConversionException {
+			assert data.equals(responseData);
+			return getSolutions(pattern);
+		}
+
+		@Override
+		public String getURL() {
+			return "http://example.org/";
+		}
+
+		@Override
+		public int getNumberOfParameters() {
+			return params.size();
+		}
+
+		@Override
+		public Iterable<Parameter> getParameters() {
+			return params;
+		}
+
+		@Override
+		public boolean supportsMoreThanTriplePatterns() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
+			throw new UnsupportedOperationException();
+		}
+	}
+
 	protected static class BRTPFServerWithVocabularyMappingForTest extends BRTPFServerForTest
 	{
 		final VocabularyMapping vm;
@@ -411,6 +466,12 @@ public abstract class EngineTestBase
 				return resp;
 			}
 
+			if ( req instanceof RESTRequest reqREST && fm instanceof RESTEndpoint ep ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqREST, ep);
+				return resp;
+			}
+
 			throw new UnsupportedOperationException();
 		}
 
@@ -478,6 +539,20 @@ public abstract class EngineTestBase
 		{
 			final Neo4jRequestProcessor reqProc = new Neo4jRequestProcessorImpl();
 			final RecordsResponse response = reqProc.performRequest(req, fm);
+			return CompletableFuture.completedFuture(response);
+		}
+
+		protected CompletableFuture<StringResponse> _issueRequest( final RESTRequest req,
+		                                                           final RESTEndpoint fm )
+						throws FederationAccessException
+		{
+			final String data;
+			if ( fm instanceof WrappedRESTEndpointForTest ep )
+				data = ep.responseData;
+			else
+				throw new IllegalArgumentException();
+
+			final StringResponse response = new StringResponseImpl(data, fm, req, new Date());
 			return CompletableFuture.completedFuture(response);
 		}
 

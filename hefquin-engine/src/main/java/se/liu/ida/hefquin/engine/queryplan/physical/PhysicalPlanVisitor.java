@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 public interface PhysicalPlanVisitor
 {
 	void visit( PhysicalOpRequest<?,?> op );
+	void visit( PhysicalOpFixedSolMap op );
 
 	void visit( PhysicalOpBindJoinBRTPF op );
 	void visit( PhysicalOpBindJoinWithVALUES op );
@@ -13,7 +14,7 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpBindJoinWithVALUESorFILTER op );
     void visit( PhysicalOpBindJoinWithBoundJoin op );
 	void visit( PhysicalOpIndexNestedLoopsJoin op );
-	void visit( PhysicalOpBindJoinViaMaterializingWrapper op );
+	void visit( PhysicalOpLookupJoinViaWrapper op );
 
 	void visit( PhysicalOpHashJoin op );
 	void visit( PhysicalOpSymmetricHashJoin op );

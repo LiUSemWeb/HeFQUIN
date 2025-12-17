@@ -1,27 +1,69 @@
 PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
 PREFIX fd:     <http://w3id.org/hefquin/feddesc#>
+PREFIX rml:    <http://w3id.org/rml/>
 PREFIX ex:     <http://example.org/>
 
 ex:dbpediaSPARQL
-      a            fd:FederationMember ;
+      fd:serviceURI <http://dbpedia.org/sparql> ;
       fd:interface [ a                  fd:SPARQLEndpointInterface ;
                      fd:endpointAddress <http://dbpedia.org/sparql> ] .
 
 ex:dbpediaTPF
-      a            fd:FederationMember ;
+      fd:serviceURI <http://fragments.dbpedia.org/2016-04/en> ;
       fd:interface [ a                         fd:TPFInterface ;
                      fd:exampleFragmentAddress <http://fragments.dbpedia.org/2016-04/en> ] .
 
 ex:wikidataSPARQL
-      a            fd:FederationMember ;
+      fd:serviceURI <https://query.wikidata.org/sparql> ;
       fd:interface [ a                  fd:SPARQLEndpointInterface ;
                      fd:endpointAddress <https://query.wikidata.org/sparql> ] .
 
 ex:europaSPARQL
-      a            fd:FederationMember ;
+      fd:serviceURI <https://data.europa.eu/sparql> ;
       fd:interface [ a                  fd:SPARQLEndpointInterface ;
                      fd:endpointAddress <https://data.europa.eu/sparql> ] .
+
+ex:openMeteo
+      fd:serviceURI <https://api.open-meteo.com/v1/forecast> ;
+      fd:interface _:openMeteoRestEndpoint ;
+      fd:wrapper _:openMeteoWrapper .
+
+_:openMeteoRestEndpoint a fd:RESTInterface ;
+      fd:endpointAddress <https://api.open-meteo.com/v1/forecast> ;
+      fd:queryParameters ( [ fd:paramName "latitude" ; fd:paramType xsd:float ]
+                           [ fd:paramName "longitude" ; fd:paramType xsd:float ]
+                           [ fd:paramName "current" ; fd:paramType xsd:string ] ) .
+
+ex:openMeteo2
+      fd:serviceURI <https://api.open-meteo.com/v1/forecast/WithFixedParams> ;
+      fd:interface [ a                  fd:RESTInterface ;
+                     fd:endpointAddress <https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m> ;
+                     fd:queryParameters () ] ;
+      fd:wrapper _:openMeteoWrapper .
+
+_:openMeteoWrapper
+      fd:rmlTriplesMaps ( _:openMeteoTM1 _:openMeteoTM2 ) .
+
+_:openMeteoTM1
+      rml:logicalSource [ rml:source _:openMeteoRestEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.current" ] ;
+      rml:subjectMap [ rml:termType rml:BlankNode ;
+                       rml:reference "time" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:temperature ] ;
+                               rml:objectMap [ rml:reference "temperature_2m" ; rml:datatype xsd:double ] ] .
+
+_:openMeteoTM2
+      rml:logicalSource [ rml:source _:openMeteoRestEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.current" ] ;
+      rml:subjectMap [ rml:termType rml:BlankNode ;
+                       rml:reference "time" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:windSpeed ] ;
+                               rml:objectMap [ rml:reference "wind_speed_10m" ; rml:datatype xsd:double ] ] .
+
+
 
 #ex:neo4jTest
 #      a            fd:FederationMember ;

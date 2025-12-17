@@ -16,7 +16,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessingStatsAndExceptionsImpl;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.FederationAccessStats;
-import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
+import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINEngineConstants;
 
 /**
  * An object of this class can be used in two ways to process queries over
@@ -209,7 +209,7 @@ public class HeFQUINEngine
 
 			@Override
 			public QueryProcessingStatsAndExceptions getStatsAndExceptions() {
-				return (QueryProcessingStatsAndExceptions) qe.getContext().get(HeFQUINConstants.sysQProcStatsAndExceptions);
+				return (QueryProcessingStatsAndExceptions) qe.getContext().get(HeFQUINEngineConstants.sysQProcStatsAndExceptions);
 			}
 		};
 	}
@@ -262,7 +262,7 @@ public class HeFQUINEngine
 			ex = e;
 		}
 
-		final QueryProcessingStatsAndExceptions stats = (QueryProcessingStatsAndExceptions) qe.getContext().get(HeFQUINConstants.sysQProcStatsAndExceptions);
+		final QueryProcessingStatsAndExceptions stats = (QueryProcessingStatsAndExceptions) qe.getContext().get(HeFQUINEngineConstants.sysQProcStatsAndExceptions);
 
 		if ( ex == null ) {
 			return stats;

@@ -30,6 +30,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
+import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 
 /**
  * Servlet for handling SPARQL inspect queries via HTTP GET and POST requests.
@@ -175,7 +176,7 @@ public class InspectServlet extends HttpServlet
 	                                   final String mimeType )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
-		final Query query = QueryFactory.create( queryString );
+		final Query query = QueryFactory.create( queryString, SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN );
 		final ResultsFormat resultsFormat = ServletUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

@@ -4,7 +4,6 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinSPARQL;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinTPF;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -120,10 +119,8 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 			}
 		}
 
-		if ( fm instanceof TPFServer tpf )
+		if ( fm instanceof TPFServer tpf ) // this include brTPF servers
 			return new ExecOpIndexNestedLoopsJoinTPF(tp, tpf, useOuterJoin, collectExceptions, qpInfo);
-		else if ( fm instanceof BRTPFServer brtpf )
-			return new ExecOpIndexNestedLoopsJoinBRTPF(tp, brtpf, useOuterJoin, collectExceptions, qpInfo);
 		else if ( fm instanceof SPARQLEndpoint ep )
 			return new ExecOpIndexNestedLoopsJoinSPARQL(gp, ep, useOuterJoin, collectExceptions, qpInfo);
 		else

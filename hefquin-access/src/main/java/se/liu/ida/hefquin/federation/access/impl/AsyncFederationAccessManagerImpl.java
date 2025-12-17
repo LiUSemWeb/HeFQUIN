@@ -14,6 +14,8 @@ import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
@@ -38,8 +40,9 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 			final SPARQLRequestProcessor reqProcSPARQL,
 			final TPFRequestProcessor reqProcTPF,
 			final BRTPFRequestProcessor reqProcBRTPF,
-			final Neo4jRequestProcessor reqProcNeo4j) {
-		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
+			final Neo4jRequestProcessor reqProcNeo4j,
+			final RESTRequestProcessor reqProcREST ) {
+		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j, reqProcREST);
 
 		assert execService != null;
 		threadPool = execService;
@@ -53,7 +56,8 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 		      new SPARQLRequestProcessorImpl(),
 		      new TPFRequestProcessorImpl(),
 		      new BRTPFRequestProcessorImpl(),
-		      new Neo4jRequestProcessorImpl() );
+		      new Neo4jRequestProcessorImpl(),
+		      new RESTRequestProcessorImpl() );
 	}
 
 	@Override

@@ -332,7 +332,9 @@ public class QueryProcessorImplTest extends EngineTestBase
 				@Override public TPFResponse performRequest(BRTPFRequest req, BRTPFServer fm) { return null; }
 			};
 			final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessorImpl();
-			final FederationAccessManager fedAccessMgr = new BlockingFederationAccessManagerImpl(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
+			final RESTRequestProcessor reqProcREST = new RESTRequestProcessorImpl();
+
+			final FederationAccessManager fedAccessMgr = new BlockingFederationAccessManagerImpl(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j, reqProcREST);
 
 			// executing the tested method
 			final Iterator<SolutionMapping> it = processQuery(queryString, fedCat, fedAccessMgr);
