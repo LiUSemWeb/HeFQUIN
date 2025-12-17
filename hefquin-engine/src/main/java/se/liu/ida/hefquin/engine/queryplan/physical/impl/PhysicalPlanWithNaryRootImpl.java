@@ -134,6 +134,11 @@ public class PhysicalPlanWithNaryRootImpl extends BaseForQueryPlan
 	}
 
 	@Override
+	public Iterator<PhysicalPlan> getSubPlans() {
+		return subPlans.iterator();
+	}
+
+	@Override
 	public NaryPhysicalOp getRootOperator() {
 		return rootOp;
 	}

@@ -8,8 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecutablePlanImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.StatsOfPushBasedExecutablePlan;
 
-public class TextBasedExecutablePlanPrinterImpl extends BaseForTextBasedPlanPrinters
-		implements ExecutablePlanPrinter
+public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 {	
 	protected String parentIndent = "";
 
@@ -23,19 +22,31 @@ public class TextBasedExecutablePlanPrinterImpl extends BaseForTextBasedPlanPrin
 		}
 	}
 
-	public void print( final PushBasedExecutablePlanImpl plan, final PrintStream out ) {
-		final StatsOfPushBasedExecutablePlan planStats = (StatsOfPushBasedExecutablePlan) plan.getStats();
-		@SuppressWarnings("unchecked")
-		final List<Stats> statsOfTasks = (List<Stats>) planStats.getEntry("statsOfTasks");
+	public void print( final PushBasedExecutablePlanImpl plan,
+	                   final PrintStream out ) {
+		print( (StatsOfPushBasedExecutablePlan) plan.getStats(), out );
+	}
 
-		int i = 0;
-		for(final Stats statsOfTask : statsOfTasks){
-			final ExecutableOperatorStats opStats = (ExecutableOperatorStats) statsOfTask.getEntry("operatorStats");
-			print(opStats, i, out);
-			i++;
+	public void print( final StatsOfPushBasedExecutablePlan planStats,
+	                   final PrintStream out ) {
+		if ( planStats.getEntry("statsOfTasks") instanceof List<?> l ) {
+			@SuppressWarnings("unchecked")
+			final List<Stats> statsOfTasks = (List<Stats>) l;
+			print(statsOfTasks, out);
+		}
+		else {
+			throw new IllegalArgumentException( planStats.getEntry("statsOfTasks").getClass().getName() );
 		}
 	}
-	
+
+	public void print( final List<Stats> statsOfTasks, final PrintStream out ) {
+		int i = 0;
+		for ( final Stats statsOfTask : statsOfTasks ) {
+			final Object opStats = statsOfTask.getEntry("operatorStats");
+			print( (ExecutableOperatorStats) opStats, i++, out );
+		}
+	}
+
 	public void print( final ExecutableOperatorStats stats,
 	                   final int planLevel,
 	                   final PrintStream out ) {
@@ -60,4 +71,96 @@ public class TextBasedExecutablePlanPrinterImpl extends BaseForTextBasedPlanPrin
 
 		parentIndent = indentLevelString;
 	}
+
+	// The following was moved here from BaseForTextBasedPlanPrinters when
+	// I reimplemented the printer for logical and for physical plans based
+	// on PlanPrinter with PrintablePlan objects. I didn't bother do adapt
+	// this class here as well, because it is somewhat useless.
+	// By the way, in case the CLI does not print the executable plan even
+	// with the --printExecutablePlan argument given, this may be the case
+	// because the --skipExecution argument is given as well. The current
+	// implementation of the QueryProcessor creates the executable plan
+	// only when actually executing the query and, thus, that plan can be
+	// printed only in this case.
+	//                                     -Olaf
+
+	// The string represents '|'.
+	protected static String singleBase = "\u2502";
+	// The string represents '|   '.
+	protected static String levelIndentBase = "\u2502   ";
+	// The string represents '├── '.
+	protected static String nonLastChildIndentBase = "\u251C\u2500\u2500 ";
+	// The string represents '└── '.
+	protected static String lastChildIndentBase = "\u2514\u2500\u2500 ";
+	protected static String spaceBase = "    ";
+
+	protected String getIndentLevelString( final int planNumber,
+	                                       final int planLevel,
+	                                       final int numberOfSiblings,
+	                                       final String upperRootOpIndentString ) {
+		if ( planLevel == 0 ) {
+			// This is only for the root operator of the overall plan to be printed.
+			return "";
+		}
+
+		if ( upperRootOpIndentString.isEmpty() ) {
+			if ( planNumber < numberOfSiblings-1 ) {
+				return nonLastChildIndentBase;
+			}
+			else {
+				return lastChildIndentBase;
+			}
+		}
+
+		if ( upperRootOpIndentString.endsWith(nonLastChildIndentBase) ) {
+			final String indentLevelString = upperRootOpIndentString.substring( 0, upperRootOpIndentString.length() - nonLastChildIndentBase.length() ) + levelIndentBase;
+
+			if ( planNumber < numberOfSiblings-1 ) {
+				return indentLevelString + nonLastChildIndentBase;
+			}
+			else {
+				return indentLevelString + lastChildIndentBase;
+			}
+		}
+
+		if ( upperRootOpIndentString.endsWith(lastChildIndentBase) ) {
+			final String indentLevelString = upperRootOpIndentString.substring( 0, upperRootOpIndentString.length() - lastChildIndentBase.length() ) + spaceBase;
+			if ( planNumber < numberOfSiblings-1 ) {
+				return indentLevelString + nonLastChildIndentBase;
+			}
+			else {
+				return indentLevelString + lastChildIndentBase;
+			}
+		}
+
+		return "";
+	}
+
+	protected String getIndentLevelStringForDetail( final int planNumber,
+	                                                final int planLevel,
+	                                                final int numberOfSiblings,
+	                                                final int numberOfSubPlans,
+	                                                final String indentLevelString ) {
+		if ( planLevel == 0 ) {
+			if ( numberOfSubPlans > 0 ) {
+				return "";
+			}
+			else {
+				return spaceBase;
+			}
+		}
+
+		if ( indentLevelString == "") {
+			return spaceBase;
+		}
+		else if ( indentLevelString.endsWith(nonLastChildIndentBase) ) {
+			return indentLevelString.substring( 0, indentLevelString.length() - nonLastChildIndentBase.length() ) + levelIndentBase;
+		}
+		else if ( indentLevelString.endsWith(lastChildIndentBase) ) {
+			return indentLevelString.substring( 0, indentLevelString.length() - lastChildIndentBase.length() ) + spaceBase;
+		}
+
+		return "";
+	}
+
 }
