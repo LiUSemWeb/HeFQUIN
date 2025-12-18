@@ -83,26 +83,24 @@ public class PhysicalPlanWithNaryRootImpl extends BaseForQueryPlan
 
 	@Override
 	public boolean equals( final Object o ) {
-		if ( ! (o instanceof PhysicalPlanWithNaryRoot) )
-			return false; 
-
-		final PhysicalPlanWithNaryRoot oo = (PhysicalPlanWithNaryRoot) o;
-		if ( oo == this )
+		if ( o == this )
 			return true;
 
-		if ( oo.numberOfSubPlans() != subPlans.size() )
-			return false;
-
-		if ( ! oo.getRootOperator().equals(rootOp) )
-			return false;
-
-		for ( int i = 0; i < subPlans.size(); ++i ) {
-			if ( ! oo.getSubPlan(i).equals(subPlans.get(i)) ) {
-				return false;
+		if (    o instanceof PhysicalPlanWithNaryRoot oo
+		     && oo.getRootOperator().getID() == rootOp.getID()
+		     && oo.numberOfSubPlans() == subPlans.size() )
+		{
+			final Iterator<PhysicalPlan> it1 = subPlans.iterator();
+			final Iterator<PhysicalPlan> it2 = oo.getSubPlans();
+			while ( it1.hasNext() ) {
+				if ( ! it1.next().equals(it2.next()) )
+					return false;
 			}
-		}
 
-		return true;
+			return true;
+		}
+		else
+			return false;
 	}
 
 	@Override

@@ -44,14 +44,11 @@ public class PhysicalPlanWithNullaryRootImpl extends BaseForQueryPlan
 
 	@Override
 	public boolean equals( final Object o ) {
-		if ( ! (o instanceof PhysicalPlanWithNullaryRoot) )
-			return false; 
-
-		final PhysicalPlanWithNullaryRoot oo = (PhysicalPlanWithNullaryRoot) o;
-		if ( oo == this )
+		if ( o == this )
 			return true;
-		else
-			return oo.getRootOperator().equals(rootOp); 
+
+		return (    o instanceof PhysicalPlanWithNullaryRoot oo
+		         && oo.getRootOperator().getID() == rootOp.getID() ); 
 	}
 
 	@Override
