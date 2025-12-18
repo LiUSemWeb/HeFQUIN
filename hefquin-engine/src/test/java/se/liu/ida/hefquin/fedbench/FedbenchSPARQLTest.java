@@ -4,12 +4,12 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
+// @Ignore
 public class FedbenchSPARQLTest extends FedbenchTestBase
 {
 	@BeforeClass
 	public static void setUp() throws Exception {
-		final String fedCat = "fedbench/SPARQLFedConf.ttl";
+		final String fedCat = "fedbench/FedbenchFedConf.ttl";
 		init(fedCat);
 	}
 
