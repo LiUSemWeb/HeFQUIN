@@ -27,10 +27,10 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
        extends BaseForExecOpRequest<ReqType,MemberType>
 {
 	private int numberOfPageRequestsIssued = 0;
-	private int totalNumberOfMatchingTriplesRetrieved = 0;
+	private long totalNumberOfMatchingTriplesRetrieved = 0L;
 	private int minNumberOfMatchingTriplesPerPage = Integer.MAX_VALUE;
 	private int maxNumberOfMatchingTriplesPerPage = 0;
-	private int numberOfOutputMappingsProduced = 0;
+	private long numberOfOutputMappingsProduced = 0L;
 
 	public BaseForExecOpRequestWithTPFPaging( final ReqType req,
 	                                          final MemberType fm,
@@ -134,19 +134,19 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 	public void resetStats() {
 		super.resetStats();
 		numberOfPageRequestsIssued = 0;
-		totalNumberOfMatchingTriplesRetrieved = 0;
+		totalNumberOfMatchingTriplesRetrieved = 0L;
 		minNumberOfMatchingTriplesPerPage = 0;
 		maxNumberOfMatchingTriplesPerPage = 0;
-		numberOfOutputMappingsProduced = 0;
+		numberOfOutputMappingsProduced = 0L;
 	}
 
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
 		s.put( "numberOfPageRequestsIssued",             Integer.valueOf(numberOfPageRequestsIssued) );
-		s.put( "totalNumberOfMatchingTriplesRetrieved",  Integer.valueOf(totalNumberOfMatchingTriplesRetrieved) );
+		s.put( "totalNumberOfMatchingTriplesRetrieved",  Long.valueOf(totalNumberOfMatchingTriplesRetrieved) );
 		s.put( "minNumberOfMatchingTriplesPerPage",      Integer.valueOf(minNumberOfMatchingTriplesPerPage) );
 		s.put( "maxNumberOfMatchingTriplesPerPage",      Integer.valueOf(maxNumberOfMatchingTriplesPerPage) );
-		s.put( "numberOfOutputMappingsProduced",         Integer.valueOf(numberOfOutputMappingsProduced) );
+		s.put( "numberOfOutputMappingsProduced",         Long.valueOf(numberOfOutputMappingsProduced) );
 		return s;
 	}
 }

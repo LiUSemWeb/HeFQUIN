@@ -8,6 +8,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 -  Initial support for RML-wrapped REST endpoints as federation members ([#486](https://github.com/LiUSemWeb/HeFQUIN/pull/486)).
+-  Adding a 'numberOfSolMapsRetrievedPerReqOp' entry to the stats of bind joins ([#489](https://github.com/LiUSemWeb/HeFQUIN/pull/489)).
 ### Changed
 -  Reimplementation of the printers for logical and for physical plans ([#487](https://github.com/LiUSemWeb/HeFQUIN/pull/487)).
 -  Bux fix: 'equals' comparison of logical and also of physical plans must take the ID of the root operator into account ([#488](https://github.com/LiUSemWeb/HeFQUIN/pull/488)).
