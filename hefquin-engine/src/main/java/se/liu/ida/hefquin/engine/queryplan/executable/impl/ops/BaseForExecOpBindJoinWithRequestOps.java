@@ -382,7 +382,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		statsOfLastReqOp = reqOp.getStats();
 		if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
 
-		numOfSolMapsRetrievedPerReqOp.add( (Long) statsOfLastReqOp.getEntry("solMapsRetrieved") );
+		numOfSolMapsRetrievedPerReqOp.add( (Long) statsOfLastReqOp.getEntry("numberOfOutputMappingsProduced") );
 	}
 
 	protected boolean alreadyCovered( final Binding inputSolMapRestricted ) {
