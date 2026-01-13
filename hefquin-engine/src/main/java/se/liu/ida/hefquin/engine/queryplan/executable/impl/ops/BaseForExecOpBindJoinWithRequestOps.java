@@ -146,6 +146,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	private long numberOfOutputMappingsProduced = 0L;
 	protected boolean requestBlockSizeWasReduced = false;
 	protected int numberOfRequestOpsUsed = 0;
+	protected List<Long> numOfSolMapsRetrievedPerReqOp = new ArrayList<>();
 	protected ExecutableOperatorStats statsOfFirstReqOp = null;
 	protected ExecutableOperatorStats statsOfLastReqOp = null;
 
@@ -380,6 +381,8 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 		statsOfLastReqOp = reqOp.getStats();
 		if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
+
+		numOfSolMapsRetrievedPerReqOp.add( (Long) statsOfLastReqOp.getEntry("solMapsRetrieved") );
 	}
 
 	protected boolean alreadyCovered( final Binding inputSolMapRestricted ) {
@@ -470,6 +473,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		numberOfOutputMappingsProduced = 0L;
 		requestBlockSizeWasReduced = false;
 		numberOfRequestOpsUsed = 0;
+		numOfSolMapsRetrievedPerReqOp.clear();
 		statsOfFirstReqOp = null;
 		statsOfLastReqOp = null;
 	}
@@ -484,6 +488,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		s.put( "requestBlockSizeWasReduced",      Boolean.valueOf(requestBlockSizeWasReduced) );
 		s.put( "requestBlockSize",                Integer.valueOf(requestBlockSize) );
 		s.put( "numberOfRequestOpsUsed",          Integer.valueOf(numberOfRequestOpsUsed) );
+		s.put( "numberOfSolMapsRetrievedPerReqOp", numOfSolMapsRetrievedPerReqOp.toString() );
 
 		if ( statsOfFirstReqOp == statsOfLastReqOp ) {
 			s.put( "statsOfReqOp",  statsOfFirstReqOp );
