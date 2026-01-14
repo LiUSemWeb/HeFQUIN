@@ -74,31 +74,31 @@ ex:dbpedia-tpf
 
 ex:drugbank-tpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/tpf/drugbank/> ;
+      fd:serviceURI <http://localhost:8080/tpf/drugbank> ;
       fd:interface [ a                         fd:TPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/drugbank> ] .
 
 ex:geonames-tpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/tpf/geonames/> ;
+      fd:serviceURI <http://localhost:8080/tpf/geonames> ;
       fd:interface [ a                         fd:TPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/geonames> ] .
 
 ex:jamendo-tpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/tpf/jamendo/> ;
+      fd:serviceURI <http://localhost:8080/tpf/jamendo> ;
       fd:interface [ a                         fd:TPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/jamendo> ] .
 
 ex:kegg-tpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/tpf/kegg/> ;
+      fd:serviceURI <http://localhost:8080/tpf/kegg> ;
       fd:interface [ a                         fd:TPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/kegg> ] .
 
 ex:lmdb-tpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/tpf/lmdb/> ;
+      fd:serviceURI <http://localhost:8080/tpf/lmdb> ;
       fd:interface [ a                         fd:TPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/lmdb> ] .
 
@@ -110,13 +110,13 @@ ex:nyt-tpf
 
 ex:sp2b-tpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/tpf/sp2b/> ;
+      fd:serviceURI <http://localhost:8080/tpf/sp2b> ;
       fd:interface [ a                         fd:TPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/sp2b> ] .
 
 ex:swdfood-tpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/tpf/swdfood/> ;
+      fd:serviceURI <http://localhost:8080/tpf/swdfood> ;
       fd:interface [ a                         fd:TPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/swdfood> ] .
 
