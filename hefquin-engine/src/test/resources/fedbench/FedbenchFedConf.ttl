@@ -126,54 +126,54 @@ ex:swdfood-tpf
 
 ex:dbpedia-brtpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/brtpf/dbpedia/> ;
+      fd:serviceURI <http://localhost:8080/brtpf/dbpedia> ;
       fd:interface [ a                         fd:brTPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/dbpedia> ] .
 
 ex:drugbank-brtpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/brtpf/drugbank/> ;
+      fd:serviceURI <http://localhost:8080/brtpf/drugbank> ;
       fd:interface [ a                         fd:brTPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/drugbank> ] .
 
 ex:geonames-brtpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/brtpf/geonames/> ;
+      fd:serviceURI <http://localhost:8080/brtpf/geonames> ;
       fd:interface [ a                         fd:brTPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/geonames> ] .
 
 ex:jamendo-brtpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/brtpf/jamendo/> ;
+      fd:serviceURI <http://localhost:8080/brtpf/jamendo> ;
       fd:interface [ a                         fd:brTPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/jamendo> ] .
 
 ex:kegg-brtpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/brtpf/kegg/> ;
+      fd:serviceURI <http://localhost:8080/brtpf/kegg> ;
       fd:interface [ a                         fd:brTPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/kegg> ] .
 
 ex:lmdb-brtpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/brtpf/lmdb/> ;
+      fd:serviceURI <http://localhost:8080/brtpf/lmdb> ;
       fd:interface [ a                         fd:brTPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/lmdb> ] .
 
 ex:nyt-brtpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/brtpf/nyt/> ;
+      fd:serviceURI <http://localhost:8080/brtpf/nyt> ;
       fd:interface [ a                         fd:brTPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/nyt> ] .
 
 ex:sp2b-brtpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/brtpf/sp2b/> ;
+      fd:serviceURI <http://localhost:8080/brtpf/sp2b> ;
       fd:interface [ a                         fd:brTPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/sp2b> ] .
 
 ex:swdfood-brtpf
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/brtpf/swdfood/> ;
+      fd:serviceURI <http://localhost:8080/brtpf/swdfood> ;
       fd:interface [ a                         fd:brTPFInterface ;
                      fd:exampleFragmentAddress <http://localhost:8080/ldf/swdfood> ] .
