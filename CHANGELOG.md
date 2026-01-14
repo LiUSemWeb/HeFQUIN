@@ -7,6 +7,14 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
+-  none yet
+### Changed
+-  none yet
+
+
+## [0.0.8] - 2026-01-14
+
+### Added
 -  Initial support for RML-wrapped REST endpoints as federation members ([#486](https://github.com/LiUSemWeb/HeFQUIN/pull/486)).
 -  Adding a 'numberOfSolMapsRetrievedPerReqOp' entry to the stats of bind joins ([#489](https://github.com/LiUSemWeb/HeFQUIN/pull/489)).
 ### Changed
