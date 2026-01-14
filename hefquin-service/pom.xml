@@ -6,7 +6,7 @@
   <parent>
     <groupId>se.liu.research.hefquin</groupId>
     <artifactId>hefquin</artifactId>
-    <version>0.0.8</version>
+    <version>0.0.9-SNAPSHOT</version>
   </parent>
 
   <artifactId>hefquin-service</artifactId>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-engine</artifactId>
-      <version>0.0.8</version>
+      <version>0.0.9-SNAPSHOT</version>
     </dependency>
 <!--
  I needed to added the following two dependencies when upgrading the
