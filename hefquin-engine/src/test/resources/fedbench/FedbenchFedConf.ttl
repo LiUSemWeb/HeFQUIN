@@ -9,7 +9,7 @@
 
 ex:dbpedia-sparql
       a            fd:FederationMember ;
-      fd:serviceURI <http://localhost:8080/sparql/dbpedia2/> ;
+      fd:serviceURI <http://localhost:8080/sparql/dbpedia/> ;
       fd:interface [ a                  fd:SPARQLEndpointInterface ;
                      fd:endpointAddress <http://localhost:8080/sparql/dbpedia/> ] .
 
