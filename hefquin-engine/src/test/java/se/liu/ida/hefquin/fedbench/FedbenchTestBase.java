@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.query.Query;
@@ -28,6 +30,8 @@ import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 public abstract class FedbenchTestBase
 {
 	private static HeFQUINEngine engine;
+	public static double DEFAULT_TOLERANCE = 0.5;
+	public static long DEFAULT_SLACK = 100;
 
 	public static void init( final String fedCat ) {
 		engine = new HeFQUINEngineBuilder()
@@ -55,12 +59,12 @@ public abstract class FedbenchTestBase
 
 		if ( statsAndExceptions != null ) {
 			if ( statsAndExceptions.getExceptions() != null ) {
-				String msg = "";
+				final List<String> exceptions = new ArrayList<>();
 				statsAndExceptions.getExceptions().forEach( c -> {
-					System.err.println( c.getCause() );
-					System.err.println( c.getLocalizedMessage() );
+					exceptions.add(c.getLocalizedMessage());
+					exceptions.add(c.getCause().toString());
 				} );
-				throw new Exception("Query failed with exceptions.");
+				throw new Exception( "Query failed with exceptions:\n" + String.join( "\n", exceptions ));
 			}
 		}
 
@@ -69,13 +73,13 @@ public abstract class FedbenchTestBase
 
 	/**
 	 * Verifies that a measured execution time does not represent a performance
-	 * regression. Uses default values for tolerance (50%) and slack (500ms).
+	 * regression. Uses default values for tolerance and slack.
 	 * 
 	 * @param baseline  average time from previous measurements (ms)
 	 * @param actual    time from current run (ms)
 	 */
 	public static void assertWithinTimeBudget( long baseline, long actual ) {
-		assertWithinTimeBudget( baseline, actual, 0.5, 500 );
+		assertWithinTimeBudget( baseline, actual, DEFAULT_TOLERANCE, DEFAULT_SLACK );
 	}
 
 	/**
