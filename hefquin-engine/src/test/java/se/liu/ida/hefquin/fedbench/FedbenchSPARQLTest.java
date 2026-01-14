@@ -9,6 +9,8 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	public static void setUp() throws Exception {
 		final String fedCat = "fedbench/FedbenchFedConf.ttl";
 		init(fedCat);
+		DEFAULT_TOLERANCE = 0.5;
+		DEFAULT_SLACK = 100;
 	}
 
 	@Test
@@ -18,7 +20,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 		    "http://localhost:8080/sparql/nyt/",
 		    "http://localhost:8080/sparql/nyt/"
 		};
-		_executeQuery( "fedbench/cross-domain/q1", 250, values );
+		_executeQuery( "fedbench/cross-domain/q1", 300, values );
 	}
 
 	@Test
@@ -28,7 +30,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 			"http://localhost:8080/sparql/nyt/",
 			"http://localhost:8080/sparql/nyt/"
 		};
-		_executeQuery( "fedbench/cross-domain/q2", 350, values );
+		_executeQuery( "fedbench/cross-domain/q2", 500, values );
 	}
 
 	@Test
@@ -40,7 +42,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 		    "http://localhost:8080/sparql/nyt/",
 		    "http://localhost:8080/sparql/nyt/"
 		};
-		_executeQuery( "fedbench/cross-domain/q3", 350, values );
+		_executeQuery( "fedbench/cross-domain/q3", 400, values );
 	}
 
 	@Test
@@ -63,7 +65,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 		    "http://localhost:8080/sparql/lmdb/",
 		    "http://localhost:8080/sparql/lmdb/"
 		};
-		_executeQuery( "fedbench/cross-domain/q5", 330, values );
+		_executeQuery( "fedbench/cross-domain/q5", 350, values );
 	}
 
 	@Test
@@ -74,7 +76,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 		    "http://localhost:8080/sparql/geonames/",
 		    "http://localhost:8080/sparql/geonames/"
 		};
-		_executeQuery( "fedbench/cross-domain/q6", 5000, values );
+		_executeQuery( "fedbench/cross-domain/q6", 2700, values );
 	}
 
 	@Test
@@ -91,6 +93,6 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 		    "http://localhost:8080/sparql/nyt/",
 		    "http://localhost:8080/sparql/nyt/"
 		};
-		_executeQuery( "fedbench/cross-domain/q7", 2000, values );
+		_executeQuery( "fedbench/cross-domain/q7", 1500, values );
 	}
 }
