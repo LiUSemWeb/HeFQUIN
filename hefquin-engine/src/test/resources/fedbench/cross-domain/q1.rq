@@ -1,19 +1,12 @@
-
-# CD1
-PREFIX dbr: <http://dbpedia.org/resource/>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-
-SELECT ?predicate ?object WHERE {
-VALUES (?s1 ?s2 ) { ( <%s> <%s> ) }
+SELECT DISTINCT ?predicate ?object WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ) {
+    ( <%s> <%s> <%s> )
+  }
   {
-    SERVICE ?s1 {
-      dbr:Barack_Obama ?predicate ?object
-    }
+    SERVICE ?s1 { <http://dbpedia.org/resource/Barack_Obama> ?predicate ?object }
   }
   UNION {
-    SERVICE ?s2 {
-      ?subject owl:sameAs dbr:Barack_Obama .
-      ?subject ?predicate ?object
-    }
+    SERVICE ?s2 { ?subject <http://www.w3.org/2002/07/owl#sameAs> <http://dbpedia.org/resource/Barack_Obama> }
+    SERVICE ?s3 { ?subject ?predicate ?object }
   }
 }

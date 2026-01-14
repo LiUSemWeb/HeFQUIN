@@ -1,15 +1,9 @@
-PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-PREFIX geo:  <http://www.geonames.org/ontology#>
-
-SELECT ?name ?location ?germany
-WHERE {
-VALUES (?s1 ?s2) { (<%s> <%s>) }
-   SERVICE ?s1 {
-      ?artist foaf:name ?name .
-      ?artist foaf:based_near ?location
-   }
-   SERVICE ?s2 {
-      ?location geo:parentFeature ?germany .
-      ?germany geo:name 'Federal Republic of Germany'
-   }
+SELECT DISTINCT ?name ?location ?germany WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ) {
+    ( <%s> <%s> <%s> <%s> )
+  }
+  SERVICE ?s1 { ?artist <http://xmlns.com/foaf/0.1/name> ?name }
+  SERVICE ?s2 { ?artist <http://xmlns.com/foaf/0.1/based_near> ?location }
+  SERVICE ?s3 { ?location <http://www.geonames.org/ontology#parentFeature> ?germany }
+  SERVICE ?s4 { ?germany <http://www.geonames.org/ontology#name> 'Federal Republic of Germany' }
 }

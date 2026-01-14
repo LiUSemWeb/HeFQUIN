@@ -4,12 +4,10 @@ PREFIX dbo: <http://dbpedia.org/ontology/>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
 SELECT ?party ?page WHERE {
-   VALUES (?s1 ?s2) { ( <%s> <%s>) }
-   SERVICE ?s1 {
-      dbr:Barack_Obama dbo:party ?party
-   }
-   SERVICE ?s2 {
-      ?x nyt:topicPage ?page .
-      ?x owl:sameAs dbr:Barack_Obama
-   }
+  VALUES ( ?s1 ?s2 ?s3 ) {
+    ( <%s> <%s> <%s> )
+  }
+  SERVICE ?s1 { <http://dbpedia.org/resource/Barack_Obama> <http://dbpedia.org/ontology/party> ?party }
+  SERVICE ?s2 { ?x <http://data.nytimes.com/elements/topicPage> ?page }
+  SERVICE ?s3 { ?x <http://www.w3.org/2002/07/owl#sameAs> <http://dbpedia.org/resource/Barack_Obama> }
 }
