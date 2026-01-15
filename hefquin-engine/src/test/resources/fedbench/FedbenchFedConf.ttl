@@ -7,6 +7,12 @@
 # SPARQL endpoints
 ################################
 
+ex:chebi-sparql
+      a            fd:FederationMember ;
+      fd:serviceURI <http://localhost:8080/sparql/chebi/> ;
+      fd:interface [ a                  fd:SPARQLEndpointInterface ;
+                     fd:endpointAddress <http://localhost:8080/sparql/chebi/> ] .
+
 ex:dbpedia-sparql
       a            fd:FederationMember ;
       fd:serviceURI <http://localhost:8080/sparql/dbpedia/> ;
@@ -66,6 +72,12 @@ ex:swdfood-sparql
 # TPF endpoints
 ################################
 
+ex:chebi-tpf
+      a            fd:FederationMember ;
+      fd:serviceURI <http://localhost:8080/tpf/chebi> ;
+      fd:interface [ a                         fd:TPFInterface ;
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/chebi> ] .
+
 ex:dbpedia-tpf
       a            fd:FederationMember ;
       fd:serviceURI <http://localhost:8080/tpf/dbpedia> ;
@@ -123,6 +135,12 @@ ex:swdfood-tpf
 ################################
 # brTPF endpoints
 ################################
+
+ex:chebi-brtpf
+      a            fd:FederationMember ;
+      fd:serviceURI <http://localhost:8080/brtpf/chebi> ;
+      fd:interface [ a                         fd:brTPFInterface ;
+                     fd:exampleFragmentAddress <http://localhost:8080/ldf/chebi> ] .
 
 ex:dbpedia-brtpf
       a            fd:FederationMember ;
