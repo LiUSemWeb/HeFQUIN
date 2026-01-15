@@ -1,0 +1,11 @@
+SELECT DISTINCT ?drug ?transform ?mass WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
+    ( <%s> <%s> <%s> <%s> <%s> )
+  }
+  SERVICE ?s1 { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/affectedOrganism>  'Humans and other mammals' }
+  SERVICE ?s2 { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/casRegistryNumber> ?cas }
+  SERVICE ?s3 { ?keggDrug <http://bio2rdf.org/ns/bio2rdf#xRef> ?cas }
+  SERVICE ?s4 { ?keggDrug <http://bio2rdf.org/ns/bio2rdf#mass> ?mass FILTER ( ?mass > '5' ) }
+  # FILTER ( ?mass > '5' )
+  SERVICE ?s5 { OPTIONAL { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/biotransformation> ?transform } }
+}

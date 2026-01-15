@@ -1,0 +1,3347 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "predicate",
+      "object"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/vocab/resource/class/Offer"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2000/01/rdf-schema#label"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffeine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#sameAs"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Caffeine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#sameAs"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://data.linkedct.org/resource/intervention/26517"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#sameAs"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://data.linkedct.org/resource/intervention/26853"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#sameAs"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://data.linkedct.org/resource/intervention/2688"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#sameAs"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://data.linkedct.org/resource/intervention/31077"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#sameAs"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://data.linkedct.org/resource/intervention/33537"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#sameAs"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://data.linkedct.org/resource/intervention/33539"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#sameAs"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://data.linkedct.org/resource/intervention/57132"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#sameAs"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://data.linkedct.org/resource/intervention/57134"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://xmlns.com/foaf/0.1/page"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/page/Caffeine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://xmlns.com/foaf/0.1/page"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://en.wikipedia.org/wiki/Caffeine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://xmlns.com/foaf/0.1/page"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www.drugbank.ca/drugs/DB00201"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/absorption"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Readily absorbed after oral or parenteral administration. The peak plasma level for caffeine range from 6-10mg/L and the mean time to reach peak concentration ranged from 30 minutes to 2 hours."
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/affectedOrganism"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Humans and other mammals"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/ahfsCode"
+        },
+        "object": {
+          "type": "literal",
+          "value": "28:08.92"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/ahfsCode"
+        },
+        "object": {
+          "type": "literal",
+          "value": "28:20.00"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/ahfsCode"
+        },
+        "object": {
+          "type": "literal",
+          "value": "28:20.92"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/ahfsCode"
+        },
+        "object": {
+          "type": "literal",
+          "value": "92:02.00*"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/atcCode"
+        },
+        "object": {
+          "type": "literal",
+          "value": "N02BE01"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/atcCode"
+        },
+        "object": {
+          "type": "literal",
+          "value": "N06BC01"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/biotransformation"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Hepatic cytochrome P450 1A2 (CYP 1A2) is involved in caffeine biotransformation. About 80% of a dose of caffeine is metabolized to paraxanthine (1,7-dimethylxanthine), 10% to theobromine (3,7-dimethylxanthine), and 4% to theophylline (1,3-dimethylxanthine)."
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Anacin Extra Strength Caplet (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Trianal Tablet (Acetylsalicylic Acid + Butalbital + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Midol Menstrual Formula - Caplet (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "282 Tablets (Acetylsalicylic Acid + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Ratio-Lenoltec No 2 (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Tylenol with Codeine No. 3 - Tab (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Codamin No2 (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Codamin No3 (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Tylenol No.1 Caplets (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Tylenol with Codeine No2 Tab (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "A & C Tablets with Codeine 30mg (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen Compound Tablets with Codeine (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Tylenol No1 Forte Tablets with Codeine (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "A.C. & C Tablets (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "282 Tab (Acetylsalicylic Acid + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Tylenol No.1 Forte Caplets (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Corytab (Acetaminophen + Caffeine + Diphenylpyraline Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Arco Pain Tab (Acetylsalicylic Acid + Caffeine Citrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Instantine - Tablets (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Midol Extra Strength Gelcaps (Acetaminophen + Caffeine + Pyrilamine Maleate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "217 (Acetylsalicylic Acid + Caffeine Citrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Ratio-Lenoltec No 3 (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "292 Tablets (Acetylsalicylic Acid + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cafergot PB Tab (Belladonna + Caffeine + Ergotamine (Ergotamine Tartrate) + Pentobarbital Sodium)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Anacin with Codeine Tab (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Novo-Propoxyn Compound Cap (Acetylsalicylic Acid + Caffeine + Dextropropoxyphene Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Ratio-Tecnal C 1/2 (Acetylsalicylic Acid + Butalbital + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Extra Strength Midol (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen Extra Strength with Caf & Codeine (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Tylenol No 1 Tab (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Sinugex 38 (Acetaminophen + Caffeine + Diphenylpyraline Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen Compound Tablets with Codeine 8mg (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Anacin Caplet (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Anacin Caplets (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Anacin Tab (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Anacin Tablet (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Antidol Tablets (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Astone Cap (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen Caffeine & 8mg Cod. Phos. Tab (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cafergot Sup (Caffeine + Ergotamine Tartrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cafergot Tab (Caffeine + Ergotamine Tartrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Calmine Tab (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Dolomine 37 (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Excedrin (Acetaminophen + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Excedrin Extra-Strength (Acetaminophen + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Excedrin Tab (Acetaminophen + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Novo-Gesic C30 (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Instantine - Tab (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Instantine Tab (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "AC and C Tab 1/8gr (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Madelon (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Midol Regular (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Herbopyrine Tab 325mg (Acetylsalicylic Acid + Caffeine Citrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Nervine (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Nervine Tab (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Pain Aid (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Emercidin D Tab (Acetaminophen + Caffeine + Diphenylpyraline Hydrochloride + Phenylpropanolamine Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Exdol 8 Tab (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Tylenol Ultra Relief (Acetaminophen + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Ultra Headache Relief (Acetaminophen + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetylsalicylic Acid, Caffeine & 8 Mg Codeine Phosphate Tablets (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Atasol 15 Tab (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Exdol 30tab (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Ergodryl Cap (Caffeine Citrate + Diphenhydramine Hydrochloride + Ergotamine Tartrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "692 Tablet (Acetylsalicylic Acid + Caffeine + Dextropropoxyphene Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "217 Strong Tab (Acetylsalicylic Acid + Caffeine Citrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen with Codeine - Caplet (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "C2 Tab with Codeine (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Midol Extra Strength Menstrual (Acetaminophen + Caffeine + Pyrilamine Maleate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetylsalicylic Acid, Caffeine and 8mg Codeine Phosphate (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Emertabs Tab (Acetaminophen + Caffeine + Phenylpropanolamine Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "A.C. & C 8mg Tab (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "222 Tablet (Acetylsalicylic Acid + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Midol Tab (Acetylsalicylic Acid + Caffeine + Cinnamedrine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "692 Tab (Acetylsalicylic Acid + Caffeine + Dextropropoxyphene Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Fiorinal C1/4 Cap (Acetylsalicylic Acid + Butalbital + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Exdol 15tab (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Triatec-8 Tab (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "282 Mep Tab (Acetylsalicylic Acid + Caffeine Citrate + Codeine Phosphate + Meprobamate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen, Caffeine, and 8mg of Codeine Phosphate Tablets (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Ratio-Tecnal (Acetylsalicylic Acid + Butalbital + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Alka-Seltzer Morning Relief (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen, Caffeine & 8mg Codeine Phosphate Tablets (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Dristan Capsules (Acetylsalicylic Acid + Caffeine + Chlorpheniramine Maleate + Phenylpropanolamine Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Midol - Caplet (Acetylsalicylic Acid + Caffeine + Cinnamedrine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Neo Tigol Tab (Acetylsalicylic Acid + Aluminum Hydroxide + Caffeine + Magnesium Hydroxide + Passion Flower + Valerian)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "AC&C Tablets (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen Caffeine & 8mg Cod Phos Tab (Acetaminophen + Caffeine + Codeine (Codeine Phosphate))"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Exdol-8 Tablets (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Oradrine 2 Tab (Acetaminophen + Caffeine + Diphenylpyraline Hydrochloride + Phenylpropanolamine Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "C-2 Buffered with Codeine (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Fiorinal Tab (Acetylsalicylic Acid + Butalbital + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetylsalicylic Acid Caffeine & 8mg Cod Phos (Acetylsalicylic Acid + Caffeine + Codeine (Codeine Phosphate))"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Painex Tab 0.25gr (Acetylsalicylic Acid + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen 300 Mg with Caffeine & Codeine Caplet (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Trianal Capsules (Acetylsalicylic Acid + Butalbital + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Oradrine-2 Tab (Acetaminophen + Caffeine + Diphenylpyraline Hydrochloride + Phenylpropanolamine Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acet 2 (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Tylenol with Codeine No. 2 - Tab (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acet 3 (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen with Codeine Tab (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Ratio-Lenoltec No 1 (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Triatec-8 Fort Tab (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Exdol-15 Tablets (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen 500mg Cmpd Tab with Codeine (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Midol Multi-Symptom Caplets Extra Strength (Acetaminophen + Caffeine + Pyrilamine Maleate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Extra Strength Acetaminophen, Caffeine & 8mg Codeine Phosphate Caplets (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Oradrine Tablets (Acetaminophen + Caffeine + Codeine Phosphate + Diphenylpyraline Hydrochloride + Phenylpropanolamine Hydrochloride)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Fiorinal Cap (Acetylsalicylic Acid + Butalbital + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Novo AC and C 8mg Tab (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Wigraine Suppositories (Belladonna + Caffeine + Ergotamine Tartrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Ratio-Tecnal C1/4 (Acetylsalicylic Acid + Butalbital + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Wigraine Tab (Belladonna + Caffeine + Ergotamine Tartrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Anacin Extra Strength Tablet (Acetylsalicylic Acid + Caffeine)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen, Caffeine and 8 Mg of Codeine Phosphate Tablets (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Norgesic Forte Tab (Acetylsalicylic Acid + Caffeine + Orphenadrine Citrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "C2 Buffered with Codeine Tab (Acetylsalicylic Acid + Aluminum Hydroxide + Caffeine + Codeine Phosphate + Magnesium Hydroxide)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Fiorinal C1/2 Cap (Acetylsalicylic Acid + Butalbital + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Gravergol Capsules (Caffeine + Dimenhydrinate + Ergotamine Tartrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Megral Tabs (Caffeine + Cyclizine Hydrochloride + Ergotamine Tartrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Norgesic Tab (Acetylsalicylic Acid + Caffeine + Orphenadrine Citrate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen Compound Caplets with Codeine (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Atasol 8 Tab (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cafergot PB Sup (Belladonna + Caffeine + Ergotamine (Ergotamine Tartrate) + Pentobarbital)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Novo-Gesic C15 (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Triaminicin Colds & Flu Caplets (Acetaminophen + Caffeine + Pheniramine Maleate + Phenylpropanolamine Hydrochloride + Pyrilamine Maleate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "A & C Tablets with Codeine 15mg (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Tylenol with Codeine No3 Tab (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "A C and C Tab 0.125gr (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "282 Mep (Acetylsalicylic Acid + Caffeine Citrate + Codeine Phosphate + Meprobamate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Exdol-30 Tablets (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Atasol 30 Tab (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "C T Acetylsalicylic Acid Codeine and Caf Tab (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Trianal-C 1/2 Capsule (Acetylsalicylic Acid + Butalbital + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Darvon N Compound Pulvule 405 (Acetylsalicylic Acid + Caffeine + Dextropropoxyphene Napsylate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen, Caffeine & 8mg Codeine Phosphate (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Novo-Gesic-C8 (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Midol Multi-Symptom Gelcap Extra Strength (Acetaminophen + Caffeine + Pyrilamine Maleate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Painex Tab 0.5gr (Acetylsalicylic Acid + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Acetaminophen with Caffeine and Codeine (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cotabs (Acetaminophen + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "292 Tab (Acetylsalicylic Acid + Caffeine Citrate + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "ASA, Caffeine & 8mg Codeine Phosphate (Acetylsalicylic Acid + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "C2 Buffered Tab (Acetylsalicylic Acid + Aluminum Hydroxide + Caffeine + Magnesium Hydroxide)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandMixture"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Codaminophen Tab 1/8gr (Acetaminophen + Caffeine + Codeine Phosphate)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Coffein"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Koffein"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Thein"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Alert-Pep"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Anoquan"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cafamil"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cafcit"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cafecon"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cafergot"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffedrine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffedrine Caplets"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cafipel"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Coffeine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Darvon Compound"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Darvon Compound-65"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Dasin"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Dexitac"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Dexitac Stay Alert Stimulant"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Dhc Plus"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Diurex"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Durvitan"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Eldiatric C"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Enerjets"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Ercatab"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Esgic"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Esgic-Plus"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Femcet"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Fioricet"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Fiorinal"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Guaranine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Hycomine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Invagesic"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Invagesic Forte"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Keep Alert"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Kofein"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Lanorinal"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Mateina"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Maximum Strength Snapback Stimulant Powders"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Medigesic Plus"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Migergot"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Miudol"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Natural Caffeinum"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Nix Nap"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "No-Doz"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Nodaca"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Nodoz Maximum Strength Caplets"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Norgesic"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Norgesic Forte"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Organex"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Orphengesic"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Orphengesic Forte"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Pep-Back"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Phensal"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Propoxyphene Compound 65"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Propoxyphene Compound-65"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Quick Pep"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Refresh'n"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "SK 65 Compound"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Stim"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Synalgos-Dc"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Theine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Triad"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Ultra Pep-Back"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Vivarin"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Wake-Up"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Wigraine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/casRegistryNumber"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:58-08-2"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/chebiId"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/chebi:27732"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/chemicalFormula"
+        },
+        "object": {
+          "type": "literal",
+          "value": "C8H10N4O2"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/chemicalIupacName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "1,3,7-trimethylpurine-2,6-dione"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/contraindicationInsert"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://129.128.185.122/drugbank2/drugs/DB00201/inserts/1256/full"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/creationDate"
+        },
+        "object": {
+          "type": "literal",
+          "value": "2005-06-13 13:24:05 UTC"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/description"
+        },
+        "object": {
+          "type": "literal",
+          "value": "A methylxanthine naturally occurring in some beverages and also used as a pharmacological agent. Caffeine&#39;s most notable pharmacological effect is as a central nervous system stimulant, increasing alertness and producing agitation. It also relaxes smooth muscle, stimulates cardiac muscle, stimulates diuresis, and appears to be useful in the treatment of some types of headache. Several cellular actions of caffeine have been observed, but it is not entirely clear how each contributes to its pharmacological profile. Among the most important are inhibition of cyclic nucleotide phosphodiesterases, antagonism of adenosine receptors, and modulation of intracellular calcium handling. [PubChem]"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/capsuleOral"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/elixirOral"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/liquidOral"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/pillOral"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/solution/DropsOral"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/solutionOral"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/suppositoryRectal"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/suspensionOral"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/syrupOral"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/tabletExtendedReleaseOral"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dosageForm"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/tabletOral"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/dpdDrugIdNumber"
+        },
+        "object": {
+          "type": "literal",
+          "value": "02241831"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugCategory"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugcategory/anorexigenicAgents"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugCategory"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugcategory/centralNervousSystemStimulants"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugCategory"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugcategory/phosphodiesteraseInhibitors"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugType"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugtype/approved"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugType"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugtype/smallMolecule"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/enzyme"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/enzymes/1"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/experimentalCaco2Permeability"
+        },
+        "object": {
+          "type": "literal",
+          "value": "-4.41 [ADME Research, USCD]"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/experimentalLogpHydrophobicity"
+        },
+        "object": {
+          "type": "literal",
+          "value": "-0.5"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/experimentalLogs"
+        },
+        "object": {
+          "type": "literal",
+          "value": "-0.97 [ADME Research, USCD]"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/experimentalWaterSolubility"
+        },
+        "object": {
+          "type": "literal",
+          "value": "22 mg/ml"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/fdaLabelFiles"
+        },
+        "object": {
+          "type": "literal",
+          "value": "1999-09-01\t/drugs/201/fda_labels/456"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/genericName"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffeine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/halfLife"
+        },
+        "object": {
+          "type": "literal",
+          "value": "3 to 7 hours in adults, 65 to 130 hours in neonates"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/hetId"
+        },
+        "object": {
+          "type": "literal",
+          "value": "CFF"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/inchiIdentifier"
+        },
+        "object": {
+          "type": "literal",
+          "value": "InChI=1/C8H10N4O2/c1-10-4-9-6-5(10)7(13)12(3)8(14)11(6)2/h4H,1-3H3"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/inchiKey"
+        },
+        "object": {
+          "type": "literal",
+          "value": "RYYVLZVUVIJVGH-UHFFFAOYAW"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/indication"
+        },
+        "object": {
+          "type": "literal",
+          "value": "For management of fatigue, orthostatic hypotension, and for the short term treatment of apnea of prematurity in infants."
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/interactionInsert"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://129.128.185.122/drugbank2/drugs/DB00201/inserts/2258/full"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/keggCompoundId"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cpd:C07481"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/keggDrugId"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/kegg:D00528"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/limsDrugId"
+        },
+        "object": {
+          "type": "literal",
+          "value": "201"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/massSpecFile"
+        },
+        "object": {
+          "type": "literal",
+          "value": "1"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/mechanismOfAction"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffeine stimulates medullary, vagal, vasomotor, and respiratory centers, promoting bradycardia, vasoconstriction, and increased respiratory rate. This action was previously believed to be due primarily to increased intracellular cyclic 3&prime;,5&prime;-adenosine monophosphate (cyclic AMP) following inhibition of phosphodiesterase, the enzyme that degrades cyclic AMP. It is now thought that xanthines such as caffeine act as agonists at adenosine-receptors within the plasma membrane of virtually every cell. As adenosine acts as an autocoid, inhibiting the release of neurotransmitters from presynaptic sites but augmenting the actions of norepinephrine or angiotensin, antagonism of adenosine receptors promotes neurotransmitter release. This explains the stimulatory effects of caffeine. Blockade of the adenosine A1 receptor in the heart leads to the accelerated, pronounced \"pounding\" of the heart upon caffeine intake."
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/meltingPoint"
+        },
+        "object": {
+          "type": "literal",
+          "value": "238 oC"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/molecularWeightAverage"
+        },
+        "object": {
+          "type": "literal",
+          "value": "194.1906"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/molecularWeightMono"
+        },
+        "object": {
+          "type": "literal",
+          "value": "194.0804"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/msdsFiles"
+        },
+        "object": {
+          "type": "literal",
+          "value": "/drugs/201/safety_sheets/954"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/patientInformationInsert"
+        },
+        "object": {
+          "type": "literal",
+          "value": "http://129.128.185.122/drugbank2/drugs/DB00201/inserts/382/full"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pharmacology"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffeine, a naturally occurring xanthine derivative like theobromine and the bronchodilator theophylline, is used as a CNS stimulant, mild diuretic, and respiratory stimulant (in neonates with apnea of prematurity). Often combined with analgesics or with ergot alkaloids, caffeine is used to treat migraine and other headache types. Over the counter, caffeine is available to treat drowsiness or mild water-weight gain."
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pharmgkbId"
+        },
+        "object": {
+          "type": "literal",
+          "value": "PA448710"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pkaIsoelectricPoint"
+        },
+        "object": {
+          "type": "literal",
+          "value": "10.4"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/predictedLogpHydrophobicity"
+        },
+        "object": {
+          "type": "literal",
+          "value": "-0.23"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/predictedLogs"
+        },
+        "object": {
+          "type": "literal",
+          "value": "-1.25"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/predictedWaterSolubility"
+        },
+        "object": {
+          "type": "literal",
+          "value": "1.10e+01 mg/mL"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/primaryAccessionNo"
+        },
+        "object": {
+          "type": "literal",
+          "value": "DB00201"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/proteinBinding"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Low (25 to 36%)."
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pubchemCompoundId"
+        },
+        "object": {
+          "type": "literal",
+          "value": "2519"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/pubchemSubstanceId"
+        },
+        "object": {
+          "type": "literal",
+          "value": "148854"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/reference"
+        },
+        "object": {
+          "type": "literal",
+          "value": ""
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/rxlistLink"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www.rxlist.com/cgi/generic3/caffeine.htm"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/secondaryAccessionNumber"
+        },
+        "object": {
+          "type": "literal",
+          "value": "aprd00673"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/smilesStringCanonical"
+        },
+        "object": {
+          "type": "literal",
+          "value": "CN1C=NC2=C1C(=O)N(C)C(=O)N2C"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/smilesStringIsomeric"
+        },
+        "object": {
+          "type": "literal",
+          "value": "CN1C=NC2=C1C(=O)N(C)C(=O)N2C"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/state"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Solid"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/structure"
+        },
+        "object": {
+          "type": "literal",
+          "value": "1"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "CFF"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Cafeina"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffein"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffeine Pure"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffeine, Anhydrous"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffeine, Monohydrate"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Caffeine, Synthetic"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Compound 65"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Methyltheobromide"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Methyltheobromine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Monomethyl Derivative of Theophylline"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Theobromine ME"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synonym"
+        },
+        "object": {
+          "type": "literal",
+          "value": "Theophylline ME"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/synthesisReference"
+        },
+        "object": {
+          "type": "literal",
+          "value": "U.S. Pat. 2,508,545 (1950)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/targets/1178"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/targets/16"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/targets/541"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/toxicity"
+        },
+        "object": {
+          "type": "literal",
+          "value": "LD\u003Csub\u003E50\u003C/sub\u003E=127 mg/kg (orally in mice)"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/updateDate"
+        },
+        "object": {
+          "type": "literal",
+          "value": "2008-08-26 14:01:33 UTC"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#Thing"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/ontology/ChemicalCompound"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2000/01/rdf-schema#label"
+        },
+        "object": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Caffeine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://dbpedia.org/ontology/thumbnail"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Caffeine.svg/200px-Caffeine.svg.png"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2004/02/skos/core#subject"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Anxiogenics"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2004/02/skos/core#subject"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Bitter_compounds"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2004/02/skos/core#subject"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Caffeine"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2004/02/skos/core#subject"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Coffee"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2004/02/skos/core#subject"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:IARC_Group_3_carcinogens"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2004/02/skos/core#subject"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Phosphodiesterase_inhibitors"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2004/02/skos/core#subject"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Plant_toxin_insecticides"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://www.w3.org/2004/02/skos/core#subject"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Xanthines"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://xmlns.com/foaf/0.1/depiction"
+        },
+        "object": {
+          "type": "uri",
+          "value": "http://upload.wikimedia.org/wikipedia/commons/d/d8/Caffeine.svg"
+        }
+      },
+      {
+        "predicate": {
+          "type": "uri",
+          "value": "http://xmlns.com/foaf/0.1/name"
+        },
+        "object": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Caffeine"
+        }
+      }
+    ]
+  }
+}

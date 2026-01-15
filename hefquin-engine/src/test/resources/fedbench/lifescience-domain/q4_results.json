@@ -1,0 +1,58 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "drugDesc",
+      "cpd",
+      "equation"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "drugDesc": {
+          "type": "literal",
+          "value": "A polyhydric alcohol with about half the sweetness of sucrose. Sorbitol occurs naturally and is also produced synthetically from glucose. It was formerly used as a diuretic and may still be used as a laxative and in irrigating solutions for some surgical procedures. It is also used in many manufacturing processes, as a pharmaceutical aid, and in several research applications. [PubChem]"
+        },
+        "cpd": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cpd:C00794"
+        },
+        "equation": {
+          "type": "literal",
+          "value": "C00794 + C00028 \u003C=\u003E C00247 + C00030"
+        }
+      },
+      {
+        "drugDesc": {
+          "type": "literal",
+          "value": "A polyhydric alcohol with about half the sweetness of sucrose. Sorbitol occurs naturally and is also produced synthetically from glucose. It was formerly used as a diuretic and may still be used as a laxative and in irrigating solutions for some surgical procedures. It is also used in many manufacturing processes, as a pharmaceutical aid, and in several research applications. [PubChem]"
+        },
+        "cpd": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cpd:C00794"
+        },
+        "equation": {
+          "type": "literal",
+          "value": "C00794 + C00016 \u003C=\u003E C01352 + C00247"
+        }
+      },
+      {
+        "drugDesc": {
+          "type": "literal",
+          "value": "A polyhydric alcohol with about half the sweetness of sucrose. Sorbitol occurs naturally and is also produced synthetically from glucose. It was formerly used as a diuretic and may still be used as a laxative and in irrigating solutions for some surgical procedures. It is also used in many manufacturing processes, as a pharmaceutical aid, and in several research applications. [PubChem]"
+        },
+        "cpd": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cpd:C00794"
+        },
+        "equation": {
+          "type": "literal",
+          "value": "C00794 + C00006 \u003C=\u003E C00247 + C00005 + C00080"
+        }
+      }
+    ]
+  }
+}

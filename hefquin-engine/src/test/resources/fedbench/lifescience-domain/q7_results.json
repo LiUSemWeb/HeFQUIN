@@ -1,0 +1,2670 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "drug",
+      "transform",
+      "mass"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04575"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Metabolized principally to the parent compound, ethinyl estradiol. Ethinyl estradiol is metabolized in the liver. Quantitatively, the major metabolic pathway for ethinyl estradiol, both in rats and in humans, is aromatic hydroxylation, as it is for the natural estrogens."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "364.2402"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04829"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "323.1998"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04839"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Primarily hepatic. Cyproterone acetate is metabolized by the CYP3A4 enzyme, forming the active metabolite 15beta-hydroxycyproterone acetate, which retains its antiandrogen activity, but has reduced progestational activity."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "374.1649"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04840"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "175.1109"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB06144"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic. Sertindole is metabolized by cytochrome P450 isoenzymes CYP 2D6 and CYP 3A4."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "440.1779"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00118"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Significant first-pass metabolism in the liver. Approximately 50% of S-Adenosylmethionine (SAMe) is metabolized in the liver. SAMe is metabolized to S-adenosylhomocysteine, which is then metabolized to homocysteine. Homocysteine can either be metabolized to cystathionine and then cysteine or to methionine. The cofactor in the metabolism of homocysteine to cysteine is vitamin B6. Cofactors for the metabolism of homocysteine to methionine are folic acid, vitamin B12 and betaine."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "398.1372"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00119"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "In the liver, pyruvate is metabolized via several pathways."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "88.016"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00145"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "75.032"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00152"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "300.0812"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00200"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Primarily hepatic. Cobalamins are absorbed in the ileum and stored in the liver. They continuously undergo enterohepatic recycling via secretion in the bile. Part of a dose is excreted in the urine, most of it in the first 8 hours."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "1345.5671"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00288"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Once absorbed through the skin, topical corticosteroids are handled through pharmacokinetic pathways similar to systemically administered corticosteroids. Corticosteroids are metabolized primarily in the liver and are then excreted by the kidneys."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "502.2367"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00309"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "851.3775"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00321"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Exclusively hepatic, with first pass effect. Amitriptyline is demethylated in the liver to its primary active metabolite, nortriptyline."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "277.1831"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00445"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "543.1741"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00451"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic (primarily via cytochrome P450 isozyme 3A4)."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "776.6867"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00471"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "585.2104"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00476"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "The major biotransformation pathways for duloxetine involve oxidation of the naphthyl ring followed by conjugation and further oxidation. Both CYP2D6 and CYP1A2 catalyze the oxidation of the naphthyl ring in vitro. Metabolites found in plasma include 4-hydroxy duloxetine glucuronide and 5-hydroxy, 6-methoxy duloxetine sulfate. The major circulating metabolites have not been shown to contribute significantly to the pharmacologic activity of duloxetine."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "333.0954"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00541"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "824.3996"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00549"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "575.209"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00559"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Bosentan is metabolized in the liver by the cytochrome P450 enzymes CYP2C9 and CYP3A4 (and possibly CYP2C19), producing three metabolites, one of which, Ro 48-5033, is pharmacologically active and may contribute 10 to 20% to the total activity of the parent compound."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "551.1839"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00694"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "527.1791"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00696"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic. Ergotamine is metabolized by the liver by largely undefined pathways, and 90% of the metabolites are excreted in the bile."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "581.2638"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00714"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "624.2158"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00773"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Primarily hepatic (through O-demethylation via the CYP450 3A4 isoenzyme pathway) with 40% excreted unchanged in the urine."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "588.1843"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00790"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Perindopril is extensively metabolized following oral administration, with only 4 to 12% of the dose recovered unchanged in the urine."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "441.3203"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00946"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Phenprocoumon is stereoselectively metabolized by hepatic microsomal enzymes (cytochrome P-450) to inactive hydroxylated metabolites (predominant route) and by reductases to reduced metabolites. Cytochrome P450 2C9 is the principal form of human liver P-450 responsible for metabolism."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "282.1256"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00947"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Metabolism of fulvestrant appears to involve combinations of a number of possible biotransformation pathways analogous to those of endogenous steroids, including oxidation, aromatic hydroxylation, conjugation with glucuronic acid and/or sulphate at the 2, 3 and 17 positions of the steroid nucleus, and oxidation of the side chain sulphoxide. Identified metabolites are either less active or exhibit similar activity to fulvestrant in antiestrogen models. Studies using human liver preparations and recombinant human enzymes indicate that cytochrome P-450 3A4 (CYP 3A4) is the only P-450 isoenzyme involved in the oxidation of fulvestrant; however, the relative contribution of P-450 and non-P-450 routes in vivo is unknown."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "606.3166"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00966"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Minimally metabolized by conjugation to form a pharmacologically inactive acylglucuronide; the glucuronide of the parent compound is the only metabolite that has been identified in human plasma and urine. The cytochrome P450 isoenzymes are not involved in the metabolism of telmisartan."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "514.2369"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00973"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic, intestinal wall"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "409.149"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00975"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "504.3173"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00984"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Nandrolone is unusual in that unlike most anabolic steroids, it is not broken down into the more reactive DHT by the enzyme 5��-reductase, but rather into a less effective product known as Dihydronandrolone."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "274.1933"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01005"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "76.0273"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01076"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Atorvastatin is extensively metabolized to ortho- and parahydroxylated derivatives and various beta-oxidation products. In vitro inhibition of HMG-CoA reductase by ortho- and parahydroxylated metabolites is equivalent to that of atorvastatin. Approximately 70% of circulating inhibitory activity for HMG-CoA reductase is attributed to active metabolites."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "558.253"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01079"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Tegaserod is metabolized mainly via two pathways. The first is a presystemic acid catalyzed hydrolysis in the stomach followed by oxidation and conjugation which produces the main metabolite of tegaserod, 5-methoxyindole-3-carboxylic acid glucuronide. The main metabolite has negligible affinity for 5-HT\u003Csub\u003E4\u003C/sub\u003E receptors in vitro. The second metabolic pathway of tegaserod is direct glucuronidation which leads to generation of three isomeric N-glucuronides."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "417.2012"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01093"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Dimethyl sulfoxide is metabolized in man by oxidation to dimethyl sulfone or by reduction in dimethyl sulfide. Dimethyl sulfoxide and dimethyl sulfone are excreted in the urine and feces."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "78.0139"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00171"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "506.9957"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00160"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "89.0477"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB03501"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "566.055"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01092"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "584.2833"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB03193"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "284.2715"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04827"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "89.0477"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00997"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "543.1741"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00847"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "77.0299"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB03615"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "454.2275"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04573"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "288.1725"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00206"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "608.2734"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01089"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "578.2628"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00284"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "645.248"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00137"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "568.428"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00411"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "182.0822"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB05630"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "905.9186"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00877"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "913.5551"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04552"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "282.0616"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04711"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "1139.512"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04834"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hydrolyzed to active metabolites (Cytochrome P450 system is not involved)."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "676.3815"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04837"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "289.1233"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04841"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic, to two metabolites via N-dealylation and hydroxylation."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "404.2064"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04878"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Little metabolism occurs and no metabolites have as yet been identified."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "267.1318"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04898"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic. Ximelagatran is a prodrug, being converted in vivo to the active agent melagatran. This conversion takes place in the liver and many other tissues through dealkylation and dehydroxylation (replacing the ethyl and hydroxyl groups with hydrogen)."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "473.2638"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04899"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Nesiritide undergoes proteolytic cleavage of the peptide by endopeptidases, such as neutral endopeptidase, which are present on the vascular lumenal surface."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "3461.7377"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB06262"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Droxidopa is metabolized by aromatic L-amino acid decarboxylase"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "213.0637"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB06285"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "4115.1309"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB06287"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic, primarily cytochrome P450 (CYP) 3A4/5."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "1029.6025"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00001"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Lepirudin is thought to be metabolized by release of amino acids via catabolic hydrolysis of the parent drug. However, con-clusive data are not available. About 48% of the administration dose is excreted in the urine which consists of unchanged drug (35%) and other fragments of the parent drug."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "6958.962"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00046"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Insulin is predominantly cleared by metabolic degradation via a receptor-mediated process."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "5803.6376"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00047"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Insulin is predominantly cleared by metabolic degradation via a receptor-mediated process."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "6058.8184"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00050"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "In in vitro studies, cetrorelix was stable against phase I- and phase II-metabolism. Cetrorelix was transformed by peptidases, and the (1-4) peptide was the predominant metabolite."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "1429.6698"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00054"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Most likely removed by opsonization via the reticuloendothelial system when bound to platelets, or by human antimurine antibody production"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "47580.23"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00063"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "No major metabolites have been detected in human plasma. Deamidated eptifibatide and other, more polar metabolites have been detected in urine."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "831.3156"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00074"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Most likely removed by opsonization via the reticuloendothelial system when bound to lymphocytes, or by human antimurine antibody production"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "144031.1268"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00111"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Most likely removed by opsonization via the reticuloendothelial system when bound to lymphocytes."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "144031.1268"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00112"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Most likely removed by opsonization via the reticuloendothelial system when bound to endothelial cells, or by human antimurine antibody production"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "149104.8407"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00115"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "1354.5674"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00115"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "1359.6065"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00183"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Primarily hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "767.3312"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00209"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Not fully defined"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "427.1914"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00223"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Metabolized, primarily in the liver, and then excreted by the kidneys."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "410.1905"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00226"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Primarily hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "524.2628"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00240"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "520.2228"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00275"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Olmesartan is rapidly and completely bioactivated by ester hydrolysis to olmesartan during absorption from the gastrointestinal tract. There is virtually no further metabolism of olmesartan."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "558.2227"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00278"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "508.2468"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00287"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Travoprost, an isopropyl ester prodrug, is hydrolyzed by esterases in the cornea to its biologically active free acid. Systemically, travoprost free acid is metabolized to inactive metabolites via beta-oxidation of the &alpha;(carboxylic acid) chain to give the 1,2-dinor and 1,2,3,4-tetranor analogs, via oxidation of the 15-hydroxyl moiety, as well as via reduction of the 13,14 double bond."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "500.2386"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00289"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Atomoxetine is primarily metabolized by the CYP2D6 pathway to 4-hydroxyatomoxetine. 4-Hydroxyatomoxetine is equipotent to atomoxetine as an inhibitor of the norepinephrine transporter but circulates in plasma at much lower concentrations (1% of atomoxetine concentration in EMs and 0.1% of atomoxetine concentration in PMs)."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "291.139"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00308"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Primarily hepatic. Eight metabolites of ibutilide were detected in metabolic profiling of urine. These metabolites are thought to be formed primarily by o-oxidation followed by sequential b-oxidation of the heptyl side chain of ibutilide. Of the eight metabolites, only the o-hydroxy metabolite possesses class III electrophysiologic properties similar to that of ibutilide in an in vitro isolated rabbit myocardium model."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "884.5003"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00320"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "679.2676"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00337"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Metabolized by the CYP3A sub-family of metabolizing enzymes."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "809.4481"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00385"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Valrubicin is metabolized to two primary metabolites: N-trifluoroacetyladriamycin and N-trifluoroacetyladriamycinol."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "723.2139"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00390"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic (but not dependent upon the cytochrome P-450 system). The end metabolites, which include 3 b-digoxigenin, 3-keto-digoxigenin, and their glucuronide and sulfate conjugates, are polar in nature and are postulated to be formed via hydrolysis, oxidation, and conjugation."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "780.4296"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00429"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Metabolized in the lungs and liver. Metabolites are excreted in urine."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "489.3302"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00462"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Little is known about the fate and excretion of methscopolamine."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "397.0889"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00492"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Since fosinoprilat is not biotransformed after intravenous administration, fosinopril, not fosinoprilat, appears to be the precursor for the glucuronide and p-hydroxy metabolites."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "563.3012"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00531"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "278.0354"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00538"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "None detected"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "662.1547"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00570"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic. Metabolism of vinblastine has been shown to be mediated by hepatic cytochrome P450 3A isoenzymes."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "810.4204"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00588"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Fluticasone propionate is metabolized in the liver by cytochrome P450 3A4-mediated hydrolysis of the 5-fluoromethyl carbothioate grouping. This transformation occurs in 1 metabolic step to produce the inactive 17-(beta)-carboxylic acid metabolite, the only known metabolite detected in man."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "500.1844"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00611"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Extensively metabolized in the liver. The pharmacological activity of butorphanol metabolites has not been studied in humans; in animal studies, butorphanol metabolites have demonstrated some analgesic activity."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "477.2363"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00642"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Metabolized by Cytochrome P450 Enzymes"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "471.1131"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00650"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic and intestinal mucosal, the main metabolite being the active 5-methyltetrahydrofolate. Leucovorin is readily converted to another reduced folate, 5,10-methylenetetrahydrofolate, which acts to stabilize the binding of fluorodeoxyridylic acid to thymidylate synthase and thereby enhances the inhibition of this enzyme."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "511.1128"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00673"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Aprepitant is metabolized primarily by CYP3A4 with minor metabolism by CYP1A2 and CYP2C19. Seven metabolites of aprepitant, which are only weakly active, have been identified in human plasma."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "534.1502"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00722"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Lisinopril does not undergo metabolism and is excreted unchanged entirely in the urine"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "441.2475"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00736"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "367.0967"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00746"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Deferoxamine is mainly metabolised in the plasma and hepatic metabolism is minimal. A number of metabolites have been isolated but not characterised. Some metabolites of deferoxamine, most notably the product of oxidative deamination, also chelate iron, and thus the antidotal effect of the drug appears unaffected by hepatic metabolism."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "560.3534"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00762"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "622.2558"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00789"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "No detectable biotransformation or decomposition."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "938.2603"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00800"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Elimination is largely by conjugation, without participation of cytochrome P-450 enzymes. Methylation, glucuronidation, and sulfation are the main routes of conjugation."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "401.07"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00864"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic, extensive, primarily by CYP3A4. The major metabolite identified in incubations with human liver microsomes is 13-demethyl tacrolimus. In in vitro studies, a 31-demethyl metabolite has been reported to have the same activity as tacrolimus."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "803.482"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00868"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Benzonatate is hydrolyzed to para-aminobenzoic acid (PABA) by plasma esterases"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "603.3619"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00885"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic (Ophthalmic)"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "266.0318"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00920"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Primarily hepatic. The main metabolite found in both plasma and urine is the inactive ketotifen-N-glucuronide. Nor-ketotifen, the N-demethylated metabolite, and the 10-alpha-hydroxyl derivative are the only other metabolites detectable in human urine."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "425.1297"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00934"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic. Maprotiline is metabolized by N-demethylation, deamination, aliphatic and aromatic hydroxylations and by formation of aromatic methoxy derivatives."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "277.1831"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00937"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Extensively metabolized through a complex pathway of biotransformation involving N-dealkylation and reduction. Many of these metabolites are biologically active and may participate in the therapeutic action of diethylpropion."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "241.1233"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00950"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Approximately 5% of the total dose is metabolized, by cytochrome P450 3A4 and by intestinal microflora."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "501.2879"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00953"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Rizatriptan is metabolized by monoamine oxidase A isoenzyme (MAO-A) to an inactive indole acetic acid metabolite. In addition, several other inactive metabolites are formed. An active metabolite, N-monodesmethyl-rizatriptan, with pharmacological activity similar to that of the parent compound has been identified in small concentrations (14%) in the plasma."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "391.2008"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00974"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Almost none of the compound is metabolized."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "374.0015"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01030"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Topotecan undergoes a reversible pH dependent hydrolysis of its lactone moiety; it is the lactone form that is pharmacologically active."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "457.1404"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01077"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Not metabolized."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "249.9384"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01085"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Possibly occurs at the neuronal synapses and in the plasma"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "244.0979"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01088"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Primarily hepatic. Iloprost is metabolized principally via beta-oxidation of the carboxyl side chain."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "360.2301"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00279"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "650.79"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04819"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "261.13"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04942"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "351.1834"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04599"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "219.0895"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00761"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "73.9326"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04690"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "348.111"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04833"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "250.1106"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB03575"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "243.1987"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04830"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "157.1327"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04843"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "339.1834"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04805"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "823.3541"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04831"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "329.952"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04818"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "179.1059"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB02998"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "284.1776"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04824"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "318.0892"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00212"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "630.3451"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00732"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "928.5085"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00444"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "656.1564"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00040"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "3480.6157"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01057"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "256.1136"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04820"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "298.143"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB06288"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "354.1613"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB03010"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "507.2655"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00995"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "678.1327"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04838"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "276.1725"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB05246"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "203.0946"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00986"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "397.1253"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00944"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "714.2355"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00068"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "19867.2792"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00416"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "906.1602"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00728"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "608.3189"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01010"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "201.092"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00392"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "348.1427"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00597"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "559.1277"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01078"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "942.4824"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00345"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "216.0511"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04890"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "546.1591"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00747"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "437.1049"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01113"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "375.1237"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00271"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "613.7696"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB06689"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "343.3086"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00483"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "891.1769"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04825"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "329.2144"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04842"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "475.2435"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00052"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "22111.0409"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00069"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "19551.846"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00105"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "19256.7431"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00022"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "19256.7431"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00092"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "72414.14"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00053"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "55562.1608"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00918"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "469.1883"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00009"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "58969.675"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00026"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "17246.4608"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB03880"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "477.1756"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04812"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "301.0506"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00016"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "18224.5242"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00403"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "1351.4485"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00004"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "57605.128"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00941"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "660.1715"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00090"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "82067.1507"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00038"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "19035.5679"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00039"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "16400.3409"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00015"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "39546.0247"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00031"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "58703.4783"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04900"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "3106.5041"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04894"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "1130.483"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00219"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "427.1722"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01118"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Amiodarone is extensively metabolized in the liver via CYP2C8 (under 1% unchanged in urine), and can effect the metabolism of numerous other drugs. The major metabolite of amiodarone is desethylamiodarone (DEA), which also has antiarrhythmic properties. The metabolism of amiodarone is inhibited by grapefruit juice, leading to elevated serum levels of amiodarone."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "645.0237"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01122"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Plasma and hepatic"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "536.2685"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01126"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic. Extensively metabolized."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "528.2211"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01170"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Guanethidine is converted by the liver to three metabolites, which are excreted in the urine. The metabolites are pharmacologically less active than the parent compound."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "296.1518"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01213"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Primarily hepaticm the primary metabolite is 4-carboxypyrazole (approximately 80 to 85% of an administered dose). Other metabolites include 4-hydroxymethylpyrazole and the N -glucuronide conjugates of 4-carboxypyrazole and 4-hydroxymethylpyrazole."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "82.0531"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01229"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic. In vitro studies with human liver microsomes and tissue slices showed that paclitaxel was metabolized primarily to 6a-hydrox-ypaclitaxel by the cytochrome P450 isozyme CYP2C8; and to two minor metabolites, 3&rsquo;-p-hydroxypaclitaxel and 6a, 3&rsquo;-p-dihydroxypaclitaxel, by CYP3A4."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "853.331"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01237"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic (cytochrome P-450 system); some renal."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "369.0495"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01248"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic. In vitro drug interaction studies revealed that docetaxel is metabolized by the CYP3A4 isoenzyme (1 major, 3 minor metabolites)."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "807.3466"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01258"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic. About one-fourth of the absorbed dose appears in the urine as parent drug. How much of the absorbed dose is metabolized is unknown. Based on the in vitro studies, the major enzyme responsible for aliskiren metabolism appears to be CYP 3A4."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "551.3934"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01259"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Lapatinib undergoes extensive metabolism, primarily by CYP3A4 and CYP3A5, with minor contributions from CYP2C19 and CYP2C8 to a variety of oxidated metabolites, none of which accounts for more than 14% of the dose recovered in the feces or 10% of lapatinib concentration in plasma."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "942.1841"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01277"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Both the liver and the kidney have been shown to metabolize IGF-1."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "7643.5862"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01337"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "730.292"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01396"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "764.4347"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01408"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatic, extensive. Further metabolized to terbutaline by plasma cholinesterase."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "403.1874"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01558"
+        },
+        "transform": {
+          "type": "literal",
+          "value": "Hepatically, via oxidative pathways (via an enzyme belonging to the Cytochrome P450 family of enzymes)."
+        },
+        "mass": {
+          "type": "literal",
+          "value": "317.0164"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01592"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "55.9349"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01440"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "104.0473"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01698"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "610.1534"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01180"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "634.289"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01200"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "653.2213"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01390"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "83.9823"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01599"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "516.3096"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01338"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "602.4771"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01619"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "261.1518"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01282"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "987.4848"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01578"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "788.8541"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01362"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "820.8803"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01199"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "770.2948"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01251"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "527.209"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01281"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "84342.0374"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01272"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "105270.8023"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01276"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "4184.0273"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01270"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "48349.6111"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01279"
+        },
+        "mass": {
+          "type": "literal",
+          "value": "55833.1016"
+        }
+      }
+    ]
+  }
+}

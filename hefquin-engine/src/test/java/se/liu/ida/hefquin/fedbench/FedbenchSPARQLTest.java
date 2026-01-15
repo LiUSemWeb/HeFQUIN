@@ -13,6 +13,8 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 		DEFAULT_SLACK = 100;
 	}
 
+	// cross-domain queries
+
 	@Test
 	public void executeQuery1() throws Exception {
 		final String[] values = new String[]{
@@ -94,5 +96,93 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 		    "http://localhost:8080/sparql/nyt/"
 		};
 		_executeQuery( "fedbench/cross-domain/q7", 1500, values );
+	}
+
+	// lifescience-domain queries
+
+	@Test
+	public void executeQuery8() throws Exception {
+		final String[] values = new String[]{
+			"http://localhost:8080/sparql/drugbank/"
+		};
+		_executeQuery( "fedbench/lifescience-domain/q1", 900, values );
+	}
+
+	@Test
+	public void executeQuery9() throws Exception {
+		final String[] values = new String[]{
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/dbpedia/"
+			
+		};
+		_executeQuery( "fedbench/lifescience-domain/q2", 700, values );
+	}
+
+	@Test
+	public void executeQuery10() throws Exception {
+		final String[] values = new String[]{
+			"http://localhost:8080/sparql/dbpedia/",
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/drugbank/"
+		};
+		_executeQuery( "fedbench/lifescience-domain/q3", 17_000, values );
+	}
+
+	@Test
+	public void executeQuery11() throws Exception {
+		final String[] values = new String[]{
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/kegg/",
+			"http://localhost:8080/sparql/kegg/",
+			"http://localhost:8080/sparql/kegg/",
+			"http://localhost:8080/sparql/kegg/"
+		};
+		_executeQuery( "fedbench/lifescience-domain/q4", 700, values );
+	}
+
+	@Test
+	public void executeQuery12() throws Exception {
+		final String[] values = new String[]{
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/kegg/",
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/chebi/",
+			"http://localhost:8080/sparql/chebi/"
+		};
+		_executeQuery( "fedbench/lifescience-domain/q5", 5_000, values );
+	}
+
+	@Test
+	public void executeQuery13() throws Exception {
+		final String[] values = new String[]{
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/kegg/",
+			"http://localhost:8080/sparql/kegg/",
+			"http://localhost:8080/sparql/kegg/"
+		};
+		_executeQuery( "fedbench/lifescience-domain/q6", 800, values );
+	}
+
+	// Issue:
+	// - Filter "FILTER ( ?mass > '5' )" outside SERVICE clause causes java.lang.Exception
+	// - OPTIONAL in SERVICE clause causes "java.lang.UnsupportedOperationException: Getting the variables from arbitrary SPARQL patterns is an open TODO"
+	// @Test
+	public void executeQuery14() throws Exception {
+		final String[] values = new String[]{
+			// first
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/drugbank/",
+			"http://localhost:8080/sparql/kegg/",
+			"http://localhost:8080/sparql/kegg/",
+			"http://localhost:8080/sparql/drugbank/"
+		};
+		_executeQuery( "fedbench/lifescience-domain/q7", 0, values );
 	}
 }

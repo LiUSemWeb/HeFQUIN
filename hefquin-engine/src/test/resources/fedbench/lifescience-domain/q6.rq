@@ -1,0 +1,10 @@
+SELECT DISTINCT ?drug ?title WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5  ) {
+    ( <%s> <%s> <%s> <%s> <%s> )
+  }
+  SERVICE ?s1 { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugCategory> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugcategory/micronutrient> . }
+  SERVICE ?s2 { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/casRegistryNumber> ?id . }
+  SERVICE ?s3 { ?keggDrug <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ns/kegg#Drug> . }
+  SERVICE ?s4 { ?keggDrug <http://bio2rdf.org/ns/bio2rdf#xRef> ?id . }
+  SERVICE ?s5 { ?keggDrug <http://purl.org/dc/elements/1.1/title> ?title . }
+}

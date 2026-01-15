@@ -1,0 +1,4 @@
+
+{ "head": { "link": [], "vars": ["callret-0"] },
+  "results": { "distinct": false, "ordered": true, "bindings": [
+    { "callret-0": { "type": "literal", "datatype": "http://www.w3.org/2001/XMLSchema#integer", "value": "1159" }} ] } }

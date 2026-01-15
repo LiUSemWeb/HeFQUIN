@@ -1,0 +1,5518 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "drug",
+      "keggUrl",
+      "chebiImage"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB03966"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12032"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=29557"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB02702"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06488"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=10050"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB03575"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07575"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8058"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00554"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C01608"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8249"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00175"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C01844"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8360"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00919"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C02078"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9215"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04844"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11168"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9467"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01654"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C01619"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9568"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00500"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C02328"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9618"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04400"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C02953"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=15375"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01694"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C02107"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=15672"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00157"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00004"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=16908"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00381"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06825"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2668"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00595"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06624"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=27701"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04626"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C01555"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2790"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04365"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C10129"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2814"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB02024"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C05629"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=28631"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00637"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06832"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2896"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00245"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06846"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3048"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01244"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06847"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3061"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00195"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06849"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3082"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01019"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06850"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3084"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00901"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06853"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3133"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00835"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06857"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3183"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04830"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07674"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3209"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB02860"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C05370"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3335"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00564"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06868"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3387"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00748"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06871"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3398"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04657"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11255"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3405"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00833"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06877"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3478"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01140"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06878"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3479"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01326"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06879"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3480"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01327"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06880"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3482"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00671"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06881"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3487"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01328"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06882"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3491"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01329"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06883"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3493"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00923"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06884"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3495"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00493"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06885"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3497"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01330"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06886"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3499"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01331"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06887"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3500"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01150"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06888"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3506"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00438"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06889"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3508"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01332"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06890"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3511"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB02717"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C02013"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3527"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00567"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06895"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3534"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01139"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06896"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3544"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01114"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06905"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3644"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00369"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06909"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3696"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01597"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C01675"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3697"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00537"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C05349"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3717"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00604"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06910"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3720"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01211"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06912"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3732"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00845"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06915"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3749"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00100"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C03101"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3774"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00375"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06925"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3814"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00048"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00816"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3823"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00924"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06931"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3996"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00979"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06932"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4024"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00260"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06682"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4030"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01219"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06939"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4317"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00705"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06941"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4378"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00618"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06942"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4392"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00485"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06950"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4511"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00266"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00796"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4513"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00804"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06951"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4514"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00900"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06953"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4516"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00937"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06954"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4530"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00390"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06956"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4551"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00343"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06958"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4602"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00917"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00584"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4625"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00449"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06963"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4646"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00841"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06967"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4670"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00869"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06969"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4702"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01010"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06976"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4758"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00584"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06977"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4784"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB03395"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07466"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4787"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01228"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06978"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4788"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00467"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06979"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4796"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00187"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06980"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4856"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00330"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06984"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4877"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00574"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06996"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5000"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01195"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07001"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5090"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00492"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07016"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5163"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00889"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07023"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5537"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00629"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07034"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5553"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01018"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07037"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5558"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01275"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07040"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5775"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01611"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07043"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5801"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04818"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11777"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5958"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00221"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07053"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6005"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01625"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07055"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6043"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00465"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07062"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6129"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00581"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07064"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6359"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00709"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07065"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6366"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00504"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07069"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6431"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00848"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07070"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6432"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00978"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07078"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6517"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00836"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07080"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6532"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00934"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07107"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6690"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04200"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C10682"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6698"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00784"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C02168"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6717"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04843"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07818"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6752"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04833"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07560"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6821"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01646"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C02712"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7211"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00788"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C01517"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7476"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04808"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C01441"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7489"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01059"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06687"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7629"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00646"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C06572"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7660"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB02998"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C14257"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=34844"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00160"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C01401"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=40735"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00151"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00097"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=41700"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00151"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00097"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=41781"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00151"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00097"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=41811"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00130"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00064"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=42814"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00130"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00064"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=42899"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00130"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00064"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=42943"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00117"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00135"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43048"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00117"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00135"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43114"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00117"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00135"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43190"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00117"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00135"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43239"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00167"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00407"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43290"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00167"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00407"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43342"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00167"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00407"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43366"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00123"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00047"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43757"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB04200"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C10682"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43819"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00123"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00047"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43840"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00123"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00047"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=43875"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00172"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00148"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=45040"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00172"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00148"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=45100"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00133"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00065"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=45451"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00133"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00065"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=45590"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00133"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00065"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=45597"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00156"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00188"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=45843"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00150"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00078"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=46086"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00150"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00078"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=46125"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00135"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C01536"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=46161"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00150"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00078"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=46225"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00161"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00183"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=46376"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00161"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00183"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=46418"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00161"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C00183"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=46484"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01034"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12058"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=29552"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB02054"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12110"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=29585"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00976"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12009"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=29688"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00560"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12012"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=29696"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01431"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12811"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=31189"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00606"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12685"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=31448"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00879"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12599"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=31536"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01601"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12871"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=31781"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01071"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12755"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=31821"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00731"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12508"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=31897"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00582"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07622"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=10023"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00943"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07207"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=10101"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00962"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07484"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=10102"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00495"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07210"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=10110"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00425"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07219"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=10125"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00909"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07504"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=10127"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01121"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07428"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8049"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01438"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07429"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8057"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01579"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07904"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8059"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00780"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07430"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8060"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00914"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07673"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8064"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01619"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07790"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8065"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00830"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07432"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8067"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00925"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07435"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8077"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00832"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07437"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8079"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00397"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07911"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8104"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00252"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07443"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8107"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01338"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07554"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8230"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00319"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07361"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8232"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00236"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07362"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8242"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01291"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07807"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8245"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01324"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07766"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8327"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01297"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11696"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8348"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01588"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07366"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8362"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01058"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07367"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8363"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00750"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07531"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8404"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01087"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07627"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8405"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01032"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07372"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8426"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01599"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07373"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8427"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00721"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07375"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8430"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01168"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07402"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8432"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01123"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11181"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8452"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01131"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07631"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8455"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01182"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07381"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8465"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00782"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07506"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8481"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00807"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07383"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8485"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00545"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07410"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8665"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00205"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07391"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8673"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01589"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07336"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8694"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01325"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07342"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8717"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01369"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08032"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8732"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00899"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08021"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8802"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00212"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07465"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8803"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00912"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07670"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8805"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00740"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07937"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8863"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00478"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07236"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8864"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00867"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07239"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8872"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00503"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07240"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8873"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00989"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11766"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8874"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00296"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07532"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8890"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00938"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07241"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9011"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01236"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07520"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9130"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01105"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07247"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9137"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00203"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07259"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9139"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00489"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07309"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9206"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00649"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07312"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9253"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00566"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07598"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9303"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00364"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07314"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9313"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00708"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08022"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9316"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00795"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07316"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9334"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00263"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07318"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9343"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00870"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07320"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9362"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB02034"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C10173"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9367"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01606"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07771"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9421"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00857"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08079"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9448"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00251"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08080"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9451"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00342"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07463"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9453"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01041"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07910"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9513"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00352"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07648"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9555"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00599"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07521"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9560"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00906"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07503"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9586"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01007"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08082"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9604"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00697"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07452"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9608"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01056"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07142"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9611"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00323"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07949"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9617"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00273"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07502"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9633"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01030"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11158"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9634"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00193"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07153"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9648"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01021"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07767"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9683"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00376"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07171"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9720"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01246"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07172"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9725"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01116"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07174"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9728"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01157"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11154"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9737"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00792"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07180"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9741"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00685"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07664"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9763"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01339"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07553"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9939"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00661"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07188"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9948"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01080"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07500"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9979"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01669"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11299"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=9997"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00802"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08005"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2569"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01122"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07773"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2627"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00357"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07617"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2654"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01427"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C13594"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2686"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01217"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08159"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2704"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB02403"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11010"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=27526"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00964"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07668"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2788"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00732"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07548"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2914"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00719"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07774"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2946"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00972"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07768"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=2950"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00436"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07758"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3013"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01086"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07527"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3030"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01515"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C10847"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3041"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00865"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07538"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3044"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00562"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07759"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3047"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00810"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07941"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3112"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00921"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08007"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3216"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01091"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08067"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3238"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00639"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08066"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3240"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00248"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08187"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3286"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00389"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07615"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3397"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00395"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07927"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3419"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00535"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08110"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3485"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01413"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08111"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3486"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00274"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08103"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3489"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01415"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08117"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3510"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00439"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07966"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3558"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00341"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07778"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3561"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00880"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07461"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3640"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00856"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07928"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3642"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01556"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07559"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3646"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00356"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07931"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3655"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01683"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11308"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3691"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00827"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08052"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3716"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00771"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07853"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3743"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01380"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08173"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=3897"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01764"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08033"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4309"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00250"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07666"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4325"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01209"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08010"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4474"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00527"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07879"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4500"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01144"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07459"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4505"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01501"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07871"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4534"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00320"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07798"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4562"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01565"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11782"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4575"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01548"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11794"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4650"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01334"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07549"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4706"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00645"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07881"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4724"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00651"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07819"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4728"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01525"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C10858"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4743"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00625"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08088"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4760"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01084"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07785"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4779"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00445"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11230"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4809"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01253"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07543"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4822"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07897"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4875"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00189"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07833"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4882"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01031"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07832"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4884"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00593"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07505"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4887"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00754"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07839"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4888"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01466"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07537"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4902"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00292"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07522"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4910"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00990"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08162"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4953"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00949"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07501"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=4995"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01148"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07809"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5088"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00301"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11748"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5098"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00983"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07805"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5147"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01320"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07840"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5165"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00614"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07999"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5195"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01044"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07661"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5280"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00441"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07650"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5295"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01437"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07489"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5439"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00365"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11368"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5543"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01218"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07634"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5612"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00739"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11729"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5683"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00756"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08039"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5693"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00774"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07763"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5784"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00308"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07753"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5856"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00068"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07901"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=5938"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00602"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07970"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6078"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01221"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07525"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6121"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00007"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07612"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6427"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01202"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07841"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6437"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01137"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07660"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6440"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00854"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08014"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6444"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00601"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08146"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6477"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00447"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08109"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6537"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00657"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07511"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6706"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00737"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07116"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6709"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00358"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07633"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6718"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00814"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08169"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6741"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00454"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07128"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6754"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00961"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07528"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6759"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00933"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07143"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6780"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00660"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07934"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6797"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00931"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07654"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6805"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00940"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07849"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6817"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00703"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07764"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6822"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00902"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07175"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6823"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00474"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07844"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6833"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00723"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07513"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6839"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01028"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07517"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6843"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00232"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07765"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6847"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01214"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07915"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6897"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01233"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07868"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6898"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01336"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07919"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6900"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00765"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07921"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6912"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00379"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07220"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6916"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01388"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07222"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6920"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00683"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07524"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6931"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00491"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07708"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6935"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01226"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07550"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6958"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00691"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07704"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6960"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01618"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07230"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6965"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00680"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07743"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=6997"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00218"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07663"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7007"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00410"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C11758"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7025"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00666"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07613"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7445"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00735"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08071"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7451"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00220"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07257"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7496"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00238"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07263"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7546"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00622"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07264"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7550"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00393"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07267"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7575"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00401"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07699"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7577"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01595"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07487"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7581"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01054"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07713"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7582"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00336"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08042"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7592"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00585"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07270"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7601"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01165"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07321"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7731"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00768"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07789"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7769"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01250"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07323"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7770"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00904"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07325"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7773"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01173"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07935"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7789"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01096"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07341"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7819"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00991"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07356"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7822"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00776"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07492"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7824"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00239"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08075"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7825"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00935"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07363"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7862"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01192"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C08019"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7865"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00383"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07851"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7868"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00282"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07395"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7903"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01337"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07551"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7907"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00617"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07411"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7921"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01384"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07413"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7922"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01626"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07414"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7930"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01230"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07899"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7953"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00299"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07417"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7956"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00806"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07424"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=7986"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01186"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C07425"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=8020"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01361"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C12753"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=32267"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB02417"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C14454"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=34234"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01526"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C14210"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=34386"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01471"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C14475"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=34583"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00473"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C14172"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=34791"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00253"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C14643"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=34829"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01043"
+        },
+        "keggUrl": {
+          "type": "literal",
+          "value": "http://www.genome.jp/dbget-bin/www_bget?cpd:C13736"
+        },
+        "chebiImage": {
+          "type": "literal",
+          "value": "http://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=34832"
+        }
+      }
+    ]
+  }
+}
