@@ -1,0 +1,323 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "a",
+      "n"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/The_Essential_Michael_Jackson"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "The Essential Michael Jackson"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/The_Ultimate_Collection_%28Michael_Jackson_album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Michael Jackson: The Ultimate Collection"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Dangerous_%28album%29__Dangerous_-_The_Remix_Collection"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Dangerous - The Remix Collection"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Ben_%28album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Ben"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Farewell_My_Summer_Love"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Farewell My Summer Love"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Forever%2C_Michael"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Forever, Michael"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Got_to_Be_There"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Got to Be There"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Music_%26_Me"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Music & Me"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/One_Day_in_Your_Life_%28album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "One Day in Your Life"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Visionary:_The_Video_Singles"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Visionary: The Video Singles"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Bad_%28album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Bad"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Blood_on_the_Dance_Floor:_HIStory_in_the_Mix"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Blood on the Dance Floor: HIStory in the Mix"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/HIStory:_Past%2C_Present_and_Future%2C_Book_I"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "HIStory: Past, Present and Future, Book I"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Number_Ones_%28Michael_Jackson_album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Number Ones"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Thriller_%28album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Thriller"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Invincible_%28Michael_Jackson_album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Invincible"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Anthology_%28Michael_Jackson_album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Anthology"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Dangerous_%28album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Dangerous"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/King_of_Pop_%28album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "King of Pop"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Off_the_Wall_%28album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Off the Wall"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Thriller_25"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Thriller 25"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/E.T._the_Extra-Terrestrial_%28album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "E.T. the Extra-Terrestrial"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/The_Collection_%28Michael_Jackson_album%29"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "The Collection"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Looking_Back_to_Yesterday"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Looking Back to Yesterday"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Hello_World:_The_Motown_Solo_Collection"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Hello World: The Motown Solo Collection"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Michael_Jackson:_The_Stripped_Mixes"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Michael Jackson: The Stripped Mixes"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Michael_Jackson%27s_This_Is_It:_The_Music_That_Inspired_the_Movie"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "This Is It"
+        }
+      },
+      {
+        "a": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/The_Original_Soul_of_Michael_Jackson"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "The Original Soul of Michael Jackson"
+        }
+      }
+    ]
+  }
+}

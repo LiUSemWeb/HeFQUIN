@@ -1,0 +1,2606 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "proceedings",
+      "paper",
+      "p"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/konstantinos-kotis"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/aristotelis-zosakis"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/george-anadiotis"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/konstantinos-kafentzis"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/konstantinos-mpaslis"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/panos-alexopoulos"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/14"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/juergen-ziegler"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/14"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/philipp-heim"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/14"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/thomas-ertl"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/18"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/florian-lemmerich"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/18"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/joachim-baumeister"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/18"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jochen-reutelshoefer"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/18"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jorit-wintjes"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/18"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/lorenz-haas"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/pavel-shvaiko"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/alessandro-oltramari"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/davide-pozza"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/giuseppe-angelini"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/roberta-cuel"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/philipp-heim"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/steffen-lohmann"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/timo-stegemann"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/40"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/luciano-serafini"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/40"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/andrei-tamilin"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/40"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/bernardo-magnini"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/40"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/christian-girardi"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/40"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathew-joseph"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/40"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/roberto-zanoli"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/45"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yang-yang"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/45"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/igor-popov"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/45"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/christos-koumenides"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/45"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/tope-omitola"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/56"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/chen-zhou"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/56"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/howard-beck"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/56"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jeff-depree"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/56"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/stanley-su"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/56"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/xuelian-xiao"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/58"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/antoine-isaac"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/58"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/claus-zinn"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/58"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/lourens-van-der-meij"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/59"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/ceri-binding"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/7"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/dhavalkumar-thakker"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/7"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/phil-lakin"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/7"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/shakti-gohil"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/inuse/7"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/taha-osman"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/10"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/emanuele-della-valle"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/10"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/stefano-ceri"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/10"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/daniele-braga"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/10"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/davide-francesco-barbieri"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/10"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/michael-grossniklaus"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/12"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/eugenio-di-sciascio"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/12"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/floriano-scioscia"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/12"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/michele-ruta"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/christine-parent"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/dipanjan-chakraborty"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/stefano-spaccapietra"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/zhixian-yan"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/4"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/lora-aroyo"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/4"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/natalia-stash"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/4"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/willem-van-hage"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/4"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yiwen-wang"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/mobility/6"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/bernhard-schandl"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/14"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/martin-knechtel"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/14"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/rafael-penaloza"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/16"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/hamish-cunningham"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/16"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/danica-damljanovic"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/16"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/milan-agatonovic"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/27"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/fausto-giunchiglia"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/27"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/biswanath-dutta"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/27"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/feroz-farazi"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/27"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/vincenzo-maltese"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/bob-wielinga"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guus-schreiber"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/anna-tordai"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jacco-van-ossenbruggen"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/42"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/sonja-zillner"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/43"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/andreas-abecker"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/43"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/joachim-kleb"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/44"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/frank-van-harmelen"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/44"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/henri-bal"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/44"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jacopo-urbani"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/44"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jason-maassen"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/44"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/spyros-kotoulas"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/56"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/luigi-iannone"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/56"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/ignazio-palmisano"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/56"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/alan-rector"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/56"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/robert-stevens"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/57"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/axel-polleres"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/57"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/amadis-martinez"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/57"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/edna-ruckhaus"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/57"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/javier-sierra"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/57"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/maria-esther-vidal"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/57"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/tomas-lampo"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/66"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/thomas-eiter"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/66"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/stijn-heymans"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/66"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/joerg-puehrer"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/68"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/daniel-olmedilla"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/68"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/piero-bonatti"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/68"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/philipp-kaerger"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/72"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/agnieszka-lawrynowicz"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/72"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/claudia-damato"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/onto/72"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/nicola-fanizzi"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/11"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/huairen-lin"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/12"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yan-shvartzshnaider"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/17"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/qi-gao"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/19"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathew-joseph"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/22"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/georgeta-bordea"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/23"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/claudia-wagner"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/25"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jacopo-urbani"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/sebastian-hellmann"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/5"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/zsolt-zombori"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/6"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/patrick-lambrix"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/phd_symposium/6"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/qiang-liu"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/sensor/1"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/manolis-koubarakis"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/sensor/1"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/kostis-kyzirakos"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/11"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/rudi-studer"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/11"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/martin-junghans"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/11"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/sudhir-agarwal"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/15"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/rudi-studer"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/15"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/sebastian-speiser"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/2"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/ulrich-kuester"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/2"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/birgitta-koenig-ries"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/24"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/antonio-ruiz-cortes"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/24"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/david-ruiz"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/24"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jose-maria-garcia"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/services/3"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/heiko-paulheim"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/1"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/wolfgang-nejdl"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/1"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/dimitrios-skoutas"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/1"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/ekaterini-ioannou"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/1"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/odysseas-papapetrou"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/paola-monachesi"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/thomas-markus"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/wolf-siberski"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/philipp-kaerger"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/33"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/aldo-gangemi"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/33"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/alfio-massimiliano-gliozzo"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/33"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/claudio-giuliano"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/33"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/katerina-tymoshenko"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/david-robertson"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/wamberto-vasconcelos"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/xi-bai"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/4"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/daniel-krause"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/4"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/fabian-abel"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/4"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/ricardo-kawase"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/5"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/harith-alani"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/5"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/alain-barrat"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/5"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/ciro-cattuto"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/5"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/martin-szomszor"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/5"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/wouter-van-den-broeck"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/6"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/steffen-staab"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/6"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/ansgar-scherp"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/social_web/6"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/felix-schwagereit"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/17"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/giovanni-tummarello"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/17"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/stefan-decker"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/17"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/renaud-delbru"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/17"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/michele-catasta"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/17"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/nickolai-toupikov"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/18"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/giovanni-tummarello"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/18"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/renaud-delbru"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/18"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/michele-catasta"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/18"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/nickolai-toupikov"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/steffen-staab"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/isabel-rojas"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mohammad-s-mir"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guenter-ladwig"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/haofen-wang"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/thanh-tran"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/lei-zhang-1"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/soeren-auer"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/sebastian-dietzold"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/raphael-doehring"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/32"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/heiner-stuckenschmidt"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/32"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/christian-meilicke"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/32"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jan-noessner"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/32"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathias-niepert"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/36"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/soeren-auer"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/36"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/joerg-unbehauen"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/36"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/michael-martin"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/44"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/thanh-tran"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/48"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mariano-consens"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/48"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/shahan-khatchadourian"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/8"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/weiyi-ge"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/8"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yuzhong-qu"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/8"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jianfeng-chen"
+        }
+      },
+      {
+        "proceedings": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/proceedings"
+        },
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/eswc/2010/paper/web_of_data/8"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/wei-hu"
+        }
+      }
+    ]
+  }
+}

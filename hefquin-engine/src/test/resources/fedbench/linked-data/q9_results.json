@@ -1,0 +1,25 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "x",
+      "p"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "x": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Brazil_national_football_team"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Luiz_Felipe_Scolari"
+        }
+      }
+    ]
+  }
+}

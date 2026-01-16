@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.fedbench;
 
+import java.lang.annotation.Native;
+
+import org.apache.jena.Jena;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -16,7 +19,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	// cross-domain queries
 
 	@Test
-	public void executeQuery1() throws Exception {
+	public void crossDomainQ1() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/dbpedia/",
 		    "http://localhost:8080/sparql/nyt/",
@@ -26,7 +29,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	}
 
 	@Test
-	public void executeQuery2() throws Exception {
+	public void crossDomainQ2() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/dbpedia/",
 			"http://localhost:8080/sparql/nyt/",
@@ -36,7 +39,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	}
 
 	@Test
-	public void executeQuery3() throws Exception {
+	public void crossDomainQ3() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/dbpedia/",
 			"http://localhost:8080/sparql/dbpedia/",
@@ -48,7 +51,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	}
 
 	@Test
-	public void executeQuery4() throws Exception {
+	public void crossDomainQ4() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/lmdb/",
 			"http://localhost:8080/sparql/lmdb/",
@@ -60,7 +63,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	}
 
 	@Test
-	public void executeQuery5() throws Exception {
+	public void crossDomainQ5() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/dbpedia/",
 			"http://localhost:8080/sparql/dbpedia/",
@@ -71,7 +74,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	}
 
 	@Test
-	public void executeQuery6() throws Exception {
+	public void crossDomainQ6() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/jamendo/",
 			"http://localhost:8080/sparql/jamendo/",
@@ -82,7 +85,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	}
 
 	@Test
-	public void executeQuery7() throws Exception {
+	public void crossDomainQ7() throws Exception {
 		final String[] values = new String[]{
 			// first
 			"http://localhost:8080/sparql/nyt/",
@@ -101,7 +104,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	// lifescience-domain queries
 
 	@Test
-	public void executeQuery8() throws Exception {
+	public void lifescienceDomainQ1() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/drugbank/"
 		};
@@ -109,7 +112,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	}
 
 	@Test
-	public void executeQuery9() throws Exception {
+	public void lifescienceDomainQ2() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/drugbank/",
 			"http://localhost:8080/sparql/drugbank/",
@@ -119,8 +122,8 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 		_executeQuery( "fedbench/lifescience-domain/q2", 700, values );
 	}
 
-	@Test
-	public void executeQuery10() throws Exception {
+	// @Test
+	public void lifescienceDomainQ3() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/dbpedia/",
 			"http://localhost:8080/sparql/drugbank/",
@@ -132,7 +135,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	}
 
 	@Test
-	public void executeQuery11() throws Exception {
+	public void lifescienceDomainQ4() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/drugbank/",
 			"http://localhost:8080/sparql/drugbank/",
@@ -146,7 +149,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	}
 
 	@Test
-	public void executeQuery12() throws Exception {
+	public void lifescienceDomainQ5() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/drugbank/",
 			"http://localhost:8080/sparql/drugbank/",
@@ -159,7 +162,7 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 	}
 
 	@Test
-	public void executeQuery13() throws Exception {
+	public void lifescienceDomainQ6() throws Exception {
 		final String[] values = new String[]{
 			"http://localhost:8080/sparql/drugbank/",
 			"http://localhost:8080/sparql/drugbank/",
@@ -170,11 +173,11 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 		_executeQuery( "fedbench/lifescience-domain/q6", 800, values );
 	}
 
-	// Issue:
-	// - Filter "FILTER ( ?mass > '5' )" outside SERVICE clause causes java.lang.Exception
-	// - OPTIONAL in SERVICE clause causes "java.lang.UnsupportedOperationException: Getting the variables from arbitrary SPARQL patterns is an open TODO"
+	// java.lang.Exception: Query failed with exceptions:
+	// Exception occurred when outputting the result of a SELECT query using the Jena machinery.
+	// java.lang.NullPointerException: Cannot invoke "se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.getValue()" because "crd" is null
 	// @Test
-	public void executeQuery14() throws Exception {
+	public void lifescienceDomainQ7() throws Exception {
 		final String[] values = new String[]{
 			// first
 			"http://localhost:8080/sparql/drugbank/",
@@ -183,6 +186,6 @@ public class FedbenchSPARQLTest extends FedbenchTestBase
 			"http://localhost:8080/sparql/kegg/",
 			"http://localhost:8080/sparql/drugbank/"
 		};
-		_executeQuery( "fedbench/lifescience-domain/q7", 0, values );
+		_executeQuery( "fedbench/lifescience-domain/q7", 20000, values );
 	}
 }

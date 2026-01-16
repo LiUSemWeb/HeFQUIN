@@ -1,0 +1,8 @@
+SELECT DISTINCT * WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ) {
+    ( <http://localhost/sparql/swdfood> <http://localhost/sparql/swdfood> <http://localhost/sparql/swdfood> )
+  }
+  SERVICE ?s1 { ?proceedings <http://data.semanticweb.org/ns/swc/ontology#relatedToEvent>  <http://data.semanticweb.org/conference/eswc/2010> . }
+  SERVICE ?s2 { ?paper <http://data.semanticweb.org/ns/swc/ontology#isPartOf> ?proceedings . }
+  SERVICE ?s3 { ?paper <http://swrc.ontoware.org/ontology#author> ?p . }
+}
