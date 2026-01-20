@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
@@ -42,7 +43,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 
 		final Var v = Var.alloc("v");
 
-		final UnaryExecutableOp op = createOperatorForTest( query, List.of(v), 1 );
+		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("v", v), 1 );
 
 		final Node lit = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
 		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(v, lit);
@@ -76,7 +77,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 
 		final Var v = Var.alloc("v");
 
-		final UnaryExecutableOp op = createOperatorForTest( query, List.of(v), 1 );
+		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("v", v), 1 );
 
 		// Here we use xsd:float even if xsd:double is expected (according
 		// to the parameter declarations of the federation member).
@@ -112,7 +113,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final Var v = Var.alloc("v");
 		final Var t = Var.alloc("t");
 
-		final UnaryExecutableOp op = createOperatorForTest( query, List.of(v), 1 );
+		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("v", v), 1 );
 
 		final Node litForV = NodeFactory.createLiteralDT( "0.1", XSDDatatype.XSDdouble );
 		final Node litForT = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
@@ -153,7 +154,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final Var v = Var.alloc("v");
 		final Var t = Var.alloc("t");
 
-		final UnaryExecutableOp op = createOperatorForTest( query, List.of(v), 1 );
+		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("v", v), 1 );
 
 		final Node litForV = NodeFactory.createLiteralDT( "0.1", XSDDatatype.XSDdouble );
 		final Node litForT = NodeFactory.createLiteralDT( "0.0", XSDDatatype.XSDdouble );
@@ -187,7 +188,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final Var v = Var.alloc("v");
 
 		// batch size = 2 !!
-		final UnaryExecutableOp op = createOperatorForTest( query, List.of(v), 2 );
+		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("v", v), 2 );
 
 		final Node lit = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
 		final SolutionMapping smIn1 = SolutionMappingUtils.createSolutionMapping(v, lit);
@@ -224,7 +225,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final Var v = Var.alloc("v");
 
 		// batch size = 1 !!
-		final UnaryExecutableOp op = createOperatorForTest( query, List.of(v), 1 );
+		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("v", v), 1 );
 
 		final Node lit = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
 		final SolutionMapping smIn1 = SolutionMappingUtils.createSolutionMapping(v, lit);
@@ -249,7 +250,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 	// -------- helpers ----------
 
 	protected UnaryExecutableOp createOperatorForTest( final String query,
-	                                                   final List<Var> paramVarsOfEndpoint,
+	                                                   final Map<String,Var> paramVarsOfEndpoint,
 	                                                   final int batchSize) {
 		assert paramVarsOfEndpoint.size() == 1;
 
@@ -259,6 +260,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final RESTEndpoint.Parameter param = new RESTEndpoint.Parameter() {
 			@Override public String getName() { return "lat"; }
 			@Override public RDFDatatype getType() { return XSDDatatype.XSDdouble; }
+			@Override public Boolean isRequired() { return true;}
 		};
 
 		final String responseData = "dummy";

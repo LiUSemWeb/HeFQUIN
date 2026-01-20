@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.jenaext.sparql.syntax;
 
-import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
@@ -13,18 +13,18 @@ import org.apache.jena.sparql.syntax.ElementService;
  */
 public class ElementServiceWithParams extends ElementService
 {
-	protected final List<Var> paramVars;
+	protected final Map<String, Var> paramVars;
 
 	/**
 	 * @param n - the service node, an IRI or a variable
 	 * @param el - represents the graph pattern inside the SERVICE clause
 	 * @param silent - {@code true} if the SERVICE clause has the SILENT keyword
-	 * @param paramVars - the variables listed inside PARAMS(...)
+	 * @param paramVars - the variables listed inside PARAMS(...) where the keys correspond to the AS "..." names
 	 */
 	public ElementServiceWithParams( final Node n,
 	                                 final Element el,
 	                                 final boolean silent,
-	                                 final List<Var> paramVars ) {
+	                                 final Map<String, Var> paramVars ) {
 		super(n, el, silent);
 
 		assert paramVars != null;
@@ -37,7 +37,7 @@ public class ElementServiceWithParams extends ElementService
 	 *
 	 * @return the variables from the PARAMS(...) part
 	 */
-	public List<Var> getParamVars() {
+	public Map<String, Var> getParamVars() {
 		return paramVars;
 	}
 

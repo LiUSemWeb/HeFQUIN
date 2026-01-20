@@ -37,19 +37,15 @@ public class FDVocab {
      */
     public static final Property mappingConfiguration = M_MODEL.createProperty( "http://w3id.org/hefquin/feddesc#mappingConfiguration" );
     
-    /** <p>The name of query parameters for a REST API.</p> */
-    public static final Property paramName = M_MODEL.createProperty( "http://w3id.org/hefquin/feddesc#paramName" );
-    
+    /** <p>The IRI template for accessing the endpoint of the federation member.</p>
+     */
+    public static final Property iriTemplate = M_MODEL.createProperty( "http://w3id.org/hefquin/feddesc#iriTemplate" );
+
     /** <p>The type of query parameters for a REST API, which is expected to be specified 
      *  as a datatype IRI (e.g., xsd:string, xsd:float).</p>
      */
     public static final Property paramType = M_MODEL.createProperty( "http://w3id.org/hefquin/feddesc#paramType" );
-    
-    /** <p>List of query parameters for a REST API. The elements of such a list are expected 
-     *  to be of type fd:QueryParameter.</p>
-     */
-    public static final Property queryParameters = M_MODEL.createProperty( "http://w3id.org/hefquin/feddesc#queryParameters" );
-    
+
     /** <p>List of RML triples maps that define the mapping for a wrapper. The elements 
      *  of such a list are expected to be of type rml:TriplesMap.</p>
      */

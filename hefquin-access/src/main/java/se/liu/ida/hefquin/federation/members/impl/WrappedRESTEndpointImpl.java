@@ -32,10 +32,10 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 	protected final MappingOperator mappingExpression;
 	protected final Set<SourceReference> srcRefs;
 
-	public WrappedRESTEndpointImpl( final String url,
+	public WrappedRESTEndpointImpl( final String urlTemplate,
 	                                final List<RESTEndpoint.Parameter> params,
 	                                final MappingOperator mappingExpression ) {
-		super(url, params);
+		super(urlTemplate, params);
 
 		assert mappingExpression != null;
 		this.mappingExpression = mappingExpression;
@@ -44,7 +44,7 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 	}
 
 	@Override
-	public String toString() { return "Wrapped REST endpoint at " + url; }
+	public String toString() { return "Wrapped REST endpoint at " + urlTemplate; }
 
 	@Override
 	public boolean equals( final Object o ) {

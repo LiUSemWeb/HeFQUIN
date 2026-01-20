@@ -1016,7 +1016,7 @@ Element GraphGraphPattern() : { Element el ; Node n ;}
 }
 
 #ifdef SPARQL_12_HeFQUIN
-Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ; Var v ; List<Var> paramVars = null ; }
+Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ; Var v ; String paramName ; java.util.Map<String,Var> paramVars = null ; }
 #endif
 #if !defined(SPARQL_12_HeFQUIN)
 Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ; }
@@ -1029,16 +1029,26 @@ Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ;
   n = VarOrIri()
 #ifdef SPARQL_12_HeFQUIN
   (<PARAMS>
-   <LPAREN>
-   v = Var()
-   { paramVars = new ArrayList<Var>(); }
-   { paramVars.add(v); }
-   (
-    ( <COMMA> )?
-    v = Var()
-    { paramVars.add(v); }
-   )*
-   <RPAREN>
+    <LPAREN>
+    { paramVars = new java.util.LinkedHashMap<>(); }
+
+    v = Var() <AS> paramName = String()
+    {
+      // paramName is already unescaped by String()
+      if ( paramVars.containsKey(paramName) )
+        throwParseException("Duplicate PARAMS name: " + paramName, token.beginLine, token.beginColumn);
+      paramVars.put(paramName, v);
+    }
+    (
+      ( <COMMA> )?
+      v = Var() <AS> paramName = String()
+      {
+        if ( paramVars.containsKey(paramName) )
+          throwParseException("Duplicate PARAMS name: " + paramName, token.beginLine, token.beginColumn);
+        paramVars.put(paramName, v);
+      }
+    )*
+    <RPAREN>
   )?
 #endif
   el = GroupGraphPattern()

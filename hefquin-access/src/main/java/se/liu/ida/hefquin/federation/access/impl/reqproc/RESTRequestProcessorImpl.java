@@ -75,10 +75,10 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 			httpResponse = httpClient.send( httpReq, BodyHandlers.ofInputStream() );
 		}
 		catch ( final IOException e ) {
-			throw new FederationAccessException( "Request to REST API at <" + fm.getURL() + "> failed: " + e.getMessage(), e, req, fm );
+			throw new FederationAccessException( "Request to REST API at <" + uri.toString() + "> failed: " + e.getMessage(), e, req, fm );
 		}
 		catch ( final InterruptedException e ) {
-			throw new FederationAccessException( "Request to REST API at <" + fm.getURL() + "> failed: " + e.getMessage(), e, req, fm );
+			throw new FederationAccessException( "Request to REST API at <" + uri.toString() + "> failed: " + e.getMessage(), e, req, fm );
 		}
 
 		final String body;

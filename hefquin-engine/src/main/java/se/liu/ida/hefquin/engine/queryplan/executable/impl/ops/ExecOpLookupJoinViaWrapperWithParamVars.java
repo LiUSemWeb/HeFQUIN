@@ -48,10 +48,10 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	public final static int DEFAULT_BATCH_SIZE = 5;
 
 	protected final SPARQLGraphPattern pattern;
-	protected final List<Var> paramVars;
+	protected final Map<String,Var> paramVars;
 	protected final WrappedRESTEndpoint fm;
 
-	protected final Map<Node[], List<SolutionMapping>> cache = new HashMap<>();
+	protected final Map<Map<String,Node>, List<SolutionMapping>> cache = new HashMap<>();
 
 	// statistics
 	private long numberOfRequestsIssued = 0L;
@@ -62,7 +62,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 
 	public ExecOpLookupJoinViaWrapperWithParamVars( final SPARQLGraphPattern pattern,
-	                                                final List<Var> paramVars,
+	                                                final Map<String,Var> paramVars,
 	                                                final WrappedRESTEndpoint fm,
 	                                                final boolean collectExceptions,
 	                                                final QueryPlanningInfo qpInfo ) {
@@ -72,7 +72,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	}
 
 	public ExecOpLookupJoinViaWrapperWithParamVars( final SPARQLGraphPattern pattern,
-	                                                final List<Var> paramVars,
+	                                                final Map<String,Var> paramVars,
 	                                                final WrappedRESTEndpoint fm,
 	                                                final int batchSize,
 	                                                final boolean collectExceptions,
@@ -84,7 +84,6 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		assert fm        != null;
 
 		assert paramVars.size() > 0;
-		assert paramVars.size() == fm.getNumberOfParameters();
 
 		this.pattern = pattern;
 		this.paramVars = paramVars;
@@ -97,9 +96,9 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	                              final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		final Map<Node[], Set<SolutionMapping>> paramsForRequests = new HashMap<>();
+		final Map<Map<String,Node>, Set<SolutionMapping>> paramsForRequests = new HashMap<>();
 		for ( final SolutionMapping sm : input ) {
-			final Node[] paramValues = extractParamValues(sm);
+			final Map<String,Node> paramValues = extractParamValues(sm);
 
 			// If we could not extract parameter values from the
 			// current solution mapping, then this solution mapping
@@ -138,7 +137,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		// issue a request to the REST endpoint.
 		final CompletableFuture<?>[] futures = new CompletableFuture[ paramsForRequests.size() ];
 		int i = 0;
-		for ( Map.Entry<Node[], Set<SolutionMapping>> entry : paramsForRequests.entrySet() ) {
+		for ( Map.Entry<Map<String,Node>, Set<SolutionMapping>> entry : paramsForRequests.entrySet() ) {
 			// issue a request based on the current solution mapping
 			final RESTRequest req = createRequest( entry.getKey() );
 
@@ -193,32 +192,42 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	 * @return the parameter values (in the form of a Jena {@link Node}
 	 *         objects) or {@code null}
 	 */
-	protected Node[] extractParamValues( final SolutionMapping sm ) {
+	protected Map<String, Node> extractParamValues( final SolutionMapping sm ) {
 		final Binding solmap = sm.asJenaBinding();
 
-		if ( solmap.size() < paramVars.size() ) return null;
+		final Map<String, Node> result = new HashMap<>();
 
-		final Node[] result = new Node[ paramVars.size() ];
+		final Iterator<String> paramVarNames = paramVars.keySet().iterator();
 
-		int i = 0;
-		final Iterator<RESTEndpoint.Parameter> itParamDecl = fm.getParameters().iterator();
-		final Iterator<Var>                    itParamVar  = paramVars.iterator();
+		while (paramVarNames.hasNext()) {
+			final String paramVarName = paramVarNames.next();
+			final Var paramVar = paramVars.get(paramVarName);
 
-		while ( itParamDecl.hasNext() ) {
-			final Var paramVar = itParamVar.next();
 			final Node paramValueAsNode = solmap.get(paramVar);
 
-			if ( paramValueAsNode == null ) return null;
-			if ( ! paramValueAsNode.isLiteral() ) return null;
+			if (paramValueAsNode == null)
+				return null;
+			if (!paramValueAsNode.isLiteral())
+				return null;
 
-			final RESTEndpoint.Parameter paramDecl = itParamDecl.next();
+			final RESTEndpoint.Parameter paramDecl = fm.getParameterByName(paramVarName);
+			if (paramDecl == null)
+				throw new IllegalStateException(
+						"No parameter declaration found for parameter variable " + paramVarName);
 
 			final RDFDatatype typeOfNode = paramValueAsNode.getLiteralDatatype();
 
-			if ( ! paramDecl.getType().equals(typeOfNode) ) return null;
+			if (!paramDecl.getType().equals(typeOfNode))
+				throw new IllegalStateException(
+						"Datatype of value bound to parameter variable " + paramVarName +
+								" does not match the datatype declared for the corresponding parameter (" +
+								typeOfNode.getURI() + " vs. " + paramDecl.getType().getURI() + ").");
 
-			result[i++] = paramValueAsNode;
+			result.put(paramVarName, paramValueAsNode);
 		}
+
+		// TODO Also check that all required parameters are present... but this should
+		// already be done previously?
 
 		return result;
 	}
@@ -229,19 +238,11 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	 * that the datatypes of the values match the ones of the parameter
 	 * declarations.
 	 */
-	protected RESTRequest createRequest( final Node[] paramValues ) {
-		final Params params = Params.create();
-
-		final Iterator<RESTEndpoint.Parameter> it = fm.getParameters().iterator();
-		int i = 0;
-		while ( it.hasNext() ) {
-			final RESTEndpoint.Parameter paramDecl = it.next();
-			final Node paramValueAsNode = paramValues[i++];
-			final String paramValue = paramValueAsNode.getLiteralValue().toString();
-			params.add( paramDecl.getName(), paramValue );
-		}
-
-		return new RESTRequestImpl( fm.getURL(), params );
+	protected RESTRequest createRequest( final Map<String,Node> paramValues ) {
+		return new RESTRequestImpl(fm.getURLTemplate(), paramValues.entrySet().stream()
+				.collect(HashMap::new,
+						(m, e) -> m.put(e.getKey(), e.getValue().getLiteralValue().toString()),
+						HashMap::putAll));
 	}
 
 

@@ -8,21 +8,30 @@ import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 public class RESTEndpointImpl extends BaseForFederationMember
                               implements RESTEndpoint
 {
-	protected final String url;
+	protected final String urlTemplate;
 	protected final List<RESTEndpoint.Parameter> params;
 
-	public RESTEndpointImpl( final String url, final List<RESTEndpoint.Parameter> params ) {
-		assert url != null && ! url.isEmpty();
-
-		this.url = url;
+	public RESTEndpointImpl( final String urlTemplate, final List<RESTEndpoint.Parameter> params ) {
+		assert urlTemplate != null && ! urlTemplate.isEmpty();
+		this.urlTemplate = urlTemplate;
 		this.params = (params == null) ? List.of() : params;
 	}
 
 	@Override
-	public String getURL() { return url; }
+	public String getURLTemplate() { return urlTemplate; }
 
 	@Override
 	public int getNumberOfParameters() { return params.size(); }
+
+	@Override
+	public RESTEndpoint.Parameter getParameterByName(String name) {
+		for (RESTEndpoint.Parameter param : params) {
+			if (param.getName().equals(name)) {
+				return param;
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public Iterable<Parameter> getParameters() { return params; }
@@ -34,7 +43,7 @@ public class RESTEndpointImpl extends BaseForFederationMember
 	public boolean isSupportedPattern( final SPARQLGraphPattern p ) { return true; }
 
 	@Override
-	public String toString() { return "REST endpoint at " + url; }
+	public String toString() { return "REST endpoint at " + urlTemplate; }
 
 	@Override
 	public boolean equals( final Object o ) {
@@ -42,7 +51,7 @@ public class RESTEndpointImpl extends BaseForFederationMember
 			return false;
 
 		return    o instanceof RESTEndpoint ep
-		       && ep.getURL().equals(url)
+		       && ep.getURLTemplate().equals(urlTemplate)
 		       && ep.getParameters().equals(params);
 	}
 
