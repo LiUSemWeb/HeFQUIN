@@ -205,23 +205,15 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 			final Node paramValueAsNode = solmap.get(paramVar);
 
-			if (paramValueAsNode == null)
-				return null;
-			if (!paramValueAsNode.isLiteral())
-				return null;
+			if (paramValueAsNode == null) return null;
+			if (!paramValueAsNode.isLiteral()) return null;
 
 			final RESTEndpoint.Parameter paramDecl = fm.getParameterByName(paramVarName);
-			if (paramDecl == null)
-				throw new IllegalStateException(
-						"No parameter declaration found for parameter variable " + paramVarName);
+			if (paramDecl == null) return null;
 
 			final RDFDatatype typeOfNode = paramValueAsNode.getLiteralDatatype();
 
-			if (!paramDecl.getType().equals(typeOfNode))
-				throw new IllegalStateException(
-						"Datatype of value bound to parameter variable " + paramVarName +
-								" does not match the datatype declared for the corresponding parameter (" +
-								typeOfNode.getURI() + " vs. " + paramDecl.getType().getURI() + ").");
+			if (!paramDecl.getType().equals(typeOfNode)) return null;
 
 			result.put(paramVarName, paramValueAsNode);
 		}
