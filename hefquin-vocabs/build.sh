@@ -93,8 +93,8 @@ function procRMLCore
 
 function procHydraVocab
 {
-    syntaxCheck  hydra.ttl
-    proc hydra.ttl \
+    syntaxCheck https://www.w3.org/ns/hydra/core.jsonld
+    proc https://www.w3.org/ns/hydra/core.jsonld \
          HydraVocab \
          "http://www.w3.org/ns/hydra/core#" \
          "se.liu.ida.hefquin.vocabulary" \
