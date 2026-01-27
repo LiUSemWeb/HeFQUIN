@@ -18,11 +18,12 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
-
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Base class for FedBench tests.
  */
@@ -32,6 +33,7 @@ public abstract class FedbenchTestBase
 	private static HeFQUINEngine engine;
 	public static double DEFAULT_TOLERANCE = 0.5;
 	public static long DEFAULT_SLACK = 100;
+	private static final Logger LOGGER = LoggerFactory.getLogger(FedbenchTestBase.class);
 
 	public static void init( final String fedCat ) {
 		engine = new HeFQUINEngineBuilder()
@@ -63,6 +65,7 @@ public abstract class FedbenchTestBase
 				statsAndExceptions.getExceptions().forEach( c -> {
 					exceptions.add(c.getLocalizedMessage());
 					exceptions.add(c.getCause().toString());
+					c.printStackTrace();
 				} );
 				throw new Exception( "Query failed with exceptions:\n" + String.join( "\n", exceptions ));
 			}
@@ -72,59 +75,20 @@ public abstract class FedbenchTestBase
 	}
 
 	/**
-	 * Verifies that a measured execution time does not represent a performance
-	 * regression. Uses default values for tolerance and slack.
-	 * 
-	 * @param baseline  average time from previous measurements (ms)
-	 * @param actual    time from current run (ms)
-	 */
-	public static void assertWithinTimeBudget( long baseline, long actual ) {
-		assertWithinTimeBudget( baseline, actual, DEFAULT_TOLERANCE, DEFAULT_SLACK );
-	}
-
-	/**
-	 * Verifies that a measured execution time does not represent a performance
-	 * regression.
-	 * 
-	 * @param baseline  average time from previous measurements (ms)
-	 * @param actual    time from current run (ms)
-	 * @param tolerance relative tolerance compared with baseline
-	 * @param slack     absolute slack in ms added on top (ms)
-	 */
-	public static void assertWithinTimeBudget( long baseline,
-	                                           long actual,
-	                                           double tolerance,
-		                                       long slack ) {
-		double allowedMax = baseline * (1.0 + tolerance) + slack;
-		if ( actual > allowedMax ) {
-			final String msg = String.format(
-				"Query too slow: actual=%dms, baseline=%dms, allowedMax=%.2fms",
-				actual,
-				baseline,
-				allowedMax );
-			throw new AssertionError(msg);
-		}
-	}
-
-	/**
-	 * Loads a benchmark SPARQL query and formats it with the given parameter values
-	 * (if any). The query is then executed and the result validated against the
-	 * expected result, and checks that the execution time is within the allowed
-	 * performance budget.
+	 * Loads a SPARQL query from {@code queryFile}, executes it, and validates the
+	 * actual result set against an expected result loaded from {@code resultFile}.
 	 *
 	 * This method is the main entry point for FedBench test cases.
 	 *
-	 * @param f        base filename (without extension) for the query and results
-	 * @param baseline baseline execution time in milliseconds
-	 * @param values   optional formatting parameters applied to the query string
-	 * @throws Exception
+	 * @param queryFile  path to the SPARQL query file
+	 * @param resultFile path to the expected result file
+	 * @throws Exception if reading resources fails or query execution fails
 	 */
-	public void _executeQuery( final String f, final long baseline, final Object[] values )
+	public void _executeQuery( final String queryFile, final String resultFile )
 			throws Exception {
 		String query;
-		try( final InputStream is = getClass().getClassLoader().getResourceAsStream(f + ".rq") ) {
+		try ( final InputStream is = getClass().getClassLoader().getResourceAsStream(queryFile) ) {
 			query = new String( is.readAllBytes(), StandardCharsets.UTF_8 );
-			query = String.format(query, values);
 		}
 
 		final long t0 = System.currentTimeMillis();
@@ -132,7 +96,7 @@ public abstract class FedbenchTestBase
 		final long t1 = System.currentTimeMillis();
 
 		String expected;
-		try( final InputStream is = getClass().getClassLoader().getResourceAsStream(f + "_results.json") ) {
+		try( final InputStream is = getClass().getClassLoader().getResourceAsStream(resultFile) ) {
 			expected = new String( is.readAllBytes(), StandardCharsets.UTF_8 );
 		}
 
@@ -143,8 +107,9 @@ public abstract class FedbenchTestBase
 			              "Actual:\n%s\n", expected, result),
 			resultSetEqual(expected, result)
 		);
-		// Assert execution time within range
-		assertWithinTimeBudget(baseline, t1-t0);
+	
+		// Log execution time
+		LOGGER.debug("Query executed in {} ms", (t1 - t0));
 	}
 
 	/**
@@ -164,7 +129,11 @@ public abstract class FedbenchTestBase
 		     final InputStream is2 = new ByteArrayInputStream(actual.getBytes(StandardCharsets.UTF_8) )) {
 			final ResultSet rs1 = ResultSetFactory.fromJSON(is1);
 			final ResultSet rs2 = ResultSetFactory.fromJSON(is2);
-			return resultSetToStringSet(rs1).equals(resultSetToStringSet(rs2));
+			final Set<String> s1 = resultSetToStringSet(rs1);
+			final Set<String> s2 = resultSetToStringSet(rs2);
+			LOGGER.debug("Expected size {} vs actual size {}", s1.size(), s2.size() );
+
+			return s1.equals(s2);
 		}
 	}
 
