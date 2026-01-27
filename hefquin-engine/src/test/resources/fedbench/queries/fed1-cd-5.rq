@@ -1,6 +1,6 @@
-SELECT DISTINCT ?film ?director ?genre WHERE {
+SELECT ?film ?director ?genre WHERE {
   VALUES ( ?s1 ?s2 ?s3 ?s4 ) {
-    ( <%s> <%s> <%s> <%s> )
+    ( <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/brtpf/lmdb> )
   }
   SERVICE ?s1 { ?film <http://dbpedia.org/ontology/director>  ?director }
   SERVICE ?s2 { ?director <http://dbpedia.org/ontology/nationality> <http://dbpedia.org/resource/Italy> }

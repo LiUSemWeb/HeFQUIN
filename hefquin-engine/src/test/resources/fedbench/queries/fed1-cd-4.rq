@@ -1,6 +1,6 @@
-SELECT DISTINCT ?actor ?news WHERE {
+SELECT ?actor ?news WHERE {
   VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
-    ( <%s> <%s> <%s> <%s> <%s> )
+    ( <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> )
   }
   SERVICE ?s1 { ?film <http://purl.org/dc/terms/title> 'Tarzan' }
   SERVICE ?s2 { ?film <http://data.linkedmdb.org/resource/movie/actor> ?actor }

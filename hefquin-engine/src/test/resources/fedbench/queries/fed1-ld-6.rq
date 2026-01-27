@@ -1,6 +1,6 @@
-SELECT DISTINCT * WHERE {
+SELECT DISTINCT ?director ?film ?x ?y ?n WHERE {
   VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
-    ( <http://localhost/sparql/dbpedia> <http://localhost/sparql/dbpedia> <http://localhost/sparql/lmdb> <http://localhost/sparql/lmdb> <http://localhost/sparql/geonames> )
+    ( <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/sparql/geonames/> )
   }
   SERVICE ?s1 { ?director <http://dbpedia.org/ontology/nationality> <http://dbpedia.org/resource/Italy> . }
   SERVICE ?s2 { ?film <http://dbpedia.org/ontology/director> ?director. }

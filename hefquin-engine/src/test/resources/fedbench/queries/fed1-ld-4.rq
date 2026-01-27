@@ -1,6 +1,6 @@
-SELECT DISTINCT * WHERE {
+SELECT DISTINCT ?role ?p ?paper ?p ?proceedings WHERE {
   VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
-    ( <http://localhost/sparql/swdfood> <http://localhost/sparql/swdfood> <http://localhost/sparql/swdfood> <http://localhost/sparql/swdfood> <http://localhost/sparql/swdfood> )
+    ( <http://localhost:8080/tpf/swdfood> <http://localhost:8080/tpf/swdfood> <http://localhost:8080/tpf/swdfood> <http://localhost:8080/tpf/swdfood> <http://localhost:8080/tpf/swdfood> )
   }
   SERVICE ?s1 { ?role <http://data.semanticweb.org/ns/swc/ontology#isRoleAt> <http://data.semanticweb.org/conference/eswc/2010> . }
   SERVICE ?s2 { ?role <http://data.semanticweb.org/ns/swc/ontology#heldBy> ?p . }

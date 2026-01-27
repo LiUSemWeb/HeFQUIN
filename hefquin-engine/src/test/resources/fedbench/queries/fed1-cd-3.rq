@@ -1,6 +1,6 @@
-SELECT DISTINCT ?president ?party ?page WHERE {
+SELECT ?president ?party ?page WHERE {
   VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
-    ( <%s> <%s> <%s> <%s> <%s> )
+    ( <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> )
   }
   SERVICE ?s1 { ?president <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/President> }
   SERVICE ?s2 { ?president <http://dbpedia.org/ontology/nationality> <http://dbpedia.org/resource/United_States> }
