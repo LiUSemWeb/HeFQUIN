@@ -260,7 +260,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final RESTEndpoint.Parameter param = new RESTEndpoint.Parameter() {
 			@Override public String getName() { return "lat"; }
 			@Override public RDFDatatype getType() { return XSDDatatype.XSDdouble; }
-			@Override public Boolean isRequired() { return true;}
+			@Override public boolean isRequired() { return true;}
 		};
 
 		final String responseData = "dummy";
