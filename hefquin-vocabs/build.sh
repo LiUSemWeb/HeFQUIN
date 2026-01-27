@@ -91,9 +91,20 @@ function procRMLCore
     echo "public static final Resource defaultGraph = M_MODEL.createResource( \"http://w3id.org/rml/defaultGraph\" );"
 }
 
+function procHydraVocab
+{
+    syntaxCheck https://www.w3.org/ns/hydra/core.jsonld
+    proc https://www.w3.org/ns/hydra/core.jsonld \
+         HydraVocab \
+         "http://www.w3.org/ns/hydra/core#" \
+         "se.liu.ida.hefquin.vocabulary" \
+         ../hefquin-vocabs/src/main/java/se/liu/ida/hefquin/vocabulary/
+}
+
 ### Below, uncomment the line for which you want to run the script.
 
 #procLPGtoRDF
 #procECVocab
 #procFDVocab
 #procRMLCore
+#procHydraVocab

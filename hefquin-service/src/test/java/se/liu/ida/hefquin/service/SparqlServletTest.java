@@ -406,7 +406,8 @@ public class SparqlServletTest {
 
 	@Test
 	public void testUseOfHeFQUINParser() throws Exception {
-		final String validQueryStr = "SELECT * WHERE { BIND (42 AS ?v) SERVICE <http://example.org/> PARAMS(?v) { ?s ?p ?o } }";
+		final String validQueryStr = """
+			SELECT * WHERE { BIND (42 AS ?v) SERVICE <http://example.org/> PARAMS(?v AS "v") { ?s ?p ?o } }""";
 		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_XML, validQueryStr );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 500, response.getStatusLine().getStatusCode() );

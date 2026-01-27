@@ -136,7 +136,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 			final StringBuilder b = new StringBuilder("parameter variables:");
 			if ( op.hasParameterVariables() ) {
-				for ( final Var v : op.getParameterVariables() )
+				for ( final Var v : op.getParameterVariables().values() )
 					b.append( " " + v.toString() );
 			}
 			else {

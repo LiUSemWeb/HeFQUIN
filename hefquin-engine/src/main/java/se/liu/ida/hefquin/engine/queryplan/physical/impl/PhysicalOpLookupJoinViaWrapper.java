@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
@@ -80,14 +80,9 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 			    && ep.isSupportedPattern(gpAdd.getPattern()) )
 			{
 				if ( gpAdd.hasParameterVariables() ) {
-					final List<Var> paramVars = gpAdd.getParameterVariables();
-
-					if ( ep.getNumberOfParameters() != paramVars.size() )
-						return false;
-
 					// check that each of the parameter variables is certainly bound
 					final Set<Var> certainInputVars = inputVars[0].getCertainVariables();
-					for ( final Var v : gpAdd.getParameterVariables() ) {
+					for ( final Var v : gpAdd.getParameterVariables().values() ) {
 						if ( ! certainInputVars.contains(v) )
 							return false;
 					}

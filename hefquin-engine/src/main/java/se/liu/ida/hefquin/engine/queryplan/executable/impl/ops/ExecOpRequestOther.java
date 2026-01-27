@@ -61,7 +61,7 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 	}
 
 	protected RESTRequest createRESTRequest() {
-		return new RESTRequestImpl( fm.getURL() );
+		return new RESTRequestImpl( fm.getURLTemplate() );
 	}
 
 	protected void process( final String data, final IntermediateResultElementSink sink )

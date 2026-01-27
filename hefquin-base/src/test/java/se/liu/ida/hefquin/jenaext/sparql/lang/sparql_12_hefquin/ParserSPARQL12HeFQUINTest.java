@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryParseException;
@@ -21,7 +21,8 @@ public class ParserSPARQL12HeFQUINTest
 {
 	@Test
 	public void acceptPARAMSwithOneVar() {
-		final String queryString = "SELECT * { SERVICE <http://exmpl.org> PARAMS(?v) {} }";
+		final String queryString = """
+			SELECT * { SERVICE <http://exmpl.org> PARAMS(?v AS "x") {} }""";
 
 		final SPARQLParser p = new ParserSPARQL12HeFQUIN();
 		final Query q = p.parse( new Query(), queryString );
@@ -34,15 +35,16 @@ public class ParserSPARQL12HeFQUINTest
 		assertTrue( eg.get(0) instanceof ElementServiceWithParams );
 
 		final ElementServiceWithParams es = (ElementServiceWithParams) eg.get(0);
-		final List<Var> paramVars = es.getParamVars();
+		final Map<String,Var> paramVars = es.getParamVars();
 		assertNotNull( paramVars );
 		assertEquals( 1, paramVars.size() );
-		assertEquals( "v", paramVars.get(0).getVarName() );
+		assertEquals( "v", paramVars.get("x").getVarName() );
 	}
 
 	@Test
 	public void acceptPARAMSwithComma() {
-		final String queryString = "SELECT * { SERVICE <http://exmpl.org> PARAMS(?v1, ?v2) {} }";
+		final String queryString = """
+			SELECT * { SERVICE <http://exmpl.org> PARAMS(?v1 AS "x1", ?v2 AS "x2") {} }""";
 
 		final SPARQLParser p = new ParserSPARQL12HeFQUIN();
 		final Query q = p.parse( new Query(), queryString );
@@ -50,16 +52,17 @@ public class ParserSPARQL12HeFQUINTest
 		final ElementGroup eg = (ElementGroup) q.getQueryPattern();
 		final ElementServiceWithParams es = (ElementServiceWithParams) eg.get(0);
 
-		final List<Var> paramVars = es.getParamVars();
+		final Map<String, Var> paramVars = es.getParamVars();
 		assertNotNull( paramVars );
 		assertEquals( 2, paramVars.size() );
-		assertEquals( "v1", paramVars.get(0).getVarName() );
-		assertEquals( "v2", paramVars.get(1).getVarName() );
+		assertEquals( "v1", paramVars.get("x1").getVarName() );
+		assertEquals( "v2", paramVars.get("x2").getVarName() );
 	}
 
 	@Test
 	public void acceptPARAMSwithoutComma() {
-		final String queryString = "SELECT * { SERVICE <http://exmpl.org> PARAMS(?v1 ?v2) {} }";
+		final String queryString = """
+			SELECT * { SERVICE <http://exmpl.org> PARAMS(?v1 AS "x1" ?v2 AS "x2") {} }""";
 
 		final SPARQLParser p = new ParserSPARQL12HeFQUIN();
 		final Query q = p.parse( new Query(), queryString );
@@ -67,11 +70,11 @@ public class ParserSPARQL12HeFQUINTest
 		final ElementGroup eg = (ElementGroup) q.getQueryPattern();
 		final ElementServiceWithParams es = (ElementServiceWithParams) eg.get(0);
 
-		final List<Var> paramVars = es.getParamVars();
+		final Map<String, Var> paramVars = es.getParamVars();
 		assertNotNull( paramVars );
 		assertEquals( 2, paramVars.size() );
-		assertEquals( "v1", paramVars.get(0).getVarName() );
-		assertEquals( "v2", paramVars.get(1).getVarName() );
+		assertEquals( "v1", paramVars.get("x1").getVarName() );
+		assertEquals( "v2", paramVars.get("x2").getVarName() );
 	}
 
 	@Test(expected = QueryParseException.class)

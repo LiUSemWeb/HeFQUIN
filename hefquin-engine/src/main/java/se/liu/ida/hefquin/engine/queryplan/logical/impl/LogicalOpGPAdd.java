@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -21,7 +21,7 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 {
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
-	protected final List<Var> paramVars;
+	protected final Map<String,Var> paramVars;
 
 	// will be initialized on demand 
 	protected TriplePattern tp = null;
@@ -29,7 +29,7 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 
 	public LogicalOpGPAdd( final FederationMember fm,
 	                       final SPARQLGraphPattern pattern,
-	                       final List<Var> paramVars ) {
+	                       final Map<String,Var> paramVars ) {
 		assert fm != null;
 		assert pattern != null;
 
@@ -37,8 +37,7 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 		this.pattern = pattern;
 
 		if ( paramVars != null && ! paramVars.isEmpty() ) {
-			assert    fm instanceof WrappedRESTEndpoint ep
-			       && ep.getNumberOfParameters() == paramVars.size();
+			assert    fm instanceof WrappedRESTEndpoint;
 
 			this.paramVars = paramVars;
 		}
@@ -76,7 +75,7 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 	 * use {@link #hasParameterVariables()} to ask whether this gpAdd
 	 * operator is this parameter.
 	 */
-	public List<Var> getParameterVariables() {
+	public Map<String,Var> getParameterVariables() {
 		if ( ! hasParameterVariables() )
 			throw new UnsupportedOperationException("Requesting variables of a gpAdd operator that does not have this parameter.");
 
