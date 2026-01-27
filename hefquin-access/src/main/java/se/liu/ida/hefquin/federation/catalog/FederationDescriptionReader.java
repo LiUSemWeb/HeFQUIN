@@ -17,7 +17,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
@@ -46,6 +45,7 @@ import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
 import se.liu.ida.hefquin.rml.RML2MappingAlgebra;
 import se.liu.ida.hefquin.rml.RMLParserException;
 import se.liu.ida.hefquin.vocabulary.FDVocab;
+import se.liu.ida.hefquin.vocabulary.HydraVocab;
 
 public class FederationDescriptionReader
 {
@@ -199,14 +199,11 @@ public class FederationDescriptionReader
 
 			
 
-			Resource iriTemplate = iface.getRequiredProperty(FDVocab.iriTemplate).getResource();
+			final Resource iriTemplate = ModelUtils.getSingleMandatoryResourceProperty( iface, FDVocab.iriTemplate);
 
-			String hydra = "http://www.w3.org/ns/hydra/core#";
+			final String iriTemplateString = ModelUtils.getSingleMandatoryProperty_XSDString(iriTemplate, HydraVocab.template );
 
-			final String iriTemplateString = ModelUtils.getSingleMandatoryProperty_XSDString(iriTemplate,
-					ResourceFactory.createProperty(hydra + "template"));
-
-			StmtIterator paramIter = iriTemplate.listProperties(ResourceFactory.createProperty(hydra + "mapping"));
+			final StmtIterator paramIter = iriTemplate.listProperties(HydraVocab.mapping);
 
 			final List<RESTEndpoint.Parameter> params = new ArrayList<>();
 			while (paramIter.hasNext()) {
@@ -216,13 +213,12 @@ public class FederationDescriptionReader
 							+ " is not a resource (but, probably, a literal instead).");
 
 				final Resource p = x.asResource();
-				final String name = ModelUtils.getSingleMandatoryProperty_XSDString(p,
-						ResourceFactory.createProperty(hydra + "variable"));
+				final String name = ModelUtils.getSingleMandatoryProperty_XSDString(p, HydraVocab.variable);
 				final String type = getAsURIString(ModelUtils.getSingleMandatoryProperty(p, FDVocab.paramType));
 				if (type == null)
 					throw new IllegalArgumentException();
-				final Statement isRequiredStmt = p.getProperty(ResourceFactory.createProperty(hydra + "required"));
-				final Boolean isRequired = isRequiredStmt == null ? false : isRequiredStmt.getBoolean();
+				final Statement isRequiredStmt = p.getProperty(HydraVocab.required);
+				final boolean isRequired = isRequiredStmt == null ? false : isRequiredStmt.getBoolean();
 
 				final RDFDatatype dt;
 				if (XSDDatatype.XSDstring.getURI().equals(type)) {
@@ -249,7 +245,7 @@ public class FederationDescriptionReader
 					}
 
 					@Override
-					public Boolean isRequired() {
+					public boolean isRequired() {
 						return isRequired;
 					}
 				};

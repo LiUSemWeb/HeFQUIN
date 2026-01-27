@@ -24,8 +24,8 @@ public class RESTEndpointImpl extends BaseForFederationMember
 	public int getNumberOfParameters() { return params.size(); }
 
 	@Override
-	public RESTEndpoint.Parameter getParameterByName(String name) {
-		for (RESTEndpoint.Parameter param : params) {
+	public RESTEndpoint.Parameter getParameterByName(final String name) {
+		for (final RESTEndpoint.Parameter param : params) {
 			if (param.getName().equals(name)) {
 				return param;
 			}

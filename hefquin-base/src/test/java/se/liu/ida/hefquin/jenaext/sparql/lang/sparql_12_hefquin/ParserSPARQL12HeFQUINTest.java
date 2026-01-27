@@ -22,7 +22,7 @@ public class ParserSPARQL12HeFQUINTest
 	@Test
 	public void acceptPARAMSwithOneVar() {
 		final String queryString = """
-			SELECT * { SERVICE <http://exmpl.org> PARAMS(?v AS "v") {} }""";
+			SELECT * { SERVICE <http://exmpl.org> PARAMS(?v AS "x") {} }""";
 
 		final SPARQLParser p = new ParserSPARQL12HeFQUIN();
 		final Query q = p.parse( new Query(), queryString );
@@ -38,13 +38,13 @@ public class ParserSPARQL12HeFQUINTest
 		final Map<String,Var> paramVars = es.getParamVars();
 		assertNotNull( paramVars );
 		assertEquals( 1, paramVars.size() );
-		assertEquals( "v", paramVars.get("v").getVarName() );
+		assertEquals( "v", paramVars.get("x").getVarName() );
 	}
 
 	@Test
 	public void acceptPARAMSwithComma() {
 		final String queryString = """
-			SELECT * { SERVICE <http://exmpl.org> PARAMS(?v1 AS "v1", ?v2 AS "v2") {} }""";
+			SELECT * { SERVICE <http://exmpl.org> PARAMS(?v1 AS "x1", ?v2 AS "x2") {} }""";
 
 		final SPARQLParser p = new ParserSPARQL12HeFQUIN();
 		final Query q = p.parse( new Query(), queryString );
@@ -55,14 +55,14 @@ public class ParserSPARQL12HeFQUINTest
 		final Map<String, Var> paramVars = es.getParamVars();
 		assertNotNull( paramVars );
 		assertEquals( 2, paramVars.size() );
-		assertEquals( "v1", paramVars.get("v1").getVarName() );
-		assertEquals( "v2", paramVars.get("v2").getVarName() );
+		assertEquals( "v1", paramVars.get("x1").getVarName() );
+		assertEquals( "v2", paramVars.get("x2").getVarName() );
 	}
 
 	@Test
 	public void acceptPARAMSwithoutComma() {
 		final String queryString = """
-			SELECT * { SERVICE <http://exmpl.org> PARAMS(?v1 AS "v1" ?v2 AS "v2") {} }""";
+			SELECT * { SERVICE <http://exmpl.org> PARAMS(?v1 AS "x1" ?v2 AS "x2") {} }""";
 
 		final SPARQLParser p = new ParserSPARQL12HeFQUIN();
 		final Query q = p.parse( new Query(), queryString );
@@ -73,8 +73,8 @@ public class ParserSPARQL12HeFQUINTest
 		final Map<String, Var> paramVars = es.getParamVars();
 		assertNotNull( paramVars );
 		assertEquals( 2, paramVars.size() );
-		assertEquals( "v1", paramVars.get("v1").getVarName() );
-		assertEquals( "v2", paramVars.get("v2").getVarName() );
+		assertEquals( "v1", paramVars.get("x1").getVarName() );
+		assertEquals( "v2", paramVars.get("x2").getVarName() );
 	}
 
 	@Test(expected = QueryParseException.class)

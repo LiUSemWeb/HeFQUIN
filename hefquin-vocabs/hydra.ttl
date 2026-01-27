@@ -1,0 +1,40 @@
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix hydra:  <http://www.w3.org/ns/hydra/core#> .
+
+### ===== CLASS DECLARATIONS =====
+
+hydra:IriTemplate a rdfs:Class ;
+    rdfs:label "Iri Template"@en ;
+    rdfs:comment "The class of IRI templates."@en .
+
+hydra:IriTemplateMapping a rdfs:Class ;
+    rdfs:label "Iri Template Mapping"@en ;
+    rdfs:comment "A mapping from an IRI template variable to a property."@en .
+
+### ===== PROPERTY DECLARATIONS =====
+
+hydra:template a rdf:Property ;
+    rdfs:domain hydra:IriTemplate ;
+    rdfs:range  xsd:string ;
+    rdfs:label "template"@en ;
+    rdfs:comment "A templated string with placeholders. The literal's datatype indicates the template syntax; if not specified, hydra:Rfc6570Template is assumed."@en .
+
+hydra:mapping a rdf:Property ;
+    rdfs:domain hydra:IriTemplate ;
+    rdfs:range  hydra:IriTemplateMapping ;
+    rdfs:label "mapping"@en ;
+    rdfs:comment "A variable-to-property mapping of the IRI template."@en .
+
+hydra:variable a rdf:Property ;
+    rdfs:domain hydra:IriTemplateMapping ;
+    rdfs:range  xsd:string ;
+    rdfs:label "variable"@en ;
+    rdfs:comment "An IRI template variable"@en .
+
+hydra:required a rdf:Property ;
+    rdfs:domain hydra:IriTemplateMapping ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label "required"@en ;
+    rdfs:comment "True if the property is required, false otherwise."@en .

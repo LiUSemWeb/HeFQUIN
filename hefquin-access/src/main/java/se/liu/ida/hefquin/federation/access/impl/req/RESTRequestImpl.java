@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.federation.access.impl.req;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,14 +59,14 @@ public class RESTRequestImpl implements RESTRequest
         }
         
         // Handle query parameters {?arg1,arg2,...}
-        Pattern queryPattern = Pattern.compile("\\{\\?([^}]+)\\}");
-        Matcher queryMatcher = queryPattern.matcher(result);
+        final Pattern queryPattern = Pattern.compile("\\{\\?([^}]+)\\}");
+        final Matcher queryMatcher = queryPattern.matcher(result);
         
         if (queryMatcher.find()) {
-            String queryVars = queryMatcher.group(1);
-            String[] varNames = queryVars.split(",");
+            final String queryVars = queryMatcher.group(1);
+            final String[] varNames = queryVars.split(",");
             
-            StringBuilder queryString = new StringBuilder();
+            final StringBuilder queryString = new StringBuilder();
             boolean first = true;
             
             for (String varName : varNames) {
@@ -89,10 +91,10 @@ public class RESTRequestImpl implements RESTRequest
         return result;
     }
     
-    private static String urlEncode(String value) {
+    private static String urlEncode( final String value) {
         try {
-            return java.net.URLEncoder.encode(value, "UTF-8");
-        } catch (java.io.UnsupportedEncodingException e) {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch ( UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }

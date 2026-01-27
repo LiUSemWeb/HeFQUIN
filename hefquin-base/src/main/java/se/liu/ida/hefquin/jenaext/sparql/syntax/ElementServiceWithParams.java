@@ -19,7 +19,7 @@ public class ElementServiceWithParams extends ElementService
 	 * @param n - the service node, an IRI or a variable
 	 * @param el - represents the graph pattern inside the SERVICE clause
 	 * @param silent - {@code true} if the SERVICE clause has the SILENT keyword
-	 * @param paramVars - the variables listed inside PARAMS(...) where the keys correspond to the AS "..." names
+	 * @param paramVars - the parameter-variable pairs listed inside PARAMS(...) where the keys correspond to the AS "..." names
 	 */
 	public ElementServiceWithParams( final Node n,
 	                                 final Element el,
@@ -32,10 +32,10 @@ public class ElementServiceWithParams extends ElementService
 	}
 
 	/**
-	 * Returns the variables listed inside the PARAMS(...) part of the
+	 * Returns the parameter-variable pairs listed inside the PARAMS(...) part of the
 	 * SERVICE clause.
 	 *
-	 * @return the variables from the PARAMS(...) part
+	 * @return the parameter-variable pairs from the PARAMS(...) part
 	 */
 	public Map<String, Var> getParamVars() {
 		return paramVars;

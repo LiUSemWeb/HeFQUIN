@@ -43,7 +43,7 @@ public interface RESTEndpoint extends FederationMember
 	public interface Parameter {
 		String getName();
 		RDFDatatype getType();
-		Boolean isRequired();
+		boolean isRequired();
 	}
 
 }
