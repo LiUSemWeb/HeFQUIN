@@ -1,6 +1,6 @@
-SELECT DISTINCT ?drug ?title WHERE {
+SELECT ?drug ?title WHERE {
   VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5  ) {
-    ( <%s> <%s> <%s> <%s> <%s> )
+    ( <http://localhost:8080/tpf/drugbank> <http://localhost:8080/tpf/drugbank> <http://localhost:8080/brtpf/kegg> <http://localhost:8080/brtpf/kegg> <http://localhost:8080/brtpf/kegg> )
   }
   SERVICE ?s1 { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugCategory> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugcategory/micronutrient> . }
   SERVICE ?s2 { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/casRegistryNumber> ?id . }

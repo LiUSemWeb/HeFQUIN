@@ -1,6 +1,6 @@
-SELECT DISTINCT * WHERE {
+SELECT DISTINCT ?x ?n WHERE {
   VALUES ( ?s1 ?s2 ) {
-    ( <http://localhost/sparql/geonames> <http://localhost/sparql/geonames> )
+    ( <http://localhost:8080/sparql/geonames/> <http://localhost:8080/sparql/geonames/> )
   }
   SERVICE ?s1 { ?x <http://www.geonames.org/ontology#parentFeature> <http://sws.geonames.org/2921044/> . }
   SERVICE ?s2 { ?x <http://www.geonames.org/ontology#name> ?n . }

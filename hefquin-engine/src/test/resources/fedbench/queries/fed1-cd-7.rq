@@ -1,7 +1,7 @@
-SELECT DISTINCT ?location ?news WHERE {
+SELECT ?location ?news WHERE {
   VALUES ( ?s1 ?s2 ?s3 ?s4 ) {
-    ( <%s> <%s> <%s> <%s> )
-    ( <%s> <%s> <%s> <%s> )
+    ( <http://localhost:8080/brtpf/nyt> <http://localhost:8080/sparql/geonames/> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> )
+    ( <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> )
   }
   SERVICE ?s1 { ?location <http://www.geonames.org/ontology#parentFeature> ?parent }
   SERVICE ?s2 { ?parent <http://www.geonames.org/ontology#name> 'California' }

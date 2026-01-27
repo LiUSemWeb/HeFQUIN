@@ -1,6 +1,6 @@
-SELECT DISTINCT * WHERE {
+SELECT DISTINCT ?x ?y ?d ?p ?l WHERE {
   VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
-    ( <http://localhost/sparql/dbpedia> <http://localhost/sparql/dbpedia> <http://localhost/sparql/dbpedia> <http://localhost/sparql/dbpedia> <http://localhost/sparql/dbpedia> )
+    ( <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> )
   }
   SERVICE ?s1 { ?x <http://dbpedia.org/ontology/team> <http://dbpedia.org/resource/Eintracht_Frankfurt> . }
   SERVICE ?s2 { ?x <http://www.w3.org/2000/01/rdf-schema#label> ?y . }

@@ -1,6 +1,6 @@
 SELECT ?drug ?keggUrl ?chebiImage WHERE {
   VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ?s6 ) {
-    ( <%s> <%s> <%s> <%s> <%s> <%s> )
+    ( <http://localhost:8080/tpf/drugbank> <http://localhost:8080/tpf/drugbank> <http://localhost:8080/brtpf/kegg> <http://localhost:8080/tpf/drugbank> <http://localhost:8080/sparql/chebi/> <http://localhost:8080/sparql/chebi/> )
   }
   SERVICE ?s1 { ?drug <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs> . }
   SERVICE ?s2 { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/keggCompoundId> ?keggDrug . }
