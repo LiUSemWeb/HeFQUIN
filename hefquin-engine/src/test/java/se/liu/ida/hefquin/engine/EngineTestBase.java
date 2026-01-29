@@ -367,8 +367,8 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public Parameter getParameterByName(String name) {
-			for (Parameter param : params) {
+		public Parameter getParameterByName( final String name ) {
+			for ( final Parameter param : params ) {
 				if (param.getName().equals(name)) {
 					return param;
 				}
