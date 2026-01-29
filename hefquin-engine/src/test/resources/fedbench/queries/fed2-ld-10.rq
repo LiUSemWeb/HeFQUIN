@@ -1,0 +1,8 @@
+SELECT DISTINCT ?n ?p2 ?u WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ) {
+    ( <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/brtpf/nyt> )
+  }
+  SERVICE ?s1 { ?n <http://www.w3.org/2004/02/skos/core#subject> <http://dbpedia.org/resource/Category:Chancellors_of_Germany> . }
+  SERVICE ?s2 { ?n <http://www.w3.org/2002/07/owl#sameAs> ?p2 . }
+  SERVICE ?s3 { ?p2 <http://data.nytimes.com/elements/latest_use> ?u . }
+}

@@ -1,0 +1,13 @@
+# Note: With service clause variable bound as UNDEF it returns the empty mapping and the UNION branch contributes the empty solution.
+SELECT ?drug ?melt WHERE {
+  VALUES ( ?s1 ?s2 ) {
+    ( <http://localhost:8080/tpf/drugbank> UNDEF )
+  }
+  {
+    SERVICE ?s1 { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/meltingPoint> ?melt . }
+  }
+  UNION
+  {
+    SERVICE ?s2 { ?drug <http://dbpedia.org/ontology/Drug/meltingPoint> ?melt . }
+  }
+}

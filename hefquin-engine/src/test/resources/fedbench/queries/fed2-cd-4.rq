@@ -1,0 +1,10 @@
+SELECT ?actor ?news WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
+    ( <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> )
+  }
+  SERVICE ?s1 { ?film <http://purl.org/dc/terms/title> 'Tarzan' }
+  SERVICE ?s2 { ?film <http://data.linkedmdb.org/resource/movie/actor> ?actor }
+  SERVICE ?s3 { ?actor <http://www.w3.org/2002/07/owl#sameAs> ?x }
+  SERVICE ?s4 { ?y <http://www.w3.org/2002/07/owl#sameAs> ?x }
+  SERVICE ?s5 { ?y <http://data.nytimes.com/elements/topicPage> ?news }
+}

@@ -1,0 +1,10 @@
+SELECT ?location ?news WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ) {
+    ( <http://localhost:8080/brtpf/nyt> <http://localhost:8080/tpf/geonames> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> )
+    ( <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> )
+  }
+  SERVICE ?s1 { ?location <http://www.geonames.org/ontology#parentFeature> ?parent }
+  SERVICE ?s2 { ?parent <http://www.geonames.org/ontology#name> 'California' }
+  SERVICE ?s3 { ?y <http://www.w3.org/2002/07/owl#sameAs> ?location }
+  SERVICE ?s4 { ?y <http://data.nytimes.com/elements/topicPage> ?news }
+}

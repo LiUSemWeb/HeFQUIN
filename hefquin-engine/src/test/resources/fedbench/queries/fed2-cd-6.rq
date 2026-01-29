@@ -1,0 +1,9 @@
+SELECT ?name ?location ?germany WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ) {
+    ( <http://localhost:8080/sparql/jamendo/> <http://localhost:8080/sparql/jamendo/> <http://localhost:8080/tpf/geonames> <http://localhost:8080/tpf/geonames> )
+  }
+  SERVICE ?s1 { ?artist <http://xmlns.com/foaf/0.1/name> ?name }
+  SERVICE ?s2 { ?artist <http://xmlns.com/foaf/0.1/based_near> ?location }
+  SERVICE ?s3 { ?location <http://www.geonames.org/ontology#parentFeature> ?germany }
+  SERVICE ?s4 { ?germany <http://www.geonames.org/ontology#name> 'Federal Republic of Germany' }
+}

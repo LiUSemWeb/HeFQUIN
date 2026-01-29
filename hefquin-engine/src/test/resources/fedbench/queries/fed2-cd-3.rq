@@ -1,0 +1,10 @@
+SELECT ?president ?party ?page WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
+    ( <http://localhost:8080/tpf/dbpedia> <http://localhost:8080/tpf/dbpedia> <http://localhost:8080/tpf/dbpedia> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> )
+  }
+  SERVICE ?s1 { ?president <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/President> }
+  SERVICE ?s2 { ?president <http://dbpedia.org/ontology/nationality> <http://dbpedia.org/resource/United_States> }
+  SERVICE ?s3 { ?president <http://dbpedia.org/ontology/party> ?party }
+  SERVICE ?s4 { ?x <http://data.nytimes.com/elements/topicPage> ?page }
+  SERVICE ?s5 { ?x <http://www.w3.org/2002/07/owl#sameAs> ?president }
+}

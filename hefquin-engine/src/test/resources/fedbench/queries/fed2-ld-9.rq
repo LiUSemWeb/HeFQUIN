@@ -1,0 +1,8 @@
+SELECT DISTINCT ?x ?p WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ) {
+    ( <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> )
+  }
+  SERVICE ?s1 { ?x <http://www.w3.org/2004/02/skos/core#subject> <http://dbpedia.org/resource/Category:FIFA_World_Cup-winning_countries> . }
+  SERVICE ?s2 { ?p <http://dbpedia.org/ontology/managerClub> ?x . }
+  SERVICE ?s3 { ?p <http://xmlns.com/foaf/0.1/name> "Luiz Felipe Scolari"@en . }
+}          

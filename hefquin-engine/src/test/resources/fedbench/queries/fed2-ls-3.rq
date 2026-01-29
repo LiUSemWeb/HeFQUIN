@@ -1,0 +1,10 @@
+SELECT ?drug ?intDrug ?intEffect WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
+    ( <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/tpf/drugbank> <http://localhost:8080/tpf/drugbank> <http://localhost:8080/tpf/drugbank> <http://localhost:8080/tpf/drugbank> )
+  }
+  SERVICE ?s1 { ?drug <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Drug> . }
+  SERVICE ?s2 { ?y <http://www.w3.org/2002/07/owl#sameAs> ?drug . }
+  SERVICE ?s3 { ?int <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/interactionDrug1> ?y . }
+  SERVICE ?s4 { ?int <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/interactionDrug2> ?intDrug . }
+  SERVICE ?s5 { ?int <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/text> ?intEffect .  }
+}
