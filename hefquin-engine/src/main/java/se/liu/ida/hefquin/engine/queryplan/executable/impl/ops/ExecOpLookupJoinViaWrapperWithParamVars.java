@@ -14,7 +14,6 @@ import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.exec.http.Params;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
@@ -84,6 +83,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		assert fm        != null;
 
 		assert paramVars.size() > 0;
+		assert paramVars.size() <= fm.getNumberOfParameters();
 
 		this.pattern = pattern;
 		this.paramVars = paramVars;
@@ -194,15 +194,15 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	 */
 	protected Map<String, Node> extractParamValues( final SolutionMapping sm ) {
 		final Binding solmap = sm.asJenaBinding();
+		if ( solmap.size() < paramVars.size() ) return null;
 
 		final Map<String, Node> result = new HashMap<>();
 
-		final Iterator<String> paramVarNames = paramVars.keySet().iterator();
-
-		while (paramVarNames.hasNext()) {
-			final String paramVarName = paramVarNames.next();
-			final Var paramVar = paramVars.get(paramVarName);
-
+		final Iterator<Map.Entry<String,Var>> it  = paramVars.entrySet().iterator();
+		while ( it.hasNext() ) {
+			final Map.Entry<String,Var> entry = it.next();
+			final String paramVarName = entry.getKey();
+			final Var paramVar = entry.getValue();
 			final Node paramValueAsNode = solmap.get(paramVar);
 
 			if (paramValueAsNode == null) return null;
@@ -217,9 +217,6 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 			result.put(paramVarName, paramValueAsNode);
 		}
-
-		// TODO Also check that all required parameters are present... but this should
-		// already be done previously?
 
 		return result;
 	}

@@ -28,9 +28,11 @@ ex:europaSPARQL
 
 ex:openMeteo
       fd:serviceURI <https://api.open-meteo.com/v1/forecast> ;
-      fd:interface [
-          a fd:RESTInterface ;
-          fd:iriTemplate [
+      fd:interface _:openMeteoRestEndpoint ;
+      fd:wrapper _:openMeteoWrapper .
+
+_:openMeteoRestEndpoint a fd:RESTInterface ;
+      fd:iriTemplate [
             hydra:template "https://api.open-meteo.com/v1/forecast{?latitude,longitude,current}" ;
             hydra:mapping 
                   [ 
@@ -44,26 +46,38 @@ ex:openMeteo
                   [ 
                   hydra:variable "current" ;
                   fd:paramType xsd:string ]
-          ]
+          ] .                   
+
+ex:openMeteo2
+      fd:serviceURI <https://api.open-meteo.com/v1/forecast/WithFixedParams> ;
+      fd:interface [ a fd:RESTInterface ;
+            fd:iriTemplate [
+                  hydra:template "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m" ;
+            ] 
       ] ;
-      fd:wrapper [
-          fd:rmlTriplesMaps ( 
-              [ rml:logicalSource [ rml:source _:openMeteoRestEndpoint ;
-                                    rml:referenceFormulation rml:JSONPath ;
-                                    rml:iterator "$.current" ] ;
-                rml:subjectMap [ rml:termType rml:BlankNode ;
-                                 rml:reference "time" ];
-                rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:temperature ] ;
-                                         rml:objectMap [ rml:reference "temperature_2m" ; rml:datatype xsd:double ] ] ]
-              [ rml:logicalSource [ rml:source _:openMeteoRestEndpoint ;
-                                    rml:referenceFormulation rml:JSONPath ;
-                                    rml:iterator "$.current" ] ;
-                rml:subjectMap [ rml:termType rml:BlankNode ;
-                                 rml:reference "time" ];
-                rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:windSpeed ] ;
-                                         rml:objectMap [ rml:reference "wind_speed_10m" ; rml:datatype xsd:double ] ] ]
-          )
-      ] .
+      fd:wrapper _:openMeteoWrapper .
+
+_:openMeteoWrapper
+      fd:rmlTriplesMaps ( _:openMeteoTM1 _:openMeteoTM2 ) .
+
+_:openMeteoTM1
+      rml:logicalSource [ rml:source _:openMeteoRestEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.current" ] ;
+      rml:subjectMap [ rml:termType rml:BlankNode ;
+                       rml:reference "time" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:temperature ] ;
+                               rml:objectMap [ rml:reference "temperature_2m" ; rml:datatype xsd:double ] ] .
+
+_:openMeteoTM2
+      rml:logicalSource [ rml:source _:openMeteoRestEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.current" ] ;
+      rml:subjectMap [ rml:termType rml:BlankNode ;
+                       rml:reference "time" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:windSpeed ] ;
+                               rml:objectMap [ rml:reference "wind_speed_10m" ; rml:datatype xsd:double ] ] .      
+   
 
 #ex:neo4jTest
 #      a            fd:FederationMember ;
