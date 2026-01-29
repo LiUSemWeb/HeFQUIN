@@ -204,8 +204,8 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 		assertTrue( it.hasNext() );
 		assertEquals( 4, it.next().asJenaBinding().size() );
-		// assertTrue( it.hasNext() );
-		// assertEquals( 4, it.next().asJenaBinding().size() );
+		assertTrue( it.hasNext() );
+		assertEquals( 4, it.next().asJenaBinding().size() );
 		assertFalse( it.hasNext() );
 	}
 

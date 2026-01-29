@@ -1,11 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -96,7 +95,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	                              final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		final Map<Map<String,Node>, Set<SolutionMapping>> paramsForRequests = new HashMap<>();
+		final Map<Map<String,Node>, List<SolutionMapping>> paramsForRequests = new HashMap<>();
 		for ( final SolutionMapping sm : input ) {
 			final Map<String,Node> paramValues = extractParamValues(sm);
 
@@ -119,9 +118,9 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 				// for an earlier batch, then remember them, together with
 				// the current solution mapping, for further processing
 				// after this for loop.
-				Set<SolutionMapping> solmaps = paramsForRequests.get(paramValues);
+				List<SolutionMapping> solmaps = paramsForRequests.get(paramValues);
 				if ( solmaps == null ) {
-					solmaps = new HashSet<>();
+					solmaps = new ArrayList<>();
 					paramsForRequests.put(paramValues, solmaps);
 				}
 				solmaps.add(sm);
@@ -137,7 +136,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		// issue a request to the REST endpoint.
 		final CompletableFuture<?>[] futures = new CompletableFuture[ paramsForRequests.size() ];
 		int i = 0;
-		for ( Map.Entry<Map<String,Node>, Set<SolutionMapping>> entry : paramsForRequests.entrySet() ) {
+		for ( Map.Entry<Map<String,Node>, List<SolutionMapping>> entry : paramsForRequests.entrySet() ) {
 			// issue a request based on the current solution mapping
 			final RESTRequest req = createRequest( entry.getKey() );
 
@@ -240,11 +239,11 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 	protected class MyResponseProcessor implements Consumer<StringResponse>
 	{
-		protected final Set<SolutionMapping> solmaps;
+		protected final List<SolutionMapping> solmaps;
 		protected final IntermediateResultElementSink sink;
 		protected final ExecutableOperator op;
 
-		public MyResponseProcessor( final Set<SolutionMapping> solmaps,
+		public MyResponseProcessor( final List<SolutionMapping> solmaps,
 		                            final IntermediateResultElementSink sink,
 		                            final ExecutableOperator op ) {
 			this.solmaps = solmaps;
