@@ -372,7 +372,6 @@ public class FederationDescriptionReader
 	protected FederationMember createWrappedRESTEndpoint( final String uri,
 	                                                      final List<RESTEndpoint.Parameter> params,
 	                                                      final List<MappingOperator> trMaps ) {
-
 		assert ! trMaps.isEmpty();
 
 		if ( trMaps.size() == 1 ) {
