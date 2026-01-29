@@ -231,10 +231,11 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	 * declarations.
 	 */
 	protected RESTRequest createRequest( final Map<String,Node> paramValues ) {
-		return new RESTRequestImpl(fm.getURLTemplate(), paramValues.entrySet().stream()
-				.collect(HashMap::new,
-						(m, e) -> m.put(e.getKey(), e.getValue().getLiteralValue().toString()),
-						HashMap::putAll));
+		final Map<String,String> params = paramValues.entrySet().stream().collect(
+				HashMap::new,
+				(m, e) -> m.put( e.getKey(), e.getValue().getLiteralValue().toString() ),
+				HashMap::putAll );
+		return new RESTRequestImpl( fm.getURLTemplate(), params );
 	}
 
 
