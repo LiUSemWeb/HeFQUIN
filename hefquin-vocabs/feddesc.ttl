@@ -4,6 +4,7 @@
 @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
 @prefix dc:     <http://purl.org/dc/elements/1.1/> .
 @prefix fd:     <http://w3id.org/hefquin/feddesc#> .
+@prefix hydra:  <http://www.w3.org/ns/hydra/core#> .
 
 <http://w3id.org/hefquin/feddesc>
     rdf:type owl:Ontology ;
@@ -117,21 +118,11 @@ fd:RESTInterface a owl:Class ;
     rdfs:label "REST Endpoint Interface"@en ;
     rdfs:comment "An interface to access a federation member that provides a REST API."@en .
 
-fd:QueryParameter a owl:Class ;
-    rdfs:label "Query Parameter"@en ;
-    rdfs:comment "Declaration of a query parameter for a REST API."@en .
-
-fd:queryParameters a rdf:Property ;
+fd:iriTemplate a rdf:Property ;
     rdfs:domain fd:RESTInterface ;
-    rdfs:range  rdf:List ;
-    rdfs:label "query parameters"@en ;
-    rdfs:comment "List of query parameters for a REST API. The elements of such a list are expected to be of type fd:QueryParameter."@en .
-
-fd:paramName a rdf:Property ;
-    rdfs:domain fd:QueryParameter ;
-    rdfs:range  xsd:string ;
-    rdfs:label "name of query parameter"@en ;
-    rdfs:comment "The name of query parameters for a REST API."@en .
+    rdfs:range  hydra:IriTemplate ;
+    rdfs:label "iri template"@en ;
+    rdfs:comment "The IRI template for accessing the endpoint of the federation member."@en .
 
 fd:paramType a rdf:Property ;
     rdfs:domain fd:QueryParameter ;

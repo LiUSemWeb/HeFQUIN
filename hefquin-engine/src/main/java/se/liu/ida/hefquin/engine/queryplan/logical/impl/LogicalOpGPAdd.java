@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,13 +16,14 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.members.RESTEndpoint.Parameter;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
 public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
-	protected final List<Var> paramVars;
+	protected final Map<String,Var> paramVars;
 
 	// will be initialized on demand 
 	protected TriplePattern tp = null;
@@ -29,7 +31,7 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 
 	public LogicalOpGPAdd( final FederationMember fm,
 	                       final SPARQLGraphPattern pattern,
-	                       final List<Var> paramVars ) {
+	                       final Map<String,Var> paramVars ) {
 		assert fm != null;
 		assert pattern != null;
 
@@ -37,8 +39,28 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 		this.pattern = pattern;
 
 		if ( paramVars != null && ! paramVars.isEmpty() ) {
-			assert    fm instanceof WrappedRESTEndpoint ep
-			       && ep.getNumberOfParameters() == paramVars.size();
+			assert    fm instanceof WrappedRESTEndpoint;
+			final WrappedRESTEndpoint wrappedRestEndpoint = ((WrappedRESTEndpoint) fm);
+
+			final Iterator<String> paramVarNamesIt = paramVars.keySet().iterator();
+			while( paramVarNamesIt.hasNext() ) {
+				final String paramName = paramVarNamesIt.next();
+				if ( wrappedRestEndpoint.getParameterByName(paramName) == null ) {
+					throw new IllegalArgumentException(
+						"Invalid SERVICE clause: Parameter name " + paramName + " referred to in the PARAMS() clause is not defined for federation member " + fm.toString()
+					);
+				}
+			}
+			final Iterator<Parameter> declParamsIt = wrappedRestEndpoint.getParameters().iterator();
+			while( declParamsIt.hasNext() ) {
+				final Parameter p = declParamsIt.next();
+				if ( p.isRequired() && ! paramVars.containsKey(p.getName()) ) {
+					throw new IllegalArgumentException(
+						"Invalid SERVICE clause: Required parameter " + p.getName() + " of federation member " + fm.toString() +
+						" is not mapped to in the PARAMS() clause."
+					);
+				}
+			}
 
 			this.paramVars = paramVars;
 		}
@@ -76,7 +98,7 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 	 * use {@link #hasParameterVariables()} to ask whether this gpAdd
 	 * operator is this parameter.
 	 */
-	public List<Var> getParameterVariables() {
+	public Map<String,Var> getParameterVariables() {
 		if ( ! hasParameterVariables() )
 			throw new UnsupportedOperationException("Requesting variables of a gpAdd operator that does not have this parameter.");
 

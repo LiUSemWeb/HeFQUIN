@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.jenaext.sparql.algebra.op;
 
-import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.algebra.Op;
@@ -15,7 +15,7 @@ import org.apache.jena.sparql.util.NodeIsomorphismMap;
  */
 public class OpServiceWithParams extends OpService
 {
-	protected final List<Var> paramVars;
+	protected final Map<String, Var> paramVars;
 
 	/**
 	 * @param n - the service node, an IRI or a variable
@@ -26,7 +26,7 @@ public class OpServiceWithParams extends OpService
 	public OpServiceWithParams( final Node n,
 	                            final Op subOp,
 	                            final boolean silent,
-	                            final List<Var> paramVars ) {
+	                            final Map<String, Var> paramVars ) {
 		super(n, subOp, silent);
 
 		assert paramVars != null;
@@ -39,7 +39,7 @@ public class OpServiceWithParams extends OpService
 	 *
 	 * @return the variables from the PARAMS(...) part
 	 */
-	public List<Var> getParamVars() {
+	public Map<String, Var> getParamVars() {
 		return paramVars;
 	}
 

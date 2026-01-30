@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.srcsel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.*;
@@ -252,12 +253,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 		final WrappedRESTEndpoint ep = (WrappedRESTEndpoint) fm;
 
-		final List<Var> paramVars = jenaOp.getParamVars();
+		final Map<String,Var> paramVars = jenaOp.getParamVars();
 		assert paramVars != null;
 		assert ! paramVars.isEmpty();
-
-		if ( ep.getNumberOfParameters() != paramVars.size() )
-			throw new IllegalArgumentException( "Invalid SERVICE clause: wrong number of PARAMS for " + ep.toString() );
 
 		final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
 		final LogicalOpGPAdd op = new LogicalOpGPAdd(ep, p, paramVars);

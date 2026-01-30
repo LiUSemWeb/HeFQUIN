@@ -83,7 +83,7 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 	protected List<SolutionMapping> performRequest( final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		final RESTRequest req = new RESTRequestImpl( fm.getURL() );
+		final RESTRequest req = new RESTRequestImpl( fm.getURLTemplate() );
 
 		final long time1 = System.currentTimeMillis();
 

@@ -352,7 +352,7 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public String getURL() {
+		public String getURLTemplate() {
 			return "http://example.org/";
 		}
 
@@ -364,6 +364,16 @@ public abstract class EngineTestBase
 		@Override
 		public Iterable<Parameter> getParameters() {
 			return params;
+		}
+
+		@Override
+		public Parameter getParameterByName( final String name ) {
+			for ( final Parameter param : params ) {
+				if (param.getName().equals(name)) {
+					return param;
+				}
+			}
+			return null;
 		}
 
 		@Override

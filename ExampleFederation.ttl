@@ -3,6 +3,8 @@ PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
 PREFIX fd:     <http://w3id.org/hefquin/feddesc#>
 PREFIX rml:    <http://w3id.org/rml/>
 PREFIX ex:     <http://example.org/>
+PREFIX hydra:  <http://www.w3.org/ns/hydra/core#>
+
 
 ex:dbpediaSPARQL
       fd:serviceURI <http://dbpedia.org/sparql> ;
@@ -30,16 +32,29 @@ ex:openMeteo
       fd:wrapper _:openMeteoWrapper .
 
 _:openMeteoRestEndpoint a fd:RESTInterface ;
-      fd:endpointAddress <https://api.open-meteo.com/v1/forecast> ;
-      fd:queryParameters ( [ fd:paramName "latitude" ; fd:paramType xsd:float ]
-                           [ fd:paramName "longitude" ; fd:paramType xsd:float ]
-                           [ fd:paramName "current" ; fd:paramType xsd:string ] ) .
+      fd:iriTemplate [
+            hydra:template "https://api.open-meteo.com/v1/forecast{?latitude,longitude,current}" ;
+            hydra:mapping 
+                  [ 
+                  hydra:variable "latitude" ;      
+                  hydra:required true ;
+                  fd:paramType xsd:float ] ,
+                  [ 
+                  hydra:variable "longitude" ; 
+                  hydra:required true ;
+                  fd:paramType xsd:float ] ,
+                  [ 
+                  hydra:variable "current" ;
+                  fd:paramType xsd:string ]
+          ] .                   
 
 ex:openMeteo2
       fd:serviceURI <https://api.open-meteo.com/v1/forecast/WithFixedParams> ;
-      fd:interface [ a                  fd:RESTInterface ;
-                     fd:endpointAddress <https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m> ;
-                     fd:queryParameters () ] ;
+      fd:interface [ a fd:RESTInterface ;
+            fd:iriTemplate [
+                  hydra:template "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m" ;
+            ] 
+      ] ;
       fd:wrapper _:openMeteoWrapper .
 
 _:openMeteoWrapper
@@ -61,9 +76,8 @@ _:openMeteoTM2
       rml:subjectMap [ rml:termType rml:BlankNode ;
                        rml:reference "time" ];
       rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:windSpeed ] ;
-                               rml:objectMap [ rml:reference "wind_speed_10m" ; rml:datatype xsd:double ] ] .
-
-
+                               rml:objectMap [ rml:reference "wind_speed_10m" ; rml:datatype xsd:double ] ] .      
+   
 
 #ex:neo4jTest
 #      a            fd:FederationMember ;

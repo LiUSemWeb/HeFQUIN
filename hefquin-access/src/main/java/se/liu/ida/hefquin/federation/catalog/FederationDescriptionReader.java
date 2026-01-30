@@ -45,6 +45,7 @@ import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
 import se.liu.ida.hefquin.rml.RML2MappingAlgebra;
 import se.liu.ida.hefquin.rml.RMLParserException;
 import se.liu.ida.hefquin.vocabulary.FDVocab;
+import se.liu.ida.hefquin.vocabulary.HydraVocab;
 
 public class FederationDescriptionReader
 {
@@ -196,50 +197,57 @@ public class FederationDescriptionReader
 			if ( vocabMap != null )
 				throw new IllegalArgumentException("REST APIs cannot have a vocabulary mapping.");
 
-			final RDFNode addr = ModelUtils.getSingleMandatoryProperty( iface, FDVocab.endpointAddress );
+			
 
-			final String addrStr = getAsURIString(addr);
-			if ( addrStr == null ) {
-				throw new IllegalArgumentException();
-			}
+			final Resource iriTemplate = ModelUtils.getSingleMandatoryResourceProperty( iface, FDVocab.iriTemplate);
 
-			final Resource queryParamsList = ModelUtils.getSingleMandatoryResourceProperty( iface, FDVocab.queryParameters );
-			if ( ! queryParamsList.canAs(RDFList.class) )
-				throw new IllegalArgumentException( FDVocab.queryParameters.getLocalName() + " property of " + iface.toString() + " should be a list." );
+			final String iriTemplateString = ModelUtils.getSingleMandatoryProperty_XSDString(iriTemplate, HydraVocab.template );
 
-			final Iterator<RDFNode> queryParamsIterator = queryParamsList.as( RDFList.class ).iterator();
+			final StmtIterator paramIter = iriTemplate.listProperties(HydraVocab.mapping);
+
 			final List<RESTEndpoint.Parameter> params = new ArrayList<>();
-			while ( queryParamsIterator.hasNext() ) {
-				final RDFNode x = queryParamsIterator.next();
-				if ( ! x.isResource() )
-					throw new IllegalArgumentException( "One of the query parameters of " + iface.toString() + " is not a resource (but, probably, a literal instead)." );
+			while (paramIter.hasNext()) {
+				final RDFNode x = paramIter.next().getObject();
+				if (!x.isResource())
+					throw new IllegalArgumentException("One of the query parameters of " + iface.toString()
+							+ " is not a resource (but, probably, a literal instead).");
 
 				final Resource p = x.asResource();
-				final String name = ModelUtils.getSingleMandatoryProperty_XSDString(p, FDVocab.paramName);
-				final String type = getAsURIString( ModelUtils.getSingleMandatoryProperty(p, FDVocab.paramType) );
-				if ( type == null )
+				final String name = ModelUtils.getSingleMandatoryProperty_XSDString(p, HydraVocab.variable);
+				final String type = getAsURIString(ModelUtils.getSingleMandatoryProperty(p, FDVocab.paramType));
+				if (type == null)
 					throw new IllegalArgumentException();
+				final Statement isRequiredStmt = p.getProperty(HydraVocab.required);
+				final boolean isRequired = isRequiredStmt == null ? false : isRequiredStmt.getBoolean();
 
 				final RDFDatatype dt;
-				if ( XSDDatatype.XSDstring.getURI().equals(type) ) {
+				if (XSDDatatype.XSDstring.getURI().equals(type)) {
 					dt = XSDDatatype.XSDstring;
-				}
-				else if ( XSDDatatype.XSDinteger.getURI().equals(type) ) {
+				} else if (XSDDatatype.XSDinteger.getURI().equals(type)) {
 					dt = XSDDatatype.XSDinteger;
-				}
-				else if ( XSDDatatype.XSDfloat.getURI().equals(type) ) {
+				} else if (XSDDatatype.XSDfloat.getURI().equals(type)) {
 					dt = XSDDatatype.XSDfloat;
-				}
-				else if ( XSDDatatype.XSDdouble.getURI().equals(type) ) {
+				} else if (XSDDatatype.XSDdouble.getURI().equals(type)) {
 					dt = XSDDatatype.XSDdouble;
-				}
-				else {
-					throw new IllegalArgumentException("Unexpected data type for query parameter: " +  type.toString() );
+				} else {
+					throw new IllegalArgumentException("Unexpected data type for query parameter: " + type.toString());
 				}
 
 				final RESTEndpoint.Parameter param = new RESTEndpoint.Parameter() {
-					@Override public String getName() { return name; }
-					@Override public RDFDatatype getType() { return dt; }
+					@Override
+					public String getName() {
+						return name;
+					}
+
+					@Override
+					public RDFDatatype getType() {
+						return dt;
+					}
+
+					@Override
+					public boolean isRequired() {
+						return isRequired;
+					}
 				};
 
 				params.add(param);
@@ -277,7 +285,7 @@ public class FederationDescriptionReader
 			if ( trMaps.isEmpty() )
 				throw new IllegalArgumentException("The wrapped RESt endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
 
-			return createWrappedRESTEndpoint(addrStr, params, trMaps);
+			return createWrappedRESTEndpoint(iriTemplateString, params, trMaps);
 		}
 		else {
 			throw new IllegalArgumentException( ifaceType.toString() );
@@ -364,8 +372,6 @@ public class FederationDescriptionReader
 	protected FederationMember createWrappedRESTEndpoint( final String uri,
 	                                                      final List<RESTEndpoint.Parameter> params,
 	                                                      final List<MappingOperator> trMaps ) {
-		verifyExpectedURI(uri);
-
 		assert ! trMaps.isEmpty();
 
 		if ( trMaps.size() == 1 ) {

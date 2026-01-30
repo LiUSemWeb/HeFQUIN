@@ -30,7 +30,7 @@ PREFIX ex:     <http://example.org/>
 #	BIND ( "52.52"^^xsd:float AS ?lat )
 #	BIND ( "13.41"^^xsd:float AS ?long )
 #	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
-#	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat, ?long, ?req) {
+#	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat AS "latitude", ?long AS "longitude", ?req AS "current") {
 #		?x ex:temperature ?temp .
 #		?x ex:windSpeed ?wind .
 #	}
@@ -41,7 +41,7 @@ SELECT * WHERE {
 		<http://dbpedia.org/resource/Berlin> geo:lat ?lat ; geo:long ?long .
 	}
 	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
-	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat, ?long, ?req) {
+	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat AS "latitude", ?long AS "longitude", ?req AS "current") {
 		?x ex:temperature ?temp .
 		?x ex:windSpeed ?wind .
 	}
