@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
 import java.net.http.HttpClient;
-import java.time.Duration;
 import java.util.Map;
 
 import org.apache.jena.graph.Node;
@@ -11,6 +10,7 @@ import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.sparql.core.Quad;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.shared.http.HttpClientProvider;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.impl.RequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseBuilder;
@@ -36,13 +36,7 @@ public abstract class TPFRequestProcessorBase
 	}
 
 	protected static HttpClient createHttpClient( final long connectionTimeout ) {
-		final HttpClient.Builder httpClientBuilder = HttpClient.newBuilder()
-				.followRedirects( HttpClient.Redirect.ALWAYS );
-
-		if ( connectionTimeout > 0L )
-			httpClientBuilder.connectTimeout( Duration.ofMillis(connectionTimeout) );
-
-		return httpClientBuilder.build();
+		return HttpClientProvider.client(connectionTimeout);
 	}
 
 	protected TPFResponseBuilder performRequest( final String requestURL,
