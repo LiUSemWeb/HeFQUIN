@@ -33,7 +33,6 @@ public class GraphQLConnection
 		final JsonObject postBody = new JsonObject();
 		postBody.put( "query", query.toString() );
 		postBody.put( "variables", query.getArgumentValues() );
-		postBody.put( "raw", true );
 
 		// Create the request
 		final HttpRequest request = HttpRequest.newBuilder()
