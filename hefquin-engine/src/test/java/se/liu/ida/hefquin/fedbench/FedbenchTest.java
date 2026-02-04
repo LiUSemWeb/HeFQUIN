@@ -24,10 +24,32 @@ import org.junit.Test;
  * | Fed-II     | TPF      | TPF     | TPF    | SPARQL  | SPARQL   | SPARQL | brTPF | brTPF | brTPF |
  * |------------|----------|---------|--------|---------|----------|--------|-------|-------|-------|
  * 
+ * Required SPARQL endpoints:
+ * - http://localhost:8080/sparql/genonames/
+ * - http://localhost:8080/sparql/dbpedia/
+ * - http://localhost:8080/sparql/chebi/
+ * - http://localhost:8080/sparql/jamendo/
+ * - http://localhost:8080/sparql/drugbank/
+ * - http://localhost:8080/sparql/swdf/
+ * - http://localhost:8080/sparql/lmdb/
+ * - http://localhost:8080/sparql/kegg/
+ * - http://localhost:8080/sparql/nyt/
+ *
+ * Required LDF endpoints (with support for both TPF and brTPF):
+ * - http://localhost:8080/ldf/genonames
+ * - http://localhost:8080/ldf/dbpedia
+ * - http://localhost:8080/ldf/chebi
+ * - http://localhost:8080/ldf/jamendo
+ * - http://localhost:8080/ldf/drugbank
+ * - http://localhost:8080/ldf/swdf
+ * - http://localhost:8080/ldf/lmdb
+ * - http://localhost:8080/ldf/kegg
+ * - http://localhost:8080/ldf/nyt
+ *
  * TODO: Include SP2B in the testing. 
  */
 
-//@Ignore("Disabled since it requires access to running FedBench endpoints")
+@Ignore("Disabled since it requires access to running FedBench endpoints")
 public class FedbenchTest extends FedbenchTestBase
 {
 	@BeforeClass
