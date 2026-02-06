@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * for each timeout value. Each such client then manages its own independent set
  * of pooled connections for all routes it is used with.
  */
-public final class HttpClientProvider
+public class HttpClientProvider
 {
 	// No timeout
 	private static final long NO_TIMEOUT = -1;
