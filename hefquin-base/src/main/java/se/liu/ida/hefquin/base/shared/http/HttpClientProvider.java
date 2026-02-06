@@ -21,10 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HttpClientProvider
 {
 	// No timeout
-	private static final long NO_TIMEOUT = -1;
+	protected static final long NO_TIMEOUT = -1;
 
 	// Cache by connect timeout
-	private static final Map<Long, HttpClient> BY_CONNECT_TIMEOUT = new ConcurrentHashMap<>();
+	protected static final Map<Long, HttpClient> BY_CONNECT_TIMEOUT = new ConcurrentHashMap<>();
 
 	public static HttpClient client() {
 		return client(NO_TIMEOUT);
