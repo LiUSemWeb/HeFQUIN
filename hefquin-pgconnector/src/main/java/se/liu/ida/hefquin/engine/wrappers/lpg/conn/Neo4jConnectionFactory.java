@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpg.conn;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import se.liu.ida.hefquin.base.shared.http.HttpClientProvider;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.engine.wrappers.lpg.Neo4jException;
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
@@ -82,7 +83,7 @@ public class Neo4jConnectionFactory
 			}
 
 			final var request = builder.build();
-			final HttpClient client = HttpClient.newHttpClient();
+			final HttpClient client = HttpClientProvider.client();
 			final HttpResponse<String> response;
 			try {
 				response = client.send( request, HttpResponse.BodyHandlers.ofString() );

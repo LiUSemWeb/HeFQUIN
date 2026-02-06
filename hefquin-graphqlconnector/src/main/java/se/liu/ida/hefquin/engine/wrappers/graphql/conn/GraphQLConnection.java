@@ -1,16 +1,18 @@
 package se.liu.ida.hefquin.engine.wrappers.graphql.conn;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonParseException;
 
+import se.liu.ida.hefquin.base.shared.http.HttpClientProvider;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
 
@@ -24,87 +26,48 @@ public class GraphQLConnection
 	                                         final int readTimeout )
 			throws GraphQLConnectionException {
 
-		HttpURLConnection con = null;
-		OutputStreamWriter outWriter = null;
-		BufferedReader bufferReader = null;
-		String responseBody = "{}";
+		// Get HTTP client
+		final HttpClient client = HttpClientProvider.client(connectionTimeout);
+	
+		// Sending post body
+		final JsonObject postBody = new JsonObject();
+		postBody.put( "query", query.toString() );
+		postBody.put( "variables", query.getArgumentValues() );
+
+		// Create the request
+		final HttpRequest request = HttpRequest.newBuilder()
+				.uri( URI.create(url) )
+				.POST( BodyPublishers.ofString( postBody.toString() ) )
+				.timeout( Duration.ofMillis( readTimeout ) )
+				.header( "Accept", "application/json" )
+				.header( "User-Agent", BuildInfo.getUserAgent() )
+				.header( "Content-Type", "application/json" )
+				.build();
+
 		try {
-			// Setup the connection
-			final URL endpointURL = new URL(url);
-			con = (HttpURLConnection) endpointURL.openConnection();
-			con.setRequestMethod("POST");
-			con.setConnectTimeout(connectionTimeout);
-			con.setReadTimeout(readTimeout);
-			con.setRequestProperty("Accept", "application/json");
-			con.setRequestProperty("User-Agent", BuildInfo.getUserAgent());
-			con.setRequestProperty("Content-Type", "application/json");
-			con.setDoOutput(true);
-			con.connect();
-
-			// Sending post body
-			JsonObject postBody = new JsonObject();
-			postBody.put("query", query.toString());
-			postBody.put("variables", query.getArgumentValues());
-			postBody.put("raw", true);
-			outWriter = new OutputStreamWriter(con.getOutputStream());
-			outWriter.write(postBody.toString());
-			outWriter.close();
-
-			// Fetch the input stream stream
-			InputStream iStream;
-			final int status = con.getResponseCode();
-			if (status >= 200 && status < 300) {
-				iStream = con.getInputStream();
-			} else {
-				con.disconnect();
+			// Get response
+			final HttpResponse<String> response = client.send( request, BodyHandlers.ofString() );
+			final int status = response.statusCode();
+			if ( status < 200 || status >= 300 ) {
 				throw new GraphQLConnectionException(
-						"Couldn't establish a connection to endpoint. Response code: " + status);
+						"Couldn't establish a connection to endpoint. Response code: " + status );
 			}
 
-			// Components used to read the message
-			bufferReader = new BufferedReader(new InputStreamReader(iStream));
-			StringBuilder stringBuilder = new StringBuilder();
-
-			// Read from the buffer
-			String lineStr;
-			while ((lineStr = bufferReader.readLine()) != null) {
-				stringBuilder.append(lineStr);
-			}
-
-			responseBody = stringBuilder.toString();
-
-			// Disconnect
-			bufferReader.close();
-			con.disconnect();
-		} 
-		catch (final IOException e) {
-			if(con != null){
-				con.disconnect();
-			}
+			// Parse JSON responseBody into a json object
+			final JsonObject jsonObj;
 			try {
-				if(outWriter != null){
-					outWriter.close();
-				}
-				if(bufferReader != null){
-					bufferReader.close();
-				}
+				jsonObj = JSON.parse( response.body() );
+			} catch ( final JsonParseException e ) {
+				throw new GraphQLConnectionException( "Unable to parse the retrieved JSON", e );
 			}
-			catch(final IOException e2){
-				throw new GraphQLConnectionException(e2);
-			}
-			throw new GraphQLConnectionException(e);
-		}
 
-		// Parse JSON responseBody into a json object
-		JsonObject jsonObj;
-		try {
-			jsonObj = JSON.parse(responseBody);
-		} 
-		catch (final JsonParseException e) {
-			throw new GraphQLConnectionException("Unable to parse the retrieved JSON", e);
+			return jsonObj;
+		} catch ( final IOException e ) {
+			throw new GraphQLConnectionException( "I/O error while communicating with GraphQL endpoint", e );
+		} catch ( final InterruptedException e ) {
+			// Restore interrupt status
+			Thread.currentThread().interrupt();
+			throw new GraphQLConnectionException( "Request to GraphQL endpoint was interrupted", e );
 		}
-
-		return jsonObj;
 	}
-
 }

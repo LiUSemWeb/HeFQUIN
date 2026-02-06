@@ -13,6 +13,7 @@ import java.util.Date;
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.http.HttpLib;
 
+import se.liu.ida.hefquin.base.shared.http.HttpClientProvider;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.RESTRequest;
@@ -39,18 +40,8 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 	 */
 	public RESTRequestProcessorImpl( final long connectionTimeout,
 	                                 final long overallTimeout ) {
-		httpClient = createHttpClient(connectionTimeout);
+		httpClient = HttpClientProvider.client(connectionTimeout);
 		this.overallTimeout = overallTimeout;
-	}
-
-	protected static HttpClient createHttpClient( final long connectionTimeout ) {
-		final HttpClient.Builder httpClientBuilder = HttpClient.newBuilder()
-				.followRedirects( HttpClient.Redirect.ALWAYS );
-
-		if ( connectionTimeout > 0L )
-			httpClientBuilder.connectTimeout( Duration.ofMillis(connectionTimeout) );
-
-		return httpClientBuilder.build();
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
 import java.net.http.HttpClient;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +17,7 @@ import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
+import se.liu.ida.hefquin.base.shared.http.HttpClientProvider;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -38,18 +38,8 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 	 * The given timeouts are specified in milliseconds. Any value {@literal <=} 0 means no timeout.
 	 */
 	public SPARQLRequestProcessorImpl( final long connectionTimeout, final long overallTimeout ) {
-		httpClient = createHttpClient(connectionTimeout);
+		httpClient = HttpClientProvider.client(connectionTimeout);
 		this.overallTimeout = overallTimeout;
-	}
-
-	protected static HttpClient createHttpClient( final long connectionTimeout ) {
-		final HttpClient.Builder httpClientBuilder = HttpClient.newBuilder()
-				.followRedirects( HttpClient.Redirect.ALWAYS );
-
-		if ( connectionTimeout > 0L )
-			httpClientBuilder.connectTimeout( Duration.ofMillis(connectionTimeout) );
-
-		return httpClientBuilder.build();
 	}
 
 	@Override
