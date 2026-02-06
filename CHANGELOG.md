@@ -9,7 +9,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 -  none yet
 ### Changed
--  none yet
+-  Updated request processors to use an HTTP client provider and shared connection pools ([#495](https://github.com/LiUSemWeb/HeFQUIN/pull/495)).
 
 
 ## [0.0.8] - 2026-01-14
