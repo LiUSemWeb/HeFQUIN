@@ -40,12 +40,8 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 	 */
 	public RESTRequestProcessorImpl( final long connectionTimeout,
 	                                 final long overallTimeout ) {
-		httpClient = createHttpClient(connectionTimeout);
+		httpClient = HttpClientProvider.client(connectionTimeout);
 		this.overallTimeout = overallTimeout;
-	}
-
-	protected static HttpClient createHttpClient( final long connectionTimeout ) {
-		return HttpClientProvider.client(connectionTimeout);
 	}
 
 	@Override

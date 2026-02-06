@@ -38,12 +38,8 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 	 * The given timeouts are specified in milliseconds. Any value {@literal <=} 0 means no timeout.
 	 */
 	public SPARQLRequestProcessorImpl( final long connectionTimeout, final long overallTimeout ) {
-		httpClient = createHttpClient(connectionTimeout);
+		httpClient = HttpClientProvider.client(connectionTimeout);
 		this.overallTimeout = overallTimeout;
-	}
-
-	protected static HttpClient createHttpClient( final long connectionTimeout ) {
-		return HttpClientProvider.client(connectionTimeout);
 	}
 
 	@Override

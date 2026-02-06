@@ -32,11 +32,7 @@ public abstract class TPFRequestProcessorBase
 	 * The given timeouts are specified in milliseconds. Any value {@literal <=} 0 means no timeout.
 	 */
 	protected TPFRequestProcessorBase( final long connectionTimeout ) {
-		httpClient = createHttpClient(connectionTimeout);
-	}
-
-	protected static HttpClient createHttpClient( final long connectionTimeout ) {
-		return HttpClientProvider.client(connectionTimeout);
+		httpClient = HttpClientProvider.client(connectionTimeout);
 	}
 
 	protected TPFResponseBuilder performRequest( final String requestURL,
