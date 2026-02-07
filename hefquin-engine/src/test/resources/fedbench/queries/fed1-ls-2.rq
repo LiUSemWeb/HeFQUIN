@@ -1,0 +1,15 @@
+# Note: With service clause variable bound as UNDEF it returns the empty mapping and the UNION branch contributes the empty solution.
+SELECT ?predicate ?object WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ) {
+    ( <http://localhost:8080/tpf/drugbank> UNDEF UNDEF )
+    ( UNDEF <http://localhost:8080/tpf/drugbank> <http://localhost:8080/sparql/dbpedia/> )
+  }
+  {
+    SERVICE ?s1 { <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00201> ?predicate ?object . }
+  }
+  UNION
+  {
+    SERVICE ?s2 { <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00201> <http://www.w3.org/2002/07/owl#sameAs> ?caff . }
+    SERVICE ?s3 { ?caff ?predicate ?object . }
+  } 
+}

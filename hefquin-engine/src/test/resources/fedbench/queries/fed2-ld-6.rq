@@ -1,0 +1,10 @@
+SELECT DISTINCT ?director ?film ?x ?y ?n WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
+    ( <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/sparql/geonames/> )
+  }
+  SERVICE ?s1 { ?director <http://dbpedia.org/ontology/nationality> <http://dbpedia.org/resource/Italy> . }
+  SERVICE ?s2 { ?film <http://dbpedia.org/ontology/director> ?director. }
+  SERVICE ?s3 { ?x <http://www.w3.org/2002/07/owl#sameAs> ?film . }
+  SERVICE ?s4 { ?x <http://xmlns.com/foaf/0.1/based_near> ?y . }
+  SERVICE ?s5 { ?y <http://www.geonames.org/ontology#officialName> ?n . }
+}

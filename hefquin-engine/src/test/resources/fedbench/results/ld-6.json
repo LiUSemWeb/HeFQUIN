@@ -1,0 +1,912 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "director",
+      "film",
+      "x",
+      "y",
+      "n"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Italy"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "es",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "it",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "ln",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "vi",
+          "value": "Italia (Ý)"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Italie"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "de",
+          "value": "Italien"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "se",
+          "value": "Itália"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "to",
+          "value": "ʻĪtali"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "bo",
+          "value": "ཨི་ཊ་ལི།"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "ja",
+          "value": "イタリア共和国"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15183"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "ii",
+          "value": "ꑴꄊꆺ"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Italy"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "es",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "it",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "ln",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "vi",
+          "value": "Italia (Ý)"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Italie"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "de",
+          "value": "Italien"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "se",
+          "value": "Itália"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "to",
+          "value": "ʻĪtali"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "bo",
+          "value": "ཨི་ཊ་ལི།"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "ja",
+          "value": "イタリア共和国"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/L%27ultimo_bacio"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/15188"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "ii",
+          "value": "ꑴꄊꆺ"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Italy"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "es",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "it",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "ln",
+          "value": "Italia"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "vi",
+          "value": "Italia (Ý)"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Italie"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "de",
+          "value": "Italien"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "se",
+          "value": "Itália"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "to",
+          "value": "ʻĪtali"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "bo",
+          "value": "ཨི་ཊ་ལི།"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "ja",
+          "value": "イタリア共和国"
+        }
+      },
+      {
+        "director": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Gabriele_Muccino"
+        },
+        "film": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/But_Forever_in_My_Mind"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://data.linkedmdb.org/resource/film/18591"
+        },
+        "y": {
+          "type": "uri",
+          "value": "http://sws.geonames.org/3175395/"
+        },
+        "n": {
+          "type": "literal",
+          "xml:lang": "ii",
+          "value": "ꑴꄊꆺ"
+        }
+      }
+    ]
+  }
+}

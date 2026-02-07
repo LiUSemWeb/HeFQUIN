@@ -12,7 +12,7 @@ public abstract class FederationTestBase
 	 * Change this flag to true if you also want to run the
 	 * unit tests that access servers on the actual Web.
 	 */
-	public static boolean skipLiveWebTests = true;
+	public static boolean skipLiveWebTests = false;
 
 	/**
 	 * If this flag is true, tests that make requests to local neo4j

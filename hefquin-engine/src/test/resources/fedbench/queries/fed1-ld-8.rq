@@ -1,0 +1,10 @@
+SELECT DISTINCT ?drug ?id ?s ?o ?sub WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
+    ( <http://localhost:8080/tpf/drugbank> <http://localhost:8080/tpf/drugbank> <http://localhost:8080/tpf/drugbank> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> )
+  }
+  SERVICE ?s1 { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugCategory> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugcategory/micronutrient> . }
+  SERVICE ?s2 { ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/casRegistryNumber> ?id . }
+  SERVICE ?s3 { ?drug <http://www.w3.org/2002/07/owl#sameAs> ?s . }
+  SERVICE ?s4 { ?s <http://xmlns.com/foaf/0.1/name> ?o . }
+  SERVICE ?s5 { ?s <http://www.w3.org/2004/02/skos/core#subject> ?sub . }
+}

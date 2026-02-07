@@ -1,0 +1,18 @@
+{ "head": {
+    "vars": [ "film" , "director" , "genre" ]
+  } ,
+  "results": {
+    "bindings": [
+      { 
+        "film": { "type": "uri" , "value": "http://dbpedia.org/resource/L%27ultimo_bacio" } ,
+        "director": { "type": "uri" , "value": "http://dbpedia.org/resource/Gabriele_Muccino" } ,
+        "genre": { "type": "uri" , "value": "http://data.linkedmdb.org/resource/film_genre/4" }
+      } ,
+      { 
+        "film": { "type": "uri" , "value": "http://dbpedia.org/resource/Remember_Me%2C_My_Love" } ,
+        "director": { "type": "uri" , "value": "http://dbpedia.org/resource/Gabriele_Muccino" } ,
+        "genre": { "type": "uri" , "value": "http://data.linkedmdb.org/resource/film_genre/4" }
+      }
+    ]
+  }
+}

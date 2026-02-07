@@ -1,0 +1,8 @@
+SELECT DISTINCT ?a ?n WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ) {
+    ( <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> )
+  }
+  SERVICE ?s1 { ?a <http://dbpedia.org/ontology/artist> <http://dbpedia.org/resource/Michael_Jackson> . }
+  SERVICE ?s2 { ?a <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Album> . }
+  SERVICE ?s3 { ?a <http://xmlns.com/foaf/0.1/name> ?n . }
+}

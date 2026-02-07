@@ -1,0 +1,13 @@
+PREFIX nyt: <http://data.nytimes.com/elements/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT ?party ?page WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ) {
+    ( <http://localhost:8080/tpf/dbpedia> <http://localhost:8080/brtpf/nyt> <http://localhost:8080/brtpf/nyt> )
+  }
+  SERVICE ?s1 { <http://dbpedia.org/resource/Barack_Obama> <http://dbpedia.org/ontology/party> ?party }
+  SERVICE ?s2 { ?x <http://data.nytimes.com/elements/topicPage> ?page }
+  SERVICE ?s3 { ?x <http://www.w3.org/2002/07/owl#sameAs> <http://dbpedia.org/resource/Barack_Obama> }
+}

@@ -1,0 +1,10 @@
+SELECT DISTINCT ?x ?y ?d ?p ?l WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ?s5 ) {
+    ( <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> <http://localhost:8080/sparql/dbpedia/> )
+  }
+  SERVICE ?s1 { ?x <http://dbpedia.org/ontology/team> <http://dbpedia.org/resource/Eintracht_Frankfurt> . }
+  SERVICE ?s2 { ?x <http://www.w3.org/2000/01/rdf-schema#label> ?y . }
+  SERVICE ?s3 { ?x <http://dbpedia.org/ontology/birthDate> ?d . }
+  SERVICE ?s4 { ?x <http://dbpedia.org/ontology/birthPlace> ?p . }
+  SERVICE ?s5 { ?p <http://www.w3.org/2000/01/rdf-schema#label> ?l . }
+} 

@@ -1,0 +1,63 @@
+{ "head": {
+    "vars": [ "name" , "location" , "germany" ]
+  } ,
+  "results": {
+    "bindings": [
+      { 
+        "name": { "type": "literal" , "value": "Superdefekt" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      } ,
+      { 
+        "name": { "type": "literal" , "value": "Chaos" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      } ,
+      { 
+        "name": { "type": "literal" , "value": "Michael Bartels" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      } ,
+      { 
+        "name": { "type": "literal" , "value": "Remote Controlled" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      } ,
+      { 
+        "name": { "type": "literal" , "value": "Melophon" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      } ,
+      { 
+        "name": { "type": "literal" , "value": "Arne Pahlke" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      } ,
+      { 
+        "name": { "type": "literal" , "value": "The Gay Romeos" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      } ,
+      { 
+        "name": { "type": "literal" , "value": "Der tollwütige Kasper" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      } ,
+      { 
+        "name": { "type": "literal" , "value": "The Rodeo Five" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      } ,
+      { 
+        "name": { "type": "literal" , "value": "the ad.kowas" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      } ,
+      { 
+        "name": { "type": "literal" , "value": "herr gau" } ,
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/2911297/" } ,
+        "germany": { "type": "uri" , "value": "http://sws.geonames.org/2921044/" }
+      }
+    ]
+  }
+}

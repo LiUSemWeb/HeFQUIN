@@ -1,0 +1,9 @@
+SELECT ?film ?director ?genre WHERE {
+  VALUES ( ?s1 ?s2 ?s3 ?s4 ) {
+    ( <http://localhost:8080/tpf/dbpedia> <http://localhost:8080/tpf/dbpedia> <http://localhost:8080/brtpf/lmdb> <http://localhost:8080/brtpf/lmdb> )
+  }
+  SERVICE ?s1 { ?film <http://dbpedia.org/ontology/director>  ?director }
+  SERVICE ?s2 { ?director <http://dbpedia.org/ontology/nationality> <http://dbpedia.org/resource/Italy> }
+  SERVICE ?s3 { ?x <http://www.w3.org/2002/07/owl#sameAs> ?film }
+  SERVICE ?s4 { ?x <http://data.linkedmdb.org/resource/movie/genre> ?genre }
+}

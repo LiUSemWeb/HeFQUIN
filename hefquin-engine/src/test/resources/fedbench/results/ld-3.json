@@ -1,0 +1,2933 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "paper",
+      "p",
+      "x",
+      "n"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/38"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/enrico-motta"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://identifiers.kmi.open.ac.uk/people/enrico-motta/"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Enrico Motta"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/19"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/enrico-motta"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://identifiers.kmi.open.ac.uk/people/enrico-motta/"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Enrico Motta"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/enrico-motta"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://identifiers.kmi.open.ac.uk/people/enrico-motta/"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Enrico Motta"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/21"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/olaf-hartig"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://olafhartig.de/foaf.rdf#olaf"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Olaf Hartig"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/88"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/sean-bechhofer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.cs.man.ac.uk/~seanb/#me"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Sean Bechhofer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/69"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/simon-schenk"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.uni-koblenz.de/~sschenk/foaf.rdf#me"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Simon Schenk"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/83"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/soeren-auer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.informatik.uni-leipzig.de/~auer/foaf.rdf#me"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Sören Auer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/83"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/soeren-auer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.informatik.uni-leipzig.de/~auer/foaf.rdf#me"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Soeren Auer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/19"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/enrico-motta"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Enrico_Motta"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Enrico Motta"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/19"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/enrico-motta"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#enrico-motta"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Enrico Motta"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/enrico-motta"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Enrico_Motta"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Enrico Motta"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/enrico-motta"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#enrico-motta"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Enrico Motta"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/38"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/enrico-motta"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Enrico_Motta"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Enrico Motta"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/38"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/enrico-motta"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#enrico-motta"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Enrico Motta"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/88"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/sean-bechhofer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#sean-bechhofer"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Sean Bechhofer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/88"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/sean-bechhofer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Sean_Bechhofer"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Sean Bechhofer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/69"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/simon-schenk"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#simon-schenk"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Simon Schenk"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/83"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/soeren-auer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#soren-auer"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Sören Auer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/83"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/soeren-auer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#soren-auer"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Soeren Auer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/83"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/soeren-auer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Soeren_Auer"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Sören Auer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/83"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/soeren-auer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Soeren_Auer"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Soeren Auer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/50"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/kouji-kozaki"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Kouji_Kozaki"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Kouji Kozaki"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/50"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/riichiro-mizoguchi"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Riichiro_Mizoguchi"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Riichiro Mizoguchi"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/50"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/riichiro-mizoguchi"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Riichiro_Mizoguchi"
+        },
+        "n": {
+          "type": "literal",
+          "value": "R. Mizoguchi"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/50"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/riichiro-mizoguchi"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#riichiro-mizoguchi"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Riichiro Mizoguchi"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/50"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/riichiro-mizoguchi"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#riichiro-mizoguchi"
+        },
+        "n": {
+          "type": "literal",
+          "value": "R. Mizoguchi"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/84"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/aldo-gangemi"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Aldo_Gangemi"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Aldo Gangemi"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/84"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/aldo-gangemi"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#aldo-gangemi"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Aldo Gangemi"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/47"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/bijan-parsia"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Bijan_Parsia"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Bijan Parsia"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/47"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/bijan-parsia"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#bijan-parsia"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Bijan Parsia"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/65"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/bijan-parsia"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Bijan_Parsia"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Bijan Parsia"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/65"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/bijan-parsia"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#bijan-parsia"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Bijan Parsia"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/46"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/charlie-abela"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#charlie-abela"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Charlie Abela"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/22"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/daniel-oberle"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#daniel-oberle"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Daniel Oberle"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/daniel-olmedilla"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Daniel_Olmedilla"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Daniel Olmedilla"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/daniel-olmedilla"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#daniel-olmedilla"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Daniel Olmedilla"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/39"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/daniel-olmedilla"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Daniel_Olmedilla"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Daniel Olmedilla"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/39"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/daniel-olmedilla"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#daniel-olmedilla"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Daniel Olmedilla"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/20"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/fadi-badra"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#fadi-badra"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Fadi Badra"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Guotong_Xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guotong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Guotong_Xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guo Tong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#guotong-xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guotong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#guotong-xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guo Tong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Guotong_Xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guotong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Guotong_Xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guo Tong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#guotong-xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guotong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#guotong-xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guo Tong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Guotong_Xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guotong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Guotong_Xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guo Tong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#guotong-xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guotong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#guotong-xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guo Tong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Guotong_Xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guotong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Guotong_Xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guo Tong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#guotong-xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guotong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/guotong-xie"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#guotong-xie"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Guo Tong Xie"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/37"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/hideaki-takeda"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Hideaki_Takeda"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Hideaki Takeda"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/37"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/hideaki-takeda"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#hideaki-takeda"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Hideaki Takeda"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/27"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/kaarel-kaljurand"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#kaarel-kaljurand"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Kaarel Kaljurand"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Knud_Moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Möller"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Knud_Moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Hinnerk Möller"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Knud_Moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Moeller"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Knud_Moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Möller "
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#knud-moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Möller"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#knud-moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Hinnerk Möller"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#knud-moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Moeller"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#knud-moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Möller "
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/41"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/luigi-iannone"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#luigi-iannone"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Luigi Iannone"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/43"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/malte-kiesel"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#malte-kiesel"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Malte Kiesel"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/19"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/marta-sabou"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#marta-sabou"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Marta Sabou"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/marta-sabou"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#marta-sabou"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Marta Sabou"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/41"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/paul-doran"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#paul-doran"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Paul Doran"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/13"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/piero-bonatti"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#piero-bonatti"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Piero Bonatti"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/33"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/ronald-denaux"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#ronald-denaux"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Ronald Denaux"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/siegfried-handschuh"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Siegfried_Handschuh"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Siegfried Handschuh"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/siegfried-handschuh"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Siegfried_Handschuh"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Siggi Handschuh"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/41"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/terry-payne"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#terry-payne"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Terry Payne"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/41"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/terry-payne"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#terry-payne"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Terry R. Payne"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/67"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/thomas-franz"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#thomas-franz"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Thomas Franz"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/81"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/thomas-franz"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#thomas-franz"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Thomas Franz"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/84"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/valentina-presutti"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#valentina-presutti"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Valentina Presutti"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/41"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/valentina-tamma"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#valentina-tamma"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Valentina Tamma"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/33"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/vania-dimitrova"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#vania-dimitrova"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Vania Dimitrova"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/64"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/vit-novacek"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#vit-novacek"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Vit Novacek"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/69"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/vojtech-svatek"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#vojtech-svatek"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Vojtech Svatek"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/69"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/vojtech-svatek"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#vojtech-svatek"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Vojtěch Svátek"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yang-yang"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#yang-yang"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Yang Yang"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yue-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#yue-pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Yue Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yue-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#yue-pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Yue Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yue-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#yue-pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Yue Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yue-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://www.eswc2006.org/people/#yue-pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Yue Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/87"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/abraham-bernstein"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Abraham_Bernstein"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Abraham Bernstein"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/87"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/abraham-bernstein"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Abraham_Bernstein"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Abraham Bernstein"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/57"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jeff-z-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Jeff_Z_Pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Jeff Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/57"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jeff-z-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Jeff_Z_Pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Jeff Z. Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/22"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/kay-uwe-schmidt"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Kay-Uwe_Schmidt"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Kay-Uwe Schmidt"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/47"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/ulrike-sattler"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Ulrike_Sattler"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Ulrike Sattler"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/54"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/catherine-dolbear"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Catherine_Dolbear"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Catherine Dolbear"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/33"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/catherine-dolbear"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Catherine_Dolbear"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Catherine Dolbear"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/51"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/floriana-esposito"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Floriana_Esposito"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Floriana Esposito"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/54"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/glen-hart"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Glen_Hart"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Glen Hart"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/33"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/glen-hart"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Glen_Hart"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Glen Hart"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/36"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/holger-stenzhorn"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Holger_Stenzhorn"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Holger Stenzhorn"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/73"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/toru-ishida"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://semanticweb.org/id/Toru_Ishida"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Toru Ishida"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/37"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/aman-shakya"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Aman_Shakya"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Aman Shakya"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/49"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/david-leal"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/David_Leal"
+        },
+        "n": {
+          "type": "literal",
+          "value": "David Leal"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/83"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/soeren-auer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Soeren_Auer"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Sören Auer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/83"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/soeren-auer"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Soeren_Auer"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Soeren Auer"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Knud_Moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Möller"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Knud_Moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Hinnerk Möller"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Knud_Moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Moeller"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/knud-moeller"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Knud_Moeller"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Knud Möller "
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/19"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/marta-sabou"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Marta_Sabou"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Marta Sabou"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/marta-sabou"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Marta_Sabou"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Marta Sabou"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/siegfried-handschuh"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Siegfried_Handschuh"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Siegfried Handschuh"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/53"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/siegfried-handschuh"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Siegfried_Handschuh"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Siggi Handschuh"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/84"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/valentina-presutti"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Valentina_Presutti"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Valentina Presutti"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/69"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/vojtech-svatek"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Vojtech_Svatek"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Vojtech Svatek"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/69"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/vojtech-svatek"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Vojtech_Svatek"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Vojtěch Svátek"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yang-yang"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Yang_Yang"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Yang Yang"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yue-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Yue_Pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Yue Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yue-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Yue_Pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Yue Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yue-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Yue_Pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Yue Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/yue-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Yue_Pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Yue Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/57"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jeff-z-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Jeff_Pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Jeff Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/57"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jeff-z-pan"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Jeff_Pan"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Jeff Z. Pan"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/83"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/jens-lehmann"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Jens_Lehmann"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Jens Lehmann"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/20"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_dAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d'Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/20"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_dAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d’Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_dAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d'Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_dAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d’Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/19"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_dAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d'Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/19"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_dAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d’Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/38"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_dAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d'Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/38"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_dAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d’Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/19"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_DAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d'Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/19"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_DAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d’Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_DAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d'Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/34"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_DAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d’Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/38"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_DAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d'Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/38"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_DAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d’Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/20"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_DAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d'Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/20"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/mathieu-daquin"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Mathieu_DAquin"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Mathieu d’Aquin"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/25"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/natalya-noy"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Natasha_Noy"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Natasha Noy"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/25"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/natalya-noy"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Natasha_Noy"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Natalya Noy"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/25"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/natalya-noy"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Natasha_Noy"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Natasha F. Noy"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/25"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/natalya-noy"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Natasha_Noy"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Natalya F. Noy"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/60"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/natalya-noy"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Natasha_Noy"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Natasha Noy"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/60"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/natalya-noy"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Natasha_Noy"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Natalya Noy"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/60"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/natalya-noy"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Natasha_Noy"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Natasha F. Noy"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/60"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/natalya-noy"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Natasha_Noy"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Natalya F. Noy"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/73"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/toru-ishida"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Toru_Ishida"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Toru Ishida"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/32"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/matthias-wagner"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Matthias_Wagner"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Matthias Wagner"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/90"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/taowei-wang"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Taowei_Wang"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Taowei Wang"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/lei-zhang"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Lei_Zhang"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Lei Zhang"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/lei-zhang"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Lei_Zhang"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Lei Zhang"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/47"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/matthew-horridge"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Matthew_Horridge"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Matthew Horridge"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/49"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/michel-boehms"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Michel_Boehms"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Michel Böhms"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/31"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/shengping-liu"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Shengping_Liu"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Shengping Liu"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/30"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/shengping-liu"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Shengping_Liu"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Shengping Liu"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/28"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/shengping-liu"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Shengping_Liu"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Shengping Liu"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/29"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/shengping-liu"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Shengping_Liu"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Shengping Liu"
+        }
+      },
+      {
+        "paper": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/conference/iswc/2008/paper/poster_demo/37"
+        },
+        "p": {
+          "type": "uri",
+          "value": "http://data.semanticweb.org/person/vilas-wuwongse"
+        },
+        "x": {
+          "type": "uri",
+          "value": "http://ontoworld.org/wiki/Special:URIResolver/Vilas_Wuwongse"
+        },
+        "n": {
+          "type": "literal",
+          "value": "Vilas Wuwongse"
+        }
+      }
+    ]
+  }
+}

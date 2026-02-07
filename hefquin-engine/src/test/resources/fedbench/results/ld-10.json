@@ -1,0 +1,61 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "n",
+      "p2",
+      "u"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "n": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Angela_Merkel"
+        },
+        "p2": {
+          "type": "uri",
+          "value": "http://data.nytimes.com/47020002042752366693"
+        },
+        "u": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2010-06-10"
+        }
+      },
+      {
+        "n": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Helmut_Kohl"
+        },
+        "p2": {
+          "type": "uri",
+          "value": "http://data.nytimes.com/67130703510420659813"
+        },
+        "u": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2010-05-18"
+        }
+      },
+      {
+        "n": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Adolf_Hitler"
+        },
+        "p2": {
+          "type": "uri",
+          "value": "http://data.nytimes.com/86622946654839267863"
+        },
+        "u": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2010-05-22"
+        }
+      }
+    ]
+  }
+}

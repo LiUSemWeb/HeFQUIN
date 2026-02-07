@@ -1,0 +1,295 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "drug",
+      "title"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00168"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Aspartame (NF/INN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00155"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Citrulline (DCF)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00142"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Glutamic acid (JAN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00145"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Glycine (JP15/USP)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00160"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Alanine (JAN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00128"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Aspartic acid (JP15)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00143"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Glutathione (reduced type) (JP15)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00130"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Glutamine (JAN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00133"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Serine (JAN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00134"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Methionine (JP15)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00150"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Tryptophan (JP15)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00120"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Phenylalanine (JP15)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00135"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Tyrosine (JAN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00121"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Biotin (JAN/USP/INN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00149"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Leucine (JP15)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00117"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Histidine (JAN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00173"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Adenine (JAN/USP)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00172"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Proline (JAN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00156"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Threonine (JP15)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00167"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Isoleucine (JP15)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00158"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Folic acid (JP15/USP/INN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00166"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Thioctic acid (JAN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00123"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Lysine (USAN/INN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00170"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Menadione (USP)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00131"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Adenosine phosphate (USAN/INN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00125"
+        },
+        "title": {
+          "type": "literal",
+          "value": "L-Arginine (JP15)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00138"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Cystine (USAN/INN)"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00144"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Lecithin (NF)"
+        }
+      }
+    ]
+  }
+}

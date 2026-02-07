@@ -1,0 +1,16 @@
+{ "head": {
+    "vars": [ "location" , "news" ]
+  } ,
+  "results": {
+    "bindings": [
+      { 
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/5369907/" } ,
+        "news": { "type": "uri" , "value": "http://topics.nytimes.com/top/great-homes-and-destinations/destinations/southern-california/index.html" }
+      } ,
+      { 
+        "location": { "type": "uri" , "value": "http://sws.geonames.org/5369907/" } ,
+        "news": { "type": "uri" , "value": "http://topics.nytimes.com/top/great-homes-and-destinations/destinations/southern-california/index.html" }
+      }
+    ]
+  }
+}

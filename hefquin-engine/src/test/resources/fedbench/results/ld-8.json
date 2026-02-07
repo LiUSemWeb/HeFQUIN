@@ -1,0 +1,524 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "drug",
+      "id",
+      "s",
+      "o",
+      "sub"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00121"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:58-85-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Biotin"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Biotin"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Cofactors"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00121"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:58-85-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Biotin"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Biotin"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Organosulfur_compounds"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00121"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:58-85-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Biotin"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Biotin"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Vitamins"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00119"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:127-17-3"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Pyruvic_acid"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Pyruvic acid"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Exercise_physiology"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00119"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:127-17-3"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Pyruvic_acid"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Pyruvic acid"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Keto_acids"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00119"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:127-17-3"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Pyruvic_acid"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Pyruvic acid"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Cellular_respiration"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00133"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:56-45-1"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Serine"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Serine"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Proteinogenic_amino_acids"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00133"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:56-45-1"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Serine"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Serine"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Glucogenic_amino_acids"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00148"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:57-00-1"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Creatine"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Creatine"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Dietary_supplements"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00148"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:57-00-1"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Creatine"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Creatine"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Amino_acids"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00148"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:57-00-1"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Creatine"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Creatine"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Bodybuilding_supplements"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00148"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:57-00-1"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Creatine"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Creatine"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Guanidines"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00171"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:56-65-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Adenosine_triphosphate"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Adenosine triphosphate"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Exercise_physiology"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00171"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:56-65-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Adenosine_triphosphate"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Adenosine triphosphate"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Cellular_respiration"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00171"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:56-65-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Adenosine_triphosphate"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Adenosine triphosphate"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Coenzymes"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00171"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:56-65-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Adenosine_triphosphate"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Adenosine triphosphate"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Nucleotides"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00168"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:22839-47-0"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Aspartame"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Aspartame"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Sweeteners"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00168"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:22839-47-0"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Aspartame"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Aspartame"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Carboxylate_esters"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00147"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:65-22-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Pyridoxal"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Pyridoxal"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Alcohols"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00147"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:65-22-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Pyridoxal"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Pyridoxal"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Vitamins"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00147"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:65-22-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Pyridoxal"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Pyridoxal"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Aldehydes"
+        }
+      },
+      {
+        "drug": {
+          "type": "uri",
+          "value": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00147"
+        },
+        "id": {
+          "type": "uri",
+          "value": "http://bio2rdf.org/cas:65-22-5"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Pyridoxal"
+        },
+        "o": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Pyridoxal"
+        },
+        "sub": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/Category:Pyridines"
+        }
+      }
+    ]
+  }
+}
