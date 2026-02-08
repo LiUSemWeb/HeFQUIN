@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -16,8 +17,7 @@ import org.junit.Test;
  * tests focus on verifying that the CLI reaches and executes the expected code
  * paths, rather than asserting full result correctness.
  */
-
-//@Ignore("Disabled since it uses live web tests")
+@Ignore("Disabled since it uses live web tests")
 public class RunQueryWithoutSrcSelTest
 {
 	private static final String queryFile = "TestQuery.rq";
