@@ -527,6 +527,114 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		}
 	}
 
+	protected void _tpWithDuplicateInput1( final boolean useOuterJoinSemantics ) throws ExecutionException {
+		// This test sends two identical solution mappings as input to the
+		// operator; both of them have the same join partner in the result
+		// from the triple pattern and, thus, both must be reflected in the
+		// result of the operator because we use bag semantics.
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
+
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node s1 = NodeFactory.createURI("http://example.org/s1");
+		final Node x = NodeFactory.createURI("http://example.org/x");
+		final Node o1 = NodeFactory.createURI("http://example.org/o1");
+
+		final List<SolutionMapping> input = new ArrayList<>();
+		// two identical input solution mappings !!
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, x) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, x) );
+
+		final TriplePattern tp = new TriplePatternImpl(var1,p,var3);
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(s1,p,o1) );
+
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() { return Set.of(var1,var2); }
+
+			@Override
+			public Set<Var> getPossibleVariables() { return Set.of(); }
+		}, useOuterJoinSemantics);
+
+		// checking
+		assertTrue( it.hasNext() );
+
+		final Binding b1 = it.next().asJenaBinding();
+		assertEquals( 3, b1.size() );
+		assertEquals( s1, b1.get(var1) );
+		assertEquals( o1, b1.get(var3) );
+
+		assertTrue( it.hasNext() );
+
+		final Binding b2 = it.next().asJenaBinding();
+		assertEquals( 3, b2.size() );
+		assertEquals( s1, b2.get(var1) );
+		assertEquals( o1, b2.get(var3) );
+
+		assertFalse( it.hasNext() );
+	}
+
+	protected void _tpWithDuplicateInput2( final boolean useOuterJoinSemantics ) throws ExecutionException {
+		// This test sends two identical solution mappings as input to the
+		// operator; both of them have no join partner in the result from
+		// the triple pattern and, thus, both must be reflected in the
+		// outer-join result of the operator (because we use bag semantics)
+		// but not in the inner-join result.
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
+
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node s1 = NodeFactory.createURI("http://example.org/s1");
+		final Node s2 = NodeFactory.createURI("http://example.org/s2");
+		final Node x = NodeFactory.createURI("http://example.org/y");
+		final Node o1 = NodeFactory.createURI("http://example.org/o1");
+
+		final List<SolutionMapping> input = new ArrayList<>();
+		// two identical input solution mappings !!
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, x) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, x) );
+
+		final TriplePattern tp = new TriplePatternImpl(var1,p,var3);
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		// different subject !
+		dataForMember.add( Triple.create(s2,p,o1) );
+
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() { return Set.of(var1,var2); }
+
+			@Override
+			public Set<Var> getPossibleVariables() { return Set.of(); }
+		}, useOuterJoinSemantics);
+
+		// checking
+		if ( useOuterJoinSemantics ) {
+			assertTrue( it.hasNext() );
+
+			final Binding b1 = it.next().asJenaBinding();
+			assertEquals( 2, b1.size() );
+			assertEquals( s1, b1.get(var1) );
+			assertEquals( x, b1.get(var2) );
+
+			assertTrue( it.hasNext() );
+
+			final Binding b2 = it.next().asJenaBinding();
+			assertEquals( 2, b2.size() );
+			assertEquals( s1, b2.get(var1) );
+			assertEquals( x, b2.get(var2) );
+
+			assertFalse( it.hasNext() );
+		}
+		else {
+			assertFalse( it.hasNext() );
+		}
+	}
+
 	protected void _tpWithSpuriousDuplicates( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");

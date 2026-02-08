@@ -26,7 +26,6 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class ExecOpBindJoinSPARQLwithBoundJoinTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
 {
-
 	@Test
 	public void tpWithMissingNonJoinVar_InnerJoin() throws ExecutionException {
 		_tpWithMissingNonJoinVar(false);
@@ -135,6 +134,26 @@ public class ExecOpBindJoinSPARQLwithBoundJoinTest extends TestsForTPAddAlgorith
 	@Test
 	public void tpWithIllegalBNodeJoin_OuterJoin() throws ExecutionException {
 		_tpWithIllegalBNodeJoin(true);
+	}
+
+	@Test
+	public void tpWithDuplicateInput1_InnerJoin() throws ExecutionException {
+		_tpWithDuplicateInput1(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput1_OuterJoin() throws ExecutionException {
+		_tpWithDuplicateInput1(true);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_InnerJoin() throws ExecutionException {
+		_tpWithDuplicateInput2(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_OuterJoin() throws ExecutionException {
+		_tpWithDuplicateInput2(true);
 	}
 
 	@Test

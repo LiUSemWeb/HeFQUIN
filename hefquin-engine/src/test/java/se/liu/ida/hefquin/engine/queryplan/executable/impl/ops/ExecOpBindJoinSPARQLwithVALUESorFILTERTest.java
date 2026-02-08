@@ -103,6 +103,30 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTERTest extends TestsForTPAddAlg
 	}
 
 	@Test
+	public void tpWithDuplicateInput1_InnerJoin_WithVALUES() throws ExecutionException {
+		forceFailureForVALUES = false;
+		_tpWithDuplicateInput1(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput1_OuterJoin_WithVALUES() throws ExecutionException {
+		forceFailureForVALUES = false;
+		_tpWithDuplicateInput1(true);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_InnerJoin_WithVALUES() throws ExecutionException {
+		forceFailureForVALUES = false;
+		_tpWithDuplicateInput2(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_OuterJoin_WithVALUES() throws ExecutionException {
+		forceFailureForVALUES = false;
+		_tpWithDuplicateInput2(true);
+	}
+
+	@Test
 	public void tpWithSpuriousDuplicates_InnerJoin_WithVALUES() throws ExecutionException {
 		forceFailureForVALUES = false;
 		_tpWithSpuriousDuplicates(false);
@@ -196,6 +220,30 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTERTest extends TestsForTPAddAlg
 	public void tpWithIllegalBNodeJoin_OuterJoin_WithFILTER() throws ExecutionException {
 		forceFailureForVALUES = true;
 		_tpWithIllegalBNodeJoin(true);
+	}
+
+	@Test
+	public void tpWithDuplicateInput1_InnerJoin_WithFILTER() throws ExecutionException {
+		forceFailureForVALUES = true;
+		_tpWithDuplicateInput1(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput1_OuterJoin_WithFILTER() throws ExecutionException {
+		forceFailureForVALUES = true;
+		_tpWithDuplicateInput1(true);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_InnerJoin_WithFILTER() throws ExecutionException {
+		forceFailureForVALUES = true;
+		_tpWithDuplicateInput2(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_OuterJoin_WithFILTER() throws ExecutionException {
+		forceFailureForVALUES = true;
+		_tpWithDuplicateInput2(true);
 	}
 
 	@Test
