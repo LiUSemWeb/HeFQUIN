@@ -7,19 +7,21 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
--  none yet
+- Support for optional parameters in the template IRIs for REST APIs ([#493](https://github.com/LiUSemWeb/HeFQUIN/pull/493)).
 ### Changed
--  Updated request processors to use an HTTP client provider and shared connection pools ([#495](https://github.com/LiUSemWeb/HeFQUIN/pull/495)).
+- Change to Hydra vocabulary for the template IRIs of REST APIs in federation descriptions ([#493](https://github.com/LiUSemWeb/HeFQUIN/pull/493)).
+- Updated request processors to use an HTTP client provider and shared connection pools ([#495](https://github.com/LiUSemWeb/HeFQUIN/pull/495)).
+- Bug fix: the base implementation of the bind-join algorithm did not correctly implement bag semantics ([#498](https://github.com/LiUSemWeb/HeFQUIN/pull/498)).
 
 
 ## [0.0.8] - 2026-01-14
 
 ### Added
--  Initial support for RML-wrapped REST endpoints as federation members ([#486](https://github.com/LiUSemWeb/HeFQUIN/pull/486)).
--  Adding a 'numberOfSolMapsRetrievedPerReqOp' entry to the stats of bind joins ([#489](https://github.com/LiUSemWeb/HeFQUIN/pull/489)).
+- Initial support for RML-wrapped REST endpoints as federation members ([#486](https://github.com/LiUSemWeb/HeFQUIN/pull/486)).
+- Adding a 'numberOfSolMapsRetrievedPerReqOp' entry to the stats of bind joins ([#489](https://github.com/LiUSemWeb/HeFQUIN/pull/489)).
 ### Changed
--  Reimplementation of the printers for logical and for physical plans ([#487](https://github.com/LiUSemWeb/HeFQUIN/pull/487)).
--  Bux fix: 'equals' comparison of logical and also of physical plans must take the ID of the root operator into account ([#488](https://github.com/LiUSemWeb/HeFQUIN/pull/488)).
+- Reimplementation of the printers for logical and for physical plans ([#487](https://github.com/LiUSemWeb/HeFQUIN/pull/487)).
+- Bux fix: 'equals' comparison of logical and also of physical plans must take the ID of the root operator into account ([#488](https://github.com/LiUSemWeb/HeFQUIN/pull/488)).
 
 
 ## [0.0.7] - 2025-11-03
