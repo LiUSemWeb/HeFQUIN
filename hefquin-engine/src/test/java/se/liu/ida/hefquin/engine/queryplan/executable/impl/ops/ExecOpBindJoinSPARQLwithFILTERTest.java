@@ -94,6 +94,26 @@ public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<
 	}
 
 	@Test
+	public void tpWithDuplicateInput1_InnerJoin() throws ExecutionException {
+		_tpWithDuplicateInput1(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput1_OuterJoin() throws ExecutionException {
+		_tpWithDuplicateInput1(true);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_InnerJoin() throws ExecutionException {
+		_tpWithDuplicateInput2(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_OuterJoin() throws ExecutionException {
+		_tpWithDuplicateInput2(true);
+	}
+
+	@Test
 	public void tpWithSpuriousDuplicates_InnerJoin() throws ExecutionException {
 		_tpWithSpuriousDuplicates(false);
 	}

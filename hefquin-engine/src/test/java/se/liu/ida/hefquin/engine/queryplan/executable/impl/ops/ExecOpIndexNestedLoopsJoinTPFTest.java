@@ -82,6 +82,36 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<T
 		_tpWithIllegalBNodeJoin(true);
 	}
 
+	@Test
+	public void tpWithDuplicateInput1_InnerJoin() throws ExecutionException {
+		_tpWithDuplicateInput1(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput1_OuterJoin() throws ExecutionException {
+		_tpWithDuplicateInput1(true);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_InnerJoin() throws ExecutionException {
+		_tpWithDuplicateInput2(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_OuterJoin() throws ExecutionException {
+		_tpWithDuplicateInput2(true);
+	}
+
+	@Test
+	public void tpWithSpuriousDuplicates_InnerJoin() throws ExecutionException {
+		_tpWithSpuriousDuplicates(false);
+	}
+
+	@Test
+	public void tpWithSpuriousDuplicates_OuterJoin() throws ExecutionException {
+		_tpWithSpuriousDuplicates(true);
+	}
+
 
 	@Override
 	protected TPFServer createFedMemberForTest( final Graph dataForMember ) {

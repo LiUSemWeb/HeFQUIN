@@ -113,7 +113,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	 * handled, this set will be cleared (and then populated again, by using
 	 * the next input solution mappings that will arrive afterwards).
 	 */
-	protected final Set<SolutionMapping> currentBatch = new HashSet<>();
+	protected final List<SolutionMapping> currentBatch = new ArrayList<>();
 
 	/**
 	 * This set is used to collect up solution mappings that will be used

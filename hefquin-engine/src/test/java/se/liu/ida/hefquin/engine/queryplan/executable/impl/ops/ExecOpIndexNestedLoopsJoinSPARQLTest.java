@@ -48,6 +48,21 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithm
 		_tpWithIllegalBNodeJoin(false);
 	}
 
+	@Test
+	public void tpWithDuplicateInput1() throws ExecutionException {
+		_tpWithDuplicateInput1(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2() throws ExecutionException {
+		_tpWithDuplicateInput2(false);
+	}
+
+	@Test
+	public void tpWithSpuriousDuplicates() throws ExecutionException {
+		_tpWithSpuriousDuplicates(false);
+	}
+
 
 	@Override
 	protected SPARQLEndpoint createFedMemberForTest( final Graph dataForMember ) {
