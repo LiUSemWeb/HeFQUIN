@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoinWithRequestOps;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithVALUES;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpSequentialBindJoin;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpSequentialBindJoinSPARQLwithVALUES;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
@@ -33,13 +33,13 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
  * <p>
  * <b>Algorithm description:</b> For a detailed description of the
  * actual algorithm associated with this physical operator, refer
- * to {@link ExecOpBindJoinSPARQLwithVALUES}, which provides the
+ * to {@link ExecOpSequentialBindJoinSPARQLwithVALUES}, which provides the
  * implementation of this algorithm.
  * </p>
  */
 public class PhysicalOpBindJoinWithVALUES extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
-	protected static final Factory factory = new Factory( BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE );
+	protected static final Factory factory = new Factory( BaseForExecOpSequentialBindJoin.DEFAULT_BATCH_SIZE );
 	public static PhysicalOpFactory getFactory() { return factory; }
 
 	protected PhysicalOpBindJoinWithVALUES( final LogicalOpGPAdd lop,
@@ -59,7 +59,7 @@ public class PhysicalOpBindJoinWithVALUES extends BaseForPhysicalOpSingleInputJo
 	                                       final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables... inputVars ) {
-		return new ExecOpBindJoinSPARQLwithVALUES( pattern,
+		return new ExecOpSequentialBindJoinSPARQLwithVALUES( pattern,
 		                                           sparqlEndpoint,
 		                                           inputVars[0],
 		                                           useOuterJoinSemantics,

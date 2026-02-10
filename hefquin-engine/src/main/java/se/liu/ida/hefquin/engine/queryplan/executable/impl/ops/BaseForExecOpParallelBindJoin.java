@@ -94,7 +94,7 @@ import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalEr
  * {@link #createExecutableReqOpForAll()} method that needs to be provided by
  * each concrete implementation that extends this base class.
  */
-public abstract class BaseForExecOpParallelBindJoinWithRequests<
+public abstract class BaseForExecOpParallelBindJoin<
                                        QueryType extends Query,
                                        MemberType extends FederationMember,
                                        ReqType extends DataRetrievalRequest,
@@ -209,7 +209,7 @@ public abstract class BaseForExecOpParallelBindJoinWithRequests<
 	 *          super classes); <code>false</code> if the operator should
 	 *          immediately throw every {@link ExecOpExecutionException}
 	 */
-	public BaseForExecOpParallelBindJoinWithRequests(
+	public BaseForExecOpParallelBindJoin(
 			final QueryType query,
 			final Set<Var> varsInQuery,
 			final MemberType fm,
@@ -231,7 +231,7 @@ public abstract class BaseForExecOpParallelBindJoinWithRequests<
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 		this.batchSize = batchSize;
 
-		this.allJoinVarsAreCertain = BaseForExecOpBindJoinWithRequestOps.areAllJoinVarsAreCertain(varsInQuery, inputVars);
+		this.allJoinVarsAreCertain = BaseForExecOpSequentialBindJoin.areAllJoinVarsAreCertain(varsInQuery, inputVars);
 	}
 
 	@Override

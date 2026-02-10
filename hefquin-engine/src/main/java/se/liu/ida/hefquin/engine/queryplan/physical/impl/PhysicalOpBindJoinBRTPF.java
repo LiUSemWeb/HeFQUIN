@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoinWithRequestOps;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpSequentialBindJoin;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpSequentialBindJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
@@ -34,13 +34,13 @@ import se.liu.ida.hefquin.federation.members.BRTPFServer;
  * <p>
  * <b>Algorithm description:</b> For a detailed description of the
  * actual algorithm associated with this physical operator, refer
- * to {@link ExecOpBindJoinBRTPF}, which provides the
+ * to {@link ExecOpSequentialBindJoinBRTPF}, which provides the
  * implementation of this algorithm.
  * </p>
  */
 public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 {
-	protected static final Factory factory = new Factory( BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE );
+	protected static final Factory factory = new Factory( BaseForExecOpSequentialBindJoin.DEFAULT_BATCH_SIZE );
 	public static PhysicalOpFactory getFactory() { return factory; }
 
 	protected final int batchSize;
@@ -97,7 +97,7 @@ public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 		}
 
 		if ( fm instanceof BRTPFServer brtpf )
-			return new ExecOpBindJoinBRTPF( tp,
+			return new ExecOpSequentialBindJoinBRTPF( tp,
 			                                brtpf,
 			                                inputVars[0],
 			                                useOuterJoinSemantics,

@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
-public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
+public class ExecOpSequentialBindJoinSPARQLwithVALUESTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
 {
 	@Test
 	public void tpWithJoinOnObject_InnerJoin() throws ExecutionException {
@@ -123,9 +123,8 @@ public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<
 		_tpWithSpuriousDuplicates(true);
 	}
 
-
 	@Override
-	protected SPARQLEndpoint createFedMemberForTest(Graph dataForMember) {
+	protected SPARQLEndpoint createFedMemberForTest( final Graph dataForMember ) {
 		return new SPARQLEndpointForTest(dataForMember);
 	}
 
@@ -139,11 +138,12 @@ public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<
 	                                                 final SPARQLEndpoint fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		return new ExecOpBindJoinSPARQLwithFILTER( tp,
+
+		return new ExecOpSequentialBindJoinSPARQLwithVALUES( tp,
 		                                           fm,
 		                                           expectedVariables,
 		                                           useOuterJoinSemantics,
-		                                           ExecOpBindJoinSPARQLwithFILTER.DEFAULT_BATCH_SIZE,
+		                                           ExecOpSequentialBindJoinSPARQLwithVALUES.DEFAULT_BATCH_SIZE,
 		                                           false,
 		                                           null );
 	}

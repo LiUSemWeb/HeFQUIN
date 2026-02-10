@@ -12,11 +12,11 @@ import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
- * A base class for all variations of our batch-based bind-join algorithm
- * that use some form of SPARQL requests.
+ * A base class for all variations of our parallelized, batch-based
+ * bind-join algorithm that use some form of SPARQL requests.
  */
 public abstract class BaseForExecOpParallelBindJoinSPARQL
-		extends BaseForExecOpParallelBindJoinWithRequests<SPARQLGraphPattern,
+		extends BaseForExecOpParallelBindJoin<SPARQLGraphPattern,
 		                                                  SPARQLEndpoint,
 		                                                  SPARQLRequest,
 		                                                  SolMapsResponse>
@@ -39,6 +39,7 @@ public abstract class BaseForExecOpParallelBindJoinSPARQL
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
-		return new ExecOpRequestSPARQL<>( new SPARQLRequestImpl(query), fm, false, null );
+		final SPARQLRequest req = new SPARQLRequestImpl(query);
+		return new ExecOpRequestSPARQL<>(req, fm, false, null);
 	}
 }

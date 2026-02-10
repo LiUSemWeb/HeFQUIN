@@ -18,7 +18,7 @@ import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 
 /**
- * Implementation of (a batching version of) the bind join algorithm
+ * Implementation of the sequential, batch-based bind-join algorithm
  * for cases in which the federation member accessed by the algorithm
  * supports the brTPF interface.
  *
@@ -38,9 +38,10 @@ import se.liu.ida.hefquin.federation.members.BRTPFServer;
  * the input.
  *
  * For more details about the actual implementation of the algorithm, and its
- * extra capabilities, refer to {@link BaseForExecOpBindJoinWithRequestOps}.
+ * extra capabilities, refer to {@link BaseForExecOpSequentialBindJoin}.
  */
-public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<TriplePattern,BRTPFServer>
+public class ExecOpSequentialBindJoinBRTPF
+		extends BaseForExecOpSequentialBindJoin<TriplePattern,BRTPFServer>
 {
 	/**
 	 * @param tp - the triple pattern to be evaluated (in a bind-join
@@ -69,13 +70,14 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 	 *          the physical operator for which this executable operator
 	 *          was created
 	 */
-	public ExecOpBindJoinBRTPF( final TriplePattern tp,
-	                            final BRTPFServer fm,
-	                            final ExpectedVariables inputVars,
-	                            final boolean useOuterJoinSemantics,
-	                            final int batchSize,
-	                            final boolean collectExceptions,
-	                            final QueryPlanningInfo qpInfo ) {
+	public ExecOpSequentialBindJoinBRTPF(
+			final TriplePattern tp,
+			final BRTPFServer fm,
+			final ExpectedVariables inputVars,
+			final boolean useOuterJoinSemantics,
+			final int batchSize,
+			final boolean collectExceptions,
+			final QueryPlanningInfo qpInfo ) {
 		super( tp, tp.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo );
 	}
 

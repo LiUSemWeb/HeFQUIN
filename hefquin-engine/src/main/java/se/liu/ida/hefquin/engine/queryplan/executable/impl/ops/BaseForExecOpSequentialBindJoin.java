@@ -24,9 +24,9 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 
 /**
- * A generic implementation of (a batching version of) the bind join algorithm
- * that uses executable request operators for performing the requests to the
- * federation member.
+ * A generic implementation of batch-based bind-join algorithm that performs
+ * the bind-join requests sequentially, one after another, for which it uses
+ * executable request operators.
  *
  * The implementation is generic in the sense that it works with any type of
  * request operator. Each concrete implementation that extends this base class
@@ -75,8 +75,9 @@ import se.liu.ida.hefquin.federation.FederationMember;
  * {@link #createExecutableReqOpForAll()} method that needs to be provided by
  * each concrete implementation that extends this base class.
  */
-public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Query,
-                                                          MemberType extends FederationMember>
+public abstract class BaseForExecOpSequentialBindJoin<
+                                       QueryType extends Query,
+                                       MemberType extends FederationMember>
            extends UnaryExecutableOpBase
 {
 	public final static int DEFAULT_BATCH_SIZE = 30;
@@ -175,7 +176,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	 *          super classes); <code>false</code> if the operator should
 	 *          immediately throw every {@link ExecOpExecutionException}
 	 */
-	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
+	public BaseForExecOpSequentialBindJoin( final QueryType query,
 	                                            final Set<Var> varsInQuery,
 	                                            final MemberType fm,
 	                                            final ExpectedVariables inputVars,

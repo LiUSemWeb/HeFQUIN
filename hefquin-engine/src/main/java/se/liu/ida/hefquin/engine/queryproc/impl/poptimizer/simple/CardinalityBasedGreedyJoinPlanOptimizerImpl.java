@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoinWithRequestOps;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpSequentialBindJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
@@ -296,7 +296,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
          */
         protected double determineBlockSize( final FederationMember fm ) {
             if ( (fm instanceof SPARQLEndpoint) || (fm instanceof BRTPFServer) ){
-                return BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
+                return BaseForExecOpSequentialBindJoin.DEFAULT_BATCH_SIZE;
             }
             else if ( fm instanceof TPFServer ){
                 return 1;

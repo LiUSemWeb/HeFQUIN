@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
  * sent to the federation member.
  *
  * For more details about the actual implementation of the algorithm, and its
- * extra capabilities, refer to {@link BaseForExecOpParallelBindJoinWithRequests}.
+ * extra capabilities, refer to {@link BaseForExecOpParallelBindJoin}.
  */
 public class ExecOpParallelBindJoinSPARQLwithVALUES
 		extends BaseForExecOpParallelBindJoinSPARQL
@@ -68,7 +68,7 @@ public class ExecOpParallelBindJoinSPARQLwithVALUES
 
 	@Override
 	protected SPARQLRequest createRequest( final Set<Binding> batch ) {
-		return ExecOpBindJoinSPARQLwithVALUES.createRequest(batch, pattern);
+		return ExecOpSequentialBindJoinSPARQLwithVALUES.createRequest(batch, pattern);
 	}
 
 }

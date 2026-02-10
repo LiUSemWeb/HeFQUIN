@@ -3,9 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoinWithRequestOps;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpParallelBindJoinWithRequests;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithVALUES;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpParallelBindJoin;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpParallelBindJoinSPARQLwithVALUES;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -14,7 +12,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUES.Factory;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
@@ -43,7 +40,7 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 public class PhysicalOpParallelBindJoinWithVALUES
 		extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
-	protected static final Factory factory = new Factory( BaseForExecOpParallelBindJoinWithRequests.DEFAULT_BATCH_SIZE );
+	protected static final Factory factory = new Factory( BaseForExecOpParallelBindJoin.DEFAULT_BATCH_SIZE );
 	public static PhysicalOpFactory getFactory() { return factory; }
 
 	protected PhysicalOpParallelBindJoinWithVALUES( final LogicalOpGPAdd lop,
