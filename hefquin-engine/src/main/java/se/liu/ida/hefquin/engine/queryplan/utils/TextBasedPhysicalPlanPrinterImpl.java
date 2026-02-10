@@ -120,6 +120,12 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
+		public void visit( final PhysicalOpParallelBindJoinWithVALUES op ) {
+			rootOpString = "parallel bind join with VALUES (" + op.getID() + ")";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
 		public void visit( final PhysicalOpBindJoinWithUNION op ) {
 			rootOpString = "bind join with UNION (" + op.getID() + ")";
 			record( op.getLogicalOperator() );

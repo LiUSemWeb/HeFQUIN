@@ -81,6 +81,12 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 	public static NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps,
 	                                                         final Element pattern,
 	                                                         final SPARQLEndpoint fm ) {
+		final SPARQLRequest request = createRequest(solMaps, pattern);
+		return new ExecOpRequestSPARQL<>(request, fm, false, null);
+	}
+
+	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
+	                                           final Element pattern ) {
 		// Create the VALUES clause.
 		final Element valuesClause = createValuesClause(solMaps);
 
@@ -89,10 +95,8 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 		group.addElement( valuesClause );
 		group.addElement( pattern );
 
-		// Create the request operator using the combined pattern.
-		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
-		final SPARQLRequest request = new SPARQLRequestImpl(patternForReq);
-		return new ExecOpRequestSPARQL<>(request, fm, false, null);
+		// Create the request using the combined pattern.
+		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(group) );
 	}
 
 	public static Element createValuesClause( final Set<Binding> solMaps ) {

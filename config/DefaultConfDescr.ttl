@@ -79,6 +79,8 @@ _:bListOfPhysicalOpFactories
           ec:constructorArguments (30) ] # batch size
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUESorFILTER$Factory" ;
           ec:constructorArguments (30) ] # batch size
+        #[ ec:javaClassName #"se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpParallelBindJoinWithVALUES$Factory" ;
+        #  ec:constructorArguments (30) ] # batch size
         #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION$Factory" ]
         #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithFILTER$Factory" ]
         #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUES$Factory" ]
