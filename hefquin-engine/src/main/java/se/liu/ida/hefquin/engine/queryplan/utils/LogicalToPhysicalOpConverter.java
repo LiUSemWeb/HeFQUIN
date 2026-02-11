@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
@@ -34,6 +35,16 @@ public interface LogicalToPhysicalOpConverter
 	NullaryPhysicalOp convert( NullaryLogicalOp lop );
 
 	/**
+	 * Returns all physical operators that implement the given logical
+	 * operator.
+	 *
+	 * @param lop - the logical operator to be converted
+	 * @return a set of all possible physical operators for the given
+	 *         logical operator; the set may be empty
+	 */
+	Set<NullaryPhysicalOp> getAllPossible( NullaryLogicalOp lop );
+
+	/**
 	 * Returns a physical operator that implements the given logical
 	 * operator under the assumption that this operator will be used
 	 * in a plan in which the subplan under this operator will produce
@@ -54,6 +65,21 @@ public interface LogicalToPhysicalOpConverter
 	 *                     type of physical operator for the given input
 	 */
 	UnaryPhysicalOp convert( UnaryLogicalOp lop, ExpectedVariables inputVars );
+
+	/**
+	 * Returns all physical operators that implement the given logical
+	 * operator under the assumption that this operator will be used
+	 * in a plan in which the subplan under this operator will produce
+	 * solution mappings with the given variables.
+	 *
+	 * @param lop - the logical operator to be converted
+	 * @param inputVars - the variables that can be expected to be bound
+	 *                    in solution mappings that the physical operator
+	 *                    will have to process
+	 * @return a set of all possible physical operators for the given
+	 *         logical operator; the set may be empty
+	 */
+	Set<UnaryPhysicalOp> getAllPossible( UnaryLogicalOp lop, ExpectedVariables inputVars );
 
 	/**
 	 * Returns a physical operator that implements the given logical
@@ -83,6 +109,26 @@ public interface LogicalToPhysicalOpConverter
 	                          ExpectedVariables inputVars2 );
 
 	/**
+	 * Returns all physical operators that implement the given logical
+	 * operator under the assumption that this operator will be used
+	 * in a plan in which the two subplans under this operator will
+	 * produce solution mappings with the given variables, respectively.
+	 *
+	 * @param lop - the logical operator to be converted
+	 * @param inputVars1 - the variables that can be expected to be bound
+	 *                     in solution mappings that the physical operator
+	 *                     will have to process as its left input
+	 * @param inputVars2 - the variables that can be expected to be bound
+	 *                     in solution mappings that the physical operator
+	 *                     will have to process as its right input
+	 * @return a set of all possible physical operators for the given
+	 *         logical operator; the set may be empty
+	 */
+	Set<BinaryPhysicalOp> getAllPossible( BinaryLogicalOp lop,
+	                                      ExpectedVariables inputVars1,
+	                                      ExpectedVariables inputVars2 );
+
+	/**
 	 * Returns a physical operator that implements the given logical
 	 * operator under the assumption that this operator will be used
 	 * in a plan in which the subplans under this operator will produce
@@ -103,4 +149,20 @@ public interface LogicalToPhysicalOpConverter
 	 *                     type of physical operator for the given case
 	 */
 	NaryPhysicalOp convert( NaryLogicalOp lop, ExpectedVariables... inputVars );
+
+	/**
+	 * Returns all physical operators that implement the given logical
+	 * operator under the assumption that this operator will be used
+	 * in a plan in which the subplans under this operator will produce
+	 * solution mappings with the given variables, respectively.
+	 *
+	 * @param lop - the logical operator to be converted
+	 * @param inputVars - the variables that can be expected to be bound
+	 *                    in solution mappings that the physical operator
+	 *                    will have to process for each of its inputs
+	 * @param inputVars
+	 * @return a set of all possible physical operators for the given
+	 *         logical operator; the set may be empty
+	 */
+	Set<NaryPhysicalOp> getAllPossible( NaryLogicalOp lop, ExpectedVariables... inputVars );
 }

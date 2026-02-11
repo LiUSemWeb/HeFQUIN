@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
@@ -19,7 +20,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
@@ -30,7 +30,6 @@ import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
-import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class PhysicalPlanFactory
@@ -115,18 +114,11 @@ public class PhysicalPlanFactory
 	/**
 	 * Creates a plan with a request operator as root operator.
 	 */
-	public static <R extends DataRetrievalRequest, M extends FederationMember>
-	PhysicalPlan createPlanWithRequest( final LogicalOpRequest<R,M> lop ) {
-		final NullaryPhysicalOp pop = PhysicalOpRequest.getFactory().create(lop);
-		return createPlan(pop);
-	}
-
-	/**
-	 * Creates a plan with a request operator as root operator.
-	 */
 	public static  PhysicalPlan createPlanWithRequest( final DataRetrievalRequest req,
 	                                                   final FederationMember fm ) {
-		return createPlanWithRequest( new LogicalOpRequest<>(fm, req) );
+		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>(fm, req);
+		final NullaryPhysicalOp pop = PhysicalOpRequest.getFactory().create(lop);
+		return createPlan(pop);
 	}
 
 	/**
@@ -172,69 +164,6 @@ public class PhysicalPlanFactory
 
 
 	// --------- plans with unary root operators -----------
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoin( final LogicalOpGPAdd lop,
-	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinBRTPF.getFactory().create(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with an index nested loops join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpGPAdd lop,
-	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpIndexNestedLoopsJoin.getFactory().create(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a FILTER-based bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpGPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithFILTER.getFactory().create(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a UNION-based bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpGPAdd lop,
-	                                                        final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithUNION.getFactory().create(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a VALUES-based bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpGPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithVALUES.getFactory().create(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a VALUES-based bind join that can switch to FILTER-based bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUESorFILTER( final LogicalOpGPAdd lop,
-	                                                                 final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithVALUESorFILTER.getFactory().create(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bound join-based bind join.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinBoundJoin( final LogicalOpGPAdd lop,
-	                                                            final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithBoundJoin.getFactory().create(lop);
-		return createPlan(pop, subplan);
-	}
 
 	/**
 	 * Creates a physical plan in which the root operator is the physical
@@ -283,78 +212,6 @@ public class PhysicalPlanFactory
 	}
 
 	// --------- plans with binary root operators -----------
-
-	/**
-	 * Creates a plan with a binary union as root operator.
-	 */
-	public static PhysicalPlan createPlanWithUnion( final PhysicalPlan subplan1,
-	                                                final PhysicalPlan subplan2 ) {
-		return createPlanWithUnion( LogicalOpUnion.getInstance(), subplan1, subplan2 );
-	}
-
-	/**
-	 * Creates a plan with a binary union as root operator.
-	 */
-	public static PhysicalPlan createPlanWithUnion( final LogicalOpUnion lop,
-	                                                final PhysicalPlan subplan1,
-	                                                final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = PhysicalOpBinaryUnion.getFactory().create(lop);
-		return createPlan(pop, subplan1, subplan2);
-	}
-
-	/**
-	 * Creates a plan with a hash join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithHashJoin( final PhysicalPlan subplan1,
-	                                                   final PhysicalPlan subplan2 ) {
-		return createPlanWithHashJoin( LogicalOpJoin.getInstance(), subplan1, subplan2 );
-	}
-
-	/**
-	 * Creates a plan with a hash join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithHashJoin( final LogicalOpJoin lop,
-	                                                   final PhysicalPlan subplan1,
-	                                                   final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = PhysicalOpHashJoin.getFactory().create(lop);
-		return createPlan(pop, subplan1, subplan2);
-	}
-
-	/**
-	 * Creates a plan with a symmetric hash join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithSymmetricHashJoin( final PhysicalPlan subplan1,
-	                                                            final PhysicalPlan subplan2 ) {
-		return createPlanWithSymmetricHashJoin( LogicalOpJoin.getInstance(), subplan1, subplan2 );
-	}
-
-	/**
-	 * Creates a plan with a symmetric hash join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithSymmetricHashJoin( final LogicalOpJoin lop,
-	                                                            final PhysicalPlan subplan1,
-	                                                            final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = PhysicalOpSymmetricHashJoin.getFactory().create(lop);
-		return createPlan(pop, subplan1, subplan2);
-	}
-
-	/**
-	 * Creates a plan with a naive nested loops join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithNaiveNLJ( final PhysicalPlan subplan1,
-	                                                   final PhysicalPlan subplan2 ) {
-		return createPlanWithNaiveNLJ( LogicalOpJoin.getInstance(), subplan1, subplan2 );
-	}
-
-	/**
-	 * Creates a plan with a naive nested loops join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithNaiveNLJ( final LogicalOpJoin lop,
-	                                                   final PhysicalPlan subplan1,
-	                                                   final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = PhysicalOpNaiveNestedLoopsJoin.getFactory().create(lop);
-		return createPlan(pop, subplan1, subplan2);
-	}
 
 	/**
 	 * Creates a plan with a binary join as root operator, using the
@@ -582,39 +439,29 @@ public class PhysicalPlanFactory
 	}
 
 	public static PhysicalPlan extractRequestAsPlan( final UnaryLogicalOp lop ) {
-		if ( lop instanceof LogicalOpGPAdd ) {
-			return extractRequestAsPlan( (LogicalOpGPAdd) lop );
+		if ( lop instanceof LogicalOpGPAdd gpAdd ) {
+			return extractRequestAsPlan(gpAdd);
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of logical operator (type: " + lop.getClass().getName() + ").");
 		}
 	}
 
-	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq( final PhysicalOpRequest<?, ?> req,
-	                                                                   final PhysicalPlan subplan ) {
-		final List<PhysicalPlan> plans = new ArrayList<>();
-		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) req).getLogicalOperator();
-		final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp( (LogicalOpRequest<?,?>) lop );
+	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq(
+			final PhysicalOpRequest<?, ?> req,
+			final PhysicalPlan subplan,
+			final LogicalToPhysicalOpConverter lop2pop ) {
+		final LogicalOpRequest<?,?> lop = (LogicalOpRequest<?,?>) req.getLogicalOperator();
+		final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(lop);
 
-		if ( newRoot instanceof LogicalOpGPAdd gpAdd ) {
-			plans.add( createPlanWithIndexNLJ( gpAdd, subplan) );
+		assert newRoot instanceof LogicalOpGPAdd;
 
-			final FederationMember fm = gpAdd.getFederationMember();
+		final Set<UnaryPhysicalOp> allPOPs = lop2pop.getAllPossible( newRoot,
+		                                                             subplan.getExpectedVariables() );
 
-			if ( fm instanceof SPARQLEndpoint ) {
-				plans.add( createPlanWithBindJoinFILTER(gpAdd, subplan) );
-				plans.add( createPlanWithBindJoinUNION(gpAdd, subplan) );
-				//plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
-				plans.add( createPlanWithBindJoinVALUESorFILTER(gpAdd, subplan) );
-				plans.add( createPlanWithBindJoinBoundJoin(gpAdd, subplan) );
-			}
-
-			if ( fm instanceof BRTPFServer ) {
-				plans.add( createPlanWithBindJoin(gpAdd, subplan) );
-			}
-		}
-		else {
-			throw new UnsupportedOperationException( "unsupported operator: " + newRoot.getClass().getName() );
+		final List<PhysicalPlan> plans = new ArrayList<>( allPOPs.size() );
+		for ( final UnaryPhysicalOp pop : allPOPs ) {
+			plans.add( createPlan(pop, subplan) );
 		}
 
 		return plans;

@@ -185,7 +185,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 				final PhysicalOperator rightRootOp = optmRight.getRootOperator();
 				if ( rightRootOp instanceof PhysicalOpRequest ) {
 					final PhysicalOpRequest<?,?> _rightRootOp = (PhysicalOpRequest<?,?>) rightRootOp;
-					final List<PhysicalPlan> plansWithUnaryRoot = PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq(_rightRootOp, optmLeft);
+					final List<PhysicalPlan> plansWithUnaryRoot = PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq(_rightRootOp, optmLeft, lop2pop);
 					candidatePlans.addAll(plansWithUnaryRoot);
 				}
 				else if (    rightRootOp instanceof PhysicalOpBinaryUnion
