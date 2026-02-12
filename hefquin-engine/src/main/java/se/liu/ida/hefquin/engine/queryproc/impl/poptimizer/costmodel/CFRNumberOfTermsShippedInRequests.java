@@ -66,14 +66,21 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 
 		// cases in which the cost value depends on some intermediate
 		// result size, which needs to be fetched first
-		if (    pop instanceof PhysicalOpIndexNestedLoopsJoin
-		     || pop instanceof PhysicalOpBindJoinWithUNION ) {
+		if ( pop instanceof PhysicalOpIndexNestedLoopsJoin ) {
 			return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfTerms + numberOfJoinVars) );
 		}
-		else if (    pop instanceof PhysicalOpBindJoinWithFILTER
-		          || pop instanceof PhysicalOpBindJoinWithVALUES
-		          || pop instanceof PhysicalOpBindJoinBRTPF ) {
+		else if ( pop instanceof PhysicalOpBindJoinBRTPF ) {
 			return futureIntResSize.thenApply( intResSize -> numberOfTerms + intResSize * numberOfJoinVars );
+		}
+		else if ( pop instanceof PhysicalOpBindJoinSPARQL bj ) {
+			if ( bj.getType().equals("VALUES_BASED") )
+				return futureIntResSize.thenApply( intResSize -> numberOfTerms + intResSize * numberOfJoinVars );
+			if ( bj.getType().equals("VALUES_OR_FILTER") )
+				return futureIntResSize.thenApply( intResSize -> numberOfTerms + intResSize * numberOfJoinVars );
+			if ( bj.getType().equals("UNION_BASED") )
+				return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfTerms + numberOfJoinVars) );
+
+			throw new UnsupportedOperationException("The cost model does not yet support " + bj.getType() + "bind joins.");
 		}
 
 		// cases in which the cost value can be calculated directly

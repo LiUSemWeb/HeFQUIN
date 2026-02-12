@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 
 import java.util.concurrent.CompletableFuture;
 
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoinWithRequestOps;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpSequentialBindJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
@@ -26,7 +26,7 @@ public class CFRNumberOfRequests extends CFRBase
 		final PhysicalOperator rootOp = plan.getRootOperator();
 
 		final double pageSize = defaultPageSize;
-		final double blockSize = BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
+		final double blockSize = BaseForExecOpSequentialBindJoin.DEFAULT_BATCH_SIZE;
 		final CompletableFuture<Integer> numReq;
 
 		if ( rootOp instanceof PhysicalOpIndexNestedLoopsJoin inljOp ) {
@@ -66,9 +66,7 @@ public class CFRNumberOfRequests extends CFRBase
 						return avgPageNum * opeNum;
 			} );
 		}
-		else if ( rootOp instanceof PhysicalOpBindJoinWithUNION
-		     || rootOp instanceof PhysicalOpBindJoinWithFILTER
-		     || rootOp instanceof PhysicalOpBindJoinWithVALUES ) {
+		else if ( rootOp instanceof PhysicalOpBindJoinSPARQL ) {
 //			The actual number of requests depends on the block size used for the bind-join requests.
 			numReq = initiateCardinalityEstimation( plan.getSubPlan(0) );
 			return numReq.thenApply( card -> (int) Math.ceil(card/blockSize) );

@@ -8,11 +8,7 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpFixedSolMap op );
 
 	void visit( PhysicalOpBindJoinBRTPF op );
-	void visit( PhysicalOpBindJoinWithVALUES op );
-	void visit( PhysicalOpBindJoinWithUNION op );
-	void visit( PhysicalOpBindJoinWithFILTER op );
-	void visit( PhysicalOpBindJoinWithVALUESorFILTER op );
-    void visit( PhysicalOpBindJoinWithBoundJoin op );
+	void visit( PhysicalOpBindJoinSPARQL op );
 	void visit( PhysicalOpIndexNestedLoopsJoin op );
 	void visit( PhysicalOpLookupJoinViaWrapper op );
 

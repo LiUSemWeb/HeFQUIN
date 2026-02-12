@@ -37,15 +37,16 @@ import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
- * Implementation of (a batching version of) the bound-join algorithm that
+ * Implementation of the sequential, batch-based bind-join algorithm that
  * uses UNION clauses with variable renaming (as proposed in the FedX
- * paper by Schwarte et al. 2011). The variable that is renamed can be
- * any non-join variable.
+ * paper by Schwarte et al. 2011, where it is called "bound join"). The
+ * variable that is renamed can be any non-join variable.
  *
  * For more details about the actual implementation of the algorithm, and its
- * extra capabilities, refer to {@link BaseForExecOpBindJoinWithRequestOps}.
+ * extra capabilities, refer to {@link BaseForExecOpSequentialBindJoin}.
  */
-public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPARQL
+public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
+		extends BaseForExecOpSequentialBindJoinSPARQL
 {
 	protected final Element pattern;
 
@@ -83,13 +84,14 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	 *          the physical operator for which this executable operator
 	 *          was created
 	 */
-	public ExecOpBindJoinSPARQLwithBoundJoin( final SPARQLGraphPattern query,
-	                                          final SPARQLEndpoint fm,
-	                                          final ExpectedVariables inputVars,
-	                                          final boolean useOuterJoinSemantics,
-	                                          final int batchSize,
-	                                          final boolean collectExceptions,
-	                                          final QueryPlanningInfo qpInfo ) {
+	public ExecOpSequentialBindJoinSPARQLwithVarRenaming(
+			final SPARQLGraphPattern query,
+			final SPARQLEndpoint fm,
+			final ExpectedVariables inputVars,
+			final boolean useOuterJoinSemantics,
+			final int batchSize,
+			final boolean collectExceptions,
+			final QueryPlanningInfo qpInfo ) {
 		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 

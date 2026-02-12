@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.util.List;
+import java.util.Set;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
@@ -36,9 +37,20 @@ public class LogicalToPhysicalOpConverterImpl implements LogicalToPhysicalOpConv
 	}
 
 	@Override
+	public Set<NullaryPhysicalOp> getAllPossible( final NullaryLogicalOp lop ) {
+		return registry.createAll(lop);
+	}
+
+	@Override
 	public UnaryPhysicalOp convert( final UnaryLogicalOp lop,
 	                                final ExpectedVariables inputVars ) {
 		return registry.create(lop, inputVars);
+	}
+
+	@Override
+	public Set<UnaryPhysicalOp> getAllPossible( final UnaryLogicalOp lop,
+	                                            final ExpectedVariables inputVars ) {
+		return registry.createAll(lop, inputVars);
 	}
 
 	@Override
@@ -49,8 +61,21 @@ public class LogicalToPhysicalOpConverterImpl implements LogicalToPhysicalOpConv
 	}
 
 	@Override
+	public Set<BinaryPhysicalOp> getAllPossible( final BinaryLogicalOp lop,
+	                                             final ExpectedVariables inputVars1,
+	                                             final ExpectedVariables inputVars2 ) {
+		return registry.createAll(lop, inputVars1, inputVars2);
+	}
+
+	@Override
 	public NaryPhysicalOp convert( final NaryLogicalOp lop,
 	                               final ExpectedVariables... inputVars ) {
 		return registry.create(lop, inputVars);
+	}
+
+	@Override
+	public Set<NaryPhysicalOp> getAllPossible( final NaryLogicalOp lop,
+	                                           final ExpectedVariables... inputVars ) {
+		return registry.createAll(lop, inputVars);
 	}
 }

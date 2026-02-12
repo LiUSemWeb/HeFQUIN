@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
-public class ExecOpBindJoinSPARQLwithVALUESorFILTERTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
+public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTERTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
 {
 	protected boolean forceFailureForVALUES = false;
 
@@ -286,11 +286,11 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTERTest extends TestsForTPAddAlg
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
 
-		return new ExecOpBindJoinSPARQLwithVALUESorFILTER( tp,
+		return new ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER( tp,
 		                                                   fm,
 		                                                   expectedVariables,
 		                                                   useOuterJoinSemantics,
-		                                                   ExecOpBindJoinSPARQLwithVALUESorFILTER.DEFAULT_BATCH_SIZE,
+		                                                   ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER.DEFAULT_BATCH_SIZE,
 		                                                   false,
 		                                                   null );
 	}

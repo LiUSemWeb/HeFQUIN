@@ -1,20 +1,19 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.E_Equals;
 import org.apache.jena.sparql.expr.E_LogicalAnd;
-import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprVar;
-import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
+import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementUnion;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -28,14 +27,14 @@ import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
- * Implementation of (a batching version of) the bind join algorithm that
- * uses FILTERs to capture the potential join partners that are sent to the
- * federation member.
+ * Implementation of the sequential, batch-based bind-join algorithm
+ * that uses UNION clauses with FILTERs inside.
  *
  * For more details about the actual implementation of the algorithm, and its
- * extra capabilities, refer to {@link BaseForExecOpBindJoinWithRequestOps}.
+ * extra capabilities, refer to {@link BaseForExecOpSequentialBindJoin}.
  */
-public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
+public class ExecOpSequentialBindJoinSPARQLwithUNION
+		extends BaseForExecOpSequentialBindJoinSPARQL
 {
 	protected final Element pattern;
 
@@ -66,13 +65,14 @@ public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
 	 *          the physical operator for which this executable operator
 	 *          was created
 	 */
-	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query,
-	                                       final SPARQLEndpoint fm,
-	                                       final ExpectedVariables inputVars,
-	                                       final boolean useOuterJoinSemantics,
-	                                       final int batchSize,
-	                                       final boolean collectExceptions,
-	                                       final QueryPlanningInfo qpInfo ) {
+	public ExecOpSequentialBindJoinSPARQLwithUNION(
+			final SPARQLGraphPattern query,
+			final SPARQLEndpoint fm,
+			final ExpectedVariables inputVars,
+			final boolean useOuterJoinSemantics,
+			final int batchSize,
+			final boolean collectExceptions,
+			final QueryPlanningInfo qpInfo ) {
 		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
@@ -80,54 +80,60 @@ public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
-		return createExecutableReqOp(solMaps, pattern, fm);
-	}
-
-
-	// ---- helper functions ---------
-
-	public static NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps,
-	                                                         final Element pattern,
-	                                                         final SPARQLEndpoint fm ) {
-		final Expr expr = createFilterExpression(solMaps);
-
-		final ElementGroup group = new ElementGroup();
-		group.addElement( pattern );
-		group.addElement( new ElementFilter(expr) );
-
-		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
-		final SPARQLRequest request = new SPARQLRequestImpl(patternForReq);
+		final SPARQLRequest request = createRequest(solMaps, pattern, varsInQuery);
 		return new ExecOpRequestSPARQL<>(request, fm, false, null);
 	}
 
-	public static Expr createFilterExpression( final Iterable<Binding> solMaps ) {
-		Expr disjunction = null;
+	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
+	                                           final Element pattern,
+	                                           final Set<Var> varsInQuery ) {
+		final Element elmt = createUnion(solMaps, pattern, varsInQuery);
+		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(elmt) );
+	}
+
+	public static Element createUnion( final Iterable<Binding> solMaps,
+	                                   final Element pattern,
+	                                   final Set<Var> varsInQuery ) {
+		final Set<Expr> conjunctions = new HashSet<>();
 		for ( final Binding sm : solMaps ) {
 			Expr conjunction = null;
-			final Iterator<Var> vars = sm.vars();
-			while ( vars.hasNext() ) {
-				final Var v = vars.next();
-				final Node n = sm.get(v);
-				final Expr expr = new E_Equals( new ExprVar(v),
-				                                new NodeValueNode(n) );
+			for ( final Var v : varsInQuery ) {
+				if ( sm.contains(v) ) {
+					final NodeValue nv = NodeValue.makeNode( sm.get(v) );
+					final Expr expr = new E_Equals( new ExprVar(v), nv );
 
-				if ( conjunction == null )
-					conjunction = expr;
-				else
-					conjunction = new E_LogicalAnd(conjunction, expr);
+					if ( conjunction == null )
+						conjunction = expr;
+					else
+						conjunction = new E_LogicalAnd(conjunction, expr);
+				}
 			}
 
 			assert conjunction != null;
 
-			if ( disjunction == null )
-				disjunction = conjunction;
-			else
-				disjunction = new E_LogicalOr(disjunction, conjunction);
+			conjunctions.add(conjunction);
 		}
 
-		assert disjunction != null;
+		if ( conjunctions.size() == 1 ) {
+			final Expr conjunction = conjunctions.iterator().next();
 
-		return disjunction;
+			final ElementGroup group = new ElementGroup();
+			group.addElement( pattern );
+			group.addElement( new ElementFilter(conjunction) );
+
+			return group;
+		}
+
+		final ElementUnion union = new ElementUnion();
+		for ( final Expr conjunction : conjunctions ) {
+			final ElementGroup group = new ElementGroup();
+			group.addElement( pattern );
+			group.addElement( new ElementFilter(conjunction) );
+
+			union.addElement(group);
+		}
+
+		return union;
 	}
 
 }

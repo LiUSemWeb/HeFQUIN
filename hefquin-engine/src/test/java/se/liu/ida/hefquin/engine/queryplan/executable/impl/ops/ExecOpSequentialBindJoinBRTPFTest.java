@@ -9,9 +9,9 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
-import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
 
-public class ExecOpBindJoinSPARQLwithUNIONTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
+public class ExecOpSequentialBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer>
 {
 	@Test
 	public void tpWithJoinOnObject_InnerJoin() throws ExecutionException {
@@ -123,9 +123,10 @@ public class ExecOpBindJoinSPARQLwithUNIONTest extends TestsForTPAddAlgorithms<S
 		_tpWithSpuriousDuplicates(true);
 	}
 
+
 	@Override
-	protected SPARQLEndpoint createFedMemberForTest( final Graph dataForMember) {
-		return new SPARQLEndpointForTest(dataForMember);
+	protected BRTPFServer createFedMemberForTest( final Graph dataForMember ) {
+		return new BRTPFServerForTest(dataForMember);
 	}
 
 	@Override
@@ -135,16 +136,15 @@ public class ExecOpBindJoinSPARQLwithUNIONTest extends TestsForTPAddAlgorithms<S
 
 	@Override
 	protected UnaryExecutableOp createExecOpForTest( final TriplePattern tp,
-	                                                 final SPARQLEndpoint fm,
+	                                                 final BRTPFServer fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		return new ExecOpBindJoinSPARQLwithUNION( tp,
-		                                          fm,
-		                                          expectedVariables,
-		                                          useOuterJoinSemantics,
-		                                          ExecOpBindJoinSPARQLwithUNION.DEFAULT_BATCH_SIZE,
-		                                          false,
-		                                          null );
+		return new ExecOpSequentialBindJoinBRTPF( tp,
+		                                fm,
+		                                expectedVariables,
+		                                useOuterJoinSemantics,
+		                                ExecOpSequentialBindJoinBRTPF.DEFAULT_BATCH_SIZE,
+		                                false,
+		                                null);
 	}
-
 }

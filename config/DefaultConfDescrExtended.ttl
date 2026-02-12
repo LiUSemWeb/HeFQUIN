@@ -87,13 +87,30 @@ _:bListOfPhysicalOpFactories
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF$Factory" ;
           ec:constructorArguments (30) ] # batch size
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin$Factory" ;
-          ec:constructorArguments (30) ] # batch size
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUESorFILTER$Factory" ;
-          ec:constructorArguments (30) ] # batch size
-        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION$Factory" ]
-        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithFILTER$Factory" ]
-        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUES$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
+          ec:constructorArguments ("VARIABLE_RENAMING"
+                                   false  # false = sequential version
+                                   30) ]  # batch size
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
+          ec:constructorArguments ("VALUES_OR_FILTER"
+                                   false  # false = sequential version
+                                   30) ]  # batch size
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
+        #  ec:constructorArguments ("VALUES_BASED"
+        #                           false  # false = sequential version
+        #                           30) ]  # batch size
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
+        #  ec:constructorArguments ("VALUES_BASED"
+        #                           true   # true = parallel version
+        #                           30) ]  # batch size
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
+        #  ec:constructorArguments ("FILTER_BASED"
+        #                           false  # false = sequential version
+        #                           30) ]  # batch size
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
+        #  ec:constructorArguments ("UNION_BASED"
+        #                           false  # false = sequential version
+        #                           30) ]  # batch size
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLookupJoinViaWrapper$Factory" ]

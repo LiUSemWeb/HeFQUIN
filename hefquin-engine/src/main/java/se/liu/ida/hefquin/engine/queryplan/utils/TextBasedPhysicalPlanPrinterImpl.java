@@ -114,32 +114,11 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
-		public void visit( final PhysicalOpBindJoinWithVALUES op ) {
-			rootOpString = "bind join with VALUES (" + op.getID() + ")";
-			record( op.getLogicalOperator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpBindJoinWithUNION op ) {
-			rootOpString = "bind join with UNION (" + op.getID() + ")";
-			record( op.getLogicalOperator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpBindJoinWithFILTER op ) {
-			rootOpString = "bind join with FILTER (" + op.getID() + ")";
-			record( op.getLogicalOperator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpBindJoinWithVALUESorFILTER op ) {
-			rootOpString = "bind join with VALUES/FILTER (" + op.getID() + ")";
-			record( op.getLogicalOperator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpBindJoinWithBoundJoin op ) {
-			rootOpString = "bind join with variable renaming (" + op.getID() + ")";
+		public void visit( final PhysicalOpBindJoinSPARQL op ) {
+			rootOpString = "bind join for SPARQL (" + op.getID() + ")";
+			props.add( "type: " + op.getType() );
+			props.add( "parallel version: " + op.usesParallelVersion() );
+			props.add( "batch size: " + op.getBatchSize() );
 			record( op.getLogicalOperator() );
 		}
 

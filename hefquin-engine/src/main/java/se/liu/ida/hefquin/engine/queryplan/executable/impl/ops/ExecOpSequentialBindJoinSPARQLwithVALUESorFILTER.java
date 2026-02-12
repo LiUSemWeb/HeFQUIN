@@ -17,15 +17,18 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
- * Implementation of (a batching version of) the bind join algorithm that starts by
- * using a VALUES clause exactly as done by {@link ExecOpBindJoinSPARQLwithVALUES}.
- * If this fails for the first request, the implementation repeats the request by
- * using FILTERs as done by {@link ExecOpBindJoinSPARQLwithFILTER} and, then,
- * continues using the FILTER-based approach for the rest of the requests. If the
- * first VALUES-based request succeeds, however, then the implementation continues
- * using the VALUES-based approach for the rest of the requests. 
+ * Implementation of the sequential, batch-based bind-join algorithm
+ * that starts by using a VALUES clause exactly as done by
+ * {@link ExecOpSequentialBindJoinSPARQLwithVALUES}. If this fails for
+ * the first request, the implementation repeats the request by using
+ * FILTERs as done by {@link ExecOpSequentialBindJoinSPARQLwithFILTER}
+ * and, then, continues using the FILTER-based approach for the rest
+ * of the requests. If the first VALUES-based request succeeds, however,
+ * then the implementation continues using the VALUES-based approach for
+ * the rest of the requests. 
  */
-public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoinSPARQL
+public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
+		extends BaseForExecOpSequentialBindJoinSPARQL
 {
 	protected final Element pattern;
 
@@ -71,13 +74,14 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 	 *          the physical operator for which this executable operator
 	 *          was created
 	 */
-	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final SPARQLGraphPattern query,
-	                                               final SPARQLEndpoint fm,
-	                                               final ExpectedVariables inputVars,
-	                                               final boolean useOuterJoinSemantics,
-	                                               final int batchSize,
-	                                               final boolean collectExceptions,
-	                                               final QueryPlanningInfo qpInfo ) {
+	public ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER(
+			final SPARQLGraphPattern query,
+			final SPARQLEndpoint fm,
+			final ExpectedVariables inputVars,
+			final boolean useOuterJoinSemantics,
+			final int batchSize,
+			final boolean collectExceptions,
+			final QueryPlanningInfo qpInfo ) {
 		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
@@ -86,10 +90,10 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
 		if ( useFilterBasedApproach ) {
-			return ExecOpBindJoinSPARQLwithFILTER.createExecutableReqOp(solMaps, pattern, fm);
+			return ExecOpSequentialBindJoinSPARQLwithFILTER.createExecutableReqOp(solMaps, pattern, fm);
 		}
 		else {
-			return ExecOpBindJoinSPARQLwithVALUES.createExecutableReqOp(solMaps, pattern, fm);
+			return ExecOpSequentialBindJoinSPARQLwithVALUES.createExecutableReqOp(solMaps, pattern, fm);
 		}
 	}
 

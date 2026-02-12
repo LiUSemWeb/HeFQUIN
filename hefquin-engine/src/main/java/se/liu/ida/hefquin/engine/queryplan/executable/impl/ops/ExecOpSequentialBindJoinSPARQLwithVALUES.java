@@ -23,14 +23,15 @@ import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
- * Implementation of (a batching version of) the bind join algorithm that uses
+ * Implementation of the sequential, batch-based bind-join algorithm that uses
  * a VALUES clause to capture the potential join partners that are sent to the
  * federation member.
  *
  * For more details about the actual implementation of the algorithm, and its
- * extra capabilities, refer to {@link BaseForExecOpBindJoinWithRequestOps}.
+ * extra capabilities, refer to {@link BaseForExecOpSequentialBindJoin}.
  */
-public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
+public class ExecOpSequentialBindJoinSPARQLwithVALUES
+		extends BaseForExecOpSequentialBindJoinSPARQL
 {
 	protected final Element pattern;
 
@@ -61,13 +62,14 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 	 *          the physical operator for which this executable operator
 	 *          was created
 	 */
-	public ExecOpBindJoinSPARQLwithVALUES( final SPARQLGraphPattern query,
-	                                       final SPARQLEndpoint fm,
-	                                       final ExpectedVariables inputVars,
-	                                       final boolean useOuterJoinSemantics,
-	                                       final int batchSize,
-	                                       final boolean collectExceptions,
-	                                       final QueryPlanningInfo qpInfo ) {
+	public ExecOpSequentialBindJoinSPARQLwithVALUES(
+			final SPARQLGraphPattern query,
+			final SPARQLEndpoint fm,
+			final ExpectedVariables inputVars,
+			final boolean useOuterJoinSemantics,
+			final int batchSize,
+			final boolean collectExceptions,
+			final QueryPlanningInfo qpInfo ) {
 		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
@@ -81,6 +83,12 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 	public static NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps,
 	                                                         final Element pattern,
 	                                                         final SPARQLEndpoint fm ) {
+		final SPARQLRequest request = createRequest(solMaps, pattern);
+		return new ExecOpRequestSPARQL<>(request, fm, false, null);
+	}
+
+	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
+	                                           final Element pattern ) {
 		// Create the VALUES clause.
 		final Element valuesClause = createValuesClause(solMaps);
 
@@ -89,10 +97,8 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 		group.addElement( valuesClause );
 		group.addElement( pattern );
 
-		// Create the request operator using the combined pattern.
-		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
-		final SPARQLRequest request = new SPARQLRequestImpl(patternForReq);
-		return new ExecOpRequestSPARQL<>(request, fm, false, null);
+		// Create the request using the combined pattern.
+		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(group) );
 	}
 
 	public static Element createValuesClause( final Set<Binding> solMaps ) {

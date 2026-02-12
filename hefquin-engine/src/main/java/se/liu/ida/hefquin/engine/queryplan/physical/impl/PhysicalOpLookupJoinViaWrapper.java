@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;

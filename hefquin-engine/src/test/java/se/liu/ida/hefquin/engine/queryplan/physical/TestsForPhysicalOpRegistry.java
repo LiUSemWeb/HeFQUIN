@@ -18,8 +18,7 @@ import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.TestsForPhysicalOpFactories.ConstructorGPAddAndGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 
@@ -41,30 +40,38 @@ public class TestsForPhysicalOpRegistry
 
 	@Test
 	public void testOpBindJoinWithBoundJoin_gpAdd(){
-		final PhysicalOpRegistry factory = new PhysicalOpRegistry()
-			.register( PhysicalOpBindJoinWithBoundJoin.getFactory() );
-		assertSupportForOpBindJoinWithBoundJoin(gpAddConstructor, factory);
+		final PhysicalOpRegistry registry = new PhysicalOpRegistry();
+		registry.register( new PhysicalOpBindJoinSPARQL.Factory("VARIABLE_RENAMING",
+		                                                        false,
+		                                                        30) );
+		assertSupportForOpBindJoinWithBoundJoin(gpAddConstructor, registry);
 	}
 
 	@Test
 	public void testOpBindJoinWithBoundJoin_gpOptAdd(){
-		final PhysicalOpRegistry factory = new PhysicalOpRegistry()
-			.register( PhysicalOpBindJoinWithBoundJoin.getFactory() );
-		assertSupportForOpBindJoinWithBoundJoin(gpAddConstructor, factory);
+		final PhysicalOpRegistry registry = new PhysicalOpRegistry();
+		registry.register( new PhysicalOpBindJoinSPARQL.Factory("VARIABLE_RENAMING",
+		                                                        false,
+		                                                        30) );
+		assertSupportForOpBindJoinWithBoundJoin(gpAddConstructor, registry);
 	}
 
 	@Test
 	public void testOpBindJoinWithUNION_gpAdd(){
-		final PhysicalOpRegistry factory = new PhysicalOpRegistry()
-			.register( PhysicalOpBindJoinWithUNION.getFactory() );
-		assertSupportForOpBindJoinWithUNION(gpAddConstructor, factory);
+		final PhysicalOpRegistry registry = new PhysicalOpRegistry();
+		registry.register( new PhysicalOpBindJoinSPARQL.Factory("UNION_BASED",
+		                                                        false,
+		                                                        30) );
+		assertSupportForOpBindJoinWithUNION(gpAddConstructor, registry);
 	}
 
 	@Test
 	public void testOpBindJoinWithUNION_gpOptAdd(){
-		final PhysicalOpRegistry factory = new PhysicalOpRegistry()
-			.register( PhysicalOpBindJoinWithUNION.getFactory() );
-		assertSupportForOpBindJoinWithUNION(gpAddConstructor, factory);
+		final PhysicalOpRegistry registry = new PhysicalOpRegistry();
+		registry.register( new PhysicalOpBindJoinSPARQL.Factory("UNION_BASED",
+		                                                        false,
+		                                                        30) );
+		assertSupportForOpBindJoinWithUNION(gpAddConstructor, registry);
 	}
 
 
@@ -79,7 +86,7 @@ public class TestsForPhysicalOpRegistry
 		final ExpectedVariables spo = TestUtils.getExpectedVariables( List.of("s", "p", "o"), List.of() );
 
 		// assert type
-		assertEquals( PhysicalOpBindJoinWithBoundJoin.class, registry.create(lop, sp).getClass());
+		assertEquals( PhysicalOpBindJoinSPARQL.class, registry.create(lop, sp).getClass());
 		// non-joinable var missing
 		assertThrows( NoSuchElementException.class, () -> registry.create(lop, spo) );
 	}
@@ -93,7 +100,11 @@ public class TestsForPhysicalOpRegistry
 
 		final ExpectedVariables sp = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
 
+		final UnaryPhysicalOp pop = registry.create(lop, sp);
+
 		// assert type
-		assertEquals( PhysicalOpBindJoinWithUNION.class, registry.create(lop, sp).getClass());
+		assertEquals( PhysicalOpBindJoinSPARQL.class, pop.getClass() );
+		final PhysicalOpBindJoinSPARQL bj = (PhysicalOpBindJoinSPARQL) pop;
+		assertEquals( "UNION_BASED", bj.getType() );
 	}
 }

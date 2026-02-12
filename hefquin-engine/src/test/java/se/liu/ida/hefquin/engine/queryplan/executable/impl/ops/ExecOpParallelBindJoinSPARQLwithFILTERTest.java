@@ -9,9 +9,9 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
-import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
-public class ExecOpBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer>
+public class ExecOpParallelBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
 {
 	@Test
 	public void tpWithJoinOnObject_InnerJoin() throws ExecutionException {
@@ -123,10 +123,9 @@ public class ExecOpBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer
 		_tpWithSpuriousDuplicates(true);
 	}
 
-
 	@Override
-	protected BRTPFServer createFedMemberForTest( final Graph dataForMember ) {
-		return new BRTPFServerForTest(dataForMember);
+	protected SPARQLEndpoint createFedMemberForTest( final Graph dataForMember ) {
+		return new SPARQLEndpointForTest(dataForMember);
 	}
 
 	@Override
@@ -136,15 +135,15 @@ public class ExecOpBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer
 
 	@Override
 	protected UnaryExecutableOp createExecOpForTest( final TriplePattern tp,
-	                                                 final BRTPFServer fm,
+	                                                 final SPARQLEndpoint fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		return new ExecOpBindJoinBRTPF( tp,
-		                                fm,
-		                                expectedVariables,
-		                                useOuterJoinSemantics,
-		                                ExecOpBindJoinBRTPF.DEFAULT_BATCH_SIZE,
-		                                false,
-		                                null);
+
+		return new ExecOpParallelBindJoinSPARQLwithFILTER(
+				tp, fm, expectedVariables, useOuterJoinSemantics,
+				ExecOpSequentialBindJoinSPARQLwithVALUES.DEFAULT_BATCH_SIZE,
+				false, null );
 	}
+
+
 }
