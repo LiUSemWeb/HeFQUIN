@@ -61,7 +61,7 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
  * for the different kinds of bind-join requests.
  * </p>
  */
-public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
+public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoin
 {
 	public static final String VALUES_BASED       = "VALUES_BASED";
 	public static final String FILTER_BASED       = "FILTER_BASED";
@@ -80,13 +80,20 @@ public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoinAt
 
 	protected PhysicalOpBindJoinSPARQL( final LogicalOpGPAdd lop,
 	                                    final Factory myFactory ) {
-		super(lop, myFactory.batchSize);
+		super(lop);
+
+		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+		assert ! lop.hasParameterVariables();
+
 		this.myFactory = myFactory;
 	}
 
 	protected PhysicalOpBindJoinSPARQL( final LogicalOpGPOptAdd lop,
 	                                    final Factory myFactory ) {
-		super(lop, myFactory.batchSize);
+		super(lop);
+
+		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+
 		this.myFactory = myFactory;
 	}
 
@@ -95,12 +102,39 @@ public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoinAt
 	public int getBatchSize()            { return myFactory.batchSize; }
 
 	@Override
-	public UnaryExecutableOp createExecOp( final SPARQLGraphPattern pattern,
-	                                       final SPARQLEndpoint sparqlEndpoint,
-	                                       final boolean useOuterJoinSemantics,
-	                                       final boolean collectExceptions,
+	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables... inputVars ) {
+		final SPARQLGraphPattern gp;
+		final FederationMember fm;
+		final boolean useOuterJoin;
+
+		if ( lop instanceof LogicalOpGPAdd gpAdd ) {
+			gp = gpAdd.getPattern();
+			fm = gpAdd.getFederationMember();
+			useOuterJoin = false;
+		}
+		else if ( lop instanceof LogicalOpGPOptAdd gpOptAdd ) {
+			gp = gpOptAdd.getPattern();
+			fm = gpOptAdd.getFederationMember();
+			useOuterJoin = true;
+		}
+		else {
+			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
+		}
+
+		if ( fm instanceof SPARQLEndpoint ep )
+			return createExecOp(gp, ep, useOuterJoin, collectExceptions, qpInfo, inputVars);
+		else
+			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+	}
+
+	protected UnaryExecutableOp createExecOp( final SPARQLGraphPattern pattern,
+	                                          final SPARQLEndpoint sparqlEndpoint,
+	                                          final boolean useOuterJoinSemantics,
+	                                          final boolean collectExceptions,
+	                                          final QueryPlanningInfo qpInfo,
+	                                          final ExpectedVariables... inputVars ) {
 		if ( myFactory.useParallelVersion ) {
 			if ( myFactory.type.equals(VALUES_BASED) ) {
 				return new ExecOpParallelBindJoinSPARQLwithVALUES(
