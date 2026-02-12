@@ -66,9 +66,7 @@ public class CFRNumberOfRequests extends CFRBase
 						return avgPageNum * opeNum;
 			} );
 		}
-		else if ( rootOp instanceof PhysicalOpBindJoinWithUNION
-		     || rootOp instanceof PhysicalOpBindJoinWithFILTER
-		     || rootOp instanceof PhysicalOpBindJoinWithVALUES ) {
+		else if ( rootOp instanceof PhysicalOpBindJoinSPARQL ) {
 //			The actual number of requests depends on the block size used for the bind-join requests.
 			numReq = initiateCardinalityEstimation( plan.getSubPlan(0) );
 			return numReq.thenApply( card -> (int) Math.ceil(card/blockSize) );

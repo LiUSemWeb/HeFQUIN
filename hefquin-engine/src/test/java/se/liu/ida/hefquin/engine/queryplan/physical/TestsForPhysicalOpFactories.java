@@ -41,11 +41,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithFILTER;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUES;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUESorFILTER;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin;
@@ -114,37 +110,37 @@ public class TestsForPhysicalOpFactories
 
 	@Test
 	public void testPhysicalOpBindJoinWithBoundJoin() {
-		final PhysicalOpFactory factory = PhysicalOpBindJoinWithBoundJoin.getFactory();
-		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinWithBoundJoin.class, factory );
-		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinWithBoundJoin.class, factory );
+		final PhysicalOpFactory factory = new PhysicalOpBindJoinSPARQL.Factory("VARIABLE_RENAMING", false, 30);
+		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinSPARQL.class, factory );
+		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinSPARQL.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithFILTER() {
-		final PhysicalOpFactory factory = PhysicalOpBindJoinWithFILTER.getFactory();
-		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinWithFILTER.class, factory );
-		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinWithFILTER.class, factory );
+		final PhysicalOpFactory factory = new PhysicalOpBindJoinSPARQL.Factory("FILTER_BASED", false, 30);
+		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinSPARQL.class, factory );
+		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinSPARQL.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithUNION() {
-		final PhysicalOpFactory factory = PhysicalOpBindJoinWithUNION.getFactory();
-		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinWithUNION.class, factory );
-		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinWithUNION.class, factory );
+		final PhysicalOpFactory factory = new PhysicalOpBindJoinSPARQL.Factory("UNION_BASED", false, 30);
+		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinSPARQL.class, factory );
+		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinSPARQL.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithVALUES() {
-		final PhysicalOpFactory factory = PhysicalOpBindJoinWithVALUES.getFactory();
-		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinWithVALUES.class, factory );
-		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinWithVALUES.class, factory );
+		final PhysicalOpFactory factory = new PhysicalOpBindJoinSPARQL.Factory("VALUES_BASED", false, 30);
+		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinSPARQL.class, factory );
+		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinSPARQL.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithVALUESorFILTER() {
-		final PhysicalOpFactory factory = PhysicalOpBindJoinWithVALUESorFILTER.getFactory();
-		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinWithVALUESorFILTER.class, factory );
-		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinWithVALUESorFILTER.class, factory );
+		final PhysicalOpFactory factory = new PhysicalOpBindJoinSPARQL.Factory("VALUES_OR_FILTER", false, 30);
+		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinSPARQL.class, factory );
+		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinSPARQL.class, factory );
 	}
 
 	@Test
@@ -342,11 +338,12 @@ public class TestsForPhysicalOpFactories
 		assertTrue( factory.supports(lop, sp2) );
 		assertTrue( factory.supports(lop, po2) );
 		assertTrue( factory.supports(lop, so2) );
-		// null value for exepcted variables
+		// null value for expected variables
 		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
 
 		// supports cases with no non-joining vars?
-		if ( opClass.equals(PhysicalOpBindJoinWithBoundJoin.class) ) {
+		if (    factory instanceof PhysicalOpBindJoinSPARQL.Factory ff
+		     && ff.type.equals(PhysicalOpBindJoinSPARQL.VARIABLE_RENAMING) ) {
 			assertFalse( factory.supports(lop, spo1) );
 			assertFalse( factory.supports(lop, spo2) );
 		}

@@ -37,7 +37,7 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan(gpAdd);
 			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan,reqGP).size();
 
-			if ( pop instanceof PhysicalOpBindJoinWithVALUES ) {
+			if ( pop instanceof PhysicalOpBindJoinSPARQL ) {
 				futureIntResSize = null; // irrelevant
 			} else {
 				futureIntResSize = initiateCardinalityEstimation(subplan);
@@ -70,22 +70,33 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 
 		// cases in which the cost value depends on some intermediate
 		// result size, which needs to be fetched first
-		if (    pop instanceof PhysicalOpIndexNestedLoopsJoin
-		     || pop instanceof PhysicalOpBindJoinWithUNION ) {
+		if ( pop instanceof PhysicalOpIndexNestedLoopsJoin ) {
 			return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfVars - numberOfJoinVars) );
 		}
-		else if (    pop instanceof PhysicalOpBindJoinWithFILTER
-		          || pop instanceof PhysicalOpBindJoinBRTPF ) {
+		if (    pop instanceof PhysicalOpBindJoinSPARQL bj
+		     && bj.getType().equals("UNION_BASED") ) {
+			return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfVars - numberOfJoinVars) );
+		}
+		if ( pop instanceof PhysicalOpBindJoinBRTPF ) {
+			return futureIntResSize.thenApply( intResSize -> numberOfVars + intResSize * numberOfJoinVars );
+		}
+		if (    pop instanceof PhysicalOpBindJoinSPARQL bj
+		     && bj.getType().equals("FILTER_BASED") ) {
 			return futureIntResSize.thenApply( intResSize -> numberOfVars + intResSize * numberOfJoinVars );
 		}
 
 		// cases in which the cost value can be calculated directly
 		final int costValue;
-		if ( pop instanceof PhysicalOpBindJoinWithVALUES ) {
+		if ( pop instanceof PhysicalOpRequest ) {
+			costValue = numberOfVars;
+		}
+		else if (    pop instanceof PhysicalOpBindJoinSPARQL bj
+		          && bj.getType().equals("VALUE_BASED") ) {
 			costValue = numberOfVars + numberOfJoinVars;
 		}
-		else if ( pop instanceof PhysicalOpRequest ) {
-			costValue = numberOfVars;
+		else if (    pop instanceof PhysicalOpBindJoinSPARQL bj
+		          && bj.getType().equals("VALUE_OR_FILTER") ) {
+			costValue = numberOfVars + numberOfJoinVars;
 		}
 		else if (    pop instanceof BaseForPhysicalOpBinaryJoin
 		          || pop instanceof PhysicalOpBinaryUnion

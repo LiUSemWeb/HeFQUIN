@@ -29,8 +29,7 @@ import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUESorFILTER;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin;
@@ -96,11 +95,8 @@ public abstract class EngineTestBase
 				PhysicalOpGlobalToLocal.getFactory(),
 				PhysicalOpLocalToGlobal.getFactory(),
 				PhysicalOpBindJoinBRTPF.getFactory(),
-				PhysicalOpBindJoinWithBoundJoin.getFactory(),
-				PhysicalOpBindJoinWithVALUESorFILTER.getFactory(),
-				//PhysicalOpBindJoinWithUNION.getFactory(),
-				//PhysicalOpBindJoinWithFILTER.getFactory(),
-				//PhysicalOpBindJoinWithVALUES.getFactory(),
+				new PhysicalOpBindJoinSPARQL.Factory("VARIABLE_RENAMING", false, 30),
+				new PhysicalOpBindJoinSPARQL.Factory("VALUES_OR_FILTER", false, 30),
 				PhysicalOpSymmetricHashJoin.getFactory(),
 				PhysicalOpHashRJoin.getFactory(),
 				PhysicalOpIndexNestedLoopsJoin.getFactory(),

@@ -422,15 +422,7 @@ public class PhysicalPlanFactory
 		return extractRequestAsPlan( pop.getLogicalOperator() );
 	}
 
-	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinWithFILTER pop ) {
-		return extractRequestAsPlan( pop.getLogicalOperator() );
-	}
-
-	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinWithUNION pop ) {
-		return extractRequestAsPlan( pop.getLogicalOperator() );
-	}
-
-	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinWithVALUES pop ) {
+	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinSPARQL pop ) {
 		return extractRequestAsPlan( pop.getLogicalOperator() );
 	}
 
