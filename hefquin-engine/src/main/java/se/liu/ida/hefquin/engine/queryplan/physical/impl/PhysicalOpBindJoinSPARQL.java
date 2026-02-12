@@ -9,6 +9,8 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpParallelBindJoin;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpSequentialBindJoin;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpParallelBindJoinSPARQLwithFILTER;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpParallelBindJoinSPARQLwithUNION;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpParallelBindJoinSPARQLwithVALUES;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpSequentialBindJoinSPARQLwithFILTER;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpSequentialBindJoinSPARQLwithUNION;
@@ -68,11 +70,11 @@ public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoinAt
 	public static final String VALUES_OR_FILTER   = "VALUES_OR_FILTER";
 
 	public static final Set<String> POSSIBLE_TYPES = Set.of(
-			VALUES_BASED,
-			FILTER_BASED,
-			UNION_BASED,
-			VALUES_OR_FILTER, // only as a sequential version, not a parallel one
-			VARIABLE_RENAMING );
+		VALUES_OR_FILTER, // <-- only as a sequential version, cannot be parallel!?
+		VARIABLE_RENAMING, // <-- also only as a sequential version at the moment
+		VALUES_BASED,
+		FILTER_BASED,
+		UNION_BASED );
 
 	protected final Factory myFactory;
 
@@ -106,7 +108,22 @@ public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoinAt
 						useOuterJoinSemantics, myFactory.batchSize,
 						collectExceptions, qpInfo );
 			}
+			else if ( myFactory.type.equals(FILTER_BASED) ) {
+				return new ExecOpParallelBindJoinSPARQLwithFILTER(
+						pattern, sparqlEndpoint, inputVars[0],
+						useOuterJoinSemantics, myFactory.batchSize,
+						collectExceptions, qpInfo );
+			}
+			else if ( myFactory.type.equals(UNION_BASED) ) {
+				return new ExecOpParallelBindJoinSPARQLwithUNION(
+						pattern, sparqlEndpoint, inputVars[0],
+						useOuterJoinSemantics, myFactory.batchSize,
+						collectExceptions, qpInfo );
+			}
 			else if ( myFactory.type.equals(VALUES_OR_FILTER) ) {
+				throw new IllegalArgumentException("There is no parallel version of the " + myFactory.type + " bind join.");
+			}
+			else if ( myFactory.type.equals(VARIABLE_RENAMING) ) {
 				throw new IllegalArgumentException("There is no parallel version of the " + myFactory.type + " bind join.");
 			}
 			else {
@@ -218,7 +235,7 @@ public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoinAt
 				return false;
 
 			if ( type.equals(VARIABLE_RENAMING) )
-				return hasNonJoiningVar( gp, inputVars[0] );
+				return ! useParallelVersion && hasNonJoiningVar( gp, inputVars[0] );
 			else if ( type.equals(VALUES_OR_FILTER) )
 				return ! useParallelVersion;
 			else

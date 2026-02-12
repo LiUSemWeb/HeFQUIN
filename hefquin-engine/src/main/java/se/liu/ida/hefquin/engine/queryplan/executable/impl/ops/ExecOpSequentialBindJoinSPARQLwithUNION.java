@@ -80,13 +80,20 @@ public class ExecOpSequentialBindJoinSPARQLwithUNION
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
-		final Element elmt = createUnion(solMaps);
-		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(elmt);
-		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
+		final SPARQLRequest request = createRequest(solMaps, pattern, varsInQuery);
 		return new ExecOpRequestSPARQL<>(request, fm, false, null);
 	}
 
-	protected Element createUnion( final Iterable<Binding> solMaps ) {
+	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
+	                                           final Element pattern,
+	                                           final Set<Var> varsInQuery ) {
+		final Element elmt = createUnion(solMaps, pattern, varsInQuery);
+		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(elmt) );
+	}
+
+	public static Element createUnion( final Iterable<Binding> solMaps,
+	                                   final Element pattern,
+	                                   final Set<Var> varsInQuery ) {
 		final Set<Expr> conjunctions = new HashSet<>();
 		for ( final Binding sm : solMaps ) {
 			Expr conjunction = null;

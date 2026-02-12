@@ -91,6 +91,12 @@ public class ExecOpSequentialBindJoinSPARQLwithFILTER
 	public static NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps,
 	                                                         final Element pattern,
 	                                                         final SPARQLEndpoint fm ) {
+		final SPARQLRequest request = createRequest(solMaps, pattern);
+		return new ExecOpRequestSPARQL<>(request, fm, false, null);
+	}
+
+	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
+	                                           final Element pattern ) {
 		final Expr expr = createFilterExpression(solMaps);
 
 		final ElementGroup group = new ElementGroup();
@@ -98,8 +104,7 @@ public class ExecOpSequentialBindJoinSPARQLwithFILTER
 		group.addElement( new ElementFilter(expr) );
 
 		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
-		final SPARQLRequest request = new SPARQLRequestImpl(patternForReq);
-		return new ExecOpRequestSPARQL<>(request, fm, false, null);
+		return new SPARQLRequestImpl(patternForReq);
 	}
 
 	public static Expr createFilterExpression( final Iterable<Binding> solMaps ) {
