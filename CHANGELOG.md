@@ -8,6 +8,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - Support for optional parameters in the template IRIs for REST APIs ([#493](https://github.com/LiUSemWeb/HeFQUIN/pull/493)).
+- Adding an implementation of the batch-based bind-join algorithm for SPARQL endpoints that issues the bind-join requests without blocking, handling the processing of their responses in parallel ([#499](https://github.com/LiUSemWeb/HeFQUIN/pull/499)).
 ### Changed
 - Change to Hydra vocabulary for the template IRIs of REST APIs in federation descriptions ([#493](https://github.com/LiUSemWeb/HeFQUIN/pull/493)).
 - Updated request processors to use an HTTP client provider and shared connection pools ([#495](https://github.com/LiUSemWeb/HeFQUIN/pull/495)).
