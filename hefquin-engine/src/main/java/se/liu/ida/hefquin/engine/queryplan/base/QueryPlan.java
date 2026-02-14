@@ -8,10 +8,12 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 /**
- * This interface captures aspects that are common both to logical plans and
- * to physical plans. That is, every such plan has a root operator and child
- * plans that produce the input to the root operator. Moreover, every plan
- * may be associated with query-planning-related information.
+ * This interface captures aspects that are common both to logical plans
+ * and to physical plans. That is, every such plan has a unique ID, a root
+ * operator, and child plans that produce the input to the root operator.
+ * The child plans are plans themselves, also captured as objects of this
+ * interface. Moreover, every plan (and sub-plan) may be associated with
+ * query-planning-related information.
  * <p>
  * This interface serves purely an abstract purpose in the sense that it is
  * not meant to be instantiated directly. Instead, {@link LogicalPlan} and
@@ -20,6 +22,12 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
  */
 public interface QueryPlan
 {
+	/**
+	 * Returns an identifier of this (sub-)plan, which should be distinct
+	 * from the identifiers of all other sub-plans within the same plan.
+	 */
+	int getID();
+
 	/**
 	 * Returns the root operator of this plan.
 	 */

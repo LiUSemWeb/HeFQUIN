@@ -11,6 +11,10 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
  */
 public abstract class BaseForQueryPlan implements QueryPlan
 {
+	private static int counter = 0;
+
+	protected final int id;
+
 	// to be created only when requested, or provided via the constructor
 	private QueryPlanningInfo info;
 
@@ -24,10 +28,18 @@ public abstract class BaseForQueryPlan implements QueryPlan
 	protected BaseForQueryPlan( final QueryPlanningInfo qpInfo ) {
 		assert qpInfo != null;
 		info = qpInfo;
+
+		id = ++counter;
 	}
 
 	protected BaseForQueryPlan() {
 		info = null;
+
+		id = ++counter;
+	}
+
+	@Override public int getID() {
+		return id;
 	}
 
 	@Override
