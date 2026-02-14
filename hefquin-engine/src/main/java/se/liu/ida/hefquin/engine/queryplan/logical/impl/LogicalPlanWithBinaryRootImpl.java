@@ -28,22 +28,6 @@ public class LogicalPlanWithBinaryRootImpl extends BaseForQueryPlan
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
-
-		return (    o instanceof LogicalPlanWithBinaryRoot oo
-		         && oo.getRootOperator().getID() == rootOp.getID()
-		         && oo.getSubPlan1().equals(subPlan1)
-		         && oo.getSubPlan2().equals(subPlan2) );
-	}
-
-	@Override
-	public int hashCode(){
-		return rootOp.hashCode() ^ subPlan1.hashCode() ^ subPlan2.hashCode();
-	}
-
-	@Override
 	public BinaryLogicalOp getRootOperator() {
 		return rootOp;
 	}

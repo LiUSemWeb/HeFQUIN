@@ -74,12 +74,6 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpIndexNestedLoopsJoin
-				&& ((PhysicalOpIndexNestedLoopsJoin) o).lop.equals(lop);
-	}
-
-	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables ... inputVars )
@@ -128,14 +122,26 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 	}
 
 	@Override
-	public void visit(final PhysicalPlanVisitor visitor) {
+	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
 
 	@Override
-	public String toString(){
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
 
-		return "> indexNestedLoop" + lop.toString();
+		return    o instanceof PhysicalOpIndexNestedLoopsJoin oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "idxNLJ for " + lop.toString();
 	}
 
 	public static class Factory implements PhysicalOpFactory

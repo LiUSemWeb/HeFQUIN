@@ -45,7 +45,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		final SPARQLGraphPattern graphPattern  = pe.graphPattern;
 		final String fullStringForGraphPattern = pe.fullStringForGraphPattern;
-		final String rootOpString              = pe.rootOpString;
+		final String rootOpString              = pe.rootOpString + " (" + p.getID() + ")";
 		final List<String> rootOpProps         = pe.props;
 
 		addPropStrings( p.getExpectedVariables(), rootOpProps );
@@ -97,25 +97,25 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpRequest<?, ?> op ) {
-			rootOpString = "req (" + op.getID() + ")";
+			rootOpString = "req";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpFixedSolMap op ) {
-			rootOpString = "sm (" + op.getID() + ")";
+			rootOpString = "sm";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpBindJoinBRTPF op ) {
-			rootOpString = "bind join for brTPF (" + op.getID() + ")";
+			rootOpString = "bind join for brTPF";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpBindJoinSPARQL op ) {
-			rootOpString = "bind join for SPARQL (" + op.getID() + ")";
+			rootOpString = "bind join for SPARQL";
 			props.add( "type: " + op.getType() );
 			props.add( "parallel version: " + op.usesParallelVersion() );
 			props.add( "batch size: " + op.getBatchSize() );
@@ -124,84 +124,84 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpIndexNestedLoopsJoin op ) {
-			rootOpString = "indexNLJ (" + op.getID() + ")";
+			rootOpString = "indexNLJ";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpLookupJoinViaWrapper op ) {
-			rootOpString = "wrapper-based lookup join (" + op.getID() + ")";
+			rootOpString = "wrapper-based lookup join";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpHashJoin op ) {
-			rootOpString = "hash join (" + op.getID() + ")";
+			rootOpString = "hash join";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpSymmetricHashJoin op ) {
-			rootOpString = "SHJ (" + op.getID() + ")";
+			rootOpString = "SHJ";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpNaiveNestedLoopsJoin op ) {
-			rootOpString = "naive NLJ (" + op.getID() + ")";
+			rootOpString = "naive NLJ";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpHashRJoin op ) {
-			rootOpString = "right-outer hash join (" + op.getID() + ")";
+			rootOpString = "right-outer hash join";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpParallelMultiLeftJoin op ) {
-			rootOpString = "parallel multiway left-outer join (" + op.getID() + ")";
+			rootOpString = "parallel multiway left-outer join";
 		}
 
 		@Override
 		public void visit( final PhysicalOpBinaryUnion op ) {
-			rootOpString = "union (" + op.getID() + ")";
+			rootOpString = "union";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpMultiwayUnion op ) {
-			rootOpString = "multiway union (" + op.getID() + ")";
+			rootOpString = "multiway union";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpFilter op ) {
-			rootOpString = "filter (" + op.getID() + ")";
+			rootOpString = "filter";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpBind op ) {
-			rootOpString = "bind (" + op.getID() + ")";
+			rootOpString = "bind";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpLocalToGlobal op ) {
-			rootOpString = "l2g (" + op.getID() + ")";
+			rootOpString = "l2g";
 			record( op.getLogicalOperator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpGlobalToLocal op ) {
-			rootOpString = "g2l (" + op.getID() + ")";
+			rootOpString = "g2l";
 			record( op.getLogicalOperator() );
 		}
 
 		protected void record( final LogicalOperator lop ) {
 			lop.visit(snc);
-			props.add( "lop: " + snc.name + " (" + lop.getID()  + ")" );
+			props.add( "lop: " + snc.name );
 			lop.visit(this);
 		}
 	}

@@ -19,20 +19,6 @@ public class LogicalPlanWithNullaryRootImpl extends BaseForQueryPlan
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
-
-		return (    o instanceof LogicalPlanWithNullaryRoot oo
-		         && oo.getRootOperator().getID() == rootOp.getID() );
-	}
-
-	@Override
-	public int hashCode(){
-		return rootOp.hashCode();
-	}
-
-	@Override
 	public NullaryLogicalOp getRootOperator() {
 		return rootOp;
 	}

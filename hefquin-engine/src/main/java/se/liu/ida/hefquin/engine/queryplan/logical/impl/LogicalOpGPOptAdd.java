@@ -9,12 +9,11 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.federation.FederationMember;
 
-public class LogicalOpGPOptAdd extends BaseForQueryPlanOperator implements UnaryLogicalOp
+public class LogicalOpGPOptAdd implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
@@ -94,6 +93,11 @@ public class LogicalOpGPOptAdd extends BaseForQueryPlanOperator implements Unary
 	}
 
 	@Override
+	public void visit( final LogicalPlanVisitor visitor ) {
+		visitor.visit(this);
+	}
+
+	@Override
 	public boolean equals( final Object o ) {
 		if ( o == this )
 			return true;
@@ -107,27 +111,12 @@ public class LogicalOpGPOptAdd extends BaseForQueryPlanOperator implements Unary
 	}
 
 	@Override
-	public int hashCode(){
-		return fm.hashCode() ^ pattern.hashCode();
-	}
-
-	@Override
-	public void visit( final LogicalPlanVisitor visitor ) {
-		visitor.visit(this);
+	public int hashCode() {
+		return getClass().hashCode() ^ fm.hashCode() ^ pattern.hashCode();
 	}
 
 	@Override
 	public String toString(){
-		final int codeOfPattern = pattern.toString().hashCode();
-		final int codeOfFm = fm.toString().hashCode();
-
-		return "> gpOptAdd" +
-				"[" + codeOfPattern + ", "+ codeOfFm + "]"+
-				" ( "
-				+ pattern.toString()
-				+ ", "
-				+ fm.toString()
-				+ " )";
+		return "gpOptAdd (fm: " + fm.hashCode() + ", gp: " + pattern.hashCode() + ")";
 	}
-
 }

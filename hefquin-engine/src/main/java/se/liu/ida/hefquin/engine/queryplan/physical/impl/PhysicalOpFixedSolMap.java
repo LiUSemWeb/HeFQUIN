@@ -1,9 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.Objects;
-
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOpBase;
@@ -16,8 +13,10 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class PhysicalOpFixedSolMap extends BaseForQueryPlanOperator
-                                   implements NullaryPhysicalOpForLogicalOp
+/**
+ * A physical operator that returns a given solution mapping.
+ */
+public class PhysicalOpFixedSolMap implements NullaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
@@ -28,20 +27,6 @@ public class PhysicalOpFixedSolMap extends BaseForQueryPlanOperator
 		assert lop != null;
 		this.lop = lop;
 	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
-
-		return o instanceof PhysicalOpFixedSolMap in && in.lop.equals(lop);
-	}
-
-	@Override
-	public int hashCode(){
-		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
-	}
-
 
 	@Override
 	public LogicalOpFixedSolMap getLogicalOperator() {
@@ -64,6 +49,19 @@ public class PhysicalOpFixedSolMap extends BaseForQueryPlanOperator
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpFixedSolMap oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
 	}
 
 	@Override

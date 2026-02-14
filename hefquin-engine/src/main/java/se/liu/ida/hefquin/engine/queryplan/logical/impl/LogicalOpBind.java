@@ -8,11 +8,10 @@ import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.Expr;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpBind extends BaseForQueryPlanOperator implements UnaryLogicalOp
+public class LogicalOpBind implements UnaryLogicalOp
 {
 	protected final VarExprList bindExpressions;
 
@@ -67,20 +66,6 @@ public class LogicalOpBind extends BaseForQueryPlanOperator implements UnaryLogi
 		return true;
 	}
 
-	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this ) return true;
-		if ( ! (o instanceof LogicalOpBind) ) return false;
-
-		final LogicalOpBind oo = (LogicalOpBind) o;
-		return oo.bindExpressions.equals(bindExpressions);
-	}
-
-	@Override
-	public int hashCode(){
-		return bindExpressions.hashCode();
-	}
-
 	public VarExprList getBindExpressions() {
 		return bindExpressions;
 	}
@@ -91,8 +76,21 @@ public class LogicalOpBind extends BaseForQueryPlanOperator implements UnaryLogi
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof LogicalOpBind oo
+		       && oo.bindExpressions.equals(bindExpressions);
+	}
+
+	@Override
+	public int hashCode(){
+		return getClass().hashCode() ^ bindExpressions.hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> Bind ( " + bindExpressions.toString() + " )";
+		return "Bind ( " + bindExpressions.toString() + " )";
 	}
 
 }

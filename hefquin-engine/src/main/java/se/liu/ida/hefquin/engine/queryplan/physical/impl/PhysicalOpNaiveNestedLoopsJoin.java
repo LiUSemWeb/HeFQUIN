@@ -27,14 +27,9 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected PhysicalOpNaiveNestedLoopsJoin( final LogicalOpJoin lop ) {
-		super(lop);
-	}
+	private static PhysicalOpNaiveNestedLoopsJoin singleton = null;
 
-	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpNaiveNestedLoopsJoin && ((PhysicalOpNaiveNestedLoopsJoin) o).lop.equals(lop);
-	}
+	protected PhysicalOpNaiveNestedLoopsJoin() { }
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
@@ -49,8 +44,20 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof PhysicalOpNaiveNestedLoopsJoin;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ getLogicalOperator().hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> naiveNestedLoop ";
+		return "naiveNLJ";
 	}
 
 	public static class Factory implements PhysicalOpFactory
@@ -62,11 +69,15 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 
 		@Override
 		public PhysicalOpNaiveNestedLoopsJoin create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpJoin op ) {
-				return new PhysicalOpNaiveNestedLoopsJoin(op);
-			}
+			if ( lop instanceof LogicalOpJoin ) return getInstance();
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
+	}
+
+	public static PhysicalOpNaiveNestedLoopsJoin getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpNaiveNestedLoopsJoin();
+
+		return singleton;
 	}
 }

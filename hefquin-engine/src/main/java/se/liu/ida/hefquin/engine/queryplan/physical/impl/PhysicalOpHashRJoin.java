@@ -1,9 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.Objects;
-
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashRJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -30,22 +27,18 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpHashRJoin} class.
  */
-public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
-                                 implements BinaryPhysicalOpForLogicalOp
+public class PhysicalOpHashRJoin implements BinaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected final LogicalOpRightJoin lop;
+	private static PhysicalOpHashRJoin singleton = null;
 
-	protected PhysicalOpHashRJoin(final LogicalOpRightJoin lop ) {
-		assert lop != null;
-		this.lop = lop;
-	}
+	protected PhysicalOpHashRJoin() { }
 
 	@Override
 	public LogicalOpRightJoin getLogicalOperator() {
-		return lop;
+		return LogicalOpRightJoin.getInstance();
 	}
 
 	@Override
@@ -64,17 +57,19 @@ public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpHashRJoin && ((PhysicalOpHashRJoin) o).lop.equals(lop);
+		if ( o == this ) return true;
+
+		return o instanceof PhysicalOpHashRJoin;
 	}
 
 	@Override
-	public int hashCode(){
-		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
+	public int hashCode() {
+		return getClass().hashCode() ^ LogicalOpRightJoin.getInstance().hashCode();
 	}
 
 	@Override
-	public String toString(){
-		return "> hashRJoin ";
+	public String toString() {
+		return "hash join for rjoin";
 	}
 
 	public static class Factory implements PhysicalOpFactory
@@ -86,11 +81,15 @@ public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
 
 		@Override
 		public PhysicalOpHashRJoin create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpRightJoin op ) {
-				return new PhysicalOpHashRJoin(op);
-			}
+			if ( lop instanceof LogicalOpRightJoin ) return getInstance();
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
+	}
+
+	public static PhysicalOpHashRJoin getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpHashRJoin();
+
+		return singleton;
 	}
 }

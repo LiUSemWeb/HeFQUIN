@@ -6,12 +6,13 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 
-public class LogicalOpFixedSolMap extends BaseForQueryPlanOperator
-                                  implements NullaryLogicalOp
+/**
+ * A logical operator that returns a given solution mapping.
+ */
+public class LogicalOpFixedSolMap implements NullaryLogicalOp
 {
 	protected final SolutionMapping sm;
 	protected final ExpectedVariables expectedVars;
@@ -35,29 +36,6 @@ public class LogicalOpFixedSolMap extends BaseForQueryPlanOperator
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
-
-		if (    o instanceof LogicalOpFixedSolMap fin
-		     && fin.getSolutionMapping().equals(sm) )
-			return true;
-
-		return false; 
-	}
-
-	@Override
-	public int hashCode(){
-		return sm.hashCode();
-	}
-
-	@Override
-	public String toString(){
-		return "sm" + " (" + getID() + ")"
-		       + "\t " + sm.toString();
-	}
-
-	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
@@ -69,4 +47,20 @@ public class LogicalOpFixedSolMap extends BaseForQueryPlanOperator
 		return expectedVars;
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof LogicalOpFixedSolMap oo && oo.sm.equals(sm);
+	}
+
+	@Override
+	public int hashCode(){
+		return getClass().hashCode() ^ sm.hashCode();
+	}
+
+	@Override
+	public String toString(){
+		return "sm (" + sm.toString() + ")";
+	}
 }

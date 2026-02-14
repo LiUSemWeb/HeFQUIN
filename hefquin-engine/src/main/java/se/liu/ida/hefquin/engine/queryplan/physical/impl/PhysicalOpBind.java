@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBind;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -12,8 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
-public class PhysicalOpBind extends BaseForQueryPlanOperator
-                            implements UnaryPhysicalOpForLogicalOp
+public class PhysicalOpBind implements UnaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
@@ -40,6 +38,24 @@ public class PhysicalOpBind extends BaseForQueryPlanOperator
 	public LogicalOpBind getLogicalOperator() {
 		return lop;
  	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpBind oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return lop.toString();
+	}
 
 	public static class Factory implements PhysicalOpFactory
 	{

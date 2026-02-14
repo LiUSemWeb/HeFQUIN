@@ -15,7 +15,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.EngineTestBase;
-import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
@@ -523,20 +523,18 @@ public class UnionPullUpTest extends EngineTestBase
 
 	// ---- helpers -----
 
-	protected static class DummyLogicalPlan implements LogicalPlan {
+	protected static class DummyLogicalPlan extends BaseForQueryPlan
+	                                        implements LogicalPlan {
 		final protected LogicalOperator rootOp = new DummyLogicalOp();
 		@Override public LogicalOperator getRootOperator() { return rootOp; }
 		@Override public ExpectedVariables getExpectedVariables() { throw new UnsupportedOperationException(); }
 		@Override public int numberOfSubPlans() { return 0; }
 		@Override public LogicalPlan getSubPlan(int i) { throw new UnsupportedOperationException(); }
-		@Override public QueryPlanningInfo getQueryPlanningInfo() { throw new UnsupportedOperationException(); }
-		@Override public boolean hasQueryPlanningInfo() { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyLogicalOp implements NullaryLogicalOp {
 		@Override public void visit(LogicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
 		@Override public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
-		@Override public int getID() { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyTriplePattern extends TriplePatternImpl {

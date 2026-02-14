@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -18,11 +17,12 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * The actual algorithm of this operator is implemented
  * in the {@link ExecOpMultiwayUnion} class.
  */
-public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
-                                     implements NaryPhysicalOpForLogicalOp
+public class PhysicalOpMultiwayUnion implements NaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
+
+	private static PhysicalOpMultiwayUnion singleton = null;
 
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
@@ -43,17 +43,19 @@ public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
 
 	@Override
 	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
 		return o instanceof PhysicalOpMultiwayUnion;
 	}
 
 	@Override
 	public int hashCode() {
-		return LogicalOpMultiwayUnion.getInstance().hashCode();
+		return getClass().hashCode() ^ getLogicalOperator().hashCode();
 	}
 
 	@Override
-	public String toString(){
-		return "> multiwayUnion " + "(" + getID() + ")";
+	public String toString() {
+		return "mu";
 	}
 
 	public static class Factory implements PhysicalOpFactory
@@ -66,10 +68,17 @@ public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
 		@Override
 		public PhysicalOpMultiwayUnion create( final NaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpMultiwayUnion ) {
-				return new PhysicalOpMultiwayUnion();
+				return getInstance();
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
+	}
+
+	public static PhysicalOpMultiwayUnion getInstance() {
+		if ( singleton == null )
+			singleton = new PhysicalOpMultiwayUnion();
+
+		return singleton;
 	}
 }

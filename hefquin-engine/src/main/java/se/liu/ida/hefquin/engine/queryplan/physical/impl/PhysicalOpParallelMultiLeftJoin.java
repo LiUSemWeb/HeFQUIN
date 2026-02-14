@@ -9,7 +9,6 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpParallelMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -32,8 +31,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
  * The actual algorithm of this operator is implemented
  * in the {@link ExecOpParallelMultiwayLeftJoin} class.
  */
-public class PhysicalOpParallelMultiLeftJoin extends BaseForQueryPlanOperator
-                                             implements UnaryPhysicalOp
+public class PhysicalOpParallelMultiLeftJoin implements UnaryPhysicalOp
 {
 	/**
 	 * Checks whether a {@link LogicalOpMultiwayLeftJoin} with the given list
@@ -143,18 +141,19 @@ public class PhysicalOpParallelMultiLeftJoin extends BaseForQueryPlanOperator
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpParallelMultiLeftJoin
-				&& ((PhysicalOpParallelMultiLeftJoin) o).optionalParts.equals(optionalParts);
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpParallelMultiLeftJoin oo
+		       && oo.optionalParts.equals(optionalParts);
 	}
 
 	@Override
-	public int hashCode(){
-		return optionalParts.hashCode();
+	public int hashCode() {
+		return getClass().hashCode() ^ optionalParts.hashCode();
 	}
 
 	@Override
-	public String toString(){
-		return "> parallelMultiLeftJoin with " + optionalParts.size() + " optional parts";
+	public String toString() {
+		return "parallel mlj with " + optionalParts.size() + " optional parts";
 	}
-
 }

@@ -8,10 +8,12 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 /**
- * This interface captures aspects that are common both to logical plans and
- * to physical plans. That is, every such plan has a root operator and child
- * plans that produce the input to the root operator. Moreover, every plan
- * may be associated with query-planning-related information.
+ * This interface captures aspects that are common both to logical plans
+ * and to physical plans. That is, every such plan has a unique ID, a root
+ * operator, and child plans that produce the input to the root operator.
+ * The child plans are plans themselves, also captured as objects of this
+ * interface. Moreover, every plan (and sub-plan) may be associated with
+ * query-planning-related information.
  * <p>
  * This interface serves purely an abstract purpose in the sense that it is
  * not meant to be instantiated directly. Instead, {@link LogicalPlan} and
@@ -20,6 +22,12 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
  */
 public interface QueryPlan
 {
+	/**
+	 * Returns an identifier of this (sub-)plan, which should be distinct
+	 * from the identifiers of all other sub-plans within the same plan.
+	 */
+	int getID();
+
 	/**
 	 * Returns the root operator of this plan.
 	 */
@@ -59,8 +67,33 @@ public interface QueryPlan
 	QueryPlanningInfo getQueryPlanningInfo();
 
 	/**
-	 * Returns <code>true</code> if this plan already has a
+	 * Returns {@code true} if this plan already has a
 	 * {@link QueryPlanningInfo} object associated with it.
 	 */
 	boolean hasQueryPlanningInfo();
+
+	/**
+	 * Returns {@code true} if this plan is the same plan as the given one.
+	 * Plans are considered the same if they have the same root operator,
+	 * the same number of sub-plans, and the sub-plans at every index are
+	 * the same as well.
+	 * <p>
+	 * Notice that the {@link #equals(Object)} function cannot be used
+	 * for the type of comparison provided by this function because
+	 * {@link #equals(Object)} takes the IDs of the plans into account
+	 * (which essentially means that {@link #equals(Object)} falls back
+	 * to doing a {@code ==} comparison, because the IDs are unique).
+	 */
+	default boolean isSamePlan( QueryPlan other ) {
+		if ( this.equals(other) ) return true;
+
+		if ( numberOfSubPlans() != other.numberOfSubPlans() ) return false;
+		if ( ! getRootOperator().equals(other.getRootOperator()) ) return false;
+
+		for ( int i = 0; i < numberOfSubPlans(); i++ ) {
+			if ( ! getSubPlan(i).isSamePlan(other.getSubPlan(i)) ) return false;
+		}
+
+		return true;
+	}
 }

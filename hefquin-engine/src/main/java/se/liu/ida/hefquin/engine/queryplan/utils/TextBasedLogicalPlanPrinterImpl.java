@@ -49,7 +49,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		final LogicalOperator rootOp = lp.getRootOperator();
 
 		rootOp.visit(snc);
-		final String rootOpString = snc.name + " (" + rootOp.getID()  + ")";
+		final String rootOpString = snc.name + " (" + lp.getID()  + ")";
 
 		pe.graphPattern = null;
 		pe.fullStringForGraphPattern = null;

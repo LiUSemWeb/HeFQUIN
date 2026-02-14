@@ -30,15 +30,9 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected PhysicalOpSymmetricHashJoin( final LogicalOpJoin lop ) {
-		super(lop);
-	}
+	private static PhysicalOpSymmetricHashJoin singleton = null;
 
-	@Override
-	public boolean equals( final Object o ) {
-		return (    o instanceof PhysicalOpSymmetricHashJoin shj
-		         && shj.lop.equals(lop) );
-	}
+	protected PhysicalOpSymmetricHashJoin() { }
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
@@ -55,8 +49,20 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof PhysicalOpSymmetricHashJoin;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ getLogicalOperator().hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> symmetricHashJoin ";
+		return "SHJ";
 	}
 
 	public static class Factory implements PhysicalOpFactory
@@ -87,15 +93,18 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 
 		@Override
 		public PhysicalOpSymmetricHashJoin create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpJoin join ) {
-				return new PhysicalOpSymmetricHashJoin(join);
-			}
-
-			if ( lop instanceof LogicalOpMultiwayJoin ) {
-				return new PhysicalOpSymmetricHashJoin( LogicalOpJoin.getInstance() );
+			if (    lop instanceof LogicalOpJoin
+			     || lop instanceof LogicalOpMultiwayJoin ) {
+				return getInstance();
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
+	}
+
+	public static PhysicalOpSymmetricHashJoin getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpSymmetricHashJoin();
+
+		return singleton;
 	}
 }

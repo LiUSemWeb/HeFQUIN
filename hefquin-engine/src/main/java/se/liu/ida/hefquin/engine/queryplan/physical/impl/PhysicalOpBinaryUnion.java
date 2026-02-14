@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -18,28 +17,15 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpBinaryUnion} class.
  */
-public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
-                                   implements BinaryPhysicalOpForLogicalOp
+public class PhysicalOpBinaryUnion
+		implements BinaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected final LogicalOpUnion lop;
+	private static PhysicalOpBinaryUnion singleton = null;
 
-	protected PhysicalOpBinaryUnion( final LogicalOpUnion lop ) {
-		assert lop != null;
-		this.lop = lop;
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpBinaryUnion && ((PhysicalOpBinaryUnion) o).lop.equals(lop);
-	}
-
-	@Override
-	public int hashCode(){
-		return lop.hashCode();
-	}
+	protected PhysicalOpBinaryUnion() { }
 
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
@@ -55,12 +41,24 @@ public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
 
 	@Override
 	public LogicalOpUnion getLogicalOperator() {
-		return lop;
+		return LogicalOpUnion.getInstance();
 	}
 
 	@Override
-	public String toString(){
-		return "> binaryUnion ";
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof PhysicalOpBinaryUnion;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ LogicalOpUnion.getInstance().hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "union";
 	}
 
 	public static class Factory implements PhysicalOpFactory
@@ -72,11 +70,15 @@ public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
 
 		@Override
 		public PhysicalOpBinaryUnion create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpUnion op ) {
-				return new PhysicalOpBinaryUnion(op);
-			}
+			if ( lop instanceof LogicalOpUnion ) return getInstance();
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
+	}
+
+	public static PhysicalOpBinaryUnion getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpBinaryUnion();
+
+		return singleton;
 	}
 }

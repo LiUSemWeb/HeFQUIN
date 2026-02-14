@@ -59,22 +59,6 @@ public class PhysicalPlanWithBinaryRootImpl extends BaseForQueryPlan
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
-
-		return (    o instanceof PhysicalPlanWithBinaryRoot oo
-		         && oo.getRootOperator().getID() == rootOp.getID()
-		         && oo.getSubPlan1().equals(subPlan1)
-		         && oo.getSubPlan2().equals(subPlan2) ); 
-	}
-
-	@Override
-	public int hashCode(){
-		return rootOp.hashCode() ^ subPlan1.hashCode() ^ subPlan2.hashCode();
-	}
-
-	@Override
 	public BinaryPhysicalOp getRootOperator() {
 		return rootOp;
 	}

@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestOther;
@@ -24,8 +23,6 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
-import java.util.Objects;
-
 /**
  * A physical operator that performs a request at a federation member
  * and, then, outputs the solution mappings obtained via this request.
@@ -40,9 +37,9 @@ import java.util.Objects;
  * <li>{@link ExecOpRequestOther}</li>
  * </ul>
  */
-public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> 
-                       extends BaseForQueryPlanOperator
-                       implements NullaryPhysicalOpForLogicalOp
+public class PhysicalOpRequest<ReqType extends DataRetrievalRequest,
+                               MemberType extends FederationMember>
+		implements NullaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
@@ -52,16 +49,6 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 	protected PhysicalOpRequest( final LogicalOpRequest<ReqType,MemberType> lop ) {
 		assert lop != null;
 		this.lop = lop;
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpRequest<?,?> && ((PhysicalOpRequest<?,?>) o).lop.equals(lop);
-	}
-
-	@Override
-	public int hashCode(){
-		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
 	}
 
 	@Override
@@ -97,6 +84,19 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpRequest oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
 	}
 
 	@Override

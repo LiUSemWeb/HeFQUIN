@@ -40,16 +40,16 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 		@SuppressWarnings("unchecked")
 		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(null, null);
 
-		final Map<LogicalPlan,Integer> results = new HashMap<>();
-		results.put( joinPlan, 999 ); // irrelevant for the test
-		results.put( joinPlan.getSubPlan(0), 1 );
-		results.put( joinPlan.getSubPlan(1), 2 );
+		final Map<LogicalPlan,Integer> cards = new HashMap<>();
+		cards.put( joinPlan, 999 ); // irrelevant for the test
+		cards.put( joinPlan.getSubPlan(0), 1 );
+		cards.put( joinPlan.getSubPlan(1), 2 );
 
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
 		final LogicalPlan resultPlan = h.apply(joinPlan);
 
-		assertTrue( resultPlan.equals(joinPlan) );
+		assertTrue( resultPlan.isSamePlan(joinPlan) );
 	}
 
 	@Test
@@ -57,12 +57,12 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 		@SuppressWarnings("unchecked")
 		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(null, null);
 
-		final Map<LogicalPlan,Integer> results = new HashMap<>();
-		results.put( joinPlan, 999 ); // irrelevant for the test
-		results.put( joinPlan.getSubPlan(0), 2 );
-		results.put( joinPlan.getSubPlan(1), 1 );
+		final Map<LogicalPlan,Integer> cards = new HashMap<>();
+		cards.put( joinPlan, 999 ); // irrelevant for the test
+		cards.put( joinPlan.getSubPlan(0), 2 );
+		cards.put( joinPlan.getSubPlan(1), 1 );
 
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
 		final LogicalPlan resultPlan = h.apply(joinPlan);
 
@@ -79,13 +79,13 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 		final LogicalOpFilter f = new LogicalOpFilter( Expr.NONE );
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(f, joinPlan);
 
-		final Map<LogicalPlan,Integer> results = new HashMap<>();
-		results.put( filterPlan, 999 ); // irrelevant for the test
-		results.put( joinPlan, 999 );   // irrelevant for the test
-		results.put( joinPlan.getSubPlan(0), 2 );
-		results.put( joinPlan.getSubPlan(1), 1 );
+		final Map<LogicalPlan,Integer> cards = new HashMap<>();
+		cards.put( filterPlan, 999 ); // irrelevant for the test
+		cards.put( joinPlan, 999 );   // irrelevant for the test
+		cards.put( joinPlan.getSubPlan(0), 2 );
+		cards.put( joinPlan.getSubPlan(1), 1 );
 
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
 		final LogicalPlan resultPlan = h.apply(filterPlan);
 
@@ -102,13 +102,13 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null);
 		final LogicalPlan l2gPlan = new LogicalPlanWithUnaryRootImpl(l2g, joinPlan);
 
-		final Map<LogicalPlan,Integer> results = new HashMap<>();
-		results.put( l2gPlan, 999 );  // irrelevant for the test
-		results.put( joinPlan, 999 ); // irrelevant for the test
-		results.put( joinPlan.getSubPlan(0), 2 );
-		results.put( joinPlan.getSubPlan(1), 1 );
+		final Map<LogicalPlan,Integer> cards = new HashMap<>();
+		cards.put( l2gPlan, 999 );  // irrelevant for the test
+		cards.put( joinPlan, 999 ); // irrelevant for the test
+		cards.put( joinPlan.getSubPlan(0), 2 );
+		cards.put( joinPlan.getSubPlan(1), 1 );
 
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
 		final LogicalPlan resultPlan = h.apply(l2gPlan);
 
@@ -125,17 +125,17 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 				Set.of( Var.alloc("x") ),
 				Set.of( Var.alloc("x") ) );
 
-		final Map<LogicalPlan,Integer> results = new HashMap<>();
-		results.put( joinPlan, 999 ); // irrelevant for the test
-		results.put( joinPlan.getSubPlan(0), 1 );
-		results.put( joinPlan.getSubPlan(1), 2 );
-		results.put( joinPlan.getSubPlan(2), 3 );
+		final Map<LogicalPlan,Integer> cards = new HashMap<>();
+		cards.put( joinPlan, 999 ); // irrelevant for the test
+		cards.put( joinPlan.getSubPlan(0), 1 );
+		cards.put( joinPlan.getSubPlan(1), 2 );
+		cards.put( joinPlan.getSubPlan(2), 3 );
 
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
 		final LogicalPlan resultPlan = h.apply(joinPlan);
 
-		assertTrue( resultPlan.equals(joinPlan) );
+		assertTrue( resultPlan.isSamePlan(joinPlan) );
 	}
 
 	@Test
@@ -146,13 +146,13 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 				Set.of( Var.alloc("x") ),
 				Set.of( Var.alloc("x") ) );
 
-		final Map<LogicalPlan,Integer> results = new HashMap<>();
-		results.put( joinPlan, 999 ); // irrelevant for the test
-		results.put( joinPlan.getSubPlan(0), 2 );
-		results.put( joinPlan.getSubPlan(1), 1 );
-		results.put( joinPlan.getSubPlan(2), 3 );
+		final Map<LogicalPlan,Integer> cards = new HashMap<>();
+		cards.put( joinPlan, 999 ); // irrelevant for the test
+		cards.put( joinPlan.getSubPlan(0), 2 );
+		cards.put( joinPlan.getSubPlan(1), 1 );
+		cards.put( joinPlan.getSubPlan(2), 3 );
 
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
 		final LogicalPlan resultPlan = h.apply(joinPlan);
 
@@ -170,13 +170,13 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 				Set.of( Var.alloc("x") ),
 				Set.of( Var.alloc("x") ) );
 
-		final Map<LogicalPlan,Integer> results = new HashMap<>();
-		results.put( joinPlan, 999 ); // irrelevant for the test
-		results.put( joinPlan.getSubPlan(0), 2 );
-		results.put( joinPlan.getSubPlan(1), 1 );
-		results.put( joinPlan.getSubPlan(2), 3 );
+		final Map<LogicalPlan,Integer> cards = new HashMap<>();
+		cards.put( joinPlan, 999 ); // irrelevant for the test
+		cards.put( joinPlan.getSubPlan(0), 2 );
+		cards.put( joinPlan.getSubPlan(1), 1 );
+		cards.put( joinPlan.getSubPlan(2), 3 );
 
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
 		final LogicalPlan resultPlan = h.apply(joinPlan);
 
