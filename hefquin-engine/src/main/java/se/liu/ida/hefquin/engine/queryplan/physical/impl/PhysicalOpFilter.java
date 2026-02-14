@@ -45,6 +45,24 @@ public class PhysicalOpFilter implements UnaryPhysicalOpForLogicalOp
 		return lop;
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpFilter oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return lop.toString();
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
 		@Override

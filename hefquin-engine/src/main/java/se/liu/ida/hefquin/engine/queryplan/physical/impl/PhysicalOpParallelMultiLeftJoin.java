@@ -141,18 +141,19 @@ public class PhysicalOpParallelMultiLeftJoin implements UnaryPhysicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpParallelMultiLeftJoin
-				&& ((PhysicalOpParallelMultiLeftJoin) o).optionalParts.equals(optionalParts);
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpParallelMultiLeftJoin oo
+		       && oo.optionalParts.equals(optionalParts);
 	}
 
 	@Override
-	public int hashCode(){
-		return optionalParts.hashCode();
+	public int hashCode() {
+		return getClass().hashCode() ^ optionalParts.hashCode();
 	}
 
 	@Override
-	public String toString(){
-		return "> parallelMultiLeftJoin with " + optionalParts.size() + " optional parts";
+	public String toString() {
+		return "parallel mlj with " + optionalParts.size() + " optional parts";
 	}
-
 }

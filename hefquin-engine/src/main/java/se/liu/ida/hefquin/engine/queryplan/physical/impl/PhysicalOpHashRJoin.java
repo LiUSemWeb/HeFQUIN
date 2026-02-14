@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.Objects;
-
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashRJoin;
@@ -62,17 +60,20 @@ public class PhysicalOpHashRJoin implements BinaryPhysicalOpForLogicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpHashRJoin && ((PhysicalOpHashRJoin) o).lop.equals(lop);
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpHashRJoin oo
+		       && oo.lop.equals(lop);
 	}
 
 	@Override
-	public int hashCode(){
-		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
 	}
 
 	@Override
-	public String toString(){
-		return "> hashRJoin ";
+	public String toString() {
+		return "hash join for rjoin";
 	}
 
 	public static class Factory implements PhysicalOpFactory

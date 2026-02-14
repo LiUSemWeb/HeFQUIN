@@ -208,14 +208,21 @@ public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoin
 
 	@Override
 	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
 		return o instanceof PhysicalOpBindJoinSPARQL oo
 				&& oo.myFactory.equals(myFactory)
 				&& oo.lop.equals(lop);
 	}
 
 	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ myFactory.hashCode() ^ lop.hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> BindJoin(" + myFactory.type + "-" + myFactory.useParallelVersion + "-" + myFactory.batchSize + ") " + lop.toString();
+		return "bind join (" + myFactory.type + "-" + myFactory.useParallelVersion + "-" + myFactory.batchSize + ") " + lop.toString();
 	}
 
 	public static class Factory implements PhysicalOpFactory
@@ -238,10 +245,17 @@ public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoin
 
 		@Override
 		public boolean equals( final Object o ) {
+			if ( o == this ) return true;
+
 			return    o instanceof Factory oo
 			       && oo.type.equals(type)
 			       && oo.useParallelVersion == useParallelVersion
 			       && oo.batchSize == batchSize;
+		}
+
+		@Override
+		public int hashCode() {
+			return type.hashCode() ^ (useParallelVersion ? 100 : 1000) ^ batchSize;
 		}
 
 		@Override

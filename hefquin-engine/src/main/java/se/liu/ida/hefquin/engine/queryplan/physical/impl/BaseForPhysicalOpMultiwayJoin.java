@@ -18,19 +18,7 @@ public abstract class BaseForPhysicalOpMultiwayJoin
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof NaryPhysicalOpForLogicalOp
-				&& ((NaryPhysicalOpForLogicalOp) o).getLogicalOperator().equals(lop);
-	}
-
-	@Override
-	public int hashCode(){
-		return lop.hashCode();
-	}
-
-	@Override
 	public LogicalOpMultiwayJoin getLogicalOperator() {
 		return lop;
 	}
-
 }

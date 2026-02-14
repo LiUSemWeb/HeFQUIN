@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.Objects;
-
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
@@ -25,17 +23,6 @@ public abstract class BaseForPhysicalOpSingleInputJoin
 		assert lop != null;
 		assert (lop instanceof LogicalOpGPAdd) || (lop instanceof LogicalOpGPOptAdd);
 		this.lop = lop;
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof UnaryPhysicalOpForLogicalOp
-				&& ((UnaryPhysicalOpForLogicalOp) o).getLogicalOperator().equals(lop);
-	}
-
-	@Override
-	public int hashCode(){
-		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
 	}
 
 	@Override

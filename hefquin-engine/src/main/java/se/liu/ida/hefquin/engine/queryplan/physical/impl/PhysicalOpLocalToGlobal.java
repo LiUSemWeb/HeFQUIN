@@ -48,8 +48,21 @@ public class PhysicalOpLocalToGlobal implements UnaryPhysicalOpForLogicalOp
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpLocalToGlobal oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> l2g " + "(vocab.mapping: " + lop.getVocabularyMapping().hashCode() + ")";
+		return lop.toString();
 	}
 
 	public static class Factory implements PhysicalOpFactory

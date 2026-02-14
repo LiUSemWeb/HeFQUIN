@@ -31,16 +31,6 @@ public class PhysicalOpBinaryUnion
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpBinaryUnion && ((PhysicalOpBinaryUnion) o).lop.equals(lop);
-	}
-
-	@Override
-	public int hashCode(){
-		return lop.hashCode();
-	}
-
-	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
@@ -58,8 +48,21 @@ public class PhysicalOpBinaryUnion
 	}
 
 	@Override
-	public String toString(){
-		return "> binaryUnion ";
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpBinaryUnion oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "union";
 	}
 
 	public static class Factory implements PhysicalOpFactory

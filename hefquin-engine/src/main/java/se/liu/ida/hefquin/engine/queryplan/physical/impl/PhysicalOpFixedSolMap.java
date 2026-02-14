@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.Objects;
-
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
@@ -31,20 +29,6 @@ public class PhysicalOpFixedSolMap implements NullaryPhysicalOpForLogicalOp
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
-
-		return o instanceof PhysicalOpFixedSolMap in && in.lop.equals(lop);
-	}
-
-	@Override
-	public int hashCode(){
-		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
-	}
-
-
-	@Override
 	public LogicalOpFixedSolMap getLogicalOperator() {
 		return lop;
 	}
@@ -65,6 +49,19 @@ public class PhysicalOpFixedSolMap implements NullaryPhysicalOpForLogicalOp
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpFixedSolMap oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
 	}
 
 	@Override

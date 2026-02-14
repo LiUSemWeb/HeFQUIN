@@ -35,12 +35,6 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		return (    o instanceof PhysicalOpSymmetricHashJoin shj
-		         && shj.lop.equals(lop) );
-	}
-
-	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                        final QueryPlanningInfo qpInfo,
 	                                        final ExpectedVariables ... inputVars ) {
@@ -55,8 +49,21 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpSymmetricHashJoin oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> symmetricHashJoin ";
+		return "SHJ";
 	}
 
 	public static class Factory implements PhysicalOpFactory

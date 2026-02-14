@@ -32,11 +32,6 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpLookupJoinViaWrapper oo && oo.lop.equals(lop);
-	}
-
-	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables ... inputVars )
@@ -63,8 +58,21 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpLookupJoinViaWrapper oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> wrapper-based lookup join " + "(" + lop.toString() + ")";
+		return "wrapper-based lookup join for " + lop.toString();
 	}
 
 	public static class Factory implements PhysicalOpFactory

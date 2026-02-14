@@ -41,17 +41,19 @@ public class PhysicalOpMultiwayUnion implements NaryPhysicalOpForLogicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
 		return o instanceof PhysicalOpMultiwayUnion;
 	}
 
 	@Override
 	public int hashCode() {
-		return LogicalOpMultiwayUnion.getInstance().hashCode();
+		return getClass().hashCode() ^ getLogicalOperator().hashCode();
 	}
 
 	@Override
-	public String toString(){
-		return "> mu";
+	public String toString() {
+		return "mu";
 	}
 
 	public static class Factory implements PhysicalOpFactory

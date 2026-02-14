@@ -23,8 +23,6 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
-import java.util.Objects;
-
 /**
  * A physical operator that performs a request at a federation member
  * and, then, outputs the solution mappings obtained via this request.
@@ -51,16 +49,6 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest,
 	protected PhysicalOpRequest( final LogicalOpRequest<ReqType,MemberType> lop ) {
 		assert lop != null;
 		this.lop = lop;
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpRequest<?,?> && ((PhysicalOpRequest<?,?>) o).lop.equals(lop);
-	}
-
-	@Override
-	public int hashCode(){
-		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
 	}
 
 	@Override
@@ -96,6 +84,19 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest,
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof PhysicalOpRequest oo
+		       && oo.lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
 	}
 
 	@Override
