@@ -24,7 +24,7 @@ public class LogicalPlanWithNullaryRootImpl extends BaseForQueryPlan
 			return true;
 
 		return (    o instanceof LogicalPlanWithNullaryRoot oo
-		         && oo.getRootOperator().getID() == rootOp.getID() );
+		         && oo.getRootOperator().equals(rootOp) );
 	}
 
 	@Override

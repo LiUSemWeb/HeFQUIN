@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 
@@ -11,7 +10,7 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpMultiwayJoin extends BaseForQueryPlanOperator implements NaryLogicalOp
+public class LogicalOpMultiwayJoin implements NaryLogicalOp
 {
 	protected static LogicalOpMultiwayJoin singleton = new LogicalOpMultiwayJoin();
 
@@ -48,7 +47,7 @@ public class LogicalOpMultiwayJoin extends BaseForQueryPlanOperator implements N
 
 	@Override
 	public String toString(){
-		return "mj (" + getID() + ")";
+		return "mj";
 	}
 
 }

@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import java.util.Objects;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashRJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -30,8 +29,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpHashRJoin} class.
  */
-public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
-                                 implements BinaryPhysicalOpForLogicalOp
+public class PhysicalOpHashRJoin implements BinaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }

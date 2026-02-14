@@ -41,7 +41,7 @@ public class LogicalPlanWithNaryRootImpl extends BaseForQueryPlan
 			return true;
 
 		if (    o instanceof LogicalPlanWithNaryRoot oo
-		     && oo.getRootOperator().getID() == rootOp.getID()
+		     && oo.getRootOperator().equals(rootOp)
 		     && oo.numberOfSubPlans() == subPlans.size() )
 		{
 			final Iterator<LogicalPlan> it1 = subPlans.iterator();

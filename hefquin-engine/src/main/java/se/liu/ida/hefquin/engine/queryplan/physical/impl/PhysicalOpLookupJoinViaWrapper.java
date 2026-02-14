@@ -64,7 +64,7 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 
 	@Override
 	public String toString() {
-		return "> wrapper-based lookup join " + "(" + getID() + ") " +  lop.toString();
+		return "> wrapper-based lookup join " + "(" + lop.toString() + ")";
 	}
 
 	public static class Factory implements PhysicalOpFactory

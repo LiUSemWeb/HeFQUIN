@@ -57,7 +57,7 @@ public class PhysicalPlanWithUnaryRootImpl extends BaseForQueryPlan
 			return true;
 
 		return (    o instanceof PhysicalPlanWithUnaryRoot oo
-		         && oo.getRootOperator().getID() == rootOp.getID()
+		         && oo.getRootOperator().equals(rootOp)
 		         && oo.getSubPlan().equals(subPlan) );
 	}
 

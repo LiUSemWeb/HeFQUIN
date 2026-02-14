@@ -9,7 +9,6 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpParallelMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -32,8 +31,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
  * The actual algorithm of this operator is implemented
  * in the {@link ExecOpParallelMultiwayLeftJoin} class.
  */
-public class PhysicalOpParallelMultiLeftJoin extends BaseForQueryPlanOperator
-                                             implements UnaryPhysicalOp
+public class PhysicalOpParallelMultiLeftJoin implements UnaryPhysicalOp
 {
 	/**
 	 * Checks whether a {@link LogicalOpMultiwayLeftJoin} with the given list

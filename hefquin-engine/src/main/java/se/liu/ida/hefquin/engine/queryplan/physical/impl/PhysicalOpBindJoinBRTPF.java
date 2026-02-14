@@ -115,7 +115,7 @@ public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 
 	@Override
 	public String toString() {
-		return "> brTPF-based bind join " + "(" + getID() + ") " +  lop.toString();
+		return "> brTPF-based bind join " + "(" +  lop.toString() + ")";
 	}
 
 	public static class Factory implements PhysicalOpFactory

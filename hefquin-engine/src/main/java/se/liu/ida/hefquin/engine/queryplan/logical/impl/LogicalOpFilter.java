@@ -4,11 +4,10 @@ import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpFilter extends BaseForQueryPlanOperator implements UnaryLogicalOp
+public class LogicalOpFilter implements UnaryLogicalOp
 {
 	protected final ExprList filterExpressions;
 

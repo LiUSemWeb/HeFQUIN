@@ -6,12 +6,13 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 
-public class LogicalOpFixedSolMap extends BaseForQueryPlanOperator
-                                  implements NullaryLogicalOp
+/**
+ * A logical operator that returns a given solution mapping.
+ */
+public class LogicalOpFixedSolMap implements NullaryLogicalOp
 {
 	protected final SolutionMapping sm;
 	protected final ExpectedVariables expectedVars;
@@ -53,8 +54,7 @@ public class LogicalOpFixedSolMap extends BaseForQueryPlanOperator
 
 	@Override
 	public String toString(){
-		return "sm" + " (" + getID() + ")"
-		       + "\t " + sm.toString();
+		return "sm" + " (" + sm.toString() + ")";
 	}
 
 	@Override

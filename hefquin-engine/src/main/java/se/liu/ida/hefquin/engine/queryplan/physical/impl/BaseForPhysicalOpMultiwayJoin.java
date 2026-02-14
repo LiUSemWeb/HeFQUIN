@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
 
@@ -8,8 +7,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
  * Base class for physical operators that implement
  * some form of a multi-way join algorithm.
  */
-public abstract class BaseForPhysicalOpMultiwayJoin extends BaseForQueryPlanOperator
-                                                    implements NaryPhysicalOpForLogicalOp
+public abstract class BaseForPhysicalOpMultiwayJoin
+		implements NaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpMultiwayJoin lop;
 

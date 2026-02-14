@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import java.util.Objects;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOpBase;
@@ -16,8 +15,10 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class PhysicalOpFixedSolMap extends BaseForQueryPlanOperator
-                                   implements NullaryPhysicalOpForLogicalOp
+/**
+ * A physical operator that returns a given solution mapping.
+ */
+public class PhysicalOpFixedSolMap implements NullaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }

@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
 
@@ -14,8 +13,8 @@ import java.util.Objects;
  * locally (i.e., within in the engine rather than by interacting with any
  * federation member).
  */
-public abstract class BaseForPhysicalOpBinaryJoin extends BaseForQueryPlanOperator
-                                                  implements BinaryPhysicalOpForLogicalOp
+public abstract class BaseForPhysicalOpBinaryJoin
+		implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpJoin lop;
 

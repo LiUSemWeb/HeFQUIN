@@ -64,7 +64,7 @@ public class PhysicalPlanWithBinaryRootImpl extends BaseForQueryPlan
 			return true;
 
 		return (    o instanceof PhysicalPlanWithBinaryRoot oo
-		         && oo.getRootOperator().getID() == rootOp.getID()
+		         && oo.getRootOperator().equals(rootOp)
 		         && oo.getSubPlan1().equals(subPlan1)
 		         && oo.getSubPlan2().equals(subPlan2) ); 
 	}

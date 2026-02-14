@@ -48,7 +48,7 @@ public class PhysicalPlanWithNullaryRootImpl extends BaseForQueryPlan
 			return true;
 
 		return (    o instanceof PhysicalPlanWithNullaryRoot oo
-		         && oo.getRootOperator().getID() == rootOp.getID() ); 
+		         && oo.getRootOperator().equals(rootOp) ); 
 	}
 
 	@Override

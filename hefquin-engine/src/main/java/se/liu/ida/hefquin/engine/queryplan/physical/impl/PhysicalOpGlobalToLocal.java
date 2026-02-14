@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -20,8 +19,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpGlobalToLocal} class.
  */
-public class PhysicalOpGlobalToLocal extends BaseForQueryPlanOperator
-                                     implements UnaryPhysicalOpForLogicalOp
+public class PhysicalOpGlobalToLocal implements UnaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }

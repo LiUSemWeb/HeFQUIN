@@ -1,15 +1,14 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 
-public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
-                        extends BaseForQueryPlanOperator
-                        implements NullaryLogicalOp
+public class LogicalOpRequest<ReqType extends DataRetrievalRequest,
+                              MemberType extends FederationMember>
+		implements NullaryLogicalOp
 {
 	protected final MemberType fm;
 	protected final ReqType req;
@@ -59,7 +58,7 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 
 	@Override
 	public String toString(){
-		return "req" + " (" + getID() + ")"
+		return "req"
 		  		+ "\t - fm (" + fm.toString() + ")"
 		  		+ "\t - pattern (" + req.toString() + ")";
 		

@@ -16,13 +16,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 public interface QueryPlanOperator
 {
 	/**
-	 * Returns an identifier of this operator, which should be distinct from
-	 * the identifiers of all other operators within the same plan (no matter
-	 * what type of operator they are).
-	 */
-	int getID();
-
-	/**
 	 * Returns the variables that can be expected in the solution
 	 * mappings produced by this operator in the case that the input(s)
 	 * to this operator contain solutions mappings with the given set(s)

@@ -201,7 +201,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		protected void record( final LogicalOperator lop ) {
 			lop.visit(snc);
-			props.add( "lop: " + snc.name + " (" + lop.getID()  + ")" );
+			props.add( "lop: " + snc.name );
 			lop.visit(this);
 		}
 	}

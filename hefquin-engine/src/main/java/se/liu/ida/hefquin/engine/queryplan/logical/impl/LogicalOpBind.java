@@ -8,11 +8,10 @@ import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.Expr;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpBind extends BaseForQueryPlanOperator implements UnaryLogicalOp
+public class LogicalOpBind implements UnaryLogicalOp
 {
 	protected final VarExprList bindExpressions;
 

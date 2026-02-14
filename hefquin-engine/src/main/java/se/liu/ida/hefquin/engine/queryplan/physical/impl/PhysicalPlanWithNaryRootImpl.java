@@ -87,7 +87,7 @@ public class PhysicalPlanWithNaryRootImpl extends BaseForQueryPlan
 			return true;
 
 		if (    o instanceof PhysicalPlanWithNaryRoot oo
-		     && oo.getRootOperator().getID() == rootOp.getID()
+		     && oo.getRootOperator().equals(rootOp)
 		     && oo.numberOfSubPlans() == subPlans.size() )
 		{
 			final Iterator<PhysicalPlan> it1 = subPlans.iterator();

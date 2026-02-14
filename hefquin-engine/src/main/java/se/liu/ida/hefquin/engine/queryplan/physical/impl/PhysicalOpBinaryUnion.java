@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -18,8 +17,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpBinaryUnion} class.
  */
-public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
-                                   implements BinaryPhysicalOpForLogicalOp
+public class PhysicalOpBinaryUnion
+		implements BinaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }

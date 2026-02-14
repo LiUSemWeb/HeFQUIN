@@ -9,12 +9,11 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.federation.FederationMember;
 
-public class LogicalOpGPOptAdd extends BaseForQueryPlanOperator implements UnaryLogicalOp
+public class LogicalOpGPOptAdd implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;

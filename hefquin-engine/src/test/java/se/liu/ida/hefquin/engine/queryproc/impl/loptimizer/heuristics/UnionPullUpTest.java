@@ -535,7 +535,6 @@ public class UnionPullUpTest extends EngineTestBase
 	protected static class DummyLogicalOp implements NullaryLogicalOp {
 		@Override public void visit(LogicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
 		@Override public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
-		@Override public int getID() { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyTriplePattern extends TriplePatternImpl {

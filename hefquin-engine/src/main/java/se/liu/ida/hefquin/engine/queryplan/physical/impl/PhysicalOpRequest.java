@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestOther;
@@ -40,9 +39,9 @@ import java.util.Objects;
  * <li>{@link ExecOpRequestOther}</li>
  * </ul>
  */
-public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> 
-                       extends BaseForQueryPlanOperator
-                       implements NullaryPhysicalOpForLogicalOp
+public class PhysicalOpRequest<ReqType extends DataRetrievalRequest,
+                               MemberType extends FederationMember>
+		implements NullaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }

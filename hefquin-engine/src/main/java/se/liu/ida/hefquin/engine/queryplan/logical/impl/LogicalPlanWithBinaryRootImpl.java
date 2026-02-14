@@ -33,7 +33,7 @@ public class LogicalPlanWithBinaryRootImpl extends BaseForQueryPlan
 			return true;
 
 		return (    o instanceof LogicalPlanWithBinaryRoot oo
-		         && oo.getRootOperator().getID() == rootOp.getID()
+		         && oo.getRootOperator().equals(rootOp)
 		         && oo.getSubPlan1().equals(subPlan1)
 		         && oo.getSubPlan2().equals(subPlan2) );
 	}

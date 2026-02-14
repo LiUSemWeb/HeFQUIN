@@ -29,7 +29,7 @@ public class LogicalPlanWithUnaryRootImpl extends BaseForQueryPlan
 			return true;
 
 		return (    o instanceof LogicalPlanWithUnaryRoot oo
-		         && oo.getRootOperator().getID() == rootOp.getID()
+		         && oo.getRootOperator().equals(rootOp)
 		         && oo.getSubPlan().equals(subPlan) );
 	}
 
