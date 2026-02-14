@@ -24,21 +24,6 @@ public class LogicalPlanWithUnaryRootImpl extends BaseForQueryPlan
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
-
-		return (    o instanceof LogicalPlanWithUnaryRoot oo
-		         && oo.getRootOperator().equals(rootOp)
-		         && oo.getSubPlan().equals(subPlan) );
-	}
-
-	@Override
-	public int hashCode(){
-		return rootOp.hashCode() ^ subPlan.hashCode();
-	}
-
-	@Override
 	public UnaryLogicalOp getRootOperator() {
 		return rootOp;
 	}

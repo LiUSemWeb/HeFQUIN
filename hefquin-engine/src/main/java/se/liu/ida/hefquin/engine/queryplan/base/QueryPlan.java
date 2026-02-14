@@ -67,8 +67,33 @@ public interface QueryPlan
 	QueryPlanningInfo getQueryPlanningInfo();
 
 	/**
-	 * Returns <code>true</code> if this plan already has a
+	 * Returns {@code true} if this plan already has a
 	 * {@link QueryPlanningInfo} object associated with it.
 	 */
 	boolean hasQueryPlanningInfo();
+
+	/**
+	 * Returns {@code true} if this plan is the same plan as the given one.
+	 * Plans are considered the same if they have the same root operator,
+	 * the same number of sub-plans, and the sub-plans at every index are
+	 * the same as well.
+	 * <p>
+	 * Notice that the {@link #equals(Object)} function cannot be used
+	 * for the type of comparison provided by this function because
+	 * {@link #equals(Object)} takes the IDs of the plans into account
+	 * (which essentially means that {@link #equals(Object)} falls back
+	 * to doing a {@code ==} comparison, because the IDs are unique).
+	 */
+	default boolean isSamePlan( QueryPlan other ) {
+		if ( this.equals(other) ) return true;
+
+		if ( numberOfSubPlans() != other.numberOfSubPlans() ) return false;
+		if ( ! getRootOperator().equals(other.getRootOperator()) ) return false;
+
+		for ( int i = 0; i < numberOfSubPlans(); i++ ) {
+			if ( ! getSubPlan(i).isSamePlan(other.getSubPlan(i)) ) return false;
+		}
+
+		return true;
+	}
 }

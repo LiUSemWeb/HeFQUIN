@@ -55,4 +55,16 @@ public abstract class BaseForQueryPlan implements QueryPlan
 		return info;
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		// Since every plan has a unique ID, two different Java objects
+		// that represent query plans cannot be equal even if the plans
+		// that they represent are identical (except for their IDs).
+		return ( o == this );
+	}
+
+	@Override
+	public int hashCode(){
+		return id;
+	}
 }

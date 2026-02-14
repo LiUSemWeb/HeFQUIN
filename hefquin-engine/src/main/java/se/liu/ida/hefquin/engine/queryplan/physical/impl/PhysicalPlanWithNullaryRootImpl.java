@@ -43,20 +43,6 @@ public class PhysicalPlanWithNullaryRootImpl extends BaseForQueryPlan
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
-
-		return (    o instanceof PhysicalPlanWithNullaryRoot oo
-		         && oo.getRootOperator().equals(rootOp) ); 
-	}
-
-	@Override
-	public int hashCode(){
-		return rootOp.hashCode();
-	}
-
-	@Override
 	public NullaryPhysicalOp getRootOperator() {
 		return rootOp;
 	}
