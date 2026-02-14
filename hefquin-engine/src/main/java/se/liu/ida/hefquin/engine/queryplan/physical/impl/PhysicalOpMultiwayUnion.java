@@ -22,6 +22,8 @@ public class PhysicalOpMultiwayUnion implements NaryPhysicalOpForLogicalOp
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
+	private static PhysicalOpMultiwayUnion singleton = null;
+
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
@@ -66,10 +68,17 @@ public class PhysicalOpMultiwayUnion implements NaryPhysicalOpForLogicalOp
 		@Override
 		public PhysicalOpMultiwayUnion create( final NaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpMultiwayUnion ) {
-				return new PhysicalOpMultiwayUnion();
+				return getInstance();
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
+	}
+
+	public static PhysicalOpMultiwayUnion getInstance() {
+		if ( singleton == null )
+			singleton = new PhysicalOpMultiwayUnion();
+
+		return singleton;
 	}
 }

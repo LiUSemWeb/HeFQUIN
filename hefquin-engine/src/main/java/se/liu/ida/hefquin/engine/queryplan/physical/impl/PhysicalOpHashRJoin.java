@@ -32,16 +32,13 @@ public class PhysicalOpHashRJoin implements BinaryPhysicalOpForLogicalOp
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected final LogicalOpRightJoin lop;
+	private static PhysicalOpHashRJoin singleton = null;
 
-	protected PhysicalOpHashRJoin(final LogicalOpRightJoin lop ) {
-		assert lop != null;
-		this.lop = lop;
-	}
+	protected PhysicalOpHashRJoin() { }
 
 	@Override
 	public LogicalOpRightJoin getLogicalOperator() {
-		return lop;
+		return LogicalOpRightJoin.getInstance();
 	}
 
 	@Override
@@ -62,13 +59,12 @@ public class PhysicalOpHashRJoin implements BinaryPhysicalOpForLogicalOp
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return    o instanceof PhysicalOpHashRJoin oo
-		       && oo.lop.equals(lop);
+		return o instanceof PhysicalOpHashRJoin;
 	}
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() ^ lop.hashCode();
+		return getClass().hashCode() ^ LogicalOpRightJoin.getInstance().hashCode();
 	}
 
 	@Override
@@ -85,11 +81,15 @@ public class PhysicalOpHashRJoin implements BinaryPhysicalOpForLogicalOp
 
 		@Override
 		public PhysicalOpHashRJoin create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpRightJoin op ) {
-				return new PhysicalOpHashRJoin(op);
-			}
+			if ( lop instanceof LogicalOpRightJoin ) return getInstance();
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
+	}
+
+	public static PhysicalOpHashRJoin getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpHashRJoin();
+
+		return singleton;
 	}
 }

@@ -14,15 +14,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp
 public abstract class BaseForPhysicalOpBinaryJoin
 		implements BinaryPhysicalOpForLogicalOp
 {
-	protected final LogicalOpJoin lop;
-
-	protected BaseForPhysicalOpBinaryJoin( final LogicalOpJoin lop ) {
-		assert lop != null;
-		this.lop = lop;
-	}
-
 	@Override
 	public LogicalOpJoin getLogicalOperator() {
-		return lop;
+		return LogicalOpJoin.getInstance();
 	}
 }

@@ -23,12 +23,9 @@ public class PhysicalOpBinaryUnion
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected final LogicalOpUnion lop;
+	private static PhysicalOpBinaryUnion singleton = null;
 
-	protected PhysicalOpBinaryUnion( final LogicalOpUnion lop ) {
-		assert lop != null;
-		this.lop = lop;
-	}
+	protected PhysicalOpBinaryUnion() { }
 
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
@@ -44,20 +41,19 @@ public class PhysicalOpBinaryUnion
 
 	@Override
 	public LogicalOpUnion getLogicalOperator() {
-		return lop;
+		return LogicalOpUnion.getInstance();
 	}
 
 	@Override
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return    o instanceof PhysicalOpBinaryUnion oo
-		       && oo.lop.equals(lop);
+		return o instanceof PhysicalOpBinaryUnion;
 	}
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() ^ lop.hashCode();
+		return getClass().hashCode() ^ LogicalOpUnion.getInstance().hashCode();
 	}
 
 	@Override
@@ -74,11 +70,15 @@ public class PhysicalOpBinaryUnion
 
 		@Override
 		public PhysicalOpBinaryUnion create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpUnion op ) {
-				return new PhysicalOpBinaryUnion(op);
-			}
+			if ( lop instanceof LogicalOpUnion ) return getInstance();
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
+	}
+
+	public static PhysicalOpBinaryUnion getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpBinaryUnion();
+
+		return singleton;
 	}
 }

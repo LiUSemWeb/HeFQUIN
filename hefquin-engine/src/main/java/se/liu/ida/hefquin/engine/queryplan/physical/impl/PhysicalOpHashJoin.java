@@ -32,9 +32,9 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected PhysicalOpHashJoin( final LogicalOpJoin lop ) {
-		super(lop);
-	}
+	private static PhysicalOpHashJoin singleton = null;
+
+	protected PhysicalOpHashJoin() { }
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
@@ -54,13 +54,12 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return    o instanceof PhysicalOpHashJoin oo
-		       && oo.lop.equals(lop);
+		return o instanceof PhysicalOpHashJoin;
 	}
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() ^ lop.hashCode();
+		return getClass().hashCode() ^ getLogicalOperator().hashCode();
 	}
 
 	@Override
@@ -83,11 +82,17 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 
 		@Override
 		public PhysicalOpHashJoin create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpJoin op ) {
-				return new PhysicalOpHashJoin(op);
+			if ( lop instanceof LogicalOpJoin ) {
+				return getInstance();
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
+	}
+
+	public static PhysicalOpHashJoin getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpHashJoin();
+
+		return singleton;
 	}
 }
