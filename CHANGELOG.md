@@ -12,6 +12,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Change to Hydra vocabulary for the template IRIs of REST APIs in federation descriptions ([#493](https://github.com/LiUSemWeb/HeFQUIN/pull/493)).
 - Updated request processors to use an HTTP client provider and shared connection pools ([#495](https://github.com/LiUSemWeb/HeFQUIN/pull/495)).
+- Adding unique IDs for plans and sub-plan, and using these in the plan printers ([#500](https://github.com/LiUSemWeb/HeFQUIN/pull/500)).
+- Some clean up in the classes for plans and for operators ([#500](https://github.com/LiUSemWeb/HeFQUIN/pull/500)).
 - Bug fix: the base implementation of the bind-join algorithm did not correctly implement bag semantics ([#498](https://github.com/LiUSemWeb/HeFQUIN/pull/498)).
 
 
