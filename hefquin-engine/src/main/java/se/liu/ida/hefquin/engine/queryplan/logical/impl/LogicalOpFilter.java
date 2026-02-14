@@ -31,20 +31,6 @@ public class LogicalOpFilter implements UnaryLogicalOp
 		return inputVars[0];
 	}
 
-	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this ) return true;
-		if ( ! (o instanceof LogicalOpFilter) ) return false;
-
-		final LogicalOpFilter oo = (LogicalOpFilter) o;
-		return oo.filterExpressions.equals(filterExpressions); 
-	}
-
-	@Override
-	public int hashCode(){
-		return filterExpressions.hashCode();
-	}
-
 	public ExprList getFilterExpressions() {
 		return filterExpressions;
 	}
@@ -55,8 +41,21 @@ public class LogicalOpFilter implements UnaryLogicalOp
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof LogicalOpFilter oo
+		       && oo.filterExpressions.equals(filterExpressions); 
+	}
+
+	@Override
+	public int hashCode(){
+		return getClass().hashCode() ^ filterExpressions.hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> filter ( " + filterExpressions.toString() + " )";
+		return "Filter ( " + filterExpressions.toString() + " )";
 	}
 
 }

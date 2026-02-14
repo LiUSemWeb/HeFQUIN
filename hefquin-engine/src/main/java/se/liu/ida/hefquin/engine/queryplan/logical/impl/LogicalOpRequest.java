@@ -21,21 +21,6 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest,
 		this.req = req;
 	}
 
-	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
-
-		return (    o instanceof LogicalOpRequest oo
-		         && oo.fm.equals(fm)
-		         && oo.req.equals(req) );
-	}
-
-	@Override
-	public int hashCode(){
-		return fm.hashCode() ^ req.hashCode();
-	}
-
 	public MemberType getFederationMember() {
 		return fm;
 	}
@@ -57,11 +42,22 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest,
 	}
 
 	@Override
-	public String toString(){
-		return "req"
-		  		+ "\t - fm (" + fm.toString() + ")"
-		  		+ "\t - pattern (" + req.toString() + ")";
-		
+	public boolean equals( final Object o ) {
+		if ( o == this )
+			return true;
+
+		return (    o instanceof LogicalOpRequest oo
+		         && oo.fm.equals(fm)
+		         && oo.req.equals(req) );
 	}
 
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ fm.hashCode() ^ req.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "req (fm: " + fm.hashCode() + ", req: " + req.hashCode() + ")";
+	}
 }

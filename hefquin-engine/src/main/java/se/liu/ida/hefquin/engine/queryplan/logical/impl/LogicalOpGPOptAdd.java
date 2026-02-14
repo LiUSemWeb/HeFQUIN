@@ -93,6 +93,11 @@ public class LogicalOpGPOptAdd implements UnaryLogicalOp
 	}
 
 	@Override
+	public void visit( final LogicalPlanVisitor visitor ) {
+		visitor.visit(this);
+	}
+
+	@Override
 	public boolean equals( final Object o ) {
 		if ( o == this )
 			return true;
@@ -106,27 +111,12 @@ public class LogicalOpGPOptAdd implements UnaryLogicalOp
 	}
 
 	@Override
-	public int hashCode(){
-		return fm.hashCode() ^ pattern.hashCode();
-	}
-
-	@Override
-	public void visit( final LogicalPlanVisitor visitor ) {
-		visitor.visit(this);
+	public int hashCode() {
+		return getClass().hashCode() ^ fm.hashCode() ^ pattern.hashCode();
 	}
 
 	@Override
 	public String toString(){
-		final int codeOfPattern = pattern.toString().hashCode();
-		final int codeOfFm = fm.toString().hashCode();
-
-		return "> gpOptAdd" +
-				"[" + codeOfPattern + ", "+ codeOfFm + "]"+
-				" ( "
-				+ pattern.toString()
-				+ ", "
-				+ fm.toString()
-				+ " )";
+		return "gpOptAdd (fm: " + fm.hashCode() + ", gp: " + pattern.hashCode() + ")";
 	}
-
 }

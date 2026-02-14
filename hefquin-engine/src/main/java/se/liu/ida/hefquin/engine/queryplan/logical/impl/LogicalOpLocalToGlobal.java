@@ -7,10 +7,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
 public class LogicalOpLocalToGlobal implements UnaryLogicalOp
 {
-	protected final VocabularyMapping vocabularyMapping;
+	protected final VocabularyMapping vm;
 
-	public LogicalOpLocalToGlobal(final VocabularyMapping mapping){
-		this.vocabularyMapping = mapping;
+	public LogicalOpLocalToGlobal( final VocabularyMapping vm ){
+		this.vm = vm;
 	}
 
 	@Override
@@ -21,17 +21,29 @@ public class LogicalOpLocalToGlobal implements UnaryLogicalOp
 	}
 
 	@Override
-	public void visit(final LogicalPlanVisitor visitor) {
+	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
+	}
+
+	public VocabularyMapping getVocabularyMapping() {
+		return vm;
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof LogicalOpLocalToGlobal oo && oo.vm.equals(vm);
+	}
+
+	@Override
+	public int hashCode(){
+		return getClass().hashCode() ^ vm.hashCode();
 	}
 
 	@Override
 	public String toString() {
-		return "> l2g " + "(vocab.mapping: " + vocabularyMapping.hashCode() + ")";
-	}
-
-	public VocabularyMapping getVocabularyMapping() {
-		return this.vocabularyMapping;
+		return "l2g (" + vm.hashCode() + ")";
 	}
 
 }

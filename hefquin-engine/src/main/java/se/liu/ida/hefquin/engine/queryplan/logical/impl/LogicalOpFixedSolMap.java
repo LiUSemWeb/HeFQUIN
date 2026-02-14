@@ -36,28 +36,6 @@ public class LogicalOpFixedSolMap implements NullaryLogicalOp
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
-
-		if (    o instanceof LogicalOpFixedSolMap fin
-		     && fin.getSolutionMapping().equals(sm) )
-			return true;
-
-		return false; 
-	}
-
-	@Override
-	public int hashCode(){
-		return sm.hashCode();
-	}
-
-	@Override
-	public String toString(){
-		return "sm" + " (" + sm.toString() + ")";
-	}
-
-	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
@@ -69,4 +47,20 @@ public class LogicalOpFixedSolMap implements NullaryLogicalOp
 		return expectedVars;
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof LogicalOpFixedSolMap oo && oo.sm.equals(sm);
+	}
+
+	@Override
+	public int hashCode(){
+		return getClass().hashCode() ^ sm.hashCode();
+	}
+
+	@Override
+	public String toString(){
+		return "sm (" + sm.toString() + ")";
+	}
 }

@@ -66,20 +66,6 @@ public class LogicalOpBind implements UnaryLogicalOp
 		return true;
 	}
 
-	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this ) return true;
-		if ( ! (o instanceof LogicalOpBind) ) return false;
-
-		final LogicalOpBind oo = (LogicalOpBind) o;
-		return oo.bindExpressions.equals(bindExpressions);
-	}
-
-	@Override
-	public int hashCode(){
-		return bindExpressions.hashCode();
-	}
-
 	public VarExprList getBindExpressions() {
 		return bindExpressions;
 	}
@@ -90,8 +76,21 @@ public class LogicalOpBind implements UnaryLogicalOp
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof LogicalOpBind oo
+		       && oo.bindExpressions.equals(bindExpressions);
+	}
+
+	@Override
+	public int hashCode(){
+		return getClass().hashCode() ^ bindExpressions.hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> Bind ( " + bindExpressions.toString() + " )";
+		return "Bind ( " + bindExpressions.toString() + " )";
 	}
 
 }

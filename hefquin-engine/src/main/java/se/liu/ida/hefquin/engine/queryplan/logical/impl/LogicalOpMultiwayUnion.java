@@ -5,7 +5,6 @@ import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 
-import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
@@ -31,23 +30,22 @@ public class LogicalOpMultiwayUnion implements NaryLogicalOp
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpMultiwayUnion;
-	}
-
-	@Override
-	public int hashCode(){
-		return Objects.hash( this.getClass().getName() );
-	}
-
-	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
 
 	@Override
-	public String toString(){
-		return "mu";
+	public boolean equals( final Object o ) {
+		return o instanceof LogicalOpMultiwayUnion;
 	}
 
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "mu";
+	}
 }
