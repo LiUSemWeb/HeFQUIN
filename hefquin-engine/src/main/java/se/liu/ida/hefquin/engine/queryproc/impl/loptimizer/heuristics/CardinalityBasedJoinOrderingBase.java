@@ -93,33 +93,38 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 		for ( int i = 0; i < numberOfSubPlans; i++ ) {
 			final LogicalPlan oldSubPlan = inputPlan.getSubPlan(i);
 			newSubPlans[i] = _apply(oldSubPlan);
-			if ( ! newSubPlans[i].equals(oldSubPlan) ) {
+			if ( ! newSubPlans[i].isSamePlan(oldSubPlan) ) {
 				noChanges = false;
 			}
 		}
 
 		// reorder the subplans if the root of the given plan is a join
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
-		if ( rootOp instanceof LogicalOpJoin || rootOp instanceof LogicalOpMultiwayJoin ) {
-// TODO: reorder(..) should return a boolean that indicates whether
-// the order has indeed changed, and this can then be used here to
-// set noChanges to false if there was a change
-			noChanges = false;
-			reorder(newSubPlans);
+		if (    rootOp instanceof LogicalOpJoin
+		     || rootOp instanceof LogicalOpMultiwayJoin ) {
+			final boolean changed = reorder(newSubPlans);
+			noChanges = noChanges && ! changed;
 		}
 
 		if ( noChanges )
 			return inputPlan;
-		else
-			return LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
+
+		return LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+		                                                inputPlan.getQueryPlanningInfo().getProperties(),
+		                                                newSubPlans );
 	}
 
 	/**
 	 * Changes the order of the subplans in the given array by using the
 	 * greedy algorithm described above for this class.
+	 *
+	 * @param plans - the list of plans that should be reordered
+	 * @return {@code true} if the order of the plans in
+	 *         the given list has indeed been changed
+	 * @throws LogicalOptimizationException
 	 */
-	protected void reorder( final LogicalPlan[] plans ) throws LogicalOptimizationException {
-		if ( plans.length < 2 ) return;
+	protected boolean reorder( final LogicalPlan[] plans ) throws LogicalOptimizationException {
+		if ( plans.length < 2 ) return false;
 
 		// Pick the first subplan based on the cardinality estimates.
 		final int idxOfFirstPlan = determineIdxOfSmallestCardinality(plans);
@@ -132,8 +137,11 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 				final LogicalPlan secondPlan = plans[0];
 				plans[0] = firstPlan;
 				plans[1] = secondPlan;
+				return true;
 			}
-			return;
+			else {
+				return false;
+			}
 		}
 
 		final Set<Var> potentialJoinVars = new HashSet<>( firstPlan.getExpectedVariables().getCertainVariables() );
@@ -216,10 +224,30 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 			}
 		}
 
-		// Finally, update the given array by using the new ordering.
+		// Before updating the given array by using the determined
+		// ordering, determine whether the order in the given array
+		// happens to be the same as the determined ordering.
+		if ( idxOfFirstPlan == 0 ) {
+			boolean noChange = true;
+			for ( int i = 1; i < plans.length; i++ ) {
+				if ( selectedPlans.get(i) != plans[i] ) {
+					noChange = false;
+					break; // the order is different
+				}
+			}
+
+			if ( noChange == true ) {
+				return false; // return without changing the array
+			}
+		}
+
+		// In case the order is indeed different, update
+		// the given array by using the new ordering.
 		for ( int i = 0; i < plans.length; i++ ) {
 			plans[i] = selectedPlans.get(i);
 		}
+
+		return true;
 	}
 
 	/**
@@ -240,11 +268,16 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 		for ( int i = 0; i < plans.length; i++ ) {
 			final QueryPlanningInfo qpInfo = plans[i].getQueryPlanningInfo();
 			final QueryPlanProperty crd = qpInfo.getProperty( QueryPlanProperty.CARDINALITY );
+
+			if ( crd == null )
+				throw new IllegalStateException("The plan with ID " + plans[i].getID() + " does not have a cardinality estimate (the root op. of this plan is: " + plans[i].getRootOperator().toString() + ").");
+
 			if ( crd.getValue() < smallestSeenCardinality ) {
 				smallestSeenCardinality = crd.getValue();
 				qtyOfSmallestSeenCardinality = crd.getQuality();
 				idxOfSmallestSeenCardinality = i;
 			}
+
 			if (    crd.getValue() == smallestSeenCardinality 
 			     && crd.getQuality().higherThan(qtyOfSmallestSeenCardinality) ) {
 				smallestSeenCardinality = crd.getValue();

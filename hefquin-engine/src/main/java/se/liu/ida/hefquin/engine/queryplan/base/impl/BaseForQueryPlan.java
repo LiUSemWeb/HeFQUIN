@@ -1,6 +1,9 @@
 package se.liu.ida.hefquin.engine.queryplan.base.impl;
 
+import java.util.Iterator;
+
 import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
 /**
@@ -23,11 +26,39 @@ public abstract class BaseForQueryPlan implements QueryPlan
 	 * an already existing {@link QueryPlanningInfo} object. This object may
 	 * later be extended with additional properties for this plan. Therefore,
 	 * do not create multiple plans with the same {@link QueryPlanningInfo}
-	 * object; instead, make copies of such an object if needed.
+	 * object; instead, make copies of such an object if needed. One way to
+	 * create such a copy is to use the {@link #BaseForQueryPlan(Iterable)}
+	 * constructor instead, passing {@link QueryPlanningInfo#getProperties()}
+	 * of the {@link QueryPlanningInfo} object to be copied.
 	 */
 	protected BaseForQueryPlan( final QueryPlanningInfo qpInfo ) {
 		assert qpInfo != null;
 		info = qpInfo;
+
+		id = ++counter;
+	}
+
+	/**
+	 * Use this constructor to create the plan with a {@link QueryPlanningInfo}
+	 * object that is initialized with the given properties. This object may
+	 * later be extended with additional properties for this plan.
+	 *<p>
+	 * If the given argument is {@code null} or an empty iterable, then this
+	 * constructor does not associate a {@link QueryPlanningInfo} with the
+	 * plan.
+	 */
+	protected BaseForQueryPlan( final Iterable<QueryPlanProperty> qpInfo ) {
+		if ( qpInfo != null ) {
+			final Iterator<QueryPlanProperty> it = qpInfo.iterator();
+			if ( it.hasNext() ) {
+				info = new QueryPlanningInfo();
+
+				// Populate the new object with the given properties.
+				while ( it.hasNext() ) {
+					info.addProperty( it.next() );
+				}
+			}
+		}
 
 		id = ++counter;
 	}

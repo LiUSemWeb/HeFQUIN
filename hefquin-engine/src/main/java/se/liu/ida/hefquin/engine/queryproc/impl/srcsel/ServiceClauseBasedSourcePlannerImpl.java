@@ -140,7 +140,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		// Now handle the collected OpExtend objects.
 		for ( final OpExtend opExtend : collectedOpExtend ) {
 			final LogicalOpBind lop = new LogicalOpBind( opExtend.getVarExprList() );
-			plan = new LogicalPlanWithUnaryRootImpl(lop, plan);
+			plan = new LogicalPlanWithUnaryRootImpl(lop, null, plan);
 		}
 
 		// Now handle the collected OpServiceWithParams objects.
@@ -180,14 +180,14 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	                                           final QueryProcContext ctxt ) {
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), ctxt );
 		final LogicalOpFilter rootOp = new LogicalOpFilter( jenaOp.getExprs() );
-		return new LogicalPlanWithUnaryRootImpl(rootOp, subPlan);
+		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
 	}
 
 	protected LogicalPlan createPlanForBind( final OpExtend jenaOp,
 	                                         final QueryProcContext ctxt ) {
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), ctxt );
 		final LogicalOpBind rootOp = new LogicalOpBind( jenaOp.getVarExprList() );
-		return new LogicalPlanWithUnaryRootImpl(rootOp, subPlan);
+		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
 	}
 
 	protected LogicalPlan createPlanForValues( final OpTable jenaOp,
@@ -201,7 +201,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		final Binding sm = jenaOp.getTable().rows().next();
 		final SolutionMapping solmap = new SolutionMappingImpl(sm);
 		final LogicalOpFixedSolMap rootOp = new LogicalOpFixedSolMap(solmap);
-		return new LogicalPlanWithNullaryRootImpl(rootOp);
+		return new LogicalPlanWithNullaryRootImpl(rootOp, null);
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
 			final SPARQLRequest req = new SPARQLRequestImpl(p);
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(ep, req);
-			return new LogicalPlanWithNullaryRootImpl(op);
+			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
 
 		return createPlan( jenaOp.getSubOp(), fm );
@@ -259,7 +259,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 		final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
 		final LogicalOpGPAdd op = new LogicalOpGPAdd(ep, p, paramVars);
-		return new LogicalPlanWithUnaryRootImpl(op, subplan);
+		return new LogicalPlanWithUnaryRootImpl(op, null, subplan);
 	}
 
 	protected LogicalPlan createPlan( final Op jenaOp, final FederationMember fm ) {
@@ -280,7 +280,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			else {
 				final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp) );
 				final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, req );
-				return new LogicalPlanWithNullaryRootImpl(op);
+				return new LogicalPlanWithNullaryRootImpl(op, null);
 			}
 		}
 
@@ -343,7 +343,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForFilter( final OpFilter jenaOp, final FederationMember fm ) {
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), fm );
 		final LogicalOpFilter rootOp = new LogicalOpFilter( jenaOp.getExprs() );
-		return new LogicalPlanWithUnaryRootImpl(rootOp, subPlan);
+		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
 	}
 
 	protected LogicalPlan createPlanForBGP( final OpBGP pattern, final FederationMember fm ) {
@@ -359,7 +359,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		final TriplePattern tp = new TriplePatternImpl( pattern.getTriple() );
 		final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 		final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req);
-		return new LogicalPlanWithNullaryRootImpl(op);
+		return new LogicalPlanWithNullaryRootImpl(op, null);
 	}
 
 	protected LogicalPlan createPlanForBGP( final BGP bgp, final FederationMember fm ) {
@@ -376,7 +376,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
 				final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 				final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req);
-				final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl(op);
+				final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl(op, null);
 				subPlans.add( subPlan );
 			}
 
@@ -388,7 +388,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			// ... then we can simply create a BGP request operator.
 			final BGPRequest req = new BGPRequestImpl(bgp);
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req);
-			return new LogicalPlanWithNullaryRootImpl(op);
+			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
 
 		throw new IllegalArgumentException( "the given federation member cannot handle triple patterns requests (" + fm.toString() + ")" );
@@ -421,6 +421,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		}
 
 		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayJoin.getInstance(),
+		                                        null,
 		                                        subPlansFlattened );
 	}
 
@@ -444,7 +445,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 		children.add( rightSubPlan );
 
-		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayLeftJoin.getInstance(), children );
+		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayLeftJoin.getInstance(), null, children );
 	}
 
 	protected LogicalPlan mergeIntoMultiwayUnion( final LogicalPlan ... subPlans ) {
@@ -466,6 +467,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		}
 
 		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(),
+		                                        null,
 		                                        subPlansFlattened );
 	}
 

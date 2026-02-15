@@ -49,12 +49,14 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp2) );
 
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
-				new LogicalPlanWithNullaryRootImpl(reqOp2),
-				new LogicalPlanWithNullaryRootImpl(reqOp3) );
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
+				null );
 
 		final LogicalPlan joinPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				unionSubPlan );
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				unionSubPlan,
+				null );
 
 		// test
 		final LogicalPlan result = new PushJoinUnderUnionWithRequests().apply(joinPlan);
@@ -109,12 +111,14 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp2) );
 
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
-				new LogicalPlanWithNullaryRootImpl(reqOp2),
-				new LogicalPlanWithNullaryRootImpl(reqOp3) );
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
+				null );
 
 		final LogicalPlan joinPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
 				unionSubPlan,
-				new LogicalPlanWithNullaryRootImpl(reqOp1) );
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				null );
 
 		// test
 		final LogicalPlan result = new PushJoinUnderUnionWithRequests().apply(joinPlan);
@@ -145,12 +149,14 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final LogicalOpFilter filterOp = new LogicalOpFilter(e);
 		
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
-				new LogicalPlanWithUnaryRootImpl(filterOp, new LogicalPlanWithNullaryRootImpl(reqOp2)),
-				new LogicalPlanWithUnaryRootImpl(filterOp, new LogicalPlanWithNullaryRootImpl(reqOp3)) );
+				new LogicalPlanWithUnaryRootImpl(filterOp, null, new LogicalPlanWithNullaryRootImpl(reqOp2, null)),
+				new LogicalPlanWithUnaryRootImpl(filterOp, null, new LogicalPlanWithNullaryRootImpl(reqOp3, null)),
+				null );
 
 		final LogicalPlan joinPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				unionSubPlan );
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				unionSubPlan,
+				null );
 
 		// test
 		final LogicalPlan result = new PushJoinUnderUnionWithRequests().apply(joinPlan);
@@ -211,16 +217,18 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp3) );
 
 		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl( new LogicalOpGPAdd(fmD, tp4, null),
-		                                                                 new LogicalPlanWithNullaryRootImpl(reqOp1) );
+		                                                                 null,
+		                                                                 new LogicalPlanWithNullaryRootImpl(reqOp1, null) );
 
 		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl( new LogicalOpGPAdd(fmD, tp4, null),
-		                                                                 new LogicalPlanWithNullaryRootImpl(reqOp2) );
+		                                                                 null,
+		                                                                 new LogicalPlanWithNullaryRootImpl(reqOp2, null) );
 
-		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(gpAddPlan1, gpAddPlan2);
+		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(gpAddPlan1, gpAddPlan2, null);
 
-		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp3);
+		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp3, null);
 
-		final LogicalPlan joinPlan = LogicalPlanUtils.createPlanWithBinaryJoin(reqPlan, unionSubPlan);
+		final LogicalPlan joinPlan = LogicalPlanUtils.createPlanWithBinaryJoin(reqPlan, unionSubPlan, null);
 
 		// test
 		final LogicalPlan result = new PushJoinUnderUnionWithRequests().apply(joinPlan);
@@ -277,16 +285,19 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3C = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp3) );
 
 		final LogicalPlan unionSubPlan1 = LogicalPlanUtils.createPlanWithBinaryUnion(
-				new LogicalPlanWithNullaryRootImpl(reqOp2B),
-				new LogicalPlanWithNullaryRootImpl(reqOp2C) );
+				new LogicalPlanWithNullaryRootImpl(reqOp2B, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2C, null),
+				null );
 
 		final LogicalPlan unionSubPlan2 = LogicalPlanUtils.createPlanWithBinaryUnion(
-				new LogicalPlanWithNullaryRootImpl(reqOp3B),
-				new LogicalPlanWithNullaryRootImpl(reqOp3C) );
+				new LogicalPlanWithNullaryRootImpl(reqOp3B, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp3C, null),
+				null );
 
-		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp1);
+		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
 		final LogicalPlan joinPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
+				null,
 				reqPlan,
 				unionSubPlan1,
 				unionSubPlan2 );

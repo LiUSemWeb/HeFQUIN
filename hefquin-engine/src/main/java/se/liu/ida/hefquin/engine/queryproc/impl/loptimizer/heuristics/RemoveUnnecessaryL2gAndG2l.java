@@ -34,13 +34,14 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
 		if ( noChanges )
 			newPlan = inputPlan;
-		else {
-			newPlan = LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
-		}
+		else
+			newPlan = LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+			                                                   null,
+			                                                   newSubPlans );
 
-		if ( (inputPlan.getRootOperator() instanceof LogicalOpLocalToGlobal
-				|| inputPlan.getRootOperator() instanceof LogicalOpGlobalToLocal)
-			&& !checkIfL2gOrG2lNeeded( newPlan.getSubPlan(0)) ) {
+		if ( (rootOp instanceof LogicalOpLocalToGlobal
+				|| rootOp instanceof LogicalOpGlobalToLocal)
+			&& !checkIfL2gOrG2lNeeded(newPlan.getSubPlan(0)) ) {
 			return newPlan.getSubPlan(0);
 		}
 		else {

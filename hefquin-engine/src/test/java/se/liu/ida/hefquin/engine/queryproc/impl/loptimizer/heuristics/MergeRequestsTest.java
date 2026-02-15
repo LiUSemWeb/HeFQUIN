@@ -59,12 +59,14 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2) );
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				null );
 
 		final LogicalPlan unionPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
 				joinSubPlan,
-				new LogicalPlanWithNullaryRootImpl(reqOp3) );
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
+				null );
 
 		// test
 		final LogicalPlan result = new MergeRequests().apply(unionPlan);
@@ -113,12 +115,14 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2) );
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				null );
 
 		final LogicalPlan unionPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
 				joinSubPlan,
-				new LogicalPlanWithNullaryRootImpl(reqOp3) );
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
+				null );
 
 		// test
 		final LogicalPlan result = new MergeRequests().apply(unionPlan);
@@ -169,12 +173,14 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2) );
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				null );
 
 		final LogicalPlan unionPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
 				joinSubPlan,
-				new LogicalPlanWithNullaryRootImpl(reqOp3) );
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
+				null );
 
 		// test
 		final LogicalPlan result = new MergeRequests().apply(unionPlan);
@@ -214,9 +220,10 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2),
-				new LogicalPlanWithNullaryRootImpl(reqOp3) );
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null) );
 
 		// test
 		final LogicalPlan result = new MergeRequests().apply(mjPlan);
@@ -278,9 +285,10 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2),
-				new LogicalPlanWithNullaryRootImpl(reqOp3) );
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null) );
 
 		// test
 		final LogicalPlan result = new MergeRequests().apply(mjPlan);
@@ -324,9 +332,10 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2),
-				new LogicalPlanWithNullaryRootImpl(reqOp3) );
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null) );
 
 		// test
 		final LogicalPlan result = new MergeRequests().apply(mjPlan);
@@ -364,9 +373,10 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayUnion(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2),
-				new LogicalPlanWithNullaryRootImpl(reqOp3) );
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null) );
 
 		// test
 		final LogicalPlan result = new MergeRequests().apply(mjPlan);
@@ -432,9 +442,10 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayUnion(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2),
-				new LogicalPlanWithNullaryRootImpl(reqOp3) );
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null) );
 
 		// test
 		final LogicalPlan result = new MergeRequests().apply(mjPlan);
@@ -464,7 +475,8 @@ public class MergeRequestsTest extends EngineTestBase
 
 		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(
 				new LogicalOpGPAdd(fm, tp2, null),
-				new LogicalPlanWithNullaryRootImpl(reqOp) );
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp, null) );
 
 		// test
 		final LogicalPlan result = new MergeRequests().apply(gpAddPlan);
@@ -502,7 +514,8 @@ public class MergeRequestsTest extends EngineTestBase
 
 		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(
 				new LogicalOpGPAdd(fm, tp2, null),
-				new LogicalPlanWithNullaryRootImpl(reqOp) );
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp, null) );
 
 		// test
 		final LogicalPlan result = new MergeRequests().apply(gpAddPlan);

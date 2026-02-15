@@ -7,6 +7,8 @@ import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlan;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
@@ -17,8 +19,22 @@ public class LogicalPlanWithNaryRootImpl extends BaseForQueryPlan
 	private final NaryLogicalOp rootOp;
 	private final List<LogicalPlan> subPlans;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param rootOp - the root operator of the plan to be created
+	 * @param qpInfo - query-planning-related properties for a
+	 *                 {@link QueryPlanningInfo} object for the
+	 *                 plan to be created; may be {@code null},
+	 *                 in which case the plan does not get such
+	 *                 an object initially
+	 * @param subPlans - the child plans of the plan to be created
+	 */
 	public LogicalPlanWithNaryRootImpl( final NaryLogicalOp rootOp,
+	                                    final Iterable<QueryPlanProperty> qpInfo,
 	                                    final List<LogicalPlan> subPlans ) {
+		super( qpInfo );
+
 		assert rootOp != null;
 		assert subPlans != null;
 
@@ -26,8 +42,22 @@ public class LogicalPlanWithNaryRootImpl extends BaseForQueryPlan
 		this.subPlans = subPlans;
 	}
 
+	/**
+	 * Constructor.
+	 *
+	 * @param rootOp - the root operator of the plan to be created
+	 * @param qpInfo - query-planning-related properties for a
+	 *                 {@link QueryPlanningInfo} object for the
+	 *                 plan to be created; may be {@code null},
+	 *                 in which case the plan does not get such
+	 *                 an object initially
+	 * @param subPlans - the child plans of the plan to be created
+	 */
 	public LogicalPlanWithNaryRootImpl( final NaryLogicalOp rootOp,
+	                                    final Iterable<QueryPlanProperty> qpInfo,
 	                                    final LogicalPlan ... subPlans ) {
+		super( qpInfo );
+
 		assert rootOp != null;
 		assert subPlans != null;
 

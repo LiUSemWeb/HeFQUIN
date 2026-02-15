@@ -44,12 +44,12 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> subPlans1 = new ArrayList<>();
 		subPlans1.add(lp1);
 		subPlans1.add(lp2);
-		final LogicalPlan unionPlan1 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans1 );
+		final LogicalPlan unionPlan1 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans1 );
 
 		final List<LogicalPlan> subPlans2 = new ArrayList<>();
 		subPlans2.add(lp3);
 		subPlans2.add(lp4);
-		final LogicalPlan unionPlan2 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans2 );
+		final LogicalPlan unionPlan2 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans2 );
 
 		final List<LogicalPlan> plansWithUnionRoot = new ArrayList<>();
 		plansWithUnionRoot.add(unionPlan1);
@@ -88,12 +88,12 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> subPlans1 = new ArrayList<>();
 		subPlans1.add(lp1);
 		subPlans1.add(lp2);
-		final LogicalPlan unionPlan1 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans1 );
+		final LogicalPlan unionPlan1 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans1 );
 
 		final List<LogicalPlan> subPlans2 = new ArrayList<>();
 		subPlans2.add(lp3);
 		subPlans2.add(lp4);
-		final LogicalPlan unionPlan2 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans2 );
+		final LogicalPlan unionPlan2 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans2 );
 
 		final List<LogicalPlan> plansWithUnionRoot = new ArrayList<>();
 		plansWithUnionRoot.add(unionPlan1);
@@ -142,7 +142,7 @@ public class UnionPullUpTest extends EngineTestBase
 
 		final List<LogicalPlan> subPlans = new ArrayList<>();
 		subPlans.add(lp1);
-		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans );
+		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans );
 
 		final List<LogicalPlan> plansWithUnionRoot = new ArrayList<>();
 		plansWithUnionRoot.add(unionPlan);
@@ -189,7 +189,7 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> subPlans = new ArrayList<>();
 		subPlans.add(lp1);
 		subPlans.add(lp2);
-		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans );
+		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans );
 
 		final UnaryLogicalOp rootOp = new LogicalOpFilter( Expr.NONE );
 
@@ -229,12 +229,12 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> subPlans1 = new ArrayList<>();
 		subPlans1.add(lp1);
 		subPlans1.add(lp2);
-		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans1 );
+		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans1 );
 
 		final List<LogicalPlan> subPlans2 = new ArrayList<>();
 		subPlans2.add(unionPlan);
 		subPlans2.add(lp3);
-		final LogicalPlan joinPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayJoin.getInstance(), subPlans2 );
+		final LogicalPlan joinPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayJoin.getInstance(), null, subPlans2 );
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(joinPlan);
 
@@ -288,12 +288,12 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> subPlans1 = new ArrayList<>();
 		subPlans1.add(lp1);
 		subPlans1.add(lp2);
-		final LogicalPlan unionPlan1 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans1 );
+		final LogicalPlan unionPlan1 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans1 );
 
 		final List<LogicalPlan> subPlans2 = new ArrayList<>();
 		subPlans2.add(unionPlan1);
 		subPlans2.add(lp3);
-		final LogicalPlan unionPlan2 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans2 );
+		final LogicalPlan unionPlan2 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans2 );
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(unionPlan2);
 
@@ -331,17 +331,17 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> subPlans1 = new ArrayList<>();
 		subPlans1.add(lp1);
 		subPlans1.add(lp2);
-		final LogicalPlan unionPlan1 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans1 );
+		final LogicalPlan unionPlan1 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans1 );
 
 		final List<LogicalPlan> subPlans2 = new ArrayList<>();
 		subPlans2.add(unionPlan1);
 		subPlans2.add(lp3);
-		final LogicalPlan joinPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayJoin.getInstance(), subPlans2 );
+		final LogicalPlan joinPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayJoin.getInstance(), null, subPlans2 );
 
 		final List<LogicalPlan> subPlans3 = new ArrayList<>();
 		subPlans3.add(joinPlan);
 		subPlans3.add(lp4);
-		final LogicalPlan unionPlan2 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans3 );
+		final LogicalPlan unionPlan2 = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans3 );
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(unionPlan2);
 
@@ -401,13 +401,13 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> subPlans = new ArrayList<>();
 		subPlans.add(lp1);
 		subPlans.add(lp2);
-		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans );
+		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans );
 
 		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
-		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, unionPlan);
+		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, null, unionPlan);
 
 		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
-		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, gpAddPlan1);
+		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, null, gpAddPlan1);
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(gpAddPlan2);
 
@@ -457,16 +457,16 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> subPlans = new ArrayList<>();
 		subPlans.add(lp1);
 		subPlans.add(lp2);
-		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans );
+		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans );
 
 		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
-		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, unionPlan);
+		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, null, unionPlan);
 
 		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
-		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, gpAddPlan1);
+		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, null, gpAddPlan1);
 
 		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null);
-		final LogicalPlan l2gPlan = new LogicalPlanWithUnaryRootImpl(l2g, gpAddPlan2);
+		final LogicalPlan l2gPlan = new LogicalPlanWithUnaryRootImpl(l2g, null, gpAddPlan2);
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(l2gPlan);
 
