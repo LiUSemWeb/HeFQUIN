@@ -162,7 +162,9 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 			if ( noChanges )
 				return inputPlan;
 			else
-				return LogicalPlanUtils.createPlanWithSubPlans(rootOp, rewrittenSubPlans);
+				return LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+				                                                null,
+				                                                rewrittenSubPlans );
 		}
 
 		if ( numberOfSubPlans == 1 ) return rewrittenSubPlans[0];
@@ -198,10 +200,10 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 
 		if ( noChanges ) return inputPlan;
 
-		if ( subPlansAsNextInput.size() == 1 )
-			return subPlansAsNextInput.get(0);
-		else
-			return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlansAsNextInput);
+		if ( subPlansAsNextInput.size() == 1 ) return subPlansAsNextInput.get(0);
+
+		return LogicalPlanUtils.createPlanWithMultiwayJoin( subPlansAsNextInput,
+		                                                    null );
 	}
 
 	protected LogicalPlan rewrite( final LogicalPlan unionPlan, final List<LogicalPlan> subPlansAsInput ) {
@@ -209,7 +211,8 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 		if ( subPlansAsInput.size() == 1 )
 			inputPlan = subPlansAsInput.get(0);
 		else
-			inputPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(subPlansAsInput);
+			inputPlan = LogicalPlanUtils.createPlanWithMultiwayJoin( subPlansAsInput,
+			                                                         null );
 
 		final int numberOfSubPlansUnderUnion = unionPlan.numberOfSubPlans();
 		final LogicalPlan[] newUnionSubPlans = new LogicalPlan[numberOfSubPlansUnderUnion];
@@ -220,50 +223,50 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 			final LogicalOperator oldSubPlanRootOp = oldSubPlan.getRootOperator();
 			if ( oldSubPlanRootOp instanceof LogicalOpRequest reqOp ) {
 				final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(reqOp);
-				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, inputPlan);
+				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, null, inputPlan);
 				newSubPlan = addOpPlan;
 			}
 			else if (    oldSubPlanRootOp instanceof LogicalOpFilter filterOp
 			          && oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest ) {
 				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?,?>) oldSubPlan.getSubPlan(0).getRootOperator();
 				final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(reqOp);
-				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, inputPlan);
-				final LogicalPlan filterOpPlan = new LogicalPlanWithUnaryRootImpl(filterOp, addOpPlan);
+				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, null, inputPlan);
+				final LogicalPlan filterOpPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, addOpPlan);
 				newSubPlan = filterOpPlan;
 			}
 			else if ( oldSubPlanRootOp instanceof LogicalOpLocalToGlobal l2gLop
 					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest ) {
 				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping() );
-				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, inputPlan );
+				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, null, inputPlan );
 
 				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?, ?>) oldSubPlan.getSubPlan(0).getRootOperator();
 				final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(reqOp);
-				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, newInputPlan);
+				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, null, newInputPlan);
 
-				newSubPlan = new LogicalPlanWithUnaryRootImpl( l2gLop, addOpPlan );
+				newSubPlan = new LogicalPlanWithUnaryRootImpl(l2gLop, null, addOpPlan);
 			}
 			else if ( oldSubPlanRootOp instanceof LogicalOpFilter filterOp
 					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpLocalToGlobal
 					&& oldSubPlan.getSubPlan(0).getSubPlan(0).getRootOperator() instanceof LogicalOpRequest ) {
 				final LogicalOpLocalToGlobal l2gLop = (LogicalOpLocalToGlobal) oldSubPlan.getSubPlan(0).getRootOperator();
 				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping() );
-				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, inputPlan );
+				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, null, inputPlan );
 
 				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?, ?>) oldSubPlan.getSubPlan(0).getSubPlan(0).getRootOperator();
 				final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(reqOp);
-				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, newInputPlan);
+				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, null, newInputPlan);
 
-				final LogicalPlan l2gOpPlan = new LogicalPlanWithUnaryRootImpl( l2gLop, addOpPlan );
-				newSubPlan = new LogicalPlanWithUnaryRootImpl( filterOp, l2gOpPlan );
+				final LogicalPlan l2gOpPlan = new LogicalPlanWithUnaryRootImpl( l2gLop, null, addOpPlan );
+				newSubPlan = new LogicalPlanWithUnaryRootImpl( filterOp, null, l2gOpPlan );
 			}
 			else {
-				newSubPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(inputPlan, oldSubPlan);
+				newSubPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(null, inputPlan, oldSubPlan);
 			}
 
 			newUnionSubPlans[i] = newSubPlan; 
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayUnion(newUnionSubPlans);
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(null, newUnionSubPlans);
 	}
 
 }

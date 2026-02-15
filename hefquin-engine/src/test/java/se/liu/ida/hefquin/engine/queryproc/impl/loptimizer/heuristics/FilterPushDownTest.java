@@ -63,12 +63,13 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, new TriplePatternRequestImpl(tp2) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2) );
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				null );
 
 		final Expr e = new E_IsIRI( new ExprVar(v1) );
 		final UnaryLogicalOp rootOp = new LogicalOpFilter(e);
-		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, joinSubPlan);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, joinSubPlan);
 
 		// test
 		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
@@ -123,12 +124,13 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp2) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2) );
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				null );
 
 		final Expr e = new E_Equals( new ExprVar(v1), new ExprVar(v2) );
 		final UnaryLogicalOp rootOp = new LogicalOpFilter(e);
-		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, joinSubPlan);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, joinSubPlan);
 
 		// test
 		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
@@ -156,19 +158,19 @@ public class FilterPushDownTest extends EngineTestBase
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp1) );
-		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp);
+		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
 		final LogicalOpGPOptAdd gpOptAdd = new LogicalOpGPOptAdd(fm, tp2);
-		final LogicalPlan gpOptAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpOptAdd, reqSubPlan);
+		final LogicalPlan gpOptAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpOptAdd, null, reqSubPlan);
 
 		final Expr e1 = new E_LogicalNot( new E_Bound(new ExprVar(v2)) );
 		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1);
-		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp1, gpOptAddSubPlan);
+		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp1, null, gpOptAddSubPlan);
 
 		final Expr e2 = new E_IsIRI( new ExprVar(v1) );
 		final LogicalOpFilter rootOp = new LogicalOpFilter(e2);
-		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, filterSubPlan);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, filterSubPlan);
 
 		// test
 		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
@@ -212,16 +214,17 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp2) );
 
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithMultiwayUnion(
-				new LogicalPlanWithNullaryRootImpl(reqOp1),
-				new LogicalPlanWithNullaryRootImpl(reqOp2) );
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null) );
 
 		final Expr e1 = new E_IsIRI( new ExprVar(v1) );
 		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1);
-		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp1, unionSubPlan);
+		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp1, null, unionSubPlan);
 
 		final Expr e2 = new E_IsIRI( new ExprVar(v2) );
 		final LogicalOpFilter rootOp = new LogicalOpFilter(e2);
-		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, filterSubPlan);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, filterSubPlan);
 
 		// test
 		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
@@ -273,9 +276,9 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
 
 		// - plan
-		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp);
-		final LogicalPlan bindPlan = new LogicalPlanWithUnaryRootImpl(bindOp, reqPlan);
-		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, bindPlan);
+		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+		final LogicalPlan bindPlan = new LogicalPlanWithUnaryRootImpl(bindOp, null, reqPlan);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, bindPlan);
 
 		// test
 		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
@@ -311,9 +314,9 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
 
 		// - plan
-		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp);
-		final LogicalPlan bindPlan = new LogicalPlanWithUnaryRootImpl(bindOp, reqPlan);
-		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, bindPlan);
+		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+		final LogicalPlan bindPlan = new LogicalPlanWithUnaryRootImpl(bindOp, null, reqPlan);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, bindPlan);
 
 		// test
 		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
@@ -355,10 +358,10 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
 
 		// - plan
-		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp);
-		final LogicalPlan bind1Plan = new LogicalPlanWithUnaryRootImpl(bind1Op, reqPlan);
-		final LogicalPlan bind2Plan = new LogicalPlanWithUnaryRootImpl(bind2Op, bind1Plan);
-		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, bind2Plan);
+		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+		final LogicalPlan bind1Plan = new LogicalPlanWithUnaryRootImpl(bind1Op, null, reqPlan);
+		final LogicalPlan bind2Plan = new LogicalPlanWithUnaryRootImpl(bind2Op, null, bind1Plan);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, bind2Plan);
 
 		// test
 		final LogicalPlan result = new FilterPushDown().apply(filterPlan);

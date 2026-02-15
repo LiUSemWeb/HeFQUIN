@@ -4,6 +4,8 @@ import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlan;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithBinaryRoot;
@@ -15,9 +17,24 @@ public class LogicalPlanWithBinaryRootImpl extends BaseForQueryPlan
 	private final LogicalPlan subPlan1;
 	private final LogicalPlan subPlan2;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param rootOp - the root operator of the plan to be created
+	 * @param qpInfo - query-planning-related properties for a
+	 *                 {@link QueryPlanningInfo} object for the
+	 *                 plan to be created; may be {@code null},
+	 *                 in which case the plan does not get such
+	 *                 an object initially
+	 * @param subPlan1 - the first child plan of the plan to be created
+	 * @param subPlan2 - the second child plan of the plan to be created
+	 */
 	public LogicalPlanWithBinaryRootImpl( final BinaryLogicalOp rootOp,
+	                                      final Iterable<QueryPlanProperty> qpInfo,
 	                                      final LogicalPlan subPlan1,
 	                                      final LogicalPlan subPlan2 ) {
+		super( qpInfo );
+
 		assert rootOp != null;
 		assert subPlan1 != null;
 		assert subPlan2 != null;

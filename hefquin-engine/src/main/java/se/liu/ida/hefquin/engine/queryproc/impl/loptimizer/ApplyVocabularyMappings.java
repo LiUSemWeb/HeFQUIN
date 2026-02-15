@@ -13,6 +13,7 @@ import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
@@ -54,7 +55,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				final VocabularyMapping vm = fm.getVocabularyMapping();
 				final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(vm);
 
-				return new LogicalPlanWithUnaryRootImpl(l2g, newInputPlan);
+				return new LogicalPlanWithUnaryRootImpl(l2g, null, newInputPlan);
 			}
 			else {
 				return inputPlan;
@@ -78,23 +79,29 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 					rewritten = true;
 				}
 			}
-			if (rewritten) {
-				return new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) inputPlan.getRootOperator(), rewrittenSubplans);
-			} else {
+
+			if ( rewritten )
+				return new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) rootOp,
+				                                        null,
+				                                        rewrittenSubplans );
+			else
 				return inputPlan;
-			}
 		}
 		else if ( rootOp instanceof LogicalOpFilter filterOp )
 		{
 			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
 			// TODO: the expressions of 'filterOp' should be rewritten too
-			return new LogicalPlanWithUnaryRootImpl(filterOp, rewrittenSubPlan);
+			return new LogicalPlanWithUnaryRootImpl( filterOp,
+			                                         null,
+			                                         rewrittenSubPlan );
 		}
 		else if ( rootOp instanceof LogicalOpBind bindOp )
 		{
 			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
 			// TODO: the expressions of 'bindOp' should be rewritten too
-			return new LogicalPlanWithUnaryRootImpl(bindOp, rewrittenSubPlan);
+			return new LogicalPlanWithUnaryRootImpl( bindOp,
+			                                         null,
+			                                         rewrittenSubPlan );
 		}
 		else if ( rootOp instanceof LogicalOpGPAdd gpAdd )
 		{
@@ -104,7 +111,9 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			}
 				
 			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
-			return new LogicalPlanWithUnaryRootImpl(gpAdd, rewrittenSubPlan);
+			return new LogicalPlanWithUnaryRootImpl( gpAdd,
+			                                         null,
+			                                         rewrittenSubPlan );
 		}
 		else {
 			throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a root operator of type: " + rootOp.getClass().getName() );
@@ -153,18 +162,18 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 		if ( fm instanceof SPARQLEndpoint ) {
 			final SPARQLRequest reqP = new SPARQLRequestImpl(pattern);
 			final LogicalOpRequest<SPARQLRequest, SPARQLEndpoint> req = new LogicalOpRequest<>( (SPARQLEndpoint) fm, reqP );
-			return new LogicalPlanWithNullaryRootImpl(req);
+			return new LogicalPlanWithNullaryRootImpl(req, null);
 		}
 		else if( pattern instanceof TriplePattern tp ) {
 			final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 			final LogicalOpRequest<TriplePatternRequest, FederationMember> reqOp = new LogicalOpRequest<>(fm,req);
-			return new LogicalPlanWithNullaryRootImpl(reqOp);
+			return new LogicalPlanWithNullaryRootImpl(reqOp, null);
 		}
 		else if( pattern instanceof BGP bgp ) {
 			if ( fm.isSupportedPattern(bgp) ) {
 				final BGPRequest req = new BGPRequestImpl(bgp);
 				final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm,req);
-				return new LogicalPlanWithNullaryRootImpl(reqOp);
+				return new LogicalPlanWithNullaryRootImpl(reqOp, null);
 			}
 	
 			// For federation members that do not support BGP requests,
@@ -173,11 +182,10 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
 				final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 				final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm,req);
-				subPlans.add( new LogicalPlanWithNullaryRootImpl(reqOp) );
+				subPlans.add( new LogicalPlanWithNullaryRootImpl(reqOp,null) );
 			}
 	
-			final LogicalOpMultiwayJoin mjRootOp = LogicalOpMultiwayJoin.getInstance();
-			return new LogicalPlanWithNaryRootImpl(mjRootOp, subPlans);
+			return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans, null);
 		}
 		else if( pattern instanceof SPARQLUnionPattern up ) {
 			final List<LogicalPlan> subPlans = new ArrayList<>();
@@ -186,8 +194,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				subPlans.add(subPlan);
 			}
 	
-			final LogicalOpMultiwayUnion muRootOp = LogicalOpMultiwayUnion.getInstance();
-			return new LogicalPlanWithNaryRootImpl(muRootOp, subPlans);
+			return LogicalPlanUtils.createPlanWithMultiwayUnion(subPlans, null);
 		}
 		else if( pattern instanceof SPARQLGroupPattern gp ) {
 			final List<LogicalPlan> subPlans = new ArrayList<>();
@@ -196,8 +203,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				subPlans.add(subPlan);
 			}
 	
-			final LogicalOpMultiwayJoin mjRootOp = LogicalOpMultiwayJoin.getInstance();
-			return new LogicalPlanWithNaryRootImpl(mjRootOp, subPlans);
+			return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans, null);
 		}
 		else {
 			throw new IllegalArgumentException( pattern.getClass().getName() );

@@ -59,7 +59,7 @@ public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlanner
 			subPlans.add( createSubPlanForTP(tp, ctxt) );
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans);
+		return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans, null);
 	}
 
 	protected LogicalPlan createSubPlanForTP( final Triple tp,
@@ -76,12 +76,12 @@ public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlanner
 			reqSubPlans.add( createRequestSubPlan(tp, fm) );
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayUnion(reqSubPlans);
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(reqSubPlans, null);
 	}
 
 	protected LogicalPlan createRequestSubPlan( final Triple tp, final FederationMember fm ) {
 		final TriplePatternRequest req = new TriplePatternRequestImpl( new TriplePatternImpl(tp) );
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, req);
-		return new LogicalPlanWithNullaryRootImpl(reqOp);
+		return new LogicalPlanWithNullaryRootImpl(reqOp, null);
 	}
 }

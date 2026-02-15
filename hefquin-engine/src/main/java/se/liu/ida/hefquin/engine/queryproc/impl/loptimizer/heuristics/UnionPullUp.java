@@ -149,7 +149,9 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 			rewrittenSubPlans.addAll(rewrittenSubPlansWithUnionRoot);
 			rewrittenSubPlans.addAll(rewrittenSubPlansWithNonUnionRoot);
 
-			return LogicalPlanUtils.createPlanWithSubPlans(rootOp, rewrittenSubPlans);
+			return LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+			                                                null,
+			                                                rewrittenSubPlans );
 		}
 		else
 			return inputPlan;
@@ -174,11 +176,15 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 		final List<LogicalPlan> newSubPlans = new ArrayList<>(numberOfSubPlansUnderUnion);
 		for ( int i = 0; i < numberOfSubPlansUnderUnion; i++ ) {
 			final LogicalPlan subPlanUnderUnion = subPlan.getSubPlan(i);
-			final LogicalPlan newSubPlan = new LogicalPlanWithUnaryRootImpl(rootOp, subPlanUnderUnion);
+			final LogicalPlan newSubPlan = new LogicalPlanWithUnaryRootImpl(
+					rootOp,
+					null,
+					subPlanUnderUnion );
+
 			newSubPlans.add(newSubPlan);
 		}
 
-		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), newSubPlans );
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(newSubPlans, null);
 	}
 
 	/**
@@ -202,8 +208,7 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 
 		newSubPlans.addAll(plansWithNonUnionRoot);
 
-		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), newSubPlans );
-		
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(newSubPlans, null);
 	}
 
 	/**
@@ -244,11 +249,10 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 		for ( final List<LogicalPlan> join : unionsOverJoins ) {
 			join.addAll(plansWithNonUnionRoot);
 
-			final LogicalPlan newSubPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayJoin.getInstance(), join );
-			newSubPlans.add(newSubPlan);
+			newSubPlans.add( LogicalPlanUtils.createPlanWithMultiwayJoin(join,null) );
 		}
 
-		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), newSubPlans ); 
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(newSubPlans, null); 
 	}
 
 }

@@ -14,7 +14,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Updated request processors to use an HTTP client provider and shared connection pools ([#495](https://github.com/LiUSemWeb/HeFQUIN/pull/495)).
 - Adding unique IDs for plans and sub-plan, and using these in the plan printers ([#500](https://github.com/LiUSemWeb/HeFQUIN/pull/500)).
 - Some clean up in the classes for plans and for operators ([#500](https://github.com/LiUSemWeb/HeFQUIN/pull/500)).
-- Bug fix: the base implementation of the bind-join algorithm did not correctly implement bag semantics ([#498](https://github.com/LiUSemWeb/HeFQUIN/pull/498)).
+- Bug fix in the base implementation of the bind-join algorithm, which did not correctly implement bag semantics ([#498](https://github.com/LiUSemWeb/HeFQUIN/pull/498)).
+- Bug fix in cardinality-based join reordering ([#501](https://github.com/LiUSemWeb/HeFQUIN/pull/501)).
+- Bug fix in join cardinality estimation ([#501](https://github.com/LiUSemWeb/HeFQUIN/pull/501)).
 
 
 ## [0.0.8] - 2026-01-14

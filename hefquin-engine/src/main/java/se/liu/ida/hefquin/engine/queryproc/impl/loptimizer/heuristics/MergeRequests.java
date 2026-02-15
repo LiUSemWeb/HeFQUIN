@@ -252,7 +252,9 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				if ( newSubPlans.size() == 1 )
 					return newSubPlans.get(0);
 				else
-					return LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
+					return LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+					                                                null,
+					                                                newSubPlans );
 			}
 		}
 		else if ( rootOp instanceof LogicalOpMultiwayJoin )
@@ -288,7 +290,9 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				if ( newSubPlans.size() == 1 )
 					return newSubPlans.get(0);
 				else
-					return LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
+					return LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+					                                                null,
+					                                                newSubPlans );
 			}
 		}
 		else if ( rootOp instanceof LogicalOpMultiwayLeftJoin )
@@ -309,12 +313,12 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		// Finally, if the heuristic was not applied to the root of
 		// the plan, return the plan without changing its root, but
 		// make sure to use the rewritten subplans if necessary.
-		if ( subPlansDiffer ) {
-			return LogicalPlanUtils.createPlanWithSubPlans(rootOp, rewrittenSubPlans);
-		}
-		else {
+		if ( subPlansDiffer )
+			return LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+			                                                null,
+			                                                rewrittenSubPlans );
+		else
 			return inputPlan;
-		}
 	}
 
 	/**
@@ -422,7 +426,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		}
 
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, req);
-		return new LogicalPlanWithNullaryRootImpl(reqOp);
+		return new LogicalPlanWithNullaryRootImpl(reqOp, null);
 	}
 
 	protected void separateSubPlansOfMultiwayOps( final List<LogicalPlan> subPlans,
