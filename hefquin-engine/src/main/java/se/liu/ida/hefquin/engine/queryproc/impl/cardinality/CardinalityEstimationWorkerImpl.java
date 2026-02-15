@@ -312,7 +312,11 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	public void addCardinalityForInnerJoin() {
 		// As the estimated cardinality, we simply use the maximum
 		// of the estimated cardinality of every input plan. This
-		// is a very inaccurate estimate!
+		// is a very inaccurate estimate! (The only exception are
+		// cases in which one of the input plans has a cardinality
+		// estimate of 0 that is ACCURATE, which means that the join
+		// result is guaranteed to be empty and, thus, we copy the
+		// cardinality of 0 over as the join cardinality.)
 		// TODO: There is probably a slightly better approach.
 		// TODO: An initial addition that is certainly useful (and
 		// easy to implement) is to consider the special case of a
@@ -332,6 +336,18 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 			final QueryPlanningInfo qpInfoSubPlanX = currentSubPlan.getSubPlan(x).getQueryPlanningInfo();
 			final QueryPlanProperty crdX = qpInfoSubPlanX.getProperty(CARDINALITY);
 			final QueryPlanProperty maxX = qpInfoSubPlanX.getProperty(MAX_CARDINALITY);
+
+			// Check first whether we have a case in which the subplan is
+			// guaranteed to produce an empty result. If so, we can stop
+			// here because the join cardinality is then guaranteed to be
+			// zero as well.
+			if ( crdX.getValue() == 0 && crdX.getQuality() == Quality.ACCURATE ) {
+				final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+				return;
+			}
 
 			maxValue = multiplyWithoutExceedingMax( maxValue, maxX.getValue() );
 			crdValue = Math.max( crdValue, crdX.getValue() );
