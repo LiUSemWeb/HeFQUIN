@@ -326,16 +326,37 @@ public abstract class EngineTestBase
 	public static class WrappedRESTEndpointForTest extends FederationMemberBaseForTest
 	                                               implements WrappedRESTEndpoint
 	{
-		//public final String responseData = "{ \"current\": { \"temperature_2m\": 2.3, \"wind_speed_10m\": 1.0 } }";
-		public final String responseData;
+		//protected final String responseData = "{ \"current\": { \"temperature_2m\": 2.3, \"wind_speed_10m\": 1.0 } }";
+		protected final String responseData;
 		protected final List<Parameter> params;
+		protected final int maxRequestsExpected;
+		protected int reqCnt = 0;
 
 		public WrappedRESTEndpointForTest( final String responseData,
 		                                   final Graph rdfView,
 		                                   final List<Parameter> params ) {
+			this(responseData, rdfView, params, -1);
+		}
+
+		public WrappedRESTEndpointForTest( final String responseData,
+		                                   final Graph rdfView,
+		                                   final List<Parameter> params,
+		                                   final int maxRequestsExpected ) {
 			super(rdfView);
 			this.responseData = responseData;
 			this.params = ( params == null ) ? List.of() : params;
+			this.maxRequestsExpected = maxRequestsExpected;
+		}
+
+		public String getResponseData() {
+			if ( maxRequestsExpected >= 0 ) {
+				reqCnt++;
+				if ( reqCnt > maxRequestsExpected ) {
+					throw new IllegalStateException();
+				}
+			}
+
+			return responseData;
 		}
 
 		@Override
@@ -554,7 +575,7 @@ public abstract class EngineTestBase
 		{
 			final String data;
 			if ( fm instanceof WrappedRESTEndpointForTest ep )
-				data = ep.responseData;
+				data = ep.getResponseData();
 			else
 				throw new IllegalArgumentException();
 

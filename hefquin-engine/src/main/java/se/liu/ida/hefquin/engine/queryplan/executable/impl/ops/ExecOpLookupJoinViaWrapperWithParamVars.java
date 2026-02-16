@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
@@ -49,7 +51,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	protected final Map<String,Var> paramVars;
 	protected final WrappedRESTEndpoint fm;
 
-	protected final Map<Map<String,Node>, List<SolutionMapping>> cache = new HashMap<>();
+	protected final ConcurrentMap<Map<String,Node>, List<SolutionMapping>> cache = new ConcurrentHashMap<>();
 
 	// statistics
 	private long numberOfRequestsIssued = 0L;
@@ -151,7 +153,8 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			numberOfRequestsIssued++;
 
 			// attach the processing of the response obtained for the request
-			final MyResponseProcessor respProc = new MyResponseProcessor( entry.getValue(), sink, this );
+			final MyResponseProcessor respProc = new MyResponseProcessor(
+					entry.getKey(),entry.getValue(), sink, this );
 			futures[i++] = f.thenAccept(respProc);
 		}
 
@@ -239,13 +242,16 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 	protected class MyResponseProcessor implements Consumer<StringResponse>
 	{
+		protected final Map<String,Node> paramValues;
 		protected final List<SolutionMapping> solmaps;
 		protected final IntermediateResultElementSink sink;
 		protected final ExecutableOperator op;
 
-		public MyResponseProcessor( final List<SolutionMapping> solmaps,
+		public MyResponseProcessor( final Map<String,Node> paramValues,
+		                            final List<SolutionMapping> solmaps,
 		                            final IntermediateResultElementSink sink,
 		                            final ExecutableOperator op ) {
+			this.paramValues = paramValues;
 			this.solmaps = solmaps;
 			this.sink = sink;
 			this.op = op;
@@ -265,9 +271,9 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 				return;
 			}
 
-			final Iterable<SolutionMapping> resutingSolMaps;
+			final List<SolutionMapping> resultingSolMaps;
 			try {
-				resutingSolMaps = fm.evaluatePatternOverRDFView(pattern, respData);
+				resultingSolMaps = fm.evaluatePatternOverRDFView(pattern, respData);
 			}
 			catch ( final DataConversionException e ) {
 				numberOfDataConversionExceptions++;
@@ -276,8 +282,12 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 				return;
 			}
 
+			join(resultingSolMaps, solmaps, sink);
 
-			join(resutingSolMaps, solmaps, sink);
+			final List<SolutionMapping> x = cache.putIfAbsent( paramValues,
+			                                                   resultingSolMaps );
+			if ( x != null )
+				throw new IllegalStateException("Overwriting in the cache.");
 
 			final long time2 = System.currentTimeMillis();
 
