@@ -35,7 +35,7 @@ import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint.DataConversionException;
 
 public class ExecOpLookupJoinViaWrapperWithParamVars
-       extends UnaryExecutableOpBaseWithBatching
+       extends BaseForUnaryExecOpWithCollectedInput
 {
 	// Since this algorithm processes the input solution mappings
 	// in parallel, we should use an input block size with which
@@ -45,7 +45,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	// the degree of parallelism in the FederationAccessManager.
 	// Notice that this number is essentially the number of
 	// requests issued in parallel (to the same endpoint!).
-	public final static int DEFAULT_BATCH_SIZE = 5;
+	public final static int DEFAULT_INPUT_BLOCK_SIZE = 5;
 
 	protected final SPARQLGraphPattern pattern;
 	protected final Map<String,Var> paramVars;
@@ -67,17 +67,17 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	                                                final boolean collectExceptions,
 	                                                final QueryPlanningInfo qpInfo ) {
 		this( pattern, paramVars, fm,
-		      DEFAULT_BATCH_SIZE,
+		      DEFAULT_INPUT_BLOCK_SIZE,
 		      collectExceptions, qpInfo );
 	}
 
 	public ExecOpLookupJoinViaWrapperWithParamVars( final SPARQLGraphPattern pattern,
 	                                                final Map<String,Var> paramVars,
 	                                                final WrappedRESTEndpoint fm,
-	                                                final int batchSize,
+	                                                final int minimumInputBlockSize,
 	                                                final boolean collectExceptions,
 	                                                final QueryPlanningInfo qpInfo ) {
-		super(batchSize, collectExceptions, qpInfo);
+		super(minimumInputBlockSize, collectExceptions, qpInfo);
 
 		assert pattern   != null;
 		assert paramVars != null;
@@ -92,7 +92,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	}
 
 	@Override
-	protected void _processBatch( final List<SolutionMapping> input,
+	protected void _processCollectedInput( final List<SolutionMapping> input,
 	                              final IntermediateResultElementSink sink,
 	                              final ExecutionContext execCxt )
 			throws ExecOpExecutionException
@@ -177,7 +177,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			throws ExecOpExecutionException
 	{
 		if ( input != null && ! input.isEmpty() ) {
-			_processBatch(input, sink, execCxt);
+			_processCollectedInput(input, sink, execCxt);
 		}
 	}
 

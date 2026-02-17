@@ -16,22 +16,31 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<SPARQLGraphPattern,SPARQLEndpoint,SPARQLRequest>
 {
 	// For SPARQL endpoints, the number of input solution mappings processed
-	// in one batch should be very small (perhaps even only 1) because this
+	// as one block should be very small (perhaps even only 1) because this
 	// is the number of requests issued in parallel (to the same endpoint!)
-	public final static int DEFAULT_BATCH_SIZE = 3;
+	public final static int DEFAULT_INPUT_BLOCK_SIZE = 3;
 
 	public ExecOpIndexNestedLoopsJoinSPARQL( final SPARQLGraphPattern query,
 	                                         final SPARQLEndpoint fm,
 	                                         final boolean useOuterJoinSemantics,
+	                                         final int minimumInputBlockSize,
 	                                         final boolean collectExceptions,
 	                                         final QueryPlanningInfo qpInfo ) {
-		super(query, fm, DEFAULT_BATCH_SIZE, collectExceptions, qpInfo);
+		super(query, fm, minimumInputBlockSize, collectExceptions, qpInfo);
 
 		// TODO extend this implementation to support outer join semantics similar
 		// to how it is implemented in ExecOpGenericIndexNestedLoopsJoinWithRequestOps
 		// TODO when done, extend ExecOpIndexNestedLoopsJoinSPARQLTest accordingly
 		if ( useOuterJoinSemantics )
 			throw new UnsupportedOperationException();
+	}
+
+	public ExecOpIndexNestedLoopsJoinSPARQL( final SPARQLGraphPattern query,
+	                                         final SPARQLEndpoint fm,
+	                                         final boolean useOuterJoinSemantics,
+	                                         final boolean collectExceptions,
+	                                         final QueryPlanningInfo qpInfo ) {
+		this(query, fm, useOuterJoinSemantics, DEFAULT_INPUT_BLOCK_SIZE, collectExceptions, qpInfo);
 	}
 
 	@Override
