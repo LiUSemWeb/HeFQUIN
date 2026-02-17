@@ -99,7 +99,7 @@ public abstract class BaseForExecOpParallelBindJoin<
                                        MemberType extends FederationMember,
                                        ReqType extends DataRetrievalRequest,
                                        RespType extends DataRetrievalResponse<?>>
-           extends UnaryExecutableOpBase
+           extends BaseForUnaryExecOpWithCollectedInput
 {
 	public final static int DEFAULT_BATCH_SIZE = 30;
 
@@ -201,8 +201,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 	 *          for inner-join semantics
 	 *
 	 * @param batchSize - the number of solution mappings to be included in
-	 *          each bind-join request; this value must not be smaller than
-	 *          {@link #minimumRequestBlockSize}
+	 *          each bind-join request
 	 *
 	 * @param collectExceptions - <code>true</code> if this operator has to
 	 *          collect exceptions (which is handled entirely by one of the
@@ -218,7 +217,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 			final int batchSize,
 			final boolean collectExceptions,
 			final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(batchSize, collectExceptions, qpInfo);
 
 		assert query != null;
 		assert fm != null;
@@ -235,18 +234,9 @@ public abstract class BaseForExecOpParallelBindJoin<
 	}
 
 	@Override
-	protected void _process( final SolutionMapping inputSolMap,
-	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
-			 throws ExecOpExecutionException
-	{
-		_process( List.of(inputSolMap), sink, execCxt );
-	}
-
-	@Override
-	protected void _process( final List<SolutionMapping> inputSolMaps,
-	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	protected void _processCollectedInput( final List<SolutionMapping> inputSolMaps,
+	                                       final IntermediateResultElementSink sink,
+	                                       final ExecutionContext execCxt )
 			 throws ExecOpExecutionException
 	{
 		// Iterate over the given input solution mappings to split them into
@@ -392,10 +382,17 @@ public abstract class BaseForExecOpParallelBindJoin<
 	}
 
 	@Override
-	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt )
+	protected void _concludeExecution( final List<SolutionMapping> inputSolMaps,
+	                                   final IntermediateResultElementSink sink,
+	                                   ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
+		// Before concluding, we process the given input solution mappings
+		// as usual, if there are any.
+		if ( ! inputSolMaps.isEmpty() ) {
+			_processCollectedInput(inputSolMaps, sink, execCxt);
+		}
+
 		// If we did not have to switch into full-retrieval mode (i.e., we
 		// are still in the normal bind-join mode), we need to check whether
 		// the last batch of input solution mappings is still incomplete. If

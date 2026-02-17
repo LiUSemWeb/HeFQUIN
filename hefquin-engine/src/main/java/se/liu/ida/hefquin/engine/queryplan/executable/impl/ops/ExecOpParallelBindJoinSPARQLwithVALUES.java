@@ -40,8 +40,7 @@ public class ExecOpParallelBindJoinSPARQLwithVALUES
 	 *          for inner-join semantics
 	 *
 	 * @param batchSize - the number of solution mappings to be included in
-	 *          each bind-join request; this value must not be smaller than
-	 *          {@link #minimumRequestBlockSize}
+	 *          each bind-join request
 	 *
 	 * @param collectExceptions - <code>true</code> if this operator has to
 	 *          collect exceptions (which is handled entirely by one of the

@@ -37,18 +37,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
                             MemberType extends FederationMember,
                             ReqType extends DataRetrievalRequest,
                             RespType extends DataRetrievalResponse<?>>
-             extends UnaryExecutableOpBaseWithBatching
+             extends BaseForUnaryExecOpWithCollectedInput
 {
-	// Since this algorithm processes the input solution mappings
-	// in parallel, we should use an input block size with which
-	// we can leverage this parallelism. However, I am not sure
-	// yet what a good value is; it probably depends on various
-	// factors, including the load on the federation member and
-	// the degree of parallelism in the FederationAccessManager.
-	// Notice that this number is essentially the number of
-	// requests issued in parallel (to the same endpoint!).
-	public final static int DEFAULT_BATCH_SIZE = 10;
-
 	protected final QueryType query;
 	protected final MemberType fm;
 
@@ -59,10 +49,10 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query,
 	                                                      final MemberType fm,
-	                                                      final int batchSize,
+	                                                      final int minimumInputBlockSize,
 	                                                      final boolean collectExceptions,
 	                                                      final QueryPlanningInfo qpInfo) {
-		super(batchSize, collectExceptions, qpInfo);
+		super(minimumInputBlockSize, collectExceptions, qpInfo);
 
 		assert query != null;
 		assert fm != null;
@@ -71,15 +61,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 		this.fm = fm;
 	}
 
-	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query,
-	                                                      final MemberType fm,
-	                                                      final boolean collectExceptions,
-	                                                      final QueryPlanningInfo qpInfo ) {
-		this(query, fm, DEFAULT_BATCH_SIZE, collectExceptions, qpInfo);
-	}
-
 	@Override
-	protected void _processBatch( final List<SolutionMapping> input,
+	protected void _processCollectedInput( final List<SolutionMapping> input,
 	                              final IntermediateResultElementSink sink,
 	                              final ExecutionContext execCxt )
 			throws ExecOpExecutionException
@@ -153,7 +136,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 			throws ExecOpExecutionException
 	{
 		if ( input != null && ! input.isEmpty() ) {
-			_processBatch(input, sink, execCxt);
+			_processCollectedInput(input, sink, execCxt);
 		}
 	}
 

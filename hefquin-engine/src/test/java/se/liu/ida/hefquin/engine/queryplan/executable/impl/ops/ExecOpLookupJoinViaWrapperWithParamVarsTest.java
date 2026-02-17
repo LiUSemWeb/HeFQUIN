@@ -43,7 +43,10 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 
 		final Var v = Var.alloc("v");
 
-		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("lat", v), 1 );
+		final UnaryExecutableOp op = createOperatorForTest( query,
+		                                                    Map.of("lat", v),
+		                                                    1,   // batch size
+		                                                    1 ); // maxRequestsExpected
 
 		final Node lit = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
 		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(v, lit);
@@ -77,7 +80,10 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 
 		final Var v = Var.alloc("v");
 
-		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("lat", v), 1 );
+		final UnaryExecutableOp op = createOperatorForTest( query,
+		                                                    Map.of("lat", v),
+		                                                    1,   // batch size
+		                                                    1 ); // maxRequestsExpected
 
 		// Here we use xsd:float even if xsd:double is expected (according
 		// to the parameter declarations of the federation member).
@@ -113,7 +119,10 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final Var v = Var.alloc("v");
 		final Var t = Var.alloc("t");
 
-		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("lat", v), 1 );
+		final UnaryExecutableOp op = createOperatorForTest( query,
+		                                                    Map.of("lat", v),
+		                                                    1,   // batch size
+		                                                    1 ); // maxRequestsExpected
 
 		final Node litForV = NodeFactory.createLiteralDT( "0.1", XSDDatatype.XSDdouble );
 		final Node litForT = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
@@ -154,7 +163,10 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final Var v = Var.alloc("v");
 		final Var t = Var.alloc("t");
 
-		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("lat", v), 1 );
+		final UnaryExecutableOp op = createOperatorForTest( query,
+		                                                    Map.of("lat", v),
+		                                                    1,   // batch size
+		                                                    1 ); // maxRequestsExpected
 
 		final Node litForV = NodeFactory.createLiteralDT( "0.1", XSDDatatype.XSDdouble );
 		final Node litForT = NodeFactory.createLiteralDT( "0.0", XSDDatatype.XSDdouble );
@@ -188,7 +200,10 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final Var v = Var.alloc("v");
 
 		// batch size = 2 !!
-		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("lat", v), 2 );
+		final UnaryExecutableOp op = createOperatorForTest( query,
+		                                                    Map.of("lat", v),
+		                                                    2,   // batch size
+		                                                    1 ); // maxRequestsExpected
 
 		final Node lit = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
 		final SolutionMapping smIn1 = SolutionMappingUtils.createSolutionMapping(v, lit);
@@ -225,7 +240,10 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final Var v = Var.alloc("v");
 
 		// batch size = 1 !!
-		final UnaryExecutableOp op = createOperatorForTest( query, Map.of("lat", v), 1 );
+		final UnaryExecutableOp op = createOperatorForTest( query,
+		                                                    Map.of("lat", v),
+		                                                    1,   // batch size
+		                                                    1 ); // maxRequestsExpected (caching!)
 
 		final Node lit = NodeFactory.createLiteralDT( "2.3", XSDDatatype.XSDdouble );
 		final SolutionMapping smIn1 = SolutionMappingUtils.createSolutionMapping(v, lit);
@@ -251,7 +269,8 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 
 	protected UnaryExecutableOp createOperatorForTest( final String query,
 	                                                   final Map<String,Var> paramVarsOfEndpoint,
-	                                                   final int batchSize) {
+	                                                   final int batchSize,
+	                                                   final int maxRequestsExpected ) {
 		assert paramVarsOfEndpoint.size() == 1;
 
 		final Element el = QueryFactory.create(query).getQueryPattern();
@@ -276,7 +295,8 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final WrappedRESTEndpoint ep = new WrappedRESTEndpointForTest(
 				responseData,
 				rdfMockUp,
-				List.of(param) );
+				List.of(param),
+				maxRequestsExpected );
 
 		return new ExecOpLookupJoinViaWrapperWithParamVars( pattern,
 		                                                    paramVarsOfEndpoint,

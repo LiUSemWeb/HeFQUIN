@@ -28,7 +28,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 /**
  * TODO: Provide a description of the algorithm implemented by this class.
  */
-public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBatching
+public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollectedInput
 {
 	public final static int DEFAULT_BATCH_SIZE = 30;
 
@@ -93,7 +93,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 	}
 
 	@Override
-	protected void _processBatch( final List<SolutionMapping> input,
+	protected void _processCollectedInput( final List<SolutionMapping> input,
 	                              final IntermediateResultElementSink sink,
 	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		final List<SolutionMapping> inputForParallelProcess = determineInputForParallelProcess(input);
@@ -199,7 +199,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 			throws ExecOpExecutionException
 	{
 		if ( batch != null && ! batch.isEmpty() ) {
-			_processBatch(batch, sink, execCxt);
+			_processCollectedInput(batch, sink, execCxt);
 		}
 	}
 
