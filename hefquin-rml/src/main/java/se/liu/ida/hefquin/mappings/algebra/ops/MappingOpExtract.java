@@ -157,6 +157,12 @@ public class MappingOpExtract< DDS extends DataObject,
 				nextCursor = currentCursor;
 			}
 
+			// currentCursor may be null in cases in which hasNext() is
+			// called a second time where the first call returned false
+			// in the previous if-block (i.e., itContextObjs is an empty
+			// iterator)
+			if ( currentCursor == null ) return false;
+
 			while ( ! currentCursor.hasNext() && ! nextCursor.hasNext() ) {
 				if ( ! itContextObjs.hasNext() ) return false;
 
