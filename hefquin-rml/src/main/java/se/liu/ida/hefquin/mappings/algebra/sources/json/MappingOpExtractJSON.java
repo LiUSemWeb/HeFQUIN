@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
  */
 public class MappingOpExtractJSON extends MappingOpExtract< JsonObject,
                                                             JsonObject,
-                                                            JsonScalarValue,
+                                                            JsonElement,
                                                             JsonPathQuery,
                                                             JsonPathQuery >
 {

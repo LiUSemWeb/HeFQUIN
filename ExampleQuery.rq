@@ -4,6 +4,7 @@ PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
 PREFIX owl:    <http://www.w3.org/2002/07/owl#>
 PREFIX dbo:    <http://dbpedia.org/ontology/>
 PREFIX geo:    <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX cdt:	   <http://w3id.org/awslabs/neptune/SPARQL-CDTs/>
 PREFIX ex:     <http://example.org/>
 
 #SELECT ?c ?cc ?o ?s1 ?s2 WHERE {
@@ -36,15 +37,39 @@ PREFIX ex:     <http://example.org/>
 #	}
 #}
 
+#SELECT * WHERE {
+#	SERVICE <http://dbpedia.org/sparql> {
+#		<http://dbpedia.org/resource/Berlin> geo:lat ?lat ; geo:long ?long .
+#	}
+#	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
+#	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat AS "latitude", ?long AS "longitude", ?req AS "current") {
+#		?x ex:temperature ?temp .
+#		?x ex:windSpeed ?wind .
+#	}
+#}
+
+#SELECT * WHERE {
+#	SERVICE <http://dbpedia.org/sparql> {
+#		<http://dbpedia.org/resource/Berlin> geo:lat ?lat ; geo:long ?long .
+#	}
+#	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
+#	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat AS "latitude", ?long AS "longitude", ?req AS "current") {
+#		?x ex:current ?c .
+#	}
+#	BIND ( cdt:size(?c) AS ?size )
+#	BIND ( cdt:get(?c, "temperature_2m") AS ?temp )
+#}
+
 SELECT * WHERE {
 	SERVICE <http://dbpedia.org/sparql> {
 		<http://dbpedia.org/resource/Berlin> geo:lat ?lat ; geo:long ?long .
 	}
-	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
-	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat AS "latitude", ?long AS "longitude", ?req AS "current") {
-		?x ex:temperature ?temp .
-		?x ex:windSpeed ?wind .
+	BIND ( "temperature_2m" AS ?req)
+	SERVICE <https://api.open-meteo.com/v1/forecast> PARAMS(?lat AS "latitude", ?long AS "longitude", ?req AS "hourly") {
+		?x ex:hourly_temperature ?list .
 	}
+	BIND ( cdt:size(?list) AS ?size )
+	BIND ( cdt:get(?list, 1) AS ?firstTemp )
 }
 
 # An example query that must take into account vocabulary mappings
