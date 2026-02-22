@@ -4,9 +4,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.ReadContext;
 
-import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
-
-public class JsonObject implements DataObject
+public class JsonObject extends JsonElement
 {
 	protected final ReadContext ctx;
 
@@ -16,7 +14,7 @@ public class JsonObject implements DataObject
 	}
 
 	public JsonObject( final String jsonString ) throws JsonPathException {
-		this( JsonPath.parse(jsonString) );
+		this( JsonPath.parse(jsonString, SourceTypeJSON.conf) );
 	}
 
 	public ReadContext getReadContext() {
