@@ -5,11 +5,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.*;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
@@ -321,6 +324,14 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForLeftJoin( final OpLeftJoin jenaOp, final FederationMember fm ) {
 		if ( jenaOp.getExprs() != null && ! jenaOp.getExprs().isEmpty() ) {
 			throw new IllegalArgumentException( "OpLeftJoin with filter condition is not supported" );
+		}
+
+		// Jena compiles a group that consists solely of an OPTIONAL pattern into
+		// OpLeftJoin(OpTable.unit(), pattern). The join identity contains exactly
+		// one empty (dummy) solution mapping. Semantically, this equivalent to
+		// evaluating the right-hand pattern directly.
+		if( jenaOp.getLeft() instanceof OpTable opTable && opTable.isJoinIdentity() ){
+			return createPlan( jenaOp.getRight(), fm );
 		}
 
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), fm );
