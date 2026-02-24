@@ -12,6 +12,7 @@ import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.apache.jena.sparql.algebra.op.OpService;
+import org.apache.jena.sparql.algebra.op.OpTable;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
@@ -62,6 +63,9 @@ public class OpUtils
 		else if ( op instanceof OpExtend opExtend ){
 			addVariablesFromPattern( acc, opExtend.getSubOp() );
 			acc.addAll( opExtend.getVarExprList().getVars() );
+		}
+		else if ( op instanceof OpTable opTable ){
+			acc.addAll( opTable.getTable().getVars() );
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
