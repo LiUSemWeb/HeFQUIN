@@ -179,8 +179,53 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 
 	@Override
 	public void visit( final LogicalOpMultiwayLeftJoin op ) {
-		// TODO: add support for mlj
-		throw new UnsupportedOperationException("Cardinality estimation for multiway left join not supported yet.");
+		// Use the cardinality estimate from the first subplan
+		// Use the min-cardinality from the first subplan
+		// Use the product of the max-cardinalities from all subplans
+		// as max-cardinality
+
+		final QueryPlanningInfo qpInfoSubPlan0 = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+		final QueryPlanProperty crd0 = qpInfoSubPlan0.getProperty(CARDINALITY);
+		final QueryPlanProperty max0 = qpInfoSubPlan0.getProperty(MAX_CARDINALITY);
+		final QueryPlanProperty min0 = qpInfoSubPlan0.getProperty(MIN_CARDINALITY);
+
+		final int crdValue = crd0.getValue();
+		final int minValue = min0.getValue();
+		final Quality minQuality = min0.getQuality();
+
+		final Quality crdQuality;
+		if ( crd0.getQuality() == Quality.ACCURATE )
+			crdQuality = Quality.ESTIMATE_BASED_ON_ACCURATES;
+		else if (    crd0.getQuality() == Quality.DIRECT_ESTIMATE
+		          || crd0.getQuality() == Quality.ESTIMATE_BASED_ON_ACCURATES )
+			crdQuality = Quality.ESTIMATE_BASED_ON_ESTIMATES;
+		else
+			crdQuality = crd0.getQuality();
+
+		// Compute an upper bound for the result size by multiplying the
+		// max-cardinalities of all input subplans. Propagate the worst
+		// max-cardinality quality.
+		int maxValue = max0.getValue();
+		Quality maxQuality = max0.getQuality();
+		for ( int x = 1; x < currentSubPlan.numberOfSubPlans(); x++ ) {
+			final QueryPlanningInfo qpInfoSubPlanX = currentSubPlan.getSubPlan(x).getQueryPlanningInfo();
+			final QueryPlanProperty maxX = qpInfoSubPlanX.getProperty(MAX_CARDINALITY);
+			maxValue = multiplyWithoutExceedingMax( maxValue, maxX.getValue() );
+			maxQuality = pickWorse( maxQuality, maxX.getQuality() );
+		}
+
+		// The max-cardinality combines several cardinality values, but the
+		// resulting quality is a derived estimate.
+		if ( maxQuality == Quality.ACCURATE )
+			maxQuality = Quality.ESTIMATE_BASED_ON_ACCURATES;
+		else if (    maxQuality == Quality.DIRECT_ESTIMATE
+		          || maxQuality == Quality.ESTIMATE_BASED_ON_ACCURATES )
+			maxQuality = Quality.ESTIMATE_BASED_ON_ESTIMATES;
+
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(minValue, minQuality) );
 	}
 
 	@Override
