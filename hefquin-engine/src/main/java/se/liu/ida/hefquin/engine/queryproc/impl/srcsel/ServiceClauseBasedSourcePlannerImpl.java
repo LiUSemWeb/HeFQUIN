@@ -405,7 +405,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			throw new IllegalStateException();
 		}
 
-		final SolutionMapping solmap = new SolutionMappingImpl(); // empty binding
+		final SolutionMapping solmap = new SolutionMappingImpl(); // empty solution mapping
 		final LogicalOpFixedSolMap rootOp = new LogicalOpFixedSolMap(solmap);
 		return new LogicalPlanWithNullaryRootImpl(rootOp, null);
 	}
