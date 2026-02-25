@@ -22,6 +22,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
@@ -66,7 +67,8 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			return inputPlan;
 		}
 		else if (    (rootOp instanceof LogicalOpMultiwayJoin)
-		          || (rootOp instanceof LogicalOpMultiwayUnion) )
+		          || (rootOp instanceof LogicalOpMultiwayUnion)
+		          || (rootOp instanceof LogicalOpMultiwayLeftJoin) )
 		{
 			final List<LogicalPlan> rewrittenSubplans = new ArrayList<>();
 			final Iterator<LogicalPlan> it = ((LogicalPlanWithNaryRoot) inputPlan).getSubPlans();
