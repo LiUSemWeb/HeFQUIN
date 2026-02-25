@@ -400,7 +400,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForOpTable( final OpTable opTable ) {
 		// Jena rewrites a pattern consisting only of OPTIONAL into
 		// OpLeftJoin(OpTable.unit(), pattern). The only OpTable we
-		// expect here is the join identity (one empty binding).
+		// expect here is the join identity (one empty solution mapping).
 		if ( ! opTable.isJoinIdentity() ) {
 			throw new IllegalStateException();
 		}
