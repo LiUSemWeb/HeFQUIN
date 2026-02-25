@@ -307,6 +307,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		else if ( jenaOp instanceof OpTriple opTP ) {
 			return createPlanForTriplePattern(opTP, fm);
 		}
+		else if ( jenaOp instanceof OpTable opTable ) {
+			return createPlanForOpTable(opTable);
+		}
 		else {
 			throw new IllegalArgumentException( "unsupported type of query pattern: " + jenaOp.getClass().getName() );
 		}
@@ -392,6 +395,19 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		}
 
 		throw new IllegalArgumentException( "the given federation member cannot handle triple patterns requests (" + fm.toString() + ")" );
+	}
+
+	protected LogicalPlan createPlanForOpTable( final OpTable opTable ) {
+		// Jena rewrites a pattern consisting only of OPTIONAL into
+		// OpLeftJoin(OpTable.unit(), pattern). The only OpTable we
+		// expect here is the join identity (one empty solution mapping).
+		if ( ! opTable.isJoinIdentity() ) {
+			throw new IllegalStateException();
+		}
+
+		final SolutionMapping solmap = new SolutionMappingImpl(); // empty solution mapping
+		final LogicalOpFixedSolMap rootOp = new LogicalOpFixedSolMap(solmap);
+		return new LogicalPlanWithNullaryRootImpl(rootOp, null);
 	}
 
 	protected LogicalPlan mergeIntoMultiwayJoin( final LogicalPlan ... subPlans ) {
