@@ -5,14 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.*;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingBuilder;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
@@ -310,6 +307,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		else if ( jenaOp instanceof OpTriple opTP ) {
 			return createPlanForTriplePattern(opTP, fm);
 		}
+		else if ( jenaOp instanceof OpTable opTable ) {
+			return createPlanForOpTable(opTable);
+		}
 		else {
 			throw new IllegalArgumentException( "unsupported type of query pattern: " + jenaOp.getClass().getName() );
 		}
@@ -324,14 +324,6 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForLeftJoin( final OpLeftJoin jenaOp, final FederationMember fm ) {
 		if ( jenaOp.getExprs() != null && ! jenaOp.getExprs().isEmpty() ) {
 			throw new IllegalArgumentException( "OpLeftJoin with filter condition is not supported" );
-		}
-
-		// Jena compiles a group that consists solely of an OPTIONAL pattern into
-		// OpLeftJoin(OpTable.unit(), pattern). The join identity contains exactly
-		// one empty (dummy) solution mapping. Semantically, this equivalent to
-		// evaluating the right-hand pattern directly.
-		if( jenaOp.getLeft() instanceof OpTable opTable && opTable.isJoinIdentity() ){
-			return createPlan( jenaOp.getRight(), fm );
 		}
 
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), fm );
@@ -403,6 +395,19 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		}
 
 		throw new IllegalArgumentException( "the given federation member cannot handle triple patterns requests (" + fm.toString() + ")" );
+	}
+
+	protected LogicalPlan createPlanForOpTable( final OpTable opTable ) {
+		// Jena rewrites a pattern consisting only of OPTIONAL into
+		// OpLeftJoin(OpTable.unit(), pattern). The only OpTable we
+		// expect here is the join identity (one empty binding).
+		if ( ! opTable.isJoinIdentity() ) {
+			throw new IllegalStateException();
+		}
+
+		final SolutionMapping solmap = new SolutionMappingImpl(); // empty binding
+		final LogicalOpFixedSolMap rootOp = new LogicalOpFixedSolMap(solmap);
+		return new LogicalPlanWithNullaryRootImpl(rootOp, null);
 	}
 
 	protected LogicalPlan mergeIntoMultiwayJoin( final LogicalPlan ... subPlans ) {
