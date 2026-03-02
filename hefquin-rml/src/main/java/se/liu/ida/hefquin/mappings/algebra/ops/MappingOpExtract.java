@@ -196,6 +196,13 @@ public class MappingOpExtract< DDS extends DataObject,
 		return MappingRelationImplWithColumnLayout.createBasedOnColumns(attributesOfP, columns);
 	}
 
+	/**
+	 * The returned list contains one array per each of the attributes in
+	 * {@link #attributesOfP}, where the i-th array in the list is for the
+	 * i-th attribute and contains the values that have been determined by
+	 * evaluating the i-th query in {@link #queriesOfP} in the context of
+	 * the given context object.
+	 */
 	protected List<Node[]> determineValuesPerAttribute( final DDS d, final DC1 cxtObj ) {
 		final List<Node[]> result = new ArrayList<>( attributesOfP.length );
 		for ( final QL2 query2 : queriesOfP ) {
