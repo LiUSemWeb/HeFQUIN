@@ -6,9 +6,16 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.apache.jena.cdt.CompositeDatatypeList;
+import org.apache.jena.cdt.CompositeDatatypeMap;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.junit.Test;
+
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+
+import net.minidev.json.JSONArray;
 
 public class SourceTypeJSONTest
 {
@@ -76,7 +83,7 @@ public class SourceTypeJSONTest
 	}
 
 	@Test
-	public void eval1_OneObjectSelectedWithArray() {
+	public void eval1_OneObjectSelectedButArray() {
 		final String jsonData =
 				  "{"
 				+ "  \"characters\": ["
@@ -88,9 +95,7 @@ public class SourceTypeJSONTest
 
 		final List<JsonObject> result = eval1(jsonData, jsonPath);
 
-		assertEquals( 1, result.size() );
-		assertTrue( result.get(0).getReadContext().jsonString().contains("0") );
-		assertFalse( result.get(0).getReadContext().jsonString().contains("1") );
+		assertEquals( 0, result.size() );
 	}
 
 	@Test
@@ -216,11 +221,12 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "id";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
 		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonScalarValue );
 
-		final JsonScalarValue resultElmt1 = result.get(0);
+		final JsonScalarValue resultElmt1 = (JsonScalarValue) result.get(0);
 
 		assertTrue( resultElmt1.getValue() instanceof String );
 		assertEquals( "0", resultElmt1.getValue() );
@@ -237,11 +243,12 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "id";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
 		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonScalarValue );
 
-		final JsonScalarValue resultElmt1 = result.get(0);
+		final JsonScalarValue resultElmt1 = (JsonScalarValue) result.get(0);
 
 		assertTrue( resultElmt1.getValue() instanceof Integer );
 		assertEquals( 0, resultElmt1.getValue() );
@@ -258,7 +265,7 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "id";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
 		assertEquals( 0, result.size() );
 	}
@@ -274,9 +281,10 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "id";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
-		assertEquals( 0, result.size() );
+		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonObject );
 	}
 
 	@Test
@@ -290,9 +298,13 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "id";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
-		assertEquals( 0, result.size() );
+		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonArray );
+
+		final JsonArray arr = (JsonArray) result.get(0);
+		assertEquals( 1, arr.getArray().size() );
 	}
 
 	@Test
@@ -306,11 +318,12 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "name.fn";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
 		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonScalarValue );
 
-		final JsonScalarValue resultElmt1 = result.get(0);
+		final JsonScalarValue resultElmt1 = (JsonScalarValue) result.get(0);
 
 		assertTrue( resultElmt1.getValue() instanceof String );
 		assertEquals( "A", resultElmt1.getValue() );
@@ -327,11 +340,12 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "name.fn";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
 		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonScalarValue );
 
-		final JsonScalarValue resultElmt1 = result.get(0);
+		final JsonScalarValue resultElmt1 = (JsonScalarValue) result.get(0);
 
 		assertTrue( resultElmt1.getValue() instanceof Integer );
 		assertEquals( 0, resultElmt1.getValue() );
@@ -353,12 +367,14 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "name[*].fn";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
 		assertEquals( 2, result.size() );
+		assertTrue( result.get(0) instanceof JsonScalarValue );
+		assertTrue( result.get(1) instanceof JsonScalarValue );
 
-		final JsonScalarValue resultElmt1 = result.get(0);
-		final JsonScalarValue resultElmt2 = result.get(1);
+		final JsonScalarValue resultElmt1 = (JsonScalarValue) result.get(0);
+		final JsonScalarValue resultElmt2 = (JsonScalarValue) result.get(1);
 
 		assertTrue( resultElmt1.getValue() instanceof String );
 		assertTrue( resultElmt2.getValue() instanceof String );
@@ -377,13 +393,55 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "name.fn";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
 		assertEquals( 0, result.size() );
 	}
 
 	@Test
-	public void eval2_PathToObject() {
+	public void eval2_PathToNonEmptyObject() {
+		final String jsonData =
+				  "{"
+				+ "  \"characters\": ["
+				+ "      { \"name\": { \"fn\":{}, \"ln\":\"B\" } },"
+				+ "  ]"
+				+ "}";
+		final String jsonPath1 = "$.characters[0]";
+		final String jsonPath2 = "name";
+
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
+
+		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonObject );
+
+		final JsonObject obj = (JsonObject) result.get(0);
+		final String json = obj.getReadContext().jsonString();
+		assertEquals( "{\"fn\":{},\"ln\":\"B\"}", json );
+	}
+
+	@Test
+	public void eval2_PathToNonEmptyObjectWithNull() {
+		final String jsonData =
+				  "{"
+				+ "  \"characters\": ["
+				+ "      { \"name\": { \"fn\":null, \"ln\":\"B\" } },"
+				+ "  ]"
+				+ "}";
+		final String jsonPath1 = "$.characters[0]";
+		final String jsonPath2 = "name";
+
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
+
+		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonObject );
+
+		final JsonObject obj = (JsonObject) result.get(0);
+		final String json = obj.getReadContext().jsonString();
+		assertEquals( "{\"fn\":null,\"ln\":\"B\"}", json );
+	}
+
+	@Test
+	public void eval2_PathToEmptyObject() {
 		final String jsonData =
 				  "{"
 				+ "  \"characters\": ["
@@ -393,25 +451,75 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "name.fn";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
-		assertEquals( 0, result.size() );
+		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonObject );
+
+		final JsonObject obj = (JsonObject) result.get(0);
+		final String json = obj.getReadContext().jsonString();
+		assertEquals( "{}", json );
 	}
 
 	@Test
-	public void eval2_PathToArray() {
+	public void eval2_PathToNonEmptyArray() {
 		final String jsonData =
 				  "{"
 				+ "  \"characters\": ["
-				+ "      { \"name\": { \"fn\":[{}], \"ln\":\"B\" } },"
+				+ "      { \"name\": { \"fn\":[1,true], \"ln\":\"B\" } },"
 				+ "  ]"
 				+ "}";
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "name.fn";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
-		assertEquals( 0, result.size() );
+		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonArray );
+
+		final JsonArray arr = (JsonArray) result.get(0);
+		assertEquals( 2, arr.getArray().size() );
+	}
+
+	@Test
+	public void eval2_PathToNonEmptyArrayWithNull() {
+		final String jsonData =
+				  "{"
+				+ "  \"characters\": ["
+				+ "      { \"name\": { \"fn\":[1,null], \"ln\":\"B\" } },"
+				+ "  ]"
+				+ "}";
+		final String jsonPath1 = "$.characters[0]";
+		final String jsonPath2 = "name.fn";
+
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
+
+		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonArray );
+
+		final JsonArray arr = (JsonArray) result.get(0);
+		assertEquals( 2, arr.getArray().size() );
+		assertTrue( arr.getArray().get(1) == null );
+	}
+
+	@Test
+	public void eval2_PathToEmptyArray() {
+		final String jsonData =
+				  "{"
+				+ "  \"characters\": ["
+				+ "      { \"name\": { \"fn\":[], \"ln\":\"B\" } },"
+				+ "  ]"
+				+ "}";
+		final String jsonPath1 = "$.characters[0]";
+		final String jsonPath2 = "name.fn";
+
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
+
+		assertEquals( 1, result.size() );
+		assertTrue( result.get(0) instanceof JsonArray );
+
+		final JsonArray arr = (JsonArray) result.get(0);
+		assertEquals( 0, arr.getArray().size() );
 	}
 
 	@Test
@@ -425,12 +533,14 @@ public class SourceTypeJSONTest
 		final String jsonPath1 = "$.characters[0]";
 		final String jsonPath2 = "name.fn[*]";
 
-		final List<JsonScalarValue> result = eval2(jsonData, jsonPath1, jsonPath2);
+		final List<JsonElement> result = eval2(jsonData, jsonPath1, jsonPath2);
 
 		assertEquals( 2, result.size() );
+		assertTrue( result.get(0) instanceof JsonScalarValue );
+		assertTrue( result.get(1) instanceof JsonScalarValue );
 
-		final JsonScalarValue resultElmt1 = result.get(0);
-		final JsonScalarValue resultElmt2 = result.get(1);
+		final JsonScalarValue resultElmt1 = (JsonScalarValue) result.get(0);
+		final JsonScalarValue resultElmt2 = (JsonScalarValue) result.get(1);
 
 		assertTrue( resultElmt1.getValue() instanceof Integer );
 		assertTrue( resultElmt2.getValue() instanceof Boolean );
@@ -478,6 +588,94 @@ public class SourceTypeJSONTest
 		assertEquals( "true", n.getLiteralLexicalForm() );
 	}
 
+	@Test
+	public void castNonEmptyArray() {
+		final JsonArray arr = new JsonArray( new JSONArray() );
+		arr.getArray().add(1);
+		arr.getArray().add(true);
+
+		final Node n = SourceTypeJSON.instance.cast(arr);
+
+		assertTrue( n.isLiteral() );
+		assertTrue( n.getLiteral().isWellFormed() );
+
+		assertEquals( CompositeDatatypeList.type, n.getLiteralDatatype() );
+		assertEquals( "[1,true]", n.getLiteralLexicalForm() );
+	}
+
+	@Test
+	public void castNonEmptyArrayWithNull() {
+		final JsonArray arr = new JsonArray( new JSONArray() );
+		arr.getArray().add(1);
+		arr.getArray().add(null); // <-- null !
+
+		final Node n = SourceTypeJSON.instance.cast(arr);
+
+		assertTrue( n.isLiteral() );
+		assertTrue( n.getLiteral().isWellFormed() );
+
+		assertEquals( CompositeDatatypeList.type, n.getLiteralDatatype() );
+		assertEquals( "[1,null]", n.getLiteralLexicalForm() );
+	}
+
+	@Test
+	public void castEmptyArray() {
+		final JsonArray arr = new JsonArray( new JSONArray() );
+
+		final Node n = SourceTypeJSON.instance.cast(arr);
+
+		assertTrue( n.isLiteral() );
+		assertTrue( n.getLiteral().isWellFormed() );
+
+		assertEquals( CompositeDatatypeList.type, n.getLiteralDatatype() );
+		assertEquals( "[]", n.getLiteralLexicalForm() );
+	}
+
+	@Test
+	public void castNonEmptyObject() {
+		final String str = "{\"key1\":\"value1\",\"key2\":42}";
+		final DocumentContext docCtx = JsonPath.parse(str);
+		final JsonObject obj = new JsonObject(docCtx);
+
+		final Node n = SourceTypeJSON.instance.cast(obj);
+
+		assertTrue( n.isLiteral() );
+		assertTrue( n.getLiteral().isWellFormed() );
+
+		assertEquals( CompositeDatatypeMap.type, n.getLiteralDatatype() );
+		assertEquals( str, n.getLiteralLexicalForm() );
+	}
+
+	@Test
+	public void castNonEmptyObjectWithNull() {
+		final String str = "{\"key1\":null,\"key2\":42}";
+		final DocumentContext docCtx = JsonPath.parse(str);
+		final JsonObject obj = new JsonObject(docCtx);
+
+		final Node n = SourceTypeJSON.instance.cast(obj);
+
+		assertTrue( n.isLiteral() );
+		assertTrue( n.getLiteral().isWellFormed() );
+
+		assertEquals( CompositeDatatypeMap.type, n.getLiteralDatatype() );
+		assertEquals( str, n.getLiteralLexicalForm() );
+	}
+
+	@Test
+	public void castEmptyObject() {
+		final String str = "{}";
+		final DocumentContext docCtx = JsonPath.parse(str);
+		final JsonObject obj = new JsonObject(docCtx);
+
+		final Node n = SourceTypeJSON.instance.cast(obj);
+
+		assertTrue( n.isLiteral() );
+		assertTrue( n.getLiteral().isWellFormed() );
+
+		assertEquals( CompositeDatatypeMap.type, n.getLiteralDatatype() );
+		assertEquals( str, n.getLiteralLexicalForm() );
+	}
+
 
 	// ---------- helpers ---------
 
@@ -493,7 +691,7 @@ public class SourceTypeJSONTest
 	 * Assumes that the first JSONPath expression selects
 	 * exactly one JSON object from the given data.
 	 */
-	protected List<JsonScalarValue> eval2( final String jsonData,
+	protected List<JsonElement> eval2( final String jsonData,
 	                                       final String jsonPath1,
 	                                       final String jsonPath2 ) {
 		final JsonObject jsonObject = new JsonObject(jsonData);

@@ -2,6 +2,7 @@ PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
 PREFIX fd:     <http://w3id.org/hefquin/feddesc#>
 PREFIX rml:    <http://w3id.org/rml/>
+PREFIX cdt:	   <http://w3id.org/awslabs/neptune/SPARQL-CDTs/>
 PREFIX ex:     <http://example.org/>
 PREFIX hydra:  <http://www.w3.org/ns/hydra/core#>
 
@@ -33,19 +34,21 @@ ex:openMeteo
 
 _:openMeteoRestEndpoint a fd:RESTInterface ;
       fd:iriTemplate [
-            hydra:template "https://api.open-meteo.com/v1/forecast{?latitude,longitude,current}" ;
-            hydra:mapping 
-                  [ 
-                  hydra:variable "latitude" ;      
-                  hydra:required true ;
-                  fd:paramType xsd:float ] ,
-                  [ 
-                  hydra:variable "longitude" ; 
-                  hydra:required true ;
-                  fd:paramType xsd:float ] ,
-                  [ 
-                  hydra:variable "current" ;
-                  fd:paramType xsd:string ]
+            hydra:template "https://api.open-meteo.com/v1/forecast{?latitude,longitude,current,hourly}" ;
+            hydra:mapping [ hydra:variable "latitude" ;
+                            hydra:required true ;
+                            fd:paramType xsd:float
+                          ] ,
+                          [ hydra:variable "longitude" ;
+                            hydra:required true ;
+                            fd:paramType xsd:float
+                          ] ,
+                          [ hydra:variable "current" ;
+                            fd:paramType xsd:string
+                          ] ,
+                          [ hydra:variable "hourly" ;
+                            fd:paramType xsd:string
+                          ]
           ] .                   
 
 ex:openMeteo2
@@ -58,7 +61,12 @@ ex:openMeteo2
       fd:wrapper _:openMeteoWrapper .
 
 _:openMeteoWrapper
-      fd:rmlTriplesMaps ( _:openMeteoTM1 _:openMeteoTM2 ) .
+      fd:rmlTriplesMaps (
+            _:openMeteoTM1
+            _:openMeteoTM2
+            _:openMeteoTM3
+            _:openMeteoTM4
+      ) .
 
 _:openMeteoTM1
       rml:logicalSource [ rml:source _:openMeteoRestEndpoint ;
@@ -76,7 +84,25 @@ _:openMeteoTM2
       rml:subjectMap [ rml:termType rml:BlankNode ;
                        rml:reference "time" ];
       rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:windSpeed ] ;
-                               rml:objectMap [ rml:reference "wind_speed_10m" ; rml:datatype xsd:double ] ] .      
+                               rml:objectMap [ rml:reference "wind_speed_10m" ; rml:datatype xsd:double ] ] .
+
+_:openMeteoTM3
+      rml:logicalSource [ rml:source _:openMeteoRestEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$" ] ;
+      rml:subjectMap [ rml:termType rml:BlankNode ;
+                       rml:reference "current.time" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:current ] ;
+                               rml:objectMap [ rml:reference "current" ; rml:datatype cdt:Map ] ] .
+
+_:openMeteoTM4
+      rml:logicalSource [ rml:source _:openMeteoRestEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$" ] ;
+      rml:subjectMap [ rml:termType rml:BlankNode ;
+                       rml:reference "hourly_units.time" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:hourly_temperature ] ;
+                               rml:objectMap [ rml:reference "hourly.temperature_2m" ; rml:datatype cdt:List ] ] .
    
 
 #ex:neo4jTest

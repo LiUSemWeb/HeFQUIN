@@ -8,6 +8,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - Support for optional parameters in the template IRIs for REST APIs ([#493](https://github.com/LiUSemWeb/HeFQUIN/pull/493)).
+- Support for creating CDT literals in the RML processing component ([#513](https://github.com/LiUSemWeb/HeFQUIN/pull/513)).
 - Adding an implementation of the batch-based bind-join algorithm for SPARQL endpoints that issues the bind-join requests without blocking, handling the processing of their responses in parallel ([#499](https://github.com/LiUSemWeb/HeFQUIN/pull/499)).
 ### Changed
 - Change to Hydra vocabulary for the template IRIs of REST APIs in federation descriptions ([#493](https://github.com/LiUSemWeb/HeFQUIN/pull/493)).
@@ -15,6 +16,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Adding unique IDs for plans and sub-plan, and using these in the plan printers ([#500](https://github.com/LiUSemWeb/HeFQUIN/pull/500)).
 - Some clean up in the classes for plans and for operators ([#500](https://github.com/LiUSemWeb/HeFQUIN/pull/500)).
 - More effective implementation of executable operators that assume that at least a minimum number of input solution mappings are available to process ([#502](https://github.com/LiUSemWeb/HeFQUIN/pull/502)).
+- Bug fixes in some of the operators of the mapping algebra in the RML processing component ([#513](https://github.com/LiUSemWeb/HeFQUIN/pull/513)).
 - Bug fix in the lookup-join for wrapped REST APIs, which didn't actually populate its cache ([#502](https://github.com/LiUSemWeb/HeFQUIN/pull/502)).
 - Bug fix in the base implementation of the bind-join algorithm, which did not correctly implement bag semantics ([#498](https://github.com/LiUSemWeb/HeFQUIN/pull/498)).
 - Bug fix in cardinality-based join reordering ([#501](https://github.com/LiUSemWeb/HeFQUIN/pull/501)).

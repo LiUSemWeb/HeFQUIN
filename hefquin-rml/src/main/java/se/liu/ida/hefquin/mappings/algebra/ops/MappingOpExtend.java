@@ -164,6 +164,7 @@ public class MappingOpExtend extends BaseForUnaryMappingOperator
 				return input.getValueOfCurrentTuple(idxOfAttribute);
 
 			if ( currentValue == null ) {
+				currentAssignment.clear();
 				for ( int i = 0; i < schemaMappingAttrs.length; i++ ) {
 					final String attr = schemaMappingAttrs[i];
 					final Node value = input.getValueOfCurrentTuple( schemaMappingIdxs[i] );

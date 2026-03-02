@@ -101,11 +101,18 @@ public class MappingOpUnion extends BaseForNaryMappingOperator
 		protected final Iterator<MappingOperator> subOpIt;
 		protected MappingRelationCursor currentInput = null;
 		/**
+		 * This is the schema of {@link #currentInput}, which we need to
+		 * remember to be able to check whether {@link #currentSchemaMapping}
+		 * needs to be updated when we move to the next non-empty
+		 * {@link #currentInput}.
+		 */
+		protected List<String> currentInputSchema = null;
+		/**
 		 * The i-th position in this array corresponds to the i-th
-		 * attribute in the schema of myRelation and the integer at
-		 * that position in the array is the position in of the same
-		 * attribute in the schema of currentInput. As an optimization,
-		 * the array is null if the two schemas coincide.
+		 * attribute in the schema of {@link #myRelation} and the
+		 * integer at that position in the array is the position of
+		 * the same attribute in {@link #currentInputSchema}. As an
+		 * optimization, the array is null if the two schemas coincide.
 		 */
 		protected int[] currentSchemaMapping = null;
 
@@ -126,27 +133,26 @@ public class MappingOpUnion extends BaseForNaryMappingOperator
 					return false;
 				}
 
-				final List<String> prevInputSchema;
-				if ( currentInput == null )
-					prevInputSchema = null;
-				else
-					prevInputSchema = currentInput.getMappingRelation().getSchema();
-
 				final MappingRelation r = subOpIt.next().evaluate(srMap);
 				currentInput = r.getCursor();
 
-				final List<String> nextInputSchema = r.getSchema();
-				if (    currentInput.hasNext()
-				     && ! Objects.equals(prevInputSchema, nextInputSchema) ) {
-					// If the next input schema is different from the
-					// previous one (where the difference should be only
-					// in the order of the attributes, not in terms of
-					// having different attributes), then we need to
-					// update the schema mapping (currentSchemaMapping)
-					// that we will use while consuming the next input
-					// relation. Yet, we do this only if the next input
-					// is nonempty (i.e., currentInput.hasNext() == true).
-					updateSchemaMapping(nextInputSchema);
+				if ( currentInput.hasNext() ) {
+					final List<String> prevInputSchema = currentInputSchema;
+					currentInputSchema = r.getSchema();
+
+					// If the schema of the previous (non-empty) input
+					// relation is different from the schema of the
+					// next/current (non-empty) input relation (where
+					// the difference should be only in the order of
+					// the attributes, not in terms of having different
+					// attributes), then we need to update the schema
+					// mapping (currentSchemaMapping) that we will use
+					// while consuming that next input relation. Yet,
+					// we do this only if the next input is nonempty
+					// (i.e., currentInput.hasNext() == true).
+					if ( ! Objects.equals(prevInputSchema, currentInputSchema) ) {
+						updateSchemaMapping(currentInputSchema);
+					}
 				}
 			}
 

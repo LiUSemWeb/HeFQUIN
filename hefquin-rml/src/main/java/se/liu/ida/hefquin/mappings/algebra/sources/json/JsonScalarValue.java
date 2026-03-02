@@ -1,8 +1,6 @@
 package se.liu.ida.hefquin.mappings.algebra.sources.json;
 
-import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
-
-public class JsonScalarValue implements DataObject
+public class JsonScalarValue extends JsonElement
 {
 	final Object v;
 
