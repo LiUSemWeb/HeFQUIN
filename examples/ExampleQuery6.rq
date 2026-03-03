@@ -1,0 +1,26 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX owl:    <http://www.w3.org/2002/07/owl#>
+PREFIX dbo:    <http://dbpedia.org/ontology/>
+PREFIX geo:    <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX cdt:    <http://w3id.org/awslabs/neptune/SPARQL-CDTs/>
+PREFIX ex:     <http://example.org/>
+
+# Like the previous query, this one also retrieves current weather information
+# from the Web API of the Open-Meteo weather service. However, in contrast to
+# using a fixed request URI as done by the previous query, this one creates
+# the request URI at runtime, based on the values provided by the BIND clauses.
+
+SELECT * WHERE {
+	BIND ( "52.52"^^xsd:float AS ?lat )
+	BIND ( "13.41"^^xsd:float AS ?long )
+	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
+
+	SERVICE <http://example.org/OpenMeteoWrapper> PARAMS(?lat AS "latitude",
+	                                                     ?long AS "longitude",
+	                                                     ?req AS "current") {
+		?x ex:temperature ?temp .
+		?x ex:windSpeed ?wind .
+	}
+}
