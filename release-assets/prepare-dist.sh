@@ -27,6 +27,7 @@ run mkdir -p ./HeFQUIN-${RELEASE_VERSION}/libs
 run cp ./hefquin-cli/target/hefquin-cli-${RELEASE_VERSION}.jar ./HeFQUIN-${RELEASE_VERSION}/libs/
 run cp -r ./bin ./HeFQUIN-${RELEASE_VERSION}/
 run cp -r ./bat ./HeFQUIN-${RELEASE_VERSION}/
+run cp -r ./examples ./HeFQUIN-${RELEASE_VERSION}/
 run cp ./release-assets/README.txt ./HeFQUIN-${RELEASE_VERSION}/
 run zip -r HeFQUIN-${RELEASE_VERSION}.zip ./HeFQUIN-${RELEASE_VERSION}
 run rm -rf ./HeFQUIN-${RELEASE_VERSION}
