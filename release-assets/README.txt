@@ -35,8 +35,8 @@ curl -X POST http://localhost:8080/sparql \
 
 ## Quick start (CLI):
 
-bin/hefquin --federationDescription=MyFedConf.ttl \
-    --query=ExampleQuery.rq
+bin/hefquin --federationDescription=examples/ExampleFederation.ttl \
+    --query=examples/ExampleQuery1.rq
 
 See https://liusemweb.github.io/HeFQUIN/doc/programs.html for full CLI options.
 

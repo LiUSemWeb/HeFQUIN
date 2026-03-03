@@ -1,0 +1,21 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX owl:    <http://www.w3.org/2002/07/owl#>
+PREFIX dbo:    <http://dbpedia.org/ontology/>
+PREFIX geo:    <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX cdt:    <http://w3id.org/awslabs/neptune/SPARQL-CDTs/>
+PREFIX ex:     <http://example.org/>
+
+# This query accesses the Web API of the Open-Meteo weather service, with
+# a fixed request URI (requesting the current temperature and wind speed
+# at a fixed location). The graph pattern within the SERVICE clause is
+# evaluated over an RDF view of the JSON data obtained from the API; this
+# RDF view is defined by the RML mapping given in the federation description.
+
+SELECT * WHERE {
+	SERVICE <http://example.org/OpenMeteoWrapperWithFixedParams> {
+		?x ex:temperature ?temp .
+		?x ex:windSpeed ?wind .
+	}
+}

@@ -22,13 +22,25 @@ ex:wikidataSPARQL
       fd:interface [ a                  fd:SPARQLEndpointInterface ;
                      fd:endpointAddress <https://query.wikidata.org/sparql> ] .
 
+ex:dbpediaSPARQLWithVocabMappings
+      fd:serviceURI <http://example.org/DBpediaWrapper> ;
+      fd:interface [ a                  fd:SPARQLEndpointInterface ;
+                     fd:endpointAddress <http://dbpedia.org/sparql> ] ;
+      fd:vocabularyMappingsFile "examples/ExampleVocabMappingDBpedia.ttl" .
+
+ex:wikidataSPARQLWithVocabMappings
+      fd:serviceURI <http://example.org/WikidataWrapper> ;
+      fd:interface [ a                  fd:SPARQLEndpointInterface ;
+                     fd:endpointAddress <https://query.wikidata.org/sparql> ];
+      fd:vocabularyMappingsFile "examples/ExampleVocabMappingWikidata.ttl" .
+
 ex:europaSPARQL
       fd:serviceURI <https://data.europa.eu/sparql> ;
       fd:interface [ a                  fd:SPARQLEndpointInterface ;
                      fd:endpointAddress <https://data.europa.eu/sparql> ] .
 
 ex:openMeteo
-      fd:serviceURI <https://api.open-meteo.com/v1/forecast> ;
+      fd:serviceURI <http://example.org/OpenMeteoWrapper> ;
       fd:interface _:openMeteoRestEndpoint ;
       fd:wrapper _:openMeteoWrapper .
 
@@ -52,7 +64,7 @@ _:openMeteoRestEndpoint a fd:RESTInterface ;
           ] .                   
 
 ex:openMeteo2
-      fd:serviceURI <https://api.open-meteo.com/v1/forecast/WithFixedParams> ;
+      fd:serviceURI <http://example.org/OpenMeteoWrapperWithFixedParams> ;
       fd:interface [ a fd:RESTInterface ;
             fd:iriTemplate [
                   hydra:template "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m" ;
@@ -122,15 +134,3 @@ _:openMeteoTM4
 #                                                # ...
 #                                              ]
 #                   ] .
-
-#ex:dbpediaSPARQLWithVocabMappings
-#      a            fd:FederationMember ;
-#      fd:interface [ a                  fd:SPARQLEndpointInterface ;
-#                     fd:endpointAddress <http://dbpedia.org/sparql> ] ;
-#      fd:vocabularyMappingsFile "dbpedia/vocabularyMappings.nt" .
-
-#ex:wikidataSPARQLWithVocabMappings
-#      a            fd:FederationMember ;
-#      fd:interface [ a                  fd:SPARQLEndpointInterface ;
-#                     fd:endpointAddress <https://query.wikidata.org/sparql> ];
-#                     fd:vocabularyMappingsFile "wikidata/vocabularyMappings.nt" .

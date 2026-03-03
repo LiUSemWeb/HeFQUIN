@@ -1,0 +1,30 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX owl:    <http://www.w3.org/2002/07/owl#>
+PREFIX dbo:    <http://dbpedia.org/ontology/>
+PREFIX geo:    <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX ex:     <http://example.org/>
+
+# An example query that must take into account vocabulary mappings
+
+SELECT * WHERE {
+	SERVICE <http://example.org/WikidataWrapper> {
+		?pablo rdfs:label "Pablo Picasso"@en .
+		?pablo <https://schema.org/hasOccupation> ?artist .
+	}
+	SERVICE <http://example.org/DBpediaWrapper> {
+		?person rdf:type ?artist .
+		?person <https://schema.org/birthPlace> <http://dbpedia.org/resource/Spain> .
+	}
+}
+LIMIT 3
+
+# Expected results:
+#-------------------------------------------------------------------------------------------------------------------------
+#| pablo                                  | artist                      | person                                         |
+#=========================================================================================================================
+#| <http://www.wikidata.org/entity/Q5593> | <https://schema.org/artist> | <http://dbpedia.org/resource/Carles_Canut>     |
+#| <http://www.wikidata.org/entity/Q5593> | <https://schema.org/artist> | <http://dbpedia.org/resource/Carles_Casagemas> |
+#| <http://www.wikidata.org/entity/Q5593> | <https://schema.org/artist> | <http://dbpedia.org/resource/Carlos_Albert>    |
+#-------------------------------------------------------------------------------------------------------------------------
