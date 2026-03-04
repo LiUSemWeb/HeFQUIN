@@ -1,5 +1,8 @@
 # HeFQUIN Examples
-This directory contains a number of simple example queries that demonstrate some of the features of HeFQUIN. To run each of these queries, [set up the HeFQUIN command-line programs using the latest release](https://liusemweb.github.io/HeFQUIN/doc/programs.html#use-release) and, from the root folder of the extracted release, execute the following command.
+This directory contains a number of simple example queries that demonstrate some of the features of HeFQUIN. For a description of these examples, refer to the [examples page](https://liusemweb.github.io/HeFQUIN/doc/examples.html) of the documentation on the [HeFQUIN Website](https://liusemweb.github.io/HeFQUIN/).
+
+
+To run each of these queries, [set up the HeFQUIN command-line programs using the latest release](https://liusemweb.github.io/HeFQUIN/doc/programs.html#use-release) and, from the root folder of the extracted release, execute the following command.
 ```bash
 bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/ExampleQuery1.rq
 ```
@@ -10,4 +13,3 @@ To get a quick overview of additional arguments that can be passed to the progra
 bin/hefquin --help
 ```
 For a more detailed description of all the arguments refer to the [corresponding page of the HeFQUIN documentation](https://liusemweb.github.io/HeFQUIN/doc/cli.html).
-

@@ -29,7 +29,6 @@ SELECT * WHERE {
 	                                                     ?long AS "longitude",
 	                                                     ?req AS "hourly") {
 		?x ex:hourly_temperature ?list .
-# Somehow this doesn't work at the moment in the case that all four triples maps are active.
 	}
 
 	BIND ( cdt:size(?list) AS ?size )
