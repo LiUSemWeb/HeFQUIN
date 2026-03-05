@@ -125,6 +125,7 @@ public class SourceTypeJSON implements SourceType< JsonObject,
 		if ( elmt == null ) return null;
 		if ( elmt instanceof String s )  return new JsonScalarValue(s);
 		if ( elmt instanceof Integer i ) return new JsonScalarValue(i);
+		if ( elmt instanceof Long l ) return new JsonScalarValue(l);
 		if ( elmt instanceof Double d )  return new JsonScalarValue(d);
 		if ( elmt instanceof Boolean b ) return new JsonScalarValue(b);
 

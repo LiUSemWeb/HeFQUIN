@@ -14,6 +14,11 @@ public class JsonScalarValue extends JsonElement
 		this.v = v;
 	}
 
+	public JsonScalarValue( final Long v ) {
+		assert v != null;
+		this.v = v;
+	}
+
 	public JsonScalarValue( final Double v ) {
 		assert v != null;
 		this.v = v;
