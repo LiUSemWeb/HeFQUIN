@@ -75,11 +75,11 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 				try {
 					resp = reqProc.performRequest(req, fm);
 				} catch ( final FederationAccessException e ) {
-					throw new RuntimeException("Performing a request caused an exception.", e);
+					throw new RuntimeException("Performing a request caused an exception with the following message: " + e.getMessage(), e);
 				}
 
 				if ( resp == null ) {
-					throw new RuntimeException("reqProc2 returned null");
+					throw new RuntimeException("reqProc returned null");
 				}
 
 				// update the statistics

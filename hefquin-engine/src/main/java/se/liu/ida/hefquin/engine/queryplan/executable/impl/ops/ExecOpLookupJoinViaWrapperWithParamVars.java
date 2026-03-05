@@ -259,6 +259,14 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 		@Override
 		public void accept( final StringResponse response ) {
+			// If the given response captures the fact that an error was
+			// returned for the corresponding request, then the given input
+			// solution mappings (see 'solmaps') can be dropped and, thus,
+			// we can immediately stop at this point.
+			if ( response.isError() ) {
+				return;
+			}
+
 			final long time1 = System.currentTimeMillis();
 
 			final String respData;
@@ -266,9 +274,9 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 				respData = response.getResponseData();
 			}
 			catch ( final UnsupportedOperationDueToRetrievalError e ) {
-				final ExecOpExecutionException ex = new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, op );
-				recordExceptionCaughtDuringExecution( ex );
-				return;
+				// We should never end up here because we have explicitly
+				// checked for a potential error before.
+				throw new IllegalStateException("Unexpected exception at this point.", e);
 			}
 
 			final List<SolutionMapping> resultingSolMaps;
@@ -293,18 +301,6 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 			sumOfRequestExecutionTimes += response.getRequestDuration().toMillis();
 			sumOfResponseProcTimes += time2 - time1;
-		}
-
-		protected Iterable<SolutionMapping> extractSolMaps( final StringResponse response )
-				throws UnsupportedOperationDueToRetrievalError {
-			final String data = response.getResponseData();
-			try {
-				return fm.evaluatePatternOverRDFView(pattern, data);
-			}
-			catch ( final DataConversionException e ) {
-				numberOfDataConversionExceptions++;
-				throw new UnsupportedOperationDueToRetrievalError("Converting the reponse of a REST request into RDF failed.", e, null, fm);
-			}
 		}
 	}
 

@@ -36,7 +36,9 @@ public interface DataRetrievalResponse<T>
 	}
 
 	/**
-	 * Indicates whether an error occurred during data retrieval.
+	 * Indicates whether an error occurred during data retrieval. If this
+	 * method returned {@code true}, then {@link #getErrorStatusCode()}
+	 * returns the HTTP status code related to the error.
 	 */
 	default boolean isError() {
 		return getErrorStatusCode() != null;
@@ -49,15 +51,16 @@ public interface DataRetrievalResponse<T>
 	T getResponseData() throws UnsupportedOperationDueToRetrievalError;
 
 	/**
-	 * Returns the HTTP status code if the response resulted in an error, or empty
-	 * otherwise.
+	 * Returns the HTTP status code if the response resulted in an error,
+	 * or {@code null} otherwise.
 	 */
 	default Integer getErrorStatusCode() {
 		return null;
 	};
 
 	/**
-	 * Returns a short description of the error if available, or empty otherwise.
+	 * Returns a short description of the error if available, or
+	 * {@code null} otherwise.
 	 */
 	default String getErrorDescription() {
 		return null;

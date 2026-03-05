@@ -77,7 +77,13 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 			body = HttpLib.handleResponseRtnString(httpResponse);
 		}
 		catch ( final HttpException e ) {
-			throw new FederationAccessException( "Unexpected response for request to REST API (requested URI: <" + uri.toString() + ">, message: " + e.getMessage() + ")", e, req, fm );
+			if ( e.getStatusCode() > 0 )
+				return new StringResponseImpl( "", fm, req,
+				                               requestStartTime,
+				                               e.getStatusCode(),
+				                               e.getMessage() );
+			else
+				throw new FederationAccessException( "Unexpected response for request to REST API (requested URI: <" + uri.toString() + ">, message: " + e.getMessage() + ")", e, req, fm );
 		}
 
 		return new StringResponseImpl(body, fm, req, requestStartTime);

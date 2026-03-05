@@ -54,7 +54,6 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 	@Override
 	public List<SolutionMapping> evaluatePatternOverRDFView( final SPARQLGraphPattern pattern,
 	                                                         final String data )
-			throws DataConversionException
 	{
 		// The idea of this implementation is to materialize the RDF view of
 		// the given data (i.e., convert the data into an RDF graph) and, then
@@ -106,11 +105,9 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 	 * @param pattern - the pattern that is intended to be evaluated over
 	 *                  the returned RDF data; may be {@code null}
 	 * @return an RDF dataset that represents the given data
-	 * @throws DataConversionException if the conversion into RDF fails
 	 */
 	public Dataset convertResponseDataIntoRDF( final String data,
 	                                           final SPARQLGraphPattern pattern )
-			throws DataConversionException
 	{
 		final DataObject dataObj = new JsonObject(data);
 		final Map<SourceReference, DataObject> srMap = new HashMap<>();
