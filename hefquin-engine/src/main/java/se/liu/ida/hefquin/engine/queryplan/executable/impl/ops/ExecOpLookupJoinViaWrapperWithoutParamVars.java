@@ -106,6 +106,14 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 			throw new ExecOpExecutionException("The execution of the futures that performs the request caused an exception.", e, this);
 		}
 
+		// If the given response captures the fact that an error was
+		// returned for the REST request, then there are no solution
+		// mappings to produce here and, thus, we can immediately
+		// stop at this point.
+		if ( response.isError() ) {
+			return List.of();
+		}
+
 		final long time2 = System.currentTimeMillis();
 
 		final String data;
@@ -113,8 +121,9 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 			data = response.getResponseData();
 		}
 		catch ( final UnsupportedOperationDueToRetrievalError e ) {
-			retrievalError = e.getMessage();
-			return List.of();
+			// We should never end up here because we have explicitly
+			// checked for a potential error before.
+			throw new IllegalStateException("Unexpected exception at this point.", e);
 		}
 
 		final List<SolutionMapping> result;

@@ -50,11 +50,22 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 
 		timeAfterResponse = System.currentTimeMillis();
 
+		// If the given response captures the fact that an error was
+		// returned for the REST request, then there are no solution
+		// mappings to produce here and, thus, we can immediately
+		// stop at this point.
+		if ( response.isError() ) {
+			return;
+		}
+
 		final String data;
 		try {
 			data = response.getResponseData();
-		} catch ( final UnsupportedOperationDueToRetrievalError e ) {
-			throw new ExecOpExecutionException( "Accessing the response data caused an exception, which indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+		}
+		catch ( final UnsupportedOperationDueToRetrievalError e ) {
+			// We should never end up here because we have explicitly
+			// checked for a potential error before.
+			throw new IllegalStateException("Unexpected exception at this point.", e);
 		}
 
 		process(data, sink);
