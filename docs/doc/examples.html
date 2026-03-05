@@ -128,6 +128,14 @@
             </p>
             <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/OpenMeteoCDTList.rq</code></pre>
 
+            <h4 id="Covid19Stats"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/Covid19Stats.rq">Covid19Stats</a></h4>
+            <p>
+                This query accesses the Web API of the <a href="https://disease.sh/">Open Disease Data service</a> by using requests that are formed based on data obtained from a SPARQL endpoint. More specifically, the query obtains the ISO country codes of all European countries from the SPARQL endpoint of the Wikidata Knowledge Graph and, then, uses these ISO codes to request Covid-19 statistics from the Web API.
+                Notice that one of the ISO codes obtained from Wikidata is "XK" for Kosovo, which is not recognized by the Web API; that is, the request with this ISO code results in a 404 error. Therefore, the SERVICE clause for the Web API ignores the solution mapping with this ISO code.
+                Run the query as follows:
+            </p>
+            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/Covid19Stats.rq</code></pre>
+
         </section>
 
 <!--
