@@ -55,6 +55,8 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 	// statistics
 	private long numberOfRequestsIssued = 0L;
+	private long numberOfRequestsFailed = 0L;
+	private List<Integer> errorCodesOfFailedRequests = new ArrayList<>();
 	private long sumOfRequestExecutionTimes = 0L;
 	private long sumOfResponseProcTimes = 0L;
 	private long numberOfOutputMappingsProduced = 0L;
@@ -264,6 +266,8 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			// solution mappings (see 'solmaps') can be dropped and, thus,
 			// we can immediately stop at this point.
 			if ( response.isError() ) {
+				numberOfRequestsFailed++;
+				errorCodesOfFailedRequests.add( response.getErrorStatusCode() );
 				return;
 			}
 
@@ -346,6 +350,8 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		super.resetStats();
 
 		numberOfRequestsIssued = 0L;
+		numberOfRequestsFailed = 0L;
+		errorCodesOfFailedRequests.clear();
 		sumOfRequestExecutionTimes = 0L;
 		sumOfResponseProcTimes = 0L;
 		numberOfOutputMappingsProduced = 0L;
@@ -357,6 +363,8 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		final ExecutableOperatorStatsImpl s = super.createStats();
 
 		s.put( "numberOfRequestsIssued",   numberOfRequestsIssued );
+		s.put( "numberOfRequestsFailed",   numberOfRequestsFailed );
+		s.put( "errorCodesOfFailedRequests",   errorCodesOfFailedRequests );
 
 		double avgRequestExecTime = Double.NaN;
 		double avgResponseProcTimes = Double.NaN;
