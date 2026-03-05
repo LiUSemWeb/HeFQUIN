@@ -115,7 +115,89 @@ _:openMeteoTM4
                        rml:reference "hourly_units.time" ];
       rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:hourly_temperature ] ;
                                rml:objectMap [ rml:reference "hourly.temperature_2m" ; rml:datatype cdt:List ] ] .
-   
+
+
+ex:covid19API
+      fd:serviceURI <http://example.org/Covid19APIWrapper> ;
+      fd:interface _:covid19APIEndpoint ;
+      fd:wrapper [ fd:rmlTriplesMaps ( _:covid19TM_totalCases
+                                       _:covid19TM_todayCases
+                                       _:covid19TM_totalDeaths
+                                       _:covid19TM_todayDeaths
+                                       _:covid19TM_totalRecovered
+                                       _:covid19TM_updated )
+                 ] .
+
+_:covid19APIEndpoint a fd:RESTInterface ;
+      fd:iriTemplate [ hydra:template "https://disease.sh/v3/covid-19/countries/{country}" ;
+                       hydra:mapping [ hydra:variable "country" ;
+                                       hydra:required true ;
+                                       fd:paramType xsd:string ]
+                     ] .
+
+_:covid19TM_totalCases
+    rml:logicalSource [ rml:source _:covid19APIEndpoint ;
+                        rml:referenceFormulation rml:JSONPath ;
+                        rml:iterator "$" ] ;
+    rml:subjectMap [ rml:termType rml:BlankNode ; rml:reference "country" ] ;
+    rml:predicateObjectMap [
+        rml:predicateMap [ rml:constant ex:totalCases ] ;
+        rml:objectMap [ rml:reference "cases" ; rml:datatype xsd:integer ]
+    ] .
+
+_:covid19TM_todayCases
+    rml:logicalSource [ rml:source _:covid19APIEndpoint ;
+                        rml:referenceFormulation rml:JSONPath ;
+                        rml:iterator "$" ] ;
+    rml:subjectMap [ rml:termType rml:BlankNode ; rml:reference "country" ] ;
+    rml:predicateObjectMap [
+        rml:predicateMap [ rml:constant ex:todayCases ] ;
+        rml:objectMap [ rml:reference "todayCases" ; rml:datatype xsd:integer ]
+    ] .
+
+_:covid19TM_totalDeaths
+    rml:logicalSource [ rml:source _:covid19APIEndpoint ;
+                        rml:referenceFormulation rml:JSONPath ;
+                        rml:iterator "$" ] ;
+    rml:subjectMap [ rml:termType rml:BlankNode ; rml:reference "country" ] ;
+    rml:predicateObjectMap [
+        rml:predicateMap [ rml:constant ex:totalDeaths ] ;
+        rml:objectMap [ rml:reference "deaths" ; rml:datatype xsd:integer ]
+    ] .
+
+_:covid19TM_todayDeaths
+    rml:logicalSource [ rml:source _:covid19APIEndpoint ;
+                        rml:referenceFormulation rml:JSONPath ;
+                        rml:iterator "$" ] ;
+    rml:subjectMap [ rml:termType rml:BlankNode ; rml:reference "country" ] ;
+    rml:predicateObjectMap [
+        rml:predicateMap [ rml:constant ex:todayDeaths ] ;
+        rml:objectMap [ rml:reference "todayDeaths" ; rml:datatype xsd:integer ]
+    ] .
+
+_:covid19TM_totalRecovered
+    rml:logicalSource [ rml:source _:covid19APIEndpoint ;
+                        rml:referenceFormulation rml:JSONPath ;
+                        rml:iterator "$" ] ;
+    rml:subjectMap [ rml:termType rml:BlankNode ; rml:reference "country" ] ;
+    rml:predicateObjectMap [
+        rml:predicateMap [ rml:constant ex:totalRecovered ] ;
+        rml:objectMap [ rml:reference "recovered" ; rml:datatype xsd:integer ]
+    ] .
+
+_:covid19TM_updated
+    rml:logicalSource [ rml:source _:covid19APIEndpoint ;
+                        rml:referenceFormulation rml:JSONPath ;
+                        rml:iterator "$" ] ;
+    rml:subjectMap [ rml:termType rml:BlankNode ; rml:reference "country" ] ;
+    rml:predicateObjectMap [
+        rml:predicateMap [ rml:constant ex:updated ] ;
+        rml:objectMap [ rml:reference "updated" ; rml:datatype xsd:long ]
+    ] .
+
+
+
+
 
 #ex:neo4jTest
 #      a            fd:FederationMember ;
