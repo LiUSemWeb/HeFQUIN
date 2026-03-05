@@ -22,6 +22,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Bug fix in the base implementation of the bind-join algorithm, which did not correctly implement bag semantics ([#498](https://github.com/LiUSemWeb/HeFQUIN/pull/498)).
 - Bug fix in cardinality-based join reordering ([#501](https://github.com/LiUSemWeb/HeFQUIN/pull/501)).
 - Bug fix in join cardinality estimation ([#501](https://github.com/LiUSemWeb/HeFQUIN/pull/501)).
+- JSON scalar values can now be of type long ([#518](https://github.com/LiUSemWeb/HeFQUIN/pull/518)).
 
 
 ## [0.0.8] - 2026-01-14
