@@ -1,0 +1,33 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX owl:    <http://www.w3.org/2002/07/owl#>
+PREFIX dbo:    <http://dbpedia.org/ontology/>
+PREFIX dbr:    <http://dbpedia.org/resource/>
+PREFIX ex:     <http://example.org/>
+
+# This query joins data from two Web APIs. It first obtains data about
+# Japan from a Web API with country data, including the currency code
+# of the Japanese currency. Thereafter, the query also obtains the
+# current Euro exchange rate for that currency from a Web API with
+# live data about currency exchange rates.
+
+SELECT ?countryName ?capital ?population ?region ?currencyCode ?date ?eurRate WHERE {
+  BIND("Japan" AS ?searchCountry)
+  
+  # Step 1: Get country information by name  
+  SERVICE <http://example.org/CountriesAPIWrapper> PARAMS(?searchCountry AS "country") {
+    ?country ex:countryName ?countryName ;
+             ex:capital ?capital ;
+             ex:population ?population ;
+             ex:region ?region ;
+             ex:currencyCode ?currencyCode .
+  }
+
+  # Step 2: Get exchange rates using currency code of country
+  SERVICE <http://example.org/ExchangeRatesAPIWrapper> PARAMS(?currencyCode AS "base") {
+    ?currency ex:date ?date ; 
+              ex:eurRate ?eurRate .
+  }
+
+}
