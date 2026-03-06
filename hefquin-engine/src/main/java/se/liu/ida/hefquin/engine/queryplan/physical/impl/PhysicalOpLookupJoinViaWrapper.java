@@ -86,6 +86,16 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 			    && gpAdd.getFederationMember() instanceof WrappedRESTEndpoint ep
 			    && ep.isSupportedPattern(gpAdd.getPattern()) )
 			{
+/*
+   I have decided to comment out the following variables-related check, mainly
+   because we can assume that the logical plans are correct (and the variables-
+   related check here is about plan correctness). However, it is also not clear
+   whether we should consider a logical plan with a PARAMS-based gpAdd operator
+   as incorrect only because the PARAMS variables are not certainly-bound by
+   the subplan. In fact, even possible boundedness should not be a requirement.
+   The executable operator will simply drop every input solution mapping that
+   does not have bindings for all PARAMS variables.
+                                                          -Olaf
 				if ( gpAdd.hasParameterVariables() ) {
 					// check that each of the parameter variables is certainly bound
 					final Set<Var> certainInputVars = inputVars[0].getCertainVariables();
@@ -99,6 +109,8 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 				else {
 					return ( ep.getNumberOfParameters() == 0 );
 				}
+*/
+				return true;
 			}
 			else {
 				return false;
