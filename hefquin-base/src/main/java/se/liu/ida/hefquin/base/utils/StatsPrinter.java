@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.base.utils;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.jena.atlas.json.JsonArray;
@@ -128,16 +131,28 @@ public class StatsPrinter
 			return new JsonBoolean(b);
 		}
 
+		if ( entry instanceof AtomicBoolean b ) {
+			return new JsonBoolean( b.get() );
+		}
+
 		if ( entry instanceof Integer i ) {
 			return JsonNumber.value(i);
+		}
+
+		if ( entry instanceof AtomicInteger i ) {
+			return JsonNumber.value( i.get() );
 		}
 
 		if ( entry instanceof Long i ) {
 			return JsonNumber.value(i);
 		}
 
+		if ( entry instanceof AtomicLong i ) {
+			return JsonNumber.value( i.get() );
+		}
+
 		if ( entry instanceof Number num ) {
-			
+
 			if ( num instanceof Double d && (Double.isNaN(d) || Double.isInfinite(d)) ) {
 				return new JsonString( d.toString() );
 			}

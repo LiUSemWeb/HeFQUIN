@@ -196,6 +196,154 @@ _:covid19TM_updated
     ] .
 
 
+# ============================================================
+# Open Library Search API (JSON REST)
+# ============================================================
+
+ex:openLibraryBooks
+      fd:serviceURI <http://example.org/OpenLibraryWrapper> ;
+      fd:interface _:booksEndpoint ;
+      fd:wrapper _:booksWrapper .
+
+_:booksEndpoint a fd:RESTInterface ;
+      fd:iriTemplate [
+            hydra:template "https://openlibrary.org/search.json{?author,limit}" ;
+            hydra:mapping
+                  [ hydra:variable "author" ; hydra:required true ; fd:paramType xsd:string ],
+                  [ hydra:variable "limit" ; hydra:required false ; fd:paramType xsd:integer ]
+          ] .
+
+_:booksWrapper
+      fd:rmlTriplesMaps ( _:bookTitleTM _:bookAuthorTM _:bookPublishedTM _:bookEditionsTM ) .
+
+_:bookTitleTM
+      rml:logicalSource [ rml:source _:booksEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.docs[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/book{key}" ; rml:class ex:Book ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:title ] ;
+                               rml:objectMap [ rml:reference "title" ] ] .
+
+_:bookAuthorTM
+      rml:logicalSource [ rml:source _:booksEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.docs[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/book{key}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:author ] ;
+                               rml:objectMap [ rml:reference "author_name[0]" ] ] .
+
+_:bookPublishedTM
+      rml:logicalSource [ rml:source _:booksEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.docs[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/book{key}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:firstPublished ] ;
+                               rml:objectMap [ rml:reference "first_publish_year" ; rml:datatype xsd:integer ] ] .
+
+_:bookEditionsTM
+      rml:logicalSource [ rml:source _:booksEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.docs[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/book{key}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:editionCount ] ;
+                               rml:objectMap [ rml:reference "edition_count" ; rml:datatype xsd:integer ] ] .
+
+
+# ============================================================
+# REST Countries v2 API - Simpler country information structure
+# Returns country data with currency codes in simpler array format
+# ============================================================
+
+ex:countriesAPI
+      fd:serviceURI <http://example.org/CountriesAPIWrapper> ;
+      fd:interface _:countriesEndpoint ;
+      fd:wrapper _:countriesWrapper .
+
+_:countriesEndpoint a fd:RESTInterface ;
+      fd:iriTemplate [
+            hydra:template "https://restcountries.com/v2/name/{country}" ;
+            hydra:mapping
+                  [ hydra:variable "country" ; hydra:required true ; fd:paramType xsd:string ]
+          ] .
+
+_:countriesWrapper
+      fd:rmlTriplesMaps ( _:countryNameTM _:countryCapitalTM _:countryPopulationTM _:countryCurrencyTM _:countryRegionTM ) .
+
+_:countryNameTM
+      rml:logicalSource [ rml:source _:countriesEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/country/{alpha3Code}" ; rml:class ex:Country ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:countryName ] ;
+                               rml:objectMap [ rml:reference "name" ] ] .
+
+_:countryCapitalTM
+      rml:logicalSource [ rml:source _:countriesEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/country/{alpha3Code}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:capital ] ;
+                               rml:objectMap [ rml:reference "capital" ] ] .
+
+_:countryPopulationTM
+      rml:logicalSource [ rml:source _:countriesEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/country/{alpha3Code}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:population ] ;
+                               rml:objectMap [ rml:reference "population" ; rml:datatype xsd:integer ] ] .
+
+_:countryCurrencyTM
+      rml:logicalSource [ rml:source _:countriesEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/country/{alpha3Code}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:currencyCode ] ;
+                               rml:objectMap [ rml:reference "currencies[0].code" ] ] .
+
+_:countryRegionTM
+      rml:logicalSource [ rml:source _:countriesEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/country/{alpha3Code}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:region ] ;
+                               rml:objectMap [ rml:reference "region" ] ] .
+
+
+# ============================================================
+# Exchange Rates API - Get currency exchange rates
+# ============================================================
+
+ex:exchangeRatesAPI
+      fd:serviceURI <http://example.org/ExchangeRatesAPIWrapper> ;
+      fd:interface _:exchangeEndpoint ;
+      fd:wrapper _:exchangeWrapper .
+
+_:exchangeEndpoint a fd:RESTInterface ;
+      fd:iriTemplate [
+            hydra:template "https://api.exchangerate-api.com/v4/latest/{base}" ;
+            hydra:mapping
+                  [ hydra:variable "base" ; hydra:required true ; fd:paramType xsd:string ]
+          ] .
+
+_:exchangeWrapper
+      fd:rmlTriplesMaps ( _:exchangeRateEURTM _:exchangeDateTM ) .
+
+_:exchangeRateEURTM
+      rml:logicalSource [ rml:source _:exchangeEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$" ] ;
+      rml:subjectMap [ rml:template "http://example.org/exchange/{base}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:eurRate ] ;
+                               rml:objectMap [ rml:reference "rates.EUR" ; rml:datatype xsd:double ] ] .
+
+_:exchangeDateTM
+      rml:logicalSource [ rml:source _:exchangeEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$" ] ;
+      rml:subjectMap [ rml:template "http://example.org/exchange/{base}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:date ] ;
+                               rml:objectMap [ rml:reference "date" ] ] .
 
 
 
