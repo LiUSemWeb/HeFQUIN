@@ -14,6 +14,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.datatypes.xsd.impl.RDFDirLangString;
+import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -223,9 +226,22 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			if ( paramValueAsNode == null ) return null;
 			if ( ! paramValueAsNode.isLiteral() ) return null;
 
+			// Check that the datatype of the literal equals
+			// the datatype expected for the parameter.
 			final RDFDatatype typeOfNode = paramValueAsNode.getLiteralDatatype();
-
-			if ( ! paramDecl.getType().equals(typeOfNode) ) return null;
+			if ( paramDecl.getType().equals(XSDDatatype.XSDstring) ) {
+				// Special case: If the expected datatype is xsd:string but
+				// the actual one is rdf:langString or rdf:dirLangString,
+				// then the value is still accepted.
+				if (    ! typeOfNode.equals(XSDDatatype.XSDstring)
+				     && ! RDFLangString.isRDFLangString(typeOfNode)
+				     && ! RDFDirLangString.isRDFDirLangString(typeOfNode) ) {
+					return null;
+				}
+			}
+			else if ( ! paramDecl.getType().equals(typeOfNode) ) {
+				return null;
+			}
 
 			result.put( paramDecl.getName(), paramValueAsNode );
 		}
