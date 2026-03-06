@@ -13,6 +13,7 @@ import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
@@ -263,7 +264,7 @@ public class FederationDescriptionReader
 				throw new IllegalArgumentException( FDVocab.rmlTriplesMaps.getLocalName() + " property of " + wrapper.toString() + " should be a list." );
 
 			final Iterator<RDFNode> rmTMsIterator = rmlTMsList.as( RDFList.class ).iterator();
-			final Node baseIRI = null;
+			final Node baseIRI = NodeFactory.createURI("http://example.org/FixedBaseIRI/HardcodedInFederationDescriptionReader/");
 			final List<MappingOperator> trMaps = new ArrayList<>();
 			while ( rmTMsIterator.hasNext() ) {
 				final RDFNode tm = rmTMsIterator.next();
