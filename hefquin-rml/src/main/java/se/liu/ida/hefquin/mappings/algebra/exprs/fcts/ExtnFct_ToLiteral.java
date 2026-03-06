@@ -11,7 +11,16 @@ import se.liu.ida.hefquin.mappings.algebra.exprs.ExtensionFunction;
 /**
  * Given a string literal and a datatype IRI, returns a literal whose
  * lexical form is the lexical form of the given string literal and
- * whose datatype IRI is the IRI given as second argument.
+ * whose datatype IRI is the IRI given as second argument. Additionally,
+ * for the sake of robustness, the function also works for the following
+ * two types of cases:
+ * <p>
+ * First, if the given literal is not a string literal but of the same
+ * type as the given datatype IRI, then simply return that literal.
+ * <p>
+ * Second, if the given literal is not a string literal but the given
+ * datatype IRI is xsd:string, then simply use the lexical form of the
+ * given literal to create an xsd:string literal.
  */
 public class ExtnFct_ToLiteral implements ExtensionFunction
 {
@@ -32,7 +41,9 @@ public class ExtnFct_ToLiteral implements ExtensionFunction
 			final RDFDatatype dtArg1 = args[0].getLiteralDatatype();
 			final RDFDatatype dt = NodeFactory.getType( args[1].getURI() );
 
-			if ( dtArg1.equals(XSDDatatype.XSDstring) || dtArg1.equals(dt) ) {
+			if (    dtArg1.equals(XSDDatatype.XSDstring)
+			     || dtArg1.equals(dt)                     // first extra case
+			     || dt.equals(XSDDatatype.XSDstring) ) {  // second extra case
 				final String lex = args[0].getLiteralLexicalForm();
 
 				return NodeFactory.createLiteralDT(lex, dt);
