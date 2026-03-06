@@ -196,6 +196,57 @@ _:covid19TM_updated
     ] .
 
 
+# ============================================================
+# Endpoint 2: Open Library Search API (JSON REST)
+# API: https://openlibrary.org/search.json?author={author}
+# ============================================================
+ex:openLibraryBooks
+      fd:serviceURI <http://example.org/OpenLibraryWrapper> ;
+      fd:interface _:booksEndpoint ;
+      fd:wrapper _:booksWrapper .
+
+_:booksEndpoint a fd:RESTInterface ;
+      fd:iriTemplate [
+            hydra:template "https://openlibrary.org/search.json{?author,limit}" ;
+            hydra:mapping
+                  [ hydra:variable "author" ; hydra:required true ; fd:paramType xsd:string ],
+                  [ hydra:variable "limit" ; hydra:required false ; fd:paramType xsd:integer ]
+          ] .
+
+_:booksWrapper
+      fd:rmlTriplesMaps ( _:bookTitleTM _:bookAuthorTM _:bookPublishedTM _:bookEditionsTM ) .
+
+_:bookTitleTM
+      rml:logicalSource [ rml:source _:booksEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.docs[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/book{key}" ; rml:class ex:Book ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:title ] ;
+                               rml:objectMap [ rml:reference "title" ] ] .
+
+_:bookAuthorTM
+      rml:logicalSource [ rml:source _:booksEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.docs[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/book{key}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:author ] ;
+                               rml:objectMap [ rml:reference "author_name[0]" ] ] .
+
+_:bookPublishedTM
+      rml:logicalSource [ rml:source _:booksEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.docs[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/book{key}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:firstPublished ] ;
+                               rml:objectMap [ rml:reference "first_publish_year" ; rml:datatype xsd:integer ] ] .
+
+_:bookEditionsTM
+      rml:logicalSource [ rml:source _:booksEndpoint ;
+                          rml:referenceFormulation rml:JSONPath ;
+                          rml:iterator "$.docs[*]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/book{key}" ];
+      rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:editionCount ] ;
+                               rml:objectMap [ rml:reference "edition_count" ; rml:datatype xsd:integer ] ] .
 
 
 
