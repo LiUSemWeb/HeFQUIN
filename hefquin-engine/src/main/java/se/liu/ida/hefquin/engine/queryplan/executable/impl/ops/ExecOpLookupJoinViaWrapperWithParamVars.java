@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -51,7 +50,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	public final static int DEFAULT_INPUT_BLOCK_SIZE = 5;
 
 	protected final SPARQLGraphPattern pattern;
-	protected final Map<String,Var> paramVars;
+	protected final Map<RESTEndpoint.Parameter,Var> paramVars;
 	protected final WrappedRESTEndpoint fm;
 
 	protected final ConcurrentMap<Map<String,Node>, List<SolutionMapping>> cache = new ConcurrentHashMap<>();
@@ -92,8 +91,19 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		assert paramVars.size() <= fm.getNumberOfParameters();
 
 		this.pattern = pattern;
-		this.paramVars = paramVars;
 		this.fm = fm;
+
+		this.paramVars = new HashMap<>();
+		for ( final Map.Entry<String,Var> e : paramVars.entrySet() ) {
+			final String paramVarName = e.getKey();
+			final Var paramVar = e.getValue();
+
+			final RESTEndpoint.Parameter paramDecl = fm.getParameterByName(paramVarName);
+			if ( paramDecl == null )
+				throw new IllegalArgumentException("Unknown parameter name (" + paramVarName + ")");
+
+			this.paramVars.put(paramDecl, paramVar);
+		}
 	}
 
 	@Override
@@ -205,24 +215,19 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 		final Map<String, Node> result = new HashMap<>();
 
-		final Iterator<Map.Entry<String,Var>> it  = paramVars.entrySet().iterator();
-		while ( it.hasNext() ) {
-			final Map.Entry<String,Var> entry = it.next();
-			final String paramVarName = entry.getKey();
-			final Var paramVar = entry.getValue();
+		for ( final Map.Entry<RESTEndpoint.Parameter,Var> e : paramVars.entrySet() ) {
+			final RESTEndpoint.Parameter paramDecl = e.getKey();
+			final Var paramVar = e.getValue();
+
 			final Node paramValueAsNode = solmap.get(paramVar);
-
-			if (paramValueAsNode == null) return null;
-			if (!paramValueAsNode.isLiteral()) return null;
-
-			final RESTEndpoint.Parameter paramDecl = fm.getParameterByName(paramVarName);
-			if (paramDecl == null) return null;
+			if ( paramValueAsNode == null ) return null;
+			if ( ! paramValueAsNode.isLiteral() ) return null;
 
 			final RDFDatatype typeOfNode = paramValueAsNode.getLiteralDatatype();
 
-			if (!paramDecl.getType().equals(typeOfNode)) return null;
+			if ( ! paramDecl.getType().equals(typeOfNode) ) return null;
 
-			result.put(paramVarName, paramValueAsNode);
+			result.put( paramDecl.getName(), paramValueAsNode );
 		}
 
 		return result;
