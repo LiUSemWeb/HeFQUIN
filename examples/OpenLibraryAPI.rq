@@ -13,8 +13,7 @@ PREFIX ex:     <http://example.org/>
 # Graph and, then, uses these names to request information about books
 # authored by these winners from the Web API.
 
-#SELECT ?authorName ?bookTitle ?publishYear WHERE {
-SELECT * WHERE {
+SELECT ?authorName ?bookTitle ?publishYear WHERE {
   BIND(3 AS ?bookLimit)
 
   SERVICE <http://dbpedia.org/sparql> {
@@ -23,12 +22,9 @@ SELECT * WHERE {
     FILTER( lang(?authorName) = "en" )
   }
 
-FILTER ( CONTAINS(?authorName, "Annie" ) )
-
   SERVICE <http://example.org/OpenLibraryWrapper> PARAMS( ?authorName AS "author",
                                                           ?bookLimit AS "limit" ) {
-#    ?book ex:title ?bookTitle ;
-#          ex:firstPublished ?publishYear .
-?s ?p ?o
+    ?book ex:title ?bookTitle ;
+          ex:firstPublished ?publishYear .
   }
 }
