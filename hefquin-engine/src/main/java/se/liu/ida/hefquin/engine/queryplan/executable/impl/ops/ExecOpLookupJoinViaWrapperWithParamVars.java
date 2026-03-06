@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import org.apache.jena.datatypes.RDFDatatype;
@@ -55,12 +58,12 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 	// statistics
 	private long numberOfRequestsIssued = 0L;
-	private long numberOfRequestsFailed = 0L;
-	private List<Integer> errorCodesOfFailedRequests = new ArrayList<>();
-	private long sumOfRequestExecutionTimes = 0L;
-	private long sumOfResponseProcTimes = 0L;
-	private long numberOfOutputMappingsProduced = 0L;
-	private int numberOfDataConversionExceptions = 0;
+	private AtomicLong numberOfRequestsFailed = new AtomicLong(0L);
+	private List<Integer> errorCodesOfFailedRequests = Collections.synchronizedList( new ArrayList<>() );
+	private AtomicLong sumOfRequestExecutionTimes = new AtomicLong(0L);
+	private AtomicLong sumOfResponseProcTimes = new AtomicLong(0L);
+	private AtomicLong numberOfOutputMappingsProduced = new AtomicLong(0L);
+	private AtomicInteger numberOfDataConversionExceptions =new AtomicInteger(0);
 
 
 	public ExecOpLookupJoinViaWrapperWithParamVars( final SPARQLGraphPattern pattern,
@@ -266,7 +269,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			// solution mappings (see 'solmaps') can be dropped and, thus,
 			// we can immediately stop at this point.
 			if ( response.isError() ) {
-				numberOfRequestsFailed++;
+				numberOfRequestsFailed.incrementAndGet();
 				errorCodesOfFailedRequests.add( response.getErrorStatusCode() );
 				return;
 			}
@@ -288,7 +291,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 				resultingSolMaps = fm.evaluatePatternOverRDFView(pattern, respData);
 			}
 			catch ( final DataConversionException e ) {
-				numberOfDataConversionExceptions++;
+				numberOfDataConversionExceptions.incrementAndGet();
 				final ExecOpExecutionException ex = new ExecOpExecutionException( "Converting the reponse of a REST request into RDF failed (message: " + e.getMessage() + ").", e, op );
 				recordExceptionCaughtDuringExecution( ex );
 				return;
@@ -303,8 +306,8 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 			final long time2 = System.currentTimeMillis();
 
-			sumOfRequestExecutionTimes += response.getRequestDuration().toMillis();
-			sumOfResponseProcTimes += time2 - time1;
+			sumOfRequestExecutionTimes.addAndGet( response.getRequestDuration().toMillis() );
+			sumOfResponseProcTimes.addAndGet( time2 - time1 );
 		}
 	}
 
@@ -340,7 +343,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			if ( SolutionMappingUtils.compatible(sm, sm2) ) {
 				final SolutionMapping out = SolutionMappingUtils.merge(sm, sm2);
 				sink.send(out);
-				numberOfOutputMappingsProduced++;
+				numberOfOutputMappingsProduced.incrementAndGet();
 			}
 		}
 	}
@@ -350,12 +353,12 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		super.resetStats();
 
 		numberOfRequestsIssued = 0L;
-		numberOfRequestsFailed = 0L;
+		numberOfRequestsFailed.set(0L);
 		errorCodesOfFailedRequests.clear();
-		sumOfRequestExecutionTimes = 0L;
-		sumOfResponseProcTimes = 0L;
-		numberOfOutputMappingsProduced = 0L;
-		numberOfDataConversionExceptions = 0;
+		sumOfRequestExecutionTimes.set(0L);
+		sumOfResponseProcTimes.set(0L);
+		numberOfOutputMappingsProduced.set(0L);
+		numberOfDataConversionExceptions.set(0);
 	}
 
 	@Override
@@ -369,8 +372,8 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		double avgRequestExecTime = Double.NaN;
 		double avgResponseProcTimes = Double.NaN;
 		if ( numberOfRequestsIssued > 0L ) {
-			avgRequestExecTime = sumOfRequestExecutionTimes / numberOfRequestsIssued;
-			avgResponseProcTimes = sumOfResponseProcTimes / numberOfRequestsIssued;
+			avgRequestExecTime = sumOfRequestExecutionTimes.get() / numberOfRequestsIssued;
+			avgResponseProcTimes = sumOfResponseProcTimes.get() / numberOfRequestsIssued;
 		}
 
 		s.put( "avgRequestExecTime",    avgRequestExecTime );
