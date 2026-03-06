@@ -1,9 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.Set;
-
-import org.apache.jena.sparql.core.Var;
-
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpLookupJoinViaWrapperWithParamVars;
