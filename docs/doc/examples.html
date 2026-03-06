@@ -139,6 +139,20 @@
             </p>
             <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/Covid19Stats.rq --printQueryProcStats</code></pre>
 
+            <h4 id="OpenLibraryAPI"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/OpenLibraryAPI.rq">OpenLibraryAPI</a></h4>
+            <p>
+                This query accesses the Web API of the <a href="https://openlibrary.org/">Open Library</a> Website by using requests that are formed based on data obtained from a SPARQL endpoint. More specifically, the query obtains the names of winners of the Nobel Prize in Literature from the SPARQL endpoint of the DBpedia Knowledge Graph and, then, uses these names to request information about books authored by these winners from the Web API.
+                Run the query as follows:
+            </p>
+            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/OpenLibraryAPI.rq</code></pre>
+
+            <h4 id="CurrencyViaAPIs"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/CurrencyViaAPIs.rq">CurrencyViaAPIs</a></h4>
+            <p>
+                This query joins data from two Web APIs. It first obtains data about Japan from the Web API of the <a href="https://restcountries.com/">REST Countries service</a>, including the currency code of the Japanese currency. Thereafter, the query also obtains the current Euro exchange rate for that currency from the <a href="https://www.exchangerate-api.com/">Exchange Rate API</a>.
+                Run the query as follows:
+            </p>
+            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/CurrencyViaAPIs.rq</code></pre>
+
         </section>
 
 <!--
