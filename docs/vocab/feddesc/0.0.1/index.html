@@ -302,6 +302,9 @@ ul, p {
       },
       {
         "@value": "Robin Keskisärkkä"
+      },
+      {
+        "@value": "Jonas Westman"
       }
     ],
     "https://schema.org/description": [
@@ -348,6 +351,7 @@ ul, p {
               <ul>
                 <li><p>Olaf Hartig</p></li>
                 <li><p>Robin Keskisärkkä</p></li>
+                <li><p>Jonas Westman</p></li>
               </ul>
             </dd>
           </div>
@@ -386,6 +390,12 @@ ul, p {
                 <ul>
                   <li>
                     <span>
+                      <a href="#serviceURI">service URI</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
                       <a href="#interface">interface</a>
                       <sup class="sup-p" title="RDF Property">p</sup>
                     </span>
@@ -403,6 +413,58 @@ ul, p {
                     </span>
                   </li>
                 </ul>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/superClassOf" title="Inverse of RDFS' subClassOf. Defined in Ontology Documentation Profile">Super Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#WrappedFederationMember">Wrapped Federation Member</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="WrappedFederationMember">
+          <h3>Wrapped Federation Member
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#WrappedFederationMember</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>An federation member that is accessed via a wrapper.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#FederationMember">Federation Member</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#wrapper">wrapper</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
               </td>
             </tr>
           </table>
@@ -449,6 +511,12 @@ ul, p {
                   </li>
                   <li>
                     <span>
+                      <a href="#MultipleEndpointsInterface">Multiple-Endpoints Interface</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
                       <a href="#FragmentInterface">Fragment Interface</a>
                       <sup class="sup-c" title="OWL/RDFS Class">c</sup>
                     </span>
@@ -473,7 +541,7 @@ ul, p {
               <th>
                 <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
               </th>
-              <td><p>An endpoint interface is an interface that can be accessed via a single HTTP endpoint. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class.</p></td>
+              <td><p>An endpoint interface is an interface that can be accessed via a single HTTP endpoint. This class is a superclass of any kind of endpoint interface and should not be used directly within federation descriptions. Concrete types of endpoint interfaces, to be used in federation descriptions, are captured by the subclasses of this class.</p></td>
             </tr>
             <tr>
               <th>
@@ -506,6 +574,12 @@ ul, p {
                   <li>
                     <span>
                       <a href="#SPARQLEndpointInterface">SPARQL Endpoint Interface</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#RESTInterface">REST Endpoint Interface</a>
                       <sup class="sup-c" title="OWL/RDFS Class">c</sup>
                     </span>
                   </li>
@@ -551,6 +625,77 @@ ul, p {
                 <span>
                   <a href="#EndpointInterface">Endpoint Interface</a>
                   <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="MultipleEndpointsInterface">
+          <h3>Multiple-Endpoints Interface
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#MultipleEndpointsInterface</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>An interface that can be accessed via multiple HTTP endpoints. This class is a superclass of any kind of such interface and should not be used directly within federation descriptions. Concrete types of such interfaces, to be used in federation descriptions, are captured by the subclasses of this class.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#Interface">Interface</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="RESTInterface">
+          <h3>REST Endpoint Interface
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#RESTInterface</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>An interface to access a federation member that provides a REST API.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#EndpointInterface">Endpoint Interface</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#iriTemplate">iri template</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
                 </span>
               </td>
             </tr>
@@ -738,9 +883,88 @@ ul, p {
             </tr>
           </table>
         </div>
+        <div class="property entity" id="Wrapper">
+          <h3>Wrapper
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#Wrapper</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>A wrapper provides access to federation members that do not support RDF and SPARQL natively.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#rmlTriplesMaps">RML triples maps</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#wrapper">wrapper</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
       <div class="section" id="properties">
         <h2>Properties</h2>
+        <div class="property entity" id="serviceURI">
+          <h3>service URI
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#serviceURI</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>The URI via which the federation member is identified in a SERVICE clause.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#FederationMember">Federation Member</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2001/XMLSchema#anyURI">xsd:anyURI</a>
+              </td>
+            </tr>
+          </table>
+        </div>
         <div class="property entity" id="interface">
           <h3>interface
             <sup class="sup-p" title="RDF Property">p</sup>
@@ -820,6 +1044,79 @@ ul, p {
             </tr>
           </table>
         </div>
+        <div class="property entity" id="iriTemplate">
+          <h3>iri template
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#iriTemplate</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>The template for creating IRIs of endpoints of the federation member.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#RESTInterface">REST Endpoint Interface</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/ns/hydra/core#IriTemplate">hydra:IriTemplate</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="typeoftemplateparameter">
+          <h3>type of template parameter
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#paramType</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>The type of values to be used for a variable part of an IRI template, which is expected to be specified as a datatype IRI (e.g., xsd:string, xsd:float).</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/ns/hydra/core#IriTemplateMapping">hydra:IriTemplateMapping</a>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource">rdf:Resource</a>
+              </td>
+            </tr>
+          </table>
+        </div>
         <div class="property entity" id="exampleFragmentAddress">
           <h3>example fragment address
             <sup class="sup-p" title="RDF Property">p</sup>
@@ -891,7 +1188,7 @@ ul, p {
                 <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
               </th>
               <td>
-                <a href="http://www.w3.org/2001/XMLSchema#anyURI">xsd:anyURI</a>
+                <a href="http://www.w3.org/2001/XMLSchema#string">xsd:string</a>
               </td>
             </tr>
           </table>
@@ -934,6 +1231,85 @@ ul, p {
             </tr>
           </table>
         </div>
+        <div class="property entity" id="wrapper">
+          <h3>wrapper
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#wrapper</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>The wrapper of a wrapped federation member.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#WrappedFederationMember">Wrapped Federation Member</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#Wrapper">Wrapper</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="rmlTriplesMaps">
+          <h3>RML triples maps
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#rmlTriplesMaps</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>List of RML triples maps that define the mapping for a wrapper. The elements of such a list are expected to be of type rml:TriplesMap. ATTENTION: for the time being, these triples maps must all be normalized as per the definition in Section 5 of the paper titled 'An Algebraic Foundation for Knowledge Graph Construction'.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#Wrapper">Wrapper</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#List">List</a>
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
       <div id="namespaces">
         <h2>Namespaces</h2>
@@ -949,6 +1325,10 @@ ul, p {
           <dt id="fd">fd</dt>
           <dd>
             <code>http://w3id.org/hefquin/feddesc#</code>
+          </dd>
+          <dt id="hydra">hydra</dt>
+          <dd>
+            <code>http://www.w3.org/ns/hydra/core#</code>
           </dd>
           <dt id="ns1">ns1</dt>
           <dd>
@@ -1024,6 +1404,9 @@ ul, p {
               <a href="#FederationMember">Federation Member</a>
             </li>
             <li>
+              <a href="#WrappedFederationMember">Wrapped Federation Member</a>
+            </li>
+            <li>
               <a href="#Interface">Interface</a>
             </li>
             <li>
@@ -1031,6 +1414,12 @@ ul, p {
             </li>
             <li>
               <a href="#SPARQLEndpointInterface">SPARQL Endpoint Interface</a>
+            </li>
+            <li>
+              <a href="#MultipleEndpointsInterface">Multiple-Endpoints Interface</a>
+            </li>
+            <li>
+              <a href="#RESTInterface">REST Endpoint Interface</a>
             </li>
             <li>
               <a href="#FragmentInterface">Fragment Interface</a>
@@ -1047,6 +1436,9 @@ ul, p {
             <li>
               <a href="#GraphQLEndpointInterface">GraphQL Endpoint Interface</a>
             </li>
+            <li>
+              <a href="#Wrapper">Wrapper</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -1055,10 +1447,19 @@ ul, p {
           </h4>
           <ul class="second">
             <li>
+              <a href="#serviceURI">service URI</a>
+            </li>
+            <li>
               <a href="#interface">interface</a>
             </li>
             <li>
               <a href="#endpointAddress">endpoint address</a>
+            </li>
+            <li>
+              <a href="#iriTemplate">iri template</a>
+            </li>
+            <li>
+              <a href="#typeoftemplateparameter">type of template parameter</a>
             </li>
             <li>
               <a href="#exampleFragmentAddress">example fragment address</a>
@@ -1068,6 +1469,12 @@ ul, p {
             </li>
             <li>
               <a href="#mappingConfiguration">mapping configuration</a>
+            </li>
+            <li>
+              <a href="#wrapper">wrapper</a>
+            </li>
+            <li>
+              <a href="#rmlTriplesMaps">RML triples maps</a>
             </li>
           </ul>
         </li>
@@ -1084,6 +1491,9 @@ ul, p {
             </li>
             <li>
               <a href="#fd">fd</a>
+            </li>
+            <li>
+              <a href="#hydra">hydra</a>
             </li>
             <li>
               <a href="#ns1">ns1</a>

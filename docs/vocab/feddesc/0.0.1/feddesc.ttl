@@ -4,12 +4,14 @@
 @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
 @prefix dc:     <http://purl.org/dc/elements/1.1/> .
 @prefix fd:     <http://w3id.org/hefquin/feddesc#> .
+@prefix hydra:  <http://www.w3.org/ns/hydra/core#> .
 
 <http://w3id.org/hefquin/feddesc>
     rdf:type owl:Ontology ;
     dc:creator       "Olaf Hartig",
-                     "Robin Keskisärkkä" ;
-    dc:date          "2025-05-05" ;
+                     "Robin Keskisärkkä",
+                     "Jonas Westman" ;
+    dc:date          "2026-03-06" ;
     dc:format        "RDF" ;
     dc:identifier    <http://w3id.org/hefquin/feddesc> ;
     dc:title         "Federation Description Vocabulary for HeFQUIN"@en ;
@@ -23,6 +25,11 @@ fd:FederationMember a owl:Class ;
     rdfs:label "Federation Member"@en ;
     rdfs:comment "An entity that is part of the federation and provides data via a specific interface."@en .
 
+fd:WrappedFederationMember a owl:Class ;
+    rdfs:subClassOf fd:FederationMember ;
+    rdfs:label "Wrapped Federation Member"@en ;
+    rdfs:comment "An federation member that is accessed via a wrapper."@en .
+
 fd:Interface a owl:Class ;
     rdfs:label "Interface"@en ;
     rdfs:comment "An interface is a means to issue data retrieval requests to a federation member. This class is a superclass of any kind of interface and should not be used directly within federation descriptions. Concrete types of interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
@@ -30,12 +37,22 @@ fd:Interface a owl:Class ;
 fd:EndpointInterface a owl:Class ;
     rdfs:subClassOf fd:Interface ;
     rdfs:label "Endpoint Interface"@en ;
-    rdfs:comment "An endpoint interface is an interface that can be accessed via a single HTTP endpoint. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
+    rdfs:comment "An endpoint interface is an interface that can be accessed via a single HTTP endpoint. This class is a superclass of any kind of endpoint interface and should not be used directly within federation descriptions. Concrete types of endpoint interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
 
 fd:SPARQLEndpointInterface a owl:Class ;
     rdfs:subClassOf fd:EndpointInterface ;
     rdfs:label "SPARQL Endpoint Interface"@en ;
     rdfs:comment "An interface to access a federation member via the SPARQL protocol."@en .
+
+fd:MultipleEndpointsInterface a owl:Class ;
+    rdfs:subClassOf fd:Interface ;
+    rdfs:label "Multiple-Endpoints Interface"@en ;
+    rdfs:comment "An interface that can be accessed via multiple HTTP endpoints. This class is a superclass of any kind of such interface and should not be used directly within federation descriptions. Concrete types of such interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
+
+fd:RESTInterface a owl:Class ;
+    rdfs:subClassOf fd:EndpointInterface ;
+    rdfs:label "REST Endpoint Interface"@en ;
+    rdfs:comment "An interface to access a federation member that provides a REST API."@en .
 
 fd:FragmentInterface a owl:Class ;
     rdfs:subClassOf fd:Interface ;
@@ -62,7 +79,17 @@ fd:GraphQLEndpointInterface a owl:Class ;
     rdfs:label "GraphQL Endpoint Interface"@en ;
     rdfs:comment "An interface to access a federation member via a GraphQL API."@en .
 
+fd:Wrapper a owl:Class ;
+    rdfs:label "Wrapper"@en ;
+    rdfs:comment "A wrapper provides access to federation members that do not support RDF and SPARQL natively."@en .
+
 ### ===== PROPERTY DECLARATIONS =====
+
+fd:serviceURI a rdf:Property ;
+    rdfs:domain fd:FederationMember ;
+    rdfs:range  xsd:anyURI ;
+    rdfs:label "service URI"@en ;
+    rdfs:comment "The URI via which the federation member is identified in a SERVICE clause."@en .
 
 fd:interface a rdf:Property ;
     rdfs:domain fd:FederationMember ;
@@ -76,6 +103,18 @@ fd:endpointAddress a rdf:Property ;
     rdfs:label "endpoint address"@en ;
     rdfs:comment "The network address (URI) of the endpoint of the federation member."@en .
 
+fd:iriTemplate a rdf:Property ;
+    rdfs:domain fd:RESTInterface ;
+    rdfs:range  hydra:IriTemplate ;
+    rdfs:label "iri template"@en ;
+    rdfs:comment "The template for creating IRIs of endpoints of the federation member."@en .
+
+fd:paramType a rdf:Property ;
+    rdfs:domain hydra:IriTemplateMapping ;
+    rdfs:range  rdf:Resource ;
+    rdfs:label "type of template parameter"@en ;
+    rdfs:comment "The type of values to be used for a variable part of an IRI template, which is expected to be specified as a datatype IRI (e.g., xsd:string, xsd:float)."@en .
+
 fd:exampleFragmentAddress a rdf:Property ;
     rdfs:domain fd:FragmentInterface ;
     rdfs:range  xsd:anyURI ;
@@ -84,7 +123,7 @@ fd:exampleFragmentAddress a rdf:Property ;
 
 fd:vocabularyMappingsFile a rdf:Property ;
     rdfs:domain fd:FederationMember ;
-    rdfs:range  xsd:anyURI ;
+    rdfs:range  xsd:string ;
     rdfs:label "vocabulary mappings file"@en ;
     rdfs:comment "Path to a file with RDF mappings to align different vocabularies."@en .
 
@@ -93,3 +132,15 @@ fd:mappingConfiguration a rdf:Property ;
     rdfs:range  rdf:Resource ;
     rdfs:label "mapping configuration"@en ;
     rdfs:comment "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, LPG)."@en .
+
+fd:wrapper a rdf:Property ;
+    rdfs:domain fd:WrappedFederationMember ;
+    rdfs:range  fd:Wrapper ;
+    rdfs:label "wrapper"@en ;
+    rdfs:comment "The wrapper of a wrapped federation member."@en .
+
+fd:rmlTriplesMaps a rdf:Property ;
+    rdfs:domain fd:Wrapper ;
+    rdfs:range  rdf:List ;
+    rdfs:label "RML triples maps"@en ;
+    rdfs:comment "List of RML triples maps that define the mapping for a wrapper. The elements of such a list are expected to be of type rml:TriplesMap. ATTENTION: for the time being, these triples maps must all be normalized as per the definition in Section 5 of the paper titled 'An Algebraic Foundation for Knowledge Graph Construction'."@en .

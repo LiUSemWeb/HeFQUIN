@@ -463,6 +463,18 @@ ul, p {
                   </li>
                   <li>
                     <span>
+                      <a href="#LogicalToPhysicalPlanConverter">Logical-to-Physical Plan Converter</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#LogicalToPhysicalOpConverter">Logical-to-Physical Operator Converter</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
                       <a href="#PlanCompiler">Plan Compiler</a>
                       <sup class="sup-c" title="OWL/RDFS Class">c</sup>
                     </span>
@@ -735,17 +747,6 @@ ul, p {
                 </span>
               </td>
             </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
-              </th>
-              <td>
-                <span>
-                  <a href="#DefaultFederationAccessManager">ec:DefaultFederationAccessManager</a>
-                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
-                </span>
-              </td>
-            </tr>
           </table>
         </div>
         <div class="property entity" id="QueryProcessor">
@@ -844,17 +845,6 @@ ul, p {
                 </span>
               </td>
             </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
-              </th>
-              <td>
-                <span>
-                  <a href="#DefaultCostModel">ec:DefaultCostModel</a>
-                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
-                </span>
-              </td>
-            </tr>
           </table>
         </div>
         <div class="property entity" id="QueryPlanner">
@@ -880,6 +870,18 @@ ul, p {
               </th>
               <td>
                 <ul>
+                  <li>
+                    <span>
+                      <a href="#lptoppConverter">logical-to-physical plan converter</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#loptopopConverter">logical-to-physical operator converter</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
                   <li>
                     <span>
                       <a href="#sourcePlanner">source planner</a>
@@ -947,17 +949,6 @@ ul, p {
                 </span>
               </td>
             </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
-              </th>
-              <td>
-                <span>
-                  <a href="#DefaultSourcePlanner">ec:DefaultSourcePlanner</a>
-                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
-                </span>
-              </td>
-            </tr>
           </table>
         </div>
         <div class="property entity" id="LogicalOptimizer">
@@ -990,17 +981,6 @@ ul, p {
                 <span>
                   <a href="#logicalOptimizer">logical optimizer</a>
                   <sup class="sup-p" title="RDF Property">p</sup>
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
-              </th>
-              <td>
-                <span>
-                  <a href="#DefaultLogicalOptimizer">ec:DefaultLogicalOptimizer</a>
-                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
                 </span>
               </td>
             </tr>
@@ -1039,14 +1019,73 @@ ul, p {
                 </span>
               </td>
             </tr>
+          </table>
+        </div>
+        <div class="property entity" id="LogicalToPhysicalPlanConverter">
+          <h3>Logical-to-Physical Plan Converter
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#LogicalToPhysicalPlanConverter</code>
+              </td>
+            </tr>
             <tr>
               <th>
-                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
               </th>
               <td>
                 <span>
-                  <a href="#DefaultPhysicalOptimizer">ec:DefaultPhysicalOptimizer</a>
-                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#lptoppConverter">logical-to-physical plan converter</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="LogicalToPhysicalOpConverter">
+          <h3>Logical-to-Physical Operator Converter
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#LogicalToPhysicalOpConverter</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#loptopopConverter">logical-to-physical operator converter</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
                 </span>
               </td>
             </tr>
@@ -1085,17 +1124,6 @@ ul, p {
                 </span>
               </td>
             </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
-              </th>
-              <td>
-                <span>
-                  <a href="#DefaultPlanCompiler">ec:DefaultPlanCompiler</a>
-                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
-                </span>
-              </td>
-            </tr>
           </table>
         </div>
         <div class="property entity" id="ExecutionEngine">
@@ -1128,17 +1156,6 @@ ul, p {
                 <span>
                   <a href="#executionEngine">execution engine</a>
                   <sup class="sup-p" title="RDF Property">p</sup>
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
-              </th>
-              <td>
-                <span>
-                  <a href="#DefaultExecutionEngine">ec:DefaultExecutionEngine</a>
-                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
                 </span>
               </td>
             </tr>
@@ -1305,6 +1322,88 @@ ul, p {
               <td>
                 <span>
                   <a href="#QueryPlanner">Query Planner</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="lptoppConverter">
+          <h3>logical-to-physical plan converter
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#lptoppConverter</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the logical-to-physical plan converter to be used by the query planner.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryPlanner">Query Planner</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#LogicalToPhysicalPlanConverter">Logical-to-Physical Plan Converter</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="loptopopConverter">
+          <h3>logical-to-physical operator converter
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#loptopopConverter</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the logical-to-physical operator converter to be used by the query planner.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryPlanner">Query Planner</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#LogicalToPhysicalOpConverter">Logical-to-Physical Operator Converter</a>
                   <sup class="sup-c" title="OWL/RDFS Class">c</sup>
                 </span>
               </td>
@@ -1835,6 +1934,12 @@ ul, p {
               <a href="#PhysicalOptimizer">Physical Optimizer</a>
             </li>
             <li>
+              <a href="#LogicalToPhysicalPlanConverter">Logical-to-Physical Plan Converter</a>
+            </li>
+            <li>
+              <a href="#LogicalToPhysicalOpConverter">Logical-to-Physical Operator Converter</a>
+            </li>
+            <li>
               <a href="#PlanCompiler">Plan Compiler</a>
             </li>
             <li>
@@ -1858,6 +1963,12 @@ ul, p {
             </li>
             <li>
               <a href="#queryPlanner">query planner</a>
+            </li>
+            <li>
+              <a href="#lptoppConverter">logical-to-physical plan converter</a>
+            </li>
+            <li>
+              <a href="#loptopopConverter">logical-to-physical operator converter</a>
             </li>
             <li>
               <a href="#planCompiler">plan compiler</a>
