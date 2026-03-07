@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -43,8 +44,9 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	private long maxRightProcessingTime              = 0L;
 	protected long timeAtCurrentRightProcStart       = 0L;
 
-	public BinaryExecutableOpBase( final boolean collectExceptions ) {
-		super(collectExceptions);
+	public BinaryExecutableOpBase( final boolean collectExceptions,
+	                               final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 	}
 
 	@Override
@@ -306,6 +308,9 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 		s.put( "averageProcTimePerRightInputBlock",    Double.valueOf(avgProcTimeRight) );
 		s.put( "minimumProcTimePerRightInputBlock",    Long.valueOf(minRightProcessingTime) );
 		s.put( "maximumProcTimePerRightInputBlock",    Long.valueOf(maxRightProcessingTime) );
+
+		s.put( "queryPlanningInfo",    qpInfo );
+
 		return s;
 	}
 }

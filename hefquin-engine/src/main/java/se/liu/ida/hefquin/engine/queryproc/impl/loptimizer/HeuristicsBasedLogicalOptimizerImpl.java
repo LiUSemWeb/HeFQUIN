@@ -13,11 +13,9 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.*;
 public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 {
 	protected final List<HeuristicForLogicalOptimization> heuristics;
-	protected final QueryProcContext ctxt;
 
-	public HeuristicsBasedLogicalOptimizerImpl( final QueryProcContext ctxt, final List<HeuristicForLogicalOptimization> heuristics ) {
-		assert ctxt != null;
-		this.ctxt = ctxt;
+	public HeuristicsBasedLogicalOptimizerImpl( final List<HeuristicForLogicalOptimization> heuristics ) {
+		assert heuristics != null;
 		this.heuristics = heuristics;
 	}
 
@@ -59,7 +57,9 @@ public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 	}
 
 	@Override
-	public LogicalPlan optimize( final LogicalPlan inputPlan, final boolean keepNaryOperators ) throws LogicalOptimizationException {
+	public LogicalPlan optimize( final LogicalPlan inputPlan,
+	                             final boolean keepNaryOperators,
+	                             final QueryProcContext ctxt ) throws LogicalOptimizationException {
 		LogicalPlan resultPlan = inputPlan;
 		for ( final HeuristicForLogicalOptimization h : heuristics ) {
 			resultPlan = h.apply(resultPlan);

@@ -1,0 +1,35 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX owl:    <http://www.w3.org/2002/07/owl#>
+PREFIX dbo:    <http://dbpedia.org/ontology/>
+
+# This is also essentially the same as the previous two queries. The difference
+# now is that this one uses VALUES clauses to specify the federation members.
+# Notice that, while there are two separate VALUES clauses here, it is also
+# possible to merge them into one VALUE clause:
+#   VALUES (?s1 ?s2) { (<http://dbpedia.org/sparql> <https://query.wikidata.org/sparql>) }
+#
+# In the query plan for this query, you can see that the service IRIs from the
+# VALUES clause(s) become an explicit argument of the corresponding operators
+# (request operators and gpAdd operators). Hence, if there are multiple values
+# for a service variable, HeFQUIN creates separate subplans with dedicated
+# operators for all mentioned federation members, which makes it possible to
+# optimize these subplans differently.
+
+SELECT * WHERE {
+	VALUES ?s1 { <http://dbpedia.org/sparql> }
+	#VALUES ?s1 { <http://fragments.dbpedia.org/2016-04/en> }
+
+	SERVICE ?s1 {
+		<http://dbpedia.org/resource/Berlin> dbo:country ?c .
+		?c owl:sameAs ?cc
+		FILTER ( CONTAINS(STR(?cc), "wikidata" ) )
+	}
+
+	VALUES ?s2 { <https://query.wikidata.org/sparql> }
+
+	SERVICE ?s2 {
+		?cc rdfs:label ?o
+	}
+}

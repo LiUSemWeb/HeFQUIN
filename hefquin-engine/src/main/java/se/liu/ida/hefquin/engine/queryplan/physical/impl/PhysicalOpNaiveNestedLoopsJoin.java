@@ -3,7 +3,11 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpNaiveNestedLoopsJoin;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
@@ -20,19 +24,18 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  */
 public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 {
-	public PhysicalOpNaiveNestedLoopsJoin( final LogicalOpJoin lop ) {
-		super(lop);
-	}
+	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
 
-	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpNaiveNestedLoopsJoin && ((PhysicalOpNaiveNestedLoopsJoin) o).lop.equals(lop);
-	}
+	private static PhysicalOpNaiveNestedLoopsJoin singleton = null;
+
+	protected PhysicalOpNaiveNestedLoopsJoin() { }
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                        final QueryPlanningInfo qpInfo,
 	                                        final ExpectedVariables... inputVars ) {
-		return new ExecOpNaiveNestedLoopsJoin(collectExceptions);
+		return new ExecOpNaiveNestedLoopsJoin(collectExceptions, qpInfo);
 	}
 
 	@Override
@@ -41,7 +44,40 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof PhysicalOpNaiveNestedLoopsJoin;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ getLogicalOperator().hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> naiveNestedLoop ";
+		return "naiveNLJ";
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			return ( lop instanceof LogicalOpJoin );
+		}
+
+		@Override
+		public PhysicalOpNaiveNestedLoopsJoin create( final BinaryLogicalOp lop ) {
+			if ( lop instanceof LogicalOpJoin ) return getInstance();
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
+
+	public static PhysicalOpNaiveNestedLoopsJoin getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpNaiveNestedLoopsJoin();
+
+		return singleton;
 	}
 }

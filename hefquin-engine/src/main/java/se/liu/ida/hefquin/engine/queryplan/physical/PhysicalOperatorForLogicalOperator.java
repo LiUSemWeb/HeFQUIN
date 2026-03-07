@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical;
 
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 
 /**
@@ -15,4 +16,9 @@ public interface PhysicalOperatorForLogicalOperator extends PhysicalOperator
 	 * Returns the logical operator implemented by this physical operator.
 	 */
 	LogicalOperator getLogicalOperator();
+
+	@Override
+	default ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
+		return getLogicalOperator().getExpectedVariables(inputVars);
+	}
 }

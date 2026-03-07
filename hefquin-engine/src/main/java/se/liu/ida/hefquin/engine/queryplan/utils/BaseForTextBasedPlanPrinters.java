@@ -1,197 +1,165 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.io.PrintStream;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-import org.apache.jena.sparql.expr.Expr;
-import org.apache.jena.sparql.expr.ExprList;
-import org.apache.jena.sparql.util.ExprUtils;
+import org.apache.jena.sparql.core.Var;
 
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.base.utils.PlanPrinter.PrintablePlan;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 
 public class BaseForTextBasedPlanPrinters
 {
-	// The string represents '|'.
-	protected static String singleBase = "\u2502";
-	// The string represents '|   '.
-	protected static String levelIndentBase = "\u2502   ";
-	// The string represents '├── '.
-	protected static String nonLastChildIndentBase = "\u251C\u2500\u2500 ";
-	// The string represents '└── '.
-	protected static String lastChildIndentBase = "\u2514\u2500\u2500 ";
-	protected static String spaceBase = "    ";
+	public static final ShortNameCreator snc = new ShortNameCreator();
 
-	protected String getIndentLevelString( final int planNumber,
-	                                       final int planLevel,
-	                                       final int numberOfSiblings,
-	                                       final String upperRootOpIndentString ) {
-		if ( planLevel == 0 ) {
-			// This is only for the root operator of the overall plan to be printed.
-			return "";
+	/**
+	 * An extension of {@link PrintablePlan} objects that makes it possible
+	 * to record the graph pattern of the root operator of the plan (if any)
+	 * as well as a full-string representation of that pattern. We use the
+	 * latter only for cases in which the full-string representation of the
+	 * pattern was too long to be put as a root-operator property (in which
+	 * case the property that we put is only a shortened version of the full
+	 * string).
+	 */
+	public static class ExtPrintablePlan extends PrintablePlan {
+		public final SPARQLGraphPattern graphPattern;
+		public final String fullStringForGraphPattern;
+
+		public ExtPrintablePlan( final String rootOpAsString,
+		                         final List<String> rootOpProperties,
+		                         final List<PrintablePlan> subPlans,
+		                         final SPARQLGraphPattern graphPattern,
+		                         final String fullStringForGraphPattern ) {
+			super(rootOpAsString, rootOpProperties, subPlans);
+			this.graphPattern = graphPattern;
+			this.fullStringForGraphPattern = fullStringForGraphPattern;
 		}
-
-		if ( upperRootOpIndentString.isEmpty() ) {
-			if ( planNumber < numberOfSiblings-1 ) {
-				return nonLastChildIndentBase;
-			}
-			else {
-				return lastChildIndentBase;
-			}
-		}
-
-		if ( upperRootOpIndentString.endsWith(nonLastChildIndentBase) ) {
-			final String indentLevelString = upperRootOpIndentString.substring( 0, upperRootOpIndentString.length() - nonLastChildIndentBase.length() ) + levelIndentBase;
-
-			if ( planNumber < numberOfSiblings-1 ) {
-				return indentLevelString + nonLastChildIndentBase;
-			}
-			else {
-				return indentLevelString + lastChildIndentBase;
-			}
-		}
-
-		if ( upperRootOpIndentString.endsWith(lastChildIndentBase) ) {
-			final String indentLevelString = upperRootOpIndentString.substring( 0, upperRootOpIndentString.length() - lastChildIndentBase.length() ) + spaceBase;
-			if ( planNumber < numberOfSiblings-1 ) {
-				return indentLevelString + nonLastChildIndentBase;
-			}
-			else {
-				return indentLevelString + lastChildIndentBase;
-			}
-		}
-
-		return "";
 	}
 
-	protected String getIndentLevelStringForDetail( final int planNumber,
-	                                                final int planLevel,
-	                                                final int numberOfSiblings,
-	                                                final int numberOfSubPlans,
-	                                                final String indentLevelString ) {
-		if ( planLevel == 0 ) {
-			if ( numberOfSubPlans > 0 ) {
-				return "";
-			}
-			else {
-				return spaceBase;
-			}
-		}
-
-		if ( indentLevelString == "") {
-			return spaceBase;
-		}
-		else if ( indentLevelString.endsWith(nonLastChildIndentBase) ) {
-			return indentLevelString.substring( 0, indentLevelString.length() - nonLastChildIndentBase.length() ) + levelIndentBase;
-		}
-		else if ( indentLevelString.endsWith(lastChildIndentBase) ) {
-			return indentLevelString.substring( 0, indentLevelString.length() - lastChildIndentBase.length() ) + spaceBase;
-		}
-
-		return "";
+	public void printFullStringsForGraphPatterns( final ExtPrintablePlan pp,
+	                                              final PrintStream out ) {
+		printFullStringsForGraphPatterns( pp, new HashSet<>(), out );
 	}
 
-	protected static void printFederationMember( final FederationMember fm,
-	                                             final String indentString,
-	                                             final PrintStream out ) {
-		out.append( indentString );
-		out.append( "  - fm (" + fm.getInterface().getID() + ") " + fm.getInterface().toString() );
-		out.append( System.lineSeparator() );
-	}
+	public void printFullStringsForGraphPatterns( final ExtPrintablePlan pp,
+	                                              final Set<SPARQLGraphPattern> alreadyPrinted,
+	                                              final PrintStream out ) {
+		if (    pp.fullStringForGraphPattern != null
+		     && ! alreadyPrinted.contains(pp.graphPattern) ) {
+			alreadyPrinted.add(pp.graphPattern);
 
-	protected static void printSPARQLGraphPattern( final SPARQLGraphPattern gp,
-	                                               final String indentString,
-	                                               final PrintStream out ) {
-		out.append( indentString );
-		out.append( "  - pattern (" + gp.hashCode() +  ") (" + gp.toString() + ")" );
-		out.append( System.lineSeparator() );
-	}
-
-	protected static void printExpressions( final ExprList exprs,
-	                                        final String indentString,
-	                                        final PrintStream out ) {
-		final int numberOfExprs = exprs.size();
-		if ( numberOfExprs == 1 ) {
-			final Expr expr = exprs.get(0);
-			out.append( indentString + "  - expression: " + ExprUtils.fmtSPARQL(expr) );
-			out.append( System.lineSeparator() );
+			out.println();
+			out.print( "--- pattern (" + pp.graphPattern.hashCode() + ") " );
+			out.print( pp.graphPattern.getClass().getName() );
+			out.println();
+			out.println( pp.fullStringForGraphPattern );
 		}
-		else {
-			out.append( indentString + "  - number of expressions: " + numberOfExprs );
-			out.append( System.lineSeparator() );
-			for ( int i = 0; i < numberOfExprs; i++ ) {
-				final Expr expr = exprs.get(i);
-				out.append( indentString + "  - expression " + (i+1) + ": " + ExprUtils.fmtSPARQL(expr) );
-				out.append( System.lineSeparator() );
+
+		if ( pp.subPlans != null ) {
+			for ( final PrintablePlan sub : pp.subPlans ) {
+				printFullStringsForGraphPatterns( (ExtPrintablePlan) sub,
+				                                  alreadyPrinted,
+				                                  out );
 			}
 		}
 	}
 
-	protected static void printLogicalOperatorBase( final LogicalOperator lop,
-	                                                final String indentString,
-	                                                final PrintStream out,
-	                                                final OpNamePrinter np ) {
-		out.append( indentString );
-		lop.visit(np);
-		out.append( " (" + lop.getID()  + ")" );
+	protected void addPropStrings( final ExpectedVariables expVars,
+	                               final List<String> propStrings ) {
+		if ( expVars == null ) {
+			propStrings.add( "expected variables: ?" );
+			return;
+		}
+
+		String certainVarsStr = "certain variables: ";
+		final Iterator<Var> itC = expVars.getCertainVariables().iterator();
+		certainVarsStr += itC.hasNext() ? itC.next().toString() : "none";
+		while ( itC.hasNext() ) {
+			certainVarsStr += ", " + itC.next().toString();
+		}
+
+		String possibleVarsStr = "possible variables: ";
+		final Iterator<Var> itP = expVars.getPossibleVariables().iterator();
+		possibleVarsStr += itP.hasNext() ? itP.next().toString() : "none";
+		while ( itP.hasNext() ) {
+			possibleVarsStr += ", " + itP.next().toString();
+		}
+
+		propStrings.add(certainVarsStr);
+		propStrings.add(possibleVarsStr);
 	}
 
-	protected static class OpNamePrinter implements LogicalPlanVisitor {
-		protected final PrintStream out;
-		public OpNamePrinter( final PrintStream out ) { this.out = out; }
+	protected void addPropStrings( final QueryPlanningInfo qpInfo,
+	                               final List<String> propStrings ) {
+		if ( qpInfo == null || qpInfo.isEmpty() ) {
+			propStrings.add("query planning info: none" );
+			return;
+		}
+
+		final Iterator<QueryPlanProperty> it = qpInfo.getProperties().iterator();
+		propStrings.add( "query planning info:  " + it.next().toString() );
+
+		while ( it.hasNext() ) {
+			propStrings.add( "                      " + it.next().toString() );
+		}
+	}
+
+
+	public static class ShortNameCreator implements LogicalPlanVisitor {
+		/**
+		 * The short name of the most recently visited operator.
+		 */
+		public String name = null;
 
 		@Override
-		public void visit( final LogicalOpRequest<?, ?> op )    { out.append("req"); }
+		public void visit( final LogicalOpRequest<?, ?> op )    { name = "req"; }
 
 		@Override
-		public void visit( final LogicalOpTPAdd op )            { out.append("tpAdd"); }
+		public void visit( final LogicalOpFixedSolMap op )      { name = "sm"; }
 
 		@Override
-		public void visit( final LogicalOpBGPAdd op )           { out.append("bgpAdd"); }
+		public void visit( final LogicalOpGPAdd op )            { name = "gpAdd"; }
 
 		@Override
-		public void visit( final LogicalOpGPAdd op )            { out.append("gpAdd"); }
+		public void visit( final LogicalOpGPOptAdd op )         { name = "gpOptAdd"; }
 
 		@Override
-		public void visit( final LogicalOpTPOptAdd op )         { out.append("tpOptAdd"); }
+		public void visit( final LogicalOpJoin op )             { name = "join"; }
 
 		@Override
-		public void visit( final LogicalOpBGPOptAdd op )        { out.append("bgpOptAdd"); }
+		public void visit( final LogicalOpRightJoin op )        { name = "rightJoin"; }
 
 		@Override
-		public void visit( final LogicalOpGPOptAdd op )         { out.append("gpOptAdd"); }
+		public void visit( final LogicalOpUnion op )            { name = "union"; }
 
 		@Override
-		public void visit( final LogicalOpJoin op )             { out.append("join"); }
+		public void visit( final LogicalOpMultiwayJoin op )     { name = "mj"; }
 
 		@Override
-		public void visit( final LogicalOpRightJoin op )        { out.append("rightJoin"); }
+		public void visit( final LogicalOpMultiwayLeftJoin op ) { name = "mlj"; }
 
 		@Override
-		public void visit( final LogicalOpUnion op )            { out.append("union"); }
+		public void visit( final LogicalOpMultiwayUnion op )    { name = "mu"; }
 
 		@Override
-		public void visit( final LogicalOpMultiwayJoin op )     { out.append("mj"); }
+		public void visit( final LogicalOpFilter op )           { name = "filter"; }
 
 		@Override
-		public void visit( final LogicalOpMultiwayLeftJoin op ) { out.append("mlj"); }
+		public void visit( final LogicalOpBind op )             { name = "bind"; }
 
 		@Override
-		public void visit( final LogicalOpMultiwayUnion op )    { out.append("mu"); }
+		public void visit( final LogicalOpLocalToGlobal op )    { name = "l2g"; }
 
 		@Override
-		public void visit( final LogicalOpFilter op )           { out.append("filter"); }
-
-		@Override
-		public void visit( final LogicalOpBind op )             { out.append("bind"); }
-
-		@Override
-		public void visit( final LogicalOpLocalToGlobal op )    { out.append("l2g"); }
-
-		@Override
-		public void visit( final LogicalOpGlobalToLocal op )    { out.append("g2l"); }
+		public void visit( final LogicalOpGlobalToLocal op )    { name = "g2l"; }
 	}
 
 }

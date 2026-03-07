@@ -34,13 +34,14 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
 		if ( noChanges )
 			newPlan = inputPlan;
-		else {
-			newPlan = LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
-		}
+		else
+			newPlan = LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+			                                                   null,
+			                                                   newSubPlans );
 
-		if ( (inputPlan.getRootOperator() instanceof LogicalOpLocalToGlobal
-				|| inputPlan.getRootOperator() instanceof LogicalOpGlobalToLocal)
-			&& !checkIfL2gOrG2lNeeded( newPlan.getSubPlan(0)) ) {
+		if ( (rootOp instanceof LogicalOpLocalToGlobal
+				|| rootOp instanceof LogicalOpGlobalToLocal)
+			&& !checkIfL2gOrG2lNeeded(newPlan.getSubPlan(0)) ) {
 			return newPlan.getSubPlan(0);
 		}
 		else {
@@ -88,28 +89,8 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 			}
 			return triplePatterns;
 		}
-		else if ( rootOp instanceof LogicalOpTPAdd tpAdd ) {
-			final Set<TriplePattern> triplePatterns = extractTPs( plan.getSubPlan(0) );
-			triplePatterns.add( tpAdd.getTP() );
-			return triplePatterns;
-		}
-		else if ( rootOp instanceof LogicalOpBGPAdd bgpAdd ) {
-			final Set<TriplePattern> triplePatterns = bgpAdd.getBGP().getTriplePatterns();
-			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
-			return triplePatterns;
-		}
 		else if ( rootOp instanceof LogicalOpGPAdd gpAdd ) {
 			final Set<TriplePattern> triplePatterns = gpAdd.getPattern().getAllMentionedTPs();
-			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
-			return triplePatterns;
-		}
-		else if ( rootOp instanceof LogicalOpTPOptAdd tpOptAdd ) {
-			final Set<TriplePattern> triplePatterns = extractTPs( plan.getSubPlan(0) );
-			triplePatterns.add( tpOptAdd.getTP() );
-			return triplePatterns;
-		}
-		else if ( rootOp instanceof LogicalOpBGPOptAdd bgpOptAdd ) {
-			final Set<TriplePattern> triplePatterns = bgpOptAdd.getBGP().getTriplePatterns();
 			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
 			return triplePatterns;
 		}

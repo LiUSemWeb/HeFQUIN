@@ -5,12 +5,11 @@ import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
-import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpUnion extends LogicalOperatorBase implements BinaryLogicalOp
+public class LogicalOpUnion implements BinaryLogicalOp
 {
 	protected static LogicalOpUnion singleton = new LogicalOpUnion();
 
@@ -33,23 +32,22 @@ public class LogicalOpUnion extends LogicalOperatorBase implements BinaryLogical
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpUnion; 
-	}
-
-	@Override
-	public int hashCode(){
-		return Objects.hash( this.getClass().getName() );
-	}
-
-	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
 
 	@Override
-	public String toString(){
-		return "> union ";
+	public boolean equals( final Object o ) {
+		return o instanceof LogicalOpUnion; 
 	}
 
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "union";
+	}
 }

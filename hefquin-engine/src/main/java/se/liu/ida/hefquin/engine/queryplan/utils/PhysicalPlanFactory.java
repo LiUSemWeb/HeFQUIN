@@ -1,19 +1,15 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.engine.federation.BRTPFServer;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
@@ -24,25 +20,55 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
+import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class PhysicalPlanFactory
 {
 	/**
-	 * Creates a physical plan in which the root operator is the
-	 * default physical operator for the given logical operator,
-	 * as per {@link LogicalToPhysicalOpConverter}. The given
-	 * subplans become children of the root operator.
+	 * Creates a physical plan in which the root operator is the physical
+	 * operator that the given {@link LogicalToPhysicalOpConverter} returns
+	 * for the given logical operator. The given subplans become children
+	 * of the root operator.
 	 */
 	public static PhysicalPlan createPlan( final LogicalOperator lop,
+	                                       final LogicalToPhysicalOpConverter lop2pop,
 	                                       final PhysicalPlan... subplans ) {
-		if (      lop instanceof NullaryLogicalOp ) return createPlan( (NullaryLogicalOp) lop );
-		else if ( lop instanceof UnaryLogicalOp )   return createPlan( (UnaryLogicalOp) lop, subplans[0] );
-		else if ( lop instanceof BinaryLogicalOp )  return createPlan( (BinaryLogicalOp) lop, subplans[0], subplans[1] );
-		else if ( lop instanceof NaryLogicalOp )    return createPlan( (NaryLogicalOp) lop, subplans );
+		return createPlan( lop, null, lop2pop, subplans );
+	}
+
+	/**
+	 * Creates a physical plan in which the root operator is the physical
+	 * operator that the given {@link LogicalToPhysicalOpConverter} returns
+	 * for the given logical operator. The given subplans become children
+	 * of the root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
+	 */
+	public static PhysicalPlan createPlan( final LogicalOperator lop,
+	                                       final QueryPlanningInfo qpInfo,
+	                                       final LogicalToPhysicalOpConverter lop2pop,
+	                                       final PhysicalPlan... subplans ) {
+		if (      lop instanceof NullaryLogicalOp nullaryLOP ) return createPlan(nullaryLOP, qpInfo, lop2pop);
+		else if ( lop instanceof UnaryLogicalOp unaryLOP )     return createPlan(unaryLOP, qpInfo, lop2pop, subplans[0]);
+		else if ( lop instanceof BinaryLogicalOp binaryLOP )   return createPlan(binaryLOP, qpInfo, lop2pop, subplans[0], subplans[1]);
+		else if ( lop instanceof NaryLogicalOp naryLOP )       return createPlan(naryLOP, qpInfo, lop2pop, subplans);
 		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
 	}
 
@@ -52,13 +78,34 @@ public class PhysicalPlanFactory
 	 * as per {@link LogicalToPhysicalOpConverter}. The given
 	 * subplans become children of the root operator.
 	 */
-	public static PhysicalPlan createPlan( final PhysicalOperator lop,
+	public static PhysicalPlan createPlan( final PhysicalOperator pop,
 	                                       final PhysicalPlan... subplans ) {
-		if (      lop instanceof NullaryPhysicalOp ) return createPlan( (NullaryPhysicalOp) lop );
-		else if ( lop instanceof UnaryPhysicalOp )   return createPlan( (UnaryPhysicalOp) lop, subplans[0] );
-		else if ( lop instanceof BinaryPhysicalOp )  return createPlan( (BinaryPhysicalOp) lop, subplans[0], subplans[1] );
-		else if ( lop instanceof NaryPhysicalOp )    return createPlan( (NaryPhysicalOp) lop, subplans );
-		else throw new UnsupportedOperationException("Unsupported type of physical operator: " + lop.getClass().getName() + ".");
+		return createPlan(pop, null, subplans);
+	}
+
+	/**
+	 * Creates a physical plan in which the root operator is the
+	 * default physical operator for the given logical operator,
+	 * as per {@link LogicalToPhysicalOpConverter}. The given
+	 * subplans become children of the root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
+	 */
+	public static PhysicalPlan createPlan( final PhysicalOperator pop,
+	                                       final QueryPlanningInfo qpInfo,
+	                                       final PhysicalPlan... subplans ) {
+		if (      pop instanceof NullaryPhysicalOp nullaryPOP ) return createPlan(nullaryPOP, qpInfo);
+		else if ( pop instanceof UnaryPhysicalOp unaryPOP )     return createPlan(unaryPOP, qpInfo, subplans[0]);
+		else if ( pop instanceof BinaryPhysicalOp binaryPOP )   return createPlan(binaryPOP, qpInfo, subplans[0], subplans[1]);
+		else if ( pop instanceof NaryPhysicalOp naryPOP )       return createPlan(naryPOP, qpInfo, subplans);
+		else throw new UnsupportedOperationException("Unsupported type of physical operator: " + pop.getClass().getName() + ".");
 	}
 
 
@@ -67,433 +114,315 @@ public class PhysicalPlanFactory
 	/**
 	 * Creates a plan with a request operator as root operator.
 	 */
-	public static <R extends DataRetrievalRequest, M extends FederationMember>
-	PhysicalPlan createPlanWithRequest( final LogicalOpRequest<R,M> lop ) {
-		final NullaryPhysicalOp pop = new PhysicalOpRequest<>(lop);
+	public static  PhysicalPlan createPlanWithRequest( final DataRetrievalRequest req,
+	                                                   final FederationMember fm ) {
+		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>(fm, req);
+		final NullaryPhysicalOp pop = PhysicalOpRequest.getFactory().create(lop);
 		return createPlan(pop);
 	}
 
 	/**
-	 * Creates a physical plan in which the root operator is the
-	 * default physical operator for the given logical operator,
-	 * as per {@link LogicalToPhysicalOpConverter}.
+	 * Creates a physical plan in which the root operator is the physical
+	 * operator that the given {@link LogicalToPhysicalOpConverter} returns
+	 * for the given logical operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
 	 */
-	public static PhysicalPlan createPlan( final NullaryLogicalOp rootOp ) {
-		final NullaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
-		return createPlan(pop);
+	public static PhysicalPlan createPlan( final NullaryLogicalOp rootOp,
+	                                       final QueryPlanningInfo qpInfo,
+	                                       final LogicalToPhysicalOpConverter lop2pop ) {
+		final NullaryPhysicalOp pop = lop2pop.convert(rootOp);
+		return createPlan(pop, qpInfo);
 	}
 
 	/**
 	 * Creates a physical plan with the given root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
 	 */
-	public static PhysicalPlan createPlan( final NullaryPhysicalOp rootOp ) {
-		return new PhysicalPlanWithNullaryRootImpl(rootOp) {};
+	public static PhysicalPlan createPlan( final NullaryPhysicalOp rootOp,
+	                                       final QueryPlanningInfo qpInfo ) {
+		if ( qpInfo != null )
+			return new PhysicalPlanWithNullaryRootImpl(rootOp, qpInfo) {};
+		else
+			return new PhysicalPlanWithNullaryRootImpl(rootOp) {};
 	}
 
 
 	// --------- plans with unary root operators -----------
 
 	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoin( final LogicalOpTPAdd lop,
-	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoin(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpTPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithFILTER(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpTPAdd lop,
-	                                                        final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithUNION(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpTPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
-		return createPlan(pop, subplan);
-	}
-	
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUESorFILTER( final LogicalOpTPAdd lop,
-	                                                                 final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUESorFILTER(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with an index nested loops join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpTPAdd lop,
-	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpIndexNestedLoopsJoin(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with an index nested loops join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpBGPAdd lop,
-	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpIndexNestedLoopsJoin(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpBGPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithFILTER(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpBGPAdd lop,
-	                                                        final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithUNION(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpBGPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUESorFILTER( final LogicalOpBGPAdd lop,
-	                                                                 final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUESorFILTER(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with an index nested loops join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpGPAdd lop,
-	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpIndexNestedLoopsJoin(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a FILTER-based bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpGPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithFILTER(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a UNION-based bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpGPAdd lop,
-	                                                        final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithUNION(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a VALUES-based bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpGPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a VALUES-based bind join that can switch to FILTER-based bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUESorFILTER( final LogicalOpGPAdd lop,
-	                                                                 final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUESorFILTER(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a physical plan in which the root operator is the
-	 * default physical operator for the given logical operator,
-	 * as per {@link LogicalToPhysicalOpConverter}. The given
-	 * subplan becomes the single child of the root operator.
+	 * Creates a physical plan in which the root operator is the physical
+	 * operator that the given {@link LogicalToPhysicalOpConverter} returns
+	 * for the given logical operator. The given subplan becomes the child
+	 * of the root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
 	 */
 	public static PhysicalPlan createPlan( final UnaryLogicalOp rootOp,
+	                                       final QueryPlanningInfo qpInfo,
+	                                       final LogicalToPhysicalOpConverter lop2pop,
 	                                       final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
-		return createPlan(pop, subplan);
+		final ExpectedVariables inputVars = subplan.getExpectedVariables();
+		final UnaryPhysicalOp pop = lop2pop.convert(rootOp, inputVars);
+		return createPlan(pop, qpInfo, subplan);
 	}
 
 	/**
 	 * Creates a physical plan with the given root operator. The
 	 * given subplan becomes the single child of the root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
 	 */
 	public static PhysicalPlan createPlan( final UnaryPhysicalOp rootOp,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final PhysicalPlan subplan ) {
-		return new PhysicalPlanWithUnaryRootImpl(rootOp, subplan) {};
-	}
-
-	/**
-	 * Creates a physical plan with a bgpAdd as root operator.
-	 * The root operator uses the same physical algorithm as the given physical operator, which is usually a specific physical operator for bgpAdd.
-	 * The given subplan becomes the single child of the root operator.
-	 */
-	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final LogicalOpBGPAdd lop, final Class<? extends PhysicalOperator> opClass, final PhysicalPlan subplan ) {
-		if ( PhysicalOpIndexNestedLoopsJoin.class.isAssignableFrom(opClass) ) {
-			return createPlanWithIndexNLJ( lop, subplan );
-		}
-		else if ( PhysicalOpBindJoinWithFILTER.class.isAssignableFrom(opClass) ) {
-			return createPlanWithBindJoinFILTER( lop, subplan );
-		}
-		else if ( PhysicalOpBindJoinWithUNION.class.isAssignableFrom(opClass) ) {
-			return createPlanWithBindJoinUNION( lop, subplan );
-		}
-		else if ( PhysicalOpBindJoinWithVALUES.class.isAssignableFrom(opClass) ) {
-			return createPlanWithBindJoinVALUES( lop, subplan );
-		}
-		else if ( PhysicalOpBindJoinWithVALUESorFILTER.class.isAssignableFrom(opClass) ) {
-			return createPlanWithBindJoinVALUESorFILTER( lop, subplan );
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported type of physical operator: " + opClass.getName() + ".");
-		}
+		if ( qpInfo != null )
+			return new PhysicalPlanWithUnaryRootImpl(rootOp, qpInfo, subplan) {};
+		else
+			return new PhysicalPlanWithUnaryRootImpl(rootOp, subplan) {};
 	}
 
 	// --------- plans with binary root operators -----------
 
 	/**
-	 * Creates a plan with a binary union as root operator.
-	 */
-	public static PhysicalPlan createPlanWithUnion( final PhysicalPlan subplan1,
-	                                                final PhysicalPlan subplan2 ) {
-		return createPlanWithUnion( LogicalOpUnion.getInstance(), subplan1, subplan2 );
-	}
-
-	/**
-	 * Creates a plan with a binary union as root operator.
-	 */
-	public static PhysicalPlan createPlanWithUnion( final LogicalOpUnion lop,
-	                                                final PhysicalPlan subplan1,
-	                                                final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = new PhysicalOpBinaryUnion(lop);
-		return createPlan(pop, subplan1, subplan2);
-	}
-
-	/**
-	 * Creates a plan with a hash join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithHashJoin( final PhysicalPlan subplan1,
-	                                                   final PhysicalPlan subplan2 ) {
-		return createPlanWithHashJoin( LogicalOpJoin.getInstance(), subplan1, subplan2 );
-	}
-
-	/**
-	 * Creates a plan with a hash join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithHashJoin( final LogicalOpJoin lop,
-	                                                   final PhysicalPlan subplan1,
-	                                                   final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = new PhysicalOpHashJoin(lop);
-		return createPlan(pop, subplan1, subplan2);
-	}
-
-	/**
-	 * Creates a plan with a symmetric hash join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithSymmetricHashJoin( final PhysicalPlan subplan1,
-	                                                            final PhysicalPlan subplan2 ) {
-		return createPlanWithSymmetricHashJoin( LogicalOpJoin.getInstance(), subplan1, subplan2 );
-	}
-
-	/**
-	 * Creates a plan with a symmetric hash join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithSymmetricHashJoin( final LogicalOpJoin lop,
-	                                                            final PhysicalPlan subplan1,
-	                                                            final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = new PhysicalOpSymmetricHashJoin(lop);
-		return createPlan(pop, subplan1, subplan2);
-	}
-
-	/**
-	 * Creates a plan with a naive nested loops join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithNaiveNLJ( final PhysicalPlan subplan1,
-	                                                   final PhysicalPlan subplan2 ) {
-		return createPlanWithNaiveNLJ( LogicalOpJoin.getInstance(), subplan1, subplan2 );
-	}
-
-	/**
-	 * Creates a plan with a naive nested loops join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithNaiveNLJ( final LogicalOpJoin lop,
-	                                                   final PhysicalPlan subplan1,
-	                                                   final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = new PhysicalOpNaiveNestedLoopsJoin(lop);
-		return createPlan(pop, subplan1, subplan2);
-	}
-
-	/**
-	 * Creates a plan with a binary join as root operator.
-	 * The root operator is the default physical operator
+	 * Creates a plan with a binary join as root operator, using the
+	 * default physical operator for such a join (as per the given
+	 * {@link LogicalToPhysicalOpConverter}).
 	 */
 	public static PhysicalPlan createPlanWithJoin( final PhysicalPlan subplan1,
-													final PhysicalPlan subplan2 ) {
-		return createPlan( LogicalOpJoin.getInstance(), subplan1, subplan2 );
+	                                               final PhysicalPlan subplan2,
+	                                               final LogicalToPhysicalOpConverter lop2pop ) {
+		return createPlanWithJoin(subplan1, subplan2, null, lop2pop);
 	}
 
 	/**
-	 * Creates a physical plan in which the root operator is the
-	 * default physical operator for the given logical operator,
-	 * as per {@link LogicalToPhysicalOpConverter}. The given
-	 * subplans become children of the root operator.
+	 * Creates a plan with a binary join as root operator, using the
+	 * default physical operator for such a join (as per the given
+	 * {@link LogicalToPhysicalOpConverter}).
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the resulting plan is indeed meant to be associated with it (for
+	 * instance, when creating a physical plan for a logical plan that is
+	 * associated with this object). Also, do not create different physical
+	 * plans with the same {@link QueryPlanningInfo} object because these
+	 * objects may later be extended with additional properties for each plan;
+	 * instead, make copies of such an object if needed.
+	 */
+	public static PhysicalPlan createPlanWithJoin( final PhysicalPlan subplan1,
+	                                               final PhysicalPlan subplan2,
+	                                               final QueryPlanningInfo qpInfo,
+	                                               final LogicalToPhysicalOpConverter lop2pop ) {
+		return createPlan( LogicalOpJoin.getInstance(), qpInfo, lop2pop, subplan1, subplan2 );
+	}
+
+	/**
+	 * Creates a physical plan in which the root operator is the physical
+	 * operator that the given {@link LogicalToPhysicalOpConverter} returns
+	 * for the given logical operator. The given subplans become children
+	 * of the root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
 	 */
 	public static PhysicalPlan createPlan( final BinaryLogicalOp rootOp,
+	                                       final QueryPlanningInfo qpInfo,
+	                                       final LogicalToPhysicalOpConverter lop2pop,
 	                                       final PhysicalPlan subplan1,
 	                                       final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
-		return createPlan(pop, subplan1, subplan2);
+		final ExpectedVariables inputVars1 = subplan1.getExpectedVariables();
+		final ExpectedVariables inputVars2 = subplan2.getExpectedVariables();
+		final BinaryPhysicalOp pop = lop2pop.convert(rootOp, inputVars1, inputVars2);
+		return createPlan(pop, qpInfo, subplan1, subplan2);
 	}
 
 	/**
 	 * Creates a physical plan with the given root operator. The
 	 * given subplans become children of the root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
 	 */
 	public static PhysicalPlan createPlan( final BinaryPhysicalOp rootOp,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final PhysicalPlan subplan1,
 	                                       final PhysicalPlan subplan2 ) {
-		return new PhysicalPlanWithBinaryRootImpl(rootOp, subplan1, subplan2) {};
+		if ( qpInfo != null )
+			return new PhysicalPlanWithBinaryRootImpl(rootOp, qpInfo, subplan1, subplan2) {};
+		else
+			return new PhysicalPlanWithBinaryRootImpl(rootOp, subplan1, subplan2) {};
 	}
 
 
 	// --------- plans with n-ary root operators -----------
 
 	/**
-	 * Creates a physical plan in which the root operator is the
-	 * default physical operator for the given logical operator,
-	 * as per {@link LogicalToPhysicalOpConverter}. The given
-	 * subplans become children of the root operator.
+	 * Creates a physical plan in which the root operator is the physical
+	 * operator that the given {@link LogicalToPhysicalOpConverter} returns
+	 * for the given logical operator. The given subplans become children
+	 * of the root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
 	 */
 	public static PhysicalPlan createPlan( final NaryLogicalOp rootOp,
+	                                       final QueryPlanningInfo qpInfo,
+	                                       final LogicalToPhysicalOpConverter lop2pop,
 	                                       final PhysicalPlan... subplans ) {
-		final NaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
-		return createPlan(pop, subplans);
+		// Collect input vars
+		final ExpectedVariables[] inputVars = Arrays.stream(subplans)
+				.map( PhysicalPlan::getExpectedVariables )
+				.toArray( ExpectedVariables[]::new );
+
+		final NaryPhysicalOp pop = lop2pop.convert(rootOp, inputVars);
+		return createPlan(pop, qpInfo, subplans);
 	}
 
 	/**
-	 * Creates a physical plan in which the root operator is the
-	 * default physical operator for the given logical operator,
-	 * as per {@link LogicalToPhysicalOpConverter}. The given
-	 * subplans become children of the root operator.
+	 * Creates a physical plan in which the root operator is the physical
+	 * operator that the given {@link LogicalToPhysicalOpConverter} returns
+	 * for the given logical operator. The given subplans become children
+	 * of the root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
 	 */
 	public static PhysicalPlan createPlan( final NaryLogicalOp rootOp,
+	                                       final QueryPlanningInfo qpInfo,
+	                                       final LogicalToPhysicalOpConverter lop2pop,
 	                                       final List<PhysicalPlan> subplans ) {
-		final NaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
-		return createPlan(pop, subplans);
+		// Collect input vars
+		final ExpectedVariables[] inputVars = subplans.stream()
+				.map( PhysicalPlan::getExpectedVariables )
+				.toArray( ExpectedVariables[]::new );
+
+		final NaryPhysicalOp pop = lop2pop.convert(rootOp, inputVars);
+		return createPlan(pop, qpInfo, subplans);
 	}
 
 	/**
 	 * Creates a physical plan with the given root operator. The
 	 * given subplans become children of the root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
 	 */
 	public static PhysicalPlan createPlan( final NaryPhysicalOp rootOp,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final PhysicalPlan... subplans ) {
-		return new PhysicalPlanWithNaryRootImpl(rootOp, subplans) {};
+		if ( qpInfo != null )
+			return new PhysicalPlanWithNaryRootImpl(rootOp, qpInfo, subplans) {};
+		else
+			return new PhysicalPlanWithNaryRootImpl(rootOp, subplans) {};
 	}
 
 	/**
 	 * Creates a physical plan with the given root operator. The
 	 * given subplans become children of the root operator.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the plan is indeed meant to be associated with it (for instance,
+	 * when creating a physical plan for a logical plan that is associated
+	 * with this object). Also, do not create different physical plans with
+	 * the same {@link QueryPlanningInfo} object because these objects may
+	 * later be extended with additional properties for each plan; instead,
+	 * make copies of such an object if needed.
 	 */
 	public static PhysicalPlan createPlan( final NaryPhysicalOp rootOp,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final List<PhysicalPlan> subplans ) {
-		return new PhysicalPlanWithNaryRootImpl(rootOp, subplans) {};
+		if ( qpInfo != null )
+			return new PhysicalPlanWithNaryRootImpl(rootOp, qpInfo, subplans) {};
+		else
+			return new PhysicalPlanWithNaryRootImpl(rootOp, subplans) {};
 	}
 
 
 	// --------- other special cases -----------
 
-	public static PhysicalPlan extractRequestAsPlan( final LogicalOpTPAdd lop ) {
-		final FederationMember fm = lop.getFederationMember();
-		final TriplePattern tp = lop.getTP();
+	public static PhysicalPlan extractRequestAsPlan( final LogicalOpGPAdd gpAdd ) {
+		final FederationMember fm = gpAdd.getFederationMember();
+		final SPARQLGraphPattern gp = gpAdd.getPattern();
 
-		final DataRetrievalRequest req;
-		if      ( fm instanceof SPARQLEndpoint ) req = new TriplePatternRequestImpl(tp);
-		else if ( fm instanceof TPFServer )      req = new TPFRequestImpl(tp);
-		else if ( fm instanceof BRTPFServer )    req = new TPFRequestImpl(tp);
-		else {
-			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
+		if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
+			final TriplePattern tp = gpAdd.getTP();
+			final TPFRequest req = new TPFRequestImpl(tp);
+			return createPlanWithRequest(req, fm);
 		}
-
-		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
-	}
-
-	public static PhysicalPlan extractRequestAsPlan( final LogicalOpBGPAdd lop ) {
-		final FederationMember fm = lop.getFederationMember();
-
-		final DataRetrievalRequest req;
-		if ( fm.getInterface().supportsBGPRequests() ) {
-			req = new BGPRequestImpl( lop.getBGP() );
+		else if ( fm.isSupportedPattern(gp) ) {
+			final SPARQLRequest req = new SPARQLRequestImpl(gp);
+			return createPlanWithRequest(req, fm);
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
 		}
-
-		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
 	}
 
-	public static PhysicalPlan extractRequestAsPlan( final LogicalOpGPAdd lop ) {
-		final FederationMember fm = lop.getFederationMember();
-
-		final DataRetrievalRequest req;
-		if ( fm.getInterface().supportsSPARQLPatternRequests() ) {
-			req = new SPARQLRequestImpl( lop.getPattern() );
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
-		}
-
-		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
-	}
-
-	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoin pop ) {
+	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinBRTPF pop ) {
 		return extractRequestAsPlan( pop.getLogicalOperator() );
 	}
 
-	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinWithFILTER pop ) {
-		return extractRequestAsPlan( pop.getLogicalOperator() );
-	}
-
-	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinWithUNION pop ) {
-		return extractRequestAsPlan( pop.getLogicalOperator() );
-	}
-
-	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinWithVALUES pop ) {
+	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinSPARQL pop ) {
 		return extractRequestAsPlan( pop.getLogicalOperator() );
 	}
 
@@ -501,176 +430,180 @@ public class PhysicalPlanFactory
 		return extractRequestAsPlan( pop.getLogicalOperator() );
 	}
 
-	public static PhysicalPlan extractRequestAsPlan(final UnaryLogicalOp lop) {
-		if ( lop instanceof LogicalOpTPAdd ) {
-			return extractRequestAsPlan( (LogicalOpTPAdd) lop );
-		}
-		else if ( lop instanceof LogicalOpBGPAdd ) {
-			return extractRequestAsPlan( (LogicalOpBGPAdd) lop );
-		}
-		else if ( lop instanceof LogicalOpGPAdd ) {
-			return extractRequestAsPlan( (LogicalOpGPAdd) lop );
+	public static PhysicalPlan extractRequestAsPlan( final UnaryLogicalOp lop ) {
+		if ( lop instanceof LogicalOpGPAdd gpAdd ) {
+			return extractRequestAsPlan(gpAdd);
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of logical operator (type: " + lop.getClass().getName() + ").");
 		}
 	}
 
-	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq( final PhysicalOpRequest<?, ?> req,
-	                                                                   final PhysicalPlan subplan ) {
-		final List<PhysicalPlan> plans = new ArrayList<>();
-		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) req).getLogicalOperator();
-		final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp( (LogicalOpRequest<?,?>) lop );
+	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq(
+			final PhysicalOpRequest<?, ?> req,
+			final PhysicalPlan subplan,
+			final LogicalToPhysicalOpConverter lop2pop ) {
+		final LogicalOpRequest<?,?> lop = (LogicalOpRequest<?,?>) req.getLogicalOperator();
+		final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(lop);
 
-		if ( newRoot instanceof LogicalOpTPAdd ) {
-			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) newRoot;
+		assert newRoot instanceof LogicalOpGPAdd;
 
-			plans.add( createPlanWithIndexNLJ( tpAdd, subplan) );
+		final Set<UnaryPhysicalOp> allPOPs = lop2pop.getAllPossible( newRoot,
+		                                                             subplan.getExpectedVariables() );
 
-			if ( tpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
-				plans.add( createPlanWithBindJoinFILTER(tpAdd, subplan) );
-				plans.add( createPlanWithBindJoinUNION( tpAdd, subplan) );
-				//plans.add( createPlanWithBindJoinVALUES(tpAdd, subplan) );
-				plans.add( createPlanWithBindJoinVALUESorFILTER(tpAdd, subplan) );
-			}
-
-			if ( tpAdd.getFederationMember() instanceof BRTPFServer ) {
-				plans.add( createPlanWithBindJoin(tpAdd, subplan) );
-			}
-		}
-		else if ( newRoot instanceof LogicalOpBGPAdd ) {
-			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) newRoot;
-
-			plans.add( createPlanWithIndexNLJ( bgpAdd, subplan) );
-
-			if ( bgpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
-				plans.add( createPlanWithBindJoinFILTER(bgpAdd, subplan) );
-				plans.add( createPlanWithBindJoinUNION( bgpAdd, subplan) );
-				//plans.add( createPlanWithBindJoinVALUES(bgpAdd, subplan) );
-				plans.add( createPlanWithBindJoinVALUESorFILTER(bgpAdd, subplan) );
-			}
-		}
-		else if ( newRoot instanceof LogicalOpGPAdd ) {
-			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) newRoot;
-
-			plans.add( createPlanWithIndexNLJ( gpAdd, subplan) );
-			plans.add( createPlanWithBindJoinFILTER(gpAdd, subplan) );
-			plans.add( createPlanWithBindJoinUNION( gpAdd, subplan) );
-			//plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
-			plans.add( createPlanWithBindJoinVALUESorFILTER(gpAdd, subplan) );
-		}
-		else {
-			throw new UnsupportedOperationException("unsupported operator: " + newRoot.getClass().getName() );
+		final List<PhysicalPlan> plans = new ArrayList<>( allPOPs.size() );
+		for ( final UnaryPhysicalOp pop : allPOPs ) {
+			plans.add( createPlan(pop, subplan) );
 		}
 
 		return plans;
 	}
 
 	/**
-	 * This function take a inputPlan and unionPlan as input,
-	 * where the unionPlan is required to be a plan with union as root operator, and all subPlans under the UNION are all requests or filters with request.
+	 * This function takes two physical plans as input, with the assumptions
+	 * that the second of these plans i) has a union as its root operator and
+	 * ii) every sub plan under this union is either a request or a filter
+	 * with a request.
 	 *
-	 * In such cases, this function turns the requests under UNION into xxAdd operators with the inputPlan as subplans.
+	 * Given such input plans, the function turns the requests under the union
+	 * into gpAdd operators with the first given plan as a common subplan.
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the resulting plan is indeed meant to be associated with it (for
+	 * instance, when creating a physical plan for a logical plan that is
+	 * associated with this object). Also, do not create different physical
+	 * plans with the same {@link QueryPlanningInfo} object because these
+	 * objects may later be extended with additional properties for each plan;
+	 * instead, make copies of such an object if needed.
 	 */
-	public static PhysicalPlan createPlanWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan, final PhysicalPlan unionPlan ) {
+	public static PhysicalPlan createPlanWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan,
+	                                                              final PhysicalPlan unionPlan,
+	                                                              final QueryPlanningInfo qpInfo,
+	                                                              final LogicalToPhysicalOpConverter lop2pop ) {
 		final int numberOfSubPlansUnderUnion = unionPlan.numberOfSubPlans();
-		final PhysicalPlan[] newUnionSubPlans = new PhysicalPlan[numberOfSubPlansUnderUnion];
+		final List<PhysicalPlan> newUnionSubPlans = new ArrayList<>(numberOfSubPlansUnderUnion);
 
 		for ( int i = 0; i < numberOfSubPlansUnderUnion; i++ ) {
 			final PhysicalPlan oldSubPlan = unionPlan.getSubPlan(i);
-			final PhysicalPlan newSubPlan = createPlanWithDefaultUnaryOpIfPossible( inputPlan, oldSubPlan );
-			newUnionSubPlans[i] = newSubPlan;
+			final QueryPlanningInfo qpInfoForNewSubPlan = null;
+			final PhysicalPlan newSubPlan = createPlanWithDefaultUnaryOpIfPossible(inputPlan, oldSubPlan, qpInfoForNewSubPlan, lop2pop);
+			newUnionSubPlans.add(newSubPlan);
 		}
 
-		return createPlan( LogicalOpMultiwayUnion.getInstance(), newUnionSubPlans );
+		return createPlan( LogicalOpMultiwayUnion.getInstance(), qpInfo, lop2pop, newUnionSubPlans );
 	}
 
 	/**
-	 * If the nextPlan is in the form of a request, filter with request, or union with requests,
-	 * this function turns the requests into xxAdd operators with the inputPlan as subplans.
+	 * If the second of the two given plans is either a request, a filter
+	 * with request, or a union over requests, then this function turns the
+	 * request(s) into gpAdd operators with the first given plan as subplan.
 	 *
-	 * Otherwise, it constructs a plan with a binary join between inputPlan and nextPlan (using the default physical operator)
+	 * Otherwise, the function returns a plan with a binary join over the two
+	 * given plans (using the default physical operator).
+	 * <p>
+	 * The qpInfo argument may be <code>null</code>. Provide an actual
+	 * {@link QueryPlanningInfo} object only if this object already exists
+	 * and the resulting plan is indeed meant to be associated with it (for
+	 * instance, when creating a physical plan for a logical plan that is
+	 * associated with this object). Also, do not create different physical
+	 * plans with the same {@link QueryPlanningInfo} object because these
+	 * objects may later be extended with additional properties for each plan;
+	 * instead, make copies of such an object if needed.
 	 **/
-	public static PhysicalPlan createPlanWithDefaultUnaryOpIfPossible( final PhysicalPlan inputPlan, final PhysicalPlan nextPlan ) {
-		final PhysicalOperator oldSubPlanRootOp = nextPlan.getRootOperator();
-		if ( oldSubPlanRootOp instanceof PhysicalOpRequest ) {
-			final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) oldSubPlanRootOp;
-			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
-			return PhysicalPlanFactory.createPlan( addOp, inputPlan);
-		}
-		else if ( oldSubPlanRootOp instanceof PhysicalOpFilter
-				&& nextPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest ) {
-			final PhysicalOpFilter filterOp = (PhysicalOpFilter) oldSubPlanRootOp;
-			final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) nextPlan.getSubPlan(0).getRootOperator();
+	public static PhysicalPlan createPlanWithDefaultUnaryOpIfPossible( final PhysicalPlan inputPlan,
+	                                                                   final PhysicalPlan nextPlan,
+	                                                                   final QueryPlanningInfo qpInfo,
+	                                                                   final LogicalToPhysicalOpConverter lop2pop ) {
+		final PhysicalOperator rootOp = nextPlan.getRootOperator();
 
+		if ( rootOp instanceof PhysicalOpRequest reqOp ) {
 			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
-			final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan( addOp, inputPlan);
-
-			return PhysicalPlanFactory.createPlan( filterOp, addOpPlan);
+			return PhysicalPlanFactory.createPlan(addOp, qpInfo, lop2pop, inputPlan);
 		}
-		else if ( oldSubPlanRootOp instanceof PhysicalOpLocalToGlobal
-				&& nextPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest ){
-			final PhysicalOpLocalToGlobal l2gPOP = (PhysicalOpLocalToGlobal) oldSubPlanRootOp;
+
+		final PhysicalOperator subPlanRootOp = nextPlan.getSubPlan(0).getRootOperator();
+
+		if (    rootOp instanceof PhysicalOpFilter filterOp
+		     && subPlanRootOp instanceof PhysicalOpRequest reqOp ) {
+			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
+			final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan(addOp, lop2pop, inputPlan);
+			return PhysicalPlanFactory.createPlan(filterOp, qpInfo, addOpPlan);
+		}
+
+		if (    rootOp instanceof PhysicalOpLocalToGlobal l2gPOP
+		     && subPlanRootOp instanceof PhysicalOpRequest reqOp ) {
 			final LogicalOpLocalToGlobal l2gLOP = (LogicalOpLocalToGlobal) l2gPOP.getLogicalOperator();
 			final VocabularyMapping vm = l2gLOP.getVocabularyMapping();
 
 			final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal(vm);
-			final PhysicalPlan newInputPlan = PhysicalPlanFactory.createPlan( new PhysicalOpGlobalToLocal(g2l), inputPlan );
-
-			final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) nextPlan.getSubPlan(0).getRootOperator();
+			final PhysicalPlan newInputPlan = PhysicalPlanFactory.createPlan(g2l, lop2pop, inputPlan);
 
 			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
-			final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan( addOp, newInputPlan);
+			final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan(addOp, lop2pop, newInputPlan);
 
-			return PhysicalPlanFactory.createPlan( l2gPOP, addOpPlan );
+			return PhysicalPlanFactory.createPlan(l2gPOP, qpInfo, addOpPlan);
 		}
-		else if ( (oldSubPlanRootOp instanceof PhysicalOpBinaryUnion || oldSubPlanRootOp instanceof PhysicalOpMultiwayUnion)
-				&& PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(nextPlan)){
-			
-			return PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan( inputPlan, nextPlan );
+
+		if (    (rootOp instanceof PhysicalOpBinaryUnion || rootOp instanceof PhysicalOpMultiwayUnion)
+		     && PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(nextPlan) ) {
+			return PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(inputPlan, nextPlan, qpInfo, lop2pop);
 		}
-		else
-			return createPlanWithJoin(inputPlan, nextPlan);
+
+		return createPlanWithJoin(inputPlan, nextPlan, qpInfo, lop2pop);
 	}
 
 	/**
-	 * Check whether all operators under the UNION operator belong to any of the following:
-	 * 	 - The operator is a request
-	 * 	 - If the operator is a filter, then under that filter there must be a request,
-	 * 	 - If the operator is a L2G operator, under the L2G operator, there must be a request or a filter operator with requests.
+	 * Returns <code>true</code> if the given plan has a union operator as
+	 * its root operator and all subplans under this union are of one of the
+	 * following forms:
+	 * i) a request,
+	 * ii) a filter over a request,
+	 * iii) an l2g operator over either a request or a filter with a request.
 	 */
 	public static boolean checkUnaryOpApplicableToUnionPlan( final PhysicalPlan unionPlan ){
 		final PhysicalOperator rootOp = unionPlan.getRootOperator();
-		if ( !(rootOp instanceof PhysicalOpBinaryUnion || rootOp instanceof PhysicalOpMultiwayUnion) ){
+		if (    ! (rootOp instanceof PhysicalOpBinaryUnion)
+		     && ! (rootOp instanceof PhysicalOpMultiwayUnion) ) {
 			return false;
 		}
 
 		for ( int i = 0; i < unionPlan.numberOfSubPlans(); i++ ) {
 			final PhysicalPlan subPlan = unionPlan.getSubPlan(i);
 			final PhysicalOperator subRootOp = subPlan.getRootOperator();
-			if ( !(subRootOp instanceof PhysicalOpRequest || subRootOp instanceof PhysicalOpFilter || subRootOp instanceof PhysicalOpLocalToGlobal ) ) {
+
+			if (    ! (subRootOp instanceof PhysicalOpRequest)
+			     && ! (subRootOp instanceof PhysicalOpFilter)
+			     && ! (subRootOp instanceof PhysicalOpLocalToGlobal) ) {
 				return false;
 			}
 
-			if ( subRootOp instanceof PhysicalOpLocalToGlobal ){
+			if ( subRootOp instanceof PhysicalOpLocalToGlobal ) {
 				final PhysicalPlan subSubPlan = subPlan.getSubPlan(0);
 				final PhysicalOperator subSubRootOp = subSubPlan.getRootOperator();
-				if ( !( subSubRootOp instanceof PhysicalOpRequest || subSubRootOp instanceof PhysicalOpFilter) ){
+
+				if (    ! (subSubRootOp instanceof PhysicalOpRequest)
+				     && ! (subSubRootOp instanceof PhysicalOpFilter) ) {
 					return false;
 				}
-				if ( subSubRootOp instanceof PhysicalOpFilter ){
-					if ( !( subSubPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest) ){
+
+				if ( subSubRootOp instanceof PhysicalOpFilter ) {
+					final PhysicalOperator subSubSubRootOp = subSubPlan.getSubPlan(0).getRootOperator();
+					if ( ! (subSubSubRootOp instanceof PhysicalOpRequest) ) {
 						return false;
 					}
 				}
 			}
 
-			if ( subRootOp instanceof PhysicalOpFilter ){
-				if ( !( subPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest) ){
+			if ( subRootOp instanceof PhysicalOpFilter ) {
+				final PhysicalOperator subSubRootOp = subPlan.getSubPlan(0).getRootOperator();
+
+				if ( ! (subSubRootOp instanceof PhysicalOpRequest) ) {
 					return false;
 				}
 			}
 		}
+
 		return true;
 	}
 

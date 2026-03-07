@@ -110,6 +110,6 @@ public class ExecOpNaiveNestedLoopJoinTest extends TestsForInnerJoinAlgorithms
 
 	@Override
 	protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {
-		return new ExecOpNaiveNestedLoopsJoin(false);
+		return new ExecOpNaiveNestedLoopsJoin(false, null);
 	}
 }

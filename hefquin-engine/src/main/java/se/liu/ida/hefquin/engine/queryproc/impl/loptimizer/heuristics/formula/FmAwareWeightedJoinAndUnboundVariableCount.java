@@ -1,9 +1,10 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula;
 
 import org.apache.jena.graph.Node;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
+
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.JoinAnalyzer;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.QueryAnalyzer;
+import se.liu.ida.hefquin.federation.FederationMember;
 
 import java.util.List;
 import java.util.Set;

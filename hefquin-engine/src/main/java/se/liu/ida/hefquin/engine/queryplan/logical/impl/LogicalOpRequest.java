@@ -1,12 +1,14 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 
-public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> extends LogicalOperatorBase implements NullaryLogicalOp
+public class LogicalOpRequest<ReqType extends DataRetrievalRequest,
+                              MemberType extends FederationMember>
+		implements NullaryLogicalOp
 {
 	protected final MemberType fm;
 	protected final ReqType req;
@@ -14,27 +16,9 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 	public LogicalOpRequest( final MemberType fm, final ReqType req ) {
 		assert fm != null;
 		assert fm != req;
-		assert fm.getInterface().supportsRequest(req);
 
 		this.fm = fm;
 		this.req = req;
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		if ( ! (o instanceof LogicalOpRequest) )
-			return false;
-
-		final LogicalOpRequest<?,?> oo = (LogicalOpRequest<?,?>) o;
-		if ( oo == this )
-			return true;
-		else
-			return oo.fm.equals(fm) && oo.req.equals(req); 
-	}
-
-	@Override
-	public int hashCode(){
-		return fm.hashCode() ^ req.hashCode();
 	}
 
 	public MemberType getFederationMember() {
@@ -58,11 +42,22 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 	}
 
 	@Override
-	public String toString(){
-		return "req" + " (" + getID() + ")"
-		  		+ "\t - fm (" + fm.getInterface().toString() + ")"
-		  		+ "\t - pattern (" + req.toString() + ")";
-		
+	public boolean equals( final Object o ) {
+		if ( o == this )
+			return true;
+
+		return (    o instanceof LogicalOpRequest oo
+		         && oo.fm.equals(fm)
+		         && oo.req.equals(req) );
 	}
 
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ fm.hashCode() ^ req.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "req (fm: " + fm.hashCode() + ", req: " + req.hashCode() + ")";
+	}
 }

@@ -3,10 +3,12 @@ PREFIX ex:     <http://example.org/>
 
 ex:dbpediaSPARQL
       a            fd:FederationMember ;
+      fd:serviceURI <http://dbpedia.org/sparql> ;
       fd:interface [ a                  fd:SPARQLEndpointInterface ;
                      fd:endpointAddress <http://dbpedia.org/sparql> ] .
 
 ex:dbpediaTPF
       a            fd:FederationMember ;
+      fd:serviceURI <http://fragments.dbpedia.org/2016-04/en> ;
       fd:interface [ a                         fd:TPFInterface ;
                      fd:exampleFragmentAddress <http://fragments.dbpedia.org/2016-04/en> ] .

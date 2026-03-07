@@ -14,16 +14,19 @@ import org.apache.jena.sparql.util.ExprUtils;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class ExecOpFilter extends UnaryExecutableOpBase
+public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 {
 	private long numberOfOutputMappingsProduced = 0L;
 
 	protected final ExprList filterExpressions;
 
-	public ExecOpFilter( final ExprList filterExpressions, final boolean collectExceptions ) {
-		super(collectExceptions);
+	public ExecOpFilter( final ExprList filterExpressions,
+	                     final boolean collectExceptions,
+	                     final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		assert filterExpressions != null;
 		assert ! filterExpressions.isEmpty();
@@ -31,8 +34,10 @@ public class ExecOpFilter extends UnaryExecutableOpBase
 		this.filterExpressions = filterExpressions;
 	}
 
-	public ExecOpFilter( final Expr filterExpression, final boolean collectExceptions ) {
-		super(collectExceptions);
+	public ExecOpFilter( final Expr filterExpression,
+	                     final boolean collectExceptions,
+	                     final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		assert filterExpression != null;
 
@@ -51,30 +56,34 @@ public class ExecOpFilter extends UnaryExecutableOpBase
 	}
 
 	@Override
-	protected void _process( final List<SolutionMapping> inputSolMaps,
+	protected void _process( final Iterator<SolutionMapping> inputSolMaps,
+	                         final int maxBatchSize,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
-		// Iterate over the given list until either we find the first solution
+		// Iterate over the given input until either we find the first solution
 		// mapping that satisfies all of the filter expressions of this operator
 		// and, thus, can be passed on as an output solution mapping, or until
-		// the end of the list.
-		final Iterator<SolutionMapping> it = inputSolMaps.iterator();
+		// we have reached either the maximum batch size or the end of the
+		// iterator.
+		int cnt = 0;
 		SolutionMapping firstOutput = null;
-		while ( it.hasNext() && firstOutput == null ) {
-			final SolutionMapping inputSolMap = it.next();
+		while ( firstOutput == null && cnt < maxBatchSize && inputSolMaps.hasNext() ) {
+			final SolutionMapping inputSolMap = inputSolMaps.next();
+			cnt++;
 			if ( checkSolutionMapping(inputSolMap) == true ) {
 				firstOutput = inputSolMap;
 			}
 		}
 
-		// Continue consuming the rest of the list (if any). If we find
+		// Continue consuming the rest of the batch (if any). If we find
 		// further solution mappings that can be passed on as output, we
 		// collect them in an output list, with the earlier-found first
 		// output solution mapping as the first list element. We create
 		// the output list only in this case.
 		List<SolutionMapping> allOutput = null;
-		while ( it.hasNext() ) {
-			final SolutionMapping inputSolMap = it.next();
+		while ( cnt < maxBatchSize && inputSolMaps.hasNext() ) {
+			final SolutionMapping inputSolMap = inputSolMaps.next();
+			cnt++;
 			if ( checkSolutionMapping(inputSolMap) == true ) {
 				// We found another output solution mapping. Check whether
 				// we have already created the list; if not, create it now

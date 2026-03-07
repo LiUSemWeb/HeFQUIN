@@ -12,14 +12,16 @@ import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVars;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 
 /**
  * Pushes filter conditions as much as possible towards the leaf nodes
@@ -48,8 +50,8 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		}
 
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
-		if ( rootOp instanceof LogicalOpFilter ) {
-			return applyToPlanWithFilterAsRootOperator( (LogicalOpFilter) rootOp,
+		if ( rootOp instanceof LogicalOpFilter filterOp ) {
+			return applyToPlanWithFilterAsRootOperator( filterOp,
 			                                            inputPlan.getSubPlan(0), // subPlanUnderFilter
 			                                            inputPlan );
 		}
@@ -68,8 +70,8 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 			if ( noChanges )
 				return inputPlan;
-			else
-				return LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
+
+			return LogicalPlanUtils.createPlanWithSubPlans(rootOp, null, newSubPlans);
 		}
 	}
 
@@ -104,11 +106,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			                                         subPlanUnderFilter.getSubPlan(0),
 			                                         inputPlan );
 		}
-		else if (    childOpUnderFilter instanceof LogicalOpTPAdd
-		          || childOpUnderFilter instanceof LogicalOpTPOptAdd
-		          || childOpUnderFilter instanceof LogicalOpBGPAdd
-		          || childOpUnderFilter instanceof LogicalOpBGPOptAdd
-		          || childOpUnderFilter instanceof LogicalOpGPAdd
+		else if (    childOpUnderFilter instanceof LogicalOpGPAdd
 		          || childOpUnderFilter instanceof LogicalOpGPOptAdd )
 		{
 			return createPlanForAddOpUnderFilter( filterOp,
@@ -146,14 +144,23 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 	protected LogicalPlan createPlanForRequestUnderFilter( final LogicalOpFilter filterOp,
 	                                                       final LogicalOpRequest<?,?> reqOp,
 	                                                       final LogicalPlan inputPlan ) {
-		if ( reqOp.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
-			final SPARQLEndpoint ep = (SPARQLEndpoint) reqOp.getFederationMember();
-			final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
-			return MergeRequests.mergeFilterIntoSPARQLEndpointRequest(filterOp, ep, req);
-		}
-		else {
+		final FederationMember fm = reqOp.getFederationMember();
+
+		if ( ! fm.supportsMoreThanTriplePatterns() ) {
 			return inputPlan;
 		}
+
+		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
+		final ExprList exprList = filterOp.getFilterExpressions();
+		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(exprList);
+
+		if ( ! fm.isSupportedPattern(mergedPattern) ) {
+			return inputPlan;
+		}
+
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl(mergedPattern);
+		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>(fm, mergedReq);
+		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 	}
 
 	protected LogicalPlan createPlanForFilterUnderFilter( final LogicalOpFilter parentFilterOp,
@@ -169,8 +176,10 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		final ExprList childFilterExprsWithoutAND = splitConjunctions(childFilterExprs);
 		combinedFilterExprsWithoutAND.addAll(childFilterExprsWithoutAND);
 
-		final LogicalOpFilter newFilterOp = new LogicalOpFilter(combinedFilterExprsWithoutAND);
-		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(newFilterOp, subPlanUnderChildFilterOp);
+		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
+				new LogicalOpFilter(combinedFilterExprsWithoutAND),
+				null,
+				subPlanUnderChildFilterOp );
 
 		return apply(newPlan);
 	}
@@ -185,7 +194,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlansUnderUnion];
 		for ( int i = 0; i < numberOfSubPlansUnderUnion; i++ ) {
 			final LogicalPlan subPlanUnderUnion = subPlanUnderFilter.getSubPlan(i);
-			final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterOp, subPlanUnderUnion);
+			final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterOp, null, subPlanUnderUnion);
 			final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
 			newSubPlans[i] = newSubPlanWithFilterPushed;
 		}
@@ -194,7 +203,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		if ( numberOfSubPlansUnderUnion == 1 ) return newSubPlans[0];
 
 		final LogicalOperator unionOp = subPlanUnderFilter.getRootOperator(); // may be multiway union or binary union
-		return LogicalPlanUtils.createPlanWithSubPlans(unionOp, newSubPlans);
+		return LogicalPlanUtils.createPlanWithSubPlans(unionOp, null, newSubPlans);
 	}
 
 	protected LogicalPlan createPlanForBindUnderFilter( final LogicalOpFilter filterOp,
@@ -212,11 +221,14 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		// The filter can be pushed. In this case, create a new subplan with
 		// the filter as root operator on top of the subplan that was under
 		// the bind, and apply this heuristic recursively to this new subplan.
-		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(filterOp, subPlanUnderBind);
+		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
+				filterOp,
+				null,
+				subPlanUnderBind );
 		final LogicalPlan newSubPlan2 = apply(newSubPlan1);
 
 		// Finally, put together the new plan with the bind operator as root.
-		return LogicalPlanUtils.createPlanWithSubPlans(bindOp, newSubPlan2);
+		return LogicalPlanUtils.createPlanWithSubPlans(bindOp, null, newSubPlan2);
 	}
 
 	/**
@@ -311,18 +323,23 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return createPlanAfterPushingInSubPlan(parentFilterOp, childOp, subPlanUnderChildOp, inputPlan);
 		}
 
-		final LogicalOpFilter pushedFilterOp = new LogicalOpFilter(toBePushed);
-		final LogicalPlan newSubPlanUnderChildOp = new LogicalPlanWithUnaryRootImpl(pushedFilterOp, subPlanUnderChildOp);
+		final LogicalPlan newSubPlanUnderChildOp = new LogicalPlanWithUnaryRootImpl(
+				new LogicalOpFilter(toBePushed), // pushed filter op.
+				null,
+				subPlanUnderChildOp );
 		final LogicalPlan newSubPlanUnderChildOpRewritten = apply(newSubPlanUnderChildOp);
 
-		final LogicalPlan newSubPlanUnderRootOp = new LogicalPlanWithUnaryRootImpl(childOp, newSubPlanUnderChildOpRewritten);
+		final LogicalPlan newSubPlanUnderRootOp = new LogicalPlanWithUnaryRootImpl(
+				childOp,
+				null,
+				newSubPlanUnderChildOpRewritten );
 
 		if ( toBeKept.isEmpty() ) {
 			return newSubPlanUnderRootOp;
 		}
 
 		final LogicalOpFilter newRootFilterOp = new LogicalOpFilter(toBeKept);
-		return new LogicalPlanWithUnaryRootImpl(newRootFilterOp, newSubPlanUnderRootOp);
+		return new LogicalPlanWithUnaryRootImpl(newRootFilterOp, null, newSubPlanUnderRootOp);
 	}
 
 	protected LogicalPlan createPlanForJoinUnderFilter( final LogicalOpFilter filterOp,
@@ -334,7 +351,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		if ( numberOfSubPlansUnderJoin == 1 ) {
 			final LogicalPlan subPlan = subPlanUnderFilter.getSubPlan(0);
 			final LogicalPlan subPlanAfterFilterPushDown = apply(subPlan);
-			return new LogicalPlanWithUnaryRootImpl(filterOp, subPlanAfterFilterPushDown);
+			return new LogicalPlanWithUnaryRootImpl(filterOp, null, subPlanAfterFilterPushDown);
 		}
 
 		// Determine the sets of certain variables in each of the subplans
@@ -445,7 +462,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 				else {
 					// There are filter conditions to be pushed to the current subplan.
 					final LogicalOpFilter filterForSubPlan = new LogicalOpFilter( toBePushed[i] );
-					final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterForSubPlan, oldSubPlan);
+					final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterForSubPlan, null, oldSubPlan);
 					final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
 					newSubPlansUnderJoin[i] = newSubPlanWithFilterPushed;
 				}
@@ -454,12 +471,17 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		// Create the new rewritten plan to be returned.
 		final LogicalOperator joinOp = subPlanUnderFilter.getRootOperator(); // may be multiway join or binary join
-		final LogicalPlan newSubPlanUnderFilter = LogicalPlanUtils.createPlanWithSubPlans( joinOp,
-		                                                                                   newSubPlansUnderJoin );
+		final LogicalPlan newSubPlanUnderFilter = LogicalPlanUtils.createPlanWithSubPlans(
+				joinOp,
+				null,
+				newSubPlansUnderJoin );
+
 		if ( newFilterOp == null )
 			return newSubPlanUnderFilter;
 		else
-			return new LogicalPlanWithUnaryRootImpl(newFilterOp, newSubPlanUnderFilter);
+			return new LogicalPlanWithUnaryRootImpl( newFilterOp,
+			                                         null,
+			                                         newSubPlanUnderFilter );
 	}
 
 	protected LogicalPlan createPlanForRightJoinUnderFilter( final LogicalOpFilter filterOp,
@@ -511,13 +533,18 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		}
 
 		// Create the new rewritten plan to be returned.
-		final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithBinaryRootImpl( LogicalOpRightJoin.getInstance(),
-		                                                                             newOptSubPlan,
-		                                                                             newNonOptSubPlan );
+		final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithBinaryRootImpl(
+				LogicalOpRightJoin.getInstance(),
+				null,
+				newOptSubPlan,
+				newNonOptSubPlan );
+
 		if ( newFilterOp == null )
 			return newSubPlanUnderFilter;
 		else
-			return new LogicalPlanWithUnaryRootImpl(newFilterOp, newSubPlanUnderFilter);
+			return new LogicalPlanWithUnaryRootImpl( newFilterOp,
+			                                         null,
+			                                         newSubPlanUnderFilter );
 	}
 
 	protected LogicalPlan createPlanForMultiwayLeftJoinUnderFilter( final LogicalOpFilter filterOp,
@@ -588,12 +615,17 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		}
 
 		// Create the new rewritten plan to be returned.
-		final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayLeftJoin.getInstance(),
-		                                                                           newSubPlansUnderJoin );
+		final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithNaryRootImpl(
+				LogicalOpMultiwayLeftJoin.getInstance(),
+				null,
+				newSubPlansUnderJoin );
+
 		if ( newFilterOp == null )
 			return newSubPlanUnderFilter;
 		else
-			return new LogicalPlanWithUnaryRootImpl(newFilterOp, newSubPlanUnderFilter);
+			return new LogicalPlanWithUnaryRootImpl( newFilterOp,
+			                                         null,
+			                                         newSubPlanUnderFilter );
 	}
 
 
@@ -637,7 +669,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		else {
 			// There are filter conditions to be pushed to the subplan.
 			final LogicalOpFilter filterForSubPlan = new LogicalOpFilter(toBePushed);
-			final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterForSubPlan, nonoptSubPlan);
+			final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterForSubPlan, null, nonoptSubPlan);
 			final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
 			return newSubPlanWithFilterPushed;
 		}
@@ -659,8 +691,14 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		}
 
 		// After pushing filters in the subplan, create a new plan.
-		final LogicalPlan newPlanUnderFilter = new LogicalPlanWithUnaryRootImpl(childOp, newPlanUnderChildRoot);
-		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(parentFilterOp, newPlanUnderFilter);
+		final LogicalPlan newPlanUnderFilter = new LogicalPlanWithUnaryRootImpl(
+				childOp,
+				null,
+				newPlanUnderChildRoot );
+		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
+				parentFilterOp,
+				null,
+				newPlanUnderFilter );
 		return newPlan;
 	}
 

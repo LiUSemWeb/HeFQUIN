@@ -14,12 +14,15 @@ import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public class HeFQUINEngineConfigReaderTest
 {
@@ -271,8 +274,7 @@ public class HeFQUINEngineConfigReaderTest
 	protected Resource parseAndCreateResource( final String turtle ) {
 		final Model m = ModelFactory.createDefaultModel();
 
-		final RDFParserBuilder b = RDFParser.fromString(turtle);
-		b.lang( Lang.TURTLE );
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
 		b.parse(m);
 
 		return m.createResource("http://example.org/a");
@@ -308,10 +310,19 @@ public class HeFQUINEngineConfigReaderTest
 			public PhysicalPlanPrinter getPhysicalPlanPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
+			public ExecutablePlanPrinter getExecutablePlanPrinter() { throw new UnsupportedOperationException(); }
+
+			@Override
 			public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
 
 			@Override
 			public CostModel getCostModel() { throw new UnsupportedOperationException(); }
+
+			@Override
+			public void complete( final LogicalToPhysicalPlanConverter c ) { throw new UnsupportedOperationException(); }
+
+			@Override
+			public void complete( final LogicalToPhysicalOpConverter c ) { throw new UnsupportedOperationException(); }
 		};
 	}
 
@@ -330,6 +341,16 @@ public class HeFQUINEngineConfigReaderTest
 
 				@Override
 				public ExecutorService getExecutorServiceForPlanTasks() {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() {
 					throw new UnsupportedOperationException();
 				}
 
@@ -374,10 +395,19 @@ public class HeFQUINEngineConfigReaderTest
 			public PhysicalPlanPrinter getPhysicalPlanPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
+			public ExecutablePlanPrinter getExecutablePlanPrinter() { throw new UnsupportedOperationException(); }
+
+			@Override
 			public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
 
 			@Override
 			public CostModel getCostModel() { throw new UnsupportedOperationException(); }
+
+			@Override
+			public void complete(LogicalToPhysicalPlanConverter c) { throw new UnsupportedOperationException(); }
+
+			@Override
+			public void complete(LogicalToPhysicalOpConverter c) { throw new UnsupportedOperationException(); }
 		};
 	}
 

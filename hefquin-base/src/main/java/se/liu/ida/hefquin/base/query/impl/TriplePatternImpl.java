@@ -6,8 +6,8 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.util.FmtUtils;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
@@ -130,17 +130,24 @@ public class TriplePatternImpl implements TriplePattern
 	}
 
 	@Override
-	public TriplePattern applySolMapToGraphPattern( final SolutionMapping sm )
+	public TriplePattern applySolMapToGraphPattern( final Binding sm )
 			throws VariableByBlankNodeSubstitutionException
 	{
-		final Binding b = sm.asJenaBinding();
-		boolean unchanged = true;
+		return applySolMapToTriplePattern( sm, this );
+	}
 
-		Node s = jenaObj.getSubject();
+	public static TriplePattern applySolMapToTriplePattern( final Binding sm,
+	                                                        final TriplePattern tp )
+			throws VariableByBlankNodeSubstitutionException
+	{
+		boolean unchanged = true;
+		final Triple jenaTP = tp.asJenaTriple();
+
+		Node s = jenaTP.getSubject();
 		if ( s.isVariable() ) {
 			final Var var = Var.alloc(s);
-			if ( b.contains(var) ) {
-				s = b.get(var);
+			if ( sm.contains(var) ) {
+				s = sm.get(var);
 				unchanged = false;
 				if ( s.isBlank() ) {
 					throw new VariableByBlankNodeSubstitutionException();
@@ -148,11 +155,11 @@ public class TriplePatternImpl implements TriplePattern
 			}
 		}
 
-		Node p = jenaObj.getPredicate();
+		Node p = jenaTP.getPredicate();
 		if ( p.isVariable() ) {
 			final Var var = Var.alloc(p);
-			if ( b.contains(var) ) {
-				p = b.get(var);
+			if ( sm.contains(var) ) {
+				p = sm.get(var);
 				unchanged = false;
 				if ( p.isBlank() ) {
 					throw new VariableByBlankNodeSubstitutionException();
@@ -160,11 +167,11 @@ public class TriplePatternImpl implements TriplePattern
 			}
 		}
 
-		Node o = jenaObj.getObject();
+		Node o = jenaTP.getObject();
 		if ( o.isVariable() ) {
 			final Var var = Var.alloc(o);
-			if ( b.contains(var) ) {
-				o = b.get(var);
+			if ( sm.contains(var) ) {
+				o = sm.get(var);
 				unchanged = false;
 				if ( o.isBlank() ) {
 					throw new VariableByBlankNodeSubstitutionException();
@@ -172,7 +179,7 @@ public class TriplePatternImpl implements TriplePattern
 			}
 		}
 
-		return unchanged ? this : new TriplePatternImpl(s,p,o);
+		return unchanged ? tp : new TriplePatternImpl(s,p,o);
 	}
 
 	@Override
@@ -222,6 +229,11 @@ public class TriplePatternImpl implements TriplePattern
 
 		final Element resultElmt = ElementUtils.merge( tp.asJenaTriple(), elmt );
 		return new GenericSPARQLGraphPatternImpl1(resultElmt);
+	}
+
+	@Override
+	public String toStringForPlanPrinters() {
+		return "(" + FmtUtils.stringForTriple(jenaObj) + ")";
 	}
 
 }

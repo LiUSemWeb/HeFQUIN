@@ -27,15 +27,18 @@ public class PullUpLtgOverUnion implements HeuristicForLogicalOptimization {
 		}
 
 		final LogicalPlan newPlan;
-		final LogicalOperator rootOp = inputPlan.getRootOperator();
-		if ( noChanges )
+		if ( noChanges ) {
 			newPlan = inputPlan;
+		}
 		else {
-			newPlan = LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
+			final LogicalOperator rootOp = inputPlan.getRootOperator();
+			newPlan = LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+			                                                   null,
+			                                                   newSubPlans );
 		}
 
 		if ( checkIfLtgCanBeExtractedOverUnion(newPlan) ) {
-			return extractLtgOverNaryOp( newPlan );
+			return extractLtgOverNaryOp(newPlan);
 		}
 		else {
 			return newPlan;
@@ -91,10 +94,13 @@ public class PullUpLtgOverUnion implements HeuristicForLogicalOptimization {
 			newSubPlans[i] = newSubPlan;
 		}
 
-		final LogicalPlan newNextPlan = LogicalPlanUtils.createPlanWithSubPlans( inputPlan.getRootOperator(), newSubPlans);
+		final LogicalPlan newNextPlan = LogicalPlanUtils.createPlanWithSubPlans(
+				inputPlan.getRootOperator(),
+				null,
+				newSubPlans );
 
 		final LogicalOpLocalToGlobal l2g = (LogicalOpLocalToGlobal) inputPlan.getSubPlan(0).getRootOperator();
-		return new LogicalPlanWithUnaryRootImpl(l2g, newNextPlan);
+		return new LogicalPlanWithUnaryRootImpl(l2g, null, newNextPlan);
 	}
 
 }

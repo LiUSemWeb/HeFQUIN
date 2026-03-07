@@ -21,7 +21,7 @@ public class NodeMappingImpl_AllToBNodesTest {
         final Node resultNode = nodeMapping.map(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isBlank());
-        assertEquals(resultNode.getBlankNodeId().toString(), "0");
+        assertEquals(resultNode.getBlankNodeLabel(), "0");
     }
 
     @Test

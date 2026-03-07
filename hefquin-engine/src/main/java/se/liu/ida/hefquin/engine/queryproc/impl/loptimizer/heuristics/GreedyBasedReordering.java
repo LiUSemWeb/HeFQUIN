@@ -52,16 +52,16 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         final LogicalOperator rootOp = inputPlan.getRootOperator();
         if ( noChanges )
             newPlan = inputPlan;
-        else {
-            newPlan = LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
-        }
+        else
+            newPlan = LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+                                                               null,
+                                                               newSubPlans );
 
-        if ( rootOp instanceof LogicalOpJoin || rootOp instanceof LogicalOpMultiwayJoin) {
-            return reorderSubPlans( newPlan );
-        }
-        else {
+        if (    rootOp instanceof LogicalOpJoin
+             || rootOp instanceof LogicalOpMultiwayJoin )
+            return reorderSubPlans(newPlan);
+        else
             return newPlan;
-        }
     }
 
     protected LogicalPlan reorderSubPlans( final LogicalPlan inputPlan ) {
@@ -101,7 +101,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         for ( final QueryAnalyzer query: selectedSubPlans  ) {
             subPlans.add( query.getPlan() );
         }
-        return LogicalPlanUtils.createPlanWithMultiwayJoin( subPlans );
+        return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans, null);
     }
 
 }

@@ -27,11 +27,14 @@ public class RemovePairsOfG2lAndL2g implements HeuristicForLogicalOptimization {
 		}
 
 		final LogicalPlan newPlan;
-		final LogicalOperator rootOp = inputPlan.getRootOperator();
-		if ( noChanges )
+		if ( noChanges ) {
 			newPlan = inputPlan;
+		}
 		else {
-			newPlan = LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
+			final LogicalOperator rootOp = inputPlan.getRootOperator();
+			newPlan = LogicalPlanUtils.createPlanWithSubPlans( rootOp,
+			                                                   null,
+			                                                   newSubPlans );
 		}
 
 		if ( checkIfG2lAndL2gPairsRemovable(newPlan) ) {

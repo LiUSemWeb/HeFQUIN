@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -10,7 +9,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -147,13 +145,4 @@ public class PushBasedExecutablePlanImpl implements ExecutablePlan
 		return allExceptions;
 	}
 
-	public void print( final PrintStream str ) {
-		int j = 0;
-		for ( final PushBasedPlanThread t : tasks ) {
-			str.println( "Task #" + j );
-			StatsPrinter.print( t.getStats(), str, true );
-
-			j++;
-		}
-	}
 }

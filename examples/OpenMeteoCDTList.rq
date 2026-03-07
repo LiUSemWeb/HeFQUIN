@@ -1,0 +1,36 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX owl:    <http://www.w3.org/2002/07/owl#>
+PREFIX dbo:    <http://dbpedia.org/ontology/>
+PREFIX geo:    <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX cdt:    <http://w3id.org/awslabs/neptune/SPARQL-CDTs/>
+PREFIX ex:     <http://example.org/>
+
+# While also similar to the previous queries, this one demonstrates that the
+# RML processor of HeFQUIN creates cdt:List literals for cases in which the
+# object map of an RML triples map refers to a JSON array (rather than to the
+# elements of such an array). The BIND clauses at the end of the query apply
+# functions that have been defined for cdt:Map literals.
+#
+# Notice that the requested weather information in this case is not the
+# current one but an hourly forecast, because the JSON data with hourly
+# forecasts from the Open-Meteo API does indeed contain arrays.
+
+SELECT * WHERE {
+	SERVICE <http://dbpedia.org/sparql> {
+		<http://dbpedia.org/resource/Berlin> geo:lat ?lat ;
+		                                     geo:long ?long .
+	}
+
+	BIND ( "temperature_2m" AS ?req)
+
+	SERVICE <http://example.org/OpenMeteoWrapper> PARAMS(?lat AS "latitude",
+	                                                     ?long AS "longitude",
+	                                                     ?req AS "hourly") {
+		?x ex:hourly_temperature ?list .
+	}
+
+	BIND ( cdt:size(?list) AS ?size )
+	BIND ( cdt:get(?list, 1) AS ?firstTemp )
+}

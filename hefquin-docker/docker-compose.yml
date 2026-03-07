@@ -16,5 +16,5 @@ services:
     ### the following three lines and change their respective first parts
     ### to refer to the files that you want to use.
     #volumes:
-      #- ../hefquin-service/src/main/resources/DefaultEngineConf.ttl:/usr/local/tomcat/webapps/ROOT/DefaultEngineConf.ttl
-      #- ../hefquin-service/src/main/resources/DefaultFedConf.ttl:/usr/local/tomcat/webapps/ROOT/DefaultFedConf.ttl
+      #- ../config/MyConfDescr.ttl:/usr/local/tomcat/webapps/ROOT/config/DefaultConfDescr.ttl
+      #- ../config/MyFedConf.ttl:/usr/local/tomcat/webapps/ROOT/config/DefaultFedConf.ttl

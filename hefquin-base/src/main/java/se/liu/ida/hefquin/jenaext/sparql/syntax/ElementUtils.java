@@ -50,7 +50,7 @@ public class ElementUtils
 		// - now add the filters to the group
 		for ( final Expr expr : exprs ) {
 			final ElementFilter f = new ElementFilter(expr);
-			group.addElementFilter(f);
+			group.addElement(f);
 		}
 
 		return group;

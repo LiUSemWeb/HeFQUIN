@@ -1,21 +1,22 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.federation.BRTPFServer;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.TPFServer;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinSPARQL;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinTPF;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
  * A physical operator that implements a version of the index nested loops
@@ -44,7 +45,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * outer loop to the given graph pattern of the operator (i.e., substituting
  * the join variables in the pattern by the values assigned in the current
  * input solution mapping) and, then, performing a request with the graph
- * pattern resulting from the substitution.
+ * pattern resulting from the substitution. Hence, this is like a bind join
+ * without batching.
  * </p>
  *
  * The actual algorithm of this operator is implemented in the following three
@@ -58,121 +60,120 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  */
 public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInputJoin
 {
-	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpTPAdd lop ) {
+	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
+
+	protected PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPAdd lop ) {
 		super(lop);
+
+		assert ! lop.hasParameterVariables();
 	}
 
-	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpTPOptAdd lop ) {
+	protected PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPOptAdd lop ) {
 		super(lop);
-	}
-
-	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpBGPAdd lop ) {
-		super(lop);
-	}
-
-	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpBGPOptAdd lop ) {
-		super(lop);
-	}
-
-	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPAdd lop ) {
-		super(lop);
-	}
-
-	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPOptAdd lop ) {
-		super(lop);
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpIndexNestedLoopsJoin
-				&& ((PhysicalOpIndexNestedLoopsJoin) o).lop.equals(lop);
 	}
 
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables ... inputVars )
 	{
-		if ( lop instanceof LogicalOpTPAdd ) {
-			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
-			final FederationMember fm = tpAdd.getFederationMember();
-			final boolean useOuterJoinSemantics = false;
+		final SPARQLGraphPattern gp;
+		final TriplePattern tp;
+		final FederationMember fm;
+		final boolean useOuterJoin;
 
-			if ( fm instanceof TPFServer )
-				return new ExecOpIndexNestedLoopsJoinTPF( tpAdd.getTP(), (TPFServer) fm, useOuterJoinSemantics, collectExceptions );
-			else if ( fm instanceof BRTPFServer )
-				return new ExecOpIndexNestedLoopsJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics, collectExceptions );
-			else if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpIndexNestedLoopsJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
-			else
-				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
-		}
-		else if ( lop instanceof LogicalOpTPOptAdd ) {
-			final LogicalOpTPOptAdd tpAdd = (LogicalOpTPOptAdd) lop;
-			final FederationMember fm = tpAdd.getFederationMember();
-			final boolean useOuterJoinSemantics = true;
+		if ( lop instanceof LogicalOpGPAdd gpAdd ) {
+			gp = gpAdd.getPattern();
+			fm = gpAdd.getFederationMember();
+			useOuterJoin = false;
 
-			if ( fm instanceof TPFServer )
-				return new ExecOpIndexNestedLoopsJoinTPF( tpAdd.getTP(), (TPFServer) fm, useOuterJoinSemantics, collectExceptions );
-			else if ( fm instanceof BRTPFServer )
-				return new ExecOpIndexNestedLoopsJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics, collectExceptions );
-			else if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpIndexNestedLoopsJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
+			if ( fm instanceof TPFServer || fm instanceof BRTPFServer )
+				tp = gpAdd.getTP();
 			else
-				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+				tp = null;
 		}
-		else if ( lop instanceof LogicalOpBGPAdd ) {
-			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) lop;
-			final FederationMember fm = bgpAdd.getFederationMember();
-			final boolean useOuterJoinSemantics = false;
+		else if ( lop instanceof LogicalOpGPOptAdd gpAdd ) {
+			gp = gpAdd.getPattern();
+			fm = gpAdd.getFederationMember();
+			useOuterJoin = true;
 
-			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpIndexNestedLoopsJoinSPARQL( bgpAdd.getBGP(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
+			if ( fm instanceof TPFServer || fm instanceof BRTPFServer )
+				tp = gpAdd.getTP();
 			else
-				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+				tp = null;
 		}
-		else if ( lop instanceof LogicalOpBGPOptAdd ) {
-			final LogicalOpBGPOptAdd bgpAdd = (LogicalOpBGPOptAdd) lop;
-			final FederationMember fm = bgpAdd.getFederationMember();
-			final boolean useOuterJoinSemantics = true;
-
-			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpIndexNestedLoopsJoinSPARQL( bgpAdd.getBGP(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
-			else
-				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
-		}
-		else if ( lop instanceof LogicalOpGPAdd ) {
-			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
-			final FederationMember fm = gpAdd.getFederationMember();
-			final boolean useOuterJoinSemantics = false;
-
-			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpIndexNestedLoopsJoinSPARQL( gpAdd.getPattern(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
-			else
-				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
-		}
-		else if ( lop instanceof LogicalOpGPOptAdd ) {
-			final LogicalOpGPOptAdd gpAdd = (LogicalOpGPOptAdd) lop;
-			final FederationMember fm = gpAdd.getFederationMember();
-			final boolean useOuterJoinSemantics = true;
-
-			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpIndexNestedLoopsJoinSPARQL( gpAdd.getPattern(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
-			else
-				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
-		}
-		else
+		else {
 			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
+		}
+
+		if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
+			if ( tp == null ) {
+				throw new IllegalArgumentException("For TPF and brTPF, the graph pattern must be a triple pattern, but it is: " + gp.getClass().getName() );
+			}
+		}
+
+		if ( fm instanceof TPFServer tpf ) // this include brTPF servers
+			return new ExecOpIndexNestedLoopsJoinTPF(tp, tpf, useOuterJoin, collectExceptions, qpInfo);
+		else if ( fm instanceof SPARQLEndpoint ep )
+			return new ExecOpIndexNestedLoopsJoinSPARQL(gp, ep, useOuterJoin, collectExceptions, qpInfo);
+		else
+			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}
 
 	@Override
-	public void visit(final PhysicalPlanVisitor visitor) {
+	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
 
 	@Override
-	public String toString(){
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
 
-		return "> indexNestedLoop" + lop.toString();
+		return    o instanceof PhysicalOpIndexNestedLoopsJoin oo
+		       && oo.lop.equals(lop);
 	}
 
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ lop.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "idxNLJ for " + lop.toString();
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return    isSupported( op.getFederationMember() )
+				       && ! op.hasParameterVariables();
+			}
+			if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return isSupported( op.getFederationMember() );
+			}
+			return false;
+		}
+
+		@Override
+		public PhysicalOpIndexNestedLoopsJoin create( final UnaryLogicalOp lop ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return new PhysicalOpIndexNestedLoopsJoin(op);
+			}
+			else if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return new PhysicalOpIndexNestedLoopsJoin(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+
+		private boolean isSupported( final FederationMember fm ) {
+			return    fm instanceof SPARQLEndpoint
+			       || fm instanceof TPFServer
+			       || fm instanceof BRTPFServer;
+		}
+	}
 }

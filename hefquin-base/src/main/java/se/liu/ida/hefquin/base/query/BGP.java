@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.base.query;
 
 import java.util.Set;
 
+import org.apache.jena.sparql.engine.binding.Binding;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 
 /**
@@ -20,7 +22,12 @@ public interface BGP extends SPARQLGraphPattern
 	String toString();
 
 	@Override
-	BGP applySolMapToGraphPattern( SolutionMapping sm ) throws VariableByBlankNodeSubstitutionException;
+	BGP applySolMapToGraphPattern( Binding sm ) throws VariableByBlankNodeSubstitutionException;
+
+	@Override
+	default BGP applySolMapToGraphPattern( final SolutionMapping sm ) throws VariableByBlankNodeSubstitutionException {
+		return applySolMapToGraphPattern( sm.asJenaBinding() );
+	}
 
 	/**
 	 * Returns a BGP that contains all triple patterns of this BGP plus

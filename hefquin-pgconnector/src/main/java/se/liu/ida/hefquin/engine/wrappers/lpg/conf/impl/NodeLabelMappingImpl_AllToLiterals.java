@@ -10,7 +10,7 @@ public class NodeLabelMappingImpl_AllToLiterals implements NodeLabelMapping{
 
     @Override
     public Node map(final String label) {
-        return NodeFactory.createLiteral(label);
+        return NodeFactory.createLiteralString(label);
     }
 
     @Override

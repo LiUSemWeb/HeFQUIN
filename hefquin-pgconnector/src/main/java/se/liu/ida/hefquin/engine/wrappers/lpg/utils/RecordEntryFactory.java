@@ -90,7 +90,7 @@ public class RecordEntryFactory
         }
 
         if ( valNode.isObject() ) {
-            final Iterator<Map.Entry<String, JsonNode>> it = valNode.fields();
+            final Iterator<Map.Entry<String, JsonNode>> it = valNode.properties().iterator();
             final Map<String, Object> m = new HashMap<>();
             while ( it.hasNext() ) {
                 final Map.Entry<String, JsonNode> e = it.next();

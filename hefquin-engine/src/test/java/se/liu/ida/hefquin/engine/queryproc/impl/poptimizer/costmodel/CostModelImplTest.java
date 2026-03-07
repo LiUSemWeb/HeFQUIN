@@ -13,14 +13,13 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.EngineTestBase;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 
 /**
  * Attention: the tests here do NOT actually test the cost model. Instead,
@@ -186,9 +185,7 @@ public class CostModelImplTest extends EngineTestBase
 		final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 		final FederationMember fm = new TPFServerForTest();
 
-		final LogicalOpRequest<?,?>  reqOp = new LogicalOpRequest<>(fm, req);
-
-		return PhysicalPlanFactory.createPlanWithRequest(reqOp);
+		return PhysicalPlanFactory.createPlanWithRequest(req, fm);
 	}
 
 	/**

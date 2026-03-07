@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpFilter extends LogicalOperatorBase implements UnaryLogicalOp
+public class LogicalOpFilter implements UnaryLogicalOp
 {
 	protected final ExprList filterExpressions;
 
@@ -31,20 +31,6 @@ public class LogicalOpFilter extends LogicalOperatorBase implements UnaryLogical
 		return inputVars[0];
 	}
 
-	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this ) return true;
-		if ( ! (o instanceof LogicalOpFilter) ) return false;
-
-		final LogicalOpFilter oo = (LogicalOpFilter) o;
-		return oo.filterExpressions.equals(filterExpressions); 
-	}
-
-	@Override
-	public int hashCode(){
-		return filterExpressions.hashCode();
-	}
-
 	public ExprList getFilterExpressions() {
 		return filterExpressions;
 	}
@@ -55,8 +41,21 @@ public class LogicalOpFilter extends LogicalOperatorBase implements UnaryLogical
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof LogicalOpFilter oo
+		       && oo.filterExpressions.equals(filterExpressions); 
+	}
+
+	@Override
+	public int hashCode(){
+		return getClass().hashCode() ^ filterExpressions.hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> filter ( " + filterExpressions.toString() + " )";
+		return "Filter ( " + filterExpressions.toString() + " )";
 	}
 
 }

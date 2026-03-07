@@ -22,12 +22,12 @@ public class NodeLabelMappingImpl_SingleMatchToLiteralTest {
         final Node resultNode = nodeLabelMapping.map("DIRECTED");
         assertNotNull(resultNode);
         assertTrue(resultNode.isLiteral());
-        assertEquals(resultNode.getLiteral().toString(), "directorOf");
+        assertEquals(resultNode.getLiteralLexicalForm(), "directorOf");
     }
 
     @Test
     public void unmapSingleLiteralNodeLabel(){
-        final Node node = NodeFactory.createLiteral("directorOf");
+        final Node node = NodeFactory.createLiteralString("directorOf");
         final String resultString = nodeLabelMapping.unmap(node);
         assertNotNull(resultString);
         assertEquals(resultString, "DIRECTED");
@@ -35,7 +35,7 @@ public class NodeLabelMappingImpl_SingleMatchToLiteralTest {
 
     @Test
     public void singleLiteralNodeLabelIsPossibleResult(){
-        final Node literalNode = NodeFactory.createLiteral("directorOf");
+        final Node literalNode = NodeFactory.createLiteralString("directorOf");
         final Node IRINode = NodeFactory.createURI("http://singleExample.org/directorOf");
         final boolean literalIsPossible = nodeLabelMapping.isPossibleResult(literalNode);
         final boolean IRIIsPossible = nodeLabelMapping.isPossibleResult(IRINode);

@@ -1,9 +1,18 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
@@ -20,21 +29,20 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  */
 public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 {
-	public PhysicalOpHashJoin( final LogicalOpJoin lop ) {
-		super(lop);
-	}
+	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
 
-	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpHashJoin && ((PhysicalOpHashJoin) o).lop.equals(lop);
-	}
+	private static PhysicalOpHashJoin singleton = null;
+
+	protected PhysicalOpHashJoin() { }
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                        final QueryPlanningInfo qpInfo,
 	                                        final ExpectedVariables ... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashJoin( inputVars[0], inputVars[1], collectExceptions );
+		return new ExecOpHashJoin( inputVars[0], inputVars[1], collectExceptions, qpInfo );
 	}
 
 	@Override
@@ -43,7 +51,48 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof PhysicalOpHashJoin;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ getLogicalOperator().hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> hashJoin ";
+		return "hash join";
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			// inputVars contains null value?
+			for ( final ExpectedVariables vars : inputVars ) {
+				if ( vars == null ) return false;
+			}
+
+			final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars);
+			return ( joinVars != null && ! joinVars.isEmpty() && lop instanceof LogicalOpJoin );
+		}
+
+		@Override
+		public PhysicalOpHashJoin create( final BinaryLogicalOp lop ) {
+			if ( lop instanceof LogicalOpJoin ) {
+				return getInstance();
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
+
+	public static PhysicalOpHashJoin getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpHashJoin();
+
+		return singleton;
 	}
 }

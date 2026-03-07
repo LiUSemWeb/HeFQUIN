@@ -1,17 +1,40 @@
 package se.liu.ida.hefquin.engine;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.query.ARQ;
+import org.apache.jena.query.QueryVisitor;
+import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFParser;
+import org.apache.jena.sparql.core.Prologue;
+import org.apache.jena.sparql.engine.ExecutionContext;
+import org.apache.jena.sparql.engine.QueryEngineRegistry;
+import org.apache.jena.sparql.engine.main.OpExecutor;
+import org.apache.jena.sparql.engine.main.OpExecutorFactory;
+import org.apache.jena.sparql.engine.main.QC;
+import org.apache.jena.sparql.lang.SPARQLParser;
+import org.apache.jena.sparql.lang.SPARQLParserFactory;
+import org.apache.jena.sparql.lang.SPARQLParserRegistry;
+import org.apache.jena.sparql.serializer.QuerySerializerFactory;
+import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.sparql.serializer.SerializerRegistry;
+
 import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader.Context;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationDescriptionReader;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.federation.catalog.FederationDescriptionReader;
+import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
+import se.liu.ida.hefquin.jenaext.sparql.engine.main.QueryEngineMainForHeFQUIN;
+import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
+import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINEngineConstants;
+import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
 /**
  * Builder class that can be used to create a fully-wired instance of
@@ -28,6 +51,10 @@ public class HeFQUINEngineBuilder
 	private LogicalPlanPrinter srcasgPrinter = null;
 	private LogicalPlanPrinter lplanPrinter = null;
 	private PhysicalPlanPrinter pplanPrinter = null;
+	private ExecutablePlanPrinter eplanPrinter = null;
+
+	private final int DEFAULT_THREAD_POOL_SIZE = 10;
+	private final String DEFAULT_CONF_DESCR_FILE = "config/DefaultConfDescr.ttl";
 
 	/**
 	 * Sets the federation catalog to be used by the engine.
@@ -108,6 +135,17 @@ public class HeFQUINEngineBuilder
 	}
 
 	/**
+	 * Sets the executable plan printer to be used by the engine.
+	 *
+	 * @param printer a executable plan printer
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withExecutablePlanPrinter( final ExecutablePlanPrinter printer ) {
+		this.eplanPrinter = printer;
+		return this;
+	}
+
+	/**
 	 * Sets the source assignment printer to be used by the engine.
 	 *
 	 * @param printer a logical plan printer to be used when printing a source
@@ -155,16 +193,14 @@ public class HeFQUINEngineBuilder
 		if( fedCat == null ){
 			throw new IllegalStateException("No federation catalog has been set");
 		}
-
 		if ( execFed == null ) {
-			execFed = HeFQUINEngineDefaultComponents.createExecutorServiceForFedAccess();
+			execFed = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
 		}
 		if ( execPlan == null ) {
-			execPlan = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
+			execPlan = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
 		}
 		if ( engineConf == null ) {
-			final String ttl = HeFQUINEngineDefaultComponents.getDefaultConfigurationDescription();
-			engineConf = RDFParser.fromString(ttl).lang(Lang.TURTLE).toModel();
+			engineConf = RDFDataMgr.loadDataset(DEFAULT_CONF_DESCR_FILE).getDefaultModel();
 		}
 
 		// create context
@@ -177,13 +213,78 @@ public class HeFQUINEngineBuilder
 			public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
 			public LogicalPlanPrinter getLogicalPlanPrinter() { return lplanPrinter; }
 			public PhysicalPlanPrinter getPhysicalPlanPrinter() { return pplanPrinter; }
+			public ExecutablePlanPrinter getExecutablePlanPrinter() { return eplanPrinter; }
 		};
 
 		// init engine
-		final HeFQUINEngine engine = new HeFQUINEngineConfigReader().read(engineConf, ctx);
-		ARQ.init();
-		engine.integrateIntoJena();
+		final HeFQUINEngineConfigReader confReader = new HeFQUINEngineConfigReader();
+		final FederationAccessManager fedAccessMgr = confReader.readFederationAccessManager(engineConf, ctx);
+		final QueryProcessor qProc = confReader.readQueryProcessor(engineConf, ctx, fedAccessMgr);
+
+		final HeFQUINEngine engine = new HeFQUINEngine(fedAccessMgr, qProc);
+
+		// integrate the engine into the Jena/ARQ machinery
+		integrateEngineIntoJena(qProc);
 
 		return engine;
 	}
+
+	/**
+	 * This method integrates the given processor of the HeFQUIN
+	 * engine into the query processing machinery of Jena ARQ.
+	 */
+	protected void integrateEngineIntoJena( final QueryProcessor qProc ) {
+		final OpExecutorFactory factory = new OpExecutorFactory() {
+			@Override
+			public OpExecutor create( final ExecutionContext execCxt ) {
+				final Boolean b = execCxt.getContext().get( HeFQUINEngineConstants.sysExecuteWithJena );
+				if ( b != null && b == true )
+					return OpExecutor.stdFactory.create(execCxt);
+
+				return new OpExecutorHeFQUIN(qProc, execCxt);
+			}
+		};
+
+		ARQ.init();
+		QC.setFactory( ARQ.getContext(), factory );
+
+		final SPARQLParserFactory pFact = new SPARQLParserFactory() {
+			@Override
+			public boolean accept( final Syntax syntax ) {
+				return SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN.equals(syntax);
+			}
+
+			@Override
+			public SPARQLParser create( final Syntax syntax ) {
+				return new ParserSPARQL12HeFQUIN();
+			}
+		};
+
+		SPARQLParserRegistry.addFactory( SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN,
+		                                 pFact );
+
+		final QuerySerializerFactory sFact1 = SerializerRegistry.get().getQuerySerializerFactory( Syntax.syntaxSPARQL_12 );
+		final QuerySerializerFactory sFact2 = new QuerySerializerFactory() {
+			@Override
+			public boolean accept( final Syntax syntax ) {
+				return SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN.equals(syntax);
+			}
+
+			@Override
+			public QueryVisitor create(Syntax syntax, Prologue prologue, IndentedWriter writer) {
+				return sFact1.create(syntax, prologue, writer);
+			}
+
+			@Override
+			public QueryVisitor create(Syntax syntax, SerializationContext context, IndentedWriter writer) {
+				return sFact1.create(syntax, context, writer);
+			}
+		};
+
+		SerializerRegistry.get().addQuerySerializer( SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN,
+		                                             sFact2 );
+
+		QueryEngineRegistry.addFactory( QueryEngineMainForHeFQUIN.factory );
+	}
+
 }

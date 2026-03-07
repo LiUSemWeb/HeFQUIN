@@ -5,16 +5,21 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.atlas.io.IndentedLineBuffer;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.ARQConstants;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprTransformSubstitute;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.serializer.FormatterElement;
+import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementBind;
 import org.apache.jena.sparql.syntax.ElementFilter;
@@ -25,7 +30,6 @@ import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
@@ -137,12 +141,12 @@ public class GenericSPARQLGraphPatternImpl1 implements SPARQLGraphPattern
 	}
 
 	@Override
-	public SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm )
+	public SPARQLGraphPattern applySolMapToGraphPattern( final Binding sm )
 			throws VariableByBlankNodeSubstitutionException
 	{
 		final Map<Var, Node> map1 = new HashMap<>();
 		final Map<String, Expr> map2 = new HashMap<>();
-		sm.asJenaBinding().forEach( (v,n) -> { map1.put(v,n); map2.put(v.getVarName(),NodeValue.makeNode(n)); } );
+		sm.forEach( (v,n) -> { map1.put(v,n); map2.put(v.getVarName(),NodeValue.makeNode(n)); } );
 		final ElementTransform t1 = new ElementTransformSubst(map1);
 		final ExprTransformSubstitute t2 = new ExprTransformSubstitute(map2);
 
@@ -200,4 +204,15 @@ public class GenericSPARQLGraphPatternImpl1 implements SPARQLGraphPattern
 
 		return tps;
 	}
+
+	@Override
+	public String toStringForPlanPrinters() {
+		// convert into an Element object and use
+		// pretty printing via FormatterElement
+		final IndentedLineBuffer buf = new IndentedLineBuffer();
+		final SerializationContext sCxt = new SerializationContext( ARQConstants.getGlobalPrefixMap() );
+		FormatterElement.format( buf, sCxt, asJenaElement() );
+		return buf.asString();
+	}
+
 }

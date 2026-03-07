@@ -9,18 +9,17 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.engine.federation.BRTPFServer;
-import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTestBase
 {
@@ -350,9 +349,8 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 	// --------- helper functions ---------
 
 	@Override
-	protected SourcePlanner createSourcePlanner( final QueryProcContext ctxt )
-	{
-		return new ServiceClauseBasedSourcePlannerImpl(ctxt);
+	protected SourcePlanner createSourcePlanner() {
+		return new ServiceClauseBasedSourcePlannerImpl();
 	}
 
 }

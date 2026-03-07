@@ -10,13 +10,14 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.federation.FederationMember;
 
 /**
  * Abstract base class to implement index nested loops joins by using request
@@ -30,16 +31,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType extends Query,
                                                                       MemberType extends FederationMember>
-              extends UnaryExecutableOpBaseWithBatching
+              extends BaseForUnaryExecOpWithCollectedInput
 {
-	// Since this algorithm processes the input solution mappings
-	// in parallel, we should use an input block size with which
-	// we can leverage this parallelism. However, I am not sure
-	// yet what a good value is; it probably depends on various
-	// factors, including the load on the server and the degree
-	// of parallelism in the FederationAccessManager.
-	public final static int DEFAULT_BATCH_SIZE = 30;
-
 	protected final QueryType query;
 	protected final MemberType fm;
 	protected final boolean useOuterJoinSemantics;
@@ -52,9 +45,10 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	protected BaseForExecOpIndexNestedLoopsJoinWithRequestOps( final QueryType query,
 	                                                           final MemberType fm,
 	                                                           final boolean useOuterJoinSemantics,
-	                                                           final int batchSize,
-	                                                           final boolean collectExceptions ) {
-		super(batchSize, collectExceptions);
+	                                                           final int minimumInputBlockSize,
+	                                                           final boolean collectExceptions,
+	                                                           final QueryPlanningInfo qpInfo ) {
+		super(minimumInputBlockSize, collectExceptions, qpInfo);
 
 		assert query != null;
 		assert fm != null;
@@ -64,15 +58,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 	}
 
-	protected BaseForExecOpIndexNestedLoopsJoinWithRequestOps( final QueryType query,
-	                                                           final MemberType fm,
-	                                                           final boolean useOuterJoinSemantics,
-	                                                           final boolean collectExceptions ) {
-		this(query, fm, useOuterJoinSemantics, DEFAULT_BATCH_SIZE, collectExceptions);
-	}
-
 	@Override
-	protected void _processBatch( final List<SolutionMapping> input,
+	protected void _processCollectedInput( final List<SolutionMapping> input,
 	                              final IntermediateResultElementSink sink,
 	                              final ExecutionContext execCxt )
 			throws ExecOpExecutionException
@@ -191,7 +178,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 			throws ExecOpExecutionException
 	{
 		if ( input != null && ! input.isEmpty() ) {
-			_processBatch(input, sink, execCxt);
+			_processCollectedInput(input, sink, execCxt);
 		}
 	}
 

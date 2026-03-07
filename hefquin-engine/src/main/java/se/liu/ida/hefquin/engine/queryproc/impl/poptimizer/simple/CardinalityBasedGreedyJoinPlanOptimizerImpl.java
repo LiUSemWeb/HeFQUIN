@@ -2,21 +2,23 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
-import se.liu.ida.hefquin.engine.federation.BRTPFServer;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoinWithRequestOps;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpSequentialBindJoin;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CFRNumberOfRequests;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.*;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 import java.util.*;
 
@@ -36,15 +38,19 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
     }
 
     @Override
-    public EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans ) {
-        return new GreedyConstructionAlgorithm(subplans);
+    public EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans,
+                                                                final QueryProcContext ctxt ) {
+        return new GreedyConstructionAlgorithm(subplans, ctxt);
     }
 
     protected class GreedyConstructionAlgorithm implements EnumerationAlgorithm {
         protected final List<PhysicalPlan> subplans;
+        protected final LogicalToPhysicalOpConverter lop2pop;
 
-        public GreedyConstructionAlgorithm( final List<PhysicalPlan> subplans ) {
+        public GreedyConstructionAlgorithm( final List<PhysicalPlan> subplans,
+                                            final QueryProcContext ctxt ) {
             this.subplans = subplans;
+            lop2pop = ctxt.getLogicalToPhysicalOpConverter();
         }
 
         @Override
@@ -254,11 +260,12 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             }
 
             final PhysicalPlan newPlan;
+            final QueryPlanningInfo qpInfoForNewPlan = null;
             if ( accNumSHJ <= accNumBJ ) {
-                newPlan = PhysicalPlanFactory.createPlanWithJoin(currentPlan.plan, nextPlan.plan);
+                newPlan = PhysicalPlanFactory.createPlanWithJoin(currentPlan.plan, nextPlan.plan, qpInfoForNewPlan, lop2pop);
             }
             else {
-                newPlan = PhysicalPlanFactory.createPlanWithDefaultUnaryOpIfPossible(currentPlan.plan, nextPlan.plan);
+                newPlan = PhysicalPlanFactory.createPlanWithDefaultUnaryOpIfPossible(currentPlan.plan, nextPlan.plan, qpInfoForNewPlan, lop2pop);
             }
 
             // "We estimate the join cardinality of two subexpressions SEi and SEj as the minimum of their cardinalities."(see page 1052 in paper[1])
@@ -289,7 +296,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
          */
         protected double determineBlockSize( final FederationMember fm ) {
             if ( (fm instanceof SPARQLEndpoint) || (fm instanceof BRTPFServer) ){
-                return BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
+                return BaseForExecOpSequentialBindJoin.DEFAULT_BATCH_SIZE;
             }
             else if ( fm instanceof TPFServer ){
                 return 1;

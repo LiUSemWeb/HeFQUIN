@@ -7,22 +7,20 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 public abstract class PhysicalOptimizerBase implements PhysicalOptimizer
 {
-	protected final LogicalToPhysicalPlanConverter l2pConverter;
-
-	public PhysicalOptimizerBase( final LogicalToPhysicalPlanConverter l2pConverter ) {
-		assert l2pConverter != null;
-		this.l2pConverter = l2pConverter;
-	}
-
 	@Override
-	public final Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan lp )
+	public final Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan lp,
+	                                                                     final QueryProcContext ctxt )
 			throws PhysicalOptimizationException {
 		final boolean keepMultiwayJoins = keepMultiwayJoinsInInitialPhysicalPlan();
-		final PhysicalPlan initialPhysicalPlan = l2pConverter.convert(lp, keepMultiwayJoins);
-		return optimize(initialPhysicalPlan);
+
+		final LogicalToPhysicalPlanConverter lp2pp = ctxt.getLogicalToPhysicalPlanConverter();
+		final PhysicalPlan initialPhysicalPlan = lp2pp.convert(lp, keepMultiwayJoins, ctxt);
+
+		return optimize(initialPhysicalPlan, ctxt);
 	}
 
 	/**
@@ -35,5 +33,7 @@ public abstract class PhysicalOptimizerBase implements PhysicalOptimizer
 	 */
 	protected abstract boolean keepMultiwayJoinsInInitialPhysicalPlan();
 
-	protected abstract Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( PhysicalPlan initialPhysicalPlan ) throws PhysicalOptimizationException;
+	protected abstract Pair<PhysicalPlan, PhysicalOptimizationStats> optimize(
+			PhysicalPlan initialPhysicalPlan,
+			QueryProcContext ctxt ) throws PhysicalOptimizationException;
 }

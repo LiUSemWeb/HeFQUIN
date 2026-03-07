@@ -7,9 +7,9 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<TPFServer>
 {
@@ -82,6 +82,36 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<T
 		_tpWithIllegalBNodeJoin(true);
 	}
 
+	@Test
+	public void tpWithDuplicateInput1_InnerJoin() throws ExecutionException {
+		_tpWithDuplicateInput1(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput1_OuterJoin() throws ExecutionException {
+		_tpWithDuplicateInput1(true);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_InnerJoin() throws ExecutionException {
+		_tpWithDuplicateInput2(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2_OuterJoin() throws ExecutionException {
+		_tpWithDuplicateInput2(true);
+	}
+
+	@Test
+	public void tpWithSpuriousDuplicates_InnerJoin() throws ExecutionException {
+		_tpWithSpuriousDuplicates(false);
+	}
+
+	@Test
+	public void tpWithSpuriousDuplicates_OuterJoin() throws ExecutionException {
+		_tpWithSpuriousDuplicates(true);
+	}
+
 
 	@Override
 	protected TPFServer createFedMemberForTest( final Graph dataForMember ) {
@@ -98,6 +128,6 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<T
 	                                                 final TPFServer fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		return new ExecOpIndexNestedLoopsJoinTPF(tp, fm, useOuterJoinSemantics, false);
+		return new ExecOpIndexNestedLoopsJoinTPF(tp, fm, useOuterJoinSemantics, false, null);
 	}
 }

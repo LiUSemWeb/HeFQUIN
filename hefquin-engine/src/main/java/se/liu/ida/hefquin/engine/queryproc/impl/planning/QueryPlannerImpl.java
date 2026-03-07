@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
@@ -12,6 +13,7 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningException;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
 
@@ -26,13 +28,15 @@ public class QueryPlannerImpl implements QueryPlanner
 	protected final LogicalPlanPrinter srcasgPrinter;
 	protected final LogicalPlanPrinter lplanPrinter;
 	protected final PhysicalPlanPrinter pplanPrinter;
+	protected final ExecutablePlanPrinter eplanPrinter;
 
 	public QueryPlannerImpl( final SourcePlanner sourcePlanner,
 	                         final LogicalOptimizer loptimizer, // may be null
 	                         final PhysicalOptimizer poptimizer,
 	                         final LogicalPlanPrinter srcasgPrinter,     // may be null
 	                         final LogicalPlanPrinter lplanPrinter,      // may be null
-	                         final PhysicalPlanPrinter pplanPrinter ) {  // may be null
+	                         final PhysicalPlanPrinter pplanPrinter,     // may be null
+	                         final ExecutablePlanPrinter eplanPrinter ) {  // may be null
 		assert sourcePlanner != null;
 		assert poptimizer != null;
 
@@ -42,6 +46,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		this.srcasgPrinter = srcasgPrinter;
 		this.lplanPrinter = lplanPrinter;
 		this.pplanPrinter = pplanPrinter;
+		this.eplanPrinter = eplanPrinter;
 	}
 
 	@Override
@@ -54,9 +59,10 @@ public class QueryPlannerImpl implements QueryPlanner
 	public PhysicalOptimizer getPhysicalOptimizer() { return poptimizer; }
 
 	@Override
-	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query ) throws QueryPlanningException {
+	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query,
+	                                                          final QueryProcContext ctxt ) throws QueryPlanningException {
 		final long t1 = System.currentTimeMillis();
-		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query);
+		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query, ctxt);
 
 		if ( srcasgPrinter != null ) {
 			System.out.println("--------- Source Assignment ---------");
@@ -67,7 +73,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
 			final boolean keepNaryOperators = poptimizer.assumesLogicalMultiwayJoins();
-			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators);
+			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators, ctxt);
 		}
 		else {
 			lp = saAndStats.object1;
@@ -79,7 +85,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		}
 
 		final long t3 = System.currentTimeMillis();
-		final Pair<PhysicalPlan, PhysicalOptimizationStats> planAndStats = poptimizer.optimize(lp);
+		final Pair<PhysicalPlan, PhysicalOptimizationStats> planAndStats = poptimizer.optimize(lp, ctxt);
 
 		final long t4 = System.currentTimeMillis();
 
@@ -96,6 +102,11 @@ public class QueryPlannerImpl implements QueryPlanner
 		                                                               planAndStats.object2 );
 
 		return new Pair<>(planAndStats.object1, myStats);
+	}
+
+	@Override
+	public ExecutablePlanPrinter getExecutablePlanPrinter() {
+		return eplanPrinter;
 	}
 
 }

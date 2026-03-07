@@ -49,7 +49,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     if (conf.getLabelPredicate().equals(p)) {
                         certainNodeLabels.add(o);
                     }
-                    if (conf.isIRIForPropertyName(p) || s.isNodeTriple()) {
+                    if (conf.isIRIForPropertyName(p) || s.isTripleTerm()) {
                         certainPropertyValues.add(o);
                     }
                 }
@@ -57,7 +57,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     if (conf.isRDFTermForLPGNode(o)) {
                         certainEdgeLabels.add(p);
                     }
-                    if (o.isLiteral() || s.isNodeTriple()) {
+                    if (o.isLiteral() || s.isTripleTerm()) {
                         certainPropertyNames.add(p);
                     }
                 }
@@ -113,7 +113,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                      final Set<Node> certainPropertyNames,
                                                      final Set<Node> certainPropertyValues) {
         final Node s = tp.getSubject();
-        if (!s.isNodeTriple()) {
+        if ( ! s.isTripleTerm() ) {
             return translateTriplePattern(tp, configuration, gen, certainNodes, certainEdgeLabels,
                     certainNodeLabels, certainPropertyNames, certainPropertyValues, false);
         }

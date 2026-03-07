@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,11 +23,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
+import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
+import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 
 /**
  * Servlet for handling SPARQL queries via HTTP GET and POST requests.
@@ -204,18 +203,18 @@ public class SparqlServlet extends HttpServlet {
 	private static JsonObject execute( final String queryString, final String mimeType )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
-		final Query query = QueryFactory.create( queryString );
+		final Query query = QueryFactory.create( queryString, SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN );
 		final ResultsFormat resultsFormat = ServletUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		final Pair<QueryProcStats, List<Exception>> statsAndExceptions;
+		final QueryProcessingStatsAndExceptions statsAndExceptions;
 		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
-			statsAndExceptions = engine.executeQuery( query, resultsFormat, ps );
+			statsAndExceptions = engine.executeQueryAndPrintResult(query, resultsFormat, ps);
 		}
 
 		final JsonObject res = new JsonObject();
 		res.put( "result", baos.toString() );
-		res.put( "exceptions", ServletUtils.getExceptions( statsAndExceptions.object2 ) );
+		res.put( "exceptions", ServletUtils.getExceptions(statsAndExceptions) );
 		return res;
 	}
 

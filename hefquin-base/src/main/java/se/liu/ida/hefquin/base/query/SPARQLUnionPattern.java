@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.base.query;
 
+import org.apache.jena.sparql.engine.binding.Binding;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 
 /**
@@ -30,6 +32,12 @@ public interface SPARQLUnionPattern extends SPARQLGraphPattern
 	SPARQLGraphPattern getSubPatterns( int i ) throws IndexOutOfBoundsException;
 
 	@Override
-	SPARQLUnionPattern applySolMapToGraphPattern( SolutionMapping sm ) throws VariableByBlankNodeSubstitutionException;
+	SPARQLUnionPattern applySolMapToGraphPattern( Binding sm ) throws VariableByBlankNodeSubstitutionException;
+
+	@Override
+	default SPARQLUnionPattern applySolMapToGraphPattern( final SolutionMapping sm )
+			throws VariableByBlankNodeSubstitutionException {
+		return applySolMapToGraphPattern( sm.asJenaBinding() );
+	}
 
 }

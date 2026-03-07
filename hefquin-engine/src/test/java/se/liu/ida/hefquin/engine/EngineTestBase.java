@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -25,16 +26,56 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.engine.federation.*;
-import se.liu.ida.hefquin.engine.federation.access.*;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.BRTPFInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpNaiveNestedLoopsJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.CardinalityResponse;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
+import se.liu.ida.hefquin.federation.access.FederationAccessException;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.access.FederationAccessStats;
+import se.liu.ida.hefquin.federation.access.Neo4jRequest;
+import se.liu.ida.hefquin.federation.access.RESTRequest;
+import se.liu.ida.hefquin.federation.access.RecordsResponse;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.federation.access.StringResponse;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFResponse;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.StringResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.Neo4jServer;
+import se.liu.ida.hefquin.federation.members.RESTEndpoint;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
+import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
+import se.liu.ida.hefquin.federation.members.impl.BaseForFederationMember;
+import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
 
 public abstract class EngineTestBase
 {
@@ -44,32 +85,49 @@ public abstract class EngineTestBase
 	 */
 	public static boolean skipLiveWebTests = true;
 
-	/**
-	 * If this flag is true, tests that make requests to local neo4j
-	 * instances will be skipped.
-	 */
-	public static boolean skipLocalNeo4jTests = true;
+	protected LogicalToPhysicalOpConverter getLOP2POPForTests() {
+		return new LogicalToPhysicalOpConverterImpl( List.of(
+				PhysicalOpBinaryUnion.getFactory(),
+				PhysicalOpMultiwayUnion.getFactory(),
+				PhysicalOpBind.getFactory(),
+				PhysicalOpFilter.getFactory(),
+				PhysicalOpRequest.getFactory(),
+				PhysicalOpGlobalToLocal.getFactory(),
+				PhysicalOpLocalToGlobal.getFactory(),
+				PhysicalOpBindJoinBRTPF.getFactory(),
+				new PhysicalOpBindJoinSPARQL.Factory("VARIABLE_RENAMING", false, 30),
+				new PhysicalOpBindJoinSPARQL.Factory("VALUES_OR_FILTER", false, 30),
+				PhysicalOpSymmetricHashJoin.getFactory(),
+				PhysicalOpHashRJoin.getFactory(),
+				PhysicalOpIndexNestedLoopsJoin.getFactory(),
+				//PhysicalOpHashJoin.getFactory(),
+				PhysicalOpNaiveNestedLoopsJoin.getFactory()
+			)
+		);
+	}
 
-	/**
-	 * If true, skip tests to local GraphQL endpoint
-	 */
-	public static boolean skipLocalGraphQLTests = true;
+	protected ExecutionContext getExecContextForTests( final ExecutorService execService ) {
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+		final LogicalToPhysicalPlanConverter lp2pp = new LogicalToPhysicalPlanConverterImpl(false, false);
+		final LogicalToPhysicalOpConverter lop2pop = getLOP2POPForTests();
 
-
-	protected TPFServer getDBpediaTPFServer() {
-		final String       tpfServerBaseURL = "http://fragments.dbpedia.org/2016-04/en";
-		final TPFInterface tpfServerIface   = new TPFInterfaceImpl(tpfServerBaseURL, "subject", "predicate", "object");
-		return new TPFServer() {
-			@Override public TPFInterface getInterface() { return tpfServerIface; }
-
-			@Override
-			public VocabularyMapping getVocabularyMapping() {
-				return null;
-			}
+		return new ExecutionContext() {
+			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
+			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
+			@Override public boolean isExperimentRun() { return false; }
+			@Override public boolean skipExecution() { return false; }
 		};
 	}
 
-	protected static abstract class FederationMemberBaseForTest implements FederationMember
+	protected TPFServer getDBpediaTPFServer() {
+		return new TPFServerImpl( "http://fragments.dbpedia.org/2016-04/en",
+		                          null ); // no vocab.mapping
+	}
+
+	protected static abstract class FederationMemberBaseForTest extends BaseForFederationMember
 	{
 		protected final Graph data;
 
@@ -113,7 +171,7 @@ public abstract class EngineTestBase
 			}
 			return result;
 		}
-		
+
 		protected List<SolutionMapping> getSolutions( final SPARQLGraphPattern pattern ) {
 			final Op jenaOp;
 			if ( pattern instanceof GenericSPARQLGraphPatternImpl1 ) {
@@ -136,28 +194,32 @@ public abstract class EngineTestBase
 			}
 			return results;	
 		}
-		
 	}
 
-	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
+	public static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
 	{
-		final SPARQLEndpointInterface iface;
+		protected final String url;
 
 		public SPARQLEndpointForTest() { this("http://example.org/sparql", null); }
 
-		public SPARQLEndpointForTest( final String ifaceURL ) { this(ifaceURL, null); }
+		public SPARQLEndpointForTest( final String url ) { this(url, null); }
 
 		public SPARQLEndpointForTest( final Graph data ) { this("http://example.org/sparql", data); }
 
-		public SPARQLEndpointForTest( final String ifaceURL, final Graph data ) {
+		public SPARQLEndpointForTest( final String url, final Graph data ) {
 			super(data);
-			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
+			this.url  = url;
 		}
 
 		@Override
-		public SPARQLEndpointInterface getInterface() { return iface; }
+		public VocabularyMapping getVocabularyMapping() { return null; }
 
-		public SolMapsResponse performRequest( final SPARQLRequest req ) {
+		@Override
+		public String getURL() { return url; }
+
+		public SolMapsResponse performRequest( final SPARQLRequest req )
+				throws FederationAccessException
+		{
 			final List<SolutionMapping> result;
 			if ( req instanceof TriplePatternRequest ) {
 				result = getSolutions( (TriplePatternRequest) req);
@@ -169,78 +231,58 @@ public abstract class EngineTestBase
 			}
 			return new SolMapsResponseImpl( result, this, req, new Date() );
 		}
-		
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
 
 	}
 
-	protected static class SPARQLEndpointWithVocabularyMappingForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
+	protected static class SPARQLEndpointWithVocabularyMappingForTest extends SPARQLEndpointForTest
 	{
-		final SPARQLEndpointInterface iface;
-		final VocabularyMapping vocabularyMapping;
+		final VocabularyMapping vm;
 
 		public SPARQLEndpointWithVocabularyMappingForTest( final String ifaceURL, final Graph data , final VocabularyMapping vm) {
-			super(data);
-			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
-			vocabularyMapping = vm;
+			super(ifaceURL, data);
+			this.vm = vm;
 		}
 
 		@Override
-		public SPARQLEndpointInterface getInterface() { return iface; }
-
-		public SolMapsResponse performRequest( final SPARQLRequest req ) {
-			final List<SolutionMapping> result;
-			if ( req instanceof TriplePatternRequest ) {
-				result = getSolutions( (TriplePatternRequest) req);
-			}
-			else if (req.getQueryPattern() instanceof TriplePattern) {
-				result = getSolutions( (TriplePattern) req.getQueryPattern() );
-			} else {
-				result = getSolutions(req.getQueryPattern());
-			}
-			return new SolMapsResponseImpl( result, this, req, new Date() );
-		}
-		
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return vocabularyMapping;
-		}
-
+		public VocabularyMapping getVocabularyMapping() { return vm; }
 	}
 
-	protected static class TPFServerForTest extends FederationMemberBaseForTest implements TPFServer
+	public static class TPFServerForTest extends FederationMemberBaseForTest implements TPFServer
 	{
-		protected final TPFInterface iface = new TPFInterfaceImpl("http://example.org/", "subject", "predicate", "object");
-
 		public TPFServerForTest() { this(null); }
 		public TPFServerForTest( final Graph data ) { super(data); }
 
 		@Override
-		public TPFInterface getInterface() { return iface; }
+		public VocabularyMapping getVocabularyMapping() { return null; }
+
+		@Override
+		public String getBaseURL() { return "http://example.org/"; }
+
+		@Override
+		public String createRequestURL( final TPFRequest req ) { throw new UnsupportedOperationException(); }
 
 		public TPFResponse performRequest( final TPFRequest req ) {
 			final List<Triple> result = getMatchingTriples(req);
 			return new TPFResponseForTest(result, this, req);
 		}
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
 	}
 
-
-	protected static class BRTPFServerForTest extends FederationMemberBaseForTest implements BRTPFServer
+	public static class BRTPFServerForTest extends FederationMemberBaseForTest implements BRTPFServer
 	{
-		final BRTPFInterface iface = new BRTPFInterfaceImpl("http://example.org/", "subject", "predicate", "object", "values");
-
 		public BRTPFServerForTest() { this(null); }
 		public BRTPFServerForTest( final Graph data ) { super(data); }
 
 		@Override
-		public BRTPFInterface getInterface() { return iface; }
+		public VocabularyMapping getVocabularyMapping() { return null; }
+
+		@Override
+		public String getBaseURL() { return "http://example.org/"; }
+
+		@Override
+		public String createRequestURL( final TPFRequest req ) { throw new UnsupportedOperationException(); }
+
+		@Override
+		public String createRequestURL( final BRTPFRequest req ) { throw new UnsupportedOperationException(); }
 
 		public TPFResponse performRequest( final TPFRequest req ) {
 			final List<Triple> result = getMatchingTriples(req);
@@ -253,16 +295,15 @@ public abstract class EngineTestBase
 			final org.apache.jena.graph.Triple jenaTP = req.getTriplePattern().asJenaTriple();
 
 			final List<org.apache.jena.graph.Triple> patternsForTest = new ArrayList<>();
-			for ( final SolutionMapping sm : req.getSolutionMappings() ) {
-				final Binding b = sm.asJenaBinding();
+			for ( final Binding sm : req.getSolutionMappings() ) {
 				final Node s = ( jenaTP.getSubject().isVariable() )
-						? b.get( Var.alloc(jenaTP.getSubject()) ) // may be null
+						? sm.get( Var.alloc(jenaTP.getSubject()) ) // may be null
 						: null;
 				final Node p = ( jenaTP.getPredicate().isVariable() )
-						? b.get( Var.alloc(jenaTP.getPredicate()) ) // may be null
+						? sm.get( Var.alloc(jenaTP.getPredicate()) ) // may be null
 						: null;
 				final Node o = ( jenaTP.getObject().isVariable() )
-						? b.get( Var.alloc(jenaTP.getObject()) ) // may be null
+						? sm.get( Var.alloc(jenaTP.getObject()) ) // may be null
 						: null;
 				patternsForTest.add( org.apache.jena.graph.Triple.createMatch(s,p,o) );
 			}
@@ -280,82 +321,100 @@ public abstract class EngineTestBase
 			}
 			return new TPFResponseForTest(result, this, req);
 		}
+	}
+
+	public static class WrappedRESTEndpointForTest extends FederationMemberBaseForTest
+	                                               implements WrappedRESTEndpoint
+	{
+		//protected final String responseData = "{ \"current\": { \"temperature_2m\": 2.3, \"wind_speed_10m\": 1.0 } }";
+		protected final String responseData;
+		protected final List<Parameter> params;
+		protected final int maxRequestsExpected;
+		protected int reqCnt = 0;
+
+		public WrappedRESTEndpointForTest( final String responseData,
+		                                   final Graph rdfView,
+		                                   final List<Parameter> params ) {
+			this(responseData, rdfView, params, -1);
+		}
+
+		public WrappedRESTEndpointForTest( final String responseData,
+		                                   final Graph rdfView,
+		                                   final List<Parameter> params,
+		                                   final int maxRequestsExpected ) {
+			super(rdfView);
+			this.responseData = responseData;
+			this.params = ( params == null ) ? List.of() : params;
+			this.maxRequestsExpected = maxRequestsExpected;
+		}
+
+		public String getResponseData() {
+			if ( maxRequestsExpected >= 0 ) {
+				reqCnt++;
+				if ( reqCnt > maxRequestsExpected ) {
+					throw new IllegalStateException();
+				}
+			}
+
+			return responseData;
+		}
+
 		@Override
-		public VocabularyMapping getVocabularyMapping() {
+		public List<SolutionMapping> evaluatePatternOverRDFView(
+				final SPARQLGraphPattern pattern,
+				final String data )
+						throws DataConversionException {
+			assert data.equals(responseData);
+			return getSolutions(pattern);
+		}
+
+		@Override
+		public String getURLTemplate() {
+			return "http://example.org/";
+		}
+
+		@Override
+		public int getNumberOfParameters() {
+			return params.size();
+		}
+
+		@Override
+		public Iterable<Parameter> getParameters() {
+			return params;
+		}
+
+		@Override
+		public Parameter getParameterByName( final String name ) {
+			for ( final Parameter param : params ) {
+				if (param.getName().equals(name)) {
+					return param;
+				}
+			}
 			return null;
 		}
+
+		@Override
+		public boolean supportsMoreThanTriplePatterns() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
+			throw new UnsupportedOperationException();
+		}
 	}
-	
-	protected static class BRTPFServerWithVocabularyMappingForTest extends FederationMemberBaseForTest implements BRTPFServer
+
+	protected static class BRTPFServerWithVocabularyMappingForTest extends BRTPFServerForTest
 	{
 		final VocabularyMapping vm;
-		
+
 		public BRTPFServerWithVocabularyMappingForTest(Graph data, VocabularyMapping vocabularyMapping) {
 			super(data);
 			vm = vocabularyMapping;
 		}
-		final BRTPFInterface iface = new BRTPFInterfaceImpl("http://example.org/", "subject", "predicate", "object", "values");
 
 		@Override
-		public BRTPFInterface getInterface() { return iface; }
-
-		public TPFResponse performRequest( final TPFRequest req ) {
-			final List<Triple> result = getMatchingTriples(req);
-			return new TPFResponseForTest(result, this, req);
-		}
-		
-		public TPFResponse performRequest( final BindingsRestrictedTriplePatternRequest req ) {
-			// The implementation in this method is not particularly efficient,
-			// but it is sufficient for the purpose of unit tests.
-			final org.apache.jena.graph.Triple jenaTP = req.getTriplePattern().asJenaTriple();
-
-			final List<org.apache.jena.graph.Triple> patternsForTest = new ArrayList<>();
-			for ( final SolutionMapping sm : req.getSolutionMappings() ) {
-				final Binding b = sm.asJenaBinding();
-				final Node s = ( jenaTP.getSubject().isVariable() )
-						? b.get( Var.alloc(jenaTP.getSubject()) ) // may be null
-						: null;
-				final Node p = ( jenaTP.getPredicate().isVariable() )
-						? b.get( Var.alloc(jenaTP.getPredicate()) ) // may be null
-						: null;
-				final Node o = ( jenaTP.getObject().isVariable() )
-						? b.get( Var.alloc(jenaTP.getObject()) ) // may be null
-						: null;
-				patternsForTest.add( org.apache.jena.graph.Triple.createMatch(s,p,o) );
-			}
-
-			final Iterator<org.apache.jena.graph.Triple> it = data.find(jenaTP);
-			final List<Triple> result = new ArrayList<>();
-			while ( it.hasNext() ) {
-				final org.apache.jena.graph.Triple t = it.next();
-				for ( final org.apache.jena.graph.Triple patternForTest : patternsForTest ) {
-					if ( patternForTest.matches(t) ) {
-						result.add( new TripleImpl(t) );
-						break;
-					}
-				}
-			}
-			return new TPFResponseForTest(result, this, req);
-		}
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return vm;
-		}
-	}
-
-	protected static class Neo4jServerImpl4Test implements Neo4jServer {
-
-		public Neo4jServerImpl4Test() {}
-
-		@Override
-		public Neo4jInterface getInterface() {
-			return new Neo4jInterfaceImpl("http://localhost:7474/db/neo4j/tx");
-		}
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
+		public VocabularyMapping getVocabularyMapping() { return vm; }
 	}
 
 	protected static class TPFResponseForTest extends TPFResponseImpl
@@ -397,9 +456,54 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public CompletableFuture<SolMapsResponse> issueRequest(
-				final SPARQLRequest req,
-				final SPARQLEndpoint fm )
+		public < ReqType extends DataRetrievalRequest,
+		         RespType extends DataRetrievalResponse<?>,
+		         MemberType extends FederationMember >
+		CompletableFuture<RespType> issueRequest( final ReqType req,
+		                                          final MemberType fm )
+				throws FederationAccessException
+		{
+			if ( req instanceof SPARQLRequest reqSPARQL && fm instanceof SPARQLEndpoint fmSPARQL ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqSPARQL, fmSPARQL);
+				return resp;
+			}
+
+			if ( req instanceof BRTPFRequest reqBRTPF && fm instanceof BRTPFServer fmBRTPF ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqBRTPF, fmBRTPF);
+				return resp;
+			}
+
+			if ( req instanceof TPFRequest reqTPF && fm instanceof BRTPFServer fmBRTPF ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqTPF, fmBRTPF);
+				return resp;
+			}
+
+			if ( req instanceof TPFRequest reqTPF && fm instanceof TPFServer fmTPF && !(fm instanceof BRTPFServer)) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqTPF, fmTPF);
+				return resp;
+			}
+
+			if ( req instanceof Neo4jRequest reqNeo && fm instanceof Neo4jServer fmNeo ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqNeo, fmNeo);
+				return resp;
+			}
+
+			if ( req instanceof RESTRequest reqREST && fm instanceof RESTEndpoint ep ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqREST, ep);
+				return resp;
+			}
+
+			throw new UnsupportedOperationException();
+		}
+
+		protected CompletableFuture<SolMapsResponse> _issueRequest( final SPARQLRequest req,
+		                                                            final SPARQLEndpoint fm )
 						throws FederationAccessException
 		{
 			final SolMapsResponse response;
@@ -416,11 +520,8 @@ public abstract class EngineTestBase
 			return CompletableFuture.completedFuture(response);
 		}
 
-		@Override
-		public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req,
-		                                                    final TPFServer fm )
-				throws FederationAccessException
-		{
+		protected CompletableFuture<TPFResponse> _issueRequest( final TPFRequest req,
+		                                                        final TPFServer fm ) {
 			final TPFResponse response;
 			if ( itTriplesForResponse != null ) {
 				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
@@ -431,11 +532,8 @@ public abstract class EngineTestBase
 			return CompletableFuture.completedFuture(response);
 		}
 
-		@Override
-		public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req,
-		                                                    final BRTPFServer fm )
-				throws FederationAccessException
-		{
+		protected CompletableFuture<TPFResponse> _issueRequest( final TPFRequest req,
+		                                                        final BRTPFServer fm ) {
 			final TPFResponse response;
 			if ( itTriplesForResponse != null ) {
 				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
@@ -450,11 +548,8 @@ public abstract class EngineTestBase
 			return CompletableFuture.completedFuture(response);
 		}
 
-		@Override
-		public CompletableFuture<TPFResponse> issueRequest( final BRTPFRequest req,
-		                                                    final BRTPFServer fm )
-				throws FederationAccessException
-		{
+		protected CompletableFuture<TPFResponse> _issueRequest( final BRTPFRequest req,
+		                                                        final BRTPFServer fm ) {
 			final TPFResponse response;
 			if ( itTriplesForResponse != null ) {
 				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
@@ -465,13 +560,26 @@ public abstract class EngineTestBase
 			return CompletableFuture.completedFuture(response);
 		}
 
-		@Override
-		public CompletableFuture<RecordsResponse> issueRequest( final Neo4jRequest req,
-		                                                       final Neo4jServer fm )
+		protected CompletableFuture<RecordsResponse> _issueRequest( final Neo4jRequest req,
+		                                                            final Neo4jServer fm )
 				throws FederationAccessException
 		{
 			final Neo4jRequestProcessor reqProc = new Neo4jRequestProcessorImpl();
 			final RecordsResponse response = reqProc.performRequest(req, fm);
+			return CompletableFuture.completedFuture(response);
+		}
+
+		protected CompletableFuture<StringResponse> _issueRequest( final RESTRequest req,
+		                                                           final RESTEndpoint fm )
+						throws FederationAccessException
+		{
+			final String data;
+			if ( fm instanceof WrappedRESTEndpointForTest ep )
+				data = ep.getResponseData();
+			else
+				throw new IllegalArgumentException();
+
+			final StringResponse response = new StringResponseImpl(data, fm, req, new Date());
 			return CompletableFuture.completedFuture(response);
 		}
 
@@ -508,18 +616,13 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public void resetStats() {
-			throw new UnsupportedOperationException();
-		}
+		public void resetStats() { throw new UnsupportedOperationException(); }
 
 		@Override
-		public FederationAccessStats getStats() {
-			throw new UnsupportedOperationException();
-		}
+		public FederationAccessStats getStats() { throw new UnsupportedOperationException(); }
 
 		@Override
-		public void shutdown() {
-			// do nothing
-		}
+		public void shutdown() { } // do nothing
 	}
+
 }

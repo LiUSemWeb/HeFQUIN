@@ -7,15 +7,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.jena.atlas.io.IndentedLineBuffer;
+import org.apache.jena.sparql.ARQConstants;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.serializer.FormatterElement;
+import org.apache.jena.sparql.serializer.SerializationContext;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
+import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 
 public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 {
@@ -201,7 +206,7 @@ public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 	}
 
 	@Override
-	public SPARQLGroupPattern applySolMapToGraphPattern( final SolutionMapping sm )
+	public SPARQLGroupPattern applySolMapToGraphPattern( final Binding sm )
 			throws VariableByBlankNodeSubstitutionException
 	{
 		final SPARQLGroupPatternImpl upNew = new SPARQLGroupPatternImpl();
@@ -219,4 +224,13 @@ public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 
 	}
 
+	@Override
+	public String toStringForPlanPrinters() {
+		// convert into an Element object and use
+		// pretty printing via FormatterElement
+		final IndentedLineBuffer buf = new IndentedLineBuffer();
+		final SerializationContext sCxt = new SerializationContext( ARQConstants.getGlobalPrefixMap() );
+		FormatterElement.format( buf, sCxt, QueryPatternUtils.convertToJenaElement(this) );
+		return buf.asString();
+	}
 }

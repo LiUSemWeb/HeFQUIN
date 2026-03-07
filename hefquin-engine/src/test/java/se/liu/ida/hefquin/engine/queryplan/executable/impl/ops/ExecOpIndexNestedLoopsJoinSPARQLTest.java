@@ -7,9 +7,9 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
 {
@@ -48,6 +48,21 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithm
 		_tpWithIllegalBNodeJoin(false);
 	}
 
+	@Test
+	public void tpWithDuplicateInput1() throws ExecutionException {
+		_tpWithDuplicateInput1(false);
+	}
+
+	@Test
+	public void tpWithDuplicateInput2() throws ExecutionException {
+		_tpWithDuplicateInput2(false);
+	}
+
+	@Test
+	public void tpWithSpuriousDuplicates() throws ExecutionException {
+		_tpWithSpuriousDuplicates(false);
+	}
+
 
 	@Override
 	protected SPARQLEndpoint createFedMemberForTest( final Graph dataForMember ) {
@@ -64,6 +79,6 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithm
 	                                                 final SPARQLEndpoint fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		return new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm, useOuterJoinSemantics, false);
+		return new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm, useOuterJoinSemantics, false, null);
 	}
 }

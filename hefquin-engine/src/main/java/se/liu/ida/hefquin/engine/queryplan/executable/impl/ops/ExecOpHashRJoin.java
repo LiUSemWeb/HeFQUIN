@@ -5,6 +5,7 @@ import java.util.List;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
 /**
  * A right outer join version of the hash join algorithm implemented in
@@ -23,8 +24,9 @@ public class ExecOpHashRJoin extends ExecOpHashJoin {
 
 	public ExecOpHashRJoin( final ExpectedVariables inputVars1,
 	                        final ExpectedVariables inputVars2,
-	                        final boolean collectExceptions ) {
-		super(inputVars1, inputVars2, collectExceptions);
+	                        final boolean collectExceptions,
+	                        final QueryPlanningInfo qpInfo ) {
+		super(inputVars1, inputVars2, collectExceptions, qpInfo);
 	}
 
 	@Override

@@ -1,6 +1,9 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.sparql.core.Var;
@@ -8,10 +11,20 @@ import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.util.ExprUtils;
 
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.utils.PlanPrinter;
+import se.liu.ida.hefquin.base.utils.PlanPrinter.PrintablePlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithBinaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNullaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithUnaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 
 /**
  * Internally, the functionality of this class is implemented based on
@@ -19,222 +32,225 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
  * error whenever we add a new type of logical operator but forget to
  * extend this class here to cover that new operator.
  */
-public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinters implements LogicalPlanPrinter
+public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinters
+                                             implements LogicalPlanPrinter
 {
+	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
+
 	@Override
 	public void print( final LogicalPlan plan, final PrintStream out ) {
-		final OpPrinter opPrinter = new OpPrinter(out);
-		planWalk(plan, 0, 0, 1, opPrinter, "");
+		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		PlanPrinter.print(pp, out);
+		printFullStringsForGraphPatterns(pp, out);
 		out.flush();
 	}
 
-	/**
-	 * This method recursively goes through a plan, and appends specific strings to a print stream.
-	 * @param plan The current plan (root operator) that will be formatted.
-	 * @param planNumber The number of a plan in terms of its super plan.
-	 * @param planLevel The depth of the root operator in a plan.
-	 * @param numberOfSiblings The number of sibling plans of a plan.
-	 * @param opPrinter The helper object for the printing.
-	 */
-	public void planWalk( final LogicalPlan plan,
-	                      final int planNumber,
-	                      final int planLevel,
-	                      final int numberOfSiblings,
-	                      final OpPrinter opPrinter,
-	                      final String rootOpIndentString ) {
-		final String indentLevelString = getIndentLevelString(planNumber, planLevel, numberOfSiblings, rootOpIndentString);
-		opPrinter.setIndentLevelString(indentLevelString);
-		final String indentLevelStringForOpDetail = getIndentLevelStringForDetail(planNumber, planLevel, numberOfSiblings, plan.numberOfSubPlans(), indentLevelString);
-		opPrinter.setIndentLevelStringForOpDetail(indentLevelStringForOpDetail);
+	public ExtPrintablePlan createPrintablePlan( final LogicalPlan lp ) {
+		final LogicalOperator rootOp = lp.getRootOperator();
 
-		plan.getRootOperator().visit(opPrinter);
+		rootOp.visit(snc);
+		final String rootOpString = snc.name + " (" + lp.getID()  + ")";
 
-		for ( int i = 0; i < plan.numberOfSubPlans(); ++i ) {
-			planWalk( plan.getSubPlan(i), i, planLevel+1, plan.numberOfSubPlans(), opPrinter, indentLevelString );
+		pe.graphPattern = null;
+		pe.fullStringForGraphPattern = null;
+		pe.props = new ArrayList<>();
+
+		rootOp.visit(pe);
+
+		final SPARQLGraphPattern graphPattern  = pe.graphPattern;
+		final String fullStringForGraphPattern = pe.fullStringForGraphPattern;
+		final List<String> rootOpProps         = pe.props;
+
+		addPropStrings( lp.getExpectedVariables(), rootOpProps );
+		addPropStrings( lp.getQueryPlanningInfo(), rootOpProps );
+
+		final List<PrintablePlan> subPlans = createPrintableSubPlans(lp);
+
+		return new ExtPrintablePlan( rootOpString, rootOpProps, subPlans,
+		                             graphPattern, fullStringForGraphPattern );
+	}
+
+	public List<PrintablePlan> createPrintableSubPlans( final LogicalPlan lp ) {
+		if ( lp instanceof LogicalPlanWithNullaryRoot ) {
+			return null;
+		}
+		else if ( lp instanceof LogicalPlanWithUnaryRoot u ) {
+			final PrintablePlan pp = createPrintablePlan( u.getSubPlan() );
+			return List.of(pp);
+		}
+		else if ( lp instanceof LogicalPlanWithBinaryRoot b ) {
+			final PrintablePlan pp1 = createPrintablePlan( b.getSubPlan1() );
+			final PrintablePlan pp2 = createPrintablePlan( b.getSubPlan2() );
+			return List.of(pp1, pp2);
+		}
+		else if ( lp instanceof LogicalPlanWithNaryRoot n ) {
+			final List<PrintablePlan> subPlans = new ArrayList<>( n.numberOfSubPlans() );
+			final Iterator<LogicalPlan> it = n.getSubPlans();
+			while ( it.hasNext() ) {
+				final PrintablePlan pp = createPrintablePlan( it.next() );
+				subPlans.add(pp);
+			}
+
+			return subPlans;
+		}
+		else {
+			throw new IllegalArgumentException( lp.getClass().getName() );
 		}
 	}
 
-	protected static class OpPrinter implements LogicalPlanVisitor {
-		protected final PrintStream out;
-		protected final OpNamePrinter np;
-		protected String indentLevelString = null;
-		protected String indentLevelStringForOpDetail = null;
 
-		public OpPrinter( final PrintStream out ) {
-			this.out = out;
-			this.np = new OpNamePrinter(out);
-		}
+	public static class MyPropertiesExtractor implements LogicalPlanVisitor {
+		/**
+		 * Strings representing the properties of the most recently visited
+		 * operator.
+		 */
+		public List<String> props = null;
 
-		public void setIndentLevelString( final String s ) { indentLevelString = s; }
-		public void setIndentLevelStringForOpDetail( final String s ) { indentLevelStringForOpDetail = s; }
+		/**
+		 * The graph pattern of  the most recently visited operator (if any).
+		 */
+		public SPARQLGraphPattern graphPattern;
 
-		@Override
-		public void visit( final LogicalOpBGPAdd op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-			printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
-			printSPARQLGraphPattern( op.getBGP(), indentLevelStringForOpDetail + singleBase, out );
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
+		/**
+		 * A full-string representation of the graph pattern of the most
+		 * recently visited operator (if any), but only if that string is
+		 * too long to be put as a property into {@link #props} (in which
+		 * case we put a shortened version of that string into {@link #props}).
+		 */
+		public String fullStringForGraphPattern;
 
 		@Override
-		public void visit( final LogicalOpBGPOptAdd op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-			printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
-			printSPARQLGraphPattern( op.getBGP(), indentLevelStringForOpDetail + singleBase, out );
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
+		public void visit( final LogicalOpRequest<?,?> op ) {
+			record( op.getFederationMember() );
+			record( op.getRequest() );
+		}
+
+		@Override
+		public void visit( final LogicalOpFixedSolMap op ) {
+			props.add( "solmap: " + op.getSolutionMapping().toString() );
+		}
+
+		@Override
+		public void visit( final LogicalOpGPAdd op ) {
+			record( op.getFederationMember() );
+
+			final StringBuilder b = new StringBuilder("parameter variables:");
+			if ( op.hasParameterVariables() ) {
+				for ( final Map.Entry<String,Var> e : op.getParameterVariables().entrySet() )
+					b.append( " " + e.getValue().toString() + " AS \"" + e.getKey() + "\" " );
+			}
+			else {
+				b.append( " none" );
+			}
+			props.add( b.toString() );
+
+			record( op.getPattern() );
+		}
+
+		@Override
+		public void visit( final LogicalOpGPOptAdd op ) {
+			record( op.getFederationMember() );
+			record( op.getPattern() );
+		}
+
+		@Override
+		public void visit( final LogicalOpJoin op ) {
+			// nothing extra
+		}
+
+		@Override
+		public void visit( final LogicalOpRightJoin op ) {
+			// nothing extra
+		}
+
+		@Override
+		public void visit( final LogicalOpUnion op ) {
+			// nothing extra
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayJoin op ) {
+			// nothing extra
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayLeftJoin op ) {
+			// nothing extra
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayUnion op ) {
+			// nothing extra
+		}
+
+		@Override
+		public void visit( final LogicalOpFilter op ) {
+			final int numberOfExprs = op.getFilterExpressions().size();
+			if ( numberOfExprs == 1 ) {
+				final Expr expr = op.getFilterExpressions().get(0);
+				props.add( "expression: " + ExprUtils.fmtSPARQL(expr) );
+			}
+			else {
+				props.add( "number of expressions: " + numberOfExprs );
+				for ( int i = 0; i < numberOfExprs; i++ ) {
+					final Expr expr = op.getFilterExpressions().get(i);
+					props.add( "expression " + (i+1) + ": " + ExprUtils.fmtSPARQL(expr) );
+				}
+			}
 		}
 
 		@Override
 		public void visit( final LogicalOpBind op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
+			props = new ArrayList<>();
 
 			final VarExprList bindExpressions = op.getBindExpressions();
 			for ( Map.Entry<Var, Expr> e : bindExpressions.getExprs().entrySet() ) {
 				final Var var = e.getKey();
 				final Expr expr = e.getValue();
-				out.append( indentLevelStringForOpDetail + singleBase );
-				out.append( "  - " + var.toString() + " <-- " + ExprUtils.fmtSPARQL(expr) );
-				out.append( System.lineSeparator() );
+				props.add( var.toString() + " <-- " + ExprUtils.fmtSPARQL(expr) );
 			}
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final LogicalOpFilter op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-
-			printExpressions( op.getFilterExpressions(),
-			                  indentLevelStringForOpDetail + singleBase,
-			                  out );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final LogicalOpGlobalToLocal op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-			out.append( indentLevelStringForOpDetail + singleBase + "  - vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
-			out.append( System.lineSeparator() );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final LogicalOpGPAdd op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-			printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
-			printSPARQLGraphPattern( op.getPattern(), indentLevelStringForOpDetail + singleBase, out );
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final LogicalOpGPOptAdd op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-			printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
-			printSPARQLGraphPattern( op.getPattern(), indentLevelStringForOpDetail + singleBase, out );
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final LogicalOpJoin op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
 		}
 
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-			out.append( indentLevelStringForOpDetail + singleBase + "  - vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
-			out.append( System.lineSeparator() );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
+			props.add( "vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
 		}
 
 		@Override
-		public void visit( final LogicalOpMultiwayJoin op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
+		public void visit( final LogicalOpGlobalToLocal op ) {
+			props.add( "vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
 		}
 
-		@Override
-		public void visit( final LogicalOpMultiwayLeftJoin op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
+		protected void record( final FederationMember fm ) {
+			props.add( "fm (" + fm.getID() + ") " + fm.toString() );
 		}
 
-		@Override
-		public void visit( final LogicalOpMultiwayUnion op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
+		protected void record( final DataRetrievalRequest req ) {
+			if ( req instanceof SPARQLRequest sreq ) {
+				record( sreq.getQueryPattern() );
+			}
+			else {
+				props.add( "request (" + req.hashCode() +  "): " + req.toString() );
+			}
 		}
 
-		@Override
-		public void visit( final LogicalOpRequest<?,?> op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-			printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail, out );
-			final DataRetrievalRequest req = op.getRequest();
-			out.append( indentLevelStringForOpDetail + "  - pattern (" + req.hashCode() +  ") " + req.toString() );
-			out.append( System.lineSeparator() );
-			out.append( indentLevelStringForOpDetail );
-			out.append( System.lineSeparator() );
-		}
+		protected void record( final SPARQLGraphPattern gp ) {
+			final String gpAsString = gp.toStringForPlanPrinters();
+			final String gpAsString2 = gpAsString.replaceAll( "\\s+", " ");
 
-		@Override
-		public void visit( final LogicalOpRightJoin op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final LogicalOpTPAdd op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-			printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
-			printSPARQLGraphPattern( op.getTP(), indentLevelStringForOpDetail + singleBase, out );
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final LogicalOpTPOptAdd op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
-			out.append( System.lineSeparator() );
-			printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
-			printSPARQLGraphPattern( op.getTP(), indentLevelStringForOpDetail + singleBase, out );
-			out.append( indentLevelStringForOpDetail + singleBase );
-			out.append( System.lineSeparator() );
-		}
-
-		@Override
-		public void visit( final LogicalOpUnion op ) {
-			printLogicalOperatorBase( op, indentLevelString, out, np );
+			if ( gpAsString2.length() > 88 ) {
+				// shorten the string
+				final String s = gpAsString2.substring(0, 40) + "[...]" + gpAsString2.substring( gpAsString2.length()-40 );
+				props.add( "pattern (" + gp.hashCode() +  "): " + s );
+				graphPattern = gp;
+				fullStringForGraphPattern = gpAsString2;
+			}
+			else {
+				// the string is short enough, no need to shorten it
+				props.add( "pattern: " + gpAsString2 );
+				graphPattern = gp;
+				fullStringForGraphPattern = null;
+			}
 		}
 	}
 

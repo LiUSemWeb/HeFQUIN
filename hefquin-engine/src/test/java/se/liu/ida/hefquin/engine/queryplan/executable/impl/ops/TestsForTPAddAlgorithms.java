@@ -2,11 +2,11 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +19,7 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.graph.GraphFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
@@ -26,13 +27,11 @@ import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.federation.FederationMember;
 
 /**
  * This is an abstract class with tests for any algorithm that is
@@ -71,17 +70,10 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
 			@Override
-			public Set<Var> getCertainVariables() {
-				final Set<Var> set = new HashSet<>();
-				set.add(var1);
-				set.add(var2);
-				return set;
-			}
+			public Set<Var> getCertainVariables() { return Set.of(var1, var2); }
 
 			@Override
-			public Set<Var> getPossibleVariables() {
-				return new HashSet<>();
-			}
+			public Set<Var> getPossibleVariables() { return Set.of(); }
 		}, useOuterJoinSemantics);
 
 		// checking
@@ -264,6 +256,78 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertFalse( it.hasNext() );
 	}
 
+	protected void _tpWithAndWithoutJoinVariable( final boolean useOuterJoinSemantics ) throws ExecutionException {
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
+
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node x1 = NodeFactory.createURI("http://example.org/x1");
+		final Node x2 = NodeFactory.createURI("http://example.org/x2");
+		final Node y2 = NodeFactory.createURI("http://example.org/y2");
+		final Node z1 = NodeFactory.createURI("http://example.org/z1");
+		final Node z2 = NodeFactory.createURI("http://example.org/z2");
+
+		final List<SolutionMapping> input = new ArrayList<>();
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, x1) ); // join variable
+		input.add( SolutionMappingUtils.createSolutionMapping(var2, x2) ); // no join variable
+
+		final TriplePattern tp = new TriplePatternImpl(var1,p,var3);
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(x1,p,z1) );
+		dataForMember.add( Triple.create(y2,p,z2) );
+
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() { return Set.of(); }
+
+			@Override
+			public Set<Var> getPossibleVariables() { return Set.of(var1, var2); }
+		}, useOuterJoinSemantics);
+
+		final Binding expected1 = BindingFactory.binding(var1, x1, var3, z1);
+		final Binding expected2 = BindingFactory.binding(var1, x1, var3, z1, var2, x2);
+		final Binding expected3 = BindingFactory.binding(var1, y2, var3, z2, var2, x2);
+
+		boolean expected1Found = false;
+		boolean expected2Found = false;
+		boolean expected3Found = false;
+
+		assertTrue( it.hasNext() );
+		final Binding b1 = it.next().asJenaBinding();
+		assertTrue(    b1.equals(expected1)
+		            || b1.equals(expected2)
+		            || b1.equals(expected3) );
+		if ( b1.equals(expected1) ) expected1Found = true;
+		if ( b1.equals(expected2) ) expected2Found = true;
+		if ( b1.equals(expected3) ) expected3Found = true;
+
+		assertTrue( it.hasNext() );
+		final Binding b2 = it.next().asJenaBinding();
+		assertTrue(    b2.equals(expected1)
+		            || b2.equals(expected2)
+		            || b2.equals(expected3) );
+		if ( b2.equals(expected1) ) expected1Found = true;
+		if ( b2.equals(expected2) ) expected2Found = true;
+		if ( b2.equals(expected3) ) expected3Found = true;
+
+		assertTrue( it.hasNext() );
+		final Binding b3 = it.next().asJenaBinding();
+		assertTrue(    b3.equals(expected1)
+		            || b3.equals(expected2)
+		            || b3.equals(expected3) );
+		if ( b3.equals(expected1) ) expected1Found = true;
+		if ( b3.equals(expected2) ) expected2Found = true;
+		if ( b3.equals(expected3) ) expected3Found = true;
+
+		assertFalse( it.hasNext() );
+
+		assertTrue( expected1Found );
+		assertTrue( expected2Found );
+		assertTrue( expected3Found );
+	}
+
 	protected void _tpWithEmptyInput( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -425,31 +489,27 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 	protected void _tpWithIllegalBNodeJoin( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("p");
 
-		final Node p     = NodeFactory.createURI("http://example.org/p");
-		final Node uri   = NodeFactory.createURI("http://example.org/x1");
-		final Node bnode = NodeFactory.createBlankNode();
+		final Node p      = NodeFactory.createURI("http://example.org/p");
+		final Node uri    = NodeFactory.createURI("http://example.org/x1");
+		final Node bnode1 = NodeFactory.createBlankNode();
+		final Node bnode2 = NodeFactory.createBlankNode();
 
 		final List<SolutionMapping> input = new ArrayList<>();
-		input.add( SolutionMappingUtils.createSolutionMapping(var1, bnode) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, bnode1) );
 
-		final TriplePattern tp = new TriplePatternImpl(var1, p, uri);
+		final TriplePattern tp = new TriplePatternImpl(var1, var2, uri);
 
 		final Graph dataForMember = GraphFactory.createGraphMem();
-		dataForMember.add( Triple.create(bnode, p, uri) );
+		dataForMember.add( Triple.create(bnode2, p, uri) );
 
 		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
 			@Override
-			public Set<Var> getCertainVariables() {
-				final Set<Var> set = new HashSet<>();
-				set.add(var1);
-				return set;
-			}
+			public Set<Var> getCertainVariables() { return Set.of(var1); }
 
 			@Override
-			public Set<Var> getPossibleVariables() {
-				return new HashSet<>();
-			}
+			public Set<Var> getPossibleVariables() { return Set.of(); }
 		}, useOuterJoinSemantics);
 
 		// checking
@@ -462,14 +522,123 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 			assertFalse( it.hasNext() );
 		}
-		else { // useOuterJoinSemantics  == null
+		else { // useOuterJoinSemantics == false
 			assertFalse( it.hasNext() );
 		}
 	}
 
-	protected void _tpWithSpuriousDuplicates( final boolean useOuterJoinSemantics ) {
+	protected void _tpWithDuplicateInput1( final boolean useOuterJoinSemantics ) throws ExecutionException {
+		// This test sends two identical solution mappings as input to the
+		// operator; both of them have the same join partner in the result
+		// from the triple pattern and, thus, both must be reflected in the
+		// result of the operator because we use bag semantics.
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
+
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node s1 = NodeFactory.createURI("http://example.org/s1");
+		final Node x = NodeFactory.createURI("http://example.org/x");
+		final Node o1 = NodeFactory.createURI("http://example.org/o1");
+
+		final List<SolutionMapping> input = new ArrayList<>();
+		// two identical input solution mappings !!
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, x) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, x) );
+
+		final TriplePattern tp = new TriplePatternImpl(var1,p,var3);
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(s1,p,o1) );
+
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() { return Set.of(var1,var2); }
+
+			@Override
+			public Set<Var> getPossibleVariables() { return Set.of(); }
+		}, useOuterJoinSemantics);
+
+		// checking
+		assertTrue( it.hasNext() );
+
+		final Binding b1 = it.next().asJenaBinding();
+		assertEquals( 3, b1.size() );
+		assertEquals( s1, b1.get(var1) );
+		assertEquals( o1, b1.get(var3) );
+
+		assertTrue( it.hasNext() );
+
+		final Binding b2 = it.next().asJenaBinding();
+		assertEquals( 3, b2.size() );
+		assertEquals( s1, b2.get(var1) );
+		assertEquals( o1, b2.get(var3) );
+
+		assertFalse( it.hasNext() );
+	}
+
+	protected void _tpWithDuplicateInput2( final boolean useOuterJoinSemantics ) throws ExecutionException {
+		// This test sends two identical solution mappings as input to the
+		// operator; both of them have no join partner in the result from
+		// the triple pattern and, thus, both must be reflected in the
+		// outer-join result of the operator (because we use bag semantics)
+		// but not in the inner-join result.
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
+
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node s1 = NodeFactory.createURI("http://example.org/s1");
+		final Node s2 = NodeFactory.createURI("http://example.org/s2");
+		final Node x = NodeFactory.createURI("http://example.org/y");
+		final Node o1 = NodeFactory.createURI("http://example.org/o1");
+
+		final List<SolutionMapping> input = new ArrayList<>();
+		// two identical input solution mappings !!
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, x) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, x) );
+
+		final TriplePattern tp = new TriplePatternImpl(var1,p,var3);
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		// different subject !
+		dataForMember.add( Triple.create(s2,p,o1) );
+
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() { return Set.of(var1,var2); }
+
+			@Override
+			public Set<Var> getPossibleVariables() { return Set.of(); }
+		}, useOuterJoinSemantics);
+
+		// checking
+		if ( useOuterJoinSemantics ) {
+			assertTrue( it.hasNext() );
+
+			final Binding b1 = it.next().asJenaBinding();
+			assertEquals( 2, b1.size() );
+			assertEquals( s1, b1.get(var1) );
+			assertEquals( x, b1.get(var2) );
+
+			assertTrue( it.hasNext() );
+
+			final Binding b2 = it.next().asJenaBinding();
+			assertEquals( 2, b2.size() );
+			assertEquals( s1, b2.get(var1) );
+			assertEquals( x, b2.get(var2) );
+
+			assertFalse( it.hasNext() );
+		}
+		else {
+			assertFalse( it.hasNext() );
+		}
+	}
+
+	protected void _tpWithSpuriousDuplicates( final boolean useOuterJoinSemantics ) throws ExecutionException {
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
 
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Node s1 = NodeFactory.createURI("http://example.org/s1");
@@ -481,29 +650,40 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1) );
 		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, o1) );
 
-		final TriplePattern tp = new TriplePatternImpl(var1,p,var2);
+		final TriplePattern tp = new TriplePatternImpl(var1,var3,var2);
 
 		final Graph dataForMember = GraphFactory.createGraphMem();
 		dataForMember.add( Triple.create(s1,p,o1) );
 		dataForMember.add( Triple.create(s2,p,o2) );
 
-		assertThrows(IllegalArgumentException.class,  () -> {
-			runTest(input, dataForMember, tp, new ExpectedVariables() {
-				@Override
-				public Set<Var> getCertainVariables() {
-					final Set<Var> set = new HashSet<>();
-					set.add(var1);
-					return set;
-				}
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() {
+				return Collections.singleton(var1);
+			}
 
-				@Override
-				public Set<Var> getPossibleVariables() {
-					final Set<Var> set = new HashSet<>();
-					set.add(var2);
-					return set;
-				}
-			}, useOuterJoinSemantics);
-		});
+			@Override
+			public Set<Var> getPossibleVariables() {
+				return Collections.singleton(var2);
+			}
+		}, useOuterJoinSemantics);
+
+		// checking
+		assertTrue( it.hasNext() );
+
+		final Binding b1 = it.next().asJenaBinding();
+		assertEquals( 3, b1.size() );
+		assertEquals( s1, b1.get(var1) );
+		assertEquals( o1, b1.get(var2) );
+
+		assertTrue( it.hasNext() );
+
+		final Binding b2 = it.next().asJenaBinding();
+		assertEquals( 3, b2.size() );
+		assertEquals( s1, b2.get(var1) );
+		assertEquals( o1, b2.get(var2) );
+
+		assertFalse( it.hasNext() );
 	}
 
 
@@ -515,14 +695,9 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			final ExpectedVariables expectedVariables,
 			final boolean useOuterJoinSemantics ) throws ExecutionException
 	{
-		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
-		final ExecutionContext execCxt = new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return null; }
-			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return getExecutorServiceForTest(); }
-			@Override public boolean isExperimentRun() { return false; }
-			@Override public boolean skipExecution() { return false; }
-		};
+		final ExecutorService execService = getExecutorServiceForTest();
+		final ExecutionContext execCxt = getExecContextForTests(execService);
+
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		final MemberType fm = createFedMemberForTest(dataForMember);

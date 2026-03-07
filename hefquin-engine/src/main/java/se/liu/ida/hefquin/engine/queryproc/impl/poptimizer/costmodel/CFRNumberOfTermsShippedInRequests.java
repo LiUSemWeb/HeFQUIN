@@ -2,12 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 
 import java.util.concurrent.CompletableFuture;
 
-import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
@@ -16,6 +11,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 
 public class CFRNumberOfTermsShippedInRequests extends CFRBase
 {
@@ -32,21 +30,11 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 		final int numberOfJoinVars;
 		final CompletableFuture<Integer> futureIntResSize;
 
-		if ( lop instanceof LogicalOpTPAdd || lop instanceof LogicalOpBGPAdd || lop instanceof LogicalOpGPAdd  ) {
-			final SPARQLGraphPattern pattern;
-			if ( lop instanceof LogicalOpTPAdd tpAdd )
-				pattern = tpAdd.getTP();
-			else if ( lop instanceof LogicalOpBGPAdd bgpAdd )
-				pattern = bgpAdd.getBGP();
-			else if ( lop instanceof LogicalOpGPAdd gpAdd )
-				pattern = gpAdd.getPattern();
-			else
-				throw createIllegalArgumentException(lop);
-
-			numberOfTerms = pattern.getNumberOfTermMentions();
+		if ( lop instanceof LogicalOpGPAdd gpAdd ) {
+			numberOfTerms = gpAdd.getPattern().getNumberOfTermMentions();
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
-			final PhysicalPlan req = PhysicalPlanFactory.extractRequestAsPlan( (UnaryLogicalOp) lop );
+			final PhysicalPlan req = PhysicalPlanFactory.extractRequestAsPlan(gpAdd);
 			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan, req).size();
 
 			futureIntResSize = initiateCardinalityEstimation(subplan);
@@ -78,14 +66,21 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 
 		// cases in which the cost value depends on some intermediate
 		// result size, which needs to be fetched first
-		if (    pop instanceof PhysicalOpIndexNestedLoopsJoin
-		     || pop instanceof PhysicalOpBindJoinWithUNION ) {
+		if ( pop instanceof PhysicalOpIndexNestedLoopsJoin ) {
 			return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfTerms + numberOfJoinVars) );
 		}
-		else if (    pop instanceof PhysicalOpBindJoinWithFILTER
-		          || pop instanceof PhysicalOpBindJoinWithVALUES
-		          || pop instanceof PhysicalOpBindJoin ) {
+		else if ( pop instanceof PhysicalOpBindJoinBRTPF ) {
 			return futureIntResSize.thenApply( intResSize -> numberOfTerms + intResSize * numberOfJoinVars );
+		}
+		else if ( pop instanceof PhysicalOpBindJoinSPARQL bj ) {
+			if ( bj.getType().equals("VALUES_BASED") )
+				return futureIntResSize.thenApply( intResSize -> numberOfTerms + intResSize * numberOfJoinVars );
+			if ( bj.getType().equals("VALUES_OR_FILTER") )
+				return futureIntResSize.thenApply( intResSize -> numberOfTerms + intResSize * numberOfJoinVars );
+			if ( bj.getType().equals("UNION_BASED") )
+				return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfTerms + numberOfJoinVars) );
+
+			throw new UnsupportedOperationException("The cost model does not yet support " + bj.getType() + "bind joins.");
 		}
 
 		// cases in which the cost value can be calculated directly

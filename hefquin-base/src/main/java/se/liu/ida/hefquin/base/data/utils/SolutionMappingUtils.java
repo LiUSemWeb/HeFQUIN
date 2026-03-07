@@ -111,12 +111,33 @@ public class SolutionMappingUtils
 	}
 
 	/**
+	 * Returns true if the given set of solution mappings are equivalent; that
+	 * is, if they contain the same number of solution mappings and for each such
+	 * solution mapping there is an equivalent solution mapping in the respective
+	 * other set.
+	 */
+	public static boolean equalSets( final Set<Binding> s1, final Set<Binding> s2 ) {
+		if ( s1 == s2 )
+			return true;
+		else if ( s1.size() != s2.size() )
+			return false;
+		else
+			return s1.containsAll(s2);
+	}
+
+	/**
 	 * Returns true if the given solution mappings are compatible.
 	 */
 	public static boolean compatible( final SolutionMapping m1, final SolutionMapping m2 ) {
 		final Binding b1 = m1.asJenaBinding();
 		final Binding b2 = m2.asJenaBinding();
+		return compatible(b1, b2);
+	}
 
+	/**
+	 * Returns true if the given bindings are compatible.
+	 */
+	public static boolean compatible( final Binding b1, final Binding b2 ) {
 		final Iterator<Var> it = b1.vars();
 		while ( it.hasNext() ) {
 			final Var v = it.next();
@@ -124,7 +145,38 @@ public class SolutionMappingUtils
 				return false;
 		}
 
-		return true;		
+		return true;
+	}
+
+	/**
+	 * Returns <code>true</code> if the first solution mapping, b1, is
+	 * included in the second solution mapping, b2, where we say that
+	 * 'b1 is included in b2' if the variables in b1 are a proper subset
+	 * of the variables in b2 and the two solution mappings are compatible.
+	 * In other words, b1 and b2 are the same for the subset of variables
+	 * for which they both have bindings and, additionally, b2 has bindings
+	 * for additional variables.
+	 */
+	public static boolean includedIn( final Binding b1, final Binding b2 ) {
+		// First check: b1 can be included in b2 only if b1 has fewer
+		// variables than b2. If that is not the case, we can immediately
+		// conclude that b1 is not included in b2.
+		if ( b1.size() >= b2.size() ) return false;
+
+		// Now the main check: We iterate over the variables bound in b1 and,
+		// for each of these variables, we check that
+		// (a) the variable is also bound in b2 and
+		// (b) both solution mappings have the same term for the variable.
+		final Iterator<Var> it = b1.vars();
+		while ( it.hasNext() ) {
+			final Var var = it.next();
+			// check (a)
+			if ( ! b2.contains(var) ) return false;
+			// check (b)
+			if ( ! b1.get(var).equals(b2.get(var)) ) return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -231,11 +283,12 @@ public class SolutionMappingUtils
 	}
 
 	/**
-	 * Restricts the given Jena binding to the given set of variables.
-	 * Hence, the returned binding will be compatible to the solution
-	 * mapping given as input, but it will be defined only for the variables
-	 * that are in the intersection of the given set of variables and the
-	 * set of variables for which the given binding is defined.
+	 * Restricts the given solution mapping to the given set of variables.
+	 * Hence, the returned solution mapping will be compatible with the
+	 * solution mapping given as input, but it will be defined only for
+	 * the variables that are in the intersection of the given set of
+	 * variables and the set of variables for which the given solution
+	 * mapping is defined.
 	 */
 	public static Binding restrict( final Binding input, final Collection<Var> vars ) {
 		final Iterator<Var> it = input.vars();
@@ -252,10 +305,11 @@ public class SolutionMappingUtils
 	
 	/**
 	 * Restricts the given solution mapping to the given set of variables.
-	 * Hence, the returned solution mapping will be compatible to the solution
-	 * mapping given as input, but it will be defined only for the variables
-	 * that are in the intersection of the given set of variables and the
-	 * set of variables for which the given solution mapping is defined.
+	 * Hence, the returned solution mapping will be compatible with the
+	 * solution mapping given as input, but it will be defined only for
+	 * the variables that are in the intersection of the given set of
+	 * variables and the set of variables for which the given solution
+	 * mapping is defined.
 	 */
 	public static SolutionMapping restrict( final SolutionMapping sm, final Collection<Var> vars ) {
 		return new SolutionMappingImpl(restrict(sm.asJenaBinding(), vars));
@@ -288,10 +342,10 @@ public class SolutionMappingUtils
 	 * Returns a set containing all the variables that have a
 	 * binding in at least one of the given solution mappings.
 	 */
-	public static Set<Var> getAllMentionedVariables( final Iterable<SolutionMapping> solmaps ) {
+	public static Set<Var> getAllMentionedVariables( final Iterable<Binding> solmaps ) {
 		final Set<Var> vars = new HashSet<>();
-		for ( final SolutionMapping sm : solmaps ) {
-			final Iterator<Var> it = sm.asJenaBinding().vars();
+		for ( final Binding sm : solmaps ) {
+			final Iterator<Var> it = sm.vars();
 			while ( it.hasNext() ) {
 				vars.add( it.next() );
 			}
@@ -303,7 +357,7 @@ public class SolutionMappingUtils
 	 * Serializes the given collection of solution mappings as
 	 * a string that can be used in a SPARQL VALUES clause.
 	 */
-	public static String createValuesClause( final Iterable<SolutionMapping> solmaps,
+	public static String createValuesClause( final Iterable<Binding> solmaps,
 	                                         final SerializationContext scxt ) {
 		final Set<Var> vars = SolutionMappingUtils.getAllMentionedVariables(solmaps);
 		if ( vars.size() == 1 )
@@ -313,21 +367,21 @@ public class SolutionMappingUtils
 	}
 
 	protected static String createValuesClauseShortForm( final List<Var> vars,
-	                                                     final Iterable<SolutionMapping> solmaps,
+	                                                     final Iterable<Binding> solmaps,
 	                                                     final SerializationContext scxt ) {
 		final StringBuilder b = new StringBuilder();
 		b.append("?");
 		b.append( vars.iterator().next().getVarName() );
 		b.append(" {");
-		for ( final SolutionMapping sm : solmaps ) {
-			appendValuesClauseEntry( b, vars, sm.asJenaBinding(), scxt );
+		for ( final Binding sm : solmaps ) {
+			appendValuesClauseEntry(b, vars, sm, scxt);
 		}
 		b.append(" }");
 		return b.toString();
 	}
 
 	protected static String createValuesClauseLongForm( final List<Var> vars,
-	                                                    final Iterable<SolutionMapping> solmaps,
+	                                                    final Iterable<Binding> solmaps,
 	                                                    final SerializationContext scxt ) {
 		final StringBuilder b = new StringBuilder();
 		b.append("(");
@@ -338,9 +392,9 @@ public class SolutionMappingUtils
 		b.append(" )");
 
 		b.append(" {");
-		for ( final SolutionMapping sm : solmaps ) {
+		for ( final Binding sm : solmaps ) {
 			b.append(" (");
-			appendValuesClauseEntry( b, vars, sm.asJenaBinding(), scxt );
+			appendValuesClauseEntry(b, vars, sm, scxt);
 			b.append(" )");
 		}
 		b.append(" }");

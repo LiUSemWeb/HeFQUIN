@@ -31,16 +31,14 @@ import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
 {
@@ -1443,14 +1441,9 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 			final Graph dataForMember2,
 			final TriplePattern tp2 ) throws ExecutionException
 	{
-		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
-		final ExecutionContext execCxt = new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return null; }
-			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return getExecutorServiceForTest(); }
-			@Override public boolean isExperimentRun() { return false; }
-			@Override public boolean skipExecution() { return false; }
-		};
+		final ExecutorService execService = getExecutorServiceForTest();
+		final ExecutionContext execCxt = getExecContextForTests(execService);
+
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		final SPARQLEndpoint fm1 = createFedMemberForTest(dataForMember1);
@@ -1496,20 +1489,20 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm1, req1);
 
 		if ( tp2 == null ) {
-			return new ExecOpParallelMultiwayLeftJoin( false, expectedInputVariables, reqOp1 );
+			return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, reqOp1 );
 		}
 
 		final TriplePatternRequest req2 = new TriplePatternRequestImpl(tp2);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(fm2, req2);
 
 		if ( tp3 == null ) {
-			return new ExecOpParallelMultiwayLeftJoin( false, expectedInputVariables, reqOp1, reqOp2 );
+			return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, reqOp1, reqOp2 );
 		}
 
 		final TriplePatternRequest req3 = new TriplePatternRequestImpl(tp3);
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>(fm3, req3);
 
-		return new ExecOpParallelMultiwayLeftJoin( false, expectedInputVariables, reqOp1, reqOp2, reqOp3 );
+		return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, reqOp1, reqOp2, reqOp3 );
 	}
 
 }

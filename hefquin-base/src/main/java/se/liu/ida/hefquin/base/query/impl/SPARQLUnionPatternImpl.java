@@ -8,8 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
@@ -196,7 +196,7 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 	}
 
 	@Override
-	public SPARQLUnionPattern applySolMapToGraphPattern( final SolutionMapping sm )
+	public SPARQLUnionPattern applySolMapToGraphPattern( final Binding sm )
 			throws VariableByBlankNodeSubstitutionException
 	{
 		final SPARQLUnionPatternImpl upNew = new SPARQLUnionPatternImpl();
@@ -211,6 +211,24 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 		}
 
 		return ( unchanged ) ? this : upNew;
+	}
+
+	@Override
+	public String toStringForPlanPrinters() {
+		final StringBuilder b = new StringBuilder();
+		for ( int i = 0; i < subPatterns.size(); i++ ) {
+			if ( i > 0 ) {
+				b.append( "UNION" );
+				b.append( System.lineSeparator() );
+			}
+			b.append( "{" );
+			b.append( System.lineSeparator() );
+			b.append( subPatterns.get(i).toStringForPlanPrinters() );
+			b.append( System.lineSeparator() );
+			b.append( "}" );
+		}
+
+		return b.toString();
 	}
 
 }

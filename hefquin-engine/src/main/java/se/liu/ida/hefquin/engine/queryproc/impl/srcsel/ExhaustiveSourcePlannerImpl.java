@@ -11,15 +11,15 @@ import org.apache.jena.sparql.algebra.op.OpService;
 import org.apache.jena.sparql.core.BasicPattern;
 
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 
 /**
  * This implementation of {@link SourcePlanner} assigns every triple
@@ -33,39 +33,37 @@ import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
  */
 public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlannerImpl
 {
-	public ExhaustiveSourcePlannerImpl( final QueryProcContext ctxt ) {
-		super(ctxt);
-	}
-
 	@Override
-	protected LogicalPlan createPlan( final Op jenaOp ) {
-		if ( jenaOp instanceof OpBGP ) {
-			return createPlanForBGP( (OpBGP) jenaOp );
+	protected LogicalPlan createPlan( final Op jenaOp, final QueryProcContext ctxt ) {
+		if ( jenaOp instanceof OpBGP bgp ) {
+			return createPlanForBGP(bgp, ctxt);
 		}
 		else if ( jenaOp instanceof OpService ) {
 			throw new IllegalArgumentException( "queries with SERVICE patterns are not supported by this source planner (" + getClass().getName() + ")" ); 
 		}
 
-		return super.createPlan(jenaOp);
+		return super.createPlan(jenaOp, ctxt);
 	}
 
-	protected LogicalPlan createPlanForBGP( final OpBGP bgpOp ) {
+	protected LogicalPlan createPlanForBGP( final OpBGP bgpOp,
+	                                        final QueryProcContext ctxt ) {
 		final BasicPattern bgp = bgpOp.getPattern();
 		assert ! bgp.isEmpty();
 
 		if ( bgp.size() == 1 ) {
-			return createSubPlanForTP( bgp.get(0) );
+			return createSubPlanForTP( bgp.get(0), ctxt );
 		}
 
 		final List<LogicalPlan> subPlans = new ArrayList<>();
 		for ( final Triple tp : bgp.getList() ) {
-			subPlans.add( createSubPlanForTP(tp) );
+			subPlans.add( createSubPlanForTP(tp, ctxt) );
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans);
+		return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans, null);
 	}
 
-	protected LogicalPlan createSubPlanForTP( final Triple tp ) {
+	protected LogicalPlan createSubPlanForTP( final Triple tp,
+	                                          final QueryProcContext ctxt ) {
 		final Set<FederationMember> allFMs = ctxt.getFederationCatalog().getAllFederationMembers();
 		assert ! allFMs.isEmpty();
 
@@ -78,12 +76,12 @@ public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlanner
 			reqSubPlans.add( createRequestSubPlan(tp, fm) );
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayUnion(reqSubPlans);
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(reqSubPlans, null);
 	}
 
 	protected LogicalPlan createRequestSubPlan( final Triple tp, final FederationMember fm ) {
 		final TriplePatternRequest req = new TriplePatternRequestImpl( new TriplePatternImpl(tp) );
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, req);
-		return new LogicalPlanWithNullaryRootImpl(reqOp);
+		return new LogicalPlanWithNullaryRootImpl(reqOp, null);
 	}
 }

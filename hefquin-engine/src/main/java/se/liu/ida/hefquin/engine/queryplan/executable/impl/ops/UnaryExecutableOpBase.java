@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -17,11 +18,15 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * and the processing times per input solution mapping. To this end, it
  * implements the major methods of the {@link UnaryExecutableOp} interface,
  * where the actual functionality to be implemented for these methods needs
- * to be provided by implementing two abstract functions in each sub-class of
+ * to be provided by implementing two abstract functions in each subclass of
  * this base class. These two functions are:
  * <ul>
- * <li>{@link #_processBatch(IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)} and</li>
+ * <li>{@link #_process(SolutionMapping, IntermediateResultElementSink, ExecutionContext)} and</li>
  * <li>{@link #_concludeExecution(IntermediateResultElementSink, ExecutionContext)}.</li>
+ * </ul>
+ * Additionally, subclasses may override the following function:
+ * <ul>
+ * <li>{@link #_process(List, IntermediateResultElementSink, ExecutionContext)}.</li>
  * </ul>
  */
 public abstract class UnaryExecutableOpBase extends BaseForExecOps implements UnaryExecutableOp
@@ -29,8 +34,9 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	private boolean executionConcluded = false;
 	private long numberOfInputMappingsProcessed = 0L;
 
-	public UnaryExecutableOpBase( final boolean collectExceptions ) {
-		super(collectExceptions);
+	public UnaryExecutableOpBase( final boolean collectExceptions,
+	                              final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 	}
 
 	@Override
@@ -152,6 +158,7 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 		final ExecutableOperatorStatsImpl s = new ExecutableOperatorStatsImpl(this);
 		s.put( "executionConcluded",                Boolean.valueOf(executionConcluded) );
 		s.put( "numberOfInputMappingsProcessed",    Long.valueOf(numberOfInputMappingsProcessed) );
+		s.put( "queryPlanningInfo",                 qpInfo );
 		return s;
 	}
 

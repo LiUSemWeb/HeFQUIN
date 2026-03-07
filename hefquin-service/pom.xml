@@ -6,18 +6,77 @@
   <parent>
     <groupId>se.liu.research.hefquin</groupId>
     <artifactId>hefquin</artifactId>
-    <version>0.0.6-SNAPSHOT</version>
+    <version>0.0.10-SNAPSHOT</version>
   </parent>
 
   <artifactId>hefquin-service</artifactId>
+
+  <!-- Project Meta Data -->
+  <name>HeFQUIN</name>
+  <description>HeFQUIN is a query federation engine for heterogeneous federations of graph data sources, including federations of knowledge graphs.</description>
+  <url>https://liusemweb.github.io/HeFQUIN/</url>
+
+  <!-- License -->
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <!-- Developer Information -->
+  <developers>
+    <developer>
+      <name>Olaf Hartig</name>
+      <email>olaf.hartig@liu.se</email>
+      <organization>Linköping University</organization>
+      <organizationUrl>https://liu.se/</organizationUrl>
+    </developer>
+  </developers>
+
+  <!-- SCM (Source Code Management) -->
+  <scm>
+    <connection>scm:git:git://github.com/LiUSemWeb/HeFQUIN.git</connection>
+    <developerConnection>scm:git:ssh://github.com:LiUSemWeb/HeFQUIN.git</developerConnection>
+    <url>https://github.com/LiUSemWeb/HeFQUIN</url>
+  </scm>
 
   <dependencies>
     <!-- hefquin-engine -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-engine</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
+      <version>0.0.10-SNAPSHOT</version>
     </dependency>
+<!--
+ I needed to added the following two dependencies when upgrading the
+ code base to Jena v5.5.0, because that version of Jena has 'client5'
+ of 'org.apache.httpcomponents' as dependencies (i.e., it is not any
+ longer using v4 of 'httpclient'). Therefore, 'httpclient' needed to
+ be added as an explicit dependency here.
+
+ After I did that, I ran into a conflict regarding 'commons-codec':
+ there were two versions (1.16.0 and 1.18.0) as indirect dependencies,
+ which made the use of 'MurmurHash3' in 'BlankNodeAllocatorHash' fail.
+
+ Perhaps we should upgrade the code of hefquin-service to also use
+ 'client5' of 'org.apache.httpcomponents'. That way, we have fewer
+ explicit/direct dependencies and, thus, fewer cases of possible
+ conflicts that may arise due to indirect dependencies.
+
+ -Olaf
+-->
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.19.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.14</version>
+    </dependency>
+<!-- ^^ -->
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>

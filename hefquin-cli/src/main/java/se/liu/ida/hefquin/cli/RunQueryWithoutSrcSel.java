@@ -2,13 +2,9 @@ package se.liu.ida.hefquin.cli;
 
 import java.io.PrintStream;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.io.output.NullPrintStream;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
-import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.sparql.resultset.ResultsFormat;
@@ -16,7 +12,6 @@ import org.apache.jena.sparql.resultset.ResultsFormat;
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
-import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.base.utils.Stats;
 import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
@@ -24,10 +19,10 @@ import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
-import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
+import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
+import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 
 /**
  * A command-line tool that executes SPARQL queries using the HeFQUIN federation
@@ -113,19 +108,19 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	 */
 	@Override
 	protected void exec() {
-		final ExecutorService execServiceForFedAccess = HeFQUINEngineDefaultComponents.createExecutorServiceForFedAccess();
-		final ExecutorService execServiceForPlanTasks = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
+		final HeFQUINEngineBuilder builder = new HeFQUINEngineBuilder()
+			.withFederationCatalog( modFederation.getFederationCatalog() )
+			.withSourceAssignmentPrinter( modPlanPrinting.getSourceAssignmentPrinter() )
+			.withLogicalPlanPrinter( modPlanPrinting.getLogicalPlanPrinter() )
+			.withPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
+			.withExecutablePlanPrinter( modPlanPrinting.getExecutablePlanPrinter() )
+			.setSkipExecution( contains(argSkipExecution) );
 
-		final HeFQUINEngine e = modEngineConfig.getEngine( execServiceForFedAccess,
-		                                                   execServiceForPlanTasks,
-		                                                   modFederation.getFederationCatalog(),
-		                                                   false, // isExperimentRun
-		                                                   contains( argSkipExecution ),
-		                                                   modPlanPrinting.getSourceAssignmentPrinter(),
-		                                                   modPlanPrinting.getLogicalPlanPrinter(),
-		                                                   modPlanPrinting.getPhysicalPlanPrinter() );
-		ARQ.init();
-		e.integrateIntoJena();
+		if( modEngineConfig.getConfDescr() != null ){
+			builder.withEngineConfiguration( modEngineConfig.getConfDescr() );
+		}
+
+		final HeFQUINEngine e = builder.build();
 
 		final Query query = getQuery();
 		final ResultsFormat resFmt = modResults.getResultsFormat();
@@ -139,10 +134,10 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			out = System.out;
 		}
 
-		Pair<QueryProcStats, List<Exception>> statsAndExceptions = null;
+		QueryProcessingStatsAndExceptions statsAndExceptions = null;
 
 		try {
-			statsAndExceptions = e.executeQuery( query, resFmt, out );
+			statsAndExceptions = e.executeQueryAndPrintResult(query, resFmt, out);
 		}
 		catch ( final IllegalQueryException ex ) {
 			System.out.flush();
@@ -160,10 +155,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			ex.printStackTrace( System.err );
 		}
 
-		if (    statsAndExceptions != null
-		     && statsAndExceptions.object2 != null
-		     && ! statsAndExceptions.object2.isEmpty() ) {
-			final int numberOfExceptions = statsAndExceptions.object2.size();
+		if ( statsAndExceptions != null && statsAndExceptions.containsExceptions() ) {
+			final List<Exception> exceptions = statsAndExceptions.getExceptions();
+			final int numberOfExceptions = exceptions.size();
 			if ( numberOfExceptions > 1 ) {
 				System.err.println( "Attention: The query result may be incomplete because the following "
 						+ numberOfExceptions + " exceptions were caught when executing the query plan." );
@@ -174,8 +168,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 			System.err.println();
 			for ( int i = 0; i < numberOfExceptions; i++ ) {
-				final Exception ex = statsAndExceptions.object2.get( i );
-				System.err.println( (i + 1) + " " + ex.getClass().getName() + ": " + ex.getMessage() );
+				final Exception ex = exceptions.get(i);
+				final Throwable rc = getRootCause( ex );
+				System.err.println( (i + 1) + " " + rc.getClass().getName() + ": " + rc.getMessage() );
 				System.err.println( "StackTrace:" );
 				ex.printStackTrace( System.err );
 				System.err.println();
@@ -187,41 +182,28 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			System.err.println( "Time: " + modTime.timeStr( time ) + " sec" );
 		}
 
-		execServiceForPlanTasks.shutdownNow();
-		execServiceForFedAccess.shutdownNow();
+		e.shutdown();
 
-		try {
-			execServiceForPlanTasks.awaitTermination( 500L, TimeUnit.MILLISECONDS );
-		} catch ( final InterruptedException ex ) {
-			System.err.println( "Terminating the thread pool for query plan tasks was interrupted." );
-			ex.printStackTrace();
-		}
-
-		try {
-			execServiceForFedAccess.awaitTermination( 500L, TimeUnit.MILLISECONDS );
-		} catch ( final InterruptedException ex ) {
-			System.err.println( "Terminating the thread pool for federation access was interrupted." );
-			ex.printStackTrace();
-		}
-
-		if ( statsAndExceptions != null && statsAndExceptions.object1 != null ) {
-			if ( contains( argQueryProcStats ) ) {
-				StatsPrinter.print( statsAndExceptions.object1, System.err, true );
+		if ( statsAndExceptions != null ) {
+			if ( contains(argQueryProcStats) ) {
+				StatsPrinter.print( statsAndExceptions, System.err, true );
+				System.err.println();
 			}
-			if ( contains( argOnelineTimeStats ) ) {
-				final long overallQueryProcessingTime = statsAndExceptions.object1.getOverallQueryProcessingTime();
-				final long planningTime = statsAndExceptions.object1.getPlanningTime();
-				final long compilationTime = statsAndExceptions.object1.getCompilationTime();
-				final long executionTime = statsAndExceptions.object1.getExecutionTime();
+			if ( contains(argOnelineTimeStats) ) {
+				final long overallQueryProcessingTime = statsAndExceptions.getOverallQueryProcessingTime();
+				final long planningTime = statsAndExceptions.getPlanningTime();
+				final long compilationTime = statsAndExceptions.getCompilationTime();
+				final long executionTime = statsAndExceptions.getExecutionTime();
 				final String queryProcStats = overallQueryProcessingTime + ", " + planningTime + ", " + compilationTime
 						+ ", " + executionTime;
 				System.out.println( queryProcStats );
 			}
 		}
 
-		if ( contains( argFedAccessStats ) ) {
+		if ( contains(argFedAccessStats) ) {
 			final Stats fedAccessStats = e.getFederationAccessStats();
 			StatsPrinter.print( fedAccessStats, System.err, true );
+			System.err.println();
 		}
 	}
 
@@ -240,4 +222,22 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		}
 	}
 
+	/**
+	 * Returns the root cause of a throwable by traversing the cause chain.
+	 *
+	 * This method follows the chain of {@code Throwable.getCause()} until it
+	 * reaches the deepest non-null cause. If the input {@code throwable} has no
+	 * cause, the method returns the throwable itself.
+	 *
+	 * @param throwable the throwable from which to extract the root cause
+	 * @return the root cause of the throwable, or {@code null} if {@code throwable}
+	 *         is {@code null}
+	 */
+	private static Throwable getRootCause( final Throwable throwable ) {
+		Throwable cause = throwable;
+		while ( cause.getCause() != null ) {
+			cause = cause.getCause();
+		}
+		return cause;
+	}
 }

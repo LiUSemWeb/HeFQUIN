@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultEleme
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterWithNullaryExecOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterWithUnaryExecOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterator;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryCompilationException;
@@ -32,16 +33,22 @@ public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompile
 	protected ResultElementIterator compile( final PhysicalPlan qep,
 	                                         final ExecutionContext execCxt )
 	{
+		final QueryPlanningInfo qpInfo;
+		if ( qep.hasQueryPlanningInfo() )
+			qpInfo = qep.getQueryPlanningInfo();
+		else
+			qpInfo = null;
+
 		if ( qep.numberOfSubPlans() == 0 )
 		{
-			final NullaryExecutableOp execOp = (NullaryExecutableOp) qep.getRootOperator().createExecOp(true);
+			final NullaryExecutableOp execOp = (NullaryExecutableOp) qep.getRootOperator().createExecOp(true, qpInfo);
 			return new ResultElementIterWithNullaryExecOp(execOp, execCxt);
 		}
 		else if ( qep.numberOfSubPlans() == 1 )
 		{
 			final PhysicalPlan subPlan = qep.getSubPlan(0);
 
-			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( true, subPlan.getExpectedVariables() );
+			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( true, qpInfo, subPlan.getExpectedVariables() );
 
 			final ResultElementIterator elmtIterSubPlan = compile(subPlan, execCxt);
 			return new ResultElementIterWithUnaryExecOp(execOp, elmtIterSubPlan, execCxt);
@@ -53,6 +60,7 @@ public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompile
 
 			final BinaryExecutableOp execOp = (BinaryExecutableOp) qep.getRootOperator().createExecOp(
 					true,
+					qpInfo,
 					subPlan1.getExpectedVariables(),
 					subPlan2.getExpectedVariables() );
 

@@ -5,14 +5,16 @@ import java.util.List;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 {
 	private long numberOfOutputMappingsProduced = 0L;
 	
-	public ExecOpBinaryUnion( final boolean collectExceptions ) {
-		super(collectExceptions);
+	public ExecOpBinaryUnion( final boolean collectExceptions,
+	                          final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 	}
 
 	@Override

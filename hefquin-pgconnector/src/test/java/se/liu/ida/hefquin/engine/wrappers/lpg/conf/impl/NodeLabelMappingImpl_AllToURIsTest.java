@@ -33,7 +33,7 @@ public class NodeLabelMappingImpl_AllToURIsTest {
 
     @Test
     public void nodeLabelIsPossibleResult(){
-        final Node literalNode = NodeFactory.createLiteral("0");
+        final Node literalNode = NodeFactory.createLiteralString("0");
         final Node IRINode = NodeFactory.createURI(NSNODELABEL + "0");
         final boolean literalIsPossible = nodeLabelMapping.isPossibleResult(literalNode);
         final boolean IRIIsPossible = nodeLabelMapping.isPossibleResult(IRINode);
@@ -46,7 +46,7 @@ public class NodeLabelMappingImpl_AllToURIsTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void unmapNonURINodeLabel(){
-        final Node literalNode = NodeFactory.createLiteral("literalnode");
+        final Node literalNode = NodeFactory.createLiteralString("literalnode");
         nodeLabelMapping.unmap(literalNode);
     }
 

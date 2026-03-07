@@ -4,14 +4,15 @@ import java.util.Iterator;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.Triple;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.TriplesResponse;
-import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.access.TriplesResponse;
+import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
 /**
  * Base class for implementations of request operators with
@@ -20,13 +21,16 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * broken into multiple requests as would be the case when
  * interacting with, e.g., a TPF server which employs paging.
  * For interactions with TPF servers, there is a different
- * base class: {@link BaseForExecOpTriplePatternRequestWithTPF}.
+ * base class: {@link ExecOpRequestTPF}.
  */
 public abstract class BaseForExecOpTriplesRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
                 extends BaseForExecOpRequest<ReqType,MemberType>
 {
-	public BaseForExecOpTriplesRequest( final ReqType req, final MemberType fm, final boolean collectExceptions ) {
-		super( req, fm, collectExceptions );
+	public BaseForExecOpTriplesRequest( final ReqType req,
+	                                    final MemberType fm,
+	                                    final boolean collectExceptions,
+	                                    final QueryPlanningInfo qpInfo ) {
+		super(req, fm, collectExceptions, qpInfo);
 	}
 
 	@Override

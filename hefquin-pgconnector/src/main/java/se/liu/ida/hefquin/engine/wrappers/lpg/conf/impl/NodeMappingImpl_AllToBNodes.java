@@ -16,7 +16,7 @@ public class NodeMappingImpl_AllToBNodes implements NodeMapping{
     public LPGNode unmap(final Node node) {
         if (!isPossibleResult(node))
             throw new IllegalArgumentException("The given RDF term (" + node.toString() + ") is not a blank node.");
-        final String id = node.getBlankNodeId().toString();
+        final String id = node.getBlankNodeLabel();
         return new LPGNode(id, "", null);
     }
 

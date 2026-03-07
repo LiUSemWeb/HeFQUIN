@@ -6,17 +6,35 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlan;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 
-public class LogicalPlanWithNaryRootImpl implements LogicalPlanWithNaryRoot
+public class LogicalPlanWithNaryRootImpl extends BaseForQueryPlan
+                                         implements LogicalPlanWithNaryRoot
 {
 	private final NaryLogicalOp rootOp;
 	private final List<LogicalPlan> subPlans;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param rootOp - the root operator of the plan to be created
+	 * @param qpInfo - query-planning-related properties for a
+	 *                 {@link QueryPlanningInfo} object for the
+	 *                 plan to be created; may be {@code null},
+	 *                 in which case the plan does not get such
+	 *                 an object initially
+	 * @param subPlans - the child plans of the plan to be created
+	 */
 	public LogicalPlanWithNaryRootImpl( final NaryLogicalOp rootOp,
+	                                    final Iterable<QueryPlanProperty> qpInfo,
 	                                    final List<LogicalPlan> subPlans ) {
+		super( qpInfo );
+
 		assert rootOp != null;
 		assert subPlans != null;
 
@@ -24,47 +42,27 @@ public class LogicalPlanWithNaryRootImpl implements LogicalPlanWithNaryRoot
 		this.subPlans = subPlans;
 	}
 
+	/**
+	 * Constructor.
+	 *
+	 * @param rootOp - the root operator of the plan to be created
+	 * @param qpInfo - query-planning-related properties for a
+	 *                 {@link QueryPlanningInfo} object for the
+	 *                 plan to be created; may be {@code null},
+	 *                 in which case the plan does not get such
+	 *                 an object initially
+	 * @param subPlans - the child plans of the plan to be created
+	 */
 	public LogicalPlanWithNaryRootImpl( final NaryLogicalOp rootOp,
+	                                    final Iterable<QueryPlanProperty> qpInfo,
 	                                    final LogicalPlan ... subPlans ) {
+		super( qpInfo );
+
 		assert rootOp != null;
 		assert subPlans != null;
 
 		this.rootOp = rootOp;
 		this.subPlans = Arrays.asList(subPlans);
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		if ( ! (o instanceof LogicalPlanWithNaryRoot) )
-			return false; 
-
-		final LogicalPlanWithNaryRoot oo = (LogicalPlanWithNaryRoot) o;
-		if ( oo == this )
-			return true;
-
-		if ( oo.numberOfSubPlans() != subPlans.size() )
-			return false;
-
-		if ( ! oo.getRootOperator().equals(rootOp) )
-			return false;
-
-		final Iterator<LogicalPlan> it1 = subPlans.iterator();
-		final Iterator<LogicalPlan> it2 = oo.getSubPlans();
-		while ( it1.hasNext() ) {
-			if ( ! it1.next().equals(it2.next()) )
-				return false;
-		}
-
-		return true;
-	}
-
-	@Override
-	public int hashCode(){
-		int code = rootOp.hashCode();
-		final Iterator<LogicalPlan> it = subPlans.iterator();
-		while ( it.hasNext() )
-			code = code ^ it.next().hashCode();
-		return code;
 	}
 
 	@Override

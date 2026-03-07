@@ -5,12 +5,13 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.expr.Expr;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpBind extends LogicalOperatorBase implements UnaryLogicalOp
+public class LogicalOpBind implements UnaryLogicalOp
 {
 	protected final VarExprList bindExpressions;
 
@@ -27,17 +28,22 @@ public class LogicalOpBind extends LogicalOperatorBase implements UnaryLogicalOp
 
 		final ExpectedVariables expVarsInput = inputVars[0];
 
-		final Set<Var> certainVars = expVarsInput.getCertainVariables();
-
-		// The variable in a BIND clause is only possible, not certain,
-		// because the evaluating the expression of the BIND clause may
-		// result in an error, in which case the BIND variable remains
-		// unbound.
+		final Set<Var> certainVars = new HashSet<>( expVarsInput.getCertainVariables() );
 		final Set<Var> possibleVars = new HashSet<>( expVarsInput.getPossibleVariables() );
+
+		// In general, the variable in a BIND clause is only possible,
+		// not certain, because evaluating the expression of the BIND
+		// clause may result in an error, in which case the BIND variable
+		// remains unbound. Yet, for some expressions we can be sure that
+		// their evaluation does not result in an error (e.g., constants);
+		// hence, we check for such cases and add their BIND variable as
+		// a certain one, rather than only a possible one.
 		for ( final Var bindVar : bindExpressions.getVars() ) {
-			if ( ! certainVars.contains(bindVar) ) {
+			final Expr expr = bindExpressions.getExpr(bindVar);
+			if ( mightProduceError(expr, certainVars) )
 				possibleVars.add(bindVar);
-			}
+			else
+				certainVars.add(bindVar);
 		}
 
 		return new ExpectedVariables() {
@@ -46,18 +52,18 @@ public class LogicalOpBind extends LogicalOperatorBase implements UnaryLogicalOp
 		};
 	}
 
-	@Override
-	public boolean equals( final Object o ) {
-		if ( o == this ) return true;
-		if ( ! (o instanceof LogicalOpBind) ) return false;
+	/**
+	 * Returns <code>true</code> if it is <em>not</em> guaranteed that
+	 * evaluating the given expression may result in an error.
+	 */
+	protected boolean mightProduceError( final Expr expr, final Set<Var> certainVars ) {
+		if ( expr.isConstant() )
+			return false;
 
-		final LogicalOpBind oo = (LogicalOpBind) o;
-		return oo.bindExpressions.equals(bindExpressions);
-	}
+		if ( expr.isVariable() && certainVars.contains(expr.asVar()) )
+			return false;
 
-	@Override
-	public int hashCode(){
-		return bindExpressions.hashCode();
+		return true;
 	}
 
 	public VarExprList getBindExpressions() {
@@ -70,8 +76,21 @@ public class LogicalOpBind extends LogicalOperatorBase implements UnaryLogicalOp
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return    o instanceof LogicalOpBind oo
+		       && oo.bindExpressions.equals(bindExpressions);
+	}
+
+	@Override
+	public int hashCode(){
+		return getClass().hashCode() ^ bindExpressions.hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "> Bind ( " + bindExpressions.toString() + " )";
+		return "Bind ( " + bindExpressions.toString() + " )";
 	}
 
 }

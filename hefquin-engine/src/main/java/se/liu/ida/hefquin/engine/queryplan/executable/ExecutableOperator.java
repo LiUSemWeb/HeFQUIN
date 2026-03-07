@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.utils.StatsProvider;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
 /**
  * An executable operator provides the implementation of the concrete
@@ -13,6 +14,15 @@ public interface ExecutableOperator extends StatsProvider
 {
 	@Override
 	ExecutableOperatorStats getStats();
+
+	/**
+	 * Returns the {@link QueryPlanningInfo} object that was populated for
+	 * a physical plan whose root operator was the physical operator for
+	 * which this executable operator was created.
+	 *
+	 * @return the {@link QueryPlanningInfo} object or {@code null}.
+	 */
+	QueryPlanningInfo getQueryPlanningInfo();
 
 	/**
 	 * Returns exceptions that were caught and collected during the execution

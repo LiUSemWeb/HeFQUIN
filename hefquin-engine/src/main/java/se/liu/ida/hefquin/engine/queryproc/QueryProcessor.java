@@ -1,13 +1,12 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
-import java.util.List;
-
 import se.liu.ida.hefquin.base.query.Query;
-import se.liu.ida.hefquin.base.utils.Pair;
+import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 
 public interface QueryProcessor
 {
-	Pair<QueryProcStats, List<Exception>> processQuery( final Query query, final QueryResultSink resultSink )
+	QueryProcessingStatsAndExceptions processQuery( Query query,
+	                                                QueryResultSink resultSink )
 			throws QueryProcException;
 
 	QueryPlanner getPlanner();

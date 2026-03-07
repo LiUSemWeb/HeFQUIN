@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsIndexNoJoinVa
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.*;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
@@ -27,7 +28,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 /**
  * TODO: Provide a description of the algorithm implemented by this class.
  */
-public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBatching
+public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollectedInput
 {
 	public final static int DEFAULT_BATCH_SIZE = 30;
 
@@ -39,15 +40,17 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 	protected final Set<List<Node>> bindingsForJoinVariable = new HashSet<>();
 
 	public ExecOpParallelMultiwayLeftJoin( final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables inputVarsFromNonOptionalPart,
 	                                       final LogicalOpRequest<?,?> ... optionalParts ) {
-		this( collectExceptions, inputVarsFromNonOptionalPart, Arrays.asList(optionalParts) );
+		this( collectExceptions, qpInfo, inputVarsFromNonOptionalPart, Arrays.asList(optionalParts) );
 	}
 
 	public ExecOpParallelMultiwayLeftJoin( final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables inputVarsFromNonOptionalPart,
 	                                       final List<LogicalOpRequest<?,?>> optionalParts ) {
-		super(DEFAULT_BATCH_SIZE, collectExceptions);
+		super(DEFAULT_BATCH_SIZE, collectExceptions, qpInfo);
 
 		assert ! optionalParts.isEmpty();
 
@@ -90,7 +93,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 	}
 
 	@Override
-	protected void _processBatch( final List<SolutionMapping> input,
+	protected void _processCollectedInput( final List<SolutionMapping> input,
 	                              final IntermediateResultElementSink sink,
 	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		final List<SolutionMapping> inputForParallelProcess = determineInputForParallelProcess(input);
@@ -196,13 +199,13 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 			throws ExecOpExecutionException
 	{
 		if ( batch != null && ! batch.isEmpty() ) {
-			_processBatch(batch, sink, execCxt);
+			_processCollectedInput(batch, sink, execCxt);
 		}
 	}
 
 
 	protected static class Worker implements Runnable {
-		protected final UnaryExecutableOpBaseWithBatching execOp;
+		protected final UnaryExecutableOp execOp;
 		protected final IntermediateResultElementSink mySink;
 		protected final List<SolutionMapping> input;
 		protected final ExecutionContext execCxt;
@@ -215,9 +218,16 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 			this.input = input;
 			this.execCxt = execCxt;
 
+			final LogicalToPhysicalOpConverter lop2pop = execCxt.getLogicalToPhysicalOpConverter();
+
+			// TODO: The creation of the executable operator (i.e., the
+			// following three lines) should be moved into the constructor
+			// of the main class here (ExecOpParallelMultiwayLeftJoin).
+			// There is no need to repeatedly create these executable
+			// operators again and again.
 			final UnaryLogicalOp addLop = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(req);
-			final UnaryPhysicalOp addPop = LogicalToPhysicalOpConverter.convert(addLop);
-			this.execOp = (UnaryExecutableOpBaseWithBatching) addPop.createExecOp(false, inputVarsFromNonOptionalPart);
+			final UnaryPhysicalOp addPop = lop2pop.convert(addLop, inputVarsFromNonOptionalPart);
+			this.execOp = addPop.createExecOp(false, null, inputVarsFromNonOptionalPart);
 
 			this.mySink = new IntermediateResultElementSink() {
 				@Override
@@ -230,7 +240,8 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 		@Override
 		public void run() {
 			try {
-				execOp._processBatch(input, mySink, execCxt);
+				execOp.process(input, mySink, execCxt);
+				execOp.concludeExecution(mySink, execCxt);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				throw new RuntimeException("Executing an add operator used by this parallel multi left join caused an exception.", e);
