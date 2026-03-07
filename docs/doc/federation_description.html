@@ -53,8 +53,9 @@
 
         <h2 id="key-properties">3. Key Properties</h2>
         <ul>
-            <li><code>fd:endpointAddress</code> -        URI of a federation member that can be accessed via a single HTTP endpoint (e.g., SPARQL, REST, and GraphQL endpoints)</li>
-            <li><code>fd:exampleFragmentAddress</code> - Example URL of a fragment that can be used to access a specific subset of the dataset of a federation member (e.g., for TPF and brTPF interfaces)</li>
+            <li><code>fd:serviceURI</code> -             An <code>xsd:anyURI</code> literal with a URI to be used to refer to the corresponding federation member in <code>SERVICE</code> clauses</li>
+            <li><code>fd:endpointAddress</code> -        An <code>xsd:anyURI</code> literal with the URI via which a federation member with a single HTTP endpoint can be accessed (e.g., SPARQL, REST, and GraphQL endpoints)</li>
+            <li><code>fd:exampleFragmentAddress</code> - An <code>xsd:anyURI</code> literal with an example URL of a fragment that can be used to access a specific subset of the dataset of a federation member (e.g., for TPF and brTPF interfaces)</li>
             <li><code>fd:vocabularyMappingsFile</code> - Link to an RDF file aligning different vocabularies</li>
             <li><code>fd:mappingConfiguration</code> -   Resource pointing to a mapping configuration for translating non-RDF data models (e.g., GraphQL, LPG) into RDF</li>
             <li><code>fd:wrapper</code> -                Link to an <code>fd:Wrapper</code> that has RML triples maps listed via a <code>fd:rmlTriplesMaps</code> property</li>
@@ -63,44 +64,61 @@
         <h2>4. Example Descriptions</h2>
 
         <h3 id="SPARQL-endpoint-example">SPARQL Endpoint</h3>
-        <pre><code class="language-turtle">@prefix fd: &lt;http://www.example.org/se/liu/ida/hefquin/fd#&gt; .
-@prefix ex: &lt;http://example.org/&gt; .
+        <pre><code class="language-turtle">PREFIX xsd:  &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX fd:   &lt;http://w3id.org/hefquin/feddesc#&gt;
+PREFIX ex:   &lt;http://example.org/&gt;
 
 ex:dbpediaSPARQL
-    fd:serviceURI &lt;http://dbpedia.org/sparql&gt; ;
+    fd:serviceURI "http://dbpedia.org/sparql"^^xsd:anyURI ;
     fd:interface [
         a fd:SPARQLEndpointInterface ;
-        fd:endpointAddress &lt;http://dbpedia.org/sparql&gt;
+        fd:endpointAddress "http://dbpedia.org/sparql"^^xsd:anyURI
     ] .
 </code></pre>
 
         <h3 id="TPF-server-example">TPF Server</h3>
-        <pre><code class="language-turtle">@prefix fd: &lt;http://www.example.org/se/liu/ida/hefquin/fd#&gt; .
-@prefix ex: &lt;http://example.org/&gt; .
+        <pre><code class="language-turtle">PREFIX xsd:  &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX fd:   &lt;http://w3id.org/hefquin/feddesc#&gt;
+PREFIX ex:   &lt;http://example.org/&gt;
 
 ex:dbpediaTPF
-    fd:serviceURI &lt;http://fragments.dbpedia.org/2016-04/en&gt; ;
+    fd:serviceURI "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI ;
     fd:interface [
         a fd:TPFInterface ;
-        fd:exampleFragmentAddress &lt;http://fragments.dbpedia.org/2016-04/en&gt;
+        fd:exampleFragmentAddress "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI
     ] .
 </code></pre>
 
-        <h3 id="REST-endpoint-example">RML-Wrapped REST Endpoint</h3>
-        <pre><code class="language-turtle">@prefix fd: &lt;http://www.example.org/se/liu/ida/hefquin/fd#&gt; .
-@prefix rml: &lt;http://w3id.org/rml/&gt; .
-@prefix ex: &lt;http://example.org/&gt; .
+        <h3 id="REST-endpoint-example">RML-Wrapped REST Endpoint (with URI Template and RML Mapping)</h3>
+        <pre><code class="language-turtle">PREFIX xsd:    &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX fd:     &lt;http://w3id.org/hefquin/feddesc#&gt;
+PREFIX rml:    &lt;http://w3id.org/rml/&gt;
+PREFIX hydra:  &lt;http://www.w3.org/ns/hydra/core#&gt;
+PREFIX ex:     &lt;http://example.org/&gt;
 
 ex:openMeteo
-    fd:serviceURI &lt;https://api.open-meteo.com/v1/forecast&gt; ;
+    fd:serviceURI "http://example.org/OpenMeteoWrapper"^^xsd:anyURI ;
     fd:interface _:openMeteoRestEndpoint ;
     fd:wrapper _:openMeteoWrapper .
 
 _:openMeteoRestEndpoint a fd:RESTInterface ;
-      fd:endpointAddress &lt;https://api.open-meteo.com/v1/forecast&gt; ;
-      fd:queryParameters ( [ fd:paramName "latitude" ; fd:paramType xsd:float ]
-                           [ fd:paramName "longitude" ; fd:paramType xsd:float ]
-                           [ fd:paramName "current" ; fd:paramType xsd:string ] ) .
+      fd:iriTemplate [
+            hydra:template "https://api.open-meteo.com/v1/forecast{?latitude,longitude,current,hourly}" ;
+            hydra:mapping [ hydra:variable "latitude" ;
+                            hydra:required true ;
+                            fd:paramType xsd:float
+                          ] ;
+            hydra:mapping [ hydra:variable "longitude" ;
+                            hydra:required true ;
+                            fd:paramType xsd:float
+                          ] ;
+            hydra:mapping [ hydra:variable "current" ;
+                            fd:paramType xsd:string
+                          ] ;
+            hydra:mapping [ hydra:variable "hourly" ;
+                            fd:paramType xsd:string
+                          ]
+          ] .
 
 # the corresponding wrapper with two RML triples maps
 _:openMeteoWrapper
@@ -126,16 +144,17 @@ _:openMeteoTM2
 </code></pre>
 
         <h3 id="Neo4j-example">Neo4j</h3>
-        <pre><code class="language-turtle">@prefix fd: &lt;http://www.example.org/se/liu/ida/hefquin/fd#&gt; .
-@prefix lpg2rdf: &lt;http://w3id.org/hefquin/lpg2rdf#&gt; .
-@prefix ex: &lt;http://example.org/&gt; .
+        <pre><code class="language-turtle">PREFIX xsd:      &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX fd:       &lt;http://w3id.org/hefquin/feddesc#&gt;
+PREFIX lpg2rdf:  &lt;http://w3id.org/hefquin/lpg2rdf#&gt;
+PREFIX ex:       &lt;http://example.org/&gt;
 
 ex:neo4jTest
     a fd:FederationMember ;
-    fd:serviceURI &lt;http://localhost:7474/neo4j&gt; ;
+    fd:serviceURI "http://localhost:7474/neo4j"^^xsd:anyURI ;
     fd:interface [
         a fd:BoltInterface ;
-        fd:endpointAddress &lt;http://localhost:7474/db/neo4j/tx&gt; ;
+        fd:endpointAddress "http://localhost:7474/db/neo4j/tx"^^xsd:anyURI ;
         fd:mappingConfiguration [
             a lpg2rdf:LPGToRDFConfiguration ;
             # ...

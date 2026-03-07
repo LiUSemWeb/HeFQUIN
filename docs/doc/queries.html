@@ -82,13 +82,13 @@ SELECT * WHERE {
 	BIND ( "13.41"^^xsd:float AS ?long )
 	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
 
-	SERVICE &lt;https://api.open-meteo.com/v1/forecast> PARAMS(?lat, ?long, ?req) {
+	SERVICE &lt;http://example.org/OpenMeteoWrapper> PARAMS(?lat AS "latitude", ?long AS "longitude", ?req AS "current") {
 		?x ex:temperature ?temp .
 		?x ex:windSpeed ?wind .
 	}
 }</code></pre>
             <p>
-                Note that the <code>PARAMS</code> keyword is a HeFQUIN-specific extension to SPARQL and is not part of the SPARQL standard. At the moment, it is possible to list only variables within the <code>PARAMS</code> part. The number of variables listed must correspond to the number of query parameters that the <a href="federation_description.html">federation description</a> being used specifies for the corresponding REST endpoint (see the <a href="http://w3id.org/hefquin/feddesc#queryParameters">fd:queryParameters</a> property and a relevant <a href="federation_description.html#REST-endpoint-example">example description</a>), and the values assigned to these variables must be literals with the datatypes specified for the query parameters in the federation description.
+                Note that the <code>PARAMS</code> clause is a HeFQUIN-specific extension to SPARQL and is not part of the SPARQL standard. At the moment, it is possible to list only variables within the <code>PARAMS</code> clause. The parameter names to which the variables are assigned within the <code>PARAMS</code> clause (such as the parameter names <code>"latitude"</code>, <code>"longitude"</code>, and <code>"current"</code> in the example query) must correspond to the parameters that the <a href="federation_description.html">federation description</a> being used specifies for the corresponding REST endpoint (see the hydra:mapping properties of the <a href="http://w3id.org/hefquin/feddesc#iriTemplate">fd:iriTemplate</a> object and a relevant <a href="federation_description.html#REST-endpoint-example">example description</a>), and the values assigned to these variables must be literals with the datatypes specified for the parameters in the federation description (see the <a href="http://w3id.org/hefquin/feddesc#paramType">fd:paramType</a> property). Parameters that the federation description defines to be required (as per the hydra:required property) need to be present in the <code>PARAMS</code> clause. For every non-required parameter, if it is not present in the <code>PARAMS</code> clause, then the corresponding part of the URI template remains empty.
             </p>
             <p id="source-assignments-with-values">
                 <b>Providing the service IRIs via <code>VALUES</code> clauses.</b> The only case in which the <code>SERVICE</code> clauses may have a variable in place of a service IRI is in queries in which <code>VALUES</code> clauses are used to specify the service IRIs. In particular, such a query must satisfy the following conditions:
