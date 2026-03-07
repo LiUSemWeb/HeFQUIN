@@ -7,6 +7,14 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
+- nothing yet
+### Changed
+- nothing yet
+
+
+## [0.0.9] - 2026-03-07
+
+### Added
 - Support for optional parameters in the template IRIs for REST APIs ([#493](https://github.com/LiUSemWeb/HeFQUIN/pull/493)).
 - Support for creating CDT literals in the RML processing component ([#513](https://github.com/LiUSemWeb/HeFQUIN/pull/513)).
 - Adding an implementation of the batch-based bind-join algorithm for SPARQL endpoints that issues the bind-join requests without blocking, handling the processing of their responses in parallel ([#499](https://github.com/LiUSemWeb/HeFQUIN/pull/499)).
