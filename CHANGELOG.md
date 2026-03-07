@@ -18,6 +18,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Some clean up in the classes for plans and for operators ([#500](https://github.com/LiUSemWeb/HeFQUIN/pull/500)).
 - More effective implementation of executable operators that assume that at least a minimum number of input solution mappings are available to process ([#502](https://github.com/LiUSemWeb/HeFQUIN/pull/502)).
 - Fixes and improvements related to Web API querying and the related RML functionality ([#502](https://github.com/LiUSemWeb/HeFQUIN/pull/502), [#513](https://github.com/LiUSemWeb/HeFQUIN/pull/513), [#518](https://github.com/LiUSemWeb/HeFQUIN/pull/518), [#519](https://github.com/LiUSemWeb/HeFQUIN/pull/519), [#520](https://github.com/LiUSemWeb/HeFQUIN/pull/520), [#522](https://github.com/LiUSemWeb/HeFQUIN/pull/522)).
+- Fixes of inconsistencies and minor mistakes in the vocabulary for federation descriptions ([#523](https://github.com/LiUSemWeb/HeFQUIN/pull/523)).
 - Bug fix in the base implementation of the bind-join algorithm, which did not correctly implement bag semantics ([#498](https://github.com/LiUSemWeb/HeFQUIN/pull/498)).
 - Bug fix in cardinality-based join reordering ([#501](https://github.com/LiUSemWeb/HeFQUIN/pull/501)).
 - Bug fix in join cardinality estimation ([#501](https://github.com/LiUSemWeb/HeFQUIN/pull/501)).
