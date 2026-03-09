@@ -72,7 +72,7 @@ SELECT * WHERE {
                     <code>http://dbpedia.org/sparql</code> and <code>https://query.wikidata.org/sparql</code>, respectively).
                 With one exception (see below), HeFQUIN expects all <code>SERVICE</code> clauses to be of this form (rather than having a variable in place of the service IRI). The IRIs to be used as such service IRIs are the IRIs specified as a value of the <code>serviceURI</code> property of the federation members mentioned in the <a href="federation_description.html">description of your federation</a>. If your query mentions a service IRI that is not the <code>serviceURI</code> of any federation member in the federation to be queried, then the HeFQUIN query planner returns an error.
             </p>
-            <p>
+            <p id="service-calls-with-parameters">
                 <b>Service calls with parameters.</b> For federation members for which requests need to be formed by using values for particular parameters (e.g., REST requests with an HTTP URI that contains a <a href="https://en.wikipedia.org/wiki/Query_string">query string</a>), the corresponding <code>SERVICE</code> clauses may contain a <code>PARAMS</code> part as illustrated in the following query.
             </p>
             <pre><code class="language-sparql">PREFIX ex:   &lt;http://example.org/>
