@@ -15,6 +15,7 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -73,7 +74,7 @@ public class FederationDescriptionReader
 	}
 	
 	public FederationCatalog parseFedDescr( final List<String> filenames ) {
-		final Model mergedModel = org.apache.jena.rdf.model.ModelFactory.createDefaultModel();
+		final Model mergedModel = ModelFactory.createDefaultModel();
 		for ( final String filename : filenames ) {
 			mergedModel.add( RDFDataMgr.loadModel(filename) );
 		}
