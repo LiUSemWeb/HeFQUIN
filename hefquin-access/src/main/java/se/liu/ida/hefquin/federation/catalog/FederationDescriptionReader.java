@@ -72,13 +72,13 @@ public class FederationDescriptionReader
 		return parseFedDescr(fd);
 	}
 	
-	public FederationCatalog parseFedDescr(final List<String> filenames) {
-    final Model mergedModel = org.apache.jena.rdf.model.ModelFactory.createDefaultModel();
-    for (String filename : filenames) {
-        mergedModel.add(RDFDataMgr.loadModel(filename));
-    }
-    return parseFedDescr(mergedModel);
-}
+	public FederationCatalog parseFedDescr( final List<String> filenames ) {
+		final Model mergedModel = org.apache.jena.rdf.model.ModelFactory.createDefaultModel();
+		for ( final String filename : filenames ) {
+			mergedModel.add( RDFDataMgr.loadModel(filename) );
+		}
+		return parseFedDescr(mergedModel);
+	}
 
 	public FederationCatalog parseFedDescr( final Model fd ) {
 		final Map<String, FederationMember> membersByURI = new HashMap<>();
