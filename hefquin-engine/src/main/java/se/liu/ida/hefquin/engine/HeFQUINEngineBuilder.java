@@ -71,7 +71,7 @@ public class HeFQUINEngineBuilder
 	/**
 	 * Sets the federation catalog to be used by the engine.
 	 *
-	 * @param fedCatFiles a federation catalog file
+	 * @param fedCatFile a federation catalog file
 	 * @return this builder instance for method chaining
 	 */
 	public HeFQUINEngineBuilder withFederationCatalog( final String fedCatFile ) {
