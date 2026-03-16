@@ -16,7 +16,7 @@ public class ModFederation extends ModBase
 	@Override
 	public void registerWith( final CmdGeneral cmdLine ) {
 		cmdLine.getUsage().startCategory("Federation");
-		cmdLine.add(fedDescrDecl,  "--federationDescription",  "file with an RDF description of the federation");
+		cmdLine.add(fedDescrDecl,  "--federationDescription",  "file with an RDF description of the federation (can be given multiple times if your description is distributed across multiple files)");
 	}
 
 	@Override
