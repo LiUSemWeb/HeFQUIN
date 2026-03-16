@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.cli.modules;
 
+import java.util.List;
+
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.CmdArgModule;
 import org.apache.jena.cmd.CmdGeneral;
@@ -9,7 +11,7 @@ public class ModFederation extends ModBase
 {
 	protected final ArgDecl fedDescrDecl   = new ArgDecl(ArgDecl.HasValue, "federationDescription", "fd");
 
-	protected String cat = null;
+	protected List<String> cat = null;
 
 	@Override
 	public void registerWith( final CmdGeneral cmdLine ) {
@@ -20,14 +22,14 @@ public class ModFederation extends ModBase
 	@Override
 	public void processArgs( final CmdArgModule cmdLine ) {
 		if ( cmdLine.contains(fedDescrDecl) ) {
-			cat = cmdLine.getValue(fedDescrDecl);
+			cat = cmdLine.getValues(fedDescrDecl);
 		}
 		else {
 			cmdLine.cmdError("No federation description file", false);
 		}
 	}
 
-	public String getFederationCatalog() {
+	public List<String> getFederationCatalog() {
 		return cat;
 	}
 }

@@ -54,6 +54,10 @@ public class FederationDescriptionReader
 		return instance.parseFedDescr(filename);
 	}
 
+	public static FederationCatalog readFromFiles( final List<String> filenames ) {
+		return  instance.parseFedDescr(filenames);
+	}
+	
 	public static FederationCatalog readFromModel( final Model fd ) {
 		return instance.parseFedDescr(fd);
 	}
@@ -67,6 +71,14 @@ public class FederationDescriptionReader
 		final Model fd = RDFDataMgr.loadModel(filename);
 		return parseFedDescr(fd);
 	}
+	
+	public FederationCatalog parseFedDescr(final List<String> filenames) {
+    final Model mergedModel = org.apache.jena.rdf.model.ModelFactory.createDefaultModel();
+    for (String filename : filenames) {
+        mergedModel.add(RDFDataMgr.loadModel(filename));
+    }
+    return parseFedDescr(mergedModel);
+}
 
 	public FederationCatalog parseFedDescr( final Model fd ) {
 		final Map<String, FederationMember> membersByURI = new HashMap<>();
