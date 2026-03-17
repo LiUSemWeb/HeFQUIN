@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.cli;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 import org.apache.commons.io.output.NullPrintStream;
@@ -12,6 +14,7 @@ import org.apache.jena.sparql.resultset.ResultsFormat;
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
+import se.liu.ida.hefquin.base.utils.OutputConstants;
 import se.liu.ida.hefquin.base.utils.Stats;
 import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
@@ -42,9 +45,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl( ArgDecl.NoValue, "suppressResultPrintout" );
 	protected final ArgDecl argSkipExecution = new ArgDecl( ArgDecl.NoValue, "skipExecution" );
-	protected final ArgDecl argQueryProcStats = new ArgDecl( ArgDecl.NoValue, "printQueryProcStats" );
-	protected final ArgDecl argOnelineTimeStats = new ArgDecl( ArgDecl.NoValue, "printQueryProcMeasurements" );
-	protected final ArgDecl argFedAccessStats = new ArgDecl( ArgDecl.NoValue, "printFedAccessStats" );
+	protected final ArgDecl argQueryProcStats = new ArgDecl( ArgDecl.HasValue, "printQueryProcStats" );
+	protected final ArgDecl argOnelineTimeStats = new ArgDecl( ArgDecl.HasValue, "printQueryProcMeasurements" );
+	protected final ArgDecl argFedAccessStats = new ArgDecl( ArgDecl.HasValue, "printFedAccessStats" );
 
 	/**
 	 * Main entry point of the tool, accepting command-line arguments to specify the
@@ -186,7 +189,28 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		if ( statsAndExceptions != null ) {
 			if ( contains(argQueryProcStats) ) {
-				StatsPrinter.print( statsAndExceptions, System.err, true );
+				String outputDest = getValue( argQueryProcStats );
+				PrintStream printStream = null;
+				boolean isFile = false;
+
+				if ( outputDest.equalsIgnoreCase( OutputConstants.stdErr )) {
+					printStream = System.err;
+				} else if ( outputDest.equalsIgnoreCase( OutputConstants.stdOut) ) {
+					printStream = System.out;
+				} else {
+					try {
+						printStream = new PrintStream( new FileOutputStream( outputDest ) );
+						isFile = true;
+					} catch ( FileNotFoundException ex ) {
+						System.err.println( "Failed to create print stream for output destination: " + outputDest );
+						printStream = System.err;
+					}
+				}
+
+				StatsPrinter.print( statsAndExceptions, printStream, true );
+				if ( isFile ) {
+					System.err.println( "Query processing statistics written to: " + outputDest );
+				}
 				System.err.println();
 			}
 			if ( contains(argOnelineTimeStats) ) {
