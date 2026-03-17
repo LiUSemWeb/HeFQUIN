@@ -199,13 +199,14 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			}
 			if ( contains(argQueryProcStatsToFile) ) {
 				final String outputDest = getValue( argQueryProcStatsToFile );
-				validateOutputDest( outputDest );
-
-				try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest ) ) ) {
-					StatsPrinter.print( statsAndExceptions, printStream, true );
-				} catch ( final FileNotFoundException ex ) {
-					System.err.println( "Failed to create print stream for output destination: " + outputDest );
+				if ( outputDestIsValid( outputDest ) ) {
+					try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest, true ) ) ) {
+						StatsPrinter.print( statsAndExceptions, printStream, true );
+					} catch ( final FileNotFoundException ex ) {
+						cmdError( "Failed to create print stream for output destination: " + outputDest, false );
+					}
 				}
+
 			}
 			if ( contains(argOnelineTimeStats) ) {
 				final String queryProcStats = getQueryProcStats( statsAndExceptions );
@@ -213,13 +214,13 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			}
 			if ( contains(argOnelineTimeStatsToFile) ) {
 				final String outputDest = getValue( argOnelineTimeStatsToFile );
-				validateOutputDest( outputDest );
-
-				try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest ) ) ) {
-					final String queryProcStats = getQueryProcStats( statsAndExceptions );
-					printStream.println( queryProcStats );
-				} catch ( final FileNotFoundException ex ) {
-					System.err.println( "Failed to create print stream for output destination: " + outputDest );
+				if ( outputDestIsValid( outputDest ) ) {
+					try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest, true ) ) ) {
+						final String queryProcStats = getQueryProcStats( statsAndExceptions );
+						printStream.println( queryProcStats );
+					} catch ( final FileNotFoundException ex ) {
+						cmdError( "Failed to create print stream for output destination: " + outputDest, false );
+					}
 				}
 			}
 		}
@@ -231,13 +232,13 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		}
 		if ( contains(argFedAccessStatsToFile) ) {
 			final String outputDest = getValue( argFedAccessStatsToFile );
-			validateOutputDest( outputDest );
-
-			try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest ) ) ) {
-				final Stats fedAccessStats = e.getFederationAccessStats();
-				StatsPrinter.print( fedAccessStats, printStream, true );
-			} catch ( final FileNotFoundException ex ) {
-				System.err.println( "Failed to create print stream for output destination: " + outputDest );
+			if ( outputDestIsValid( outputDest ) ) {
+				try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest, true ) ) ) {
+					final Stats fedAccessStats = e.getFederationAccessStats();
+					StatsPrinter.print( fedAccessStats, printStream, true );
+				} catch ( final FileNotFoundException ex ) {
+					cmdError( "Failed to create print stream for output destination: " + outputDest, false );
+				}
 			}
 		}
 	}	
@@ -298,15 +299,17 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 	/**
 	 * Validates the output destination for statistics by checking if it starts with a hyphen.
-	 * If the output destination is invalid, an error message is printed and an {@code IllegalArgumentException} is thrown.
+	 * If the output destination is invalid, an error message is printed and the method returns false. Otherwise, it returns true.
 	 * 
 	 * @param outputDest the output destination to validate
+	 * @return true if the output destination is valid, false otherwise
 	 */
-	private static void validateOutputDest( final String outputDest ) {
+	private boolean outputDestIsValid( final String outputDest ) {
 		if ( outputDest.startsWith( "-" ) ) {
-			System.err.println( "Invalid output destination: " + outputDest );
-			System.err.println( "Output destination should be a file path, not an argument." );
-			throw new IllegalArgumentException( "Invalid output destination: " + outputDest );
+			cmdError( "Invalid output destination: " + outputDest, false );
+			cmdError( "Output destination should be a file path, not an argument.", false );
+			return false;
 		}
+		return true;
 	}
 }
