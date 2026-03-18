@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 public class ChronicleMapCacheObject implements BytesMarshallable
 {
 	private List<MarshallableSolutionMapping> solutionMappings = new ArrayList<>();
+	private Integer count = -1;
 
 	public ChronicleMapCacheObject() {}
 
@@ -28,12 +29,17 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 		}
 	}
 
+	public ChronicleMapCacheObject( final int count ) {
+		this.count = count;
+	}
+
 	@Override
 	public void writeMarshallable( final BytesOut<?> out ) {
 		out.writeInt( solutionMappings.size() );
 		for ( final MarshallableSolutionMapping sm : solutionMappings ) {
 			sm.writeMarshallable(out);
 		}
+		out.writeInt(count);
 	}
 
 	@Override
@@ -45,6 +51,7 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 			sm.readMarshallable(in);
 			solutionMappings.add(sm);
 		}
+		count = in.readInt();
 	}
 
 	/**
@@ -57,8 +64,17 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 		return new ArrayList<>(solutionMappings);
 	}
 
+	/**
+	 * Returns the cached count of results for this request.
+	 *
+	 * @return the number of matching results
+	 */
+	public int getCount() {
+		return count;
+	}
+
 	@Override
 	public String toString() {
-		return "ChronicleMapCacheObject{solutionMappings=" + solutionMappings.size() + "}";
+		return "ChronicleMapCacheObject{solutionMappings=" + solutionMappings.size() + ", count=" + count + "}";
 	}
 }
