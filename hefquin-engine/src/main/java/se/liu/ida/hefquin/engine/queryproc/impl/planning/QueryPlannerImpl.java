@@ -1,5 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -36,7 +40,7 @@ public class QueryPlannerImpl implements QueryPlanner
 	                         final LogicalPlanPrinter srcasgPrinter,     // may be null
 	                         final LogicalPlanPrinter lplanPrinter,      // may be null
 	                         final PhysicalPlanPrinter pplanPrinter,     // may be null
-	                         final ExecutablePlanPrinter eplanPrinter ) {  // may be null
+	                         final ExecutablePlanPrinter eplanPrinter) { // may be null{
 		assert sourcePlanner != null;
 		assert poptimizer != null;
 
@@ -65,10 +69,20 @@ public class QueryPlannerImpl implements QueryPlanner
 		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query, ctxt);
 
 		if ( srcasgPrinter != null ) {
-			System.out.println("--------- Source Assignment ---------");
-			srcasgPrinter.print( saAndStats.object1, System.out );
+			final String srcasgPrinterPath = srcasgPrinter.getFileOutputPath();
+			if ( srcasgPrinterPath != null ) {
+				try {
+					srcasgPrinter.print( saAndStats.object1, new PrintStream( new FileOutputStream(srcasgPrinterPath, true) ) );
+				} catch ( final FileNotFoundException ex ) {
+					System.err.println( "Error: Could not create file for printing source assignment: " + srcasgPrinterPath );
+				}
+			}
+			else {
+				System.out.println("--------- Source Assignment ---------");
+				srcasgPrinter.print( saAndStats.object1, System.out );
+			}
 		}
-
+		
 		final long t2 = System.currentTimeMillis();
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
@@ -78,10 +92,20 @@ public class QueryPlannerImpl implements QueryPlanner
 		else {
 			lp = saAndStats.object1;
 		}
-
+		
 		if ( lplanPrinter != null ) {
-			System.out.println("--------- Logical Plan ---------");
-			lplanPrinter.print( lp, System.out );
+			final String lplanPrinterPath = lplanPrinter.getFileOutputPath();
+			if ( lplanPrinterPath != null ) {
+				try {
+					lplanPrinter.print( lp, new PrintStream( new FileOutputStream(lplanPrinterPath, true) ) );
+				} catch ( final FileNotFoundException ex ) {
+					System.err.println( "Error: Could not create file for printing logical plan: " + lplanPrinterPath );
+				}
+			}
+			else {
+				System.out.println("--------- Logical Plan ---------");
+				lplanPrinter.print( lp, System.out );
+			}
 		}
 
 		final long t3 = System.currentTimeMillis();
@@ -90,8 +114,20 @@ public class QueryPlannerImpl implements QueryPlanner
 		final long t4 = System.currentTimeMillis();
 
 		if ( pplanPrinter != null ) {
-			System.out.println("--------- Physical Plan ---------");
-			pplanPrinter.print( planAndStats.object1, System.out );
+			final String pplanPrinterPath = pplanPrinter.getFileOutputPath();
+			if ( pplanPrinterPath != null ) {
+				try {
+					pplanPrinter.print( planAndStats.object1, new PrintStream( new FileOutputStream(pplanPrinterPath, true) ) );
+				} catch ( final FileNotFoundException ex ) {
+					System.err.println( "Error: Could not create file for printing physical plan: " + pplanPrinterPath );
+					System.err.println( "Printing physical plan to standard output instead." );
+					pplanPrinter.print( planAndStats.object1, System.out );
+				}
+			}
+			else {
+				System.out.println("--------- Physical Plan ---------");
+				pplanPrinter.print( planAndStats.object1, System.out );
+			}
 		}
 
 		final QueryPlanningStats myStats = new QueryPlanningStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3,
@@ -109,4 +145,8 @@ public class QueryPlannerImpl implements QueryPlanner
 		return eplanPrinter;
 	}
 
+	// @Override
+	// public String getExecutablePlanPrinterPath() {
+	// 	return eplanFilePath;
+	// }
 }

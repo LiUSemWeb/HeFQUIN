@@ -12,6 +12,21 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 {	
 	protected String parentIndent = "";
 
+	private final String fileOutputPath;
+
+	public TextBasedExecutablePlanPrinterImpl(String eplanPath) {
+	    this.fileOutputPath = eplanPath;
+	}
+
+	public TextBasedExecutablePlanPrinterImpl() {
+	    fileOutputPath = null;
+	}
+
+	@Override
+	public String getFileOutputPath() {
+	    return fileOutputPath;
+	}
+
 	@Override
 	public void print( final ExecutablePlan plan, final PrintStream out ) {
 		if ( plan instanceof PushBasedExecutablePlanImpl p ) {

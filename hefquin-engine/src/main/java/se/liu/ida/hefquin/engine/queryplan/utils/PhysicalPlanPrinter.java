@@ -10,6 +10,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
  */
 public interface PhysicalPlanPrinter
 {
+	default String getFileOutputPath() { return null; }
+
 	/**
 	 * Prints the given plan to the given stream.
 	 */

@@ -36,6 +36,21 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
                                              implements LogicalPlanPrinter
 {
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
+	
+	private final String fileOutputPath;
+
+	public TextBasedLogicalPlanPrinterImpl(String srcasgFilePath) {
+		this.fileOutputPath = srcasgFilePath;
+	}
+
+	public TextBasedLogicalPlanPrinterImpl() {
+		this.fileOutputPath = null;
+	}
+
+	@Override
+	public String getFileOutputPath() {
+		return fileOutputPath;
+	}
 
 	@Override
 	public void print( final LogicalPlan plan, final PrintStream out ) {

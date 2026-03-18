@@ -27,6 +27,21 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 {
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
 
+	private final String fileOutputPath;
+
+	public TextBasedPhysicalPlanPrinterImpl(String lplanPath) {
+		this.fileOutputPath = lplanPath;
+	}
+
+	public TextBasedPhysicalPlanPrinterImpl() {
+		this.fileOutputPath = null;
+	}
+
+	@Override
+	public String getFileOutputPath() {
+		return fileOutputPath;
+	}
+
 	@Override
 	public void print( final PhysicalPlan plan, final PrintStream out ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);

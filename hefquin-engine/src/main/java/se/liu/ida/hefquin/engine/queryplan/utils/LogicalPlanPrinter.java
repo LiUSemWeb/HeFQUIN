@@ -10,6 +10,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
  */
 public interface LogicalPlanPrinter
 {
+	default String getFileOutputPath() { return null; }
+
 	/**
 	 * Prints the given plan to the given stream.
 	 */
