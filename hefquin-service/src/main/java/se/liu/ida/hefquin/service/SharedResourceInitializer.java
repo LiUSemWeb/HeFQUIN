@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.jena.atlas.web.TypedInputStream;
 import org.apache.jena.riot.system.stream.StreamManager;
@@ -11,6 +12,7 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
+import se.liu.ida.hefquin.jenaintegration.HeFQUINConstants;
 
 public class SharedResourceInitializer implements ServletContextListener
 {
@@ -20,16 +22,31 @@ public class SharedResourceInitializer implements ServletContextListener
 	public void contextInitialized( ServletContextEvent servletContextEvent ) {
 		final String confDescr = System.getProperty("hefquin.configuration", "config/DefaultConfDescr.ttl");
 		final String fedCat = System.getProperty("hefquin.federation", "config/DefaultFedConf.ttl");
+		final String fedCount = System.getProperty("hefquin.federation.count", HeFQUINConstants.DEFAULT_FED_DESCR_COUNT_STRING);
+		final List<String> fedCatList = new java.util.ArrayList<>();
 
 		logger.info( "--- Initialize engine ---" );
-		logger.info( "hefquin.configuration: {}", confDescr );
-		logger.info( "hefquin.federation:    {}", fedCat );
+		logger.info( "hefquin.configuration:    {}", confDescr );
+		logger.info( "hefquin.federation.count: {}", fedCount );
+		
+		if ( fedCount.equals(HeFQUINConstants.DEFAULT_FED_DESCR_COUNT_STRING) ) {
+			fedCatList.add(fedCat);
+			logger.info( "hefquin.federation:       {}", fedCat );
+		}
+		else {
+			for ( int i = 0; i < Integer.parseInt(fedCount); i++ ) {
+				fedCatList.add(System.getProperty("hefquin.federation." + (i + 1), null ));
+			}
+			logger.info( "hefquin.federation.list:  {}", fedCatList );
+		}
 
 		check( confDescr );
-		check( fedCat );
+		for ( String fed : fedCatList ) {
+			check( fed );
+		}
 
 		final HeFQUINEngine engine = new HeFQUINEngineBuilder()
-			.withFederationCatalog(fedCat)
+			.withFederationCatalog(fedCatList)
 			.withEngineConfiguration(confDescr)
 			.build();
 

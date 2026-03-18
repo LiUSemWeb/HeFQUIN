@@ -7,6 +7,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import se.liu.ida.hefquin.cli.modules.ModServer;
+import se.liu.ida.hefquin.jenaintegration.HeFQUINConstants;
 
 public class RunHeFQUINServer extends CmdGeneral
 {
@@ -61,7 +62,16 @@ public class RunHeFQUINServer extends CmdGeneral
 	@Override
 	protected void exec() {
 		System.setProperty( "hefquin.configuration", modServer.getConfDescr() );
-		System.setProperty( "hefquin.federation", modServer.getFederationDescription() );
+		System.setProperty( "hefquin.federation.count", modServer.getFederationCount() );
+		
+		if ( modServer.getFederationDescription().size() == HeFQUINConstants.DEFAULT_FED_DESCR_COUNT_INT ) {
+			System.setProperty( "hefquin.federation", modServer.getFederationDescription().get(0) );
+		}
+		else {
+			for ( int i = 0; i < modServer.getFederationDescription().size(); i++ ) {
+				System.setProperty( "hefquin.federation." + (i+1), modServer.getFederationDescription().get(i) );
+			}
+		}
 
 		final Server server = run( modServer.getPort() );
 		try {
