@@ -16,6 +16,7 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyF
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyLRU;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
@@ -29,7 +30,9 @@ import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMap
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntryFactory;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheObject;
+import se.liu.ida.hefquin.federation.access.impl.response.CachedCardinalityResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
  * Federation access manager that augments
@@ -110,7 +113,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		// Check cache
 		final Date accessStartTime = new Date();
-		final ChronicleMapCacheKey key = new ChronicleMapCacheKey(req, fm);
+		final ChronicleMapCacheKey key = new ChronicleMapCacheKey( req, fm, ChronicleMapCacheKey.ResponseMode.RESULT );
 		final ChronicleMapCacheObject cachedObject = chronicleMapCache.get(key);
 
 		if ( cachedObject != null ) {
@@ -138,6 +141,35 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 					final Iterable<SolutionMapping> solMaps = solMapsResponse.getResponseData();
 					chronicleMapCache.put( key, new ChronicleMapCacheObject(solMaps) );
 				}
+			} catch ( UnsupportedOperationDueToRetrievalError e ) {
+				// intentionally ignored
+			}
+		} );
+		return newResponse;
+	}
+
+	@Override
+	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final SPARQLRequest req,
+	                                                                       final SPARQLEndpoint fm )
+			throws FederationAccessException
+	{
+		// Check cache
+		final Date accessStartTime = new Date();
+		final ChronicleMapCacheKey key = new ChronicleMapCacheKey( req, fm, ChronicleMapCacheKey.ResponseMode.COUNT );
+		final ChronicleMapCacheObject cachedObject = chronicleMapCache.get(key);
+
+		if ( cachedObject != null ) {
+			cacheHitsSPARQLCardinality++;
+			final int count = cachedObject.getCount();
+			CardinalityResponse cachedResponse = new CachedCardinalityResponseImpl( count, fm, req, accessStartTime, new Date() );
+			return (CompletableFuture<CardinalityResponse>) CompletableFuture.completedFuture( cachedResponse );
+		}
+
+		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
+
+		newResponse.thenAccept( value -> {
+			try {
+				chronicleMapCache.put( key, new ChronicleMapCacheObject( value.getCardinality() ) );
 			} catch ( UnsupportedOperationDueToRetrievalError e ) {
 				// intentionally ignored
 			}
