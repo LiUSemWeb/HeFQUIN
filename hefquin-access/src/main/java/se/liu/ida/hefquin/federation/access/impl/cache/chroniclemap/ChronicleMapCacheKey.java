@@ -26,6 +26,9 @@ public class ChronicleMapCacheKey implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private final String requestUrl;
+	private final ResponseMode responseMode;
+
+	public enum ResponseMode { RESULT, COUNT }
 
 	/**
 	 * Creates a cache key from a given request and a federation member.
@@ -34,16 +37,20 @@ public class ChronicleMapCacheKey implements Serializable
 	 * @param fm  federation member
 	 * @throws IllegalArgumentException if the request/member is unsupported
 	 */
-	public ChronicleMapCacheKey( final DataRetrievalRequest req, final FederationMember fm ) {
+	public ChronicleMapCacheKey( final DataRetrievalRequest req,
+	                             final FederationMember fm,
+	                             final ResponseMode responseMode ) {
 		assert req != null;
 		assert fm != null;
+		assert responseMode != null;
+
+		this.responseMode = responseMode;
 
 		if (    req instanceof SPARQLRequest sparqlRequest
 		     && fm instanceof SPARQLEndpoint sparqlEndpoint ) {
 			final String query = sparqlRequest.getQuery().toString();
 			final String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-			final String url = sparqlEndpoint.getURL();
-			requestUrl = url + "?query=" + encodedQuery;
+			requestUrl = sparqlEndpoint.getURL() + "?query=" + encodedQuery;
 		}
 		else if ( req instanceof TPFRequest tpfRequest ) {
 			if ( fm instanceof TPFServer tpfServer )
@@ -80,6 +87,6 @@ public class ChronicleMapCacheKey implements Serializable
 
 	@Override
 	public String toString() {
-		return "ChronicleMapCacheKey{url='" + requestUrl + "'}";
+		return "ChronicleMapCacheKey{requestUrl=" + requestUrl + ", responseMode=" + responseMode + "}";
 	}
 }
