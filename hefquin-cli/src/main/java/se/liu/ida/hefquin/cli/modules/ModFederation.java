@@ -26,14 +26,14 @@ public class ModFederation extends ModBase
 	@Override
 	public void processArgs( final CmdArgModule cmdLine ) {
 		if ( cmdLine.contains(fedDescrDecl) ) {			
-			List<String> filenames = cmdLine.getValues(fedDescrDecl);
+			final List<String> filenames = cmdLine.getValues(fedDescrDecl);
 			cat = new ArrayList<>();
 			
-			for ( String filename : filenames ) {
+			for ( final String filename : filenames ) {
 				try {
-					cat.add( RDFDataMgr.loadModel(filename));
+					cat.add( RDFDataMgr.loadModel(filename) );
 				}
-				catch ( RiotNotFoundException e ) {
+				catch ( final RiotNotFoundException e ) {
 					cmdLine.cmdError("Error loading federation description file: " + filename, false);
 				}
 			}
