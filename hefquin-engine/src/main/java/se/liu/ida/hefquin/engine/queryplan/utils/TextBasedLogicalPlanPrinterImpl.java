@@ -39,7 +39,6 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 	private final PrintStream[] outs;
 	
-
 	public TextBasedLogicalPlanPrinterImpl( final PrintStream ... outs ) {
 		this.outs = outs;
 		assert outs.length > 0;
