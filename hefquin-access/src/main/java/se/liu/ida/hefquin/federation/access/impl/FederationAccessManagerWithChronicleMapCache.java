@@ -2,11 +2,9 @@ package se.liu.ida.hefquin.federation.access.impl;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicyAlwaysValid;
@@ -24,6 +22,7 @@ import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntry;
@@ -32,6 +31,7 @@ import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMap
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheObject;
 import se.liu.ida.hefquin.federation.access.impl.response.CachedCardinalityResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
@@ -102,30 +102,48 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 			throws FederationAccessException
 	{	
 		// update the statistics
-		if ( req instanceof SPARQLRequest )
-			cacheRequestsSPARQL++;
-		else if ( req instanceof TPFRequest )
+		if ( req instanceof TPFRequest )
 			cacheRequestsTPF++;
 		else if ( req instanceof BRTPFRequest )
 			cacheRequestsBRTPF++;
+		else if ( req instanceof SPARQLRequest )
+			cacheRequestsSPARQL++;
 		else
 			cacheRequestsOther++;
 
-		// Check cache
 		final Date accessStartTime = new Date();
 		final ChronicleMapCacheKey key = new ChronicleMapCacheKey( req, fm, ChronicleMapCacheKey.ResponseMode.RESULT );
 		final ChronicleMapCacheObject cachedObject = chronicleMapCache.get(key);
 
+		// Check cache
 		if ( cachedObject != null ) {
-			final DataRetrievalResponse<?> cachedResponse;
-			if ( req instanceof SPARQLRequest ){
+			if( req instanceof TPFRequest )
+				cacheHitsTPF++;
+			else if( req instanceof BRTPFRequest )
+				cacheHitsBRTPF++;
+			else if( req instanceof SPARQLRequest )
 				cacheHitsSPARQL++;
-				final List<SolutionMapping> solutionMappings = cachedObject.getSolutionMappings();
-				cachedResponse = new SolMapsResponseImpl( solutionMappings, fm, req, accessStartTime, new Date() );
-			} else {
-				throw new IllegalStateException(
-						"Cache hit found, but no cached-response reconstruction is implemented for request type "
-								+ req.getClass().getName() );
+
+			final DataRetrievalResponse<?> cachedResponse;
+			if (    req instanceof TPFRequest
+			     || req instanceof BRTPFRequest ) {
+				cachedResponse = new TPFResponseImpl( cachedObject.getMatchingTriples(),
+				                                      cachedObject.getMetadataTriples(),
+				                                      cachedObject.getNextPageURL(),
+				                                      fm,
+				                                      req,
+				                                      accessStartTime,
+				                                      new Date() );
+			}
+			else if ( req instanceof SPARQLRequest ){
+				cachedResponse = new SolMapsResponseImpl( cachedObject.getSolutionMappings(),
+				                                          fm,
+				                                          req,
+				                                          accessStartTime,
+				                                          new Date() );
+			}
+			else {
+				throw new IllegalStateException( "Unsupported request type: " + req.getClass().getName() );
 			}
 
 			@SuppressWarnings("unchecked")
@@ -137,9 +155,9 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm);
 		newResponse.thenAccept( value -> {
 			try {
-				if( value instanceof SolMapsResponse solMapsResponse ){
-					final Iterable<SolutionMapping> solMaps = solMapsResponse.getResponseData();
-					chronicleMapCache.put( key, new ChronicleMapCacheObject(solMaps) );
+				final ChronicleMapCacheObject object = ChronicleMapCacheObject.create(value);
+				if ( object != null ) {
+					chronicleMapCache.put(key, object);
 				}
 			} catch ( UnsupportedOperationDueToRetrievalError e ) {
 				// intentionally ignored
@@ -159,9 +177,19 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		final ChronicleMapCacheObject cachedObject = chronicleMapCache.get(key);
 
 		if ( cachedObject != null ) {
-			cacheHitsSPARQLCardinality++;
+			if( req instanceof TPFRequest )
+				cacheHitsTPFCardinality++;
+			else if( req instanceof BRTPFRequest )
+				cacheHitsBRTPFCardinality++;
+			else if( req instanceof SPARQLRequest )
+				cacheHitsSPARQLCardinality++;
+
 			final int count = cachedObject.getCount();
-			CardinalityResponse cachedResponse = new CachedCardinalityResponseImpl( count, fm, req, accessStartTime, new Date() );
+			CardinalityResponse cachedResponse = new CachedCardinalityResponseImpl( count,
+			                                                                        fm,
+			                                                                        req,
+			                                                                        accessStartTime,
+			                                                                        new Date() );
 			return (CompletableFuture<CardinalityResponse>) CompletableFuture.completedFuture( cachedResponse );
 		}
 
