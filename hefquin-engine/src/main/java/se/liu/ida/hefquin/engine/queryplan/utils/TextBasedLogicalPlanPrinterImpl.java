@@ -36,28 +36,13 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
                                              implements LogicalPlanPrinter
 {
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
+
+	private final PrintStream[] outs;
 	
-	private final String fileOutputPath;
-	private final boolean printToTerminal;
 
-	public TextBasedLogicalPlanPrinterImpl(String srcasgFilePath, boolean printToTerminal) {
-		this.fileOutputPath = srcasgFilePath;
-		this.printToTerminal = printToTerminal;
-	}
-
-	public TextBasedLogicalPlanPrinterImpl() {
-		this.fileOutputPath = null;
-		this.printToTerminal = true;
-	}
-
-	@Override
-	public String getFileOutputPath() {
-		return fileOutputPath;
-	}
-
-	@Override
-	public boolean isPrintPlanToTerminal() {
-		return printToTerminal;
+	public TextBasedLogicalPlanPrinterImpl( final PrintStream ... outs ) {
+		this.outs = outs;
+		assert outs.length > 0;
 	}
 
 	@Override
@@ -66,6 +51,17 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		PlanPrinter.print(pp, out);
 		printFullStringsForGraphPatterns(pp, out);
 		out.flush();
+	}
+
+	@Override
+	public void print( final LogicalPlan plan, final String planType ) {
+		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		for ( final PrintStream out : outs ) {
+			out.println("--------- " + planType + " ---------");
+			PlanPrinter.print(pp, out);
+			printFullStringsForGraphPatterns(pp, out);
+			out.flush();
+		}
 	}
 
 	public ExtPrintablePlan createPrintablePlan( final LogicalPlan lp ) {

@@ -12,33 +12,30 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 {	
 	protected String parentIndent = "";
 
-	private final String fileOutputPath;
-	private final boolean printPlanToTerminal;
+	private final PrintStream[] outs;
 
-	public TextBasedExecutablePlanPrinterImpl(String eplanPath, boolean printPlanToTerminal) {
-	    this.fileOutputPath = eplanPath;
-	    this.printPlanToTerminal = printPlanToTerminal;
-	}
-
-	public TextBasedExecutablePlanPrinterImpl() {
-	    fileOutputPath = null;
-	    printPlanToTerminal = true;
+	public TextBasedExecutablePlanPrinterImpl( final PrintStream ... outs ) {
+		this.outs = outs;
+		assert outs.length > 0;
 	}
 
 	@Override
-	public String getFileOutputPath() {
-	    return fileOutputPath;
-	}
-
-	@Override
-	public boolean isPrintPlanToTerminal() {
-	    return printPlanToTerminal;
-	}
-
-	@Override
-	public void print( final ExecutablePlan plan, final PrintStream out ) {
+	public void print( final ExecutablePlan plan, PrintStream out ) {
 		if ( plan instanceof PushBasedExecutablePlanImpl p ) {
-			print(p, out);
+			print( p, out );
+		}
+		else {
+			throw new IllegalArgumentException("Unsupported type of executable plan (" + plan.getClass().getName() + ").");
+		}
+	}
+
+	@Override
+	public void print( final ExecutablePlan plan ) {
+		if ( plan instanceof PushBasedExecutablePlanImpl p ) {
+			for ( final PrintStream out : outs ) {
+				out.println("--------- Executable Plan ---------");
+				print( p, out );
+			}
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of executable plan (" + plan.getClass().getName() + ").");

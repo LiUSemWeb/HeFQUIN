@@ -10,12 +10,13 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
  */
 public interface PhysicalPlanPrinter
 {
-	default String getFileOutputPath() { return null; }
-
-	default boolean isPrintPlanToTerminal() { return true; }
-
 	/**
 	 * Prints the given plan to the given stream.
 	 */
 	void print( PhysicalPlan plan, PrintStream out );
+	
+	/**
+	 * Prints the given plan to the given stream(s) that are stored in this printer.
+	 */
+	void print( PhysicalPlan plan );
 }

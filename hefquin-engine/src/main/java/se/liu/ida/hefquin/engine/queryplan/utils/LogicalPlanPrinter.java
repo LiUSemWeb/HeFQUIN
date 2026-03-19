@@ -10,12 +10,14 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
  */
 public interface LogicalPlanPrinter
 {
-	default String getFileOutputPath() { return null; }
-
-	default boolean isPrintPlanToTerminal() { return true; }
-
 	/**
 	 * Prints the given plan to the given stream.
 	 */
 	void print( LogicalPlan plan, PrintStream out );
+	
+	/**
+	 * Prints the given plan to the stream(s) that are stored in this printer.
+	 * Plan type is used to distinguish between different types of plans when printing.
+	 */
+	void print( LogicalPlan plan, String planType );
 }

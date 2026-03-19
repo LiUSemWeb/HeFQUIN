@@ -1,8 +1,5 @@
 package se.liu.ida.hefquin.engine.queryproc.impl;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -83,18 +80,7 @@ public class QueryProcessorImpl implements QueryProcessor
 			prg = planCompiler.compile(qepAndStats.object1);
 
 			if ( planner.getExecutablePlanPrinter() != null ) {
-				final String eplanPrinterPath = planner.getExecutablePlanPrinter().getFileOutputPath();
-				if ( eplanPrinterPath != null ) {
-					try {
-						planner.getExecutablePlanPrinter().print( prg, new PrintStream( new FileOutputStream(eplanPrinterPath, true) ) );
-					} catch ( final FileNotFoundException ex ) {
-						System.err.println( "Error: Could not create file for printing executable plan: " + eplanPrinterPath );
-					}
-				}
-				if ( planner.getExecutablePlanPrinter().isPrintPlanToTerminal() ) {
-					System.out.println("--------- Executable Plan ---------");
-					planner.getExecutablePlanPrinter().print( prg, System.out );
-				}
+				planner.getExecutablePlanPrinter().print( prg );
 			}
 			
 			t3 = System.currentTimeMillis();

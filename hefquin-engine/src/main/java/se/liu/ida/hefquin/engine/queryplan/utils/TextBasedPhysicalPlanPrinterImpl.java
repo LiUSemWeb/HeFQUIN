@@ -27,35 +27,30 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 {
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
 
-	private final String fileOutputPath;
-	private final boolean printToTerminal;
+	private final PrintStream[] outs;
 
-	public TextBasedPhysicalPlanPrinterImpl(String lplanPath, boolean printToTerminal) {
-		this.fileOutputPath = lplanPath;
-		this.printToTerminal = printToTerminal;
-	}
-
-	public TextBasedPhysicalPlanPrinterImpl() {
-		this.fileOutputPath = null;
-		this.printToTerminal = true;
+	public TextBasedPhysicalPlanPrinterImpl( final PrintStream ... outs ) {
+		this.outs = outs;
+		assert outs.length > 0;
 	}
 
 	@Override
-	public String getFileOutputPath() {
-		return fileOutputPath;
-	}
-
-	@Override
-	public boolean isPrintPlanToTerminal() {
-		return printToTerminal;
-	}
-
-	@Override
-	public void print( final PhysicalPlan plan, final PrintStream out ) {
+	public void print( final PhysicalPlan plan, PrintStream out ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
 		PlanPrinter.print(pp, out);
 		printFullStringsForGraphPatterns(pp, out);
 		out.flush();
+	}
+
+	@Override
+	public void print( final PhysicalPlan plan ) {
+		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		for ( final PrintStream out : outs ) {
+			out.println("--------- Physical Plan ---------");
+			PlanPrinter.print(pp, out);
+			printFullStringsForGraphPatterns(pp, out);
+			out.flush();
+		}
 	}
 
 	public ExtPrintablePlan createPrintablePlan( final PhysicalPlan p ) {

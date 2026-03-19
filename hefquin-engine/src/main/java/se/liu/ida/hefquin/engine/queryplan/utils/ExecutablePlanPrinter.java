@@ -9,13 +9,14 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
  * to print executable plans in some way.
  */
 public interface ExecutablePlanPrinter
-{
-	default String getFileOutputPath() { return null; }
-
-	default boolean isPrintPlanToTerminal() { return true; }
-	
+{	
 	/**
 	 * Prints the given plan to the given stream.
 	 */
 	void print( ExecutablePlan plan, PrintStream out );
+	
+	/**
+	 * Prints the given plan to the stream(s) that are stored in this printer.
+	 */
+	void print( ExecutablePlan plan );
 }

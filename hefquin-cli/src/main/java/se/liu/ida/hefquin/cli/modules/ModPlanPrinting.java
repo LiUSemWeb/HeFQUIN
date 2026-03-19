@@ -1,5 +1,11 @@
 package se.liu.ida.hefquin.cli.modules;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.CmdArgModule;
 import org.apache.jena.cmd.CmdGeneral;
@@ -43,25 +49,37 @@ public class ModPlanPrinting extends ModBase
 
 	@Override
 	public void processArgs( final CmdArgModule cmdLine ) {	
-		if ( cmdLine.contains(argPrintSrcAssignmentToFile) )
-			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl(cmdLine.getValue(argPrintSrcAssignmentToFile), cmdLine.contains(argPrintSrcAssignment));
-		else if ( cmdLine.contains(argPrintSrcAssignment) )
-			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl();
+		List<PrintStream> outsList = processPrintFlags( cmdLine, argPrintSrcAssignment, argPrintSrcAssignmentToFile );
+		if ( ! outsList.isEmpty() )
+			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl( outsList.toArray(new PrintStream[0]) );
 
-		if ( cmdLine.contains(argPrintLogicalPlanToFile) )
-			lplanPrinter = new TextBasedLogicalPlanPrinterImpl(cmdLine.getValue(argPrintLogicalPlanToFile), cmdLine.contains(argPrintLogicalPlan));
-		else if ( cmdLine.contains(argPrintLogicalPlan) )
-			lplanPrinter = new TextBasedLogicalPlanPrinterImpl();
+		outsList = processPrintFlags( cmdLine, argPrintLogicalPlan, argPrintLogicalPlanToFile );
+		if ( ! outsList.isEmpty() ) 
+			lplanPrinter = new TextBasedLogicalPlanPrinterImpl( outsList.toArray(new PrintStream[0]) );
 
-		if ( cmdLine.contains(argPrintPhysicalPlanToFile) )
-			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl(cmdLine.getValue(argPrintPhysicalPlanToFile), cmdLine.contains(argPrintPhysicalPlan));
-		else if ( cmdLine.contains(argPrintPhysicalPlan) )
-			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl();
+		outsList = processPrintFlags( cmdLine, argPrintPhysicalPlan, argPrintPhysicalPlanToFile );
+		if ( ! outsList.isEmpty() ) 
+			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl( outsList.toArray(new PrintStream[0]) );
 
-		if ( cmdLine.contains(argPrintExecutablePlanToFile) )
-			eplanPrinter = new TextBasedExecutablePlanPrinterImpl(cmdLine.getValue(argPrintExecutablePlanToFile), cmdLine.contains(argPrintExecutablePlan));
-		else if ( cmdLine.contains(argPrintExecutablePlan) )
-			eplanPrinter = new TextBasedExecutablePlanPrinterImpl();
+		outsList = processPrintFlags( cmdLine, argPrintExecutablePlan, argPrintExecutablePlanToFile );
+		if ( ! outsList.isEmpty() ) 
+			eplanPrinter = new TextBasedExecutablePlanPrinterImpl( outsList.toArray(new PrintStream[0]) );
+	}
+
+	private List<PrintStream> processPrintFlags( CmdArgModule cmdLine, ArgDecl argPrintPlanToTerminal, ArgDecl argPrintPlanToFile ) {
+		final List<PrintStream> outsList = new ArrayList<>();
+		if ( cmdLine.contains(argPrintPlanToTerminal) ) {
+			outsList.add( System.out );
+		}
+		if ( cmdLine.contains(argPrintPlanToFile) ) {
+			try {
+				final PrintStream fileOut = new PrintStream( new FileOutputStream(cmdLine.getValue(argPrintPlanToFile), true) );
+				outsList.add( fileOut );
+			} catch ( final FileNotFoundException e ) {
+				cmdLine.cmdError( "Failed to create print stream for output destination: " + cmdLine.getValue(argPrintPlanToFile), false );
+			}
+		}
+		return outsList;
 	}
 
 	public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
