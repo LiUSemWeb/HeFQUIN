@@ -1,5 +1,9 @@
 package se.liu.ida.hefquin.cli.modules;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,11 +52,34 @@ public class ModServer extends ModBase
 			confDescr = "config/DefaultConfDescr.ttl";
 		}
 		if ( cmdLine.contains( argFedDescr ) ) {
-			fedDescrCount = String.valueOf( cmdLine.getValues( argFedDescr ).size() );
-			fedDescr = cmdLine.getValues( argFedDescr );
+			final List<String> filenames = cmdLine.getValues( argFedDescr );
+			fedDescr = new ArrayList<>();
+			
+			for ( final String filename : filenames ) {
+				if ( isURIOrExistingFile( cmdLine, filename ) ) {
+					fedDescr.add( filename );
+				}
+			}
+
+			fedDescrCount = String.valueOf( fedDescr.size() );
 		} else {
 			fedDescr = Arrays.asList( "config/DefaultFedConf.ttl" );
 		}
+	}
+	
+	private boolean isURIOrExistingFile(CmdArgModule cmdLine, String filename) {
+		final File f = new File(filename);
+		if ( f.isFile() ){
+			try {
+				new URI(filename);
+				return true;
+			} catch ( final URISyntaxException e ) {
+				cmdLine.cmdError( "Error loading federation description file: " + filename, false );
+			}
+		}
+		else
+			cmdLine.cmdError( "Error loading federation description file: " + filename, false );
+		return false;
 	}
 
 	public int getPort() {

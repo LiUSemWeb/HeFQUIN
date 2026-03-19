@@ -46,7 +46,7 @@ public class SharedResourceInitializer implements ServletContextListener
 		}
 
 		final HeFQUINEngine engine = new HeFQUINEngineBuilder()
-			.withFederationCatalog(fedCatList)
+			.withFederationCatalogFiles(fedCatList)
 			.withEngineConfiguration(confDescr)
 			.build();
 

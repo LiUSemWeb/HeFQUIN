@@ -54,6 +54,10 @@ public class FederationDescriptionReader
 	public static FederationCatalog readFromFile( final String filename ) {
 		return instance.parseFedDescr(filename);
 	}
+
+	public static FederationCatalog readFromFiles( final List<String> filenames ) {
+		return  instance.parseFedDescr(filenames);
+	}
 	
 	public static FederationCatalog readFromModel( final Model fd ) {
 		return instance.parseFedDescr(fd);
