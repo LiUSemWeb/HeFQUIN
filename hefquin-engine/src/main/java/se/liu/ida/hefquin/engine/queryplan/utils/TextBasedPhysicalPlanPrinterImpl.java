@@ -34,6 +34,10 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		assert outs.length > 0;
 	}
 
+	public TextBasedPhysicalPlanPrinterImpl( ) {
+		this.outs = null;
+	}
+
 	@Override
 	public void print( final PhysicalPlan plan, PrintStream out ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);

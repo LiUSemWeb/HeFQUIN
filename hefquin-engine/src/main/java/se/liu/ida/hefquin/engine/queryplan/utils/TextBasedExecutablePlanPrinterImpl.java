@@ -19,6 +19,10 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 		assert outs.length > 0;
 	}
 
+	public TextBasedExecutablePlanPrinterImpl( ) {
+		this.outs = null;
+	}
+
 	@Override
 	public void print( final ExecutablePlan plan, PrintStream out ) {
 		if ( plan instanceof PushBasedExecutablePlanImpl p ) {

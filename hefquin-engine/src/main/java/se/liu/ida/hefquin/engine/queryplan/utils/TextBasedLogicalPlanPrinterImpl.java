@@ -44,6 +44,10 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		assert outs.length > 0;
 	}
 
+	public TextBasedLogicalPlanPrinterImpl( ) {
+		this.outs = null;
+	}
+
 	@Override
 	public void print( final LogicalPlan plan, final PrintStream out ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
