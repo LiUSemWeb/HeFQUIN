@@ -40,7 +40,7 @@ public class QueryPlannerImpl implements QueryPlanner
 	                         final LogicalPlanPrinter srcasgPrinter,     // may be null
 	                         final LogicalPlanPrinter lplanPrinter,      // may be null
 	                         final PhysicalPlanPrinter pplanPrinter,     // may be null
-	                         final ExecutablePlanPrinter eplanPrinter) { // may be null{
+	                         final ExecutablePlanPrinter eplanPrinter ) {  // may be null
 		assert sourcePlanner != null;
 		assert poptimizer != null;
 
@@ -144,9 +144,4 @@ public class QueryPlannerImpl implements QueryPlanner
 	public ExecutablePlanPrinter getExecutablePlanPrinter() {
 		return eplanPrinter;
 	}
-
-	// @Override
-	// public String getExecutablePlanPrinterPath() {
-	// 	return eplanFilePath;
-	// }
 }
