@@ -144,7 +144,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 
 	@Override
 	public String toString() {
-		return "ChronicleMapCache{filename='" + filename + "', capacity=" + capacity + ", size=" + map.size() + "}";
+		return "ChronicleMapCache{filename=" + filename + ", capacity=" + capacity + ", size=" + map.size() + "}";
 	}
 
 	@Override
