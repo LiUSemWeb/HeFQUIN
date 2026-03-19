@@ -43,25 +43,25 @@ public class ModPlanPrinting extends ModBase
 
 	@Override
 	public void processArgs( final CmdArgModule cmdLine ) {	
-		if ( cmdLine.contains(argPrintSrcAssignment) )
-			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl();
-		else if ( cmdLine.contains(argPrintSrcAssignmentToFile) )
+		if ( cmdLine.contains(argPrintSrcAssignmentToFile) )
 			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl(cmdLine.getValue(argPrintSrcAssignmentToFile), cmdLine.contains(argPrintSrcAssignment));
+		else if ( cmdLine.contains(argPrintSrcAssignment) )
+			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl();
 
-		if ( cmdLine.contains(argPrintLogicalPlan) )
-			lplanPrinter = new TextBasedLogicalPlanPrinterImpl();
-		else if ( cmdLine.contains(argPrintLogicalPlanToFile) )
+		if ( cmdLine.contains(argPrintLogicalPlanToFile) )
 			lplanPrinter = new TextBasedLogicalPlanPrinterImpl(cmdLine.getValue(argPrintLogicalPlanToFile), cmdLine.contains(argPrintLogicalPlan));
+		else if ( cmdLine.contains(argPrintLogicalPlan) )
+			lplanPrinter = new TextBasedLogicalPlanPrinterImpl();
 
-		if ( cmdLine.contains(argPrintPhysicalPlan) )
-			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl();
-		else if ( cmdLine.contains(argPrintPhysicalPlanToFile) )
+		if ( cmdLine.contains(argPrintPhysicalPlanToFile) )
 			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl(cmdLine.getValue(argPrintPhysicalPlanToFile), cmdLine.contains(argPrintPhysicalPlan));
+		else if ( cmdLine.contains(argPrintPhysicalPlan) )
+			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl();
 
-		if ( cmdLine.contains(argPrintExecutablePlan) )
-			eplanPrinter = new TextBasedExecutablePlanPrinterImpl();
-		else if ( cmdLine.contains(argPrintExecutablePlanToFile) )
+		if ( cmdLine.contains(argPrintExecutablePlanToFile) )
 			eplanPrinter = new TextBasedExecutablePlanPrinterImpl(cmdLine.getValue(argPrintExecutablePlanToFile), cmdLine.contains(argPrintExecutablePlan));
+		else if ( cmdLine.contains(argPrintExecutablePlan) )
+			eplanPrinter = new TextBasedExecutablePlanPrinterImpl();
 	}
 
 	public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
