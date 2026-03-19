@@ -61,7 +61,13 @@ public class ModServer extends ModBase
 				}
 			}
 
-			fedDescrCount = String.valueOf( fedDescr.size() );
+			if ( fedDescr.size() == 0 ) {
+				fedDescr = Arrays.asList( "config/DefaultFedConf.ttl" );
+				cmdLine.cmdError( "No valid federation description file(s) provided, falling back to default", false );
+			}
+			else {
+				fedDescrCount = String.valueOf( fedDescr.size() );
+			}
 		} else {
 			fedDescr = Arrays.asList( "config/DefaultFedConf.ttl" );
 		}
