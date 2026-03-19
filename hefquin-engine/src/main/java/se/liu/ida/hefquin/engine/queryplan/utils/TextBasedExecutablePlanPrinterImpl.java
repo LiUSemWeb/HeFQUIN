@@ -13,18 +13,26 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 	protected String parentIndent = "";
 
 	private final String fileOutputPath;
+	private final boolean printPlanToTerminal;
 
-	public TextBasedExecutablePlanPrinterImpl(String eplanPath) {
+	public TextBasedExecutablePlanPrinterImpl(String eplanPath, boolean printPlanToTerminal) {
 	    this.fileOutputPath = eplanPath;
+	    this.printPlanToTerminal = printPlanToTerminal;
 	}
 
 	public TextBasedExecutablePlanPrinterImpl() {
 	    fileOutputPath = null;
+	    printPlanToTerminal = true;
 	}
 
 	@Override
 	public String getFileOutputPath() {
 	    return fileOutputPath;
+	}
+
+	@Override
+	public boolean isPrintPlanToTerminal() {
+	    return printPlanToTerminal;
 	}
 
 	@Override

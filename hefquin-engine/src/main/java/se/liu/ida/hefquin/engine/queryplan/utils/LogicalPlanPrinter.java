@@ -12,6 +12,8 @@ public interface LogicalPlanPrinter
 {
 	default String getFileOutputPath() { return null; }
 
+	default boolean isPrintPlanToTerminal() { return true; }
+
 	/**
 	 * Prints the given plan to the given stream.
 	 */

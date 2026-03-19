@@ -46,22 +46,22 @@ public class ModPlanPrinting extends ModBase
 		if ( cmdLine.contains(argPrintSrcAssignment) )
 			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl();
 		else if ( cmdLine.contains(argPrintSrcAssignmentToFile) )
-			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl(cmdLine.getValue(argPrintSrcAssignmentToFile));
+			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl(cmdLine.getValue(argPrintSrcAssignmentToFile), cmdLine.contains(argPrintSrcAssignment));
 
 		if ( cmdLine.contains(argPrintLogicalPlan) )
 			lplanPrinter = new TextBasedLogicalPlanPrinterImpl();
 		else if ( cmdLine.contains(argPrintLogicalPlanToFile) )
-			lplanPrinter = new TextBasedLogicalPlanPrinterImpl(cmdLine.getValue(argPrintLogicalPlanToFile));
+			lplanPrinter = new TextBasedLogicalPlanPrinterImpl(cmdLine.getValue(argPrintLogicalPlanToFile), cmdLine.contains(argPrintLogicalPlan));
 
 		if ( cmdLine.contains(argPrintPhysicalPlan) )
 			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl();
 		else if ( cmdLine.contains(argPrintPhysicalPlanToFile) )
-			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl(cmdLine.getValue(argPrintPhysicalPlanToFile));
+			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl(cmdLine.getValue(argPrintPhysicalPlanToFile), cmdLine.contains(argPrintPhysicalPlan));
 
 		if ( cmdLine.contains(argPrintExecutablePlan) )
 			eplanPrinter = new TextBasedExecutablePlanPrinterImpl();
 		else if ( cmdLine.contains(argPrintExecutablePlanToFile) )
-			eplanPrinter = new TextBasedExecutablePlanPrinterImpl(cmdLine.getValue(argPrintExecutablePlanToFile));
+			eplanPrinter = new TextBasedExecutablePlanPrinterImpl(cmdLine.getValue(argPrintExecutablePlanToFile), cmdLine.contains(argPrintExecutablePlan));
 	}
 
 	public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }

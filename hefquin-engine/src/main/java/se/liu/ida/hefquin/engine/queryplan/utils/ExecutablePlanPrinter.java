@@ -11,6 +11,9 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 public interface ExecutablePlanPrinter
 {
 	default String getFileOutputPath() { return null; }
+
+	default boolean isPrintPlanToTerminal() { return true; }
+	
 	/**
 	 * Prints the given plan to the given stream.
 	 */

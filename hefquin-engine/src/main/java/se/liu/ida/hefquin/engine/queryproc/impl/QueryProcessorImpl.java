@@ -91,7 +91,7 @@ public class QueryProcessorImpl implements QueryProcessor
 						System.err.println( "Error: Could not create file for printing executable plan: " + eplanPrinterPath );
 					}
 				}
-				else {
+				if ( planner.getExecutablePlanPrinter().isPrintPlanToTerminal() ) {
 					System.out.println("--------- Executable Plan ---------");
 					planner.getExecutablePlanPrinter().print( prg, System.out );
 				}

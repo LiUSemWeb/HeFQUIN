@@ -77,7 +77,7 @@ public class QueryPlannerImpl implements QueryPlanner
 					System.err.println( "Error: Could not create file for printing source assignment: " + srcasgPrinterPath );
 				}
 			}
-			else {
+			if ( srcasgPrinter.isPrintPlanToTerminal() ) {
 				System.out.println("--------- Source Assignment ---------");
 				srcasgPrinter.print( saAndStats.object1, System.out );
 			}
@@ -102,7 +102,7 @@ public class QueryPlannerImpl implements QueryPlanner
 					System.err.println( "Error: Could not create file for printing logical plan: " + lplanPrinterPath );
 				}
 			}
-			else {
+			if ( lplanPrinter.isPrintPlanToTerminal() ) {
 				System.out.println("--------- Logical Plan ---------");
 				lplanPrinter.print( lp, System.out );
 			}
@@ -124,7 +124,7 @@ public class QueryPlannerImpl implements QueryPlanner
 					pplanPrinter.print( planAndStats.object1, System.out );
 				}
 			}
-			else {
+			if ( pplanPrinter.isPrintPlanToTerminal() ) {
 				System.out.println("--------- Physical Plan ---------");
 				pplanPrinter.print( planAndStats.object1, System.out );
 			}
