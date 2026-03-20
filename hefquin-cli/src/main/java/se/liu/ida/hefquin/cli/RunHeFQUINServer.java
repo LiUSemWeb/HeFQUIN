@@ -62,13 +62,14 @@ public class RunHeFQUINServer extends CmdGeneral
 	protected void exec() {
 		System.setProperty( "hefquin.configuration", modServer.getConfDescr() );
 		
-		if ( modServer.getFederationDescriptions().size() == 1 ) {
-			System.setProperty( "hefquin.federation", modServer.getFederationDescriptions().get(0) );
+		final List<String> fds = modServer.getFederationDescriptions();
+		if ( fds.size() == 1 ) {
+			System.setProperty( "hefquin.federation", fds.get(0) );
 		}
 		else {
-			System.setProperty( "hefquin.federation.count", String.valueOf( modServer.getFederationDescriptions().size() ) );
-			for ( int i = 0; i < modServer.getFederationDescriptions().size(); i++ ) {
-				System.setProperty( "hefquin.federation." + (i+1), modServer.getFederationDescriptions().get(i) );
+			System.setProperty( "hefquin.federation.count", String.valueOf(fds.size()) );
+			for ( int i = 0; i < fds.size(); i++ ) {
+				System.setProperty( "hefquin.federation." + (i+1), fds.get(i) );
 			}
 		}
 

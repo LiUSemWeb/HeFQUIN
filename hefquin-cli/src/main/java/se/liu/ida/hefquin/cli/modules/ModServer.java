@@ -49,25 +49,23 @@ public class ModServer extends ModBase
 		}
 		if ( cmdLine.contains( argFedDescr ) ) {
 			final List<String> filenames = cmdLine.getValues( argFedDescr );
-			fedDescr = new ArrayList<>();
+			fedDescr = new ArrayList<>( filenames.size() );
 			
 			for ( final String filename : filenames ) {
-				if ( isURIOrExistingFile( filename ) ) {
-					fedDescr.add( filename );
-				}
+				if ( isURIOrExistingFile(filename) )
+					fedDescr.add(filename);
 				else
 					cmdLine.cmdError( "Invalid federation description file: " + filename, false );
 			}
-		} else {
+		}
+		else {
 			fedDescr = List.of( "config/DefaultFedConf.ttl" );
 		}
 	}
 	
 	protected boolean isURIOrExistingFile( final String filename ) {
-		final File f = new File(filename);
-		if ( f.isFile() ){
-			return true;
-		}
+		if ( new File(filename).isFile() ) return true;
+
 		try {
 			new URI(filename);
 		} catch ( final URISyntaxException e ) {

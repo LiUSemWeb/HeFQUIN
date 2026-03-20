@@ -40,8 +40,8 @@ public class SharedResourceInitializer implements ServletContextListener
 		}
 
 		check( confDescr );
-		for ( String fed : fedCatList ) {
-			check( fed );
+		for ( final String fed : fedCatList ) {
+			check(fed);
 		}
 
 		final HeFQUINEngine engine = new HeFQUINEngineBuilder()
