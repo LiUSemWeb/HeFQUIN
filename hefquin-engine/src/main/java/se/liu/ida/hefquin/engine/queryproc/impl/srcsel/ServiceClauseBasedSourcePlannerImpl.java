@@ -81,6 +81,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		else if ( jenaOp instanceof OpExtend opExtend ) {
 			return createPlanForBind(opExtend, ctxt);
 		}
+		else if ( jenaOp instanceof OpUnfold opUnfold ) {
+			return createPlanForUnfold(opUnfold, ctxt);
+		}
 		else if ( jenaOp instanceof OpTable opTable ) {
 			return createPlanForValues(opTable, ctxt);
 		}
@@ -187,6 +190,15 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	                                         final QueryProcContext ctxt ) {
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), ctxt );
 		final LogicalOpBind rootOp = new LogicalOpBind( jenaOp.getVarExprList() );
+		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
+	}
+
+	protected LogicalPlan createPlanForUnfold( final OpUnfold jenaOp,
+	                                           final QueryProcContext ctxt ) {
+		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), ctxt );
+		final LogicalOpUnfold rootOp = new LogicalOpUnfold( jenaOp.getExpr(),
+		                                                    jenaOp.getVar1(),
+		                                                    jenaOp.getVar2() );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
 	}
 

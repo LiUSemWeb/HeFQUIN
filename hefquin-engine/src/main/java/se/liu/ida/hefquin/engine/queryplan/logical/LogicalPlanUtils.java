@@ -202,6 +202,9 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpBind op )          { subplanCount++; }
 
 		@Override
+		public void visit( final LogicalOpUnfold op )        { subplanCount++; }
+
+		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) { subplanCount++; }
 
 		@Override

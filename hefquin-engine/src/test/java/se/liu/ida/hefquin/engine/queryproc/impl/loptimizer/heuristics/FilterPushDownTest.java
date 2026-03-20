@@ -34,6 +34,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -374,6 +375,118 @@ public class FilterPushDownTest extends EngineTestBase
 
 		final LogicalPlan subResult2 = subResult1.getSubPlan(0);
 		assertTrue( subResult2.getRootOperator() instanceof LogicalOpFilter );
+	}
+
+	@Test
+	public void pushFilterUnderUnfoldImpossible1() {
+		// a filter on top of an unfold with a TPF request underneath,
+		// where the filter refers to the first variable assigned by the
+		// unfold; hence, the filter can *not* be pushed under the unfold
+
+		// set up
+		// - request operator
+		final FederationMember fm = new TPFServerForTest();
+		final Var v1 = Var.alloc("x");
+		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+
+		// - unfold operator
+		final Var v2 = Var.alloc("y");
+		final Expr unfoldExpr = NodeValue.makeInteger(42);
+		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, null);
+
+		// - filter operator
+		final Expr filterExpr = new E_IsIRI( new ExprVar(v2) ); // v2 !!!
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
+
+		// - plan
+		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+		final LogicalPlan unfoldPlan = new LogicalPlanWithUnaryRootImpl(unfoldOp, null, reqPlan);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, unfoldPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpFilter );
+
+		final LogicalPlan subResult1 = result.getSubPlan(0);
+		assertTrue( subResult1.getRootOperator() instanceof LogicalOpUnfold );
+	}
+
+	@Test
+	public void pushFilterUnderUnfoldImpossible2() {
+		// a filter on top of an unfold with a TPF request underneath,
+		// where the filter refers to the second variable assigned by the
+		// unfold; hence, the filter can *not* be pushed under the unfold
+
+		// set up
+		// - request operator
+		final FederationMember fm = new TPFServerForTest();
+		final Var v1 = Var.alloc("x");
+		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+
+		// - unfold operator
+		final Var v2 = Var.alloc("y");
+		final Var v3 = Var.alloc("z");
+		final Expr unfoldExpr = NodeValue.makeInteger(42);
+		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, v3);
+
+		// - filter operator
+		final Expr filterExpr = new E_IsIRI( new ExprVar(v3) ); // v3 !!!
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
+
+		// - plan
+		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+		final LogicalPlan unfoldPlan = new LogicalPlanWithUnaryRootImpl(unfoldOp, null, reqPlan);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, unfoldPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpFilter );
+
+		final LogicalPlan subResult1 = result.getSubPlan(0);
+		assertTrue( subResult1.getRootOperator() instanceof LogicalOpUnfold );
+	}
+
+	@Test
+	public void pushFilterUnderOneUnfold() {
+		// a filter on top of an unfold with a TPF request underneath, where
+		// the filter refers to the variable assigned by the request; hence,
+		// the filter can be pushed under the unfold but not into the request
+
+		// set up
+		// - request operator
+		final FederationMember fm = new TPFServerForTest();
+		final Var v1 = Var.alloc("x");
+		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+
+		// - bind operator
+		final Var v2 = Var.alloc("y");
+		final Expr unfoldExpr = NodeValue.makeInteger(42);
+		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, null);
+
+		// - filter operator
+		final Expr filterExpr = new E_IsIRI( new ExprVar(v1) );
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
+
+		// - plan
+		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+		final LogicalPlan unfoldPlan = new LogicalPlanWithUnaryRootImpl(unfoldOp, null, reqPlan);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, unfoldPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpUnfold );
+
+		final LogicalPlan subResult1 = result.getSubPlan(0);
+		assertTrue( subResult1.getRootOperator() instanceof LogicalOpFilter );
 	}
 
 }

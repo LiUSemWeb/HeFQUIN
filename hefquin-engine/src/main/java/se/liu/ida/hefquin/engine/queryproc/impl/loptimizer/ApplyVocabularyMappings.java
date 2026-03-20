@@ -25,6 +25,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
@@ -102,6 +103,14 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
 			// TODO: the expressions of 'bindOp' should be rewritten too
 			return new LogicalPlanWithUnaryRootImpl( bindOp,
+			                                         null,
+			                                         rewrittenSubPlan );
+		}
+		else if ( rootOp instanceof LogicalOpUnfold unfoldOp )
+		{
+			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
+			// TODO: the expressions of 'unfoldOp' should be rewritten too
+			return new LogicalPlanWithUnaryRootImpl( unfoldOp,
 			                                         null,
 			                                         rewrittenSubPlan );
 		}

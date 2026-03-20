@@ -98,6 +98,13 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			                                     subPlanUnderFilter.getSubPlan(0),
 			                                     inputPlan );
 		}
+		else if ( childOpUnderFilter instanceof LogicalOpUnfold unfoldOpUnderFilter )
+		{
+			return createPlanForUnfoldUnderFilter( filterOp,
+			                                       unfoldOpUnderFilter,
+			                                       subPlanUnderFilter.getSubPlan(0),
+			                                       inputPlan );
+		}
 		else if (    childOpUnderFilter instanceof LogicalOpLocalToGlobal
 		          || childOpUnderFilter instanceof LogicalOpGlobalToLocal )
 		{
@@ -229,6 +236,36 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		// Finally, put together the new plan with the bind operator as root.
 		return LogicalPlanUtils.createPlanWithSubPlans(bindOp, null, newSubPlan2);
+	}
+
+	protected LogicalPlan createPlanForUnfoldUnderFilter(
+			final LogicalOpFilter filterOp,
+			final LogicalOpUnfold unfoldOp,
+			final LogicalPlan subPlanUnderUnfold,
+			final LogicalPlan inputPlan ) {
+		// Check whether the filter can be pushed under the given
+		// unfold operator, which is possible only if none of the
+		// variables assigned by the unfold operator is used in
+		// the filter condition.
+		final Set<Var> varsInFilter = ExprVars.getVarsMentioned( filterOp.getFilterExpressions() );
+		final Var unfoldVar1 = unfoldOp.getVar1();
+		final Var unfoldVar2 = unfoldOp.getVar2();
+		if ( varsInFilter.contains(unfoldVar1) )
+			return inputPlan;
+		if ( unfoldVar2 != null && varsInFilter.contains(unfoldVar2) )
+			return inputPlan;
+
+		// The filter can be pushed. In this case, create a new subplan with
+		// the filter as root operator on top of the subplan that was under
+		// the unfold, and apply this heuristic recursively to this new subplan.
+		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
+				filterOp,
+				null,
+				subPlanUnderUnfold );
+		final LogicalPlan newSubPlan2 = apply(newSubPlan1);
+
+		// Finally, put together the new plan with the unfold operator as root.
+		return LogicalPlanUtils.createPlanWithSubPlans(unfoldOp, null, newSubPlan2);
 	}
 
 	/**
