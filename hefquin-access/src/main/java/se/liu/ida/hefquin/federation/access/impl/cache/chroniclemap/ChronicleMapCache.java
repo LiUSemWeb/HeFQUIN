@@ -40,7 +40,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	 */
 	public ChronicleMapCache( final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> policies )
 			throws IOException {
-		this(DEFAULT_CAPACITY, policies, DEFAULT_FILENAME);
+		this(DEFAULT_CAPACITY, DEFAULT_FILENAME, policies);
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	public ChronicleMapCache( final int capacity,
 	                          final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> policies )
 			throws IOException {
-		this(capacity, policies, DEFAULT_FILENAME);
+		this(capacity, DEFAULT_FILENAME, policies);
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	public ChronicleMapCache( final String filename,
 	                          final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> policies )
 			throws IOException {
-		this(DEFAULT_CAPACITY, policies, filename);
+		this(DEFAULT_CAPACITY, filename, policies);
 	}
 
 	/**
@@ -77,8 +77,8 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	 * @throws IOException
 	 */
 	public ChronicleMapCache( final int capacity,
-	                          final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> policies,
-	                          final String filename )
+	                          final String filename,
+	                          final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> policies )
 			throws IOException {
 		assert capacity > 0;
 		assert policies != null;
