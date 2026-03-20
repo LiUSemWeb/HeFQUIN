@@ -37,15 +37,8 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 
 	@Override
 	public void print( final ExecutablePlan plan ) {
-		if ( plan instanceof PushBasedExecutablePlanImpl p ) {
-			for ( final PrintStream out : outs ) {
-				out.println("--------- Executable Plan ---------");
-				print( p, out );
-				out.flush();
-			}
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported type of executable plan (" + plan.getClass().getName() + ").");
+		for ( final PrintStream out : outs ) {
+				print( plan, out );
 		}
 	}
 

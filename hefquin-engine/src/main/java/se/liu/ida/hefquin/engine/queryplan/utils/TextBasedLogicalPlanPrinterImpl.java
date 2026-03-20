@@ -49,19 +49,19 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 	}
 
 	@Override
-	public void print( final LogicalPlan plan, final PrintStream out, final String planType ) {
+	public void print( final LogicalPlan plan, final PrintStream out, final LogicalPlanStage planType ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
-		out.println("--------- " + planType + " ---------");
+		out.println("--------- " + planType.name + " ---------");
 		PlanPrinter.print(pp, out);
 		printFullStringsForGraphPatterns(pp, out);
 		out.flush();
 	}
 
 	@Override
-	public void print( final LogicalPlan plan, final String planType ) {
+	public void print( final LogicalPlan plan, final LogicalPlanStage planType ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
 		for ( final PrintStream out : outs ) {
-			out.println("--------- " + planType + " ---------");
+			out.println("--------- " + planType.name + " ---------");
 			PlanPrinter.print(pp, out);
 			printFullStringsForGraphPatterns(pp, out);
 			out.flush();
