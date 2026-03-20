@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicyAlwaysValid;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicyTimeToLive;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyFactory;
@@ -228,7 +229,8 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		};
 
 		final CacheInvalidationPolicy<ChronicleMapCacheEntry,
-		                              ChronicleMapCacheObject> cip = new CacheInvalidationPolicyAlwaysValid<>();
+		                              ChronicleMapCacheObject
+		                             > cip = new CacheInvalidationPolicyTimeToLive<>(600_000); // 5 minutes
 
 		@Override
 		public ChronicleMapCacheEntryFactory getEntryFactory() {
