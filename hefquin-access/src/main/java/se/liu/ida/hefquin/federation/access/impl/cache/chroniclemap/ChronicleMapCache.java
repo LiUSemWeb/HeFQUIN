@@ -2,13 +2,16 @@ package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.openhft.chronicle.map.ChronicleMap;
 import se.liu.ida.hefquin.base.datastructures.Cache;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
 
 /**
  * A thread-safe persistent cache implementation. This cache uses a
@@ -18,7 +21,9 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 {
 	private static Logger logger = LoggerFactory.getLogger( ChronicleMapCache.class );
 	protected final ChronicleMap<ChronicleMapCacheKey, ChronicleMapCacheEntry> map;
-	protected final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> policies;
+	protected final CacheInvalidationPolicy<ChronicleMapCacheEntry,ChronicleMapCacheObject> invalidPolicy;
+	protected final CacheReplacementPolicy<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> replacementPolicy;
+
 	protected static final int DEFAULT_CAPACITY = 1000;
 	protected static final String DEFAULT_FILENAME = "cache/chronicle-map.dat";
 	protected final int capacity;
@@ -64,9 +69,23 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		assert filename != null && ! filename.isBlank();
 
 		this.capacity = capacity;
-		this.policies = policies;
+		replacementPolicy = policies.getReplacementPolicyFactory().create();
+		invalidPolicy = policies.getInvalidationPolicy();
+
 		this.filename = filename;
 		map = initializeMap(filename, capacity);
+
+		// Initilize replacement policy
+		for( final Entry<ChronicleMapCacheKey, ChronicleMapCacheEntry> entry : map.entrySet() ) {
+			replacementPolicy.entryWasAdded( entry.getKey(), entry.getValue() );
+		}
+
+		// Enforce max capacity
+		while ( map.size() >= capacity ) {
+			final Iterable<ChronicleMapCacheKey> evictionCandidates = replacementPolicy.getEvictionCandidates(1);
+			final ChronicleMapCacheKey evictionCandidate = evictionCandidates.iterator().next();
+			evict(evictionCandidate);
+		}
 
 		logger.info( toString() );
 	}
@@ -114,26 +133,56 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 
 	@Override
 	public void put( final ChronicleMapCacheKey key, final ChronicleMapCacheObject value ) {
+		if ( key == null )
+			throw new IllegalArgumentException();
+
+		if ( value == null )
+			throw new IllegalArgumentException();
+
 		final ChronicleMapCacheEntry entry = policies.getEntryFactory().createCacheEntry(value);
+
+		// Replacement
+		if( map.get(key) != null ) {
+			replacementPolicy.entryWasRewritten(key, entry);
+			map.put(key, entry);
+			return;
+		}
+
+		// Check capacity
+		if ( map.size() >= capacity ) {
+			final Iterable<ChronicleMapCacheKey> evictionCandidates = replacementPolicy.getEvictionCandidates(1);
+			final ChronicleMapCacheKey evictionCandidate = evictionCandidates.iterator().next();
+			evict(evictionCandidate);
+		}
+
 		map.put(key, entry);
+		replacementPolicy.entryWasAdded(key, entry);
 	}
 
 	@Override
 	public ChronicleMapCacheObject get( final ChronicleMapCacheKey key ) {
 		final ChronicleMapCacheEntry entry = map.get(key);
-		return entry == null ? null : entry.getObject();
+		if( entry != null ) {
+			replacementPolicy.entryWasRequested(key, entry);
+			return entry.getObject();
+		}
+		return null;
 	}
 
 	@Override
 	public boolean evict( final ChronicleMapCacheKey key ) {
-		return map.remove(key) != null;
+		if( map.remove(key) != null ) {
+			replacementPolicy.entryWasEvicted(key);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
 	public boolean evict( final ChronicleMapCacheKey key, final ChronicleMapCacheObject value ) {
 		final ChronicleMapCacheEntry entry = map.get(key);
 		if ( entry != null && entry.getObject().equals(value) ) {
-			return map.remove(key) != null;
+			return evict(key);
 		}
 		return false;
 	}
