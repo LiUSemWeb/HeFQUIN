@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -75,6 +76,17 @@ public class HeFQUINEngineBuilder
 	 */
 	public HeFQUINEngineBuilder withFederationCatalog( final String fedCatFile ) {
 		this.fedCat = FederationDescriptionReader.readFromFile(fedCatFile);
+		return this;
+	}
+
+	/**
+	 * Sets the federation catalog to be used by the engine.
+	 *
+	 * @param fedCatModels a list of federation catalog models
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withFederationCatalog( final List<Model> fedCatModels ) {
+		this.fedCat = FederationDescriptionReader.readFromModels(fedCatModels);
 		return this;
 	}
 
