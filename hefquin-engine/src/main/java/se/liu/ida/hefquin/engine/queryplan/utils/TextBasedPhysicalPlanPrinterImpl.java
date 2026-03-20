@@ -30,17 +30,18 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 	private final PrintStream[] outs;
 
 	public TextBasedPhysicalPlanPrinterImpl( final PrintStream ... outs ) {
-		this.outs = outs;
 		assert outs.length > 0;
+		this.outs = outs;
 	}
 
 	public TextBasedPhysicalPlanPrinterImpl( ) {
-		this.outs = null;
+		this.outs = new PrintStream[]{System.out};
 	}
 
 	@Override
 	public void print( final PhysicalPlan plan, final PrintStream out ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		out.println("--------- Physical Plan ---------");
 		PlanPrinter.print(pp, out);
 		printFullStringsForGraphPatterns(pp, out);
 		out.flush();

@@ -82,7 +82,6 @@ public class QueryProcessorImpl implements QueryProcessor
 			if ( planner.getExecutablePlanPrinter() != null ) {
 				planner.getExecutablePlanPrinter().print( prg );
 			}
-			
 			t3 = System.currentTimeMillis();
 			execStats = execEngine.execute(prg, resultSink);
 

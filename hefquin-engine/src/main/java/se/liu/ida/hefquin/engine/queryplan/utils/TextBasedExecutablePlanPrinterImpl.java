@@ -20,12 +20,13 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 	}
 
 	public TextBasedExecutablePlanPrinterImpl( ) {
-		this.outs = null;
+		this.outs = new PrintStream[]{System.out};
 	}
 
 	@Override
 	public void print( final ExecutablePlan plan, final PrintStream out ) {
 		if ( plan instanceof PushBasedExecutablePlanImpl p ) {
+			out.println("--------- Executable Plan ---------");
 			print( p, out );
 		}
 		else {

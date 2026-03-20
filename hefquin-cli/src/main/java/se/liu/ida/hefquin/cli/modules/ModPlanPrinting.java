@@ -3,8 +3,6 @@ package se.liu.ida.hefquin.cli.modules;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.CmdArgModule;
@@ -49,35 +47,47 @@ public class ModPlanPrinting extends ModBase
 
 	@Override
 	public void processArgs( final CmdArgModule cmdLine ) {	
-		List<PrintStream> outsList = processPrintFlags( cmdLine, argPrintSrcAssignment, argPrintSrcAssignmentToFile );
-		if ( ! outsList.isEmpty() )
-			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl( outsList.toArray(new PrintStream[0]) );
+		final PrintStream[] srcasgOutsList = processPrintFlags( cmdLine, argPrintSrcAssignment, argPrintSrcAssignmentToFile );
+		if ( srcasgOutsList != null )
+			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl( srcasgOutsList );
 
-		outsList = processPrintFlags( cmdLine, argPrintLogicalPlan, argPrintLogicalPlanToFile );
-		if ( ! outsList.isEmpty() ) 
-			lplanPrinter = new TextBasedLogicalPlanPrinterImpl( outsList.toArray(new PrintStream[0]) );
+		final PrintStream[] lplanOutsList = processPrintFlags( cmdLine, argPrintLogicalPlan, argPrintLogicalPlanToFile );
+		if ( lplanOutsList != null ) 
+			lplanPrinter = new TextBasedLogicalPlanPrinterImpl( lplanOutsList );
 
-		outsList = processPrintFlags( cmdLine, argPrintPhysicalPlan, argPrintPhysicalPlanToFile );
-		if ( ! outsList.isEmpty() ) 
-			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl( outsList.toArray(new PrintStream[0]) );
+		final PrintStream[] pplanOutsList = processPrintFlags( cmdLine, argPrintPhysicalPlan, argPrintPhysicalPlanToFile );
+		if ( pplanOutsList != null ) 
+			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl( pplanOutsList );
 
-		outsList = processPrintFlags( cmdLine, argPrintExecutablePlan, argPrintExecutablePlanToFile );
-		if ( ! outsList.isEmpty() ) 
-			eplanPrinter = new TextBasedExecutablePlanPrinterImpl( outsList.toArray(new PrintStream[0]) );
+		final PrintStream[] eplanOutsList = processPrintFlags( cmdLine, argPrintExecutablePlan, argPrintExecutablePlanToFile );
+		if ( eplanOutsList != null ) 
+			eplanPrinter = new TextBasedExecutablePlanPrinterImpl( eplanOutsList );
 	}
 
-	protected List<PrintStream> processPrintFlags( final CmdArgModule cmdLine, final ArgDecl argPrintPlanToTerminal, final ArgDecl argPrintPlanToFile ) {
-		final List<PrintStream> outsList = new ArrayList<>();
+	protected PrintStream[] processPrintFlags( final CmdArgModule cmdLine, final ArgDecl argPrintPlanToTerminal, final ArgDecl argPrintPlanToFile ) {
+		int count = 0;
+		if ( cmdLine.contains(argPrintPlanToTerminal) ) count++;
+		if ( cmdLine.contains(argPrintPlanToFile) ) count++;
+		
+		if ( count == 0 ) return null;
+		
+		final PrintStream[] outsList = new PrintStream[count];
+		int index = 0;
+		
 		if ( cmdLine.contains(argPrintPlanToTerminal) ) {
-			outsList.add( System.out );
+			outsList[index++] = System.out;
 		}
 		if ( cmdLine.contains(argPrintPlanToFile) ) {
+			final PrintStream fileOut;
+			final FileOutputStream fileOutputStream;
 			try {
-				final PrintStream fileOut = new PrintStream( new FileOutputStream(cmdLine.getValue(argPrintPlanToFile), true) );
-				outsList.add( fileOut );
+				fileOutputStream = new FileOutputStream(cmdLine.getValue(argPrintPlanToFile), true);
 			} catch ( final FileNotFoundException e ) {
 				cmdLine.cmdError( "Failed to create print stream for output destination: " + cmdLine.getValue(argPrintPlanToFile), false );
+				return outsList;
 			}
+			fileOut = new PrintStream ( fileOutputStream );
+			outsList[index++] = fileOut;
 		}
 		return outsList;
 	}

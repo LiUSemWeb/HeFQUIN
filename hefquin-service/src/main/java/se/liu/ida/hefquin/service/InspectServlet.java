@@ -50,6 +50,9 @@ public class InspectServlet extends HttpServlet
 	private static final PhysicalPlanPrinter physicalPlanPrinter = new TextBasedPhysicalPlanPrinterImpl();
 	private static final LogicalPlanPrinter sourceAssignmentPrinter = new TextBasedLogicalPlanPrinterImpl();
 
+	private static final String SOURCE_ASSIGNMENT_TYPE = "Source Assignment";
+	private static final String LOGICAL_PLAN_TYPE = "Logical Plan";
+
 	/**
 	 * Initializes the servlet and retrieves the HeFQUIN engine from the servlet
 	 * context.
@@ -234,7 +237,7 @@ public class InspectServlet extends HttpServlet
 	private static JsonValue getLogicalPlan( final QueryProcessingStatsAndExceptions stats ) {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintStream ps = new PrintStream( baos );
-		logicalPlanPrinter.print( stats.getQueryPlanningStats().getResultingLogicalPlan(), ps );
+		logicalPlanPrinter.print( stats.getQueryPlanningStats().getResultingLogicalPlan(), ps, LOGICAL_PLAN_TYPE );
 		return new JsonString( baos.toString() );
 	}
 
@@ -263,7 +266,7 @@ public class InspectServlet extends HttpServlet
 	private static JsonValue getSourceAssignment( final QueryProcessingStatsAndExceptions stats ) {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintStream ps = new PrintStream( baos );
-		sourceAssignmentPrinter.print( stats.getQueryPlanningStats().getResultingLogicalPlan(), ps );
+		sourceAssignmentPrinter.print( stats.getQueryPlanningStats().getResultingLogicalPlan(), ps, SOURCE_ASSIGNMENT_TYPE );
 		return new JsonString( baos.toString() );
 	}
 }

@@ -13,7 +13,7 @@ public interface LogicalPlanPrinter
 	/**
 	 * Prints the given plan to the given stream.
 	 */
-	void print( LogicalPlan plan, PrintStream out );
+	void print( LogicalPlan plan, PrintStream out, String planType );
 	
 	/**
 	 * Prints the given plan to the stream(s) that are stored in this printer.

@@ -40,17 +40,18 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 	protected final PrintStream[] outs;
 	
 	public TextBasedLogicalPlanPrinterImpl( final PrintStream ... outs ) {
-		this.outs = outs;
 		assert outs.length > 0;
+		this.outs = outs;
 	}
 
 	public TextBasedLogicalPlanPrinterImpl( ) {
-		this.outs = null;
+		this.outs = new PrintStream[]{System.out};
 	}
 
 	@Override
-	public void print( final LogicalPlan plan, final PrintStream out ) {
+	public void print( final LogicalPlan plan, final PrintStream out, final String planType ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		out.println("--------- " + planType + " ---------");
 		PlanPrinter.print(pp, out);
 		printFullStringsForGraphPatterns(pp, out);
 		out.flush();
