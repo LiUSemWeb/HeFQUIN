@@ -98,7 +98,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		}
 
 		// Enforce max capacity
-		while ( map.size() >= capacity ) {
+		while ( map.size() > capacity ) {
 			final Iterable<ChronicleMapCacheKey> evictionCandidates = replacementPolicy.getEvictionCandidates(1);
 			final ChronicleMapCacheKey evictionCandidate = evictionCandidates.iterator().next();
 			evict(evictionCandidate);
