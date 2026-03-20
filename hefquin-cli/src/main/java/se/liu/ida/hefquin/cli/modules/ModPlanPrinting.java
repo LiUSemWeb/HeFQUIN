@@ -78,7 +78,6 @@ public class ModPlanPrinting extends ModBase
 			outsList[index++] = System.out;
 		}
 		if ( cmdLine.contains(argPrintPlanToFile) ) {
-			final PrintStream fileOut;
 			final FileOutputStream fileOutputStream;
 			try {
 				fileOutputStream = new FileOutputStream(cmdLine.getValue(argPrintPlanToFile), true);
@@ -86,8 +85,8 @@ public class ModPlanPrinting extends ModBase
 				cmdLine.cmdError( "Failed to create print stream for output destination: " + cmdLine.getValue(argPrintPlanToFile), false );
 				return outsList;
 			}
-			fileOut = new PrintStream ( fileOutputStream );
-			outsList[index++] = fileOut;
+
+			outsList[index++] = new PrintStream(fileOutputStream);
 		}
 		return outsList;
 	}

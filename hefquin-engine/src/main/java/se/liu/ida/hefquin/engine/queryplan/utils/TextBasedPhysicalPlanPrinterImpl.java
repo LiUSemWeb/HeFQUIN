@@ -27,7 +27,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 {
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
 
-	private final PrintStream[] outs;
+	protected final PrintStream[] outs;
 
 	public TextBasedPhysicalPlanPrinterImpl( final PrintStream ... outs ) {
 		assert outs.length > 0;

@@ -28,6 +28,7 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 		if ( plan instanceof PushBasedExecutablePlanImpl p ) {
 			out.println("--------- Executable Plan ---------");
 			print( p, out );
+			out.flush();
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of executable plan (" + plan.getClass().getName() + ").");
