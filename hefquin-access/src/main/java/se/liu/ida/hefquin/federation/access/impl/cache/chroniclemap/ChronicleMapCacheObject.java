@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import net.openhft.chronicle.bytes.BytesIn;
 import net.openhft.chronicle.bytes.BytesMarshallable;
@@ -16,8 +17,6 @@ import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalEr
 /**
  * Object to stores solutions in a ChronicleMap-native
  * ({@link BytesMarshallable}) form.
- *
- * TODO: Implement support for TPF/brTPF requests
  */
 public class ChronicleMapCacheObject implements BytesMarshallable
 {
@@ -155,6 +154,26 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 	 */
 	public int getCount() {
 		return count;
+	}
+
+
+	@Override
+	public boolean equals( Object obj ) {
+		if ( this == obj )
+			return true;
+		if ( obj == null || getClass() != obj.getClass() )
+			return false;
+		final ChronicleMapCacheObject other = (ChronicleMapCacheObject) obj;
+		return    matchingTriples.equals( other.matchingTriples )
+		       && metadataTriples.equals( other.metadataTriples )
+		       && nextPageURL.equals( other.nextPageURL )
+		       && solutionMappings.equals( other.solutionMappings )
+		       && count.equals( other.count );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(matchingTriples, metadataTriples, solutionMappings, count);
 	}
 
 	@Override
