@@ -146,6 +146,13 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			// mappings returned from the endpoint. The optimizer should instead
 			// retain the BIND outside the request.
 		}
+		else if ( rootOp instanceof LogicalOpUnfold )
+		{
+			// nothing to do here - for the time being, an UNFOLD clause
+			// should not be merged into a request operator, not even for
+			// requests to a SPARQL endpoint, because it is unlikely that
+			// SPARQL endpoints already support the SPARQL-CDTs approach.
+		}
 		else if (    rootOp instanceof LogicalOpLocalToGlobal
 		          || rootOp instanceof LogicalOpGlobalToLocal )
 		{

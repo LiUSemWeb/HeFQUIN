@@ -978,6 +978,8 @@ Element GraphPatternNotTriples() : { Element el = null ; }
    el = ExistsElt()
  |
    el = NotExistsElt()
+#endif
+#if defined(ARQ) || defined(SPARQL_12_HeFQUIN)
  |
    el = Unfold()
 #endif
@@ -1030,7 +1032,7 @@ Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ;
 #ifdef SPARQL_12_HeFQUIN
   (<PARAMS>
     <LPAREN>
-    { paramVars = new java.util.LinkedHashMap<>(); }
+    { paramVars = new java.util.LinkedHashMap<String,Var>(); }
 
     v = Var() <AS> paramName = String()
     {
@@ -1213,7 +1215,9 @@ Element NotExistsElt() : { Element el ; }
     el = GroupGraphPattern()
     { return new ElementNotExists(el) ; }
 }
+#endif
 
+#if defined(ARQ) || defined(SPARQL_12_HeFQUIN)
 Element Unfold() : {  Var v1 ; Var v2 = null ; Expr expr ; }
 {
   <UNFOLD>
@@ -2836,6 +2840,8 @@ TOKEN [IGNORE_CASE] :
 |  < LATERAL:     "lateral" >
 |  < SEMIJOIN:    "semijoin" >
 |  < ANTIJOIN:    "antijoin" >
+#endif
+#if defined(ARQ) || defined(SPARQL_12_HeFQUIN)
 |  < UNFOLD:      "unfold" >
 #endif
 

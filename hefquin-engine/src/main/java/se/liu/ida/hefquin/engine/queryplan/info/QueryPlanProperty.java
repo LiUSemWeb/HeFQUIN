@@ -96,7 +96,19 @@ public class QueryPlanProperty
 	 * @return the copy
 	 */
 	public static QueryPlanProperty copyWithReducedQuality( final QueryPlanProperty p ) {
-		final Quality reducedQuality = switch (p.quality) {
+		final Quality reducedQuality = getReducedQuality(p.quality);
+		return new QueryPlanProperty( p.type, p.value, reducedQuality );
+	}
+
+	/**
+	 * Returns a quality score that presents a reduction of the quality
+	 * of the given score.
+	 *
+	 * @param q - the initial quality score
+	 * @return the reduced quality score
+	 */
+	public static Quality getReducedQuality( final Quality q ) {
+		final Quality reducedQuality = switch (q) {
 			case ACCURATE:
 				yield Quality.ESTIMATE_BASED_ON_ACCURATES;
 			case DIRECT_ESTIMATE:
@@ -111,7 +123,7 @@ public class QueryPlanProperty
 				yield Quality.PURE_GUESS;
 		};
 
-		return new QueryPlanProperty( p.type, p.value, reducedQuality );
+		return reducedQuality;
 	}
 
 	protected final Type type;

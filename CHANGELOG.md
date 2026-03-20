@@ -7,7 +7,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- nothing yet
+- Support for the UNFOLD operator for CDT literals ([#539](https://github.com/LiUSemWeb/HeFQUIN/pull/539)).
 ### Changed
 - nothing yet
 

@@ -4,6 +4,18 @@ import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINA
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.MAX_CARDINALITY;
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.MIN_CARDINALITY;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.jena.cdt.CDTKey;
+import org.apache.jena.cdt.CDTValue;
+import org.apache.jena.cdt.CompositeDatatypeList;
+import org.apache.jena.cdt.CompositeDatatypeMap;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.ARQConstants;
+import org.apache.jena.sparql.expr.ExprFunction;
+import org.apache.jena.sparql.expr.NodeValue;
+
 import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -23,6 +35,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoi
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -252,6 +265,127 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+	}
+
+	@Override
+	public void visit( final LogicalOpUnfold op ) {
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+
+		// Before considering the general case, we consider a few special
+		// cases for which we may be more accurate than in the general case.
+
+		// Special case 1: if the expression of the UNFOLD clause is
+		// a constant that is *not* a well-formed cdt:List or cdt:Map
+		// literal, then we know that the output cardinality will be
+		// the same as the input cardinality.
+		final NodeValue nv = op.getExpr().getConstant();
+		if ( nv != null ) {
+			final Node n = nv.asNode();
+
+			boolean isWellFormedCDTList = false;
+			boolean isWellFormedCDTMap = false;
+			if ( n.isLiteral() ) {
+				final String dtURI = n.getLiteralDatatypeURI();
+
+				isWellFormedCDTList = ( CompositeDatatypeList.uri.equals(dtURI)
+				                        && n.getLiteral().isWellFormed() );
+
+				isWellFormedCDTMap = ( CompositeDatatypeMap.uri.equals(dtURI)
+				                       && n.getLiteral().isWellFormed() );
+			}
+
+			if ( ! isWellFormedCDTList && ! isWellFormedCDTMap ) {
+				qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+				qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
+				qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+				return;
+			}
+
+			// Special case 2: if the expression is a well-formed cdt:List
+			// or cdt:Map literal, then we can use the size of the list/map
+			// for estimating the output cardinality.
+			final int size;
+			if ( isWellFormedCDTList ) {
+				@SuppressWarnings("unchecked")
+				final List<CDTValue> list = (List<CDTValue>) n.getLiteralValue();
+				size = list.size();
+			}
+			else if ( isWellFormedCDTMap ) {
+				@SuppressWarnings("unchecked")
+				final Map<CDTKey,CDTValue> list = (Map<CDTKey,CDTValue>) n.getLiteralValue();
+				size = list.size();
+			}
+			else {
+				size = -1;
+			}
+
+			if ( size == 0 ) {
+				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+				return;
+			}
+
+			if ( size > 0 ) {
+				final QueryPlanProperty crdIn = qpInfoSubPlan.getProperty(CARDINALITY);
+				final QueryPlanProperty maxIn = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
+				final QueryPlanProperty minIn = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
+
+				final int crd = multiplyWithoutExceedingMax( crdIn.getValue(), size );
+				final int max = multiplyWithoutExceedingMax( maxIn.getValue(), size );
+				final Quality crdQ = QueryPlanProperty.getReducedQuality( crdIn.getQuality() );
+				final Quality maxQ = QueryPlanProperty.getReducedQuality( maxIn.getQuality() );
+
+				qpInfo.addProperty( QueryPlanProperty.cardinality(crd, crdQ) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(max, maxQ) );
+				qpInfo.addProperty( minIn );
+				return;
+			}
+		}
+
+		// Special case 3: if the expression of the UNFOLD clause is
+		// function call using the cdt:List or the cdt:Map constructor
+		// function and there are no arguments for this function call,
+		// then we know that the produced list/map will be empty and,
+		// thus, the output cardinality will be zero.
+		final ExprFunction fct = op.getExpr().getFunction();
+		if ( fct != null ) {
+			final String fctIRI = fct.getFunctionIRI();
+
+			final boolean case3Found;
+			if (    ! fctIRI.equals(ARQConstants.CDTFunctionLibraryURI + "List")
+			     && ! fctIRI.equals(ARQConstants.CDTFunctionLibraryURI + "Map") )
+				case3Found = false;
+			else
+				case3Found = fct.getArgs().isEmpty();
+
+			if ( case3Found ) {
+				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+				return;
+			}
+		}
+
+		// Now we come to the general case.
+
+		// We take a wild guess and assume that, for every input solution
+		// mapping, the list or map to be unfolded contains 10 elements.
+		final QueryPlanProperty crdIn = qpInfoSubPlan.getProperty(CARDINALITY);
+		final QueryPlanProperty crd = QueryPlanProperty.cardinality(
+				multiplyWithoutExceedingMax( crdIn.getValue(), 10 ),
+				QueryPlanProperty.getReducedQuality( crdIn.getQuality() ) );
+		qpInfo.addProperty(crd);
+
+		// The minimum cardinality is not changed by UNFOLD.
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+
+		// The maximum cardinality is simply the maximum possible because
+		// the lists and maps to be unfolded may be unboundedly large. 
+		final int max = Integer.MAX_VALUE;
+		final Quality maxQuality = Quality.MIN_OR_MAX_POSSIBLE;
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(max, maxQuality) );
 	}
 
 	@Override

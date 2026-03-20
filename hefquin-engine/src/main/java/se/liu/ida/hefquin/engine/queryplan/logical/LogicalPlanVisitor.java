@@ -20,6 +20,7 @@ public interface LogicalPlanVisitor
 	
 	void visit( final LogicalOpFilter op );
 	void visit( final LogicalOpBind op );
+	void visit( final LogicalOpUnfold op );
 	void visit( final LogicalOpLocalToGlobal op );
 	void visit( final LogicalOpGlobalToLocal op );
 }

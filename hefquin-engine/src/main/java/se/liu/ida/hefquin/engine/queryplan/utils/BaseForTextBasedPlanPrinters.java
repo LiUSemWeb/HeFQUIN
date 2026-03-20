@@ -156,6 +156,9 @@ public class BaseForTextBasedPlanPrinters
 		public void visit( final LogicalOpBind op )             { name = "bind"; }
 
 		@Override
+		public void visit( final LogicalOpUnfold op )           { name = "unfold"; }
+
+		@Override
 		public void visit( final LogicalOpLocalToGlobal op )    { name = "l2g"; }
 
 		@Override

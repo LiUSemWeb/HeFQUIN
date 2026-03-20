@@ -24,6 +24,7 @@ public interface PhysicalPlanVisitor
 
 	void visit( PhysicalOpFilter op );
 	void visit( PhysicalOpBind op );
+	void visit( PhysicalOpUnfold op );
 	void visit( PhysicalOpLocalToGlobal op );
 	void visit( PhysicalOpGlobalToLocal op );
 }

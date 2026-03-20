@@ -188,6 +188,12 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
+		public void visit( final PhysicalOpUnfold op ) {
+			rootOpString = "unfold";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
 		public void visit( final PhysicalOpLocalToGlobal op ) {
 			rootOpString = "l2g";
 			record( op.getLogicalOperator() );

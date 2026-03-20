@@ -212,6 +212,17 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		}
 
 		@Override
+		public void visit( final LogicalOpUnfold op ) {
+			final String v;
+			if ( op.getVar2() != null )
+				v = op.getVar1().toString() + "," + op.getVar2();
+			else
+				v = op.getVar1().toString();
+
+			props.add( v + " <-- " + ExprUtils.fmtSPARQL(op.getExpr()) );
+		}
+
+		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) {
 			props.add( "vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
 		}
