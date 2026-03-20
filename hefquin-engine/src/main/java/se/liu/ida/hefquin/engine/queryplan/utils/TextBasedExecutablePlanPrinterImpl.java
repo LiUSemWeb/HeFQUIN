@@ -12,11 +12,11 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 {	
 	protected String parentIndent = "";
 
-	private final PrintStream[] outs;
+	protected final PrintStream[] outs;
 
 	public TextBasedExecutablePlanPrinterImpl( final PrintStream ... outs ) {
-		this.outs = outs;
 		assert outs.length > 0;
+		this.outs = outs;
 	}
 
 	public TextBasedExecutablePlanPrinterImpl( ) {
@@ -24,7 +24,7 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 	}
 
 	@Override
-	public void print( final ExecutablePlan plan, PrintStream out ) {
+	public void print( final ExecutablePlan plan, final PrintStream out ) {
 		if ( plan instanceof PushBasedExecutablePlanImpl p ) {
 			print( p, out );
 		}
@@ -39,6 +39,7 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 			for ( final PrintStream out : outs ) {
 				out.println("--------- Executable Plan ---------");
 				print( p, out );
+				out.flush();
 			}
 		}
 		else {

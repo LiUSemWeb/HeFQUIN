@@ -37,7 +37,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 {
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
 
-	private final PrintStream[] outs;
+	protected final PrintStream[] outs;
 	
 	public TextBasedLogicalPlanPrinterImpl( final PrintStream ... outs ) {
 		this.outs = outs;
