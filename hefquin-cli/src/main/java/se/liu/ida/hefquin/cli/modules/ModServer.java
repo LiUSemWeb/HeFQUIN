@@ -4,15 +4,12 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.CmdArgModule;
 import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.cmd.ModBase;
-
-import se.liu.ida.hefquin.jenaintegration.HeFQUINConstants;
 
 /**
  * Command-line argument module for specifying endpoint and authentication.
@@ -26,7 +23,6 @@ public class ModServer extends ModBase
 	protected int port;
 	protected List<String> fedDescr;
 	protected String confDescr;
-	protected String fedDescrCount = HeFQUINConstants.DEFAULT_FED_DESCR_COUNT_STRING;
 
 	@Override
 	public void registerWith( final CmdGeneral cmdLine ) {
@@ -56,36 +52,28 @@ public class ModServer extends ModBase
 			fedDescr = new ArrayList<>();
 			
 			for ( final String filename : filenames ) {
-				if ( isURIOrExistingFile( cmdLine, filename ) ) {
+				if ( isURIOrExistingFile( filename ) ) {
 					fedDescr.add( filename );
 				}
-			}
-
-			if ( fedDescr.size() == 0 ) {
-				fedDescr = Arrays.asList( "config/DefaultFedConf.ttl" );
-				cmdLine.cmdError( "No valid federation description file(s) provided, falling back to default", false );
-			}
-			else {
-				fedDescrCount = String.valueOf( fedDescr.size() );
+				else
+					cmdLine.cmdError( "Invalid federation description file: " + filename, false );
 			}
 		} else {
-			fedDescr = Arrays.asList( "config/DefaultFedConf.ttl" );
+			fedDescr = List.of( "config/DefaultFedConf.ttl" );
 		}
 	}
 	
-	private boolean isURIOrExistingFile(CmdArgModule cmdLine, String filename) {
+	protected boolean isURIOrExistingFile( final String filename ) {
 		final File f = new File(filename);
 		if ( f.isFile() ){
-			try {
-				new URI(filename);
-				return true;
-			} catch ( final URISyntaxException e ) {
-				cmdLine.cmdError( "Error loading federation description file: " + filename, false );
-			}
+			return true;
 		}
-		else
-			cmdLine.cmdError( "Error loading federation description file: " + filename, false );
-		return false;
+		try {
+			new URI(filename);
+		} catch ( final URISyntaxException e ) {
+			return false;
+		}
+		return true;
 	}
 
 	public int getPort() {
@@ -97,11 +85,7 @@ public class ModServer extends ModBase
 
 	}
 
-	public List<String> getFederationDescription() {
+	public List<String> getFederationDescriptions() {
 		return fedDescr;
-	}
-
-	public String getFederationCount() {
-		return fedDescrCount;
 	}
 }

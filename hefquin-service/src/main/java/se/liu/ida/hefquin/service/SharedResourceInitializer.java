@@ -12,7 +12,6 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
-import se.liu.ida.hefquin.jenaintegration.HeFQUINConstants;
 
 public class SharedResourceInitializer implements ServletContextListener
 {
@@ -22,14 +21,14 @@ public class SharedResourceInitializer implements ServletContextListener
 	public void contextInitialized( ServletContextEvent servletContextEvent ) {
 		final String confDescr = System.getProperty("hefquin.configuration", "config/DefaultConfDescr.ttl");
 		final String fedCat = System.getProperty("hefquin.federation", "config/DefaultFedConf.ttl");
-		final String fedCount = System.getProperty("hefquin.federation.count", HeFQUINConstants.DEFAULT_FED_DESCR_COUNT_STRING);
+		final String fedCount = System.getProperty("hefquin.federation.count", "1");
 		final List<String> fedCatList = new java.util.ArrayList<>();
 
 		logger.info( "--- Initialize engine ---" );
 		logger.info( "hefquin.configuration:    {}", confDescr );
 		logger.info( "hefquin.federation.count: {}", fedCount );
 		
-		if ( fedCount.equals(HeFQUINConstants.DEFAULT_FED_DESCR_COUNT_STRING) ) {
+		if ( fedCount.equals("1") ) {
 			fedCatList.add(fedCat);
 			logger.info( "hefquin.federation:       {}", fedCat );
 		}
@@ -46,7 +45,7 @@ public class SharedResourceInitializer implements ServletContextListener
 		}
 
 		final HeFQUINEngine engine = new HeFQUINEngineBuilder()
-			.withFederationCatalogFiles(fedCatList)
+			.withFederationCatalogInFiles(fedCatList)
 			.withEngineConfiguration(confDescr)
 			.build();
 
