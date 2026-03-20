@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
  * to print executable plans in some way.
  */
 public interface ExecutablePlanPrinter
-{	
+{
 	/**
 	 * Prints the given plan to the given stream.
 	 */

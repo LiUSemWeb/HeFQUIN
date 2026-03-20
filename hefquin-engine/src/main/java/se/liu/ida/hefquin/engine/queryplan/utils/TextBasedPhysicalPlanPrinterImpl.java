@@ -39,7 +39,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 	}
 
 	@Override
-	public void print( final PhysicalPlan plan, PrintStream out ) {
+	public void print( final PhysicalPlan plan, final PrintStream out ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
 		PlanPrinter.print(pp, out);
 		printFullStringsForGraphPatterns(pp, out);

@@ -66,7 +66,7 @@ public class ModPlanPrinting extends ModBase
 			eplanPrinter = new TextBasedExecutablePlanPrinterImpl( outsList.toArray(new PrintStream[0]) );
 	}
 
-	private List<PrintStream> processPrintFlags( CmdArgModule cmdLine, ArgDecl argPrintPlanToTerminal, ArgDecl argPrintPlanToFile ) {
+	protected List<PrintStream> processPrintFlags( final CmdArgModule cmdLine, final ArgDecl argPrintPlanToTerminal, final ArgDecl argPrintPlanToFile ) {
 		final List<PrintStream> outsList = new ArrayList<>();
 		if ( cmdLine.contains(argPrintPlanToTerminal) ) {
 			outsList.add( System.out );
