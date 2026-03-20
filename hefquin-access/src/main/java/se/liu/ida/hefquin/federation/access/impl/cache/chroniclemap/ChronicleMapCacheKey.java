@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
 import java.io.Serializable;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
@@ -77,12 +78,12 @@ public class ChronicleMapCacheKey implements Serializable
 		if ( obj == null || getClass() != obj.getClass() )
 			return false;
 		final ChronicleMapCacheKey other = (ChronicleMapCacheKey) obj;
-		return requestUrl.equals( other.requestUrl );
+		return requestUrl.equals( other.requestUrl ) && responseMode.equals( other.responseMode );
 	}
 
 	@Override
 	public int hashCode() {
-		return requestUrl.hashCode();
+		return Objects.hash(requestUrl, responseMode);
 	}
 
 	@Override
