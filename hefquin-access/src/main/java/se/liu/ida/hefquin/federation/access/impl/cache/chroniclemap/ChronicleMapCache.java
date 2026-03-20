@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +133,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	@Override
 	public void clear() {
 		map.clear();
+		replacementPolicy.clear();
 	}
 
 	@Override
@@ -208,5 +210,9 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	@Override
 	public void close() {
 		map.close();
+	}
+
+	public Set<ChronicleMapCacheKey> keySet(){
+		return map.keySet();
 	}
 }
