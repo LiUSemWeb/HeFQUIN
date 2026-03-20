@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import net.openhft.chronicle.map.ChronicleMap;
 import se.liu.ida.hefquin.base.datastructures.Cache;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
@@ -21,6 +22,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 {
 	private static Logger logger = LoggerFactory.getLogger( ChronicleMapCache.class );
 	protected final ChronicleMap<ChronicleMapCacheKey, ChronicleMapCacheEntry> map;
+	protected final CacheEntryFactory<ChronicleMapCacheEntry,ChronicleMapCacheObject> entryFactory;
 	protected final CacheInvalidationPolicy<ChronicleMapCacheEntry,ChronicleMapCacheObject> invalidPolicy;
 	protected final CacheReplacementPolicy<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> replacementPolicy;
 
@@ -69,6 +71,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		assert filename != null && ! filename.isBlank();
 
 		this.capacity = capacity;
+		entryFactory = policies.getEntryFactory();
 		replacementPolicy = policies.getReplacementPolicyFactory().create();
 		invalidPolicy = policies.getInvalidationPolicy();
 
@@ -139,7 +142,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		if ( value == null )
 			throw new IllegalArgumentException();
 
-		final ChronicleMapCacheEntry entry = policies.getEntryFactory().createCacheEntry(value);
+		final ChronicleMapCacheEntry entry = entryFactory.createCacheEntry(value);
 
 		// Replacement
 		if( map.get(key) != null ) {
@@ -163,6 +166,12 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	public ChronicleMapCacheObject get( final ChronicleMapCacheKey key ) {
 		final ChronicleMapCacheEntry entry = map.get(key);
 		if( entry != null ) {
+			// Still valid?
+			if( ! invalidPolicy.isStillValid(entry) ) {
+				evict(key);
+				return null;
+			}
+
 			replacementPolicy.entryWasRequested(key, entry);
 			return entry.getObject();
 		}
