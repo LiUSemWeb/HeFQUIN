@@ -12,13 +12,33 @@ public class TextBasedExecutablePlanPrinterImpl implements ExecutablePlanPrinter
 {	
 	protected String parentIndent = "";
 
+	protected final PrintStream[] outs;
+
+	public TextBasedExecutablePlanPrinterImpl( final PrintStream ... outs ) {
+		assert outs.length > 0;
+		this.outs = outs;
+	}
+
+	public TextBasedExecutablePlanPrinterImpl( ) {
+		this.outs = new PrintStream[]{System.out};
+	}
+
 	@Override
 	public void print( final ExecutablePlan plan, final PrintStream out ) {
 		if ( plan instanceof PushBasedExecutablePlanImpl p ) {
-			print(p, out);
+			out.println("--------- Executable Plan ---------");
+			print( p, out );
+			out.flush();
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of executable plan (" + plan.getClass().getName() + ").");
+		}
+	}
+
+	@Override
+	public void print( final ExecutablePlan plan ) {
+		for ( final PrintStream out : outs ) {
+				print( plan, out );
 		}
 	}
 

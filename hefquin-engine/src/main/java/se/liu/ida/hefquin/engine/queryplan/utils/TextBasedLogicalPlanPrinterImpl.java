@@ -37,12 +37,35 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 {
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
 
+	protected final PrintStream[] outs;
+	
+	public TextBasedLogicalPlanPrinterImpl( final PrintStream ... outs ) {
+		assert outs.length > 0;
+		this.outs = outs;
+	}
+
+	public TextBasedLogicalPlanPrinterImpl( ) {
+		this.outs = new PrintStream[]{System.out};
+	}
+
 	@Override
-	public void print( final LogicalPlan plan, final PrintStream out ) {
+	public void print( final LogicalPlan plan, final PrintStream out, final LogicalPlanStage planType ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		out.println("--------- " + planType.name + " ---------");
 		PlanPrinter.print(pp, out);
 		printFullStringsForGraphPatterns(pp, out);
 		out.flush();
+	}
+
+	@Override
+	public void print( final LogicalPlan plan, final LogicalPlanStage planType ) {
+		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		for ( final PrintStream out : outs ) {
+			out.println("--------- " + planType.name + " ---------");
+			PlanPrinter.print(pp, out);
+			printFullStringsForGraphPatterns(pp, out);
+			out.flush();
+		}
 	}
 
 	public ExtPrintablePlan createPrintablePlan( final LogicalPlan lp ) {

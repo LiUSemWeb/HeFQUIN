@@ -80,10 +80,8 @@ public class QueryProcessorImpl implements QueryProcessor
 			prg = planCompiler.compile(qepAndStats.object1);
 
 			if ( planner.getExecutablePlanPrinter() != null ) {
-				System.out.println("--------- Executable Plan ---------");
-				planner.getExecutablePlanPrinter().print( prg, System.out );
+				planner.getExecutablePlanPrinter().print( prg );
 			}
-
 			t3 = System.currentTimeMillis();
 			execStats = execEngine.execute(prg, resultSink);
 

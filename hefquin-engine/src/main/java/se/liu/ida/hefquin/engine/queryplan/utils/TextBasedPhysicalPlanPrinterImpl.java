@@ -27,12 +27,35 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 {
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
 
+	protected final PrintStream[] outs;
+
+	public TextBasedPhysicalPlanPrinterImpl( final PrintStream ... outs ) {
+		assert outs.length > 0;
+		this.outs = outs;
+	}
+
+	public TextBasedPhysicalPlanPrinterImpl( ) {
+		this.outs = new PrintStream[]{System.out};
+	}
+
 	@Override
 	public void print( final PhysicalPlan plan, final PrintStream out ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		out.println("--------- Physical Plan ---------");
 		PlanPrinter.print(pp, out);
 		printFullStringsForGraphPatterns(pp, out);
 		out.flush();
+	}
+
+	@Override
+	public void print( final PhysicalPlan plan ) {
+		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		for ( final PrintStream out : outs ) {
+			out.println("--------- Physical Plan ---------");
+			PlanPrinter.print(pp, out);
+			printFullStringsForGraphPatterns(pp, out);
+			out.flush();
+		}
 	}
 
 	public ExtPrintablePlan createPrintablePlan( final PhysicalPlan p ) {

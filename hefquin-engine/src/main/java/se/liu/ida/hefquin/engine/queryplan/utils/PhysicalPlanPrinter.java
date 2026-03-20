@@ -14,4 +14,9 @@ public interface PhysicalPlanPrinter
 	 * Prints the given plan to the given stream.
 	 */
 	void print( PhysicalPlan plan, PrintStream out );
+	
+	/**
+	 * Prints the given plan to the given stream(s) that are stored in this printer.
+	 */
+	void print( PhysicalPlan plan );
 }

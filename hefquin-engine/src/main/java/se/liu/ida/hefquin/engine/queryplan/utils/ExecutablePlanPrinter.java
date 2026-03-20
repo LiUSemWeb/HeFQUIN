@@ -14,4 +14,9 @@ public interface ExecutablePlanPrinter
 	 * Prints the given plan to the given stream.
 	 */
 	void print( ExecutablePlan plan, PrintStream out );
+	
+	/**
+	 * Prints the given plan to the stream(s) that are stored in this printer.
+	 */
+	void print( ExecutablePlan plan );
 }

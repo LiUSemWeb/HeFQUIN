@@ -30,6 +30,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter.LogicalPlanStage;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 
 /**
@@ -234,7 +235,7 @@ public class InspectServlet extends HttpServlet
 	private static JsonValue getLogicalPlan( final QueryProcessingStatsAndExceptions stats ) {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintStream ps = new PrintStream( baos );
-		logicalPlanPrinter.print( stats.getQueryPlanningStats().getResultingLogicalPlan(), ps );
+		logicalPlanPrinter.print( stats.getQueryPlanningStats().getResultingLogicalPlan(), ps, LogicalPlanStage.FINAL_LOGICAL_PLAN );
 		return new JsonString( baos.toString() );
 	}
 
@@ -263,7 +264,7 @@ public class InspectServlet extends HttpServlet
 	private static JsonValue getSourceAssignment( final QueryProcessingStatsAndExceptions stats ) {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintStream ps = new PrintStream( baos );
-		sourceAssignmentPrinter.print( stats.getQueryPlanningStats().getResultingLogicalPlan(), ps );
+		sourceAssignmentPrinter.print( stats.getQueryPlanningStats().getResultingLogicalPlan(), ps, LogicalPlanStage.SOURCE_ASSIGNMENT );
 		return new JsonString( baos.toString() );
 	}
 }
