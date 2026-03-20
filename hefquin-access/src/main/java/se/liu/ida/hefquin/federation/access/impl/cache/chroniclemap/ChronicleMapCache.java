@@ -57,6 +57,19 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	}
 
 	/**
+	 * Constructs a new {@link ChronicleMapCache} with  with a custom file path and the default
+	 * cache capacity.
+	 *
+	 * @param filename Path to the cache file
+	 * @throws IOException
+	 */
+	public ChronicleMapCache( final String filename,
+	                          final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> policies )
+			throws IOException {
+		this(DEFAULT_CAPACITY, policies, filename);
+	}
+
+	/**
 	 * Constructs a new {@link ChronicleMapCache} with a custom file path and a
 	 * maximum capacity.
 	 *
