@@ -25,7 +25,6 @@ public class SharedResourceInitializer implements ServletContextListener
 		
 		logger.info( "--- Initialize engine ---" );
 		logger.info( "hefquin.configuration:    {}", confDescr );
-		logger.info( "hefquin.federation.count: {}", fedCount );
 		
 		if ( fedCount == null ) {
 			final String fedCat = System.getProperty("hefquin.federation", "config/DefaultFedConf.ttl");
@@ -36,6 +35,7 @@ public class SharedResourceInitializer implements ServletContextListener
 			for ( int i = 0; i < Integer.parseInt(fedCount); i++ ) {
 				fedCatList.add( System.getProperty("hefquin.federation." + (i + 1)) );
 			}
+			logger.info( "hefquin.federation.count: {}", fedCount );
 			logger.info( "hefquin.federation.list:  {}", fedCatList );
 		}
 
