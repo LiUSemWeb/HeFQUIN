@@ -13,36 +13,44 @@ fd:FederationMemberShape
         sh:path fd:serviceURI ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:nodeKind sh:IRI ;
-        sh:message "Each federation member must have exactly one fd:serviceURI" ;
+        sh:datatype xsd:anyURI ;
+        sh:message "Each federation member must have exactly one fd:serviceURI." ;
     ] ;
     sh:property [
         sh:path fd:interface ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:node fd:InterfaceShape ;
-        sh:message "Each federation member must have exactly one fd:interface" ;
+        sh:message "Each federation member must have exactly one fd:interface." ;
     ] ;
     sh:property [
         sh:path fd:wrapper ;
         sh:maxCount 1 ;
         sh:node fd:WrapperShape ;
-        sh:message "A federation member can have at most one fd:wrapper" ;
+        sh:message "A federation member can have at most one fd:wrapper." ;
     ] ;
     sh:property [
         sh:path fd:vocabularyMappingsFile ;
         sh:maxCount 1 ;
         sh:datatype xsd:string ;
-        sh:message "A federation member can have at most one fd:vocabularyMappingsFile" ;
+        sh:message "A federation member can have at most one fd:vocabularyMappingsFile." ;
     ] .
+    # sh:property [
+    #     sh:path fd:mappingConfiguration ;
+    #     sh:maxCount 1 ;
+    #     sh:message "A federation member can have at most one fd:mappingConfiguration." ;
+    # ] .
 
 # Shape for interfaces
 fd:InterfaceShape
     a sh:NodeShape ;
     sh:or (
-        [ sh:class fd:SPARQLEndpointInterface ]
-        [ sh:class fd:TPFInterface ]
-        [ sh:class fd:RESTInterface ]
+        [ sh:node fd:SPARQLEndpointInterfaceShape ]
+        [ sh:node fd:TPFInterfaceShape ]
+        [ sh:node fd:brTPFInterfaceShape ]
+        # [ sh:node fd:BoltInterfaceShape ]
+        # [ sh:node fd:GraphQLEndpointInterfaceShape ]
+        [ sh:node fd:RESTInterfaceShape ]
     ) ;
     sh:message "Interface must be one of the supported types" .
 
@@ -54,13 +62,13 @@ fd:SPARQLEndpointInterfaceShape
         sh:path fd:endpointAddress ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:nodeKind sh:IRI ;
-        sh:message "SPARQL endpoint interface must have exactly one fd:endpointAddress" ;
+        sh:datatype xsd:anyURI ;
+        sh:message "SPARQL endpoint interface must have exactly one fd:endpointAddress." ;
     ] ;
     sh:property [
         sh:path fd:mappingConfiguration ;
         sh:maxCount 1 ;
-        sh:message "SPARQL endpoint interface can have at most one fd:mappingConfiguration" ;
+        sh:message "SPARQL endpoint interface can have at most one fd:mappingConfiguration." ;
     ] .
 
 # Shape for TPF Interface
@@ -71,20 +79,74 @@ fd:TPFInterfaceShape
         sh:path fd:exampleFragmentAddress ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:nodeKind sh:IRI ;
-        sh:message "TPF interface must have exactly one fd:exampleFragmentAddress" ;
+        sh:datatype xsd:anyURI ;
+        sh:message "TPF interface must have exactly one fd:exampleFragmentAddress." ;
     ] .
+
+# Shape for brTPF Interface
+fd:brTPFInterfaceShape
+    a sh:NodeShape ;
+    sh:targetClass fd:brTPFInterface ;
+    sh:property [
+        sh:path fd:exampleFragmentAddress ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+        sh:message "brTPF interface must have exactly one fd:exampleFragmentAddress." ;
+    ] .
+
+# # Shape for Bolt Interface
+# fd:BoltInterfaceShape
+#     a sh:NodeShape ;
+#     sh:targetClass fd:BoltInterface ;
+#     sh:property [
+#         sh:path fd:vocabularyMappingsFile ;
+#         sh:maxCount 0 ;
+#         sh:datatype xsd:string ;
+#         sh:message "Bolt interface cannot have a vocabulary mapping." ;
+#     ] ;
+#     sh:property [
+#         sh:path fd:endpointAddress ;
+#         sh:minCount 1 ;
+#         sh:maxCount 1 ;
+#         sh:datatype xsd:anyURI ;
+#         sh:message "Bolt interface must have exactly one fd:endpointAddress." ;
+#     ] .
+
+# # Shape for GraphQL Endpoint Interface
+# fd:GraphQLEndpointInterfaceShape
+#     a sh:NodeShape ;
+#     sh:targetClass fd:GraphQLEndpointInterface ;
+#     sh:property [
+#         sh:path fd:vocabularyMappingsFile ;
+#         sh:maxCount 0 ;
+#         sh:datatype xsd:string ;
+#         sh:message "GraphQL interface cannot have a vocabulary mapping." ;
+#     ] ;
+#     sh:property [
+#         sh:path fd:endpointAddress ;
+#         sh:minCount 1 ;
+#         sh:maxCount 1 ;
+#         sh:datatype xsd:anyURI ;
+#         sh:message "GraphQL interface must have exactly one fd:endpointAddress." ;
+#     ] .
 
 # Shape for REST Interface
 fd:RESTInterfaceShape
     a sh:NodeShape ;
     sh:targetClass fd:RESTInterface ;
     sh:property [
+        sh:path fd:vocabularyMappingsFile ;
+        sh:maxCount 0 ;
+        sh:datatype xsd:string ;
+        sh:message "REST interface cannot have a vocabulary mapping." ;
+    ] ;
+    sh:property [
         sh:path fd:iriTemplate ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:node fd:IriTemplateShape ;
-        sh:message "REST interface must have exactly one fd:iriTemplate" ;
+        sh:message "REST interface must have exactly one fd:iriTemplate." ;
     ] .
 
 # Shape for IRI Template
@@ -95,12 +157,12 @@ fd:IriTemplateShape
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:datatype xsd:string ;
-        sh:message "IRI template must have exactly one hydra:template" ;
+        sh:message "IRI template must have exactly one hydra:template." ;
     ] ;
     sh:property [
         sh:path hydra:mapping ;
         sh:node fd:MappingShape ;
-        sh:message "IRI template mappings must conform to mapping shape" ;
+        sh:message "IRI template mappings must conform to mapping shape." ;
     ] .
 
 # Shape for Hydra Mapping
@@ -111,7 +173,7 @@ fd:MappingShape
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:datatype xsd:string ;
-        sh:message "Mapping must have exactly one hydra:variable" ;
+        sh:message "Mapping must have exactly one hydra:variable." ;
     ] ;
     sh:property [
         sh:path hydra:required ;
@@ -122,8 +184,9 @@ fd:MappingShape
         sh:path fd:paramType ;
         sh:maxCount 1 ;
         sh:nodeKind sh:IRI ;
+        sh:in ( xsd:string xsd:integer xsd:float xsd:double ) ;
+        sh:message "Parameter type must be either xsd:string, xsd:integer, xsd:float or xsd:double." ;
     ] .
-
 
 # Shape for Wrapper
 fd:WrapperShape
@@ -132,7 +195,7 @@ fd:WrapperShape
         sh:path fd:rmlTriplesMaps ;
         sh:maxCount 1 ;
         sh:node fd:RmlTriplesMapShape ;
-        sh:message "Wrapper can have at most one fd:rmlTriplesMaps" ;
+        sh:message "Wrapper can have at most one fd:rmlTriplesMaps." ;
     ] .
 
 # Shape for RML TriplesMap
@@ -142,17 +205,17 @@ fd:RmlTriplesMapShape
         sh:path rml:logicalSource ;
         sh:minCount 1 ;
         sh:nodeKind sh:BlankNodeOrIRI ;
-        sh:message "TriplesMap must have a logicalSource" ;
+        sh:message "TriplesMap must have a logicalSource." ;
     ] ;
     sh:property [
         sh:path rml:subjectMap ;
         sh:minCount 1 ;
         sh:nodeKind sh:BlankNodeOrIRI ;
-        sh:message "TriplesMap must have a subjectMap" ;
+        sh:message "TriplesMap must have a subjectMap." ;
     ] ;
     sh:property [
         sh:path rml:predicateObjectMap ;
         sh:minCount 1 ;
         sh:nodeKind sh:BlankNodeOrIRI ;
-        sh:message "TriplesMap must have at least one predicateObjectMap" ;
+        sh:message "TriplesMap must have at least one predicateObjectMap." ;
     ] .
