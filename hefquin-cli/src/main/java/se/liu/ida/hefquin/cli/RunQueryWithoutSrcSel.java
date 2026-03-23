@@ -117,7 +117,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	@Override
 	protected void exec() {
 		final HeFQUINEngineBuilder builder = new HeFQUINEngineBuilder()
-			.withFederationCatalog( modFederation.getFederationCatalog() )
+			.withFederationCatalogInModels( modFederation.getFederationCatalog() )
 			.withSourceAssignmentPrinter( modPlanPrinting.getSourceAssignmentPrinter() )
 			.withLogicalPlanPrinter( modPlanPrinting.getLogicalPlanPrinter() )
 			.withPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
