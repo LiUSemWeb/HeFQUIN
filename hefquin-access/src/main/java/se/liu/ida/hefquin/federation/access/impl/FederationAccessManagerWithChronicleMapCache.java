@@ -30,7 +30,9 @@ import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMap
 import se.liu.ida.hefquin.federation.access.impl.response.CachedCardinalityResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
  * Federation access manager that augments
@@ -46,25 +48,25 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	private final ChronicleMapCache chronicleMapCache;
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-	                                           final int cacheCapacity,
-	                                           final CachePolicies<Key,CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies,
-	                                           final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> chronicleMapCachePolicies )
-			throws IOException 
+	                                                     final int cacheCapacity,
+	                                                     final CachePolicies<Key,CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies,
+	                                                     final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> chronicleMapCachePolicies )
+			throws IOException
 	{
 		super(fedAccMan, cacheCapacity, cachePolicies);
-		chronicleMapCache = new ChronicleMapCache(cacheCapacity, chronicleMapCachePolicies);
+		chronicleMapCache = new ChronicleMapCache(chronicleMapCachePolicies);
 	}
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-	                                           final int cacheCapacity,
-	                                           final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies )
+	                                                     final int cacheCapacity,
+	                                                     final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies )
 			throws IOException 
 	{
 		this(fedAccMan, cacheCapacity, cachePolicies, new DefaultChronicleMapCachePolicies());
 	}
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-	                                           final int cacheCapacity )
+	                                                     final int cacheCapacity )
 			throws IOException 
 	{
 		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
@@ -80,16 +82,19 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	}
 
 	/**
-	 * Issues the given request to the specified federation member, using the
-	 * ChronicleMap-backed cache when possible.
+	 * Issues a request for the given request and federation member.
 	 *
-	 * If a cached response is available, a completed future containing the
-	 * reconstructed response is returned immediately. Otherwise, the request is
-	 * delegated to the wrapped federation access manager and cacheable successful
-	 * responses are persisted asynchronously after completion.
+	 * Checks the cache first and returns a cached response if available. Otherwise,
+	 * delegates the request to the federation access manager and caches the result
+	 * asynchronously.
 	 *
-	 * @throws FederationAccessException if request processing fails before a future
-	 *                                   can be returned
+	 * @param req the data retrieval request (TPF, BRTPF, or SPARQL)
+	 * @param fm  the federation member handling the request
+	 * @return a {@link CompletableFuture} with the response
+	 *
+	 * @throws FederationAccessException if the request fails
+	 * @throws IllegalStateException     if the request/member combination is
+	 *                                   unsupported
 	 */
 	@Override
 	public < ReqType extends DataRetrievalRequest,
@@ -98,7 +103,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	CompletableFuture<RespType> issueRequest( final ReqType req,
 	                                          final MemberType fm )
 			throws FederationAccessException
-	{	
+	{
 		// update the statistics
 		if ( req instanceof TPFRequest )
 			cacheRequestsTPF++;
@@ -124,7 +129,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 			final DataRetrievalResponse<?> cachedResponse;
 			if (    req instanceof TPFRequest
-			     || req instanceof BRTPFRequest ) {
+			     || req instanceof BRTPFRequest )
 				cachedResponse = new TPFResponseImpl( cachedObject.getMatchingTriples(),
 				                                      cachedObject.getMetadataTriples(),
 				                                      cachedObject.getNextPageURL(),
@@ -132,17 +137,14 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 				                                      req,
 				                                      accessStartTime,
 				                                      new Date() );
-			}
-			else if ( req instanceof SPARQLRequest ){
+			else if ( req instanceof SPARQLRequest )
 				cachedResponse = new SolMapsResponseImpl( cachedObject.getSolutionMappings(),
 				                                          fm,
 				                                          req,
 				                                          accessStartTime,
 				                                          new Date() );
-			}
-			else {
+			else
 				throw new IllegalStateException( "Unsupported request type: " + req.getClass().getName() );
-			}
 
 			@SuppressWarnings("unchecked")
 			final CompletableFuture<RespType> cachedResponse2 = (CompletableFuture<RespType>) CompletableFuture
@@ -150,13 +152,20 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 			return cachedResponse2;
 		}
 
+		// Check if the response object has been cached (but not yet resolved)
+		final Key inMemoryCacheKey = new Key(req, fm);
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<RespType> cachedResponse = (CompletableFuture<RespType>) cache.get(inMemoryCacheKey);
+		if( cachedResponse != null )
+			return cachedResponse;
+
+		// Issue request and add it to the cache
 		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm);
+		cache.put( inMemoryCacheKey, newResponse );
 		newResponse.thenAccept( value -> {
 			try {
 				final ChronicleMapCacheObject object = ChronicleMapCacheObject.create(value);
-				if ( object != null ) {
-					chronicleMapCache.put(key, object);
-				}
+				chronicleMapCache.put(key, object);
 			} catch ( UnsupportedOperationDueToRetrievalError e ) {
 				// intentionally ignored
 			}
@@ -164,16 +173,33 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		return newResponse;
 	}
 
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final SPARQLRequest req,
-	                                                                       final SPARQLEndpoint fm )
+	/**
+	 * Issues a cardinality request for the given request and federation member.
+	 *
+	 * Checks the cache first and returns a cached response if available. Otherwise,
+	 * delegates the request to the federation access manager and caches the result
+	 * asynchronously.
+	 *
+	 * @param req the data retrieval request (TPF, BRTPF, or SPARQL)
+	 * @param fm  the federation member handling the request
+	 * @return a {@link CompletableFuture} with the cardinality response
+	 *
+	 * @throws FederationAccessException if the request fails
+	 * @throws IllegalStateException     if the request/member combination is
+	 *                                   unsupported
+	 */
+	public < ReqType extends DataRetrievalRequest,
+	         RespType extends DataRetrievalResponse<?>,
+	         MemberType extends FederationMember >
+	CompletableFuture<CardinalityResponse> issueCardReq( final ReqType req,
+	                                                     final MemberType fm )
 			throws FederationAccessException
 	{
-		// Check cache
 		final Date accessStartTime = new Date();
 		final ChronicleMapCacheKey key = new ChronicleMapCacheKey( req, fm, ChronicleMapCacheKey.ResponseMode.COUNT );
 		final ChronicleMapCacheObject cachedObject = chronicleMapCache.get(key);
 
+		// Check cache
 		if ( cachedObject != null ) {
 			if( req instanceof TPFRequest )
 				cacheHitsTPFCardinality++;
@@ -191,7 +217,22 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 			return (CompletableFuture<CardinalityResponse>) CompletableFuture.completedFuture( cachedResponse );
 		}
 
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
+		final CompletableFuture<CardinalityResponse> newResponse;
+		if (    req instanceof TPFRequest tpfReq
+			 && fm instanceof TPFServer tpfServer )
+			newResponse = fedAccMan.issueCardinalityRequest(tpfReq, tpfServer);
+		else if (    req instanceof TPFRequest tpfReq
+		          && fm instanceof BRTPFServer brtpfServer )
+			newResponse = fedAccMan.issueCardinalityRequest(tpfReq, brtpfServer);
+		else if (    req instanceof BRTPFRequest brtpfReq
+		          && fm instanceof BRTPFServer brtpfServer )
+			newResponse = fedAccMan.issueCardinalityRequest(brtpfReq, brtpfServer);
+		else if (    req instanceof SPARQLRequest sparqlReq
+		          && fm instanceof SPARQLEndpoint sparqlEndpoint )
+			newResponse = fedAccMan.issueCardinalityRequest(sparqlReq, sparqlEndpoint);
+		else
+			throw new IllegalStateException( "Unsupported request/federation member combination: " +
+			                                 req.getClass().getName() + "/" + fm.getClass().getName() );
 
 		newResponse.thenAccept( value -> {
 			try {
@@ -201,6 +242,28 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 			}
 		} );
 		return newResponse;
+	}
+
+	@Override
+	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final SPARQLRequest req,
+	                                                                       final SPARQLEndpoint fm )
+			throws FederationAccessException
+	{
+		return issueCardReq(req, fm);
+	}
+	@Override
+	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final TPFRequest req,
+	                                                                       final TPFServer fm )
+			throws FederationAccessException
+	{
+		return issueCardReq(req, fm);
+	}
+	@Override
+	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final TPFRequest req,
+	                                                                       final BRTPFServer fm )
+			throws FederationAccessException
+	{
+		return issueCardReq(req, fm);
 	}
 
 	@Override
