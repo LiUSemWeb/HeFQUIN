@@ -15,8 +15,10 @@ import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
 /**
- * Object to stores solutions in a ChronicleMap-native
- * ({@link BytesMarshallable}) form.
+ * Cache value stored in ChronicleMap-native {@link BytesMarshallable} form.
+ *
+ * This object can represent solution mappings, TPF response data, or a cached
+ * count result.
  */
 public class ChronicleMapCacheObject implements BytesMarshallable
 {
@@ -24,10 +26,15 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 	private List<MarshallableTriple> matchingTriples = new ArrayList<>();
 	private List<MarshallableTriple> metadataTriples = new ArrayList<>();
 	private String nextPageURL = "";
-	private Integer count = -1;
+	private int count = -1;
 
 	public ChronicleMapCacheObject() {}
 
+	/**
+	 * Creates a cache object containing the given solution mappings.
+	 *
+	 * @param solutionMappings the solution mappings to cache
+	 */
 	public ChronicleMapCacheObject( final Iterable<SolutionMapping> solutionMappings ) {
 		assert solutionMappings != null;
 
@@ -36,6 +43,13 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 		}
 	}
 
+	/**
+	 * Creates a cache object containing TPF response data.
+	 *
+	 * @param matchingTriples the matching triples
+	 * @param metadataTriples the metadata triples
+	 * @param nextPageURL     the next-page URL, or an empty string if none exists
+	 */
 	public ChronicleMapCacheObject( final Iterable<Triple> matchingTriples,
 	                                final Iterable<Triple> metadataTriples,
 	                                final String nextPageURL ) {
@@ -53,12 +67,27 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 		this.nextPageURL = nextPageURL;
 	}
 
+	/**
+	 * Creates a cache object containing only a cached count.
+	 *
+	 * @param count the cached result count
+	 */
 	public ChronicleMapCacheObject( final int count ) {
 		this.count = count;
 	}
 
+	/**
+	 * Creates a cache object from the given retrieval response.
+	 *
+	 * Supported response types are {@link TPFResponse} and {@link SolMapsResponse}.
+	 *
+	 * @param response the response to convert
+	 * @return the corresponding cache object
+	 * @throws IllegalStateException if the response type is unsupported
+	 * @throws UnsupportedOperationDueToRetrievalError if extracting response data fails
+	 */
 	public static ChronicleMapCacheObject create( final DataRetrievalResponse<?> response )
-			throws UnsupportedOperationDueToRetrievalError
+			throws UnsupportedOperationDueToRetrievalError, IllegalStateException
 	{
 		if( response instanceof TPFResponse tpfResponse ) {
 			final Iterable<Triple> matchingTriples = tpfResponse.getPayload();
@@ -66,10 +95,10 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 			final String nextPageURL = tpfResponse.getNextPageURL();
 			return new ChronicleMapCacheObject( matchingTriples, metadataTriples, nextPageURL );
 		}
-		else if( response instanceof SolMapsResponse solMapResponse ) {
+		else if( response instanceof SolMapsResponse solMapResponse )
 			return new ChronicleMapCacheObject( solMapResponse.getResponseData() );
-		}
-		return null;
+		else
+			throw new IllegalStateException( "Unsupported response type: " + response.getClass().getName() );
 	}
 
 	@Override
@@ -135,14 +164,35 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 		return new ArrayList<>(solutionMappings);
 	}
 
+	/**
+	 * Returns the cached matching triples.
+	 *
+	 * The returned list is a shallow copy and the contained triple instances are
+	 * shared.
+	 *
+	 * @return a new list containing the cached matching triples
+	 */
 	public List<Triple> getMatchingTriples() {
 		return new ArrayList<>(matchingTriples);
 	}
 
+	/**
+	 * Returns the cached metadata triples.
+	 *
+	 * The returned list is a shallow copy and the contained triple instances are
+	 * shared.
+	 *
+	 * @return a new list containing the cached metadata triples
+	 */
 	public List<Triple> getMetadataTriples() {
 		return new ArrayList<>(metadataTriples);
 	}
 
+	/**
+	 * Returns the cached next-page URL.
+	 *
+	 * @return the next-page URL, or an empty string if none exists
+	 */
 	public String getNextPageURL() {
 		return nextPageURL;
 	}
@@ -150,12 +200,12 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 	/**
 	 * Returns the cached count of results for this request.
 	 *
-	 * @return the number of matching results
+	 * @return the cached count, or {@code -1} if this object does not represent a
+	 *         count
 	 */
 	public int getCount() {
 		return count;
 	}
-
 
 	@Override
 	public boolean equals( Object obj ) {
@@ -168,12 +218,12 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 		       && metadataTriples.equals( other.metadataTriples )
 		       && nextPageURL.equals( other.nextPageURL )
 		       && solutionMappings.equals( other.solutionMappings )
-		       && count.equals( other.count );
+		       && count == other.count;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(matchingTriples, metadataTriples, solutionMappings, count);
+		return Objects.hash(matchingTriples, metadataTriples, nextPageURL, solutionMappings, count);
 	}
 
 	@Override
