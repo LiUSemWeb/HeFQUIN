@@ -3,7 +3,8 @@ package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
 import java.io.Serializable;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
+import java.util.Arrays;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
@@ -15,28 +16,35 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
- * Cache key representing a concrete request issued to a specific federation
- * member.
+ * Immutable cache key for a request sent to a specific federation member.
  *
- * The key is derived from a canonical request URL constructed from the
- * combination of the {@link DataRetrievalRequest} and the
- * {@link FederationMember}. Two keys are considered equal if they produce the
- * same request URL.
+ * The key is derived from a string-based representation of the request,
+ * constructed from the {@link DataRetrievalRequest}, the
+ * {@link FederationMember}, and the {@link ResponseMode}.
+ *
+ * This representation is hashed using SHA-256 and stored as a 32-byte digest,
+ * and equality and hash code are based solely on this digest.
  */
-public class ChronicleMapCacheKey implements Serializable
-{
+public class ChronicleMapCacheKey implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private final String requestUrl;
-	private final ResponseMode responseMode;
 
+	// Binary SHA-256 digest (32 bits)
+	private final byte[] requestDigest;
 	public enum ResponseMode { RESULT, COUNT }
 
 	/**
-	 * Creates a cache key from a given request and a federation member.
+	 * Creates a cache key for the given request, federation member, and response
+	 * mode.
 	 *
-	 * @param req retrieval request
-	 * @param fm  federation member
-	 * @throws IllegalArgumentException if the request/member is unsupported
+	 * The key is computed by constructing a URL representation of the request and
+	 * hashing it together with the response mode using SHA-256.
+	 *
+	 * @param req          the retrieval request (must not be {@code null})
+	 * @param fm           the target federation member (must not be {@code null})
+	 * @param responseMode the response mode (must not be {@code null})
+	 *
+	 * @throws IllegalArgumentException if the request/member combination is
+	 *                                  unsupported
 	 */
 	public ChronicleMapCacheKey( final DataRetrievalRequest req,
 	                             final FederationMember fm,
@@ -45,7 +53,7 @@ public class ChronicleMapCacheKey implements Serializable
 		assert fm != null;
 		assert responseMode != null;
 
-		this.responseMode = responseMode;
+		final String requestUrl;
 
 		if (    req instanceof SPARQLRequest sparqlRequest
 		     && fm instanceof SPARQLEndpoint sparqlEndpoint ) {
@@ -69,8 +77,16 @@ public class ChronicleMapCacheKey implements Serializable
 			throw new IllegalArgumentException( "Unexpected request type: " + req.getClass().getName()
 					+ "(server type: " + fm.getClass().getName() + ")" );
 		}
+
+		requestDigest = DigestUtils.sha256( requestUrl + ";" + responseMode );
 	}
 
+	/**
+	 * Compares this key with another object for equality.
+	 *
+	 * Two {@code ChronicleMapCacheKey} instances are considered equal if their
+	 * SHA-256 digests are identical.
+	 */
 	@Override
 	public boolean equals( Object obj ) {
 		if ( this == obj )
@@ -78,16 +94,21 @@ public class ChronicleMapCacheKey implements Serializable
 		if ( obj == null || getClass() != obj.getClass() )
 			return false;
 		final ChronicleMapCacheKey other = (ChronicleMapCacheKey) obj;
-		return requestUrl.equals( other.requestUrl ) && responseMode.equals( other.responseMode );
+		return Arrays.equals(requestDigest, other.requestDigest);
 	}
 
+	/**
+	 * Returns a hash code derived from the SHA-256 digest.
+	 *
+	 * @return the hash code of this key
+	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(requestUrl, responseMode);
+		return Arrays.hashCode(requestDigest);
 	}
 
 	@Override
 	public String toString() {
-		return "ChronicleMapCacheKey{requestUrl=" + requestUrl + ", responseMode=" + responseMode + "}";
+		return "ChronicleMapCacheKey{" + requestDigest + "}";
 	}
 }
