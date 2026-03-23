@@ -16,27 +16,36 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
 
 /**
- * A thread-safe persistent cache implementation. This cache uses a
- * {@link ChronicleMap}.
+ * Thread-safe persistent cache backed by a {@link ChronicleMap}.
+ *
+ * This cache stores entries on disk and restores them when reopened from the
+ * same file. Cache entry creation, invalidation, and replacement behavior are
+ * delegated to the configured cache policies.
+ *
+ * The cache enforces a maximum logical capacity. If the persisted map already
+ * contains more entries than allowed when opened, entries are evicted according
+ * to the configured replacement policy until the capacity constraint is met.
  */
 public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleMapCacheObject>, AutoCloseable
 {
-	private static Logger logger = LoggerFactory.getLogger( ChronicleMapCache.class );
+	private static final Logger logger = LoggerFactory.getLogger( ChronicleMapCache.class );
+
+	protected static final int DEFAULT_CAPACITY = 1000;
+	protected static final String DEFAULT_FILENAME = "cache/chronicle-map.dat";
+
 	protected final ChronicleMap<ChronicleMapCacheKey, ChronicleMapCacheEntry> map;
 	protected final CacheEntryFactory<ChronicleMapCacheEntry,ChronicleMapCacheObject> entryFactory;
 	protected final CacheInvalidationPolicy<ChronicleMapCacheEntry,ChronicleMapCacheObject> invalidPolicy;
 	protected final CacheReplacementPolicy<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> replacementPolicy;
 
-	protected static final int DEFAULT_CAPACITY = 1000;
-	protected static final String DEFAULT_FILENAME = "cache/chronicle-map.dat";
 	protected final int capacity;
 	protected final String filename;
 
 	/**
-	 * Constructs a new {@link ChronicleMapCache} with the default cache file and
-	 * the default capacity.
-	 * 
-	 * @throws IOException
+	 * Creates a cache with the default capacity and default file path.
+	 *
+	 * @param policies the cache policies to use
+	 * @throws IOException if the cache file cannot be created or opened
 	 */
 	public ChronicleMapCache( final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> policies )
 			throws IOException {
@@ -44,11 +53,11 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	}
 
 	/**
-	 * Constructs a new {@link ChronicleMapCache} with the default cache file and a
-	 * maximum capacity.
+	 * Creates a cache with the given capacity and the default file path.
 	 *
-	 * @param capacity Maximum cache capacity.
-	 * @throws IOException
+	 * @param capacity the maximum number of cache entries
+	 * @param policies the cache policies to use
+	 * @throws IOException if the cache file cannot be created or opened
 	 */
 	public ChronicleMapCache( final int capacity,
 	                          final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> policies )
@@ -57,11 +66,12 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	}
 
 	/**
-	 * Constructs a new {@link ChronicleMapCache} with  with a custom file path and the default
-	 * cache capacity.
+	 * Constructs a new {@link ChronicleMapCache} with with a custom file path and
+	 * the default cache capacity.
 	 *
-	 * @param filename Path to the cache file
-	 * @throws IOException
+	 * @param filename the path to the cache file
+	 * @param policies the cache policies to use
+	 * @throws IOException if the cache file cannot be created or opened
 	 */
 	public ChronicleMapCache( final String filename,
 	                          final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> policies )
@@ -70,11 +80,12 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	}
 
 	/**
-	 * Constructs a new {@link ChronicleMapCache} with a custom file path and a
-	 * maximum capacity.
+	 * Creates a cache with the given capacity and file path.
 	 *
-	 * @param filename Path to the cache file
-	 * @throws IOException
+	 * @param capacity the maximum number of cache entries
+	 * @param filename the path to the cache file
+	 * @param policies the cache policies to use
+	 * @throws IOException if the cache file cannot be created or opened
 	 */
 	public ChronicleMapCache( final int capacity,
 	                          final String filename,
@@ -92,7 +103,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		this.filename = filename;
 		map = initializeMap(filename, capacity);
 
-		// Initilize replacement policy
+		// Initialize replacement policy
 		for( final Entry<ChronicleMapCacheKey, ChronicleMapCacheEntry> entry : map.entrySet() ) {
 			replacementPolicy.entryWasAdded( entry.getKey(), entry.getValue() );
 		}
@@ -106,24 +117,34 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 
 		logger.info( toString() );
 	}
-	
+
+	/**
+	 * Ensures that the parent directory of the given file path exists.
+	 *
+	 * @param filename the path to the file
+	 * @return a {@link File} object for the given path
+	 * @throws IllegalStateException if the parent directory does not exist and
+	 *                               cannot be created
+	 */
 	protected static File ensureParentDirectoryExists( final String filename ) {
-		final File file = new File( filename );
+		final File file = new File(filename);
 		final File parent = file.getParentFile();
 		if ( parent != null && ! parent.exists() && ! parent.mkdirs() ) {
-			throw new RuntimeException( "Failed to create directory: " + parent.getAbsolutePath() );
+			throw new IllegalStateException( "Failed to create directory: " + parent.getAbsolutePath() );
 		}
 		return file;
 	}
 
 	/**
-	 * Initializes and returns a persistent ChronicleMap for storing cardinality cache entries.
-	 * If the specified file does not exist, it is created before the map is initialized.
+	 * Initializes and returns the persistent Chronicle Map used by this cache.
 	 *
-	 * @param filename The path to the ChronicleMap file for persistent storage.
-	 * @param capacity The maximum number of entries the cache can store.
-	 * @return A {@link ChronicleMap} instance configured for storing cardinality cache entries.
-	 * @throws IOException If an error occurs while creating or accessing the file.
+	 * If the specified file does not exist, it is created before the map is
+	 * initialized.
+	 *
+	 * @param filename the path to the file used for persistent storage
+	 * @param capacity the maximum number of entries
+	 * @return an instance of {@link ChronicleMap}
+	 * @throws IOException if an error occurs while creating or accessing the file
 	 */
 	protected ChronicleMap<ChronicleMapCacheKey, ChronicleMapCacheEntry> initializeMap( final String filename,
 	                                                                                    final int capacity )
@@ -131,10 +152,10 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		final File file = ensureParentDirectoryExists(filename);
 		return ChronicleMap.of( ChronicleMapCacheKey.class, ChronicleMapCacheEntry.class )
 			.name("cache-map")
-			.entries(capacity)
-			.averageKeySize(512)
-			.averageValueSize(1024)
-			.maxBloatFactor(5.0)
+			.entries(10 * capacity)
+			.averageKeySize(248)
+			.averageValueSize(4096)
+			.maxBloatFactor(10.0)
 			.createPersistedTo(file);
 	}
 
@@ -149,13 +170,25 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		replacementPolicy.clear();
 	}
 
+	/**
+	 * Stores the given key-value pair in the cache.
+	 *
+	 * If the key already exists, the corresponding entry is replaced and the
+	 * replacement policy is notified of a rewrite. If the key is new and the cache
+	 * is already at capacity, one entry is evicted first according to the
+	 * replacement policy.
+	 *
+	 * @param key   the cache key
+	 * @param value the cache value
+	 * @throws IllegalArgumentException if {@code key} or {@code value} is {@code null}
+	 */
 	@Override
 	public void put( final ChronicleMapCacheKey key, final ChronicleMapCacheObject value ) {
 		if ( key == null )
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Cache key must not be null");
 
 		if ( value == null )
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Cache value must not be null");
 
 		final ChronicleMapCacheEntry entry = entryFactory.createCacheEntry(value);
 
@@ -177,6 +210,15 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		replacementPolicy.entryWasAdded(key, entry);
 	}
 
+	/**
+	 * Returns the cached object for the given key.
+	 *
+	 * If the key is present but the corresponding entry is no longer valid, the
+	 * entry is evicted and {@code null} is returned.
+	 *
+	 * @param key the cache key
+	 * @return the cached object, or {@code null} if no valid entry exists
+	 */
 	@Override
 	public ChronicleMapCacheObject get( final ChronicleMapCacheKey key ) {
 		final ChronicleMapCacheEntry entry = map.get(key);
@@ -193,6 +235,12 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		return null;
 	}
 
+	/**
+	 * Evicts the cache entry for the given key.
+	 *
+	 * @param key the key to evict
+	 * @return {@code true} if an entry was removed, otherwise {@code false}
+	 */
 	@Override
 	public boolean evict( final ChronicleMapCacheKey key ) {
 		if( map.remove(key) != null ) {
@@ -202,6 +250,14 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		return false;
 	}
 
+	/**
+	 * Evicts the cache entry for the given key if it currently maps to the given
+	 * value.
+	 *
+	 * @param key   the key to evict
+	 * @param value the expected value
+	 * @return {@code true} if an entry was removed, otherwise {@code false}
+	 */
 	@Override
 	public boolean evict( final ChronicleMapCacheKey key, final ChronicleMapCacheObject value ) {
 		final ChronicleMapCacheEntry entry = map.get(key);
@@ -211,6 +267,11 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		return false;
 	}
 
+	/**
+	 * Returns the current number of entries stored in the cache.
+	 *
+	 * @return the cache size
+	 */
 	public int size() {
 		return map.size();
 	}
@@ -220,12 +281,23 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		return "ChronicleMapCache{filename=" + filename + ", capacity=" + capacity + ", size=" + map.size() + "}";
 	}
 
+	/**
+	 * Closes the underlying Chronicle Map and releases associated resources.
+	 *
+	 * Closing the map is not required but ensures that all data is properly
+	 * flushed to disk and that off-heap resources are released.
+	 */
 	@Override
 	public void close() {
 		map.close();
 	}
 
-	public Set<ChronicleMapCacheKey> keySet(){
+	/**
+	 * Returns the set of keys currently stored in the cache.
+	 *
+	 * @return the current key set
+	 */
+	public Set<ChronicleMapCacheKey> keySet() {
 		return map.keySet();
 	}
 }
