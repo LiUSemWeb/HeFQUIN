@@ -20,21 +20,21 @@ public class SharedResourceInitializer implements ServletContextListener
 	@Override
 	public void contextInitialized( ServletContextEvent servletContextEvent ) {
 		final String confDescr = System.getProperty("hefquin.configuration", "config/DefaultConfDescr.ttl");
-		final String fedCat = System.getProperty("hefquin.federation", "config/DefaultFedConf.ttl");
-		final String fedCount = System.getProperty("hefquin.federation.count", "1");
+		final String fedCount = System.getProperty("hefquin.federation.count");
 		final List<String> fedCatList = new java.util.ArrayList<>();
-
+		
 		logger.info( "--- Initialize engine ---" );
 		logger.info( "hefquin.configuration:    {}", confDescr );
 		logger.info( "hefquin.federation.count: {}", fedCount );
 		
-		if ( fedCount.equals("1") ) {
+		if ( fedCount == null ) {
+			final String fedCat = System.getProperty("hefquin.federation", "config/DefaultFedConf.ttl");
 			fedCatList.add(fedCat);
 			logger.info( "hefquin.federation:       {}", fedCat );
 		}
 		else {
 			for ( int i = 0; i < Integer.parseInt(fedCount); i++ ) {
-				fedCatList.add(System.getProperty("hefquin.federation." + (i + 1), null ));
+				fedCatList.add( System.getProperty("hefquin.federation." + (i + 1)) );
 			}
 			logger.info( "hefquin.federation.list:  {}", fedCatList );
 		}
