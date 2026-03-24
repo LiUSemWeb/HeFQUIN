@@ -11,7 +11,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Support for multiple --fd arguments for the CLI tools, to split the federation description into multiple files ([#529](https://github.com/LiUSemWeb/HeFQUIN/pull/529), [#534](https://github.com/LiUSemWeb/HeFQUIN/pull/534), [#538](https://github.com/LiUSemWeb/HeFQUIN/pull/538)).
 - New arguments for the CLI tool to specify files into which the query plans and the statistics should be printed ([#531](https://github.com/LiUSemWeb/HeFQUIN/pull/531), [#536](https://github.com/LiUSemWeb/HeFQUIN/pull/536)).
 ### Changed
-- nothing yet
+- Bug fix: cache-related statistics for TPF have not been recorded correctly by the federation access manager ([#548](https://github.com/LiUSemWeb/HeFQUIN/pull/548)).
 
 
 ## [0.0.9] - 2026-03-07
