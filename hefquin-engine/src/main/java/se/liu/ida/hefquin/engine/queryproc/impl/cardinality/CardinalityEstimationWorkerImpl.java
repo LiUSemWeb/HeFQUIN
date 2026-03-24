@@ -23,6 +23,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.Quality;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpDedup;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
@@ -457,7 +458,31 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	public void visit( final LogicalOpMultiwayUnion op ) {
 		addCardinalityForUnion();
 	}
+	
+	@Override
+	public void visit( final LogicalOpDedup op ) {
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
 
+		final QueryPlanProperty crdIn = qpInfoSubPlan.getProperty(CARDINALITY);
+		final QueryPlanProperty maxIn = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
+
+		// Heuristic: assume 50% duplicates
+		final int crdValue = crdIn.getValue() / 2;
+
+		// Max cardinality cannot increase
+		final int maxValue = maxIn.getValue();
+
+		// Min cardinality: could be 0 (all duplicates collapse)
+		final int minValue = 0;
+
+		final Quality crdQuality = QueryPlanProperty.getReducedQuality( crdIn.getQuality() );
+		final Quality maxQuality = QueryPlanProperty.getReducedQuality( maxIn.getQuality() );
+
+		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(minValue, Quality.MIN_OR_MAX_POSSIBLE) );
+	}
 
 	public void addCardinalityForUnion() {
 		int crdValue = 0;

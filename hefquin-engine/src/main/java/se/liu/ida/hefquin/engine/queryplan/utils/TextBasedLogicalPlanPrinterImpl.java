@@ -200,9 +200,14 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		public void visit( final LogicalOpMultiwayLeftJoin op ) {
 			// nothing extra
 		}
-
+		
 		@Override
 		public void visit( final LogicalOpMultiwayUnion op ) {
+			// nothing extra
+		}
+
+		@Override
+		public void visit( final LogicalOpDedup op ) {
 			// nothing extra
 		}
 
