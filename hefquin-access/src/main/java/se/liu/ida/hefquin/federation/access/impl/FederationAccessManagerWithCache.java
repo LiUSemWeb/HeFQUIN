@@ -88,12 +88,12 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 			throws FederationAccessException
 	{
 		// update the statistics
-		if ( req instanceof SPARQLRequest )
-			cacheRequestsSPARQL++;
-		else if ( req instanceof TPFRequest )
+		if ( req instanceof TPFRequest )
 			cacheRequestsTPF++;
 		else if ( req instanceof BRTPFRequest )
 			cacheRequestsBRTPF++;
+		else if ( req instanceof SPARQLRequest )
+			cacheRequestsSPARQL++;
 		else
 			cacheRequestsOther++;
 
@@ -101,12 +101,12 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			// update the statistics
-			if ( req instanceof SPARQLRequest )
-				cacheHitsSPARQL++;
-			else if ( req instanceof TPFRequest )
+			if ( req instanceof TPFRequest )
 				cacheHitsTPF++;
 			else if ( req instanceof BRTPFRequest )
 				cacheHitsBRTPF++;
+			else if ( req instanceof SPARQLRequest )
+				cacheHitsSPARQL++;
 			else
 				cacheHitsOther++;
 
