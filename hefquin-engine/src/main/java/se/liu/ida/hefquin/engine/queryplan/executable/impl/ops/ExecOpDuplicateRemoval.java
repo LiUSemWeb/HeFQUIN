@@ -8,11 +8,16 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorSta
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
+/**
+ * To be used for DISTINCT clauses. This algorithm removes duplicates by collecting
+ * input solution mappings in the same hash set. Passes only distinct solution mappings 
+ * to its output. Duplicates are based on SolutionMapping equality, not object identity.
+ */
 public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase 
 {
     private long numberOfOutputMappingsProduced = 0L;
 
-    protected HashSet<SolutionMapping> hashSet = new HashSet<>();
+    protected HashSet<SolutionMapping> distinctSolMaps = new HashSet<>();
 
 	public ExecOpDuplicateRemoval(
 	                     final boolean collectExceptions,
@@ -24,16 +29,14 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
-        hashSet.add(inputSolMap);
+        distinctSolMaps.add(inputSolMap);
 	}
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
-		for ( SolutionMapping inputSolMap : hashSet ) {
-            sink.send(inputSolMap);
-            numberOfOutputMappingsProduced++;
-        }
+		sink.send(distinctSolMaps);
+		numberOfOutputMappingsProduced = distinctSolMaps.size();
 	}
 
 	@Override
