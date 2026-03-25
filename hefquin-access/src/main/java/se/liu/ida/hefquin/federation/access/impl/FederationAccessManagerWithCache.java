@@ -18,6 +18,7 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyF
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyLRU;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.GenericCacheImpl;
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.shared.http.HttpClientProvider;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
@@ -66,6 +67,15 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	                                         final int cacheCapacity ) 
 	{
 		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
+	}
+
+	public FederationAccessManagerWithCache( final FederationAccessManager fedAccMan,
+	                                         final int cacheCapacity,
+	                                         final int maxParallelRequests )
+	{
+		this(fedAccMan, cacheCapacity);
+		// Set default number of parallel request to a given endpoint
+		HttpClientProvider.setDefaultMaxParallelRequests(maxParallelRequests);
 	}
 
 	/**
