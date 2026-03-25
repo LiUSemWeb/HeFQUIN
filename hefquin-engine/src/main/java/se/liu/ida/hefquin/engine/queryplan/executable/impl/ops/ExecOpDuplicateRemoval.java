@@ -32,7 +32,7 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
 		if ( distinctSolMaps.add(inputSolMap) ) {
-			sink.send(distinctSolMaps);
+			sink.send(inputSolMap);
 			numberOfOutputMappingsProduced++;
 		}
 		else numberOfDuplicates++;
@@ -41,8 +41,7 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
-		sink.send(distinctSolMaps);
-		numberOfOutputMappingsProduced = distinctSolMaps.size();
+		// nothing to be done here
 	}
 
 	@Override
