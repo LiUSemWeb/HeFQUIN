@@ -7,7 +7,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- nothing yet
+- Support limits on the number of parallel request that can be executed against a specific endpoint/server ([#553](https://github.com/LiUSemWeb/HeFQUIN/pull/553))
 ### Changed
 - nothing yet
 
