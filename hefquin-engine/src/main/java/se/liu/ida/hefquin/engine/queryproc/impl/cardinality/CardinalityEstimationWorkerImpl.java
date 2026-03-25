@@ -466,22 +466,29 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 
 		final QueryPlanProperty crdIn = qpInfoSubPlan.getProperty(CARDINALITY);
 		final QueryPlanProperty maxIn = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
+		final QueryPlanProperty minIn = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
 
 		// Heuristic: assume 50% duplicates
 		final int crdValue = crdIn.getValue() / 2;
-
-		// Max cardinality cannot increase
-		final int maxValue = maxIn.getValue();
-
-		// Min cardinality: could be 0 (all duplicates collapse)
-		final int minValue = 0;
-
 		final Quality crdQuality = QueryPlanProperty.getReducedQuality( crdIn.getQuality() );
-		final Quality maxQuality = QueryPlanProperty.getReducedQuality( maxIn.getQuality() );
+
+		final int maxValue = maxIn.getValue();
+		final Quality maxQuality = maxIn.getQuality();
+
+		final int minValue;
+		final Quality minQuality;
+		if ( minIn.getValue() == 0 ) {
+			minValue = minIn.getValue();
+			minQuality = minIn.getQuality();
+		}
+		else {
+			minValue = 1;
+			minQuality = Quality.MIN_OR_MAX_POSSIBLE;
+		}
 
 		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
 		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
-		qpInfo.addProperty( QueryPlanProperty.minCardinality(minValue, Quality.MIN_OR_MAX_POSSIBLE) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(minValue, minQuality) );
 	}
 
 	public void addCardinalityForUnion() {
