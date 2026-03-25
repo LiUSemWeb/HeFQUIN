@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -15,9 +16,9 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase 
 {
-    private long numberOfOutputMappingsProduced = 0L;
+	private long numberOfOutputMappingsProduced = 0L;
 
-    protected HashSet<SolutionMapping> distinctSolMaps = new HashSet<>();
+	protected final Set<SolutionMapping> distinctSolMaps = new HashSet<>();
 
 	public ExecOpDuplicateRemoval(
 	                     final boolean collectExceptions,
