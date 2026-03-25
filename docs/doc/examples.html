@@ -10,7 +10,7 @@
     <!-- Prism -->
     <link href="../css/prism-coy-without-shadows.css" rel="stylesheet" />
     <script src="../js/prism_1.29.0/prism.min.js"></script>
-    <script src="../js/prism_1.29.0/prism-sparql.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
     <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
     <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
     <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
@@ -41,9 +41,9 @@
         <p>
             To run any of these queries, <a href="programs.html#use-release">set up the HeFQUIN command-line programs using the latest release</a> and, from the root folder of the extracted release, execute the following command.
         </p>
-        <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/ExampleQuery1.rq</code></pre>
+        <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/ExampleQuery1.rq</code></pre>
         <p>
-            While the command above is for the first example query, you can simply change the file name of the query file to run any other of the example queries. The given federation description (<code>examples/ExampleFederation.ttl</code>) defines all federation members relevant for the examples.
+            While the command above is for the first example query, you can simply change the file name of the query file to run any other of the example queries. The given <a href="federation_description.html">federation description</a> (<code>examples/ExampleFederation.ttl</code>) defines all federation members relevant for the examples.
         </p>
         <p>
             To get a quick overview of additional arguments that can be passed to the program, execute the following command.
@@ -60,25 +60,25 @@
             <p>
                 This query demonstrates a join between data from two SPARQL endpoints: the SPARQL endpoint of the DBpedia Knowledge Graph and the SPARQL endpoint of the Wikidata Knowledge Graph. Run the query as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/ExampleQuery1.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/ExampleQuery1.rq</code></pre>
             <p>
                 Notice that, after deciding the join order and deciding to use the bind-join algorithm, HeFQUIN pushes the FILTER into the request to the DBpedia endpoint. This behavior can be observed by inspecting the physical plan using a command such as the following.
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/ExampleQuery1.rq --printPhysicalPlan --skipExecution</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/ExampleQuery1.rq --printPhysicalPlan --skipExecution</code></pre>
 
             <h4 id="ExampleQuery2"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/ExampleQuery2.rq">ExampleQuery2</a></h4>
             <p>
                 This is essentially the same query as the previous one. The only difference is that, instead of using the SPARQL endpoint of DBpedia, this one uses the TPF server of DBpedia. As a consequence, the query plan will be different because the two triple patterns of the first SERVICE clause cannot be sent as a single request to the TPF server, and also the FILTER needs to be locally now (i.e., by HeFQUIN itself).
                 Run the query (without plan printing) as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/ExampleQuery2.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/ExampleQuery2.rq</code></pre>
 
             <h4 id="ExampleQuery3"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/ExampleQuery3.rq">ExampleQuery3</a></h4>
             <p>
                 This is also essentially the same as the previous two queries. The difference now is that this one uses VALUES clauses to specify the federation members.
                 Run the query as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/ExampleQuery3.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/ExampleQuery3.rq</code></pre>
             <p>
                 Notice that, while there are two separate VALUES clauses in the query, it is also possible to merge them into one VALUE clause:<br/>
                 <code>VALUES (?s1 ?s2) { (&lt;http://dbpedia.org/sparql&gt; &lt;https://query.wikidata.org/sparql&gt;) }</code>
@@ -97,61 +97,61 @@
                 This query accesses the Web API of the <a href="https://open-meteo.com/">Open-Meteo weather service</a>, with a fixed request URI (requesting the current temperature and wind speed at a fixed location). The graph pattern within the SERVICE clause is evaluated over an RDF view of the JSON data obtained from the API; this RDF view is defined by the RML mapping given in the federation description.
                 Run the query as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/OpenMeteoFixed.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/OpenMeteoFixed.rq</code></pre>
 
             <h4 id="OpenMeteoBind"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/OpenMeteoBind.rq">OpenMeteoBind</a></h4>
             <p>
                 Like the previous query, this one also retrieves current weather information from the Web API of the <a href="https://open-meteo.com/">Open-Meteo weather service</a>. However, in contrast to using a fixed request URI as done by the previous query, this one creates the request URI at runtime, based on the values provided by the BIND clauses.
                 Run the query as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/OpenMeteoBind.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/OpenMeteoBind.rq</code></pre>
 
             <h4 id="OpenMeteoJoin"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/OpenMeteoJoin.rq">OpenMeteoJoin</a></h4>
             <p>
                 This query accesses the Web API of the <a href="https://open-meteo.com/">Open-Meteo weather service</a> by using requests that are formed based on data obtained from a SPARQL endpoint. More specifically, the query obtains the geographic coordinates of Berlin from the SPARQL endpoint of the DBpedia Knowledge Graph and, then, uses these coordinates to request the current temperature and wind speed in Berlin from the Web API. Hence, the query joins data from the SPARQL endpoint with data from the API.
                 Run the query as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/OpenMeteoJoin.rq</code></pre>
-
-            <h4 id="OpenMeteoCDTMap"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/OpenMeteoCDTMap.rq">OpenMeteoCDTMap</a></h4>
-            <p>
-                This query is similar to the previous one (obtaining weather information from the Web API of the Open-Meteo service, for a location whose geographic coordinates are obtained from DBpedia) but it also demonstrates that the RML processor of HeFQUIN creates <a href="https://w3id.org/awslabs/neptune/SPARQL-CDTs/latest.html">cdt:Map literals</a> for cases in which the object map of an RML triples map refers to a JSON object (rather than to scalars value within a JSON object). The BIND clauses at the end of the query apply <a href="https://awslabs.github.io/SPARQL-CDTs/spec/latest.html#combined-functions">functions that have been defined for cdt:Map literals</a>.
-                Run the query as follows:
-            </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/OpenMeteoCDTMap.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/OpenMeteoJoin.rq</code></pre>
 
             <h4 id="OpenMeteoCDTList"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/OpenMeteoCDTList.rq">OpenMeteoCDTList</a></h4>
             <p>
-                While also similar to the previous queries, this one demonstrates that the RML processor of HeFQUIN creates <a href="https://w3id.org/awslabs/neptune/SPARQL-CDTs/latest.html">cdt:List literals</a> for cases in which the object map of an RML triples map refers to a JSON array (rather than to the elements of such an array). 
+                This query is similar to the previous one (obtaining weather information from the Web API of the Open-Meteo service, for a location whose geographic coordinates are obtained from DBpedia) but it also demonstrates that the RML processor of HeFQUIN creates <a href="https://w3id.org/awslabs/neptune/SPARQL-CDTs/latest.html">cdt:Map literals</a> for cases in which the object map of an RML triples map refers to a JSON array (rather than to the elements of such an array).
                 Notice that the requested weather information in this case is not the current one but an hourly forecast, because the JSON data with hourly forecasts from the Open-Meteo API does indeed contain arrays. The BIND clauses at the end of the query apply <a href="https://awslabs.github.io/SPARQL-CDTs/spec/latest.html#combined-functions">functions that have been defined for cdt:List literals</a>.
                 Run the query as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/OpenMeteoCDTList.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/OpenMeteoCDTList.rq</code></pre>
+
+            <h4 id="OpenMeteoCDTMap"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/OpenMeteoCDTMap.rq">OpenMeteoCDTMap</a></h4>
+            <p>
+                While also similar to the previous queries, this one demonstrates that the RML processor of HeFQUIN creates <a href="https://w3id.org/awslabs/neptune/SPARQL-CDTs/latest.html">cdt:Map literals</a> for cases in which the object map of an RML triples map refers to a JSON object (rather than to scalars value within a JSON object). The BIND clause at the end of the query applies the <a href="https://awslabs.github.io/SPARQL-CDTs/spec/latest.html#func_keys">cdt:keys function</a> that has been defined for cdt:Map literals, and the <a href="https://awslabs.github.io/SPARQL-CDTs/spec/latest.html#description-of-unfold">UNFOLD operator</a> unfolds the cdt:List literal obtained from the cdt:keys function.
+                Run the query as follows:
+            </p>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/OpenMeteoCDTMap.rq</code></pre>
 
             <h4 id="Covid19Stats"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/Covid19Stats.rq">Covid19Stats</a></h4>
             <p>
                 This query accesses the Web API of the <a href="https://disease.sh/">Open Disease Data service</a> by using requests that are formed based on data obtained from a SPARQL endpoint. More specifically, the query obtains the ISO country codes of all European countries from the SPARQL endpoint of the Wikidata Knowledge Graph and, then, uses these ISO codes to request Covid-19 statistics from the Web API.
                 Run the query as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/Covid19Stats.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/Covid19Stats.rq</code></pre>
             <p>
                 Notice that one of the ISO codes obtained from Wikidata is "XK" for Kosovo, which is not recognized by the Web API; that is, the request with this ISO code results in a 404 error. Therefore, the SERVICE clause for the Web API ignores the solution mapping with this ISO code. This behavior can be observed by inspecting the detailed statistics about the query execution process, which is printed when running the query using the following command. In particular, the part of the printed statistics to look at are the entries called <code>numberOfRequestsFailed</code> and <code>errorCodesOfFailedRequests</code> for the corresponding operator of type <code>ExecOpLookupJoinViaWrapperWithParamVars</code>.
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/Covid19Stats.rq --printQueryProcStats</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/Covid19Stats.rq --printQueryProcStats</code></pre>
 
             <h4 id="OpenLibraryAPI"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/OpenLibraryAPI.rq">OpenLibraryAPI</a></h4>
             <p>
                 This query accesses the Web API of the <a href="https://openlibrary.org/">Open Library</a> Website by using requests that are formed based on data obtained from a SPARQL endpoint. More specifically, the query obtains the names of winners of the Nobel Prize in Literature from the SPARQL endpoint of the DBpedia Knowledge Graph and, then, uses these names to request information about books authored by these winners from the Web API.
                 Run the query as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/OpenLibraryAPI.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/OpenLibraryAPI.rq</code></pre>
 
             <h4 id="CurrencyViaAPIs"><a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/examples/CurrencyViaAPIs.rq">CurrencyViaAPIs</a></h4>
             <p>
                 This query joins data from two Web APIs. It first obtains data about Japan from the Web API of the <a href="https://restcountries.com/">REST Countries service</a>, including the currency code of the Japanese currency. Thereafter, the query also obtains the current Euro exchange rate for that currency from the <a href="https://www.exchangerate-api.com/">Exchange Rate API</a>.
                 Run the query as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/CurrencyViaAPIs.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/CurrencyViaAPIs.rq</code></pre>
 
         </section>
 
@@ -164,7 +164,7 @@
                 This query joins data from the Wikidata SPARQL endpoint and the DBpedia SPARQL endpoint, but is expressed in terms of the Schema.org vocabulary instead of the vocabularies used by Wikidata and DBpedia. Hence, the query demonstrates the capability of HeFQUIN to apply vocabulary mappings for answering queries that are expressed in terms of a global vocabulary.
                 Run the query as follows:
             </p>
-            <pre><code class="language-bash">bin/hefquin --federationDescription examples/ExampleFederation.ttl --query examples/QueryWithVocabMapping.rq</code></pre>
+            <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/QueryWithVocabMapping.rq</code></pre>
 
         </section>
 -->
