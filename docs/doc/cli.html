@@ -36,7 +36,7 @@
         <p>
             You can use the program as follows, assuming the file <code>MyFedConf.ttl</code> contains the <a href="federation_description.html">description of your federation</a> and the file <code>ExampleQuery.rq</code> contains the <a href="queries.html">query that you want to run</a> over this federation, and assuming that you have <a href="programs.html">added the HeFQUIN programs to your <code>PATH</code></a> (otherwise, enter the directory in which you have unpacked the HeFQUIN release and replace <code>hefquin</code> by <code>bin/hefquin</code>).
         </p>
-        <pre><code class="language-bash">hefquin --federationDescription=MyFedConf.ttl --query=ExampleQuery.rq</code></pre>
+        <pre><code class="language-bash">hefquin --fd=MyFedConf.ttl --query=ExampleQuery.rq</code></pre>
         <p>
             Further arguments can be passed to the program, which are described in detail below. You can also have the list of supported arguments printed by executing the program with the argument <code>--help</code>.
         </p>
@@ -44,8 +44,8 @@
 
         <section id="arguments">
             <h2>Query-Related Arguments of the Program</h2>
-            <p id="--federationDescription" style="font-weight:bold">
-                --federationDescription=&lt;<em>file</em>>
+            <p id="--fd" style="font-weight:bold">
+                --fd=&lt;<em>file</em>>
                 <em style="padding-left:1em">(mandatory argument)</em>
             </p>
             <p style="padding-left:2em">
