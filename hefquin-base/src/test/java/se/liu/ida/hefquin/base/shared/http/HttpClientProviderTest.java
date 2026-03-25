@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.HttpServer;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,6 +28,35 @@ public class HttpClientProviderTest {
 	public static void createExecService() throws IOException {
 		server = setupHttpServerForTests();
 		url = "http://localhost:" + server.getAddress().getPort() + "/test";
+	}
+
+	@Before
+	public void resetProvider() {
+		HttpClientProvider.resetForTests();
+	}
+
+	@Test
+	public void limitConcurrentRequestsToOneViaGlobal() throws IOException{
+		final int numberOfRequests = 20;
+		HttpClientProvider.setDefaultMaxParallelRequests(1);
+		final long start = System.currentTimeMillis();
+		final HttpClient client = HttpClientProvider.client();
+		final CompletableFuture<?>[] futures = new CompletableFuture[numberOfRequests];
+
+		for(int i=0; i < numberOfRequests; i++){
+			final URI uri = URI.create( url + "?i=" + i );
+			final HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
+			futures[i] = client.sendAsync( request, HttpResponse.BodyHandlers.ofString() );
+		}
+
+		// Wait for all futures to complete
+		CompletableFuture.allOf(futures).join();
+
+		// Executions should complete sequentially, which
+		// means that the total time should be greater than
+		// numberOfRequests * delay
+		final long end = System.currentTimeMillis();
+		assertTrue( (numberOfRequests * DELAY) < (end - start) );
 	}
 
 	@Test
@@ -79,8 +109,57 @@ public class HttpClientProviderTest {
 	}
 
 	@Test
+	public void noLimitOnConcurrentRequestsViaGlobal() throws IOException{
+		final int numberOfRequests = 20;
+		HttpClientProvider.setDefaultMaxParallelRequests(numberOfRequests);
+		final long start = System.currentTimeMillis();
+		final HttpClient client = HttpClientProvider.client();
+		final CompletableFuture<?>[] futures = new CompletableFuture[numberOfRequests];
+
+		for(int i=0; i < numberOfRequests; i++){
+			final URI uri = URI.create( url + "?i=" + i );
+			final HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
+			futures[i] = client.sendAsync( request, HttpResponse.BodyHandlers.ofString() );
+		}
+
+		// Wait for all futures to complete
+		CompletableFuture.allOf(futures).join();
+
+		// Executions should complete in a fraction of the time.
+		// To avoid flaky tests, we assume that the time is 1/10
+		// of the minimum sequential time.
+		final long end = System.currentTimeMillis();
+		assertTrue( DELAY + 1000 > (end - start) );
+	}
+
+	@Test
 	public void noLimitOnConcurrentRequests() throws IOException{
 		final int numberOfRequests = 20;
+		HttpClientProvider.registerEndpointLimiter(url, numberOfRequests);
+		final long start = System.currentTimeMillis();
+		final HttpClient client = HttpClientProvider.client();
+		final CompletableFuture<?>[] futures = new CompletableFuture[numberOfRequests];
+
+		for(int i=0; i < numberOfRequests; i++){
+			final URI uri = URI.create( url + "?i=" + i );
+			final HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
+			futures[i] = client.sendAsync( request, HttpResponse.BodyHandlers.ofString() );
+		}
+
+		// Wait for all futures to complete
+		CompletableFuture.allOf(futures).join();
+
+		// Executions should complete in a fraction of the time.
+		// To avoid flaky tests, we assume that the time is 1/10
+		// of the minimum sequential time.
+		final long end = System.currentTimeMillis();
+		assertTrue( DELAY + 1000 > (end - start) );
+	}
+
+	@Test
+	public void endpointLimiterOverridesDefaultLimit() throws IOException{
+		final int numberOfRequests = 20;
+		HttpClientProvider.setDefaultMaxParallelRequests(1);
 		HttpClientProvider.registerEndpointLimiter(url, numberOfRequests);
 		final long start = System.currentTimeMillis();
 		final HttpClient client = HttpClientProvider.client();
