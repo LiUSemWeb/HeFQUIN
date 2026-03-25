@@ -35,22 +35,19 @@ fd:FederationMemberShape
         sh:datatype xsd:string ;
         sh:message "A federation member can have at most one fd:vocabularyMappingsFile." ;
     ] .
-    # sh:property [
-    #     sh:path fd:mappingConfiguration ;
-    #     sh:maxCount 1 ;
-    #     sh:message "A federation member can have at most one fd:mappingConfiguration." ;
-    # ] .
 
 # Shape for interfaces
 fd:InterfaceShape
     a sh:NodeShape ;
     sh:or (
-        [ sh:node fd:SPARQLEndpointInterfaceShape ]
-        [ sh:node fd:TPFInterfaceShape ]
-        [ sh:node fd:brTPFInterfaceShape ]
-        # [ sh:node fd:BoltInterfaceShape ]
-        # [ sh:node fd:GraphQLEndpointInterfaceShape ]
-        [ sh:node fd:RESTInterfaceShape ]
+        [ sh:class fd:SPARQLEndpointInterface ;
+            sh:node fd:SPARQLEndpointInterfaceShape ]
+        [ sh:class fd:TPFInterface ;
+            sh:node fd:TPFInterfaceShape ]
+        [ sh:class fd:brTPFInterface ;
+            sh:node fd:brTPFInterfaceShape ]
+        [ sh:class fd:RESTInterface ;
+            sh:node fd:RESTInterfaceShape ]
     ) ;
     sh:message "Interface must be one of the supported types" .
 
@@ -94,42 +91,6 @@ fd:brTPFInterfaceShape
         sh:datatype xsd:anyURI ;
         sh:message "brTPF interface must have exactly one fd:exampleFragmentAddress." ;
     ] .
-
-# # Shape for Bolt Interface
-# fd:BoltInterfaceShape
-#     a sh:NodeShape ;
-#     sh:targetClass fd:BoltInterface ;
-#     sh:property [
-#         sh:path fd:vocabularyMappingsFile ;
-#         sh:maxCount 0 ;
-#         sh:datatype xsd:string ;
-#         sh:message "Bolt interface cannot have a vocabulary mapping." ;
-#     ] ;
-#     sh:property [
-#         sh:path fd:endpointAddress ;
-#         sh:minCount 1 ;
-#         sh:maxCount 1 ;
-#         sh:datatype xsd:anyURI ;
-#         sh:message "Bolt interface must have exactly one fd:endpointAddress." ;
-#     ] .
-
-# # Shape for GraphQL Endpoint Interface
-# fd:GraphQLEndpointInterfaceShape
-#     a sh:NodeShape ;
-#     sh:targetClass fd:GraphQLEndpointInterface ;
-#     sh:property [
-#         sh:path fd:vocabularyMappingsFile ;
-#         sh:maxCount 0 ;
-#         sh:datatype xsd:string ;
-#         sh:message "GraphQL interface cannot have a vocabulary mapping." ;
-#     ] ;
-#     sh:property [
-#         sh:path fd:endpointAddress ;
-#         sh:minCount 1 ;
-#         sh:maxCount 1 ;
-#         sh:datatype xsd:anyURI ;
-#         sh:message "GraphQL interface must have exactly one fd:endpointAddress." ;
-#     ] .
 
 # Shape for REST Interface
 fd:RESTInterfaceShape
