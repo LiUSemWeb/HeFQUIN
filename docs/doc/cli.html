@@ -167,11 +167,17 @@
                     <li>the query execution time (in ms), which is the total time from starting the executable plan until completion of the executable plan.</li>
                 </ol>
             </p>
+            <p style="padding-left:2em">
+                Note that these measurements are purely related to processing that takes place within the HeFQUIN engine; any pre-processing and post-processing performed by the Jena query processing machinery that HeFQUIN uses is not considered for these measurements.
+            </p>
+            <p style="padding-left:2em">
+                Since these measurements are printed as a single line in which the different values are separated by commas, this argument can be used to produce a CSV file of measurements for multiple queries (or for multiple executions of the same query). For this use case, you may want to use this argument in combination with the <a href="#--suppressResultPrintout">--suppressResultPrintout</a> argument.
+            </p>
             <p id="--printQueryProcMeasurementsToFile" style="font-weight:bold">
                 --printQueryProcMeasurementsToFile=&lt;<em>file</em>>
             </p>
             <p style="padding-left:2em">
-                    Use this argument to instruct the HeFQUIN engine to print the same comma-separated query processing measurements as produced by the <a href="#--printQueryProcMeasurements">--printQueryProcMeasurements</a> argument to a file. If the specified file already exists, the output will be appended rather than overwritten.
+                Use this argument to instruct the HeFQUIN engine to print the same comma-separated query processing measurements as produced by the <a href="#--printQueryProcMeasurements">--printQueryProcMeasurements</a> argument to a file. If the specified file already exists, the output will be appended rather than overwritten.
             <p id="--printQueryProcStats" style="font-weight:bold">
                 --printQueryProcStats
             </p>
