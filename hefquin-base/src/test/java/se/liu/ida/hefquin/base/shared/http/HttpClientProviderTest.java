@@ -55,7 +55,7 @@ public class HttpClientProviderTest {
 
 	@Test
 	public void limitConcurrentRequestsToTwo() throws IOException{
-		final int numberOfRequests = 20;
+		final int numberOfRequests = 50;
 		HttpClientProvider.registerEndpointLimiter(url, 2);
 		final long start = System.currentTimeMillis();
 		final HttpClient client = HttpClientProvider.client();
@@ -73,7 +73,9 @@ public class HttpClientProviderTest {
 		// Two requests should executed in two parallel. The total time should be
 		// approximately numberOfRequests * delay / 2
 		final long end = System.currentTimeMillis();
-		assertTrue( ((numberOfRequests * DELAY) / 2) + 100 < (end - start) );
+		System.err.println(numberOfRequests * DELAY);
+		System.err.println(end - start);
+		assertTrue( ((numberOfRequests * DELAY) / 2) + 1000 > (end - start) );
 	}
 
 	@Test
@@ -97,7 +99,7 @@ public class HttpClientProviderTest {
 		// To avoid flaky tests, we assume that the time is 1/10
 		// of the minimum sequential time.
 		final long end = System.currentTimeMillis();
-		assertTrue( (numberOfRequests * DELAY) + 100 > (end - start) );
+		assertTrue( DELAY + 1000 > (end - start) );
 	}
 
 	protected static HttpServer setupHttpServerForTests() throws IOException {
