@@ -45,6 +45,9 @@ public class HttpClientProvider
 	// Default max number of parallel requests per endpoint
 	private static final int DEFAULT_MAX_PARALLEL_REQUESTS = 10;
 
+	// Mutable default (can be overridden)
+	private static int defaultMaxParallelRequests = DEFAULT_MAX_PARALLEL_REQUESTS;
+
 	/** One limiter per endpoint key, shared across all clients from this provider. */
 	protected static final Map<String, Semaphore> limiterMap = new ConcurrentHashMap<>();
 
@@ -88,6 +91,23 @@ public class HttpClientProvider
 	}
 
 	/**
+	 * Sets the default maximum number of concurrent requests per endpoint key.
+	 *
+	 * This value is used when creating new endpoint limiters via
+	 * {@link #getOrCreateEndpointLimiter(String)}.
+	 *
+	 * @param maxParallelRequests maximum number of concurrent requests per
+	 *                            endpoint
+	 * @throws IllegalArgumentException if {@code maxParallelRequests} is non-positive
+	 */
+	public static void setDefaultMaxParallelRequests( final int maxParallelRequests ) {
+		if ( maxParallelRequests <= 0 ) {
+			throw new IllegalArgumentException( "maxParallelRequests must be greater than zero" );
+		}
+		defaultMaxParallelRequests = maxParallelRequests;
+	}
+
+	/**
 	 * Registers a concurrency limiter for the given endpoint key.
 	 *
 	 * If a limiter is already registered for the key, it is replaced.
@@ -108,7 +128,7 @@ public class HttpClientProvider
 	 * @return limiter for the endpoint
 	 */
 	private static Semaphore getOrCreateEndpointLimiter( final String key ) {
-		return limiterMap.computeIfAbsent( key, k -> new Semaphore( DEFAULT_MAX_PARALLEL_REQUESTS, true ) );
+		return limiterMap.computeIfAbsent( key, k -> new Semaphore(defaultMaxParallelRequests, true) );
 	}
 
 	/**
@@ -121,6 +141,20 @@ public class HttpClientProvider
 	 */
 	private static String toEndpointKey( final URI uri ) {
 		return uri.resolve( uri.getPath() ).toString();
+	}
+
+	/**
+	 * Resets provider state to its default configuration.
+	 *
+	 * This clears all cached clients and registered endpoint limiters, and restores
+	 * the default maximum number of parallel requests per endpoint key.
+	 *
+	 * This method is primarily intended for test isolation.
+	 */
+	public static void resetForTests() {
+		BY_CONNECT_TIMEOUT.clear();
+		limiterMap.clear();
+		defaultMaxParallelRequests = DEFAULT_MAX_PARALLEL_REQUESTS;
 	}
 
 	static final class LimitedHttpClient extends HttpClient
