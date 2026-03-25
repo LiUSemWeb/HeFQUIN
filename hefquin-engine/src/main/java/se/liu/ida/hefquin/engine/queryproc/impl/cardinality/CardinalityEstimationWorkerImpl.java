@@ -468,9 +468,17 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		final QueryPlanProperty maxIn = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
 		final QueryPlanProperty minIn = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
 
-		// Heuristic: assume 50% duplicates
-		final int crdValue = crdIn.getValue() / 2;
-		final Quality crdQuality = QueryPlanProperty.getReducedQuality( crdIn.getQuality() );
+		final int crdValue;
+		final Quality crdQuality;
+		if ( crdIn.getValue() == 0 || crdIn.getValue() == 1 ) {
+			crdValue = crdIn.getValue();
+			crdQuality = crdIn.getQuality();
+		}
+		else {
+			// Heuristic: assume 50% duplicates
+			crdValue = crdIn.getValue() / 2;
+			crdQuality = QueryPlanProperty.getReducedQuality( crdIn.getQuality() );
+		}
 
 		final int maxValue = maxIn.getValue();
 		final Quality maxQuality = maxIn.getQuality();

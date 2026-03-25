@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
 public class LogicalOpDedup implements UnaryLogicalOp 
 {
-    protected static LogicalOpDedup singleton = new LogicalOpDedup();
+	protected static LogicalOpDedup singleton = new LogicalOpDedup();
 
 	public static LogicalOpDedup getInstance() { return singleton; }
 
