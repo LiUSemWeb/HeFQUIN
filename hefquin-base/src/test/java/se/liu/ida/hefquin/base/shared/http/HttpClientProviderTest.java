@@ -103,8 +103,6 @@ public class HttpClientProviderTest {
 		// Two requests should executed in two parallel. The total time should be
 		// approximately numberOfRequests * delay / 2
 		final long end = System.currentTimeMillis();
-		System.err.println(numberOfRequests * DELAY);
-		System.err.println(end - start);
 		assertTrue( ((numberOfRequests * DELAY) / 2) + 1000 > (end - start) );
 	}
 
