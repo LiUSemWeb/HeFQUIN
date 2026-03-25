@@ -163,6 +163,9 @@ public class BaseForTextBasedPlanPrinters
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op )    { name = "g2l"; }
+		
+		@Override
+		public void visit( final LogicalOpDedup op )    { name = "dedup"; }
 	}
 
 }

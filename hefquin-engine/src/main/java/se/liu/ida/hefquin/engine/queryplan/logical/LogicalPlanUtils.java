@@ -209,6 +209,9 @@ public class LogicalPlanUtils
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) { subplanCount++; }
+		
+		@Override
+		public void visit( final LogicalOpDedup op ) { subplanCount++; }
 	} // end of class LogicalPlanCounter
 
 	static public class SourceAssignmentChecker extends LogicalPlanVisitorBase {

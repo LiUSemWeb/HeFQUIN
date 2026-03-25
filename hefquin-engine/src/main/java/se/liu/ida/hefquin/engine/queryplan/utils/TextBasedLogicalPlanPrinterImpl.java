@@ -207,6 +207,11 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		}
 
 		@Override
+		public void visit( final LogicalOpDedup op ) {
+			// nothing extra
+		}
+
+		@Override
 		public void visit( final LogicalOpFilter op ) {
 			final int numberOfExprs = op.getFilterExpressions().size();
 			if ( numberOfExprs == 1 ) {

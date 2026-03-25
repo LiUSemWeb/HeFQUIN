@@ -23,6 +23,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.Quality;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpDedup;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
@@ -457,7 +458,46 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	public void visit( final LogicalOpMultiwayUnion op ) {
 		addCardinalityForUnion();
 	}
+	
+	@Override
+	public void visit( final LogicalOpDedup op ) {
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
 
+		final QueryPlanProperty crdIn = qpInfoSubPlan.getProperty(CARDINALITY);
+		final QueryPlanProperty maxIn = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
+		final QueryPlanProperty minIn = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
+
+		final int crdValue;
+		final Quality crdQuality;
+		if ( crdIn.getValue() == 0 || crdIn.getValue() == 1 ) {
+			crdValue = crdIn.getValue();
+			crdQuality = crdIn.getQuality();
+		}
+		else {
+			// Heuristic: assume 50% duplicates
+			crdValue = crdIn.getValue() / 2;
+			crdQuality = QueryPlanProperty.getReducedQuality( crdIn.getQuality() );
+		}
+
+		final int maxValue = maxIn.getValue();
+		final Quality maxQuality = maxIn.getQuality();
+
+		final int minValue;
+		final Quality minQuality;
+		if ( minIn.getValue() == 0 ) {
+			minValue = minIn.getValue();
+			minQuality = minIn.getQuality();
+		}
+		else {
+			minValue = 1;
+			minQuality = Quality.MIN_OR_MAX_POSSIBLE;
+		}
+
+		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(minValue, minQuality) );
+	}
 
 	public void addCardinalityForUnion() {
 		int crdValue = 0;
