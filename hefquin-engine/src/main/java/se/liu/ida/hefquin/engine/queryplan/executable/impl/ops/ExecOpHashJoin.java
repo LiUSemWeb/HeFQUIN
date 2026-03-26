@@ -68,7 +68,7 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
 
     @Override
     public boolean requiresCompleteChild2InputFirst() {
-        return true;
+        return false;
     }
 
     @Override
