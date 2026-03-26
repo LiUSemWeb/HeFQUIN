@@ -312,6 +312,11 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			// need to be kept as optional subplans. But implement this only
 			// if we really need it.
 		}
+		else if ( rootOp instanceof LogicalOpDedup )
+		{
+			// nothing to do here - for requests to SPARQL endpoints, the DISTINCT
+			// can be merged into the request.
+		}
 		else
 		{
 			throw new IllegalArgumentException( "unexpected type of logical operator: " + rootOp.getClass().getName() );

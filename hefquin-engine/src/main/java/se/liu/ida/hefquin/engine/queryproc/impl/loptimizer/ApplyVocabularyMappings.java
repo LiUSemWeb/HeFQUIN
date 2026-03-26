@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpDedup;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
@@ -123,6 +124,13 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				
 			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
 			return new LogicalPlanWithUnaryRootImpl( gpAdd,
+			                                         null,
+			                                         rewrittenSubPlan );
+		}
+		else if ( rootOp instanceof LogicalOpDedup dedupOp )
+		{
+			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
+			return new LogicalPlanWithUnaryRootImpl( dedupOp,
 			                                         null,
 			                                         rewrittenSubPlan );
 		}
