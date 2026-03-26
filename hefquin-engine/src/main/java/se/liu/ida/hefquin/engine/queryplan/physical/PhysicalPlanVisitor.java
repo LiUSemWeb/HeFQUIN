@@ -27,4 +27,5 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpUnfold op );
 	void visit( PhysicalOpLocalToGlobal op );
 	void visit( PhysicalOpGlobalToLocal op );
+	void visit( PhysicalOpDuplicateRemoval op );
 }

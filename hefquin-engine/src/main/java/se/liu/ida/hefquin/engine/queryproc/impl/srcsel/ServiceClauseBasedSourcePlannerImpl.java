@@ -90,6 +90,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		else if ( jenaOp instanceof OpService opService ) {
 			return createPlanForServicePattern(opService, ctxt); 
 		}
+		else if ( jenaOp instanceof OpDistinct opService ) {
+			return createPlanForDistinct(opService, ctxt); 
+		}
 		else {
 			throw new IllegalArgumentException( "unsupported type of query pattern: " + jenaOp.getClass().getName() );
 		}
@@ -272,6 +275,13 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
 		final LogicalOpGPAdd op = new LogicalOpGPAdd(ep, p, paramVars);
 		return new LogicalPlanWithUnaryRootImpl(op, null, subplan);
+	}
+
+	protected LogicalPlan createPlanForDistinct( final OpDistinct jenaOp,
+	                                           final QueryProcContext ctxt ) {
+		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), ctxt );
+		final LogicalOpDedup rootOp = LogicalOpDedup.getInstance();
+		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
 	}
 
 	protected LogicalPlan createPlan( final Op jenaOp, final FederationMember fm ) {
