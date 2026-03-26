@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase 
 {
 	private long numberOfOutputMappingsProduced = 0L;
+	private long numberOfDuplicates = 0L;
 
 	protected final Set<SolutionMapping> distinctSolMaps = new HashSet<>();
 
@@ -30,26 +31,31 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
-        distinctSolMaps.add(inputSolMap);
+		if ( distinctSolMaps.add(inputSolMap) ) {
+			sink.send(inputSolMap);
+			numberOfOutputMappingsProduced++;
+		}
+		else numberOfDuplicates++;
 	}
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
-		sink.send(distinctSolMaps);
-		numberOfOutputMappingsProduced = distinctSolMaps.size();
+		distinctSolMaps.clear();
 	}
 
 	@Override
 	public void resetStats() {
 		super.resetStats();
 		numberOfOutputMappingsProduced = 0L;
+		numberOfDuplicates = 0L;
 	}
 
 	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
 		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
+		s.put( "numberOfDuplicates", Long.valueOf(numberOfDuplicates) );
 		return s;
 	}
 
