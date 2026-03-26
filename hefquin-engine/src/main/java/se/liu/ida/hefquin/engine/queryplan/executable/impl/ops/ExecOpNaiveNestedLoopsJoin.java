@@ -37,6 +37,11 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 	}
 
 	@Override
+	public boolean requiresCompleteChild2InputFirst() {
+		return false;
+	}
+
+	@Override
 	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {

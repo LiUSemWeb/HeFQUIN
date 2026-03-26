@@ -67,6 +67,11 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
     }
 
     @Override
+    public boolean requiresCompleteChild2InputFirst() {
+        return true;
+    }
+
+    @Override
     protected void _processInputFromChild1( final SolutionMapping inputSolMap,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
