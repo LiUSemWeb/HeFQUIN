@@ -7,7 +7,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- nothing yet
+- Support for DISTINCT directly within the HeFQUIN engine ([#547](https://github.com/LiUSemWeb/HeFQUIN/pull/547), [#550](https://github.com/LiUSemWeb/HeFQUIN/pull/550), [#555](https://github.com/LiUSemWeb/HeFQUIN/pull/555), [#558](https://github.com/LiUSemWeb/HeFQUIN/pull/558))
 ### Changed
 - nothing yet
 
