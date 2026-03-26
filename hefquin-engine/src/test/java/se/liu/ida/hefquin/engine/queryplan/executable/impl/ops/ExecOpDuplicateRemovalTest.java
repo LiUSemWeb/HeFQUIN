@@ -36,6 +36,7 @@ public class ExecOpDuplicateRemovalTest
 
 		op.process(sm1, sink, null);
 		op.process(sm2, sink, null);
+		op.concludeExecution(sink, null);
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 
@@ -78,6 +79,7 @@ public class ExecOpDuplicateRemovalTest
 
 		op.process(sm1, sink, null);
 		op.process(sm2, sink, null);
+		op.concludeExecution(sink, null);
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 
@@ -109,6 +111,7 @@ public class ExecOpDuplicateRemovalTest
 		op.process(sm1, sink, null);
 		op.process(sm2, sink, null);
 		op.process(sm3, sink, null);
+		op.concludeExecution(sink, null);
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 

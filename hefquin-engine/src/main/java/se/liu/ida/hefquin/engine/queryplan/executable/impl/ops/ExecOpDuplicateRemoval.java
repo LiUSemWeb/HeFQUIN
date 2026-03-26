@@ -41,7 +41,7 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
-		// nothing to be done here
+		distinctSolMaps.clear();
 	}
 
 	@Override
