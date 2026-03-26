@@ -36,6 +36,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		return inputVars;
 	}
 
+	/**
+	 * Sends first input first.
+	 */
 	protected Iterator<SolutionMapping> runTest(
 			final List<SolutionMapping> input1,
 			final List<SolutionMapping> input2,
