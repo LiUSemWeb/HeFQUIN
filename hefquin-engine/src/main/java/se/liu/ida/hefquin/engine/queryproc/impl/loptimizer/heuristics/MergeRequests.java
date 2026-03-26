@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -52,11 +53,16 @@ import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
  * after performing one merge step, another one may become available and will be
  * done.
  */
-public class MergeRequests implements HeuristicForLogicalOptimization
+public class MergeRequests implements HeuristicForLogicalOptimization, LogicalPlanVisitor
 {
+	protected List<LogicalPlan> rewrittenSubPlans; // final?
+	protected LogicalPlan returnPlan;
+	protected int numberOfSubPlans;
+
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
 		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
+		System.out.println( "NUMBER OF SUBPLANS " + numberOfSubPlans );
 		if ( numberOfSubPlans == 0 ) {
 			return inputPlan;
 		}
@@ -79,6 +85,9 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 
 		// Next, apply the heuristic to the root of the plan if possible.
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
+
+		// rootOp.visit(this);
+
 		if ( rootOp instanceof LogicalOpRequest )
 		{
 			// nothing to do here - we are in a leaf node
@@ -137,29 +146,6 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 					return createPlanWithSingleRequestOp(mergedPattern, fm);
 				}
 			}
-		}
-		else if ( rootOp instanceof LogicalOpBind )
-		{
-			// nothing to do here - while the BIND clause can be merged into
-			// a request operator if that request is for a SPARQL endpoint,
-			// unlike FILTER, for BIND this only increases the size of the solution
-			// mappings returned from the endpoint. The optimizer should instead
-			// retain the BIND outside the request.
-		}
-		else if ( rootOp instanceof LogicalOpUnfold )
-		{
-			// nothing to do here - for the time being, an UNFOLD clause
-			// should not be merged into a request operator, not even for
-			// requests to a SPARQL endpoint, because it is unlikely that
-			// SPARQL endpoints already support the SPARQL-CDTs approach.
-		}
-		else if (    rootOp instanceof LogicalOpLocalToGlobal
-		          || rootOp instanceof LogicalOpGlobalToLocal )
-		{
-			// nothing to do here - if we have a vocabulary translation as root
-			// operator, we do not attempt to merge it with its input operator
-			// (unless that is another vocabulary translation, but that case is
-			// covered by another rewriting rule)
 		}
 		else if ( rootOp instanceof LogicalOpUnion )
 		{
@@ -302,25 +288,12 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 					                                                newSubPlans );
 			}
 		}
-		else if ( rootOp instanceof LogicalOpMultiwayLeftJoin )
-		{
-			// ignore - If the non-optional subplan is just a request with a
-			// SPARQL endpoint as federation member, then it is possible to
-			// collect all optional subplans that are also only requests for
-			// the same SPARQL endpoint and merge them as optional parts into
-			// the non-optional request; the other optional subplans (if any)
-			// need to be kept as optional subplans. But implement this only
-			// if we really need it.
-		}
-		else if ( rootOp instanceof LogicalOpDedup )
-		{
-			// nothing to do here - TODO: for requests to SPARQL endpoints, the DISTINCT
-			// can be merged into the request.
-		}
 		else
 		{
 			throw new IllegalArgumentException( "unexpected type of logical operator: " + rootOp.getClass().getName() );
 		}
+
+		// if ( returnPlan != null ) return returnPlan;
 
 		// Finally, if the heuristic was not applied to the root of
 		// the plan, return the plan without changing its root, but
@@ -464,6 +437,277 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				nonReqSubPlans.add(p);
 			}
 		}
+	}
+
+	@Override
+	public void visit(LogicalOpRequest<?, ?> op) {
+		// nothing to do here - we are in a leaf node
+	}
+
+	@Override
+	public void visit(LogicalOpFixedSolMap op) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'visit'");
+	}
+
+	@Override
+	public void visit(LogicalOpGPAdd op) {
+		final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
+		if (    childOp instanceof LogicalOpRequest reqOp
+				&& reqOp.getRequest() instanceof SPARQLRequest req
+				&& reqOp.getFederationMember().supportsMoreThanTriplePatterns()
+				&& reqOp.getFederationMember().equals(op.getFederationMember())
+				&& ! op.hasParameterVariables() )
+		{
+			final SPARQLGraphPattern pattern1 = op.getPattern();
+			final SPARQLGraphPattern pattern2 = req.getQueryPattern();
+			final SPARQLGraphPattern mergedPattern = pattern1.mergeWith(pattern2);
+
+			final FederationMember fm = op.getFederationMember();
+			if ( fm.isSupportedPattern(mergedPattern) ) {
+				returnPlan = createPlanWithSingleRequestOp(mergedPattern, fm);
+			}
+		}
+	}
+
+	@Override
+	public void visit(LogicalOpGPOptAdd op) {
+		final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
+		if (    childOp instanceof LogicalOpRequest reqOp
+				&& reqOp.getRequest() instanceof SPARQLRequest req
+				&& reqOp.getFederationMember().supportsMoreThanTriplePatterns()
+				&& reqOp.getFederationMember().equals(op.getFederationMember()) )
+		{
+			final FederationMember fm = op.getFederationMember();
+			final SPARQLGraphPattern merged = mergePatternWithOptPatterns( req.getQueryPattern(),
+																			op.getPattern() );
+
+			if ( fm.isSupportedPattern(merged) ) {
+				returnPlan = createPlanWithSingleRequestOp(merged, fm);
+			}
+		}
+	}
+
+	@Override
+	public void visit(LogicalOpJoin op) {
+		final LogicalOperator childOp1 = rewrittenSubPlans.get(0).getRootOperator();
+		final LogicalOperator childOp2 = rewrittenSubPlans.get(1).getRootOperator();
+		if (    childOp1 instanceof LogicalOpRequest reqOp1
+				&& childOp2 instanceof LogicalOpRequest reqOp2
+				&& reqOp1.getRequest() instanceof SPARQLRequest req1
+				&& reqOp2.getRequest() instanceof SPARQLRequest req2
+				&& reqOp1.getFederationMember().supportsMoreThanTriplePatterns()
+				&& reqOp1.getFederationMember().equals(reqOp2.getFederationMember()) )
+		{
+			final FederationMember fm = reqOp1.getFederationMember();
+
+			final SPARQLGraphPattern p1 = req1.getQueryPattern();
+			final SPARQLGraphPattern p2 = req2.getQueryPattern();
+			final SPARQLGraphPattern mergedPattern = p1.mergeWith(p2);
+
+			if ( fm.isSupportedPattern(mergedPattern) ) {
+				returnPlan = createPlanWithSingleRequestOp(mergedPattern, fm);
+			}
+		}
+	}
+
+	@Override
+	public void visit(LogicalOpRightJoin op) {
+		final LogicalOperator childOp1 = rewrittenSubPlans.get(0).getRootOperator();
+		final LogicalOperator childOp2 = rewrittenSubPlans.get(1).getRootOperator();
+		if (    childOp1 instanceof LogicalOpRequest reqOp1
+				&& childOp2 instanceof LogicalOpRequest reqOp2
+				&& reqOp1.getRequest() instanceof SPARQLRequest req1
+				&& reqOp2.getRequest() instanceof SPARQLRequest req2
+				&& reqOp1.getFederationMember().equals(reqOp2.getFederationMember()) )
+		{
+			// the LHS is the optional part
+			final SPARQLGraphPattern merged = mergePatternWithOptPatterns( req2.getQueryPattern(),
+																			req1.getQueryPattern() );
+
+			final FederationMember fm = reqOp1.getFederationMember();
+			if ( fm.isSupportedPattern(merged) ) {
+				returnPlan = createPlanWithSingleRequestOp(merged, fm);
+			}
+		}
+	}
+
+	@Override
+	public void visit(LogicalOpUnion op) {
+		final LogicalOperator childOp1 = rewrittenSubPlans.get(0).getRootOperator();
+		final LogicalOperator childOp2 = rewrittenSubPlans.get(1).getRootOperator();
+		if (    childOp1 instanceof LogicalOpRequest reqOp1
+				&& childOp2 instanceof LogicalOpRequest reqOp2
+				&& reqOp1.getRequest() instanceof SPARQLRequest req1
+				&& reqOp2.getRequest() instanceof SPARQLRequest req2
+				&& reqOp1.getFederationMember().supportsMoreThanTriplePatterns()
+				&& reqOp1.getFederationMember().equals(reqOp2.getFederationMember()) )
+		{
+			final FederationMember fm = reqOp1.getFederationMember();
+
+			final SPARQLGraphPattern p1 = req1.getQueryPattern();
+			final SPARQLGraphPattern p2 = req2.getQueryPattern();
+			final SPARQLGraphPattern mergedPattern = new SPARQLUnionPatternImpl(p1, p2);
+
+			if ( fm.isSupportedPattern(mergedPattern) ) {
+				returnPlan = createPlanWithSingleRequestOp(mergedPattern, fm);
+			}
+		}
+	}
+
+	@Override
+	public void visit(LogicalOpMultiwayJoin op) {
+		assert numberOfSubPlans > 0;
+		if ( numberOfSubPlans == 1 ) {
+			returnPlan = rewrittenSubPlans.get(0);
+			return;
+		}
+
+		final List<LogicalPlan> newSubPlans = new ArrayList<>(numberOfSubPlans);
+		final Map<FederationMember,List<LogicalPlan>> reqOnlyPlansPerFedMember = new HashMap<>();
+
+		separateSubPlansOfMultiwayOps(rewrittenSubPlans, reqOnlyPlansPerFedMember, newSubPlans);
+
+		boolean noChange = true;
+		for ( final Map.Entry<FederationMember,List<LogicalPlan>> e : reqOnlyPlansPerFedMember.entrySet() ) {
+			final List<LogicalPlan> reqPlans = e.getValue();
+			if ( reqPlans.size() > 1 ) {
+				final FederationMember fm = e.getKey();
+				final LogicalPlan mergedSubPlan = mergeSPARQLRequestsViaJoin(fm, reqPlans);
+				if ( mergedSubPlan != null ) {
+					newSubPlans.add(mergedSubPlan);
+					noChange = false;
+				}
+				else {
+					newSubPlans.addAll(reqPlans);
+				}
+			}
+			else {
+				newSubPlans.addAll(reqPlans);
+			}
+		}
+
+		if ( noChange == false ) {
+			if ( newSubPlans.size() == 1 )
+				returnPlan = newSubPlans.get(0);
+			else
+				returnPlan = LogicalPlanUtils.createPlanWithSubPlans( op,
+																null,
+																newSubPlans );
+		}
+	}
+
+	@Override
+	public void visit(LogicalOpMultiwayLeftJoin op) {
+		// ignore - If the non-optional subplan is just a request with a
+		// SPARQL endpoint as federation member, then it is possible to
+		// collect all optional subplans that are also only requests for
+		// the same SPARQL endpoint and merge them as optional parts into
+		// the non-optional request; the other optional subplans (if any)
+		// need to be kept as optional subplans. But implement this only
+		// if we really need it.
+	}
+
+	@Override
+	public void visit(LogicalOpMultiwayUnion op) {
+		assert numberOfSubPlans > 0;
+		if ( numberOfSubPlans == 1 ) {
+			returnPlan = rewrittenSubPlans.get(0);
+			return;
+		}
+
+		final List<LogicalPlan> newSubPlans = new ArrayList<>(numberOfSubPlans);
+		final Map<FederationMember,List<LogicalPlan>> reqOnlyPlansPerFedMember = new HashMap<>();
+
+		separateSubPlansOfMultiwayOps(rewrittenSubPlans, reqOnlyPlansPerFedMember, newSubPlans);
+
+		boolean noChange = true;
+		for ( final Map.Entry<FederationMember,List<LogicalPlan>> e : reqOnlyPlansPerFedMember.entrySet() ) {
+			final List<LogicalPlan> reqPlans = e.getValue();
+			if ( reqPlans.size() > 1 ) {
+				final SPARQLGraphPattern mergedPattern = mergeSPARQLRequestsViaUnion(reqPlans);
+				final FederationMember fm = e.getKey();
+				if ( fm.isSupportedPattern(mergedPattern) ) {
+					final LogicalPlan mergedSubPlan = createPlanWithSingleRequestOp(mergedPattern, fm);
+					newSubPlans.add(mergedSubPlan);
+					noChange = false;
+				}
+				else {
+					newSubPlans.addAll(reqPlans);
+				}
+			}
+			else {
+				newSubPlans.addAll(reqPlans);
+			}
+		}
+
+		if ( noChange == false ) {
+			if ( newSubPlans.size() == 1 )
+				returnPlan = newSubPlans.get(0);
+			else
+				returnPlan = LogicalPlanUtils.createPlanWithSubPlans( op,
+																null,
+																newSubPlans );
+		}
+	}
+
+	@Override
+	public void visit(LogicalOpFilter op) {
+		// A filter can be merged into a request operator if that request
+		// is for a SPARQL endpoint.
+		final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
+		if (    childOp instanceof LogicalOpRequest reqOp
+				&& reqOp.getRequest() instanceof SPARQLRequest req
+				&& reqOp.getFederationMember().supportsMoreThanTriplePatterns() )
+		{
+			final ExprList exprList = op.getFilterExpressions();
+			final SPARQLGraphPattern reqPattern = req.getQueryPattern();
+			final SPARQLGraphPattern mergedPattern = reqPattern.mergeWith(exprList);
+
+			final FederationMember fm = reqOp.getFederationMember();
+			if ( fm.isSupportedPattern(mergedPattern) ) {
+				returnPlan = createPlanWithSingleRequestOp(mergedPattern, fm);
+			}
+		}
+	}
+
+	@Override
+	public void visit(LogicalOpBind op) {
+		// nothing to do here - while the BIND clause can be merged into
+		// a request operator if that request is for a SPARQL endpoint,
+		// unlike FILTER, for BIND this only increases the size of the solution
+		// mappings returned from the endpoint. The optimizer should instead
+		// retain the BIND outside the request.
+	}
+
+	@Override
+	public void visit(LogicalOpUnfold op) {
+		// nothing to do here - for the time being, an UNFOLD clause
+		// should not be merged into a request operator, not even for
+		// requests to a SPARQL endpoint, because it is unlikely that
+		// SPARQL endpoints already support the SPARQL-CDTs approach.
+	}
+
+	@Override
+	public void visit(LogicalOpLocalToGlobal op) {
+		// nothing to do here - if we have a vocabulary translation as root
+		// operator, we do not attempt to merge it with its input operator
+		// (unless that is another vocabulary translation, but that case is
+		// covered by another rewriting rule)
+	}
+
+	@Override
+	public void visit(LogicalOpGlobalToLocal op) {
+		// nothing to do here - if we have a vocabulary translation as root
+		// operator, we do not attempt to merge it with its input operator
+		// (unless that is another vocabulary translation, but that case is
+		// covered by another rewriting rule)
+	}
+
+	@Override
+	public void visit(LogicalOpDedup op) {
+		// nothing to do here - TODO: for requests to SPARQL endpoints, the DISTINCT
+		// can be merged into the request.
 	}
 
 }
