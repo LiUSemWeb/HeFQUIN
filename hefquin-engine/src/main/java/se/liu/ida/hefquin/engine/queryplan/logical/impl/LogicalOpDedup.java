@@ -10,7 +10,7 @@ public class LogicalOpDedup implements UnaryLogicalOp
 
 	public static LogicalOpDedup getInstance() { return singleton; }
 
-	public LogicalOpDedup() {}
+	protected LogicalOpDedup() {}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {

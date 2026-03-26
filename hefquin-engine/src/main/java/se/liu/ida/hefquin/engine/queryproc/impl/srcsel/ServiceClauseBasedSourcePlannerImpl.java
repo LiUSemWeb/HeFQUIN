@@ -280,7 +280,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForDistinct( final OpDistinct jenaOp,
 	                                           final QueryProcContext ctxt ) {
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), ctxt );
-		final LogicalOpDedup rootOp = new LogicalOpDedup();
+		final LogicalOpDedup rootOp = LogicalOpDedup.getInstance();
 		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
 	}
 

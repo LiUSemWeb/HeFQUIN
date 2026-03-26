@@ -314,7 +314,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		}
 		else if ( rootOp instanceof LogicalOpDedup )
 		{
-			// nothing to do here - for requests to SPARQL endpoints, the DISTINCT
+			// nothing to do here - TODO: for requests to SPARQL endpoints, the DISTINCT
 			// can be merged into the request.
 		}
 		else

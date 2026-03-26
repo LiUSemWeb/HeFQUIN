@@ -27,8 +27,8 @@ public class PhysicalOpDuplicateRemoval implements UnaryPhysicalOpForLogicalOp
 
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
-	                                        final QueryPlanningInfo qpInfo,
-	                                        final ExpectedVariables... inputVars ) {
+	                                       final QueryPlanningInfo qpInfo,
+	                                       final ExpectedVariables... inputVars ) {
 		return new ExecOpDuplicateRemoval(collectExceptions, qpInfo);
 	}
 
