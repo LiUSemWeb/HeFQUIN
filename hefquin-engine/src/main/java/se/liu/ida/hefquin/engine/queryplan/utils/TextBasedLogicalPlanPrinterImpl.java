@@ -146,11 +146,14 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		public void visit( final LogicalOpRequest<?,?> op ) {
 			record( op.getFederationMember() );
 			record( op.getRequest() );
+
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
 			props.add( "solmap: " + op.getSolutionMapping().toString() );
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -168,47 +171,51 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 			props.add( b.toString() );
 
 			record( op.getPattern() );
+
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpGPOptAdd op ) {
 			record( op.getFederationMember() );
 			record( op.getPattern() );
+
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpJoin op ) {
-			// nothing extra
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpRightJoin op ) {
-			// nothing extra
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpUnion op ) {
-			// nothing extra
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayJoin op ) {
-			// nothing extra
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayLeftJoin op ) {
-			// nothing extra
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayUnion op ) {
-			// nothing extra
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpDedup op ) {
-			// nothing extra
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -225,6 +232,8 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 					props.add( "expression " + (i+1) + ": " + ExprUtils.fmtSPARQL(expr) );
 				}
 			}
+
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -237,6 +246,8 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				final Expr expr = e.getValue();
 				props.add( var.toString() + " <-- " + ExprUtils.fmtSPARQL(expr) );
 			}
+
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -248,16 +259,20 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				v = op.getVar1().toString();
 
 			props.add( v + " <-- " + ExprUtils.fmtSPARQL(op.getExpr()) );
+
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) {
 			props.add( "vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
 			props.add( "vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
+			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 
 		protected void record( final FederationMember fm ) {
