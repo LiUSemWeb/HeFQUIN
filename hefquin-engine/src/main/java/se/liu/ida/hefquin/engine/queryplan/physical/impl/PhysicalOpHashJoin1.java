@@ -7,7 +7,7 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin1;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * each of the solution mappings of the second input sequence.
  *
  * The actual algorithm of this operator is implemented in the
- * {@link ExecOpHashJoin} class.
+ * {@link ExecOpHashJoin1} class.
  */
 public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 {
@@ -42,7 +42,7 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 	                                        final ExpectedVariables ... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashJoin( inputVars[0], inputVars[1], collectExceptions, qpInfo );
+		return new ExecOpHashJoin1( inputVars[0], inputVars[1], collectExceptions, qpInfo );
 	}
 
 	@Override

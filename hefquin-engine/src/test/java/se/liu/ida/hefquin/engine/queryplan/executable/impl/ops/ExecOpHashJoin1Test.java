@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
-public class ExecOpHashJoinTest extends TestsForInnerJoinAlgorithms
+public class ExecOpHashJoin1Test extends TestsForInnerJoinAlgorithms
 {
 	@Test
 	public void joinWithEmptyInput1_SeparateInput() throws ExecutionException {
@@ -85,7 +85,7 @@ public class ExecOpHashJoinTest extends TestsForInnerJoinAlgorithms
 		assert inputVars.length == 2;
 		assert useOuterJoinSemantics == false;
 
-		return new ExecOpHashJoin( inputVars[0], inputVars[1], false, null );
+		return new ExecOpHashJoin1( inputVars[0], inputVars[1], false, null );
 	}
 
 }

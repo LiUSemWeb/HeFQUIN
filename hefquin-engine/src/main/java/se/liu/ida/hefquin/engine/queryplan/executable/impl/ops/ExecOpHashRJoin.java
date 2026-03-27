@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
 /**
  * A right outer join version of the hash join algorithm implemented in
- * {@link ExecOpHashJoin}. The only difference is that, when consuming
+ * {@link ExecOpHashJoin1}. The only difference is that, when consuming
  * the second input, for every solution mapping that does not have any
  * join partners in the hash index (that was created when consuming the
  * first input), the solution mapping is not simply discarded (as required
@@ -20,7 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
  * Attention: if this algorithm is used to implement the OPTIONAL operator,
  *            the OPTIONAL part must be used as the first input.
  */
-public class ExecOpHashRJoin extends ExecOpHashJoin {
+public class ExecOpHashRJoin extends ExecOpHashJoin1 {
 
 	public ExecOpHashRJoin( final ExpectedVariables inputVars1,
 	                        final ExpectedVariables inputVars2,

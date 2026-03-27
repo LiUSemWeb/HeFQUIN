@@ -7,7 +7,7 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin2;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -46,7 +46,10 @@ public class PhysicalOpHashJoin2 extends BaseForPhysicalOpBinaryJoin
 	                                        final ExpectedVariables ... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashJoin( inputVars[0], inputVars[1], collectExceptions, qpInfo );
+		return new ExecOpHashJoin2( inputVars[0], inputVars[1],
+		                            collectExceptions,
+		                            useOuterJoinSemantics,
+		                            qpInfo );
 	}
 
 	@Override

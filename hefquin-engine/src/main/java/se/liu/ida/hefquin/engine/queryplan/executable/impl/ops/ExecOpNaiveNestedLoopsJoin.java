@@ -17,10 +17,10 @@ import java.util.List;
  * loops join in which the outer loop iterates over the second input and
  * the inner loop (repeatedly) iterates over the list with the first input.
  *
- * It is certainly better to use the {@link ExecOpHashJoin} instead. Instead 
- * of simply putting all left-input solution mappings into a list, the hash
- * join puts them into a hash index which can than be probed into for each
- *  right-input solution mapping.
+ * It is certainly better to use a hash join instead ({@link ExecOpHashJoin1}
+ * or {@link ExecOpHashJoin2}). Instead of simply putting all left-input
+ * solution mappings into a list, the hash join puts them into a hash index
+ * which can than be probed into for each right-input solution mapping.
  */
 public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 {

@@ -18,7 +18,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class ExecOpHashJoin extends BinaryExecutableOpBase
+/**
+ * Builds the hash table based on the input from the first subplan.
+ */
+public class ExecOpHashJoin1 extends BinaryExecutableOpBase
 {
     protected final SolutionMappingsIndex index;
     protected Stats statsOfIndex = null;
@@ -26,10 +29,10 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
     protected boolean child1InputComplete = false;
     protected boolean child2InputComplete = false;
 
-    public ExecOpHashJoin( final ExpectedVariables inputVars1,
-                           final ExpectedVariables inputVars2,
-                           final boolean collectExceptions,
-                           final QueryPlanningInfo qpInfo ) {
+    public ExecOpHashJoin1( final ExpectedVariables inputVars1,
+                            final ExpectedVariables inputVars2,
+                            final boolean collectExceptions,
+                            final QueryPlanningInfo qpInfo ) {
         super(collectExceptions, qpInfo);
 
         // determine the certain join variables
