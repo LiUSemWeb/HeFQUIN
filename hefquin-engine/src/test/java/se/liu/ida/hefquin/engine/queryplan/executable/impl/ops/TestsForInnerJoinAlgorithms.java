@@ -23,7 +23,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 {
-	protected void _joinWithEmptyInput1( final boolean sendAllSolMapsSeparately )
+	protected void _joinWithEmptyInput1( final boolean sendAllSolMapsSeparately,
+	                                     final boolean useOuterJoinSemantics )
 			throws ExecutionException
 	{
 		final Var var2 = Var.alloc("v2");
@@ -50,12 +51,13 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, useOuterJoinSemantics, inputVars);
 
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithEmptyInput2( final boolean sendAllSolMapsSeparately )
+	protected void _joinWithEmptyInput2( final boolean sendAllSolMapsSeparately,
+	                                     final boolean useOuterJoinSemantics )
 			throws ExecutionException
 	{
 		final Var var1 = Var.alloc("v1");
@@ -78,12 +80,20 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, useOuterJoinSemantics, inputVars);
+
+		if ( useOuterJoinSemantics ) {
+			assertTrue( it.hasNext() );
+			it.next();
+			assertTrue( it.hasNext() );
+			it.next();
+		}
 
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithEmptySolutionMapping1( final boolean sendAllSolMapsSeparately )
+	protected void _joinWithEmptySolutionMapping1( final boolean sendAllSolMapsSeparately,
+	                                               final boolean useOuterJoinSemantics )
 			throws ExecutionException
 	{
 		final Var var1 = Var.alloc("v1");
@@ -115,7 +125,7 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, useOuterJoinSemantics, inputVars);
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
@@ -128,7 +138,8 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithEmptySolutionMapping2( final boolean sendAllSolMapsSeparately )
+	protected void _joinWithEmptySolutionMapping2( final boolean sendAllSolMapsSeparately,
+	                                               final boolean useOuterJoinSemantics )
 			throws ExecutionException
 	{
 		final Var var1 = Var.alloc("v1");
@@ -151,7 +162,7 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, useOuterJoinSemantics, inputVars);
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
@@ -164,7 +175,8 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithOneJoinVariable( final boolean sendAllSolMapsSeparately ) throws ExecutionException {
+	protected void _joinWithOneJoinVariable( final boolean sendAllSolMapsSeparately,
+	                                         final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -208,7 +220,7 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, useOuterJoinSemantics, inputVars);
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -257,7 +269,8 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 		assertTrue(b3Found);
 	}
 
-	protected void _joinWithOneJoinVariable_withPossibleVars_noOverlap( final boolean sendAllSolMapsSeparately )
+	protected void _joinWithOneJoinVariable_withPossibleVars_noOverlap( final boolean sendAllSolMapsSeparately,
+	                                                                    final boolean useOuterJoinSemantics )
 			throws ExecutionException
 	{
 		final Var var1 = Var.alloc("v1");
@@ -312,25 +325,25 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, useOuterJoinSemantics, inputVars);
 
 		final Set<Binding> result = new HashSet<>();
 		assertTrue( it.hasNext() );
-		final Binding b1 = it.next().asJenaBinding();
-		assertEquals( 5, b1.size() );
-		result.add( b1 );
+		result.add( it.next().asJenaBinding() );
 
 		assertTrue( it.hasNext() );
-		final Binding b2 = it.next().asJenaBinding();
-		assertEquals( 4, b2.size() );
-		result.add( b2 );
+		result.add( it.next().asJenaBinding() );
+
+		if ( useOuterJoinSemantics ) {
+			assertTrue( it.hasNext() );
+			result.add( it.next().asJenaBinding() );
+		}
 
 		assertFalse( it.hasNext() );
 
-
-
 		boolean b1Found = false;
 		boolean b2Found = false;
+		boolean b3Found = false;
 		for ( final Binding b: result ) {
 			if ( b.get(var3).getURI().equals("http://example.org/z1") ) {
 				assertEquals( "http://example.org/x1", b.get(var1).getURI() );
@@ -345,15 +358,24 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 				assertEquals( "http://example.org/p1", b.get(var4).getURI() );
 				b2Found = true;
 			}
+			else if ( b.get(var3).getURI().equals("http://example.org/z3") ) {
+				assertEquals( "http://example.org/y2", b.get(var2).getURI() );
+				b3Found = true;
+			}
 			else {
 				fail( "Unexpected URI for ?v3: " + b.get(var3).getURI() );
 			}
 		}
+
 		assertTrue(b1Found);
 		assertTrue(b2Found);
+
+		if ( useOuterJoinSemantics )
+			assertTrue(b3Found);
 	}
 
-	protected void _joinWithOneJoinVariable_withPossibleVars_overlapped( final boolean sendAllSolMapsSeparately )
+	protected void _joinWithOneJoinVariable_withPossibleVars_overlapped( final boolean sendAllSolMapsSeparately,
+	                                                                     final boolean useOuterJoinSemantics )
 			throws ExecutionException
 	{
 		final Var var1 = Var.alloc("v1");
@@ -371,51 +393,71 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 		final Node z3 = NodeFactory.createURI("http://example.org/z3");
 		final Node p1 = NodeFactory.createURI("http://example.org/p1");
 
-		final List<SolutionMapping> input1 = new ArrayList<>();
-		input1.add( SolutionMappingUtils.createSolutionMapping(
+		final SolutionMapping sm1a = SolutionMappingUtils.createSolutionMapping(
 				var4, p1,
 				var2, y1,
-				var3, z1) );
-		input1.add( SolutionMappingUtils.createSolutionMapping(
+				var3, z1);
+		final SolutionMapping sm1b = SolutionMappingUtils.createSolutionMapping(
 				var2, y1,
-				var3, z2) );
-		input1.add( SolutionMappingUtils.createSolutionMapping(
+				var3, z2);
+		final SolutionMapping sm1c = SolutionMappingUtils.createSolutionMapping(
 				var2, y2,
-				var3, z3) );
+				var3, z3);
+		final List<SolutionMapping> input1 = List.of(sm1a, sm1b, sm1c);
 
-		final List<SolutionMapping> input2 = new ArrayList<>();
-		input2.add( SolutionMappingUtils.createSolutionMapping(
+		final SolutionMapping sm2a = SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1,
-				var3, z1) );
-		input2.add( SolutionMappingUtils.createSolutionMapping(
+				var3, z1);
+		final SolutionMapping sm2b = SolutionMappingUtils.createSolutionMapping(
 				var1, x2,
-				var2, y3) );
+				var2, y3);
+		final List<SolutionMapping> input2 = List.of(sm2a, sm2b);
 
-		final Set<Var> varsCertain1 = new HashSet<>();
-		varsCertain1.add(var2);
-		varsCertain1.add(var3);
-		final Set<Var> varsPossible1 = new HashSet<>();
-		varsPossible1.add(var1);
+		final Set<Var> varsCertain1 = Set.of(var2, var3);
+		final Set<Var> varsPossible1 = Set.of(var1);
 
-		final Set<Var> varsCertain2 = new HashSet<>();
-		varsCertain2.add(var1);
-		varsCertain2.add(var2);
-		final Set<Var> varsPossible2 = new HashSet<>();
-		varsPossible2.add(var3);
+		final Set<Var> varsCertain2 = Set.of(var1, var2);
+		final Set<Var> varsPossible2 = Set.of(var3);
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, useOuterJoinSemantics, inputVars);
 
 		assertTrue( it.hasNext() );
-		final Binding b = it.next().asJenaBinding();
-		assertEquals( 4, b.size() );
+		final SolutionMapping r1 = it.next();
+		boolean sm1bFound = r1.equals(sm1b);
+		boolean sm1cFound = r1.equals(sm1c);
+		boolean smNewFound = ( r1.asJenaBinding().size() == 4 );
+
+		if ( useOuterJoinSemantics ) {
+			assertTrue( it.hasNext() );
+			final SolutionMapping r2 = it.next();
+			if ( r2.equals(sm1b) ) sm1bFound = true;
+			if ( r2.equals(sm1c) ) sm1cFound = true;
+			if ( r2.asJenaBinding().size() == 4 ) smNewFound = true;
+
+			assertTrue( it.hasNext() );
+			final SolutionMapping r3 = it.next();
+			if ( r3.equals(sm1b) ) sm1bFound = true;
+			if ( r3.equals(sm1c) ) sm1cFound = true;
+			if ( r3.asJenaBinding().size() == 4 ) smNewFound = true;
+
+			assertEquals(true, sm1bFound);
+			assertEquals(true, sm1cFound);
+			assertEquals(true, smNewFound);
+		}
+		else {
+			assertEquals(false, sm1bFound);
+			assertEquals(false, sm1cFound);
+			assertEquals(true, smNewFound);
+		}
 
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithoutJoinVariable( final boolean sendAllSolMapsSeparately )
+	protected void _joinWithoutJoinVariable( final boolean sendAllSolMapsSeparately,
+	                                         final boolean useOuterJoinSemantics )
 			throws ExecutionException
 	{
 		final Var var1 = Var.alloc("v1");
@@ -452,7 +494,7 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, useOuterJoinSemantics, inputVars);
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
@@ -473,7 +515,8 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithTwoJoinVariables( final boolean sendAllSolMapsSeparately )
+	protected void _joinWithTwoJoinVariables( final boolean sendAllSolMapsSeparately,
+	                                          final boolean useOuterJoinSemantics )
 			throws ExecutionException
 	{
 		final Var var1 = Var.alloc("v1");
@@ -518,7 +561,7 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, useOuterJoinSemantics, inputVars);
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -555,7 +598,8 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 		assertTrue(b2Found);
 	}
 
-	protected void _joinWithTwoJoinVariables_noJoinPartner( final boolean sendAllSolMapsSeparately )
+	protected void _joinWithTwoJoinVariables_noJoinPartner( final boolean sendAllSolMapsSeparately,
+	                                                        final boolean useOuterJoinSemantics )
 			throws ExecutionException
 	{
 		final Var var1 = Var.alloc("v1");
@@ -600,7 +644,14 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, useOuterJoinSemantics, inputVars);
+
+		if ( useOuterJoinSemantics ) {
+			assertTrue( it.hasNext() );
+			it.next();
+			assertTrue( it.hasNext() );
+			it.next();
+		}
 
 		assertFalse( it.hasNext() );
 	}

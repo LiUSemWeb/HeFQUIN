@@ -10,77 +10,80 @@ public class ExecOpHashJoinTest extends TestsForInnerJoinAlgorithms
 {
 	@Test
 	public void joinWithEmptyInput1_SeparateInput() throws ExecutionException {
-		_joinWithEmptyInput1(true);
+		_joinWithEmptyInput1(true, false);
 	}
 
 	@Test
 	public void joinWithEmptyInput1_CombinedInput() throws ExecutionException {
-		_joinWithEmptyInput1(false);
+		_joinWithEmptyInput1(false, false);
 	}
 
 	@Test
 	public void joinWithEmptyInput2_SeparateInput() throws ExecutionException {
-		_joinWithEmptyInput2(true);
+		_joinWithEmptyInput2(true, false);
 	}
 
 	@Test
 	public void joinWithEmptyInput2_CombinedInput() throws ExecutionException {
-		_joinWithEmptyInput2(false);
+		_joinWithEmptyInput2(false, false);
 	}
 
 	@Test
 	public void joinWithOneJoinVariable_SeparateInput() throws ExecutionException {
-		_joinWithOneJoinVariable(true);
+		_joinWithOneJoinVariable(true, false);
 	}
 
 	@Test
 	public void joinWithOneJoinVariable_CombinedInput() throws ExecutionException {
-		_joinWithOneJoinVariable(false);
+		_joinWithOneJoinVariable(false, false);
 	}
 
 	@Test
 	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_SeparateInput() throws ExecutionException {
-		_joinWithOneJoinVariable_withPossibleVars_noOverlap(true);
+		_joinWithOneJoinVariable_withPossibleVars_noOverlap(true, false);
 	}
 
 	@Test
 	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_CombinedInput() throws ExecutionException {
-		_joinWithOneJoinVariable_withPossibleVars_noOverlap(false);
+		_joinWithOneJoinVariable_withPossibleVars_noOverlap(false, false);
 	}
 
 	@Test
 	public void joinWithOneJoinVariable_withPossibleVars_overlapped_SeparateInput() throws ExecutionException {
-		_joinWithOneJoinVariable_withPossibleVars_overlapped(true);
+		_joinWithOneJoinVariable_withPossibleVars_overlapped(true, false);
 	}
 
 	@Test
 	public void joinWithOneJoinVariable_withPossibleVars_overlapped_CombinedInput() throws ExecutionException {
-		_joinWithOneJoinVariable_withPossibleVars_overlapped(false);
+		_joinWithOneJoinVariable_withPossibleVars_overlapped(false, false);
 	}
 
 	@Test
 	public void joinWithTwoJoinVariables_SeparateInput() throws ExecutionException {
-		_joinWithTwoJoinVariables(true);
+		_joinWithTwoJoinVariables(true, false);
 	}
 
 	@Test
 	public void joinWithTwoJoinVariables_CombinedInput() throws ExecutionException {
-		_joinWithTwoJoinVariables(false);
+		_joinWithTwoJoinVariables(false, false);
 	}
 
 	@Test
 	public void joinWithTwoJoinVariables_noJoinPartner_SeparateInput() throws ExecutionException {
-		_joinWithTwoJoinVariables_noJoinPartner(true);
+		_joinWithTwoJoinVariables_noJoinPartner(true, false);
 	}
 
 	@Test
 	public void joinWithTwoJoinVariables_noJoinPartner_CombinedInput() throws ExecutionException {
-		_joinWithTwoJoinVariables_noJoinPartner(false);
+		_joinWithTwoJoinVariables_noJoinPartner(false, false);
 	}
 
 	@Override
-	protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {
+	protected BinaryExecutableOp createExecOpForTest(
+			final boolean useOuterJoinSemantics,
+			final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
+		assert useOuterJoinSemantics == false;
 
 		return new ExecOpHashJoin( inputVars[0], inputVars[1], false, null );
 	}

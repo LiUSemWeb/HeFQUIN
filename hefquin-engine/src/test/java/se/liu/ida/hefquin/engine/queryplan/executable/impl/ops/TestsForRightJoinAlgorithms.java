@@ -50,7 +50,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, true, inputVars);
 
 		assertTrue( it.hasNext() );
 		final Binding b = it.next().asJenaBinding();
@@ -86,7 +86,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, true, inputVars);
 
 		assertFalse( it.hasNext() );
 	}
@@ -123,7 +123,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, true, inputVars);
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
@@ -159,7 +159,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, true, inputVars);
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
@@ -218,7 +218,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, true, inputVars);
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -322,7 +322,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, true, inputVars);
 
 		final Set<Binding> result = new HashSet<>();
 		assertTrue( it.hasNext() );
@@ -426,7 +426,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, true, inputVars);
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
@@ -484,7 +484,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, true, inputVars);
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -566,7 +566,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, true, inputVars);
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -640,7 +640,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, inputVars);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately, true, inputVars);
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();

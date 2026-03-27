@@ -43,11 +43,13 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 			final List<SolutionMapping> input1,
 			final List<SolutionMapping> input2,
 			final boolean sendAllSolMapsSeparately,
+			final boolean useOuterJoinSemantics,
 			final ExpectedVariables... inputVars ) throws ExecutionException
 	{
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
-		final BinaryExecutableOp op = createExecOpForTest(inputVars);
+		final BinaryExecutableOp op = createExecOpForTest( useOuterJoinSemantics,
+		                                                   inputVars );
 
 		if ( sendAllSolMapsSeparately == true ) {
 			for ( final SolutionMapping sm : input1 ) {
@@ -74,5 +76,7 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		return sink.getCollectedSolutionMappings().iterator();
 	}
 
-	protected abstract BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars );
+	protected abstract BinaryExecutableOp createExecOpForTest(
+			final boolean useOuterJoinSemantics,
+			final ExpectedVariables... inputVars );
 }

@@ -24,16 +24,21 @@ import java.util.Set;
 public class ExecOpHashJoin2 extends BinaryExecutableOpBase
 {
 	protected final SolutionMappingsIndex index;
-	protected Stats statsOfIndex = null;
+	protected final boolean useOuterJoinSemantics;
 
 	protected boolean child1InputComplete = false;
 	protected boolean child2InputComplete = false;
 
+	protected Stats statsOfIndex = null;
+
 	public ExecOpHashJoin2( final ExpectedVariables inputVars1,
 	                        final ExpectedVariables inputVars2,
+	                        final boolean useOuterJoinSemantics,
 	                        final boolean collectExceptions,
 	                        final QueryPlanningInfo qpInfo ) {
 		super(collectExceptions, qpInfo);
+
+		this.useOuterJoinSemantics = useOuterJoinSemantics;
 
 		// determine the certain join variables
 		final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);
@@ -131,8 +136,14 @@ public class ExecOpHashJoin2 extends BinaryExecutableOpBase
 	protected void produceOutput( final SolutionMapping inputSolMap,
 	                              final List<SolutionMapping> output ) {
 		final Iterable<SolutionMapping> joinPartners = index.getJoinPartners(inputSolMap);
+		boolean hasJoinPartner = false;
 		for ( final SolutionMapping joinPartner : joinPartners ) {
+			hasJoinPartner = true;
 			output.add( SolutionMappingUtils.merge(joinPartner,inputSolMap) );
+		}
+
+		if ( useOuterJoinSemantics && ! hasJoinPartner ) {
+			output.add(inputSolMap);
 		}
 	}
 

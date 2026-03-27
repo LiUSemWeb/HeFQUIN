@@ -79,8 +79,11 @@ public class ExecOpHashRJoinTest extends TestsForRightJoinAlgorithms
 	}
 
 	@Override
-	protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {
+	protected BinaryExecutableOp createExecOpForTest(
+			final boolean useOuterJoinSemantics,
+			final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
+		assert useOuterJoinSemantics == true;
 
 		return new ExecOpHashRJoin( inputVars[0], inputVars[1], false, null );
 	}

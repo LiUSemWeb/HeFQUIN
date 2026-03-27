@@ -14,73 +14,143 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 public class ExecOpHashJoin2Test extends TestsForInnerJoinAlgorithms
 {
 	@Test
-	public void joinWithEmptyInput1_SeparateInput() throws ExecutionException {
-		_joinWithEmptyInput1(true);
+	public void joinWithEmptyInput1_SeparateInput_InnerJoin() throws ExecutionException {
+		_joinWithEmptyInput1(true, false);
 	}
 
 	@Test
-	public void joinWithEmptyInput1_CombinedInput() throws ExecutionException {
-		_joinWithEmptyInput1(false);
+	public void joinWithEmptyInput1_SeparateInput_OuterJoin() throws ExecutionException {
+		_joinWithEmptyInput1(true, true);
 	}
 
 	@Test
-	public void joinWithEmptyInput2_SeparateInput() throws ExecutionException {
-		_joinWithEmptyInput2(true);
+	public void joinWithEmptyInput1_CombinedInput_InnerJoin() throws ExecutionException {
+		_joinWithEmptyInput1(false, false);
 	}
 
 	@Test
-	public void joinWithEmptyInput2_CombinedInput() throws ExecutionException {
-		_joinWithEmptyInput2(false);
+	public void joinWithEmptyInput1_CombinedInput_OuterJoin() throws ExecutionException {
+		_joinWithEmptyInput1(false, true);
 	}
 
 	@Test
-	public void joinWithOneJoinVariable_SeparateInput() throws ExecutionException {
-		_joinWithOneJoinVariable(true);
+	public void joinWithEmptyInput2_SeparateInput_InnerJoin() throws ExecutionException {
+		_joinWithEmptyInput2(true, false);
 	}
 
 	@Test
-	public void joinWithOneJoinVariable_CombinedInput() throws ExecutionException {
-		_joinWithOneJoinVariable(false);
+	public void joinWithEmptyInput2_SeparateInput_OuterJoin() throws ExecutionException {
+		_joinWithEmptyInput2(true, true);
 	}
 
 	@Test
-	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_SeparateInput() throws ExecutionException {
-		_joinWithOneJoinVariable_withPossibleVars_noOverlap(true);
+	public void joinWithEmptyInput2_CombinedInput_InnerJoin() throws ExecutionException {
+		_joinWithEmptyInput2(false, false);
 	}
 
 	@Test
-	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_CombinedInput() throws ExecutionException {
-		_joinWithOneJoinVariable_withPossibleVars_noOverlap(false);
+	public void joinWithEmptyInput2_CombinedInput_OuterJoin() throws ExecutionException {
+		_joinWithEmptyInput2(false, true);
 	}
 
 	@Test
-	public void joinWithOneJoinVariable_withPossibleVars_overlapped_SeparateInput() throws ExecutionException {
-		_joinWithOneJoinVariable_withPossibleVars_overlapped(true);
+	public void joinWithOneJoinVariable_SeparateInput_InnerJoin() throws ExecutionException {
+		_joinWithOneJoinVariable(true, false);
 	}
 
 	@Test
-	public void joinWithOneJoinVariable_withPossibleVars_overlapped_CombinedInput() throws ExecutionException {
-		_joinWithOneJoinVariable_withPossibleVars_overlapped(false);
+	public void joinWithOneJoinVariable_SeparateInput_OuterJoin() throws ExecutionException {
+		_joinWithOneJoinVariable(true, true);
 	}
 
 	@Test
-	public void joinWithTwoJoinVariables_SeparateInput() throws ExecutionException {
-		_joinWithTwoJoinVariables(true);
+	public void joinWithOneJoinVariable_CombinedInput_InnerJoin() throws ExecutionException {
+		_joinWithOneJoinVariable(false, false);
 	}
 
 	@Test
-	public void joinWithTwoJoinVariables_CombinedInput() throws ExecutionException {
-		_joinWithTwoJoinVariables(false);
+	public void joinWithOneJoinVariable_CombinedInput_OuterJoin() throws ExecutionException {
+		_joinWithOneJoinVariable(false, true);
 	}
 
 	@Test
-	public void joinWithTwoJoinVariables_noJoinPartner_SeparateInput() throws ExecutionException {
-		_joinWithTwoJoinVariables_noJoinPartner(true);
+	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_SeparateInput_InnerJoin() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_noOverlap(true, false);
 	}
 
 	@Test
-	public void joinWithTwoJoinVariables_noJoinPartner_CombinedInput() throws ExecutionException {
-		_joinWithTwoJoinVariables_noJoinPartner(false);
+	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_SeparateInput_OuterJoin() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_noOverlap(true, true);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_CombinedInput_InnerJoin() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_noOverlap(false, false);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_CombinedInput_OuterJoin() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_noOverlap(false, true);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_overlapped_SeparateInput_InnerJoin() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_overlapped(true, false);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_overlapped_SeparateInput_OuterJoin() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_overlapped(true, true);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_overlapped_CombinedInput_InnerJoin() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_overlapped(false, false);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_overlapped_CombinedInput_OuterJoin() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_overlapped(false, true);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_SeparateInput_InnerJoin() throws ExecutionException {
+		_joinWithTwoJoinVariables(true, false);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_SeparateInput_OuterJoin() throws ExecutionException {
+		_joinWithTwoJoinVariables(true, true);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_CombinedInput_InnerJoin() throws ExecutionException {
+		_joinWithTwoJoinVariables(false, false);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_CombinedInput_OuterJoin() throws ExecutionException {
+		_joinWithTwoJoinVariables(false, true);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_noJoinPartner_SeparateInput_InnerJoin() throws ExecutionException {
+		_joinWithTwoJoinVariables_noJoinPartner(true, false);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_noJoinPartner_SeparateInput_OuterJoin() throws ExecutionException {
+		_joinWithTwoJoinVariables_noJoinPartner(true, true);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_noJoinPartner_CombinedInput_InnerJoin() throws ExecutionException {
+		_joinWithTwoJoinVariables_noJoinPartner(false, false);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_noJoinPartner_CombinedInput_OuterJoin() throws ExecutionException {
+		_joinWithTwoJoinVariables_noJoinPartner(false, true);
 	}
 
 
@@ -91,11 +161,13 @@ public class ExecOpHashJoin2Test extends TestsForInnerJoinAlgorithms
 			final List<SolutionMapping> input1,
 			final List<SolutionMapping> input2,
 			final boolean sendAllSolMapsSeparately,
+			final boolean useOuterJoinSemantics,
 			final ExpectedVariables... inputVars ) throws ExecutionException
 	{
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
-		final BinaryExecutableOp op = createExecOpForTest(inputVars);
+		final BinaryExecutableOp op = createExecOpForTest( useOuterJoinSemantics,
+		                                                   inputVars );
 
 		if ( sendAllSolMapsSeparately == true ) {
 			for ( final SolutionMapping sm : input2 ) {
@@ -123,10 +195,15 @@ public class ExecOpHashJoin2Test extends TestsForInnerJoinAlgorithms
 	}
 
 	@Override
-	protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {
+	protected BinaryExecutableOp createExecOpForTest(
+			final boolean useOuterJoinSemantics,
+			final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashJoin2( inputVars[0], inputVars[1], false, null );
+		return new ExecOpHashJoin2( inputVars[0], inputVars[1],
+		                            useOuterJoinSemantics,
+		                            false,   // collectExceptions
+		                            null );  // qpInfo
 	}
 
 }
