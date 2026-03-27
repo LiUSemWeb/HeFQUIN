@@ -23,9 +23,14 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * that they have for the join variables to decide where to place them in the
  * hash table) and, thereafter, probes the hash table to find join partners for
  * each of the solution mappings of the second input sequence.
- *
+ * <p>
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpHashJoin1} class.
+ * <p>
+ * In addition to this class, we also have {@link PhysicalOpHashJoin2}
+ * which does essentially the same thing but builds the has table over
+ * the second input. I contrast to this class, {@link PhysicalOpHashJoin2}
+ * even supports outer-join semantics.
  */
 public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 {
