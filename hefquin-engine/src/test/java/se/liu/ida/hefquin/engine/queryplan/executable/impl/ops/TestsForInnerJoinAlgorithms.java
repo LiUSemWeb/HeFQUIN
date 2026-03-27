@@ -19,9 +19,11 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
-public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
+public abstract class TestsForInnerJoinAlgorithms
 {
 	protected void _joinWithEmptyInput1( final boolean sendAllSolMapsSeparately,
 	                                     final boolean useOuterJoinSemantics )
@@ -656,4 +658,65 @@ public abstract class TestsForInnerJoinAlgorithms extends TestsForJoinAlgorithms
 		assertFalse( it.hasNext() );
 	}
 
+	protected ExpectedVariables[] getExpectedVariables(
+			final Set<Var> varsCertain1,
+			final Set<Var> varsPossible1,
+			final Set<Var> varsCertain2,
+			final Set<Var> varsPossible2)
+	{
+		final ExpectedVariables[] inputVars = new ExpectedVariables[2];
+		inputVars[0] = new ExpectedVariables() {
+			public Set<Var> getCertainVariables() { return varsCertain1;}
+			public Set<Var> getPossibleVariables() { return varsPossible1;}
+		};
+		inputVars[1] = new ExpectedVariables() {
+			public Set<Var> getCertainVariables() { return varsCertain2;}
+			public Set<Var> getPossibleVariables() { return varsPossible2;}
+		};
+		return inputVars;
+	}
+
+	/**
+	 * Sends first input first.
+	 */
+	protected Iterator<SolutionMapping> runTest(
+			final List<SolutionMapping> input1,
+			final List<SolutionMapping> input2,
+			final boolean sendAllSolMapsSeparately,
+			final boolean useOuterJoinSemantics,
+			final ExpectedVariables... inputVars ) throws ExecutionException
+	{
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
+
+		final BinaryExecutableOp op = createExecOpForTest( useOuterJoinSemantics,
+		                                                   inputVars );
+
+		if ( sendAllSolMapsSeparately == true ) {
+			for ( final SolutionMapping sm : input1 ) {
+				op.processInputFromChild1(sm, sink, null);
+			}
+		}
+		else {
+			op.processInputFromChild1(input1, sink, null);
+		}
+
+		op.wrapUpForChild1(sink, null);
+
+		if ( sendAllSolMapsSeparately == true ) {
+			for ( final SolutionMapping sm : input2 ) {
+				op.processInputFromChild2(sm, sink, null);
+			}
+		}
+		else {
+			op.processInputFromChild2(input2, sink, null);
+		}
+
+		op.wrapUpForChild2(sink, null);
+
+		return sink.getCollectedSolutionMappings().iterator();
+	}
+
+	protected abstract BinaryExecutableOp createExecOpForTest(
+			final boolean useOuterJoinSemantics,
+			final ExpectedVariables... inputVars );
 }
