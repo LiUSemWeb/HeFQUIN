@@ -16,15 +16,40 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
 
 /**
- * Thread-safe persistent cache backed by a {@link ChronicleMap}.
+ * Persistent cache backed by a {@link ChronicleMap}.
  *
- * This cache stores entries on disk and restores them when reopened from the
+ * <p>
+ * This class is thread-safe for concurrent access through its public methods on
+ * a single {@link ChronicleMapCache} instance. All accesses to the backing map,
+ * replacement policy, and invalidation policy via these methods are
+ * synchronized.
+ * </p>
+ *
+ * <p>
+ * The cache stores entries on disk and restores them when reopened from the
  * same file. Cache entry creation, invalidation, and replacement behavior are
  * delegated to the configured cache policies.
+ * </p>
  *
- * The cache enforces a maximum logical capacity. If the persisted map already
- * contains more entries than allowed when opened, entries are evicted according
- * to the configured replacement policy until the capacity constraint is met.
+ * <p>
+ * The cache enforces a maximum capacity. If the persisted map contains more
+ * entries than allowed when opened, entries are evicted according to the
+ * configured replacement policy until the capacity constraint is met.
+ * </p>
+ *
+ * <p>
+ * <strong>Caveats:</strong>
+ * </p>
+ * <p>
+ * Thread safety is provided only at the level of this cache instance. If two
+ * ChronicleMapCache objects point to the same persisted file, this class does
+ * not coordinate:
+ * </p>
+ * <ul>
+ * <li>replacement policy state</li>
+ * <li>capacity enforcement</li>
+ * <li>invalidation/eviction decisions</li>
+ * </ul>
  */
 public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleMapCacheObject>, AutoCloseable
 {
@@ -66,8 +91,8 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	}
 
 	/**
-	 * Constructs a new {@link ChronicleMapCache} with with a custom file path and
-	 * the default cache capacity.
+	 * Constructs a new {@link ChronicleMapCache} with a custom file path and the
+	 * default cache capacity.
 	 *
 	 * @param filename the path to the cache file
 	 * @param policies the cache policies to use
@@ -161,13 +186,17 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 
 	@Override
 	public boolean isEmpty() {
-		return map.isEmpty();
+		synchronized (map) {
+			return map.isEmpty();
+		}
 	}
 
 	@Override
 	public void clear() {
-		map.clear();
-		replacementPolicy.clear();
+		synchronized (map) {
+			map.clear();
+			replacementPolicy.clear();
+		}
 	}
 
 	/**
@@ -190,24 +219,24 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		if ( value == null )
 			throw new IllegalArgumentException("Cache value must not be null");
 
-		final ChronicleMapCacheEntry entry = entryFactory.createCacheEntry(value);
+		synchronized (map) {
+			map.compute( key, (k, oldEntry) -> {
+				final ChronicleMapCacheEntry entry = entryFactory.createCacheEntry(value);
 
-		// Replacement
-		if( map.get(key) != null ) {
-			replacementPolicy.entryWasRewritten(key, entry);
-			map.put(key, entry);
-			return;
+				if ( oldEntry == null )
+					replacementPolicy.entryWasAdded(k, entry);
+				else
+					replacementPolicy.entryWasRewritten(k, entry);
+				return entry;
+			} );
+
+			// Check capacity
+			if ( map.size() > capacity ) {
+				final Iterable<ChronicleMapCacheKey> evictionCandidates = replacementPolicy.getEvictionCandidates(1);
+				final ChronicleMapCacheKey evictionCandidate = evictionCandidates.iterator().next();
+				evict(evictionCandidate);
+			}
 		}
-
-		// Check capacity
-		if ( map.size() >= capacity ) {
-			final Iterable<ChronicleMapCacheKey> evictionCandidates = replacementPolicy.getEvictionCandidates(1);
-			final ChronicleMapCacheKey evictionCandidate = evictionCandidates.iterator().next();
-			evict(evictionCandidate);
-		}
-
-		map.put(key, entry);
-		replacementPolicy.entryWasAdded(key, entry);
 	}
 
 	/**
@@ -221,10 +250,12 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	 */
 	@Override
 	public ChronicleMapCacheObject get( final ChronicleMapCacheKey key ) {
-		final ChronicleMapCacheEntry entry = map.get(key);
-		if( entry != null ) {
-			// Still valid?
-			if( ! invalidPolicy.isStillValid(entry) ) {
+		synchronized (map) {
+			final ChronicleMapCacheEntry entry = map.get(key);
+			if ( entry == null )
+				return null;
+
+			if ( ! invalidPolicy.isStillValid(entry) ) {
 				evict(key);
 				return null;
 			}
@@ -232,7 +263,6 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 			replacementPolicy.entryWasRequested(key, entry);
 			return entry.getObject();
 		}
-		return null;
 	}
 
 	/**
@@ -243,11 +273,13 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	 */
 	@Override
 	public boolean evict( final ChronicleMapCacheKey key ) {
-		if( map.remove(key) != null ) {
-			replacementPolicy.entryWasEvicted(key);
-			return true;
+		synchronized (map) {
+			if( map.remove(key) != null ) {
+				replacementPolicy.entryWasEvicted(key);
+				return true;
+			}
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -260,11 +292,13 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	 */
 	@Override
 	public boolean evict( final ChronicleMapCacheKey key, final ChronicleMapCacheObject value ) {
-		final ChronicleMapCacheEntry entry = map.get(key);
-		if ( entry != null && entry.getObject().equals(value) ) {
-			return evict(key);
+		synchronized (map) {
+			final ChronicleMapCacheEntry entry = map.get(key);
+			if ( entry != null && entry.getObject().equals(value) ) {
+				return evict(key);
+			}
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -273,7 +307,9 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	 * @return the cache size
 	 */
 	public int size() {
-		return map.size();
+		synchronized (map) {
+			return map.size();
+		}
 	}
 
 	@Override
@@ -289,7 +325,9 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	 */
 	@Override
 	public void close() {
-		map.close();
+		synchronized (map) {
+			map.close();
+		}
 	}
 
 	/**
@@ -298,6 +336,8 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	 * @return the current key set
 	 */
 	public Set<ChronicleMapCacheKey> keySet() {
-		return map.keySet();
+		synchronized (map) {
+			return Set.copyOf( map.keySet() );
+		}
 	}
 }
