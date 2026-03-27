@@ -9,13 +9,18 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpMultiwayJoin implements NaryLogicalOp
+public class LogicalOpMultiwayJoin extends BaseForLogicalOps implements NaryLogicalOp
 {
-	protected static LogicalOpMultiwayJoin singleton = new LogicalOpMultiwayJoin();
+	protected static final LogicalOpMultiwayJoin singletonFalse = new LogicalOpMultiwayJoin(false);
+	protected static final LogicalOpMultiwayJoin singletonTrue  = new LogicalOpMultiwayJoin(true);
 
-	public static LogicalOpMultiwayJoin getInstance() { return singleton; }
+	public static LogicalOpMultiwayJoin getInstance( final boolean mayReduce ) {
+		return mayReduce ? singletonTrue : singletonFalse;
+	}
 
-	protected LogicalOpMultiwayJoin() {}
+	protected LogicalOpMultiwayJoin( final boolean mayReduce ) {
+		super( mayReduce );
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {

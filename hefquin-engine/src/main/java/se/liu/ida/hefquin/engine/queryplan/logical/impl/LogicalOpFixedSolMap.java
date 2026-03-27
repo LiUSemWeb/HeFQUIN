@@ -12,12 +12,14 @@ import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 /**
  * A logical operator that returns a given solution mapping.
  */
-public class LogicalOpFixedSolMap implements NullaryLogicalOp
+public class LogicalOpFixedSolMap extends BaseForLogicalOps implements NullaryLogicalOp
 {
 	protected final SolutionMapping sm;
 	protected final ExpectedVariables expectedVars;
 
-	public LogicalOpFixedSolMap( final SolutionMapping sm ) {
+	public LogicalOpFixedSolMap( final SolutionMapping sm, final boolean mayReduce ) {
+		super( mayReduce );
+
 		assert sm!= null;
 
 		this.sm = sm;

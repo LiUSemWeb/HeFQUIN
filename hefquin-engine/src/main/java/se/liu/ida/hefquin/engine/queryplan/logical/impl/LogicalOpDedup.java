@@ -4,13 +4,18 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpDedup implements UnaryLogicalOp 
+public class LogicalOpDedup extends BaseForLogicalOps implements UnaryLogicalOp 
 {
-	protected static LogicalOpDedup singleton = new LogicalOpDedup();
+	protected static final LogicalOpDedup singletonFalse = new LogicalOpDedup(false);
+	protected static final LogicalOpDedup singletonTrue  = new LogicalOpDedup(true);
 
-	public static LogicalOpDedup getInstance() { return singleton; }
+	public static LogicalOpDedup getInstance( final boolean mayReduce ) {
+		return mayReduce ? singletonTrue : singletonFalse;
+	}
 
-	protected LogicalOpDedup() {}
+	protected LogicalOpDedup( final boolean mayReduce ) {
+		super( mayReduce );
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {

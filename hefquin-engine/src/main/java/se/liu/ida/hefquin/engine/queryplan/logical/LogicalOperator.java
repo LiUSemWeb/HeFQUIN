@@ -8,4 +8,6 @@ import se.liu.ida.hefquin.engine.queryplan.base.QueryPlanOperator;
 public interface LogicalOperator extends QueryPlanOperator
 {
 	void visit( LogicalPlanVisitor visitor );
+
+	boolean mayReduce();
 }

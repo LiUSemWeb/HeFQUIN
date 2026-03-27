@@ -23,7 +23,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpUnfold implements UnaryLogicalOp
+public class LogicalOpUnfold extends BaseForLogicalOps implements UnaryLogicalOp
 {
 	protected final Expr expr;
 	protected final Var var1;
@@ -34,7 +34,9 @@ public class LogicalOpUnfold implements UnaryLogicalOp
 	 * where the second variable may be {@code null} (in case the UNFOLD
 	 * clause does not contain two variables).
 	 */
-	public LogicalOpUnfold( final Expr expr, final Var var1, final Var var2 ) {
+	public LogicalOpUnfold( final Expr expr, final Var var1, final Var var2, final boolean mayReduce ) {
+		super( mayReduce );
+
 		assert expr != null;
 		assert var1 != null;
 

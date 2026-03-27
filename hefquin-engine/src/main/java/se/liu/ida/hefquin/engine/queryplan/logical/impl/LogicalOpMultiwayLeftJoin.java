@@ -14,13 +14,18 @@ import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
  * Hence, it is not to be confused with nested OPTIONAL clauses (which would,
  * instead, be captured as multiple nested multiway left joins).
  */
-public class LogicalOpMultiwayLeftJoin implements NaryLogicalOp
+public class LogicalOpMultiwayLeftJoin extends BaseForLogicalOps implements NaryLogicalOp
 {
-	protected static LogicalOpMultiwayLeftJoin singleton = new LogicalOpMultiwayLeftJoin();
+	protected static final LogicalOpMultiwayLeftJoin singletonFalse = new LogicalOpMultiwayLeftJoin(false);
+	protected static final LogicalOpMultiwayLeftJoin singletonTrue  = new LogicalOpMultiwayLeftJoin(true);
 
-	public static LogicalOpMultiwayLeftJoin getInstance() { return singleton; }
+	public static LogicalOpMultiwayLeftJoin getInstance( final boolean mayReduce ) {
+		return mayReduce ? singletonTrue : singletonFalse;
+	}
 
-	protected LogicalOpMultiwayLeftJoin() {}
+	protected LogicalOpMultiwayLeftJoin( final boolean mayReduce ) {
+		super( mayReduce );
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {

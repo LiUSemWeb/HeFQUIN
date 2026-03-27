@@ -8,12 +8,15 @@ import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 
 public class LogicalOpRequest<ReqType extends DataRetrievalRequest,
                               MemberType extends FederationMember>
+		extends BaseForLogicalOps
 		implements NullaryLogicalOp
 {
 	protected final MemberType fm;
 	protected final ReqType req;
 
-	public LogicalOpRequest( final MemberType fm, final ReqType req ) {
+	public LogicalOpRequest( final MemberType fm, final ReqType req, final boolean mayReduce ) {
+		super( mayReduce );
+
 		assert fm != null;
 		assert fm != req;
 

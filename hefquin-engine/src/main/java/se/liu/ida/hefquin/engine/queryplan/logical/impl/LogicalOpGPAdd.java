@@ -18,7 +18,7 @@ import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint.Parameter;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
-public class LogicalOpGPAdd implements UnaryLogicalOp
+public class LogicalOpGPAdd extends BaseForLogicalOps implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
@@ -30,7 +30,10 @@ public class LogicalOpGPAdd implements UnaryLogicalOp
 
 	public LogicalOpGPAdd( final FederationMember fm,
 	                       final SPARQLGraphPattern pattern,
-	                       final Map<String,Var> paramVars ) {
+	                       final Map<String,Var> paramVars,
+	                       final boolean mayReduce ) {
+		super( mayReduce );
+
 		assert fm != null;
 		assert pattern != null;
 

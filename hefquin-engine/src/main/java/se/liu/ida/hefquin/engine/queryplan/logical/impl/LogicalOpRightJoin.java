@@ -9,13 +9,18 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
-public class LogicalOpRightJoin implements BinaryLogicalOp
+public class LogicalOpRightJoin extends BaseForLogicalOps implements BinaryLogicalOp
 {
-	protected static LogicalOpRightJoin singleton = new LogicalOpRightJoin();
+	protected static final LogicalOpRightJoin singletonFalse = new LogicalOpRightJoin(false);
+	protected static final LogicalOpRightJoin singletonTrue  = new LogicalOpRightJoin(true);
 
-	public static LogicalOpRightJoin getInstance() { return singleton; }
+	public static LogicalOpRightJoin getInstance( final boolean mayReduce ) {
+		return mayReduce ? singletonTrue : singletonFalse;
+	}
 
-	protected LogicalOpRightJoin() {}
+	protected LogicalOpRightJoin( final boolean mayReduce ) {
+		super( mayReduce );
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {

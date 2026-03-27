@@ -7,18 +7,22 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpFilter implements UnaryLogicalOp
+public class LogicalOpFilter extends BaseForLogicalOps implements UnaryLogicalOp
 {
 	protected final ExprList filterExpressions;
 
-	public LogicalOpFilter( final ExprList filterExpressions ) {
+	public LogicalOpFilter( final ExprList filterExpressions, final boolean mayReduce ) {
+		super( mayReduce );
+
 		assert filterExpressions != null;
 		assert ! filterExpressions.isEmpty();
 
 		this.filterExpressions = filterExpressions;
 	}
 
-	public LogicalOpFilter( final Expr filterExpression ) {
+	public LogicalOpFilter( final Expr filterExpression, final boolean mayReduce ) {
+		super( mayReduce );
+		
 		assert filterExpression != null;
 
 		this.filterExpressions = new ExprList(filterExpression);

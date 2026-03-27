@@ -9,13 +9,18 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpJoin implements BinaryLogicalOp
+public class LogicalOpJoin extends BaseForLogicalOps implements BinaryLogicalOp
 {
-	protected static LogicalOpJoin singleton = new LogicalOpJoin();
+	protected static final LogicalOpJoin singletonFalse = new LogicalOpJoin(false);
+	protected static final LogicalOpJoin singletonTrue  = new LogicalOpJoin(true);
 
-	public static LogicalOpJoin getInstance() { return singleton; }
+	public static LogicalOpJoin getInstance( final boolean mayReduce ) {
+		return mayReduce ? singletonTrue : singletonFalse;
+	}
 
-	protected LogicalOpJoin() {}
+	protected LogicalOpJoin( final boolean mayReduce ) {
+		super( mayReduce );
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
