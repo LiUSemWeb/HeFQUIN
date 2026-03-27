@@ -58,7 +58,7 @@ public class PhysicalOpHashJoin2 extends BaseForPhysicalOpBinaryJoin
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof PhysicalOpHashJoin;
+		return o instanceof PhysicalOpHashJoin2;
 	}
 
 	@Override

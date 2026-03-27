@@ -144,8 +144,8 @@ public class TestsForPhysicalOpFactories
 	}
 
 	@Test
-	public void testPhysicalOpHashJoin() {
-		final PhysicalOpFactory factory = PhysicalOpHashJoin.getFactory();
+	public void testPhysicalOpHashJoin1() {
+		final PhysicalOpFactory factory = PhysicalOpHashJoin1.getFactory();
 		final LogicalOpJoin lop = LogicalOpJoin.getInstance();
 
 		final ExpectedVariables vars1 = TestUtils.getExpectedVariables( List.of("x", "y"), List.of() );
@@ -159,7 +159,7 @@ public class TestsForPhysicalOpFactories
 		assertFalse( factory.supports(lop, vars3, vars4) ); // overlap possible/possible
 		assertFalse( factory.supports(lop, vars1, vars5) ); // no overlap
 
-		assertEquals( PhysicalOpHashJoin.class, factory.create(lop).getClass() );
+		assertEquals( PhysicalOpHashJoin1.class, factory.create(lop).getClass() );
 		assertFalse( factory.supports( new LogicalOpGlobalToLocal(null), (ExpectedVariables) null ) );
 	}
 

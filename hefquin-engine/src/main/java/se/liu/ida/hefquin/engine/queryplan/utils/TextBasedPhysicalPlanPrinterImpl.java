@@ -158,8 +158,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
-		public void visit( final PhysicalOpHashJoin op ) {
-			rootOpString = "hash join";
+		public void visit( final PhysicalOpHashJoin1 op ) {
+			rootOpString = "hash join 1";
 			record( op.getLogicalOperator() );
 		}
 

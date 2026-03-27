@@ -27,14 +27,14 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpHashJoin} class.
  */
-public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
+public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	private static PhysicalOpHashJoin singleton = null;
+	private static PhysicalOpHashJoin1 singleton = null;
 
-	protected PhysicalOpHashJoin() { super(false); }
+	protected PhysicalOpHashJoin1() { super(false); }
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
@@ -54,7 +54,7 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof PhysicalOpHashJoin;
+		return o instanceof PhysicalOpHashJoin1;
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 		}
 
 		@Override
-		public PhysicalOpHashJoin create( final BinaryLogicalOp lop ) {
+		public PhysicalOpHashJoin1 create( final BinaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpJoin ) {
 				return getInstance();
 			}
@@ -90,8 +90,8 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 		}
 	}
 
-	public static PhysicalOpHashJoin getInstance() {
-		if ( singleton == null ) singleton = new PhysicalOpHashJoin();
+	public static PhysicalOpHashJoin1 getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpHashJoin1();
 
 		return singleton;
 	}
