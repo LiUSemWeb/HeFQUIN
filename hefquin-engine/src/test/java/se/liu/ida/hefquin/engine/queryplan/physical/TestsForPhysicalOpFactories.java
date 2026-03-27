@@ -27,31 +27,8 @@ import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpNaiveNestedLoopsJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 
@@ -187,12 +164,28 @@ public class TestsForPhysicalOpFactories
 	}
 
 	@Test
-	public void testPhysicalOpHashRJoin() {
-		final PhysicalOpFactory factory = PhysicalOpHashRJoin.getFactory();
-		final LogicalOpRightJoin lop = LogicalOpRightJoin.getInstance();
+	public void testPhysicalOpHashJoin2_InnerJoin() {
+		final PhysicalOpFactory factory = PhysicalOpHashJoin2.getFactory();
+		final LogicalOpJoin lop = LogicalOpJoin.getInstance();
 
-		assertEquals( PhysicalOpHashRJoin.class, factory.create(lop).getClass() );
-		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
+		final ExpectedVariables vars1 = TestUtils.getExpectedVariables( List.of("x", "y"), List.of() );
+		final ExpectedVariables vars2 = TestUtils.getExpectedVariables( List.of("x", "z"), List.of() );
+
+		assertEquals( PhysicalOpHashJoin2.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, vars1, vars2) );
+		assertFalse( factory.supports(LogicalOpJoin.getInstance(), (ExpectedVariables) null) );
+	}
+
+	@Test
+	public void testPhysicalOpHashJoin2_OuterJoin() {
+		final PhysicalOpFactory factory = PhysicalOpHashJoin2.getFactory();
+		final LogicalOpLeftJoin lop = LogicalOpLeftJoin.getInstance();
+
+		final ExpectedVariables vars1 = TestUtils.getExpectedVariables( List.of("x", "y"), List.of() );
+		final ExpectedVariables vars2 = TestUtils.getExpectedVariables( List.of("x", "z"), List.of() );
+
+		assertEquals( PhysicalOpHashJoin2.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, vars1, vars2) );
 		assertFalse( factory.supports(LogicalOpJoin.getInstance(), (ExpectedVariables) null) );
 	}
 

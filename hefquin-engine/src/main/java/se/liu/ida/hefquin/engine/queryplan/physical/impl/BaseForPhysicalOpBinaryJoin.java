@@ -14,8 +14,17 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp
 public abstract class BaseForPhysicalOpBinaryJoin
 		implements BinaryPhysicalOpForLogicalOp
 {
+	protected final boolean useOuterJoinSemantics;
+
+	protected BaseForPhysicalOpBinaryJoin( final boolean useOuterJoinSemantics ) {
+		this.useOuterJoinSemantics = useOuterJoinSemantics;
+	}
+
 	@Override
 	public LogicalOpJoin getLogicalOperator() {
-		return LogicalOpJoin.getInstance();
+		if ( useOuterJoinSemantics )
+			return LogicalOpJoin.getInstance();
+		else
+			return LogicalOpJoin.getInstance();
 	}
 }

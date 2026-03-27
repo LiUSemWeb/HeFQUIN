@@ -12,29 +12,33 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
- * A physical operator that implements the hash join algorithm to perform an
- * inner join of two sequences of input solution mappings (produced by the two
- * sub-plans under this operator). The hash join algorithm builds a hash table
- * with the solution mappings of the first input sequence (using the values
- * that they have for the join variables to decide where to place them in the
- * hash table) and, thereafter, probes the hash table to find join partners for
- * each of the solution mappings of the second input sequence.
+ * A physical operator that implements the hash join algorithm to perform
+ * a join of two sequences of input solution mappings (produced by the two
+ * sub-plans under this operator). The algorithm builds a hash table with
+ * the solution mappings of the second input sequence (using the values
+ * that they have for the join variables to decide where to place them in
+ * the hash table) and, thereafter, probes the hash table to find join
+ * partners for each of the solution mappings of the first input sequence.
  *
  * The actual algorithm of this operator is implemented in the
- * {@link ExecOpHashJoin} class.
+ * {@link ExecOpHashJoin2} class.
  */
-public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
+public class PhysicalOpHashJoin2 extends BaseForPhysicalOpBinaryJoin
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	private static PhysicalOpHashJoin singleton = null;
+	private static PhysicalOpHashJoin2 singletonForInnerJoin = null;
+	private static PhysicalOpHashJoin2 singletonForOuterJoin = null;
 
-	protected PhysicalOpHashJoin() { super(false); }
+	protected PhysicalOpHashJoin2( final boolean useOuterJoinSemantics ) {
+		super(useOuterJoinSemantics);
+	}
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
@@ -64,35 +68,51 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 
 	@Override
 	public String toString() {
-		return "hash join 1";
+		return "hash join 2";
 	}
 
 	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			if (    ! (lop instanceof LogicalOpJoin)
+			     && ! (lop instanceof LogicalOpLeftJoin) )
+				return false;
+
 			// inputVars contains null value?
 			for ( final ExpectedVariables vars : inputVars ) {
 				if ( vars == null ) return false;
 			}
 
 			final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars);
-			return ( joinVars != null && ! joinVars.isEmpty() && lop instanceof LogicalOpJoin );
+			return ( joinVars != null && ! joinVars.isEmpty() );
 		}
 
 		@Override
-		public PhysicalOpHashJoin create( final BinaryLogicalOp lop ) {
+		public PhysicalOpHashJoin2 create( final BinaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpJoin ) {
-				return getInstance();
+				return getInstanceForInnerJoin();
+			}
+
+			if ( lop instanceof LogicalOpLeftJoin ) {
+				return getInstanceForOuterJoin();
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
 	}
 
-	public static PhysicalOpHashJoin getInstance() {
-		if ( singleton == null ) singleton = new PhysicalOpHashJoin();
+	public static PhysicalOpHashJoin2 getInstanceForInnerJoin() {
+		if ( singletonForInnerJoin == null )
+			singletonForInnerJoin = new PhysicalOpHashJoin2(false);
 
-		return singleton;
+		return singletonForInnerJoin;
+	}
+
+	public static PhysicalOpHashJoin2 getInstanceForOuterJoin() {
+		if ( singletonForOuterJoin == null )
+			singletonForOuterJoin = new PhysicalOpHashJoin2(true);
+
+		return singletonForOuterJoin;
 	}
 }

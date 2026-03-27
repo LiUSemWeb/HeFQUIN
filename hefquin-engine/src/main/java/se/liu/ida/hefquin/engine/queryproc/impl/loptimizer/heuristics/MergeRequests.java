@@ -205,7 +205,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				}
 			}
 		}
-		else if ( rootOp instanceof LogicalOpRightJoin )
+		else if ( rootOp instanceof LogicalOpLeftJoin )
 		{
 			final LogicalOperator childOp1 = rewrittenSubPlans.get(0).getRootOperator();
 			final LogicalOperator childOp2 = rewrittenSubPlans.get(1).getRootOperator();
@@ -215,9 +215,9 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			     && reqOp2.getRequest() instanceof SPARQLRequest req2
 			     && reqOp1.getFederationMember().equals(reqOp2.getFederationMember()) )
 			{
-				// the LHS is the optional part
-				final SPARQLGraphPattern merged = mergePatternWithOptPatterns( req2.getQueryPattern(),
-				                                                               req1.getQueryPattern() );
+				// the LHS is the non-optional part
+				final SPARQLGraphPattern merged = mergePatternWithOptPatterns( req1.getQueryPattern(),
+				                                                               req2.getQueryPattern() );
 
 				final FederationMember fm = reqOp1.getFederationMember();
 				if ( fm.isSupportedPattern(merged) ) {

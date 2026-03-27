@@ -181,7 +181,7 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpJoin op )          { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpRightJoin op )     { subplanCount++; }
+		public void visit( final LogicalOpLeftJoin op )      { subplanCount++; }
 
 		@Override
 		public void visit( final LogicalOpUnion op )         { subplanCount++; }
@@ -211,7 +211,7 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpGlobalToLocal op ) { subplanCount++; }
 		
 		@Override
-		public void visit( final LogicalOpDedup op ) { subplanCount++; }
+		public void visit( final LogicalOpDedup op )         { subplanCount++; }
 	} // end of class LogicalPlanCounter
 
 	static public class SourceAssignmentChecker extends LogicalPlanVisitorBase {
@@ -243,7 +243,7 @@ public class LogicalPlanUtils
 		}
 
 		@Override
-		public void visit( final LogicalOpRightJoin op ) {
+		public void visit( final LogicalOpLeftJoin op ) {
 			isSourceAssignment = false;
 		}
 

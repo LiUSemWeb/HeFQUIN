@@ -135,7 +135,7 @@ public class BaseForTextBasedPlanPrinters
 		public void visit( final LogicalOpJoin op )             { name = "join"; }
 
 		@Override
-		public void visit( final LogicalOpRightJoin op )        { name = "rightJoin"; }
+		public void visit( final LogicalOpLeftJoin op )         { name = "left join"; }
 
 		@Override
 		public void visit( final LogicalOpUnion op )            { name = "union"; }
