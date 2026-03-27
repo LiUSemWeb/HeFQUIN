@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
-public class ExecOpHashJoin1Test extends TestsForInnerJoinAlgorithms
+public class ExecOpHashJoin1Test extends TestsForJoinAlgorithms
 {
 	@Test
 	public void joinWithEmptyInput1_SeparateInput() throws ExecutionException {

@@ -23,7 +23,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
-public abstract class TestsForInnerJoinAlgorithms
+public abstract class TestsForJoinAlgorithms
 {
 	protected void _joinWithEmptyInput1( final boolean sendAllSolMapsSeparately,
 	                                     final boolean useOuterJoinSemantics )

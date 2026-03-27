@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
-public class ExecOpHashJoin2Test extends TestsForInnerJoinAlgorithms
+public class ExecOpHashJoin2Test extends TestsForJoinAlgorithms
 {
 	@Test
 	public void joinWithEmptyInput1_SeparateInput_InnerJoin() throws ExecutionException {
