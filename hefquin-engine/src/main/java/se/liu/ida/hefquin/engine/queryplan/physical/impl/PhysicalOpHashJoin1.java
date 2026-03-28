@@ -7,7 +7,7 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin1;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -23,18 +23,23 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * that they have for the join variables to decide where to place them in the
  * hash table) and, thereafter, probes the hash table to find join partners for
  * each of the solution mappings of the second input sequence.
- *
+ * <p>
  * The actual algorithm of this operator is implemented in the
- * {@link ExecOpHashJoin} class.
+ * {@link ExecOpHashJoin1} class.
+ * <p>
+ * In addition to this class, we also have {@link PhysicalOpHashJoin2}
+ * which does essentially the same thing but builds the has table over
+ * the second input. I contrast to this class, {@link PhysicalOpHashJoin2}
+ * even supports outer-join semantics.
  */
-public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
+public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	private static PhysicalOpHashJoin singleton = null;
+	private static PhysicalOpHashJoin1 singleton = null;
 
-	protected PhysicalOpHashJoin() { }
+	protected PhysicalOpHashJoin1() { super(false); }
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
@@ -42,7 +47,7 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 	                                        final ExpectedVariables ... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashJoin( inputVars[0], inputVars[1], collectExceptions, qpInfo );
+		return new ExecOpHashJoin1( inputVars[0], inputVars[1], collectExceptions, qpInfo );
 	}
 
 	@Override
@@ -54,7 +59,7 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof PhysicalOpHashJoin;
+		return o instanceof PhysicalOpHashJoin1;
 	}
 
 	@Override
@@ -64,7 +69,7 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 
 	@Override
 	public String toString() {
-		return "hash join";
+		return "hash join 1";
 	}
 
 	public static class Factory implements PhysicalOpFactory
@@ -81,7 +86,7 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 		}
 
 		@Override
-		public PhysicalOpHashJoin create( final BinaryLogicalOp lop ) {
+		public PhysicalOpHashJoin1 create( final BinaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpJoin ) {
 				return getInstance();
 			}
@@ -90,8 +95,8 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 		}
 	}
 
-	public static PhysicalOpHashJoin getInstance() {
-		if ( singleton == null ) singleton = new PhysicalOpHashJoin();
+	public static PhysicalOpHashJoin1 getInstance() {
+		if ( singleton == null ) singleton = new PhysicalOpHashJoin1();
 
 		return singleton;
 	}

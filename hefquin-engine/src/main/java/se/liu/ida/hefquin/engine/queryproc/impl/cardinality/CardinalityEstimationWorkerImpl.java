@@ -22,22 +22,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.Quality;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpDedup;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
@@ -137,9 +122,9 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	}
 
 	@Override
-	public void visit( final LogicalOpRightJoin op ) {
+	public void visit( final LogicalOpLeftJoin op ) {
 		// As the estimated cardinality, we simply use the estimated
-		// cardinality of right-hand-side input plan (i.e., the non-
+		// cardinality of left-hand-side input plan (i.e., the non-
 		// optional input). This may be a gross underestimation!
 		// TODO: There is probably a slightly better approach.
 

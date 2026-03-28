@@ -82,7 +82,7 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 		else if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion
 				|| rootOp instanceof LogicalOpJoin || rootOp instanceof LogicalOpMultiwayJoin
 				|| rootOp instanceof LogicalOpMultiwayLeftJoin
-				|| rootOp instanceof LogicalOpRightJoin ) {
+				|| rootOp instanceof LogicalOpLeftJoin ) {
 			final Set<TriplePattern> triplePatterns = new HashSet<>();
 			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
 				triplePatterns.addAll( extractTPs(plan.getSubPlan(i)) );

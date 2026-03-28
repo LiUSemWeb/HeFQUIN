@@ -20,7 +20,7 @@ public class LogicalPlanVisitorBase implements LogicalPlanVisitor
 	public void visit( final LogicalOpJoin op )              {}
 
 	@Override
-	public void visit( final LogicalOpRightJoin op )         {}
+	public void visit( final LogicalOpLeftJoin op )          {}
 
 	@Override
 	public void visit( final LogicalOpUnion op )             {}
