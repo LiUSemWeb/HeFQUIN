@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
 
 /**
@@ -21,9 +23,9 @@ public abstract class BaseForPhysicalOpBinaryJoin
 	}
 
 	@Override
-	public LogicalOpJoin getLogicalOperator() {
+	public BinaryLogicalOp getLogicalOperator() {
 		if ( useOuterJoinSemantics )
-			return LogicalOpJoin.getInstance();
+			return LogicalOpLeftJoin.getInstance();
 		else
 			return LogicalOpJoin.getInstance();
 	}
