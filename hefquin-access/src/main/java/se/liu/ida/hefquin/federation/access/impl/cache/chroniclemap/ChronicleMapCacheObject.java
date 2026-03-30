@@ -1,12 +1,11 @@
 package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import net.openhft.chronicle.bytes.BytesIn;
 import net.openhft.chronicle.bytes.BytesMarshallable;
-import net.openhft.chronicle.bytes.BytesOut;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
@@ -22,13 +21,37 @@ import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalEr
  */
 public class ChronicleMapCacheObject implements BytesMarshallable
 {
-	private List<MarshallableSolutionMapping> solutionMappings = new ArrayList<>();
-	private List<MarshallableTriple> matchingTriples = new ArrayList<>();
-	private List<MarshallableTriple> metadataTriples = new ArrayList<>();
-	private String nextPageURL = "";
-	private int count = -1;
+	private static final List<Triple> EMPTY_TRIPLES = List.of();
+	private static final List<SolutionMapping> EMPTY_SOLUTION_MAPPINGS = List.of();
+	private static final String NO_NEXT_PAGE_URL = null;
+	private static final int NO_COUNT = -1;
 
-	public ChronicleMapCacheObject() {}
+	protected final List<SolutionMapping> solutionMappings;
+	protected final List<Triple> matchingTriples;
+	protected final List<Triple> metadataTriples;
+	protected final String nextPageURL;
+	protected final int count;
+
+	public ChronicleMapCacheObject( final Iterable<SolutionMapping> solutionMappings,
+	                                final Iterable<Triple> matchingTriples,
+	                                final Iterable<Triple> metadataTriples,
+	                                final String nextPageURL,
+	                                final int count ) {
+		assert solutionMappings != null;
+		assert matchingTriples != null;
+		assert metadataTriples != null;
+
+		this.solutionMappings = new ArrayList<>();
+		solutionMappings.forEach(this.solutionMappings::add);
+
+		this.matchingTriples = new ArrayList<>();
+		matchingTriples.forEach(this.matchingTriples::add);
+		this.metadataTriples = new ArrayList<>();
+		metadataTriples.forEach(this.metadataTriples::add);
+		this.nextPageURL = nextPageURL;
+
+		this.count = count;
+	}
 
 	/**
 	 * Creates a cache object containing the given solution mappings.
@@ -38,9 +61,14 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 	public ChronicleMapCacheObject( final Iterable<SolutionMapping> solutionMappings ) {
 		assert solutionMappings != null;
 
-		for ( final SolutionMapping sm : solutionMappings ) {
-			this.solutionMappings.add( new MarshallableSolutionMapping(sm) );
-		}
+		this.solutionMappings = new ArrayList<>();
+		solutionMappings.forEach(this.solutionMappings::add);
+
+		this.matchingTriples = EMPTY_TRIPLES;
+		this.metadataTriples = EMPTY_TRIPLES;
+		nextPageURL = NO_NEXT_PAGE_URL;
+
+		count = NO_COUNT;
 	}
 
 	/**
@@ -56,15 +84,15 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 		assert matchingTriples != null;
 		assert metadataTriples != null;
 
-		for ( final Triple t : matchingTriples ) {
-			this.matchingTriples.add( new MarshallableTriple(t) );
-		}
+		this.solutionMappings = EMPTY_SOLUTION_MAPPINGS;
 
-		for ( final Triple t : metadataTriples ) {
-			this.metadataTriples.add( new MarshallableTriple(t) );
-		}
-
+		this.matchingTriples = new ArrayList<>();
+		matchingTriples.forEach(this.matchingTriples::add);
+		this.metadataTriples = new ArrayList<>();
+		metadataTriples.forEach(this.metadataTriples::add);
 		this.nextPageURL = nextPageURL;
+
+		count = NO_COUNT;
 	}
 
 	/**
@@ -73,6 +101,12 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 	 * @param count the cached result count
 	 */
 	public ChronicleMapCacheObject( final int count ) {
+		this.solutionMappings = EMPTY_SOLUTION_MAPPINGS;
+
+		matchingTriples = EMPTY_TRIPLES;
+		metadataTriples = EMPTY_TRIPLES;
+		this.nextPageURL = NO_NEXT_PAGE_URL;
+
 		this.count = count;
 	}
 
@@ -101,91 +135,31 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 			throw new IllegalStateException( "Unsupported response type: " + response.getClass().getName() );
 	}
 
-	@Override
-	public void writeMarshallable( final BytesOut<?> out ) {
-		// Matching triples
-		out.writeInt( matchingTriples.size() );
-		for ( final MarshallableTriple t : matchingTriples ) {
-			t.writeMarshallable(out);
-		}
-		// Metadata triples
-		out.writeInt( metadataTriples.size() );
-		for ( final MarshallableTriple t : metadataTriples ) {
-			t.writeMarshallable(out);
-		}
-		// Next page URL
-		out.writeUtf8(nextPageURL);
-		// Solution mappings
-		out.writeInt( solutionMappings.size() );
-		for ( final MarshallableSolutionMapping sm : solutionMappings ) {
-			sm.writeMarshallable(out);
-		}
-		// Count
-		out.writeInt(count);
-	}
-
-	@Override
-	public void readMarshallable( final BytesIn<?> in ) {
-		// Matching triples
-		final int matchingTriplesSize = in.readInt();
-		for ( int i = 0; i < matchingTriplesSize; i++ ) {
-			final MarshallableTriple t = new MarshallableTriple();
-			t.readMarshallable(in);
-			matchingTriples.add(t);
-		}
-		// Metadata triples
-		final int metadataTriplesSize = in.readInt();
-		for ( int i = 0; i < metadataTriplesSize; i++ ) {
-			final MarshallableTriple t = new MarshallableTriple();
-			t.readMarshallable(in);
-			metadataTriples.add(t);
-		}
-		// Next page URL
-		nextPageURL = in.readUtf8();
-		// Solution mappings
-		final int solutionMappingsSize = in.readInt();
-		solutionMappings = new ArrayList<>( solutionMappingsSize );
-		for ( int i = 0; i < solutionMappingsSize; i++ ) {
-			final MarshallableSolutionMapping sm = new MarshallableSolutionMapping();
-			sm.readMarshallable(in);
-			solutionMappings.add(sm);
-		}
-		// Count
-		count = in.readInt();
-	}
-
 	/**
-	 * Returns the cached solution mappings as interface-typed objects. The returned
-	 * list is a shallow copy and the contained mapping instances are shared.
+	 * Returns the cached solution mappings.
 	 * 
 	 * @return a new list containing the cached solution mappings
 	 */
 	public List<SolutionMapping> getSolutionMappings() {
-		return new ArrayList<>(solutionMappings);
+		return Collections.unmodifiableList(solutionMappings);
 	}
 
 	/**
 	 * Returns the cached matching triples.
 	 *
-	 * The returned list is a shallow copy and the contained triple instances are
-	 * shared.
-	 *
 	 * @return a new list containing the cached matching triples
 	 */
 	public List<Triple> getMatchingTriples() {
-		return new ArrayList<>(matchingTriples);
+		return Collections.unmodifiableList(matchingTriples);
 	}
 
 	/**
 	 * Returns the cached metadata triples.
 	 *
-	 * The returned list is a shallow copy and the contained triple instances are
-	 * shared.
-	 *
 	 * @return a new list containing the cached metadata triples
 	 */
 	public List<Triple> getMetadataTriples() {
-		return new ArrayList<>(metadataTriples);
+		return Collections.unmodifiableList(metadataTriples);
 	}
 
 	/**
@@ -214,10 +188,10 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 		if ( obj == null || getClass() != obj.getClass() )
 			return false;
 		final ChronicleMapCacheObject other = (ChronicleMapCacheObject) obj;
-		return    matchingTriples.equals( other.matchingTriples )
+		return    solutionMappings.equals( other.solutionMappings )
+		       && matchingTriples.equals( other.matchingTriples )
 		       && metadataTriples.equals( other.metadataTriples )
-		       && nextPageURL.equals( other.nextPageURL )
-		       && solutionMappings.equals( other.solutionMappings )
+		       && Objects.equals(nextPageURL, other.nextPageURL)
 		       && count == other.count;
 	}
 
@@ -229,10 +203,10 @@ public class ChronicleMapCacheObject implements BytesMarshallable
 	@Override
 	public String toString() {
 		return "ChronicleMapCacheObject{" +
+		       "solutionMappings=" + solutionMappings.size() + ", " +
 		       "matchingTriples=" + matchingTriples.size() + ", " +
 		       "metadataTriples=" + metadataTriples.size() + ", " +
 		       "nextPageURL=" + nextPageURL + ", " +
-		       "solutionMappings=" + solutionMappings.size() + ", " +
-			   "count=" + count + "}";
+		       "count=" + count + "}";
 	}
 }
