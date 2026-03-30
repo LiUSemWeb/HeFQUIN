@@ -24,4 +24,5 @@ public interface LogicalPlanVisitor
 	void visit( final LogicalOpLocalToGlobal op );
 	void visit( final LogicalOpGlobalToLocal op );
 	void visit( final LogicalOpDedup op );
+	void visit( final LogicalOpProject op );
 }
