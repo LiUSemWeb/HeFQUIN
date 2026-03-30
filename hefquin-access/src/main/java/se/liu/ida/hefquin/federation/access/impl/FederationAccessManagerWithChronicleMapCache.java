@@ -152,16 +152,8 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 			return cachedResponse2;
 		}
 
-		// Check if the response object has been cached (but not yet resolved)
-		final Key inMemoryCacheKey = new Key(req, fm);
-		@SuppressWarnings("unchecked")
-		final CompletableFuture<RespType> cachedResponse = (CompletableFuture<RespType>) cache.get(inMemoryCacheKey);
-		if( cachedResponse != null )
-			return cachedResponse;
-
 		// Issue request and add it to the cache
 		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm);
-		cache.put( inMemoryCacheKey, newResponse );
 		newResponse.thenAccept( value -> {
 			try {
 				final ChronicleMapCacheObject object = ChronicleMapCacheObject.create(value);
