@@ -45,7 +45,7 @@ import se.liu.ida.hefquin.federation.members.TPFServer;
  */
 public class FederationAccessManagerWithChronicleMapCache extends FederationAccessManagerWithCache implements AutoCloseable
 {
-	private final ChronicleMapCache chronicleMapCache;
+	protected final ChronicleMapCache chronicleMapCache;
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
