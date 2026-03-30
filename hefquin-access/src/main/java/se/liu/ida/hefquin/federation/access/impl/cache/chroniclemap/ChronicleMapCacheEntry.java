@@ -11,8 +11,8 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
  */
 public class ChronicleMapCacheEntry implements CacheEntry<ChronicleMapCacheObject>, BytesMarshallable
 {
-	private ChronicleMapCacheObject object;
-	private long creationTime;
+	protected ChronicleMapCacheObject object;
+	protected long creationTime;
 
 	public ChronicleMapCacheEntry() {}
 
