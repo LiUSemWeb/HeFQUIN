@@ -203,13 +203,14 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	 * Stores the given key-value pair in the cache.
 	 *
 	 * If the key already exists, the corresponding entry is replaced and the
-	 * replacement policy is notified of a rewrite. If the key is new and the cache
-	 * is already at capacity, one entry is evicted first according to the
-	 * replacement policy.
+	 * replacement policy is notified of a rewrite, otherwise the key is added to
+	 * the cache. If the cache reaches max capacity an entry is evicted according to
+	 * the replacement policy.
 	 *
 	 * @param key   the cache key
 	 * @param value the cache value
-	 * @throws IllegalArgumentException if {@code key} or {@code value} is {@code null}
+	 * @throws IllegalArgumentException if {@code key} or {@code value} is
+	 *                                  {@code null}
 	 */
 	@Override
 	public void put( final ChronicleMapCacheKey key, final ChronicleMapCacheObject value ) {
@@ -318,10 +319,10 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	}
 
 	/**
-	 * Closes the underlying Chronicle Map and releases associated resources.
+	 * Closes the underlying {@link ChronicleMap} and releases associated resources.
 	 *
-	 * Closing the map is not required but ensures that all data is properly
-	 * flushed to disk and that off-heap resources are released.
+	 * Closing the map is not required but ensures that all data is properly flushed
+	 * to disk and that off-heap resources are released.
 	 */
 	@Override
 	public void close() {
