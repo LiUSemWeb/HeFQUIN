@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.federation.access.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
@@ -159,7 +160,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 				final ChronicleMapCacheObject object = ChronicleMapCacheObject.create(value);
 				chronicleMapCache.put(key, object);
 			} catch ( UnsupportedOperationDueToRetrievalError e ) {
-				// intentionally ignored
+				throw new CompletionException(e);
 			}
 		} );
 		return newResponse;
