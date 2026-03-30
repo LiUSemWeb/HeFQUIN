@@ -181,6 +181,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 			.averageKeySize(248)
 			.averageValueSize(4096)
 			.maxBloatFactor(10.0)
+			.valueMarshaller(ChronicleMapCacheEntryMarshaller.INSTANCE)
 			.createPersistedTo(file);
 	}
 
