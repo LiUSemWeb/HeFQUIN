@@ -36,19 +36,38 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
- * Federation access manager that augments
- * {@link FederationAccessManagerWithCache} with a ChronicleMap-backed
- * persistent cache.
+ * Federation access manager with a ChronicleMap-backed persistent cache.
  *
- * Currently, persistent caching is implemented for solution-mapping responses.
- * On a cache miss, requests are delegated to the wrapped federation access
- * manager and successful responses are persisted for future reuse.
+ * <p>
+ * This class stores cache entries in a persistent {@link ChronicleMapCache} so
+ * that successful responses can be reused across repeated requests and runs.
+ * </p>
+ *
+ * <p>
+ * On a cache miss, the request is delegated to the wrapped federation access
+ * manager. Successful responses are converted into cache objects and written to
+ * the persistent cache.
+ * </p>
+ *
+ * <p>
+ * Cache writes happen asynchronously and the returned futures represents the
+ * underlying retrieval results. Cache population is performed after successful
+ * completion of that future.
+ * </p>
  */
 public class FederationAccessManagerWithChronicleMapCache extends FederationAccessManagerWithCache implements AutoCloseable
 {
 	protected static final long DEFAULT_TIME_TO_LIVE = 300_000; // 5 minutes
 	protected final ChronicleMapCache chronicleMapCache;
 
+	/**
+	 * Creates a federation access manager with a ChronicleMap-backed persistent
+	 * cache using the given capacity and cache policies.
+	 *
+	 * @param fedAccMan     the wrapped federation access manager
+	 * @param cacheCapacity the maximum cache capacity
+	 * @throws IOException if the persistent cache cannot be created or opened
+	 */
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
 	                                                     final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> chronicleMapCachePolicies )
@@ -58,6 +77,20 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		chronicleMapCache = new ChronicleMapCache(cacheCapacity, chronicleMapCachePolicies);
 	}
 
+	/**
+	 * Creates a federation access manager with a ChronicleMap-backed persistent
+	 * cache using the given capacity and the default cache policies.
+	 *
+	 * <p>
+	 * The cache uses a least-recently-used (LRU) replacement policy and the
+	 * specified time-to-live for cache entry invalidation.
+	 * </p>
+	 *
+	 * @param fedAccMan     the wrapped federation access manager
+	 * @param cacheCapacity the maximum cache capacity
+	 * @param timeToLive    the cache entry time-to-live in milliseconds
+	 * @throws IOException if the persistent cache cannot be created or opened
+	 */
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
 	                                                     final long timeToLive )
@@ -66,6 +99,19 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		this(fedAccMan, cacheCapacity, new DefaultChronicleMapCachePolicies(timeToLive) );
 	}
 
+	/**
+	 * Creates a federation access manager with a ChronicleMap-backed persistent
+	 * cache using the given capacity and the default cache policies.
+	 *
+	 * <p>
+	 * The default policies use least-recently-used (LRU) replacement and a
+	 * time-to-live of {@value #DEFAULT_TIME_TO_LIVE} milliseconds.
+	 * </p>
+	 *
+	 * @param fedAccMan     the wrapped federation access manager
+	 * @param cacheCapacity the maximum cache capacity
+	 * @throws IOException if the persistent cache cannot be created or opened
+	 */
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity )
 			throws IOException 
@@ -76,9 +122,11 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	/**
 	 * Issues a request for the given request and federation member.
 	 *
+	 * <p>
 	 * Checks the cache first and returns a cached response if available. Otherwise,
-	 * delegates the request to the federation access manager and caches the result
-	 * asynchronously.
+	 * delegates the request to the wrapped federation access manager and caches the
+	 * result asynchronously.
+	 * </p>
 	 *
 	 * @param req the data retrieval request (TPF, BRTPF, or SPARQL)
 	 * @param fm  the federation member handling the request
@@ -106,8 +154,15 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		else
 			cacheRequestsOther++;
 
+		final ChronicleMapCacheKey key;
+		try {
+			key = new ChronicleMapCacheKey( req, fm, ChronicleMapCacheKey.ResponseMode.RESULT );
+		} catch ( IllegalArgumentException e ) {
+			// Key creation not supported, skip cache usage
+			return fedAccMan.issueRequest(req, fm);
+		}
+
 		final Date accessStartTime = new Date();
-		final ChronicleMapCacheKey key = new ChronicleMapCacheKey( req, fm, ChronicleMapCacheKey.ResponseMode.RESULT );
 		final ChronicleMapCacheObject cachedObject = chronicleMapCache.get(key);
 
 		// Check cache
@@ -160,9 +215,11 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	/**
 	 * Issues a cardinality request for the given request and federation member.
 	 *
+	 * <p>
 	 * Checks the cache first and returns a cached response if available. Otherwise,
-	 * delegates the request to the federation access manager and caches the result
-	 * asynchronously.
+	 * delegates the request to the wrapped federation access manager and caches the
+	 * result asynchronously.
+	 * </p>
 	 *
 	 * @param req the data retrieval request (TPF, BRTPF, or SPARQL)
 	 * @param fm  the federation member handling the request
