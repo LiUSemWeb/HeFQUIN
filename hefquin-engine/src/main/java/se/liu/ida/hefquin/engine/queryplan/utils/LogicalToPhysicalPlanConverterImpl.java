@@ -252,10 +252,10 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 				}
 				else {
 					currentSubPlan = createPhysicalPlanWithBinaryRoot(
-							LogicalOpRightJoin.getInstance(),
+							LogicalOpLeftJoin.getInstance(),
 							null,  // no qpInfo as we don't have it for the subplan created here
-							nextChild,
-							currentSubPlan );
+							currentSubPlan,
+							nextChild );
 				}
 			}
 
