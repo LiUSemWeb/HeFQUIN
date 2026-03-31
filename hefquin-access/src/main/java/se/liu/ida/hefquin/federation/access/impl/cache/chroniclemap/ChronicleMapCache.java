@@ -251,9 +251,9 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		if ( value == null )
 			throw new IllegalArgumentException("Cache value must not be null");
 
+		final ChronicleMapCacheEntry entry = entryFactory.createCacheEntry(value);
 		synchronized (map) {
 			map.compute( key, (k, oldEntry) -> {
-				final ChronicleMapCacheEntry entry = entryFactory.createCacheEntry(value);
 				inMemoryCache.put(k, entry);
 
 				if ( oldEntry == null )
