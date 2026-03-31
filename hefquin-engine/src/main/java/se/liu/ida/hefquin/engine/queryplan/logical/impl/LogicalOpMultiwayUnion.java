@@ -18,6 +18,10 @@ public class LogicalOpMultiwayUnion extends BaseForLogicalOps implements NaryLog
 		return mayReduce ? singletonTrue : singletonFalse;
 	}
 
+	public static LogicalOpMultiwayUnion getInstance() {
+		return singletonFalse;
+	}
+
 	protected LogicalOpMultiwayUnion( final boolean mayReduce ) {
 		super( mayReduce );
 	}

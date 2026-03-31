@@ -17,6 +17,10 @@ public class LogicalOpUnion extends BaseForLogicalOps implements BinaryLogicalOp
 	public static LogicalOpUnion getInstance( final boolean mayReduce ) {
 		return mayReduce ? singletonTrue : singletonFalse;
 	}
+	
+	public static LogicalOpUnion getInstance() {
+		return singletonFalse;
+	}
 
 	protected LogicalOpUnion( final boolean mayReduce ) {
 		super( mayReduce );

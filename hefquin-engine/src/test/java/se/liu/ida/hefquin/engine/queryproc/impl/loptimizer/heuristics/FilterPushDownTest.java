@@ -58,10 +58,10 @@ public class FilterPushDownTest extends EngineTestBase
 		final FederationMember fmB = new TPFServerForTest();
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, false, new TriplePatternRequestImpl(tp2) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
@@ -69,7 +69,7 @@ public class FilterPushDownTest extends EngineTestBase
 				null );
 
 		final Expr e = new E_IsIRI( new ExprVar(v1) );
-		final UnaryLogicalOp rootOp = new LogicalOpFilter(e);
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, true);
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, joinSubPlan);
 
 		// test
@@ -119,10 +119,10 @@ public class FilterPushDownTest extends EngineTestBase
 		final FederationMember fm = new SPARQLEndpointForTest("http://exA.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v3, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v3 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
@@ -130,7 +130,7 @@ public class FilterPushDownTest extends EngineTestBase
 				null );
 
 		final Expr e = new E_Equals( new ExprVar(v1), new ExprVar(v2) );
-		final UnaryLogicalOp rootOp = new LogicalOpFilter(e);
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, true);
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, joinSubPlan);
 
 		// test
@@ -158,19 +158,19 @@ public class FilterPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
 		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
-		final LogicalOpGPOptAdd gpOptAdd = new LogicalOpGPOptAdd(fm, tp2);
+		final LogicalOpGPOptAdd gpOptAdd = new LogicalOpGPOptAdd(fm, tp2, false);
 		final LogicalPlan gpOptAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpOptAdd, null, reqSubPlan);
 
 		final Expr e1 = new E_LogicalNot( new E_Bound(new ExprVar(v2)) );
-		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1);
+		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1, true);
 		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp1, null, gpOptAddSubPlan);
 
 		final Expr e2 = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter rootOp = new LogicalOpFilter(e2);
+		final LogicalOpFilter rootOp = new LogicalOpFilter(e2, true);
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, filterSubPlan);
 
 		// test
@@ -209,10 +209,10 @@ public class FilterPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 
 		final TriplePattern tp1 = new TriplePatternImpl(v2, v2, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp2) );
 
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithMultiwayUnion(
 				null,
@@ -220,11 +220,11 @@ public class FilterPushDownTest extends EngineTestBase
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null) );
 
 		final Expr e1 = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1);
+		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1, true);
 		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp1, null, unionSubPlan);
 
 		final Expr e2 = new E_IsIRI( new ExprVar(v2) );
-		final LogicalOpFilter rootOp = new LogicalOpFilter(e2);
+		final LogicalOpFilter rootOp = new LogicalOpFilter(e2, true);
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, filterSubPlan);
 
 		// test
@@ -264,17 +264,17 @@ public class FilterPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final Var v1 = Var.alloc("x");
 		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp) );
 
 		// - bind operator
 		final Var v2 = Var.alloc("y");
 		final Expr bindExpr = NodeValue.makeInteger(42);
 		final VarExprList bindExpressions = new VarExprList(v2, bindExpr);
-		final LogicalOpBind bindOp = new LogicalOpBind(bindExpressions);
+		final LogicalOpBind bindOp = new LogicalOpBind(bindExpressions, false);
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v2) ); // v2 !!!
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
@@ -302,17 +302,17 @@ public class FilterPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final Var v1 = Var.alloc("x");
 		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp) );
 
 		// - bind operator
 		final Var v2 = Var.alloc("y");
 		final Expr bindExpr = NodeValue.makeInteger(42);
 		final VarExprList bindExpressions = new VarExprList(v2, bindExpr);
-		final LogicalOpBind bindOp = new LogicalOpBind(bindExpressions);
+		final LogicalOpBind bindOp = new LogicalOpBind(bindExpressions, false);
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
@@ -340,23 +340,23 @@ public class FilterPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final Var v1 = Var.alloc("x");
 		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp) );
 
 		// - 1st bind operator
 		final Var v2 = Var.alloc("y");
 		final Expr bind1Expr = NodeValue.makeInteger(42);
 		final VarExprList bind1Expressions = new VarExprList(v2, bind1Expr);
-		final LogicalOpBind bind1Op = new LogicalOpBind(bind1Expressions);
+		final LogicalOpBind bind1Op = new LogicalOpBind(bind1Expressions, false);
 
 		// - 2nd bind operator
 		final Var v3 = Var.alloc("z");
 		final Expr bind2Expr = NodeValue.makeInteger(42);
 		final VarExprList bind2Expressions = new VarExprList(v3, bind2Expr);
-		final LogicalOpBind bind2Op = new LogicalOpBind(bind2Expressions);
+		final LogicalOpBind bind2Op = new LogicalOpBind(bind2Expressions, false);
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
@@ -388,16 +388,16 @@ public class FilterPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final Var v1 = Var.alloc("x");
 		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp) );
 
 		// - unfold operator
 		final Var v2 = Var.alloc("y");
 		final Expr unfoldExpr = NodeValue.makeInteger(42);
-		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, null);
+		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, null, false);
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v2) ); // v2 !!!
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
@@ -425,17 +425,17 @@ public class FilterPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final Var v1 = Var.alloc("x");
 		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp) );
 
 		// - unfold operator
 		final Var v2 = Var.alloc("y");
 		final Var v3 = Var.alloc("z");
 		final Expr unfoldExpr = NodeValue.makeInteger(42);
-		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, v3);
+		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, v3, false);
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v3) ); // v3 !!!
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
@@ -463,16 +463,16 @@ public class FilterPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final Var v1 = Var.alloc("x");
 		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp) );
 
 		// - bind operator
 		final Var v2 = Var.alloc("y");
 		final Expr unfoldExpr = NodeValue.makeInteger(42);
-		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, null);
+		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, null, false);
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);

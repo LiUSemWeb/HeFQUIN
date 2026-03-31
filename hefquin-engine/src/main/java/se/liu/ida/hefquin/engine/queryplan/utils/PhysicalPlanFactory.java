@@ -116,7 +116,7 @@ public class PhysicalPlanFactory
 	 */
 	public static  PhysicalPlan createPlanWithRequest( final DataRetrievalRequest req,
 	                                                   final FederationMember fm ) {
-		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>(fm, req);
+		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>(fm, false, req);
 		final NullaryPhysicalOp pop = PhysicalOpRequest.getFactory().create(lop);
 		return createPlan(pop);
 	}
@@ -535,8 +535,9 @@ public class PhysicalPlanFactory
 		     && subPlanRootOp instanceof PhysicalOpRequest reqOp ) {
 			final LogicalOpLocalToGlobal l2gLOP = (LogicalOpLocalToGlobal) l2gPOP.getLogicalOperator();
 			final VocabularyMapping vm = l2gLOP.getVocabularyMapping();
+			final boolean mayReduce = l2gLOP.mayReduce();
 
-			final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal(vm);
+			final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal(vm, mayReduce);
 			final PhysicalPlan newInputPlan = PhysicalPlanFactory.createPlan(g2l, lop2pop, inputPlan);
 
 			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);

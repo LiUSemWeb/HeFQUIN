@@ -254,7 +254,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 			final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
 			final SPARQLRequest req = new SPARQLRequestImpl(p);
-			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(ep, req, mayReduce);
+			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(ep, mayReduce, req);
 			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
 
@@ -293,7 +293,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForDistinct( final OpDistinct jenaOp,
 	                                             final QueryProcContext ctxt ) {
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), true, ctxt );
-		final LogicalOpDedup rootOp = LogicalOpDedup.getInstance(true);
+		final LogicalOpDedup rootOp = LogicalOpDedup.getInstance();
 		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
 	}
 
@@ -314,7 +314,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			}
 			else {
 				final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp) );
-				final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, req, mayReduce );
+				final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, mayReduce, req );
 				return new LogicalPlanWithNullaryRootImpl(op, null);
 			}
 		}
@@ -397,7 +397,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	                                                  final FederationMember fm ) {
 		final TriplePattern tp = new TriplePatternImpl( pattern.getTriple() );
 		final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
-		final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req, mayReduce);
+		final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, mayReduce, req);
 		return new LogicalPlanWithNullaryRootImpl(op, null);
 	}
 
@@ -414,7 +414,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			final List<LogicalPlan> subPlans = new ArrayList<>();
 			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
 				final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
-				final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req, mayReduce);
+				final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, mayReduce, req);
 				final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl(op, null);
 				subPlans.add( subPlan );
 			}
@@ -426,7 +426,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		if ( fm.isSupportedPattern(bgp) ) {
 			// ... then we can simply create a BGP request operator.
 			final BGPRequest req = new BGPRequestImpl(bgp);
-			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req, mayReduce);
+			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, mayReduce, req);
 			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
 

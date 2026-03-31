@@ -18,6 +18,10 @@ public class LogicalOpJoin extends BaseForLogicalOps implements BinaryLogicalOp
 		return mayReduce ? singletonTrue : singletonFalse;
 	}
 
+	public static LogicalOpJoin getInstance() {
+		return singletonFalse;
+	}
+
 	protected LogicalOpJoin( final boolean mayReduce ) {
 		super( mayReduce );
 	}

@@ -377,7 +377,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 
-		final LogicalOpRequest<?,?>  reqOp = new LogicalOpRequest<>(fm, req);
+		final LogicalOpRequest<?,?>  reqOp = new LogicalOpRequest<>(fm, false, req);
 
 		return PhysicalPlanFactory.createPlan( reqOp, getLOP2POPForTests() );
 	}
@@ -419,7 +419,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	protected PhysicalPlan createGPAddPlan( final PhysicalPlan subplan,
 	                                        final TriplePattern tp ) {
 		final FederationMember fm = new TPFServerForTest();
-		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp, null);
+		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp, null, true);
 		return PhysicalPlanFactory.createPlan(gpAdd, getLOP2POPForTests(), subplan);
 	}
 

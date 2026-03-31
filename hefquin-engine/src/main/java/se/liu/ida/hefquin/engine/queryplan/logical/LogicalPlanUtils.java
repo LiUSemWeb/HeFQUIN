@@ -22,7 +22,8 @@ public class LogicalPlanUtils
 	public static LogicalPlan createPlanWithBinaryJoin( final LogicalPlan subPlan1,
 	                                                    final LogicalPlan subPlan2,
 	                                                    final Iterable<QueryPlanProperty> qpInfo ) {
-		return createPlanWithSubPlans( LogicalOpJoin.getInstance(), qpInfo, subPlan1, subPlan2 );
+		final boolean mayReduce = subPlan1.getRootOperator().mayReduce() || subPlan2.getRootOperator().mayReduce();
+		return createPlanWithSubPlans( LogicalOpJoin.getInstance(mayReduce), qpInfo, subPlan1, subPlan2 );
 	}
 
 	/**
@@ -35,7 +36,8 @@ public class LogicalPlanUtils
 	 */
 	public static LogicalPlan createPlanWithMultiwayJoin( final Iterable<QueryPlanProperty> qpInfo,
 	                                                      final LogicalPlan ... subPlans ) {
-		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(), qpInfo, subPlans );
+		final boolean mayReduce = computeMayReduce(subPlans);
+		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(mayReduce), qpInfo, subPlans );
 	}
 
 	/**
@@ -48,7 +50,8 @@ public class LogicalPlanUtils
 	 */
 	public static LogicalPlan createPlanWithMultiwayJoin( final List<LogicalPlan> subPlans,
 	                                                      final Iterable<QueryPlanProperty> qpInfo ) {
-		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(), qpInfo, subPlans );
+		final boolean mayReduce = computeMayReduce(subPlans);
+		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(mayReduce), qpInfo, subPlans );
 	}
 
 	/**
@@ -62,7 +65,8 @@ public class LogicalPlanUtils
 	public static LogicalPlan createPlanWithBinaryUnion( final LogicalPlan subPlan1,
 	                                                     final LogicalPlan subPlan2,
 	                                                     final Iterable<QueryPlanProperty> qpInfo ) {
-		return createPlanWithSubPlans( LogicalOpUnion.getInstance(), qpInfo, subPlan1, subPlan2 );
+		final boolean mayReduce = subPlan1.getRootOperator().mayReduce() || subPlan2.getRootOperator().mayReduce();
+		return createPlanWithSubPlans( LogicalOpUnion.getInstance(mayReduce), qpInfo, subPlan1, subPlan2 );
 	}
 
 	/**
@@ -75,7 +79,8 @@ public class LogicalPlanUtils
 	 */
 	public static LogicalPlan createPlanWithMultiwayUnion( final Iterable<QueryPlanProperty> qpInfo,
 	                                                       final LogicalPlan ... subPlans ) {
-		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(), qpInfo, subPlans );
+		final boolean mayReduce = computeMayReduce(subPlans);
+		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(mayReduce), qpInfo, subPlans );
 	}
 
 	/**
@@ -88,7 +93,8 @@ public class LogicalPlanUtils
 	 */
 	public static LogicalPlan createPlanWithMultiwayUnion( final List<LogicalPlan> subPlans,
 	                                                       final Iterable<QueryPlanProperty> qpInfo ) {
-		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(), qpInfo, subPlans );
+		final boolean mayReduce = computeMayReduce(subPlans);
+		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(mayReduce), qpInfo, subPlans );
 	}
 
 	/**
@@ -156,6 +162,24 @@ public class LogicalPlanUtils
 		final LogicalPlanCounter c = new LogicalPlanCounter();
 		LogicalPlanWalker.walk(plan, null, c);
 		return c.getSubplanCount();
+	}
+
+	private static boolean computeMayReduce( final LogicalPlan... subPlans ) {
+		boolean mayReduce = false;
+		for ( LogicalPlan lp : subPlans ) {
+			if ( lp.getRootOperator().mayReduce() ) {
+				mayReduce = true;
+				break;
+			}
+		}
+		return mayReduce;
+	}
+
+	public static boolean computeMayReduce( final List<LogicalPlan> subPlans ) {
+		for ( LogicalPlan lp : subPlans) {
+			if ( lp.getRootOperator().mayReduce() ) return true;
+		}
+		return false;
 	}
 
 	static public class LogicalPlanCounter implements LogicalPlanVisitor {

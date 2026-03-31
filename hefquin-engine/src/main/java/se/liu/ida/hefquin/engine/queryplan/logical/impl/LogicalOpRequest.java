@@ -14,7 +14,7 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest,
 	protected final MemberType fm;
 	protected final ReqType req;
 
-	public LogicalOpRequest( final MemberType fm, final ReqType req, final boolean mayReduce ) {
+	public LogicalOpRequest( final MemberType fm, final boolean mayReduce, final ReqType req ) {
 		super( mayReduce );
 
 		assert fm != null;

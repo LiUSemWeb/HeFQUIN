@@ -169,7 +169,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		final boolean mayReduce = filterOp.mayReduce();
 
-		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>(fm, mergedReq, mayReduce);
+		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>(fm, mayReduce, mergedReq);
 		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 	}
 
@@ -350,7 +350,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		final ExprList toBePushed = new ExprList();
 		final ExprList toBeKept = new ExprList();
 
-		final boolean parentFilterMayReduce = parentFilterOp.mayReduce();
+		final boolean mayReduce = parentFilterOp.mayReduce();
 
 		for ( final Expr e : filterExprsWithoutAND ) {
 			// If all of the variables mentioned in the current filter
@@ -368,7 +368,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		}
 
 		final LogicalPlan newSubPlanUnderChildOp = new LogicalPlanWithUnaryRootImpl(
-				new LogicalOpFilter(toBePushed, parentFilterMayReduce), // pushed filter op.
+				new LogicalOpFilter(toBePushed, mayReduce), // pushed filter op.
 				null,
 				subPlanUnderChildOp );
 		final LogicalPlan newSubPlanUnderChildOpRewritten = apply(newSubPlanUnderChildOp);
@@ -382,7 +382,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return newSubPlanUnderRootOp;
 		}
 
-		final LogicalOpFilter newRootFilterOp = new LogicalOpFilter(toBeKept, parentFilterMayReduce);
+		final LogicalOpFilter newRootFilterOp = new LogicalOpFilter(toBeKept, mayReduce);
 		return new LogicalPlanWithUnaryRootImpl(newRootFilterOp, null, newSubPlanUnderRootOp);
 	}
 
@@ -492,7 +492,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			if ( toBeKept == null )
 				newFilterOp = null;
 			else
-				newFilterOp = new LogicalOpFilter(toBeKept, mayReduce); //check: unsure
+				newFilterOp = new LogicalOpFilter(toBeKept, mayReduce);
 
 			// ... and iterate over the subplans to push their respective
 			// filter conditions to them (if any) and apply the heuristic
@@ -507,7 +507,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 				}
 				else {
 					// There are filter conditions to be pushed to the current subplan.
-					final LogicalOpFilter filterForSubPlan = new LogicalOpFilter( toBePushed[i], mayReduce ); //check: unsure
+					final LogicalOpFilter filterForSubPlan = new LogicalOpFilter( toBePushed[i], mayReduce );
 					final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterForSubPlan, null, oldSubPlan);
 					final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
 					newSubPlansUnderJoin[i] = newSubPlanWithFilterPushed;
@@ -544,12 +544,14 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		final ExprList filterExprs = filterOp.getFilterExpressions();
 		final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
 
+		final boolean mayReduce = filterOp.mayReduce();
+
 		// Create the new non-optional subplan. 
 		final ExprList toBeKept = new ExprList(); // will be populated by 'pushToNonOptSubPlan'
 		final LogicalPlan newNonOptSubPlan = pushToNonOptSubPlan( filterExprsWithoutAND,
 		                                                          nonoptSubPlan,
 		                                                          toBeKept,
-		                                                          filterOp.mayReduce() );
+		                                                          mayReduce );
 
 		// Now set up the new optional subplan of the join by
 		// applying this heuristic recursively to it.
@@ -569,7 +571,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			if ( toBeKept.isEmpty() )
 				newFilterOp = null;
 			else
-				newFilterOp = new LogicalOpFilter(toBeKept, filterOp.mayReduce());
+				newFilterOp = new LogicalOpFilter(toBeKept, mayReduce);
 		}
 
 		// If nothing was changed, return the given input plan.
@@ -579,11 +581,11 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return inputPlan;
 		}
 
-		final boolean mayReduce = newNonOptSubPlan.getRootOperator().mayReduce() || newOptSubPlan.getRootOperator().mayReduce();
+		final boolean mergedMayReduce = newNonOptSubPlan.getRootOperator().mayReduce() || newOptSubPlan.getRootOperator().mayReduce();
 
 		// Create the new rewritten plan to be returned.
 		final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithBinaryRootImpl(
-				LogicalOpRightJoin.getInstance(mayReduce),
+				LogicalOpRightJoin.getInstance(mergedMayReduce),
 				null,
 				newOptSubPlan,
 				newNonOptSubPlan );
@@ -618,7 +620,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		newSubPlansUnderJoin[0] = pushToNonOptSubPlan( filterExprsWithoutAND,
 		                                               oldNonOptSubPlan,
 		                                               toBeKept,
-		                                               filterOp.mayReduce() ); //check: unsure
+		                                               filterOp.mayReduce() );
 
 		// Now set up the new optional subplans of the join by
 		// applying this heuristic recursively to each of them.
@@ -664,13 +666,14 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return inputPlan;
 		}
 
+		// Check if any of the root operators of each subplan can reduce duplicates
 		boolean mayReduce = false;
 		for (LogicalPlan sp : newSubPlansUnderJoin) {
 			if (sp.getRootOperator().mayReduce()) {
 				mayReduce = true;
 				break;
 			}
-		} //check: unsure
+		}
 
 		// Create the new rewritten plan to be returned.
 		final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithNaryRootImpl(

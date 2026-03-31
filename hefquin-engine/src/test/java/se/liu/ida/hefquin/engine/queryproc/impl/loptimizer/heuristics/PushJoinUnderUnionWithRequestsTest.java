@@ -42,11 +42,11 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final FederationMember fmC = new TPFServerForTest();
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, new TriplePatternRequestImpl(tp2) );
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, false, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, false, new TriplePatternRequestImpl(tp2) );
 
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -104,11 +104,11 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final FederationMember fmC = new TPFServerForTest();
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, new TriplePatternRequestImpl(tp2) );
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, false, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, false, new TriplePatternRequestImpl(tp2) );
 
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -139,14 +139,14 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final FederationMember fmC = new TPFServerForTest();
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, new TriplePatternRequestImpl(tp2) );
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, false, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, false, new TriplePatternRequestImpl(tp2) );
 
 		final Expr e = new E_IsIRI( new ExprVar(v2) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(e);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(e, true);
 		
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
 				new LogicalPlanWithUnaryRootImpl(filterOp, null, new LogicalPlanWithNullaryRootImpl(reqOp2, null)),
@@ -212,15 +212,15 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
 		final TriplePattern tp4 = new TriplePatternImpl(v1 ,v2, v3);
 
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new TriplePatternRequestImpl(tp1) );
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, new TriplePatternRequestImpl(tp2) );
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, false, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, false, new TriplePatternRequestImpl(tp3) );
 
-		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl( new LogicalOpGPAdd(fmD, tp4, null),
+		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl( new LogicalOpGPAdd(fmD, tp4, null, false),
 		                                                                 null,
 		                                                                 new LogicalPlanWithNullaryRootImpl(reqOp1, null) );
 
-		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl( new LogicalOpGPAdd(fmD, tp4, null),
+		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl( new LogicalOpGPAdd(fmD, tp4, null, false),
 		                                                                 null,
 		                                                                 new LogicalPlanWithNullaryRootImpl(reqOp2, null) );
 
@@ -274,15 +274,15 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final FederationMember fmC = new TPFServerForTest();
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2B = new LogicalOpRequest<>( fmB, new TriplePatternRequestImpl(tp2) );
-		final LogicalOpRequest<?,?> reqOp2C = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2B = new LogicalOpRequest<>( fmB, false, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2C = new LogicalOpRequest<>( fmC, false, new TriplePatternRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
-		final LogicalOpRequest<?,?> reqOp3B = new LogicalOpRequest<>( fmB, new TriplePatternRequestImpl(tp3) );
-		final LogicalOpRequest<?,?> reqOp3C = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp3B = new LogicalOpRequest<>( fmB, false, new TriplePatternRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp3C = new LogicalOpRequest<>( fmC, false, new TriplePatternRequestImpl(tp3) );
 
 		final LogicalPlan unionSubPlan1 = LogicalPlanUtils.createPlanWithBinaryUnion(
 				new LogicalPlanWithNullaryRootImpl(reqOp2B, null),

@@ -236,7 +236,8 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 			}
 			else if ( oldSubPlanRootOp instanceof LogicalOpLocalToGlobal l2gLop
 					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest ) {
-				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping() );
+				final boolean mayReduce = l2gLop.mayReduce();
+				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping(), mayReduce );
 				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, null, inputPlan );
 
 				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?, ?>) oldSubPlan.getSubPlan(0).getRootOperator();
@@ -249,7 +250,8 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpLocalToGlobal
 					&& oldSubPlan.getSubPlan(0).getSubPlan(0).getRootOperator() instanceof LogicalOpRequest ) {
 				final LogicalOpLocalToGlobal l2gLop = (LogicalOpLocalToGlobal) oldSubPlan.getSubPlan(0).getRootOperator();
-				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping() );
+				final boolean mayReduce = filterOp.mayReduce() || l2gLop.mayReduce();
+				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping(), mayReduce );
 				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, null, inputPlan );
 
 				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?, ?>) oldSubPlan.getSubPlan(0).getSubPlan(0).getRootOperator();

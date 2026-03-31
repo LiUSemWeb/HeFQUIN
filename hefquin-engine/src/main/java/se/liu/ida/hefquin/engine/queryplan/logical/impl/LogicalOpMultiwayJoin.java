@@ -18,6 +18,10 @@ public class LogicalOpMultiwayJoin extends BaseForLogicalOps implements NaryLogi
 		return mayReduce ? singletonTrue : singletonFalse;
 	}
 
+	public static LogicalOpMultiwayJoin getInstance() {
+		return singletonFalse;
+	}
+
 	protected LogicalOpMultiwayJoin( final boolean mayReduce ) {
 		super( mayReduce );
 	}

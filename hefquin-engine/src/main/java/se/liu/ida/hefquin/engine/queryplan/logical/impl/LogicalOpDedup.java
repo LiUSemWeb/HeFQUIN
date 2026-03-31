@@ -6,16 +6,11 @@ import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
 public class LogicalOpDedup extends BaseForLogicalOps implements UnaryLogicalOp 
 {
-	protected static final LogicalOpDedup singletonFalse = new LogicalOpDedup(false);
-	protected static final LogicalOpDedup singletonTrue  = new LogicalOpDedup(true);
+	protected static LogicalOpDedup singleton = new LogicalOpDedup();
 
-	public static LogicalOpDedup getInstance( final boolean mayReduce ) {
-		return mayReduce ? singletonTrue : singletonFalse;
-	}
+	public static LogicalOpDedup getInstance() { return singleton; }
 
-	protected LogicalOpDedup( final boolean mayReduce ) {
-		super( mayReduce );
-	}
+	protected LogicalOpDedup() { super( true ); }
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
