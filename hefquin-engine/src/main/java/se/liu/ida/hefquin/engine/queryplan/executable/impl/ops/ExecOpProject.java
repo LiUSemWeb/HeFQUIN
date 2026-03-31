@@ -1,7 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
@@ -17,9 +20,15 @@ public class ExecOpProject extends UnaryExecutableOpBaseWithoutBlocking
 {
 	private long numberOfOutputMappingsProduced = 0L;
 
-	protected final List<Var> variables;
+	protected final Set<Var> variables;
 
 	public ExecOpProject( final List<Var> variables,
+	                      final boolean collectExceptions,
+	                      final QueryPlanningInfo qpInfo ) {
+		this( new HashSet<>(variables), collectExceptions, qpInfo );
+	}
+
+	public ExecOpProject( final Set<Var> variables,
 	                      final boolean collectExceptions,
 	                      final QueryPlanningInfo qpInfo ) {
 		super(collectExceptions, qpInfo);
@@ -41,20 +50,31 @@ public class ExecOpProject extends UnaryExecutableOpBaseWithoutBlocking
 	}
 
 	@Override
-	protected void _process( final Iterator<SolutionMapping> inputSolMap,
+	protected void _process( final Iterator<SolutionMapping> inputSolMaps,
 	                         final int maxBatchSize,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt )
 			throws ExecOpExecutionException {
-		// go through the list of solution mappings, keeping wanted variables but discarding the rest
+		final List<SolutionMapping> output = new ArrayList<>();
+
+		// Produce the output solution mappings
+		// and populate the list with them.
+		int cnt = 0;
+		while ( cnt < maxBatchSize && inputSolMaps.hasNext() ) {
+			cnt++;
+			final SolutionMapping inputSolMap = inputSolMaps.next();
+			final SolutionMapping outputSolMap = SolutionMappingUtils.restrict(inputSolMap, variables);
+			output.add(outputSolMap);
+		}
+
+		numberOfOutputMappingsProduced += output.size();
+		sink.send(output);
 	}
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt )
-			throws ExecOpExecutionException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method '_concludeExecution'");
+	                                   final ExecutionContext execCxt ) {
+		// nothing to be done here
 	}
 
 	@Override
