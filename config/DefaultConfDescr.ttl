@@ -24,7 +24,7 @@ _:bFederationAccessManager rdf:type ec:FederationAccessManager ;
           ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl" ;
           ec:constructorArguments ( ec:value:ExecServiceForFedAccess ) ]
         100  # cacheCapacity
-        50   # defaultMaxParallelRequests
+        10   # defaultMaxParallelRequests
     ) .
 
 _:bSourcePlanner rdf:type ec:SourcePlanner ;
