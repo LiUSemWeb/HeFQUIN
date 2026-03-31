@@ -26,19 +26,7 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpNaiveNestedLoopsJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
@@ -98,9 +86,9 @@ public abstract class EngineTestBase
 				new PhysicalOpBindJoinSPARQL.Factory("VARIABLE_RENAMING", false, 30),
 				new PhysicalOpBindJoinSPARQL.Factory("VALUES_OR_FILTER", false, 30),
 				PhysicalOpSymmetricHashJoin.getFactory(),
-				PhysicalOpHashRJoin.getFactory(),
-				PhysicalOpIndexNestedLoopsJoin.getFactory(),
+				PhysicalOpHashJoin2.getFactory(),
 				//PhysicalOpHashJoin.getFactory(),
+				PhysicalOpIndexNestedLoopsJoin.getFactory(),
 				PhysicalOpNaiveNestedLoopsJoin.getFactory()
 			)
 		);

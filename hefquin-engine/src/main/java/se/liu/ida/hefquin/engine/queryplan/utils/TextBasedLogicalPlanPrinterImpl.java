@@ -189,7 +189,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		}
 
 		@Override
-		public void visit( final LogicalOpRightJoin op ) {
+		public void visit( final LogicalOpLeftJoin op ) {
 			props.add( "reduces duplicates: " + op.mayReduce() );
 		}
 

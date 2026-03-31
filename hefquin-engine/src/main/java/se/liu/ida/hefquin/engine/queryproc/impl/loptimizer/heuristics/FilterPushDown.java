@@ -131,12 +131,12 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		{
 			return createPlanForJoinUnderFilter(filterOp, subPlanUnderFilter, inputPlan);
 		}
-		else if ( childOpUnderFilter instanceof LogicalOpRightJoin )
+		else if ( childOpUnderFilter instanceof LogicalOpLeftJoin )
 		{
-			return createPlanForRightJoinUnderFilter( filterOp,
-			                                          subPlanUnderFilter.getSubPlan(1), // non-optional subplan
-			                                          subPlanUnderFilter.getSubPlan(0), // optional subplan
-			                                          inputPlan );
+			return createPlanForLeftJoinUnderFilter( filterOp,
+			                                         subPlanUnderFilter.getSubPlan(0), // non-optional subplan
+			                                         subPlanUnderFilter.getSubPlan(1), // optional subplan
+			                                         inputPlan );
 		}
 		else if ( childOpUnderFilter instanceof LogicalOpMultiwayLeftJoin )
 		{
@@ -530,10 +530,10 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			                                         newSubPlanUnderFilter );
 	}
 
-	protected LogicalPlan createPlanForRightJoinUnderFilter( final LogicalOpFilter filterOp,
-	                                                         final LogicalPlan nonoptSubPlan,
-	                                                         final LogicalPlan optSubPlan,
-	                                                         final LogicalPlan inputPlan ) {
+	protected LogicalPlan createPlanForLeftJoinUnderFilter( final LogicalOpFilter filterOp,
+	                                                        final LogicalPlan nonoptSubPlan,
+	                                                        final LogicalPlan optSubPlan,
+	                                                        final LogicalPlan inputPlan ) {
 		// Note that filter conditions may not generally be pushed into the
 		// optional subplans even for cases in which all variables mentioned
 		// in a filter condition are certain variables of an optional subplan.
@@ -585,10 +585,10 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		// Create the new rewritten plan to be returned.
 		final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithBinaryRootImpl(
-				LogicalOpRightJoin.getInstance(mergedMayReduce),
+				LogicalOpLeftJoin.getInstance(mergedMayReduce),
 				null,
-				newOptSubPlan,
-				newNonOptSubPlan );
+				newNonOptSubPlan,
+				newOptSubPlan );
 
 		if ( newFilterOp == null )
 			return newSubPlanUnderFilter;

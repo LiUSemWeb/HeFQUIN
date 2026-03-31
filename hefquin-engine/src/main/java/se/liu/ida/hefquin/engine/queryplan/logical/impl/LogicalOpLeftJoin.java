@@ -9,20 +9,20 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
-public class LogicalOpRightJoin extends BaseForLogicalOps implements BinaryLogicalOp
+public class LogicalOpLeftJoin extends BaseForLogicalOps implements BinaryLogicalOp
 {
-	protected static final LogicalOpRightJoin singletonFalse = new LogicalOpRightJoin(false);
-	protected static final LogicalOpRightJoin singletonTrue  = new LogicalOpRightJoin(true);
+	protected static final LogicalOpLeftJoin singletonFalse = new LogicalOpLeftJoin(false);
+	protected static final LogicalOpLeftJoin singletonTrue  = new LogicalOpLeftJoin(true);
 
-	public static LogicalOpRightJoin getInstance( final boolean mayReduce ) {
+	public static LogicalOpLeftJoin getInstance( final boolean mayReduce ) {
 		return mayReduce ? singletonTrue : singletonFalse;
 	}
 
-	public static LogicalOpRightJoin getInstance() {
+	public static LogicalOpLeftJoin getInstance() {
 		return singletonFalse;
 	}
 
-	protected LogicalOpRightJoin( final boolean mayReduce ) {
+	protected LogicalOpLeftJoin( final boolean mayReduce ) {
 		super( mayReduce );
 	}
 
@@ -30,12 +30,12 @@ public class LogicalOpRightJoin extends BaseForLogicalOps implements BinaryLogic
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
 
-		final Set<Var> certainVars = inputVars[1].getCertainVariables();
+		final Set<Var> certainVars = inputVars[0].getCertainVariables();
 
 		final Set<Var> possibleVars = new HashSet<>();
-		possibleVars.addAll( inputVars[0].getCertainVariables() );
-		possibleVars.addAll( inputVars[0].getPossibleVariables() );
+		possibleVars.addAll( inputVars[1].getCertainVariables() );
 		possibleVars.addAll( inputVars[1].getPossibleVariables() );
+		possibleVars.addAll( inputVars[0].getPossibleVariables() );
 		possibleVars.removeAll(certainVars);
 
 		return new ExpectedVariables() {
@@ -51,7 +51,7 @@ public class LogicalOpRightJoin extends BaseForLogicalOps implements BinaryLogic
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpRightJoin; 
+		return o instanceof LogicalOpLeftJoin; 
 	}
 
 	@Override
@@ -61,6 +61,6 @@ public class LogicalOpRightJoin extends BaseForLogicalOps implements BinaryLogic
 
 	@Override
 	public String toString() {
-		return "rjoin";
+		return "leftjoin";
 	}
 }

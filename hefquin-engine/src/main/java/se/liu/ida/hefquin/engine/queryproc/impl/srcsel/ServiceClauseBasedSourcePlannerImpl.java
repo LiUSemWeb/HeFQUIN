@@ -487,9 +487,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 				children.add( leftSubPlan.getSubPlan(i) );
 			}
 		}
-		else if ( leftRootOp instanceof LogicalOpRightJoin ) {
-			children.add( leftSubPlan.getSubPlan(1) );
+		else if ( leftRootOp instanceof LogicalOpLeftJoin ) {
 			children.add( leftSubPlan.getSubPlan(0) );
+			children.add( leftSubPlan.getSubPlan(1) );
 		}
 		else {
 			children.add( leftSubPlan );

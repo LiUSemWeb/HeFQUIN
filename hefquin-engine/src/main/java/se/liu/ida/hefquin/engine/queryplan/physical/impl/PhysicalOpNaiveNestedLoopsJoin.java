@@ -29,7 +29,7 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 
 	private static PhysicalOpNaiveNestedLoopsJoin singleton = null;
 
-	protected PhysicalOpNaiveNestedLoopsJoin() { }
+	protected PhysicalOpNaiveNestedLoopsJoin() { super(false); }
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,

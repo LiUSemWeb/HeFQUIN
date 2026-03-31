@@ -32,7 +32,7 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 
 	private static PhysicalOpSymmetricHashJoin singleton = null;
 
-	protected PhysicalOpSymmetricHashJoin() { }
+	protected PhysicalOpSymmetricHashJoin() { super(false); }
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
