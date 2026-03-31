@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpProject implements UnaryLogicalOp
+public class LogicalOpProject extends BaseForLogicalOps implements UnaryLogicalOp
 {
 	protected final Set<Var> variables;
 
@@ -19,6 +19,8 @@ public class LogicalOpProject implements UnaryLogicalOp
 	}
 	
 	public LogicalOpProject( final Set<Var> variables ) {
+		super( false );
+
 		assert variables != null;
 		assert ! variables.isEmpty();
 
