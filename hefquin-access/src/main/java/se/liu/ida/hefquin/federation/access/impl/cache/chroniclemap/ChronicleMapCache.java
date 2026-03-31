@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -19,16 +21,28 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
  * Persistent cache backed by a {@link ChronicleMap}.
  *
  * <p>
- * This class is thread-safe for concurrent access through its public methods on
- * a single {@link ChronicleMapCache} instance. All accesses to the backing map,
- * replacement policy, and invalidation policy via these methods are
- * synchronized.
+ * This implementation uses a two-level design:
+ * </p>
+ * <ul>
+ * <li>An off-heap {@link ChronicleMap} as the persistent store</li>
+ * <li>An on-heap cache ({@link HashMap}) for recently accessed or written entries</li>
+ * </ul>
+ *
+ * <p>
+ * The in-memory cache is a performance optimization that avoids repeated
+ * deserialization of entries from off-heap storage. All in-memory entries
+ * originate from and are synchronized with the ChronicleMap.
  * </p>
  *
  * <p>
- * The cache stores entries on disk and restores them when reopened from the
- * same file. Cache entry creation, invalidation, and replacement behavior are
- * delegated to the configured cache policies.
+ * This class is thread-safe for concurrent access through its public methods on
+ * a single {@link ChronicleMapCache} instance. All access is guarded by
+ * synchronization on {@code map}.
+ * </p>
+ *
+ * <p>
+ * Cache entry creation, invalidation, and replacement behavior are delegated to
+ * the configured cache policies.
  * </p>
  *
  * <p>
@@ -59,6 +73,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	protected static final String DEFAULT_FILENAME = "cache/chronicle-map.dat";
 
 	protected final ChronicleMap<ChronicleMapCacheKey, ChronicleMapCacheEntry> map;
+	protected final Map<ChronicleMapCacheKey, ChronicleMapCacheEntry> inMemoryCache;
 	protected final CacheEntryFactory<ChronicleMapCacheEntry,ChronicleMapCacheObject> entryFactory;
 	protected final CacheInvalidationPolicy<ChronicleMapCacheEntry,ChronicleMapCacheObject> invalidPolicy;
 	protected final CacheReplacementPolicy<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> replacementPolicy;
@@ -127,6 +142,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 
 		this.filename = filename;
 		map = initializeMap(filename, capacity);
+		inMemoryCache = new HashMap<>(capacity);
 
 		// Initialize replacement policy
 		for( final Entry<ChronicleMapCacheKey, ChronicleMapCacheEntry> entry : map.entrySet() ) {
@@ -163,8 +179,10 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	/**
 	 * Initializes and returns the persistent Chronicle Map used by this cache.
 	 *
+	 * <p>
 	 * If the specified file does not exist, it is created before the map is
 	 * initialized.
+	 * </p>
 	 *
 	 * @param filename the path to the file used for persistent storage
 	 * @param capacity the maximum number of entries
@@ -192,10 +210,15 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		}
 	}
 
+	/**
+	 * Removes all entries from both the ChronicleMap and the in-memory cache, and
+	 * resets the replacement policy state.
+	 */
 	@Override
 	public void clear() {
 		synchronized (map) {
 			map.clear();
+			inMemoryCache.clear();
 			replacementPolicy.clear();
 		}
 	}
@@ -203,10 +226,17 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	/**
 	 * Stores the given key-value pair in the cache.
 	 *
+	 * <p>
+	 * The value is written to the ChronicleMap and also inserted into the in-memory
+	 * cache to avoid future deserialization overhead.
+	 * </p>
+	 *
+	 * <p>
 	 * If the key already exists, the corresponding entry is replaced and the
 	 * replacement policy is notified of a rewrite, otherwise the key is added to
 	 * the cache. If the cache reaches max capacity an entry is evicted according to
 	 * the replacement policy.
+	 * </p>
 	 *
 	 * @param key   the cache key
 	 * @param value the cache value
@@ -224,6 +254,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 		synchronized (map) {
 			map.compute( key, (k, oldEntry) -> {
 				final ChronicleMapCacheEntry entry = entryFactory.createCacheEntry(value);
+				inMemoryCache.put(k, entry);
 
 				if ( oldEntry == null )
 					replacementPolicy.entryWasAdded(k, entry);
@@ -244,8 +275,16 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	/**
 	 * Returns the cached object for the given key.
 	 *
+	 * <p>
+	 * This method first checks the in-memory cache. If a valid entry is found, the
+	 * replacement policy is notified and the entry returned immediately. Otherwise,
+	 * the ChronicleMap is consulted.
+	 * </p>
+	 *
+	 * <p>
 	 * If the key is present but the corresponding entry is no longer valid, the
 	 * entry is evicted and {@code null} is returned.
+	 * </p>
 	 *
 	 * @param key the cache key
 	 * @return the cached object, or {@code null} if no valid entry exists
@@ -253,6 +292,17 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	@Override
 	public ChronicleMapCacheObject get( final ChronicleMapCacheKey key ) {
 		synchronized (map) {
+			final ChronicleMapCacheEntry e = inMemoryCache.get(key);
+			if ( e != null ) {
+				if( invalidPolicy.isStillValid(e) ) {
+					replacementPolicy.entryWasRequested(key, e);
+					return e.getObject();
+				}
+				else {
+					inMemoryCache.remove(key);
+				}
+			}
+
 			final ChronicleMapCacheEntry entry = map.get(key);
 			if ( entry == null )
 				return null;
@@ -263,6 +313,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 			}
 
 			replacementPolicy.entryWasRequested(key, entry);
+			inMemoryCache.put(key, entry);
 			return entry.getObject();
 		}
 	}
@@ -270,12 +321,17 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	/**
 	 * Evicts the cache entry for the given key.
 	 *
+	 * <p>
+	 * The entry is removed from both the ChronicleMap and the in-memory cache.
+	 * </p>
+	 *
 	 * @param key the key to evict
 	 * @return {@code true} if an entry was removed, otherwise {@code false}
 	 */
 	@Override
 	public boolean evict( final ChronicleMapCacheKey key ) {
 		synchronized (map) {
+			inMemoryCache.remove(key);
 			if( map.remove(key) != null ) {
 				replacementPolicy.entryWasEvicted(key);
 				return true;
@@ -322,8 +378,10 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, ChronicleM
 	/**
 	 * Closes the underlying {@link ChronicleMap} and releases associated resources.
 	 *
+	 * <p>
 	 * Closing the map is not required but ensures that all data is properly flushed
 	 * to disk and that off-heap resources are released.
+	 * </p>
 	 */
 	@Override
 	public void close() {
