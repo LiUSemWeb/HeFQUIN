@@ -46,40 +46,31 @@ import se.liu.ida.hefquin.federation.members.TPFServer;
  */
 public class FederationAccessManagerWithChronicleMapCache extends FederationAccessManagerWithCache implements AutoCloseable
 {
+	protected static final long DEFAULT_TIME_TO_LIVE = 300_000; // 5 minutes
 	protected final ChronicleMapCache chronicleMapCache;
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
-	                                                     final CachePolicies<Key,CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies,
 	                                                     final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> chronicleMapCachePolicies )
 			throws IOException
 	{
-		super(fedAccMan, cacheCapacity, cachePolicies);
-		chronicleMapCache = new ChronicleMapCache(chronicleMapCachePolicies);
+		super(fedAccMan, cacheCapacity);
+		chronicleMapCache = new ChronicleMapCache(cacheCapacity, chronicleMapCachePolicies);
 	}
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
-	                                                     final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies )
+	                                                     final long timeToLive )
 			throws IOException 
 	{
-		this(fedAccMan, cacheCapacity, cachePolicies, new DefaultChronicleMapCachePolicies());
+		this(fedAccMan, cacheCapacity, new DefaultChronicleMapCachePolicies(timeToLive) );
 	}
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity )
 			throws IOException 
 	{
-		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
-	}
-
-	public FederationAccessManagerWithChronicleMapCache( final ExecutorService execService )
-			throws Exception 
-	{
-		this( new AsyncFederationAccessManagerImpl(execService),
-		      100,
-		      new MyDefaultCachePolicies(),
-			  new DefaultChronicleMapCachePolicies() );
+		this(fedAccMan, cacheCapacity, new DefaultChronicleMapCachePolicies(DEFAULT_TIME_TO_LIVE) );
 	}
 
 	/**
@@ -283,9 +274,11 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 			}
 		};
 
-		final CacheInvalidationPolicy<ChronicleMapCacheEntry,
-		                              ChronicleMapCacheObject
-		                             > cip = new CacheInvalidationPolicyTimeToLive<>(600_000); // 5 minutes
+		final CacheInvalidationPolicy<ChronicleMapCacheEntry, ChronicleMapCacheObject> cip;
+
+		public DefaultChronicleMapCachePolicies( final long timeToLive ) {
+			cip = new CacheInvalidationPolicyTimeToLive<>(timeToLive);
+		}
 
 		@Override
 		public ChronicleMapCacheEntryFactory getEntryFactory() {
@@ -304,5 +297,5 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		                               ChronicleMapCacheObject> getInvalidationPolicy() {
 			return cip;
 		}
-	} // end of MyDefaultCachePolicies
+	} // end of DefaultChronicleMapCachePolicies
 }
