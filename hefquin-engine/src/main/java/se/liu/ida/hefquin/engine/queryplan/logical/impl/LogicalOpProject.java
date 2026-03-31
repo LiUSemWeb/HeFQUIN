@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
@@ -10,9 +12,13 @@ import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
 public class LogicalOpProject implements UnaryLogicalOp
 {
-	protected final List<Var> variables;
+	protected final Set<Var> variables;
 
 	public LogicalOpProject( final List<Var> variables ) {
+		this( new HashSet<>(variables) );
+	}
+	
+	public LogicalOpProject( final Set<Var> variables ) {
 		assert variables != null;
 		assert ! variables.isEmpty();
 
@@ -23,10 +29,18 @@ public class LogicalOpProject implements UnaryLogicalOp
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 1;
 
-		return inputVars[0];
+		final Set<Var> certainVars = new HashSet<>( inputVars[0].getCertainVariables() );
+		certainVars.retainAll(variables);
+		final Set<Var> possibleVars = new HashSet<>( inputVars[0].getPossibleVariables() );
+		possibleVars.retainAll(variables);
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getCertainVariables() { return certainVars; }
+			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+		};
 	}
 
-	public List<Var> getVariables() {
+	public Set<Var> getVariables() {
 		return variables;
 	}
 
@@ -50,7 +64,7 @@ public class LogicalOpProject implements UnaryLogicalOp
 
 	@Override
 	public String toString() {
-		return "Variables ( " + variables.toString() + " )";
+		return "project ( " + variables.toString() + " )";
 	}
 
 }
