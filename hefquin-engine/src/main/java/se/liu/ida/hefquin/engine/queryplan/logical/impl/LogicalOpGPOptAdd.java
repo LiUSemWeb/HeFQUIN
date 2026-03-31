@@ -22,7 +22,7 @@ public class LogicalOpGPOptAdd extends BaseForLogicalOps implements UnaryLogical
 	protected TriplePattern tp = null;
 	protected boolean tpCheckDone = false;
 
-	public LogicalOpGPOptAdd( final FederationMember fm, final SPARQLGraphPattern pattern, boolean mayReduce ) {
+	public LogicalOpGPOptAdd( final FederationMember fm, final SPARQLGraphPattern pattern, final boolean mayReduce ) {
 		super( mayReduce );
 
 		assert fm != null;

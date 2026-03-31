@@ -85,7 +85,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			return createPlanForUnfold(opUnfold, mayReduce, ctxt);
 		}
 		else if ( jenaOp instanceof OpTable opTable ) {
-			return createPlanForValues(opTable, mayReduce, ctxt);
+			return createPlanForValues(opTable, ctxt);
 		}
 		else if ( jenaOp instanceof OpService opService ) {
 			return createPlanForServicePattern(opService, mayReduce, ctxt); 
@@ -216,7 +216,6 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	}
 
 	protected LogicalPlan createPlanForValues( final OpTable jenaOp,
-	                                           final boolean mayReduce,
 	                                           final QueryProcContext ctxt ) {
 		if ( jenaOp.getTable().size() != 1 )
 			// We shouldn't end up here. The only case in which we have
@@ -226,7 +225,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 		final Binding sm = jenaOp.getTable().rows().next();
 		final SolutionMapping solmap = new SolutionMappingImpl(sm);
-		final LogicalOpFixedSolMap rootOp = new LogicalOpFixedSolMap(solmap, mayReduce);
+		final LogicalOpFixedSolMap rootOp = new LogicalOpFixedSolMap(solmap);
 		return new LogicalPlanWithNullaryRootImpl(rootOp, null);
 	}
 
@@ -343,7 +342,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			return createPlanForTriplePattern(opTP, mayReduce, fm);
 		}
 		else if ( jenaOp instanceof OpTable opTable ) {
-			return createPlanForOpTable(opTable, mayReduce);
+			return createPlanForOpTable(opTable);
 		}
 		else {
 			throw new IllegalArgumentException( "unsupported type of query pattern: " + jenaOp.getClass().getName() );
@@ -433,7 +432,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		throw new IllegalArgumentException( "the given federation member cannot handle triple patterns requests (" + fm.toString() + ")" );
 	}
 
-	protected LogicalPlan createPlanForOpTable( final OpTable opTable, final boolean mayReduce ) {
+	protected LogicalPlan createPlanForOpTable( final OpTable opTable ) {
 		// Jena rewrites a pattern consisting only of OPTIONAL into
 		// OpLeftJoin(OpTable.unit(), pattern). The only OpTable we
 		// expect here is the join identity (one empty solution mapping).
@@ -442,7 +441,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		}
 
 		final SolutionMapping solmap = new SolutionMappingImpl(); // empty solution mapping
-		final LogicalOpFixedSolMap rootOp = new LogicalOpFixedSolMap(solmap, mayReduce);
+		final LogicalOpFixedSolMap rootOp = new LogicalOpFixedSolMap(solmap);
 		return new LogicalPlanWithNullaryRootImpl(rootOp, null);
 	}
 

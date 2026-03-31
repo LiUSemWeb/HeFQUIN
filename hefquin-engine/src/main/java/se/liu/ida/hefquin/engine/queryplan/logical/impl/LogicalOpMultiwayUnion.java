@@ -11,15 +11,24 @@ import org.apache.jena.sparql.core.Var;
 
 public class LogicalOpMultiwayUnion extends BaseForLogicalOps implements NaryLogicalOp
 {
-	protected static final LogicalOpMultiwayUnion singletonFalse = new LogicalOpMultiwayUnion(false);
-	protected static final LogicalOpMultiwayUnion singletonTrue  = new LogicalOpMultiwayUnion(true);
+	protected static final LogicalOpMultiwayUnion singletonWithoutReduction = new LogicalOpMultiwayUnion(false);
+	protected static final LogicalOpMultiwayUnion singletonThatMayReduce  = new LogicalOpMultiwayUnion(true);
 
 	public static LogicalOpMultiwayUnion getInstance( final boolean mayReduce ) {
-		return mayReduce ? singletonTrue : singletonFalse;
+		return mayReduce ? singletonThatMayReduce : singletonWithoutReduction;
 	}
 
+	/**
+	 * Returns the singleton instance of {@link LogicalOpMultiwayUnion} that does <em>not</em> 
+	 * reduce duplicates.
+	 *
+	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
+	 * {@code false}.
+	 *
+	 * @return the singleton instance that does not reduce duplicates
+	 */
 	public static LogicalOpMultiwayUnion getInstance() {
-		return singletonFalse;
+		return singletonWithoutReduction;
 	}
 
 	protected LogicalOpMultiwayUnion( final boolean mayReduce ) {

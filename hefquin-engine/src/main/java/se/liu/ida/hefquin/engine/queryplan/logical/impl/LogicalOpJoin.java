@@ -11,15 +11,24 @@ import org.apache.jena.sparql.core.Var;
 
 public class LogicalOpJoin extends BaseForLogicalOps implements BinaryLogicalOp
 {
-	protected static final LogicalOpJoin singletonFalse = new LogicalOpJoin(false);
-	protected static final LogicalOpJoin singletonTrue  = new LogicalOpJoin(true);
+	protected static final LogicalOpJoin singletonWithoutReduction = new LogicalOpJoin(false);
+	protected static final LogicalOpJoin singletonThatMayReduce  = new LogicalOpJoin(true);
 
 	public static LogicalOpJoin getInstance( final boolean mayReduce ) {
-		return mayReduce ? singletonTrue : singletonFalse;
+		return mayReduce ? singletonThatMayReduce : singletonWithoutReduction;
 	}
 
+	/**
+	 * Returns the singleton instance of {@link LogicalOpJoin} that does <em>not</em> 
+	 * reduce duplicates.
+	 *
+	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
+	 * {@code false}.
+	 *
+	 * @return the singleton instance that does not reduce duplicates
+	 */
 	public static LogicalOpJoin getInstance() {
-		return singletonFalse;
+		return singletonWithoutReduction;
 	}
 
 	protected LogicalOpJoin( final boolean mayReduce ) {

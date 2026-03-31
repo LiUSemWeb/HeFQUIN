@@ -11,15 +11,24 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
 public class LogicalOpLeftJoin extends BaseForLogicalOps implements BinaryLogicalOp
 {
-	protected static final LogicalOpLeftJoin singletonFalse = new LogicalOpLeftJoin(false);
-	protected static final LogicalOpLeftJoin singletonTrue  = new LogicalOpLeftJoin(true);
+	protected static final LogicalOpLeftJoin singletonWithoutReduction = new LogicalOpLeftJoin(false);
+	protected static final LogicalOpLeftJoin singletonThatMayReduce  = new LogicalOpLeftJoin(true);
 
 	public static LogicalOpLeftJoin getInstance( final boolean mayReduce ) {
-		return mayReduce ? singletonTrue : singletonFalse;
+		return mayReduce ? singletonThatMayReduce : singletonWithoutReduction;
 	}
 
+	/**
+	 * Returns the singleton instance of {@link LogicalOpLeftJoin} that does <em>not</em> 
+	 * reduce duplicates.
+	 *
+	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
+	 * {@code false}.
+	 *
+	 * @return the singleton instance that does not reduce duplicates
+	 */
 	public static LogicalOpLeftJoin getInstance() {
-		return singletonFalse;
+		return singletonWithoutReduction;
 	}
 
 	protected LogicalOpLeftJoin( final boolean mayReduce ) {

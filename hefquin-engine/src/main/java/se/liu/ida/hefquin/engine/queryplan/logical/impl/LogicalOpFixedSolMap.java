@@ -17,8 +17,8 @@ public class LogicalOpFixedSolMap extends BaseForLogicalOps implements NullaryLo
 	protected final SolutionMapping sm;
 	protected final ExpectedVariables expectedVars;
 
-	public LogicalOpFixedSolMap( final SolutionMapping sm, final boolean mayReduce ) {
-		super( mayReduce );
+	public LogicalOpFixedSolMap( final SolutionMapping sm ) {
+		super( true );
 
 		assert sm!= null;
 

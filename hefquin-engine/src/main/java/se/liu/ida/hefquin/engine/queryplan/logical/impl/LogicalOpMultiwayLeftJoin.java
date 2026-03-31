@@ -16,15 +16,24 @@ import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
  */
 public class LogicalOpMultiwayLeftJoin extends BaseForLogicalOps implements NaryLogicalOp
 {
-	protected static final LogicalOpMultiwayLeftJoin singletonFalse = new LogicalOpMultiwayLeftJoin(false);
-	protected static final LogicalOpMultiwayLeftJoin singletonTrue  = new LogicalOpMultiwayLeftJoin(true);
+	protected static final LogicalOpMultiwayLeftJoin singletonWithoutReduction = new LogicalOpMultiwayLeftJoin(false);
+	protected static final LogicalOpMultiwayLeftJoin singletonThatMayReduce  = new LogicalOpMultiwayLeftJoin(true);
 
 	public static LogicalOpMultiwayLeftJoin getInstance( final boolean mayReduce ) {
-		return mayReduce ? singletonTrue : singletonFalse;
+		return mayReduce ? singletonThatMayReduce : singletonWithoutReduction;
 	}
 
+	/**
+	 * Returns the singleton instance of {@link LogicalOpMultiwayLeftJoin} that does <em>not</em> 
+	 * reduce duplicates.
+	 *
+	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
+	 * {@code false}.
+	 *
+	 * @return the singleton instance that does not reduce duplicates
+	 */
 	public static LogicalOpMultiwayLeftJoin getInstance() {
-		return singletonFalse;
+		return singletonWithoutReduction;
 	}
 
 	protected LogicalOpMultiwayLeftJoin( final boolean mayReduce ) {

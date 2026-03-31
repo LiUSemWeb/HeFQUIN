@@ -15,7 +15,7 @@ public class LogicalOpBind extends BaseForLogicalOps implements UnaryLogicalOp
 {
 	protected final VarExprList bindExpressions;
 
-	public LogicalOpBind( final VarExprList bindExpressions, boolean mayReduce ) {
+	public LogicalOpBind( final VarExprList bindExpressions, final boolean mayReduce ) {
 		super( mayReduce );
 
 		assert bindExpressions != null;
