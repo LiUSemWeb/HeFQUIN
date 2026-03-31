@@ -13,6 +13,7 @@ PREFIX ex:     <http://example.org/>
               ec:constructorArguments ( ec:value:ExecServiceForFedAccess )
             ]
             100  # cacheCapacity
+            10   # defaultMaxParallelRequests
         )
    ] ;
    ec:queryProcessor _:b1 .
