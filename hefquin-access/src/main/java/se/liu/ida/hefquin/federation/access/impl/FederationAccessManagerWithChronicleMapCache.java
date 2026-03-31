@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutorService;
-
-import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicyTimeToLive;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
