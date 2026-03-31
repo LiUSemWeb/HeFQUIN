@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.base.shared.http;
+package se.liu.ida.hefquin.base.net.http;
 
 import java.io.IOException;
 import java.net.Authenticator;
