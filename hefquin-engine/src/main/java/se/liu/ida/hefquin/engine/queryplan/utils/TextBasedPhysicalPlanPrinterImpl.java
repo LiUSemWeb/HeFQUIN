@@ -158,8 +158,14 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
-		public void visit( final PhysicalOpHashJoin op ) {
-			rootOpString = "hash join";
+		public void visit( final PhysicalOpHashJoin1 op ) {
+			rootOpString = "hash join 1";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpHashJoin2 op ) {
+			rootOpString = "hash join 2";
 			record( op.getLogicalOperator() );
 		}
 
@@ -172,12 +178,6 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		@Override
 		public void visit( final PhysicalOpNaiveNestedLoopsJoin op ) {
 			rootOpString = "naive NLJ";
-			record( op.getLogicalOperator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpHashRJoin op ) {
-			rootOpString = "right-outer hash join";
 			record( op.getLogicalOperator() );
 		}
 

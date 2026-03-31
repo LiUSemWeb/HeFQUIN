@@ -130,7 +130,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		public List<String> props = null;
 
 		/**
-		 * The graph pattern of  the most recently visited operator (if any).
+		 * The graph pattern of the most recently visited operator (if any).
 		 */
 		public SPARQLGraphPattern graphPattern;
 
@@ -182,7 +182,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		}
 
 		@Override
-		public void visit( final LogicalOpRightJoin op ) {
+		public void visit( final LogicalOpLeftJoin op ) {
 			// nothing extra
 		}
 
@@ -258,6 +258,18 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
 			props.add( "vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
+		}
+
+		@Override
+		public void visit( final LogicalOpProject op ) {
+			String varsStr = "variables: ";
+			final Iterator<Var> it = op.getVariables().iterator();
+			varsStr += it.hasNext() ? it.next().toString() : "none";
+			while ( it.hasNext() ) {
+				varsStr += ", " + it.next().toString();
+			}
+
+			props.add( varsStr );
 		}
 
 		protected void record( final FederationMember fm ) {

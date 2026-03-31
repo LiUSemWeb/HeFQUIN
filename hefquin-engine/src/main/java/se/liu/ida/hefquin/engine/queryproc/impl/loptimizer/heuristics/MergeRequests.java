@@ -180,7 +180,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		}
 
 		@Override
-		public void visit( final LogicalOpRightJoin op ) {
+		public void visit( final LogicalOpLeftJoin op ) {
 			final LogicalOperator childOp1 = rewrittenSubPlans.get(0).getRootOperator();
 			final LogicalOperator childOp2 = rewrittenSubPlans.get(1).getRootOperator();
 			if (    childOp1 instanceof LogicalOpRequest reqOp1
@@ -189,9 +189,9 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 					&& reqOp2.getRequest() instanceof SPARQLRequest req2
 					&& reqOp1.getFederationMember().equals(reqOp2.getFederationMember()) )
 			{
-				// the LHS is the optional part
-				final SPARQLGraphPattern merged = mergePatternWithOptPatterns( req2.getQueryPattern(),
-																				req1.getQueryPattern() );
+				// the LHS is the non-optional part
+				final SPARQLGraphPattern merged = mergePatternWithOptPatterns( req1.getQueryPattern(),
+				                                                               req2.getQueryPattern() );
 
 				final FederationMember fm = reqOp1.getFederationMember();
 				if ( fm.isSupportedPattern(merged) ) {
@@ -376,6 +376,11 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		public void visit( final LogicalOpDedup op ) {
 			// nothing to do here - TODO: for requests to SPARQL endpoints, the DISTINCT
 			// can be merged into the request.
+		}
+
+		@Override
+		public void visit( final LogicalOpProject op ) {
+			// nothing to do here
 		}
 
 	} // end of Worker
