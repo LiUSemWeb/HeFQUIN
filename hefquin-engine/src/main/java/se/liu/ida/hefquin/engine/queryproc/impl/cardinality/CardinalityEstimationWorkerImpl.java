@@ -484,6 +484,16 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(minValue, minQuality) );
 	}
 
+	@Override
+	public void visit( final LogicalOpProject op ) {
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+	}
+
 	public void addCardinalityForUnion() {
 		int crdValue = 0;
 		int maxValue = 0;
