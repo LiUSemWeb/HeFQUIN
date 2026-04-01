@@ -218,472 +218,318 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			throw new UnsupportedOperationException("Unimplemented method 'visit'");
 		}
 		
-		private LogicalPlan createPlanForRequestUnderFilter( final LogicalOpFilter filterOp,
-															   final LogicalOpRequest<?,?> reqOp,
-															   final LogicalPlan inputPlan ) {
-			final FederationMember fm = reqOp.getFederationMember();
+	} // end of Worker
 	
-			if ( ! fm.supportsMoreThanTriplePatterns() ) {
-				return inputPlan;
-			}
-	
-			final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
-			final ExprList exprList = filterOp.getFilterExpressions();
-			final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(exprList);
-	
-			if ( ! fm.isSupportedPattern(mergedPattern) ) {
-				return inputPlan;
-			}
-	
-			final SPARQLRequest mergedReq = new SPARQLRequestImpl(mergedPattern);
-			final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>(fm, mergedReq);
-			return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
+	protected LogicalPlan createPlanForRequestUnderFilter( final LogicalOpFilter filterOp,
+	                                                       final LogicalOpRequest<?,?> reqOp,
+	                                                       final LogicalPlan inputPlan ) {
+		final FederationMember fm = reqOp.getFederationMember();
+
+		if ( ! fm.supportsMoreThanTriplePatterns() ) {
+			return inputPlan;
 		}
-	
-		private LogicalPlan createPlanForFilterUnderFilter( final LogicalOpFilter parentFilterOp,
-															  final LogicalOpFilter childFilterOp,
-															  final LogicalPlan subPlanUnderChildFilterOp ) {
-			final ExprList combinedFilterExprsWithoutAND = new ExprList();
-	
-			final ExprList parentFilterExprs = parentFilterOp.getFilterExpressions();
-			final ExprList parentFilterExprsWithoutAND = splitConjunctions(parentFilterExprs);
-			combinedFilterExprsWithoutAND.addAll(parentFilterExprsWithoutAND);
-	
-			final ExprList childFilterExprs = childFilterOp.getFilterExpressions();
-			final ExprList childFilterExprsWithoutAND = splitConjunctions(childFilterExprs);
-			combinedFilterExprsWithoutAND.addAll(childFilterExprsWithoutAND);
-	
-			final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
-					new LogicalOpFilter(combinedFilterExprsWithoutAND),
-					null,
-					subPlanUnderChildFilterOp );
-	
-			return apply(newPlan);
+
+		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
+		final ExprList exprList = filterOp.getFilterExpressions();
+		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(exprList);
+
+		if ( ! fm.isSupportedPattern(mergedPattern) ) {
+			return inputPlan;
 		}
-	
-		private LogicalPlan createPlanForUnionUnderFilter( final LogicalOpFilter filterOp,
-															 final LogicalPlan subPlanUnderFilter ) {
-			// simply pushes the filter operator into every subplan under the
-			// union operator and, then, applies this heuristic recursively to
-			// each such subplan; in the end, collects all resulting subplans
-			// again under a multiway union as new root operator
-			final int numberOfSubPlansUnderUnion = subPlanUnderFilter.numberOfSubPlans();
-			final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlansUnderUnion];
-			for ( int i = 0; i < numberOfSubPlansUnderUnion; i++ ) {
-				final LogicalPlan subPlanUnderUnion = subPlanUnderFilter.getSubPlan(i);
-				final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterOp, null, subPlanUnderUnion);
-				final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
-				newSubPlans[i] = newSubPlanWithFilterPushed;
-			}
-	
-			// If there is only one subplan under the union, then remove the union altogether.
-			if ( numberOfSubPlansUnderUnion == 1 ) return newSubPlans[0];
-	
-			final LogicalOperator unionOp = subPlanUnderFilter.getRootOperator(); // may be multiway union or binary union
-			return LogicalPlanUtils.createPlanWithSubPlans(unionOp, null, newSubPlans);
+
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl(mergedPattern);
+		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>(fm, mergedReq);
+		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
+	}
+
+	protected LogicalPlan createPlanForFilterUnderFilter( final LogicalOpFilter parentFilterOp,
+	                                                      final LogicalOpFilter childFilterOp,
+	                                                      final LogicalPlan subPlanUnderChildFilterOp ) {
+		final ExprList combinedFilterExprsWithoutAND = new ExprList();
+
+		final ExprList parentFilterExprs = parentFilterOp.getFilterExpressions();
+		final ExprList parentFilterExprsWithoutAND = splitConjunctions(parentFilterExprs);
+		combinedFilterExprsWithoutAND.addAll(parentFilterExprsWithoutAND);
+
+		final ExprList childFilterExprs = childFilterOp.getFilterExpressions();
+		final ExprList childFilterExprsWithoutAND = splitConjunctions(childFilterExprs);
+		combinedFilterExprsWithoutAND.addAll(childFilterExprsWithoutAND);
+
+		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
+				new LogicalOpFilter(combinedFilterExprsWithoutAND),
+				null,
+				subPlanUnderChildFilterOp );
+
+		return apply(newPlan);
+	}
+
+	protected LogicalPlan createPlanForUnionUnderFilter( final LogicalOpFilter filterOp,
+	                                                     final LogicalPlan subPlanUnderFilter ) {
+		// simply pushes the filter operator into every subplan under the
+		// union operator and, then, applies this heuristic recursively to
+		// each such subplan; in the end, collects all resulting subplans
+		// again under a multiway union as new root operator
+		final int numberOfSubPlansUnderUnion = subPlanUnderFilter.numberOfSubPlans();
+		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlansUnderUnion];
+		for ( int i = 0; i < numberOfSubPlansUnderUnion; i++ ) {
+			final LogicalPlan subPlanUnderUnion = subPlanUnderFilter.getSubPlan(i);
+			final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterOp, null, subPlanUnderUnion);
+			final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
+			newSubPlans[i] = newSubPlanWithFilterPushed;
 		}
-	
-		private LogicalPlan createPlanForBindUnderFilter( final LogicalOpFilter filterOp,
-															final LogicalOpBind bindOp,
-															final LogicalPlan subPlanUnderBind,
-															final LogicalPlan inputPlan ) {
-			// Check whether the filter can be pushed under the given bind operator,
-			// which is possible only if none of the variables assigned by the bind
-			// operator is used in the filter condition.
-			final Set<Var> varsInFilter = ExprVars.getVarsMentioned( filterOp.getFilterExpressions() );
-			final List<Var> varsInBind = bindOp.getBindExpressions().getVars();
-			if ( ! Collections.disjoint(varsInFilter, varsInBind) )
-				return inputPlan;
-	
-			// The filter can be pushed. In this case, create a new subplan with
-			// the filter as root operator on top of the subplan that was under
-			// the bind, and apply this heuristic recursively to this new subplan.
-			final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
-					filterOp,
-					null,
-					subPlanUnderBind );
-			final LogicalPlan newSubPlan2 = apply(newSubPlan1);
-	
-			// Finally, put together the new plan with the bind operator as root.
-			return LogicalPlanUtils.createPlanWithSubPlans(bindOp, null, newSubPlan2);
+
+		// If there is only one subplan under the union, then remove the union altogether.
+		if ( numberOfSubPlansUnderUnion == 1 ) return newSubPlans[0];
+
+		final LogicalOperator unionOp = subPlanUnderFilter.getRootOperator(); // may be multiway union or binary union
+		return LogicalPlanUtils.createPlanWithSubPlans(unionOp, null, newSubPlans);
+	}
+
+	protected LogicalPlan createPlanForBindUnderFilter( final LogicalOpFilter filterOp,
+	                                                    final LogicalOpBind bindOp,
+	                                                    final LogicalPlan subPlanUnderBind,
+	                                                    final LogicalPlan inputPlan ) {
+		// Check whether the filter can be pushed under the given bind operator,
+		// which is possible only if none of the variables assigned by the bind
+		// operator is used in the filter condition.
+		final Set<Var> varsInFilter = ExprVars.getVarsMentioned( filterOp.getFilterExpressions() );
+		final List<Var> varsInBind = bindOp.getBindExpressions().getVars();
+		if ( ! Collections.disjoint(varsInFilter, varsInBind) )
+			return inputPlan;
+
+		// The filter can be pushed. In this case, create a new subplan with
+		// the filter as root operator on top of the subplan that was under
+		// the bind, and apply this heuristic recursively to this new subplan.
+		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
+				filterOp,
+				null,
+				subPlanUnderBind );
+		final LogicalPlan newSubPlan2 = apply(newSubPlan1);
+
+		// Finally, put together the new plan with the bind operator as root.
+		return LogicalPlanUtils.createPlanWithSubPlans(bindOp, null, newSubPlan2);
+	}
+
+	protected LogicalPlan createPlanForUnfoldUnderFilter(
+			final LogicalOpFilter filterOp,
+			final LogicalOpUnfold unfoldOp,
+			final LogicalPlan subPlanUnderUnfold,
+			final LogicalPlan inputPlan ) {
+		// Check whether the filter can be pushed under the given
+		// unfold operator, which is possible only if none of the
+		// variables assigned by the unfold operator is used in
+		// the filter condition.
+		final Set<Var> varsInFilter = ExprVars.getVarsMentioned( filterOp.getFilterExpressions() );
+		final Var unfoldVar1 = unfoldOp.getVar1();
+		final Var unfoldVar2 = unfoldOp.getVar2();
+		if ( varsInFilter.contains(unfoldVar1) )
+			return inputPlan;
+		if ( unfoldVar2 != null && varsInFilter.contains(unfoldVar2) )
+			return inputPlan;
+
+		// The filter can be pushed. In this case, create a new subplan with
+		// the filter as root operator on top of the subplan that was under
+		// the unfold, and apply this heuristic recursively to this new subplan.
+		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
+				filterOp,
+				null,
+				subPlanUnderUnfold );
+		final LogicalPlan newSubPlan2 = apply(newSubPlan1);
+
+		// Finally, put together the new plan with the unfold operator as root.
+		return LogicalPlanUtils.createPlanWithSubPlans(unfoldOp, null, newSubPlan2);
+	}
+
+	/**
+	 * Assumes that the given child operator is either a {@link LogicalOpLocalToGlobal}
+	 * or a {@link LogicalOpGlobalToLocal}.
+	 */
+	protected LogicalPlan createPlanForL2GOrG2LUnderFilter( final LogicalOpFilter parentFilterOp,
+	                                                        final UnaryLogicalOp childOp,
+	                                                        final LogicalPlan subPlanUnderChildOp,
+	                                                        final LogicalPlan inputPlan ) {
+		// The current implementation does not try to push filter
+		// conditions under the vocabulary rewriting operators,
+		// LogicalOpLocalToGlobal and LogicalOpGlobalToLocal.
+		// Extending the implementation to try to push filter
+		// conditions in these cases is captured as issue #271.
+		//
+		// https://github.com/LiUSemWeb/HeFQUIN/issues/271
+		//
+		// However, for the time being, we only apply the filter
+		// push-down heuristic to the subplan that is under the
+		// given vocabulary rewriting operator.
+		return createPlanAfterPushingInSubPlan(parentFilterOp, childOp, subPlanUnderChildOp, inputPlan);
+	}
+
+	/**
+	 * Assumes that the given child operator is either
+	 * a {@link LogicalOpTPAdd},
+	 * a {@link LogicalOpTPOptAdd},
+	 * a {@link LogicalOpBGPAdd},
+	 * a {@link LogicalOpBGPOptAdd},
+	 * a {@link LogicalOpGPAdd}, or
+	 * a {@link LogicalOpGPOptAdd}.
+	 */
+	protected LogicalPlan createPlanForAddOpUnderFilter( final LogicalOpFilter parentFilterOp,
+	                                                     final UnaryLogicalOp childOp,
+	                                                     final LogicalPlan subPlanUnderChildOp,
+	                                                     final LogicalPlan inputPlan ) {
+		// The following snippets of code will be needed if we try to push
+		// the filter conditions also into the pattern of the xxAdd operator.
+		// Trying to do so is not necessary at the moment because we do not
+		// actually have xxAdd operators in the logical plans to which we
+		// apply the heuristics (because the initial logical plan is always
+		// a source assignment and we currently don't have any heuristics
+		// that rewrite the multiway joins of such source assignments into
+		// xxAdd operators). Even once we have heuristics that rewrite joins
+		// into xxAdd operators, as long as we apply the MergeRequest heuristic
+		// before such a heuristic (and after FilterPushDown), we would never
+		// need to try pushing filter conditions also into the pattern of the
+		// xxAdd operator.
+		// However, should we ever try to push the filter conditions also
+		// into the pattern of the xxAdd operator, notice that the xxOptAdd
+		// operators are special because not every filter condition can be
+		// pushed into the pattern of such an operator even if the certain
+		// variables of that pattern contain all of the variables mention
+		// in the filter condition. For instance, if the optional pattern
+		// has ?x as a certain variable and the filter condition is
+		// !BOUND(?x), then pushing this condition is not possible.
+
+		//final SPARQLGraphPattern patternOfAddOp;
+		//if      ( childOp instanceof LogicalOpTPAdd )     patternOfAddOp = ((LogicalOpTPAdd) childOp).getTP();
+		//else if ( childOp instanceof LogicalOpTPOptAdd )  patternOfAddOp = ((LogicalOpTPOptAdd) childOp).getTP();
+		//else if ( childOp instanceof LogicalOpBGPAdd )    patternOfAddOp = ((LogicalOpBGPAdd) childOp).getBGP();
+		//else if ( childOp instanceof LogicalOpBGPOptAdd ) patternOfAddOp = ((LogicalOpBGPOptAdd) childOp).getBGP();
+		//else if ( childOp instanceof LogicalOpGPAdd )     patternOfAddOp = ((LogicalOpGPAdd) childOp).getPattern();
+		//else if ( childOp instanceof LogicalOpGPOptAdd )  patternOfAddOp = ((LogicalOpGPOptAdd) childOp).getPattern();
+		//else throw new IllegalArgumentException( childOp.getClass().getName() );
+
+		//final ExpectedVariables expVarsInPattern = QueryPatternUtils.getExpectedVariablesInPattern(patternOfAddOp);
+		//final Set<Var> certainVarsInPattern = expVarsInPattern.getCertainVariables();
+
+		final ExpectedVariables expVarsInSubPlan = subPlanUnderChildOp.getExpectedVariables();
+		final Set<Var> certainVarsInSubPlan = expVarsInSubPlan.getCertainVariables();
+
+		final ExprList filterExprs = parentFilterOp.getFilterExpressions();
+		final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
+
+		final ExprList toBePushed = new ExprList();
+		final ExprList toBeKept = new ExprList();
+
+		for ( final Expr e : filterExprsWithoutAND ) {
+			// If all of the variables mentioned in the current filter
+			// condition are certain variables of the subplan, then the
+			// condition can be pushed to the subplan.
+			final Set<Var> varsInExpr = ExprVars.getVarsMentioned(e);
+			if ( certainVarsInSubPlan.containsAll(varsInExpr) )
+				toBePushed.add(e);
+			else
+				toBeKept.add(e);
 		}
-	
-		private LogicalPlan createPlanForUnfoldUnderFilter(
-				final LogicalOpFilter filterOp,
-				final LogicalOpUnfold unfoldOp,
-				final LogicalPlan subPlanUnderUnfold,
-				final LogicalPlan inputPlan ) {
-			// Check whether the filter can be pushed under the given
-			// unfold operator, which is possible only if none of the
-			// variables assigned by the unfold operator is used in
-			// the filter condition.
-			final Set<Var> varsInFilter = ExprVars.getVarsMentioned( filterOp.getFilterExpressions() );
-			final Var unfoldVar1 = unfoldOp.getVar1();
-			final Var unfoldVar2 = unfoldOp.getVar2();
-			if ( varsInFilter.contains(unfoldVar1) )
-				return inputPlan;
-			if ( unfoldVar2 != null && varsInFilter.contains(unfoldVar2) )
-				return inputPlan;
-	
-			// The filter can be pushed. In this case, create a new subplan with
-			// the filter as root operator on top of the subplan that was under
-			// the unfold, and apply this heuristic recursively to this new subplan.
-			final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
-					filterOp,
-					null,
-					subPlanUnderUnfold );
-			final LogicalPlan newSubPlan2 = apply(newSubPlan1);
-	
-			// Finally, put together the new plan with the unfold operator as root.
-			return LogicalPlanUtils.createPlanWithSubPlans(unfoldOp, null, newSubPlan2);
-		}
-	
-		/**
-		 * Assumes that the given child operator is either a {@link LogicalOpLocalToGlobal}
-		 * or a {@link LogicalOpGlobalToLocal}.
-		 */
-		private LogicalPlan createPlanForL2GOrG2LUnderFilter( final LogicalOpFilter parentFilterOp,
-																final UnaryLogicalOp childOp,
-																final LogicalPlan subPlanUnderChildOp,
-																final LogicalPlan inputPlan ) {
-			// The current implementation does not try to push filter
-			// conditions under the vocabulary rewriting operators,
-			// LogicalOpLocalToGlobal and LogicalOpGlobalToLocal.
-			// Extending the implementation to try to push filter
-			// conditions in these cases is captured as issue #271.
-			//
-			// https://github.com/LiUSemWeb/HeFQUIN/issues/271
-			//
-			// However, for the time being, we only apply the filter
-			// push-down heuristic to the subplan that is under the
-			// given vocabulary rewriting operator.
+
+		if ( toBePushed.isEmpty() ) {
 			return createPlanAfterPushingInSubPlan(parentFilterOp, childOp, subPlanUnderChildOp, inputPlan);
 		}
-	
-		/**
-		 * Assumes that the given child operator is either
-		 * a {@link LogicalOpTPAdd},
-		 * a {@link LogicalOpTPOptAdd},
-		 * a {@link LogicalOpBGPAdd},
-		 * a {@link LogicalOpBGPOptAdd},
-		 * a {@link LogicalOpGPAdd}, or
-		 * a {@link LogicalOpGPOptAdd}.
-		 */
-		private LogicalPlan createPlanForAddOpUnderFilter( final LogicalOpFilter parentFilterOp,
-															 final UnaryLogicalOp childOp,
-															 final LogicalPlan subPlanUnderChildOp,
-															 final LogicalPlan inputPlan ) {
-			// The following snippets of code will be needed if we try to push
-			// the filter conditions also into the pattern of the xxAdd operator.
-			// Trying to do so is not necessary at the moment because we do not
-			// actually have xxAdd operators in the logical plans to which we
-			// apply the heuristics (because the initial logical plan is always
-			// a source assignment and we currently don't have any heuristics
-			// that rewrite the multiway joins of such source assignments into
-			// xxAdd operators). Even once we have heuristics that rewrite joins
-			// into xxAdd operators, as long as we apply the MergeRequest heuristic
-			// before such a heuristic (and after FilterPushDown), we would never
-			// need to try pushing filter conditions also into the pattern of the
-			// xxAdd operator.
-			// However, should we ever try to push the filter conditions also
-			// into the pattern of the xxAdd operator, notice that the xxOptAdd
-			// operators are special because not every filter condition can be
-			// pushed into the pattern of such an operator even if the certain
-			// variables of that pattern contain all of the variables mention
-			// in the filter condition. For instance, if the optional pattern
-			// has ?x as a certain variable and the filter condition is
-			// !BOUND(?x), then pushing this condition is not possible.
-	
-			//final SPARQLGraphPattern patternOfAddOp;
-			//if      ( childOp instanceof LogicalOpTPAdd )     patternOfAddOp = ((LogicalOpTPAdd) childOp).getTP();
-			//else if ( childOp instanceof LogicalOpTPOptAdd )  patternOfAddOp = ((LogicalOpTPOptAdd) childOp).getTP();
-			//else if ( childOp instanceof LogicalOpBGPAdd )    patternOfAddOp = ((LogicalOpBGPAdd) childOp).getBGP();
-			//else if ( childOp instanceof LogicalOpBGPOptAdd ) patternOfAddOp = ((LogicalOpBGPOptAdd) childOp).getBGP();
-			//else if ( childOp instanceof LogicalOpGPAdd )     patternOfAddOp = ((LogicalOpGPAdd) childOp).getPattern();
-			//else if ( childOp instanceof LogicalOpGPOptAdd )  patternOfAddOp = ((LogicalOpGPOptAdd) childOp).getPattern();
-			//else throw new IllegalArgumentException( childOp.getClass().getName() );
-	
-			//final ExpectedVariables expVarsInPattern = QueryPatternUtils.getExpectedVariablesInPattern(patternOfAddOp);
-			//final Set<Var> certainVarsInPattern = expVarsInPattern.getCertainVariables();
-	
-			final ExpectedVariables expVarsInSubPlan = subPlanUnderChildOp.getExpectedVariables();
-			final Set<Var> certainVarsInSubPlan = expVarsInSubPlan.getCertainVariables();
-	
-			final ExprList filterExprs = parentFilterOp.getFilterExpressions();
-			final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
-	
-			final ExprList toBePushed = new ExprList();
-			final ExprList toBeKept = new ExprList();
-	
-			for ( final Expr e : filterExprsWithoutAND ) {
+
+		final LogicalPlan newSubPlanUnderChildOp = new LogicalPlanWithUnaryRootImpl(
+				new LogicalOpFilter(toBePushed), // pushed filter op.
+				null,
+				subPlanUnderChildOp );
+		final LogicalPlan newSubPlanUnderChildOpRewritten = apply(newSubPlanUnderChildOp);
+
+		final LogicalPlan newSubPlanUnderRootOp = new LogicalPlanWithUnaryRootImpl(
+				childOp,
+				null,
+				newSubPlanUnderChildOpRewritten );
+
+		if ( toBeKept.isEmpty() ) {
+			return newSubPlanUnderRootOp;
+		}
+
+		final LogicalOpFilter newRootFilterOp = new LogicalOpFilter(toBeKept);
+		return new LogicalPlanWithUnaryRootImpl(newRootFilterOp, null, newSubPlanUnderRootOp);
+	}
+
+	protected LogicalPlan createPlanForJoinUnderFilter( final LogicalOpFilter filterOp,
+	                                                    final LogicalPlan subPlanUnderFilter,
+	                                                    final LogicalPlan inputPlan ) {
+		final int numberOfSubPlansUnderJoin = subPlanUnderFilter.numberOfSubPlans();
+
+		// If there is only one subplan under the join, then remove the join altogether.
+		if ( numberOfSubPlansUnderJoin == 1 ) {
+			final LogicalPlan subPlan = subPlanUnderFilter.getSubPlan(0);
+			final LogicalPlan subPlanAfterFilterPushDown = apply(subPlan);
+			return new LogicalPlanWithUnaryRootImpl(filterOp, null, subPlanAfterFilterPushDown);
+		}
+
+		// Determine the sets of certain variables in each of the subplans
+		// under the join, which will be needed later for checking which of
+		// the filter conditions may be pushed to the subplans.
+		final List<Set<Var>> certainVarsInSubPlans = new ArrayList<>(numberOfSubPlansUnderJoin);
+		for ( int i = 0; i < numberOfSubPlansUnderJoin; i++ ) {
+			final LogicalPlan subPlanUnderJoin = subPlanUnderFilter.getSubPlan(i);
+			final ExpectedVariables expVarsInSubPlan = subPlanUnderJoin.getExpectedVariables();
+			certainVarsInSubPlans.add( expVarsInSubPlan.getCertainVariables() );
+		}
+
+		final ExprList filterExprs = filterOp.getFilterExpressions();
+		final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
+
+		// Determine which of the filter conditions may be pushed
+		// to the subplans under the join and which ones need to
+		// be kept to be evaluated after the join.
+		final ExprList[] toBePushed = new ExprList[numberOfSubPlansUnderJoin];
+		ExprList toBeKept = null;
+
+		for ( final Expr e : filterExprsWithoutAND ) {
+			boolean pushed = false; // set to true if the current condition can be pushed to at least one of the subplans
+			final Set<Var> varsInExpr = ExprVars.getVarsMentioned(e);
+
+			// check the current filter condition for each of the subplans
+			for ( int i = 0; i < numberOfSubPlansUnderJoin; i++ ) {
 				// If all of the variables mentioned in the current filter
-				// condition are certain variables of the subplan, then the
-				// condition can be pushed to the subplan.
-				final Set<Var> varsInExpr = ExprVars.getVarsMentioned(e);
-				if ( certainVarsInSubPlan.containsAll(varsInExpr) )
-					toBePushed.add(e);
+				// condition are certain variables of the current subplan,
+				// then the condition can be pushed to the subplan.
+				if ( certainVarsInSubPlans.get(i).containsAll(varsInExpr) ) {
+					pushed = true;
+					if ( toBePushed[i] == null )
+						toBePushed[i] = new ExprList(e);
+					else
+						toBePushed[i].add(e);
+				}
+			}
+
+			// If the current condition cannot be pushed to any of the
+			// subplans, then it needs to be kept for the filter that
+			// will be evaluated after the join.
+			if ( ! pushed ) {
+				if ( toBeKept == null )
+					toBeKept = new ExprList(e);
 				else
 					toBeKept.add(e);
 			}
-	
-			if ( toBePushed.isEmpty() ) {
-				return createPlanAfterPushingInSubPlan(parentFilterOp, childOp, subPlanUnderChildOp, inputPlan);
-			}
-	
-			final LogicalPlan newSubPlanUnderChildOp = new LogicalPlanWithUnaryRootImpl(
-					new LogicalOpFilter(toBePushed), // pushed filter op.
-					null,
-					subPlanUnderChildOp );
-			final LogicalPlan newSubPlanUnderChildOpRewritten = apply(newSubPlanUnderChildOp);
-	
-			final LogicalPlan newSubPlanUnderRootOp = new LogicalPlanWithUnaryRootImpl(
-					childOp,
-					null,
-					newSubPlanUnderChildOpRewritten );
-	
-			if ( toBeKept.isEmpty() ) {
-				return newSubPlanUnderRootOp;
-			}
-	
-			final LogicalOpFilter newRootFilterOp = new LogicalOpFilter(toBeKept);
-			return new LogicalPlanWithUnaryRootImpl(newRootFilterOp, null, newSubPlanUnderRootOp);
 		}
-	
-		private LogicalPlan createPlanForJoinUnderFilter( final LogicalOpFilter filterOp,
-															final LogicalPlan subPlanUnderFilter,
-															final LogicalPlan inputPlan ) {
-			final int numberOfSubPlansUnderJoin = subPlanUnderFilter.numberOfSubPlans();
-	
-			// If there is only one subplan under the join, then remove the join altogether.
-			if ( numberOfSubPlansUnderJoin == 1 ) {
-				final LogicalPlan subPlan = subPlanUnderFilter.getSubPlan(0);
-				final LogicalPlan subPlanAfterFilterPushDown = apply(subPlan);
-				return new LogicalPlanWithUnaryRootImpl(filterOp, null, subPlanAfterFilterPushDown);
-			}
-	
-			// Determine the sets of certain variables in each of the subplans
-			// under the join, which will be needed later for checking which of
-			// the filter conditions may be pushed to the subplans.
-			final List<Set<Var>> certainVarsInSubPlans = new ArrayList<>(numberOfSubPlansUnderJoin);
+
+		// Now set up the new subplans of the join as well as
+		// the filter operator to be executed after the join.
+		final LogicalPlan[] newSubPlansUnderJoin = new LogicalPlan[numberOfSubPlansUnderJoin];
+		final LogicalOpFilter newFilterOp;
+
+		// ... to this end, we need to consider two cases: either all filter
+		// conditions need to be kept in the filter operator after the join
+		// or some of them can be pushed to some subplan(s).
+		if ( toBeKept != null && toBeKept.size() == filterExprsWithoutAND.size() ) {
+			// If all filter conditions need to be kept in the filter operator after
+			// the join, then we can simply continue using that filter operator, ...
+			newFilterOp = filterOp;
+
+			// ... and we apply this heuristic recursively to each of the subplans.
+			boolean noChanges = true;
 			for ( int i = 0; i < numberOfSubPlansUnderJoin; i++ ) {
-				final LogicalPlan subPlanUnderJoin = subPlanUnderFilter.getSubPlan(i);
-				final ExpectedVariables expVarsInSubPlan = subPlanUnderJoin.getExpectedVariables();
-				certainVarsInSubPlans.add( expVarsInSubPlan.getCertainVariables() );
-			}
-	
-			final ExprList filterExprs = filterOp.getFilterExpressions();
-			final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
-	
-			// Determine which of the filter conditions may be pushed
-			// to the subplans under the join and which ones need to
-			// be kept to be evaluated after the join.
-			final ExprList[] toBePushed = new ExprList[numberOfSubPlansUnderJoin];
-			ExprList toBeKept = null;
-	
-			for ( final Expr e : filterExprsWithoutAND ) {
-				boolean pushed = false; // set to true if the current condition can be pushed to at least one of the subplans
-				final Set<Var> varsInExpr = ExprVars.getVarsMentioned(e);
-	
-				// check the current filter condition for each of the subplans
-				for ( int i = 0; i < numberOfSubPlansUnderJoin; i++ ) {
-					// If all of the variables mentioned in the current filter
-					// condition are certain variables of the current subplan,
-					// then the condition can be pushed to the subplan.
-					if ( certainVarsInSubPlans.get(i).containsAll(varsInExpr) ) {
-						pushed = true;
-						if ( toBePushed[i] == null )
-							toBePushed[i] = new ExprList(e);
-						else
-							toBePushed[i].add(e);
-					}
-				}
-	
-				// If the current condition cannot be pushed to any of the
-				// subplans, then it needs to be kept for the filter that
-				// will be evaluated after the join.
-				if ( ! pushed ) {
-					if ( toBeKept == null )
-						toBeKept = new ExprList(e);
-					else
-						toBeKept.add(e);
-				}
-			}
-	
-			// Now set up the new subplans of the join as well as
-			// the filter operator to be executed after the join.
-			final LogicalPlan[] newSubPlansUnderJoin = new LogicalPlan[numberOfSubPlansUnderJoin];
-			final LogicalOpFilter newFilterOp;
-	
-			// ... to this end, we need to consider two cases: either all filter
-			// conditions need to be kept in the filter operator after the join
-			// or some of them can be pushed to some subplan(s).
-			if ( toBeKept != null && toBeKept.size() == filterExprsWithoutAND.size() ) {
-				// If all filter conditions need to be kept in the filter operator after
-				// the join, then we can simply continue using that filter operator, ...
-				newFilterOp = filterOp;
-	
-				// ... and we apply this heuristic recursively to each of the subplans.
-				boolean noChanges = true;
-				for ( int i = 0; i < numberOfSubPlansUnderJoin; i++ ) {
-					final LogicalPlan oldSubPlan = subPlanUnderFilter.getSubPlan(i);
-					final LogicalPlan newSubPlan = apply(oldSubPlan);
-	
-					if ( newSubPlan.equals(oldSubPlan) ) {
-						// If the current subplan did not change when applying
-						// the heuristic to it, then simply keep that subplan.
-						newSubPlansUnderJoin[i] = oldSubPlan;
-					}
-					else {
-						// Otherwise, use the changed subplan and record that
-						// at least one of subplans is indeed a changed one.
-						newSubPlansUnderJoin[i] = newSubPlan;
-						noChanges = false;
-					}
-				}
-	
-				// If none of the subplans was changed by the heuristic, we can
-				// simply return the given input plan (recall that we are in the
-				// case where also none of the filter conditions can be pushed).
-				if ( noChanges ) return inputPlan;
-			}
-			else {
-				// If some of the filter conditions can be pushed to some
-				// subplan(s), create a new filter operator with only the
-				// conditions to be kept for evaluation after the join, ...
-				if ( toBeKept == null )
-					newFilterOp = null;
-				else
-					newFilterOp = new LogicalOpFilter(toBeKept);
-	
-				// ... and iterate over the subplans to push their respective
-				// filter conditions to them (if any) and apply the heuristic
-				// recursively to the resulting subplans.
-				for ( int i = 0; i < numberOfSubPlansUnderJoin; i++ ) {
-					final LogicalPlan oldSubPlan = subPlanUnderFilter.getSubPlan(i);
-					if ( toBePushed[i] == null ) {
-						// If there are no filter conditions to be pushed to the
-						// current subplan, then only apply the heuristic to it.
-						final LogicalPlan newSubPlan = apply(oldSubPlan);
-						newSubPlansUnderJoin[i] = (newSubPlan.equals(oldSubPlan)) ? oldSubPlan : newSubPlan;
-					}
-					else {
-						// There are filter conditions to be pushed to the current subplan.
-						final LogicalOpFilter filterForSubPlan = new LogicalOpFilter( toBePushed[i] );
-						final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterForSubPlan, null, oldSubPlan);
-						final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
-						newSubPlansUnderJoin[i] = newSubPlanWithFilterPushed;
-					}
-				}
-			}
-	
-			// Create the new rewritten plan to be returned.
-			final LogicalOperator joinOp = subPlanUnderFilter.getRootOperator(); // may be multiway join or binary join
-			final LogicalPlan newSubPlanUnderFilter = LogicalPlanUtils.createPlanWithSubPlans(
-					joinOp,
-					null,
-					newSubPlansUnderJoin );
-	
-			if ( newFilterOp == null )
-				return newSubPlanUnderFilter;
-			else
-				return new LogicalPlanWithUnaryRootImpl( newFilterOp,
-														 null,
-														 newSubPlanUnderFilter );
-		}
-	
-		private LogicalPlan createPlanForLeftJoinUnderFilter( final LogicalOpFilter filterOp,
-																final LogicalPlan nonoptSubPlan,
-																final LogicalPlan optSubPlan,
-																final LogicalPlan inputPlan ) {
-			// Note that filter conditions may not generally be pushed into the
-			// optional subplans even for cases in which all variables mentioned
-			// in a filter condition are certain variables of an optional subplan.
-			// As a counter example, consider the filter condition !BOUND(?x) and
-			// an optional subplan that has ?x as a certain variable. Then, the
-			// condition cannot be pushed into this subplan.
-	
-			final ExprList filterExprs = filterOp.getFilterExpressions();
-			final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
-	
-			// Create the new non-optional subplan. 
-			final ExprList toBeKept = new ExprList(); // will be populated by 'pushToNonOptSubPlan'
-			final LogicalPlan newNonOptSubPlan = pushToNonOptSubPlan( filterExprsWithoutAND,
-																	  nonoptSubPlan,
-																	  toBeKept );
-	
-			// Now set up the new optional subplan of the join by
-			// applying this heuristic recursively to it.
-			final LogicalPlan newOptSubPlan = apply(optSubPlan);
-	
-			// Now set up the filter operator to be executed after the join.
-			final LogicalOpFilter newFilterOp;
-			if ( toBeKept.size() == filterExprsWithoutAND.size() ) {
-				// If all filter conditions need to be kept in the filter operator
-				// after the join, then we can simply continue using that operator.
-				newFilterOp = filterOp;
-			}
-			else {
-				// If some filter conditions have been pushed to the non-optional
-				// subplan, create a new filter operator with only the conditions
-				// to be kept for evaluation after the join.
-				if ( toBeKept.isEmpty() )
-					newFilterOp = null;
-				else
-					newFilterOp = new LogicalOpFilter(toBeKept);
-			}
-	
-			// If nothing was changed, return the given input plan.
-			if (    newFilterOp == filterOp
-				 && newNonOptSubPlan.equals(nonoptSubPlan)
-				 && newOptSubPlan.equals(optSubPlan) ) {
-				return inputPlan;
-			}
-	
-			// Create the new rewritten plan to be returned.
-			final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithBinaryRootImpl(
-					LogicalOpLeftJoin.getInstance(),
-					null,
-					newNonOptSubPlan,
-					newOptSubPlan );
-	
-			if ( newFilterOp == null )
-				return newSubPlanUnderFilter;
-			else
-				return new LogicalPlanWithUnaryRootImpl( newFilterOp,
-														 null,
-														 newSubPlanUnderFilter );
-		}
-	
-		private LogicalPlan createPlanForMultiwayLeftJoinUnderFilter( final LogicalOpFilter filterOp,
-																		final LogicalPlan subPlanUnderFilter,
-																		final LogicalPlan inputPlan ) {
-			// Note that filter conditions may not generally be pushed into the
-			// optional subplans even for cases in which all variables mentioned
-			// in a filter condition are certain variables of an optional subplan.
-			// As a counter example, consider the filter condition !BOUND(?x) and
-			// an optional subplan that has ?x as a certain variable. Then, the
-			// condition cannot be pushed into this subplan.
-	
-			final int numberOfSubPlansUnderJoin = subPlanUnderFilter.numberOfSubPlans();
-			final LogicalPlan[] newSubPlansUnderJoin = new LogicalPlan[numberOfSubPlansUnderJoin];
-	
-			final ExprList filterExprs = filterOp.getFilterExpressions();
-			final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
-	
-			// Create the new non-optional subplan. 
-			final ExprList toBeKept = new ExprList(); // will be populated by 'pushToNonOptSubPlan'
-			final LogicalPlan oldNonOptSubPlan = subPlanUnderFilter.getSubPlan(0);
-			newSubPlansUnderJoin[0] = pushToNonOptSubPlan( filterExprsWithoutAND,
-														   oldNonOptSubPlan,
-														   toBeKept );
-	
-			// Now set up the new optional subplans of the join by
-			// applying this heuristic recursively to each of them.
-			boolean noChanges = true; // set to false if something has changed in the plan
-			for ( int i = 1; i < numberOfSubPlansUnderJoin; i++ ) {
 				final LogicalPlan oldSubPlan = subPlanUnderFilter.getSubPlan(i);
 				final LogicalPlan newSubPlan = apply(oldSubPlan);
-	
+
 				if ( newSubPlan.equals(oldSubPlan) ) {
 					// If the current subplan did not change when applying
 					// the heuristic to it, then simply keep that subplan.
@@ -696,152 +542,306 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 					noChanges = false;
 				}
 			}
-	
-			// Now set up the filter operator to be executed after the join.
-			final LogicalOpFilter newFilterOp;
-			if ( toBeKept.size() == filterExprsWithoutAND.size() ) {
-				// If all filter conditions need to be kept in the filter operator
-				// after the join, then we can simply continue using that operator.
-				newFilterOp = filterOp;
-			}
-			else {
-				// If some filter conditions have been pushed to the non-optional
-				// subplan, create a new filter operator with only the conditions
-				// to be kept for evaluation after the join.
-				if ( toBeKept.isEmpty() )
-					newFilterOp = null;
-				else
-					newFilterOp = new LogicalOpFilter(toBeKept);
-	
-				noChanges = false;
-			}
-	
-			// If nothing was changed, return the given input plan.
-			if ( noChanges && newSubPlansUnderJoin[0].equals(oldNonOptSubPlan) ) {
-				return inputPlan;
-			}
-	
-			// Create the new rewritten plan to be returned.
-			final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithNaryRootImpl(
-					LogicalOpMultiwayLeftJoin.getInstance(),
-					null,
-					newSubPlansUnderJoin );
-	
-			if ( newFilterOp == null )
-				return newSubPlanUnderFilter;
+
+			// If none of the subplans was changed by the heuristic, we can
+			// simply return the given input plan (recall that we are in the
+			// case where also none of the filter conditions can be pushed).
+			if ( noChanges ) return inputPlan;
+		}
+		else {
+			// If some of the filter conditions can be pushed to some
+			// subplan(s), create a new filter operator with only the
+			// conditions to be kept for evaluation after the join, ...
+			if ( toBeKept == null )
+				newFilterOp = null;
 			else
-				return new LogicalPlanWithUnaryRootImpl( newFilterOp,
-														 null,
-														 newSubPlanUnderFilter );
-		}
-	
-	
-	
-		private LogicalPlan pushToNonOptSubPlan( final ExprList filterExprsWithoutAND,
-												   final LogicalPlan nonoptSubPlan,
-												   final ExprList toBeKept ) {
-			// Determine the set of certain variables in the non-optional subplan,
-			// which will be needed for checking which of the filter conditions may
-			// be pushed to that subplan.
-			final ExpectedVariables expVarsInSubPlan = nonoptSubPlan.getExpectedVariables();
-			final Set<Var> certainVarsInSubPlan = expVarsInSubPlan.getCertainVariables();
-	
-			// Determine which of the filter conditions may be pushed to
-			// the non-optional subplan and which ones need to be kept to
-			// be evaluated after the join.
-			ExprList toBePushed = null;
-	
-			for ( final Expr e : filterExprsWithoutAND ) {
-				// If all of the variables mentioned in the current filter
-				// condition are certain variables of the non-optional subplan,
-				// then the condition can be pushed to the subplan.
-				final Set<Var> varsInExpr = ExprVars.getVarsMentioned(e);
-				if ( certainVarsInSubPlan.containsAll(varsInExpr) ) {
-					if ( toBePushed == null )
-						toBePushed = new ExprList(e);
-					else
-						toBePushed.add(e);
+				newFilterOp = new LogicalOpFilter(toBeKept);
+
+			// ... and iterate over the subplans to push their respective
+			// filter conditions to them (if any) and apply the heuristic
+			// recursively to the resulting subplans.
+			for ( int i = 0; i < numberOfSubPlansUnderJoin; i++ ) {
+				final LogicalPlan oldSubPlan = subPlanUnderFilter.getSubPlan(i);
+				if ( toBePushed[i] == null ) {
+					// If there are no filter conditions to be pushed to the
+					// current subplan, then only apply the heuristic to it.
+					final LogicalPlan newSubPlan = apply(oldSubPlan);
+					newSubPlansUnderJoin[i] = (newSubPlan.equals(oldSubPlan)) ? oldSubPlan : newSubPlan;
 				}
 				else {
-					toBeKept.add(e);
+					// There are filter conditions to be pushed to the current subplan.
+					final LogicalOpFilter filterForSubPlan = new LogicalOpFilter( toBePushed[i] );
+					final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterForSubPlan, null, oldSubPlan);
+					final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
+					newSubPlansUnderJoin[i] = newSubPlanWithFilterPushed;
 				}
-			}
-	
-			// Now create the new non-optional subplan.
-			if ( toBePushed == null ) {
-				// If there are no filter conditions to be pushed to
-				// the subplan, then only apply the heuristic to it.
-				return apply(nonoptSubPlan);
-			}
-			else {
-				// There are filter conditions to be pushed to the subplan.
-				final LogicalOpFilter filterForSubPlan = new LogicalOpFilter(toBePushed);
-				final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterForSubPlan, null, nonoptSubPlan);
-				final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
-				return newSubPlanWithFilterPushed;
-			}
-		}
-	
-		private LogicalPlan createPlanAfterPushingInSubPlan( final LogicalOpFilter parentFilterOp,
-															   final UnaryLogicalOp childOp,
-															   final LogicalPlan subPlanUnderChildOp,
-															   final LogicalPlan inputPlan ) {
-			// Apply the heuristic recursively within the given subplan. 
-			final LogicalPlan newPlanUnderChildRoot = apply(subPlanUnderChildOp);
-	
-			// If the heuristic cannot be applied within the subplan (more
-			// precisely, if there are no filters in the subplan that can
-			// be pushed), then we return the given input plan (instead of
-			// recreating another, identical version of that plan).
-			if ( newPlanUnderChildRoot.equals(subPlanUnderChildOp) ) {
-				return inputPlan;
-			}
-	
-			// After pushing filters in the subplan, create a new plan.
-			final LogicalPlan newPlanUnderFilter = new LogicalPlanWithUnaryRootImpl(
-					childOp,
-					null,
-					newPlanUnderChildRoot );
-			final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
-					parentFilterOp,
-					null,
-					newPlanUnderFilter );
-			return newPlan;
-		}
-	
-		private ExprList splitConjunctions( final ExprList l ) {
-			final ExprList result = new ExprList();
-			for ( final Expr e : l ) {
-				if ( e instanceof E_LogicalAnd ) {
-					split( (E_LogicalAnd) e, result );
-				}
-				else {
-					result.add(e);
-				}
-			}
-	
-			return ( l.size() == result.size() ) ? l : result;
-		}
-	
-		private void split( final E_LogicalAnd e, final ExprList l ) {
-			final Expr e1 = e.getArg1();
-			final Expr e2 = e.getArg2();
-	
-			if ( e1 instanceof E_LogicalAnd ) {
-				split( (E_LogicalAnd) e1, l );
-			}
-			else {
-				l.add(e1);
-			}
-	
-			if ( e2 instanceof E_LogicalAnd ) {
-				split( (E_LogicalAnd) e2, l );
-			}
-			else {
-				l.add(e2);
 			}
 		}
 
-	} // end of Worker
+		// Create the new rewritten plan to be returned.
+		final LogicalOperator joinOp = subPlanUnderFilter.getRootOperator(); // may be multiway join or binary join
+		final LogicalPlan newSubPlanUnderFilter = LogicalPlanUtils.createPlanWithSubPlans(
+				joinOp,
+				null,
+				newSubPlansUnderJoin );
+
+		if ( newFilterOp == null )
+			return newSubPlanUnderFilter;
+		else
+			return new LogicalPlanWithUnaryRootImpl( newFilterOp,
+			                                         null,
+			                                         newSubPlanUnderFilter );
+	}
+
+	protected LogicalPlan createPlanForLeftJoinUnderFilter( final LogicalOpFilter filterOp,
+	                                                        final LogicalPlan nonoptSubPlan,
+	                                                        final LogicalPlan optSubPlan,
+	                                                        final LogicalPlan inputPlan ) {
+		// Note that filter conditions may not generally be pushed into the
+		// optional subplans even for cases in which all variables mentioned
+		// in a filter condition are certain variables of an optional subplan.
+		// As a counter example, consider the filter condition !BOUND(?x) and
+		// an optional subplan that has ?x as a certain variable. Then, the
+		// condition cannot be pushed into this subplan.
+
+		final ExprList filterExprs = filterOp.getFilterExpressions();
+		final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
+
+		// Create the new non-optional subplan. 
+		final ExprList toBeKept = new ExprList(); // will be populated by 'pushToNonOptSubPlan'
+		final LogicalPlan newNonOptSubPlan = pushToNonOptSubPlan( filterExprsWithoutAND,
+		                                                          nonoptSubPlan,
+		                                                          toBeKept );
+
+		// Now set up the new optional subplan of the join by
+		// applying this heuristic recursively to it.
+		final LogicalPlan newOptSubPlan = apply(optSubPlan);
+
+		// Now set up the filter operator to be executed after the join.
+		final LogicalOpFilter newFilterOp;
+		if ( toBeKept.size() == filterExprsWithoutAND.size() ) {
+			// If all filter conditions need to be kept in the filter operator
+			// after the join, then we can simply continue using that operator.
+			newFilterOp = filterOp;
+		}
+		else {
+			// If some filter conditions have been pushed to the non-optional
+			// subplan, create a new filter operator with only the conditions
+			// to be kept for evaluation after the join.
+			if ( toBeKept.isEmpty() )
+				newFilterOp = null;
+			else
+				newFilterOp = new LogicalOpFilter(toBeKept);
+		}
+
+		// If nothing was changed, return the given input plan.
+		if (    newFilterOp == filterOp
+		     && newNonOptSubPlan.equals(nonoptSubPlan)
+		     && newOptSubPlan.equals(optSubPlan) ) {
+			return inputPlan;
+		}
+
+		// Create the new rewritten plan to be returned.
+		final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithBinaryRootImpl(
+				LogicalOpLeftJoin.getInstance(),
+				null,
+				newNonOptSubPlan,
+				newOptSubPlan );
+
+		if ( newFilterOp == null )
+			return newSubPlanUnderFilter;
+		else
+			return new LogicalPlanWithUnaryRootImpl( newFilterOp,
+			                                         null,
+			                                         newSubPlanUnderFilter );
+	}
+
+	protected LogicalPlan createPlanForMultiwayLeftJoinUnderFilter( final LogicalOpFilter filterOp,
+	                                                                final LogicalPlan subPlanUnderFilter,
+	                                                                final LogicalPlan inputPlan ) {
+		// Note that filter conditions may not generally be pushed into the
+		// optional subplans even for cases in which all variables mentioned
+		// in a filter condition are certain variables of an optional subplan.
+		// As a counter example, consider the filter condition !BOUND(?x) and
+		// an optional subplan that has ?x as a certain variable. Then, the
+		// condition cannot be pushed into this subplan.
+
+		final int numberOfSubPlansUnderJoin = subPlanUnderFilter.numberOfSubPlans();
+		final LogicalPlan[] newSubPlansUnderJoin = new LogicalPlan[numberOfSubPlansUnderJoin];
+
+		final ExprList filterExprs = filterOp.getFilterExpressions();
+		final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
+
+		// Create the new non-optional subplan. 
+		final ExprList toBeKept = new ExprList(); // will be populated by 'pushToNonOptSubPlan'
+		final LogicalPlan oldNonOptSubPlan = subPlanUnderFilter.getSubPlan(0);
+		newSubPlansUnderJoin[0] = pushToNonOptSubPlan( filterExprsWithoutAND,
+		                                               oldNonOptSubPlan,
+		                                               toBeKept );
+
+		// Now set up the new optional subplans of the join by
+		// applying this heuristic recursively to each of them.
+		boolean noChanges = true; // set to false if something has changed in the plan
+		for ( int i = 1; i < numberOfSubPlansUnderJoin; i++ ) {
+			final LogicalPlan oldSubPlan = subPlanUnderFilter.getSubPlan(i);
+			final LogicalPlan newSubPlan = apply(oldSubPlan);
+
+			if ( newSubPlan.equals(oldSubPlan) ) {
+				// If the current subplan did not change when applying
+				// the heuristic to it, then simply keep that subplan.
+				newSubPlansUnderJoin[i] = oldSubPlan;
+			}
+			else {
+				// Otherwise, use the changed subplan and record that
+				// at least one of subplans is indeed a changed one.
+				newSubPlansUnderJoin[i] = newSubPlan;
+				noChanges = false;
+			}
+		}
+
+		// Now set up the filter operator to be executed after the join.
+		final LogicalOpFilter newFilterOp;
+		if ( toBeKept.size() == filterExprsWithoutAND.size() ) {
+			// If all filter conditions need to be kept in the filter operator
+			// after the join, then we can simply continue using that operator.
+			newFilterOp = filterOp;
+		}
+		else {
+			// If some filter conditions have been pushed to the non-optional
+			// subplan, create a new filter operator with only the conditions
+			// to be kept for evaluation after the join.
+			if ( toBeKept.isEmpty() )
+				newFilterOp = null;
+			else
+				newFilterOp = new LogicalOpFilter(toBeKept);
+
+			noChanges = false;
+		}
+
+		// If nothing was changed, return the given input plan.
+		if ( noChanges && newSubPlansUnderJoin[0].equals(oldNonOptSubPlan) ) {
+			return inputPlan;
+		}
+
+		// Create the new rewritten plan to be returned.
+		final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithNaryRootImpl(
+				LogicalOpMultiwayLeftJoin.getInstance(),
+				null,
+				newSubPlansUnderJoin );
+
+		if ( newFilterOp == null )
+			return newSubPlanUnderFilter;
+		else
+			return new LogicalPlanWithUnaryRootImpl( newFilterOp,
+			                                         null,
+			                                         newSubPlanUnderFilter );
+	}
+
+
+
+	protected LogicalPlan pushToNonOptSubPlan( final ExprList filterExprsWithoutAND,
+	                                           final LogicalPlan nonoptSubPlan,
+	                                           final ExprList toBeKept ) {
+		// Determine the set of certain variables in the non-optional subplan,
+		// which will be needed for checking which of the filter conditions may
+		// be pushed to that subplan.
+		final ExpectedVariables expVarsInSubPlan = nonoptSubPlan.getExpectedVariables();
+		final Set<Var> certainVarsInSubPlan = expVarsInSubPlan.getCertainVariables();
+
+		// Determine which of the filter conditions may be pushed to
+		// the non-optional subplan and which ones need to be kept to
+		// be evaluated after the join.
+		ExprList toBePushed = null;
+
+		for ( final Expr e : filterExprsWithoutAND ) {
+			// If all of the variables mentioned in the current filter
+			// condition are certain variables of the non-optional subplan,
+			// then the condition can be pushed to the subplan.
+			final Set<Var> varsInExpr = ExprVars.getVarsMentioned(e);
+			if ( certainVarsInSubPlan.containsAll(varsInExpr) ) {
+				if ( toBePushed == null )
+					toBePushed = new ExprList(e);
+				else
+					toBePushed.add(e);
+			}
+			else {
+				toBeKept.add(e);
+			}
+		}
+
+		// Now create the new non-optional subplan.
+		if ( toBePushed == null ) {
+			// If there are no filter conditions to be pushed to
+			// the subplan, then only apply the heuristic to it.
+			return apply(nonoptSubPlan);
+		}
+		else {
+			// There are filter conditions to be pushed to the subplan.
+			final LogicalOpFilter filterForSubPlan = new LogicalOpFilter(toBePushed);
+			final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterForSubPlan, null, nonoptSubPlan);
+			final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
+			return newSubPlanWithFilterPushed;
+		}
+	}
+
+	protected LogicalPlan createPlanAfterPushingInSubPlan( final LogicalOpFilter parentFilterOp,
+	                                                       final UnaryLogicalOp childOp,
+	                                                       final LogicalPlan subPlanUnderChildOp,
+	                                                       final LogicalPlan inputPlan ) {
+		// Apply the heuristic recursively within the given subplan. 
+		final LogicalPlan newPlanUnderChildRoot = apply(subPlanUnderChildOp);
+
+		// If the heuristic cannot be applied within the subplan (more
+		// precisely, if there are no filters in the subplan that can
+		// be pushed), then we return the given input plan (instead of
+		// recreating another, identical version of that plan).
+		if ( newPlanUnderChildRoot.equals(subPlanUnderChildOp) ) {
+			return inputPlan;
+		}
+
+		// After pushing filters in the subplan, create a new plan.
+		final LogicalPlan newPlanUnderFilter = new LogicalPlanWithUnaryRootImpl(
+				childOp,
+				null,
+				newPlanUnderChildRoot );
+		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
+				parentFilterOp,
+				null,
+				newPlanUnderFilter );
+		return newPlan;
+	}
+
+	protected ExprList splitConjunctions( final ExprList l ) {
+		final ExprList result = new ExprList();
+		for ( final Expr e : l ) {
+			if ( e instanceof E_LogicalAnd ) {
+				split( (E_LogicalAnd) e, result );
+			}
+			else {
+				result.add(e);
+			}
+		}
+
+		return ( l.size() == result.size() ) ? l : result;
+	}
+
+	protected void split( final E_LogicalAnd e, final ExprList l ) {
+		final Expr e1 = e.getArg1();
+		final Expr e2 = e.getArg2();
+
+		if ( e1 instanceof E_LogicalAnd ) {
+			split( (E_LogicalAnd) e1, l );
+		}
+		else {
+			l.add(e1);
+		}
+
+		if ( e2 instanceof E_LogicalAnd ) {
+			split( (E_LogicalAnd) e2, l );
+		}
+		else {
+			l.add(e2);
+		}
+	}
 
 }
