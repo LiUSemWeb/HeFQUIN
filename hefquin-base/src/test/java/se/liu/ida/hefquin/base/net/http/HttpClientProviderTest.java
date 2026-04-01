@@ -32,7 +32,7 @@ public class HttpClientProviderTest {
 
 	@Before
 	public void resetProvider() {
-		HttpClientProvider.resetForTests();
+		HttpClientProvider.reset();
 	}
 
 	@Test
