@@ -59,11 +59,13 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false,  new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+				false,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 				null );
 
 		final LogicalPlan unionPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
+				false,
 				joinSubPlan,
 				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
 				null );
@@ -115,11 +117,13 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+				false,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 				null );
 
 		final LogicalPlan unionPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
+				false,
 				joinSubPlan,
 				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
 				null );
@@ -173,11 +177,13 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+				false,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 				null );
 
 		final LogicalPlan unionPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
+				false,
 				joinSubPlan,
 				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
 				null );
@@ -220,6 +226,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -285,6 +292,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fm, false,  new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -332,6 +340,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -373,6 +382,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayUnion(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -407,7 +417,7 @@ public class MergeRequestsTest extends EngineTestBase
 				assertEquals( 2, resultSubUnion.getNumberOfSubPatterns() );
 				assertTrue( resultSubUnion.getSubPatterns(0) == tp1 || resultSubUnion.getSubPatterns(0) == tp2 );
 				if ( resultSubUnion.getSubPatterns(0) == tp1 ) {
-					assertTrue( resultSubUnion.getSubPatterns(1) == tp2 );					
+					assertTrue( resultSubUnion.getSubPatterns(1) == tp2 );
 				}
 				else {
 					assertTrue( resultSubUnion.getSubPatterns(1) == tp1 );
@@ -442,6 +452,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayUnion(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),

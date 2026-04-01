@@ -39,7 +39,7 @@ public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlanner
 			return createPlanForBGP(bgp, ctxt, mayReduce);
 		}
 		else if ( jenaOp instanceof OpService ) {
-			throw new IllegalArgumentException( "queries with SERVICE patterns are not supported by this source planner (" + getClass().getName() + ")" ); 
+			throw new IllegalArgumentException( "queries with SERVICE patterns are not supported by this source planner (" + getClass().getName() + ")" );
 		}
 
 		return super.createPlan(jenaOp, mayReduce, ctxt);
@@ -60,7 +60,7 @@ public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlanner
 			subPlans.add( createSubPlanForTP(tp, ctxt, mayReduce) );
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans, null);
+		return LogicalPlanUtils.createPlanWithMultiwayJoin(mayReduce, subPlans, null);
 	}
 
 	protected LogicalPlan createSubPlanForTP( final Triple tp,
@@ -78,7 +78,7 @@ public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlanner
 			reqSubPlans.add( createRequestSubPlan(tp, fm, mayReduce) );
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayUnion(reqSubPlans, null);
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(mayReduce, reqSubPlans, null);
 	}
 
 	protected LogicalPlan createRequestSubPlan( final Triple tp, final FederationMember fm, final boolean mayReduce ) {

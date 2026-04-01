@@ -14,12 +14,12 @@ public class LogicalOpProject extends BaseForLogicalOps implements UnaryLogicalO
 {
 	protected final Set<Var> variables;
 
-	public LogicalOpProject( final List<Var> variables ) {
-		this( new HashSet<>(variables) );
+	public LogicalOpProject( final List<Var> variables, final boolean mayReduce ) {
+		this( new HashSet<>(variables), mayReduce );
 	}
-	
-	public LogicalOpProject( final Set<Var> variables ) {
-		super( false );
+
+	public LogicalOpProject( final Set<Var> variables, final boolean mayReduce ) {
+		super( mayReduce );
 
 		assert variables != null;
 		assert ! variables.isEmpty();
@@ -56,7 +56,7 @@ public class LogicalOpProject extends BaseForLogicalOps implements UnaryLogicalO
 		if ( o == this ) return true;
 
 		return    o instanceof LogicalOpProject oo
-		       && oo.variables.equals(variables); 
+		       && oo.variables.equals(variables);
 	}
 
 	@Override

@@ -38,7 +38,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
 
 	protected final PrintStream[] outs;
-	
+
 	public TextBasedLogicalPlanPrinterImpl( final PrintStream ... outs ) {
 		assert outs.length > 0;
 		this.outs = outs;
@@ -147,13 +147,13 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 			record( op.getFederationMember() );
 			record( op.getRequest() );
 
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
 			props.add( "solmap: " + op.getSolutionMapping().toString() );
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -172,7 +172,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 			record( op.getPattern() );
 
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -180,42 +180,42 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 			record( op.getFederationMember() );
 			record( op.getPattern() );
 
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpJoin op ) {
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpLeftJoin op ) {
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpUnion op ) {
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayJoin op ) {
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayLeftJoin op ) {
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayUnion op ) {
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpDedup op ) {
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -233,7 +233,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				}
 			}
 
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -247,7 +247,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				props.add( var.toString() + " <-- " + ExprUtils.fmtSPARQL(expr) );
 			}
 
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -260,19 +260,19 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 			props.add( v + " <-- " + ExprUtils.fmtSPARQL(op.getExpr()) );
 
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) {
 			props.add( "vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
 			props.add( "vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
-			props.add( "reduces duplicates: " + op.mayReduce() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override

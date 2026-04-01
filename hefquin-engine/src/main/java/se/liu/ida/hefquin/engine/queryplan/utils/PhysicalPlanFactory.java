@@ -115,8 +115,9 @@ public class PhysicalPlanFactory
 	 * Creates a plan with a request operator as root operator.
 	 */
 	public static  PhysicalPlan createPlanWithRequest( final DataRetrievalRequest req,
+	                                                   final boolean mayReduce,
 	                                                   final FederationMember fm ) {
-		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>(fm, false, req);
+		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>(fm, mayReduce, req);
 		final NullaryPhysicalOp pop = PhysicalOpRequest.getFactory().create(lop);
 		return createPlan(pop);
 	}
@@ -403,15 +404,16 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan extractRequestAsPlan( final LogicalOpGPAdd gpAdd ) {
 		final FederationMember fm = gpAdd.getFederationMember();
 		final SPARQLGraphPattern gp = gpAdd.getPattern();
+		final boolean mayReduce = gpAdd.mayReduce();
 
 		if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
 			final TriplePattern tp = gpAdd.getTP();
 			final TPFRequest req = new TPFRequestImpl(tp);
-			return createPlanWithRequest(req, fm);
+			return createPlanWithRequest(req, mayReduce, fm);
 		}
 		else if ( fm.isSupportedPattern(gp) ) {
 			final SPARQLRequest req = new SPARQLRequestImpl(gp);
-			return createPlanWithRequest(req, fm);
+			return createPlanWithRequest(req, mayReduce, fm);
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");

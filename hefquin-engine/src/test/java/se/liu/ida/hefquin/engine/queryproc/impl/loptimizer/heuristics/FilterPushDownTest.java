@@ -64,6 +64,7 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, false, new TriplePatternRequestImpl(tp2) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+				false,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 				null );
@@ -125,6 +126,7 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+				false,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 				null );
@@ -215,6 +217,7 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp2) );
 
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithMultiwayUnion(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null) );

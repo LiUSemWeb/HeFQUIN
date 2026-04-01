@@ -58,7 +58,7 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> plansWithNonUnionRoot = new ArrayList<>();
 		plansWithNonUnionRoot.add(lp5);
 
-		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithUnionRootAndUnionChild(plansWithUnionRoot, plansWithNonUnionRoot);
+		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithUnionRootAndUnionChild(false, plansWithUnionRoot, plansWithNonUnionRoot);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
 		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
@@ -102,7 +102,7 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> plansWithNonUnionRoot = new ArrayList<>();
 		plansWithNonUnionRoot.add(lp5);
 
-		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithJoinOverUnion(plansWithUnionRoot, plansWithNonUnionRoot);
+		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithJoinOverUnion(false, plansWithUnionRoot, plansWithNonUnionRoot);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
 		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
@@ -151,7 +151,7 @@ public class UnionPullUpTest extends EngineTestBase
 		plansWithNonUnionRoot.add(lp2);
 		plansWithNonUnionRoot.add(lp3);
 
-		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithJoinOverUnion(plansWithUnionRoot, plansWithNonUnionRoot);
+		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithJoinOverUnion(false, plansWithUnionRoot, plansWithNonUnionRoot);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
 		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
@@ -193,7 +193,7 @@ public class UnionPullUpTest extends EngineTestBase
 
 		final UnaryLogicalOp rootOp = new LogicalOpFilter( Expr.NONE, false );
 
-		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithUnaryRootAndUnionChild(rootOp, unionPlan);
+		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithUnaryRootAndUnionChild(false, rootOp, unionPlan);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
 		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
@@ -276,7 +276,7 @@ public class UnionPullUpTest extends EngineTestBase
 
 		assertTrue(join13Found);
 		assertTrue(join23Found);
-		
+
 	}
 
 	@Test
