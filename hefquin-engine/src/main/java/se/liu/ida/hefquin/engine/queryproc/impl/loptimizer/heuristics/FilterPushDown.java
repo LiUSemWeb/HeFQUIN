@@ -731,14 +731,14 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			                                         newSubPlanUnderFilter );
 	}
 
-	protected LogicalPlan createPlanForUnaryOpUnderFilter( final LogicalOpFilter filterOp, final LogicalOperator op, final LogicalPlan subPlanUnderOp ) {
+	protected LogicalPlan createPlanForUnaryOpUnderFilter( final LogicalOpFilter filterOp, final UnaryLogicalOp op, final LogicalPlan subPlanUnderOp ) {
 		// Create a new subplan with the filter as root operator on top of the
 		// subplan that was under the given unary operator, and apply this
 		// heuristic recursively to this new subplan.
 		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
-		filterOp,
-		null,
-		subPlanUnderOp );
+				filterOp,
+				null,
+				subPlanUnderOp );
 		final LogicalPlan newSubPlan2 = apply(newSubPlan1);
 
 		// Put together the new plan with the given unary operator as root.
