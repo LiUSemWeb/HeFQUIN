@@ -28,4 +28,5 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpLocalToGlobal op );
 	void visit( PhysicalOpGlobalToLocal op );
 	void visit( PhysicalOpDuplicateRemoval op );
+	void visit( PhysicalOpProject op );
 }

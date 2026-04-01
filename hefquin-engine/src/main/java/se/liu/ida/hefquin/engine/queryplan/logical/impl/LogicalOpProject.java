@@ -17,7 +17,7 @@ public class LogicalOpProject implements UnaryLogicalOp
 	public LogicalOpProject( final List<Var> variables ) {
 		this( new HashSet<>(variables) );
 	}
-	
+
 	public LogicalOpProject( final Set<Var> variables ) {
 		assert variables != null;
 		assert ! variables.isEmpty();
@@ -54,7 +54,7 @@ public class LogicalOpProject implements UnaryLogicalOp
 		if ( o == this ) return true;
 
 		return    o instanceof LogicalOpProject oo
-		       && oo.variables.equals(variables); 
+		       && oo.variables.equals(variables);
 	}
 
 	@Override
