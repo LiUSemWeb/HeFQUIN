@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.base.shared.http;
+package se.liu.ida.hefquin.base.net.http;
 
 import static org.junit.Assert.assertTrue;
 import java.io.IOException;
