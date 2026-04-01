@@ -497,7 +497,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 		children.add( rightSubPlan );
 
-		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayLeftJoin.getInstance(mayReduce), null, children ); //CHECK: placeholder
+		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayLeftJoin.getInstance(mayReduce), null, children );
 	}
 
 	protected LogicalPlan mergeIntoMultiwayUnion( final boolean mayReduce, final LogicalPlan ... subPlans ) {
