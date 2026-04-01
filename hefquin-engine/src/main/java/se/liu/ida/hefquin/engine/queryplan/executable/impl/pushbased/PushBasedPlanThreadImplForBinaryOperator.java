@@ -41,6 +41,8 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException {
 		if ( op.requiresCompleteChild1InputFirst() )
 			produceOutputByConsumingInput1First(sink);
+		else if ( op.requiresCompleteChild2InputFirst() )
+			produceOutputByConsumingInput2First(sink);
 		else
 			produceOutputByConsumingBothInputsInParallel(sink);
 	}
@@ -74,6 +76,39 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 			else {
 				op.wrapUpForChild2(sink, execCxt);
 				input2Consumed = true;
+			}
+		}
+	}
+
+	/**
+	 * Consumes the complete child 2 input first (and pushes that input to the
+	 * operator {@link #op}), before moving on to the input from child 1.
+	 */
+	protected void produceOutputByConsumingInput2First( final IntermediateResultElementSink sink )
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException
+	{
+		final List<SolutionMapping> transferBuffer = new ArrayList<>();
+		boolean input2Consumed = false;
+		while ( ! input2Consumed ) {
+			input2.transferAvailableOutput(transferBuffer);
+			if ( ! transferBuffer.isEmpty() ) {
+				op.processInputFromChild2(transferBuffer, sink, execCxt);
+			}
+			else {
+				op.wrapUpForChild2(sink, execCxt);
+				input2Consumed = true;
+			}
+		}
+
+		boolean input1Consumed = false;
+		while ( ! input1Consumed ) {
+			input1.transferAvailableOutput(transferBuffer);
+			if ( ! transferBuffer.isEmpty() ) {
+				op.processInputFromChild1(transferBuffer, sink, execCxt);
+			}
+			else {
+				op.wrapUpForChild1(sink, execCxt);
+				input1Consumed = true;
 			}
 		}
 	}

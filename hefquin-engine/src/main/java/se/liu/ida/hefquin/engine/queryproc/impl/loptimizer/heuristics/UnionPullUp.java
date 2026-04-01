@@ -123,7 +123,7 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 				return rewritePlanWithJoinOverUnion( rewrittenSubPlansWithUnionRoot,
 				                                     rewrittenSubPlansWithNonUnionRoot );
 		}
-		else if ( rootOp instanceof LogicalOpRightJoin )
+		else if ( rootOp instanceof LogicalOpLeftJoin )
 		{
 			// nothing to do here (if we have an outer join as root operator,
 			// we do not attempt to pull a potential union out of it)
