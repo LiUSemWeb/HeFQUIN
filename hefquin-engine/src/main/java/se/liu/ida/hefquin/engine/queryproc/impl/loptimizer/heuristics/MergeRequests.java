@@ -407,7 +407,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	 * merged pattern.
 	 */
 	protected LogicalPlan mergeSPARQLRequestsViaJoin( final FederationMember fm,
-														final List<LogicalPlan> reqPlans ) {
+	                                                  final List<LogicalPlan> reqPlans ) {
 		final Iterator<LogicalPlan> it = reqPlans.iterator();
 
 		final LogicalPlan plan1 = it.next();
@@ -452,7 +452,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	}
 
 	protected SPARQLGraphPattern mergePatternWithOptPatterns( final SPARQLGraphPattern pattern,
-																final SPARQLGraphPattern ... optPatterns ) {
+	                                                          final SPARQLGraphPattern ... optPatterns ) {
 		assert optPatterns.length > 0;
 
 		final ElementGroup group = new ElementGroup();
@@ -477,7 +477,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	}
 
 	protected LogicalPlan createPlanWithSingleRequestOp( final SPARQLGraphPattern p,
-															final FederationMember fm ) {
+	                                                     final FederationMember fm ) {
 		final SPARQLRequest req;
 		if ( p instanceof TriplePattern tp ) {
 			req = new TriplePatternRequestImpl(tp);
@@ -494,8 +494,8 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	}
 
 	protected void separateSubPlansOfMultiwayOps( final List<LogicalPlan> subPlans,
-													final Map<FederationMember,List<LogicalPlan>> reqOnlyPlansPerFedMember,
-													final List<LogicalPlan> nonReqSubPlans ) {
+	                                              final Map<FederationMember,List<LogicalPlan>> reqOnlyPlansPerFedMember,
+	                                              final List<LogicalPlan> nonReqSubPlans ) {
 		for ( final LogicalPlan p : subPlans ) {
 			final LogicalOperator rootOp = p.getRootOperator();
 			if ( rootOp instanceof LogicalOpRequest<?,?> reqOp ) {
