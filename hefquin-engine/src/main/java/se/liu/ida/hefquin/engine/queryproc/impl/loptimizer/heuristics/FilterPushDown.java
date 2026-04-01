@@ -121,7 +121,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		@Override
 		public void visit( final LogicalOpGPAdd op ) {
 			createdPlan = createPlanForAddOpUnderFilter( filterOp,
-			                                             (UnaryLogicalOp) op,
+			                                             op,
 			                                             subPlanUnderFilter.getSubPlan(0),
 			                                             inputPlan );
 		}
@@ -129,7 +129,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		@Override
 		public void visit( final LogicalOpGPOptAdd op ) {
 			createdPlan = createPlanForAddOpUnderFilter( filterOp,
-			                                             (UnaryLogicalOp) op,
+			                                             op,
 			                                             subPlanUnderFilter.getSubPlan(0),
 			                                             inputPlan );
 		}
@@ -193,7 +193,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) {
 			createdPlan = createPlanForL2GOrG2LUnderFilter( filterOp,
-			                                                (UnaryLogicalOp) op,
+			                                                op,
 			                                                subPlanUnderFilter.getSubPlan(0),
 			                                                inputPlan );
 		}
@@ -201,7 +201,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
 			createdPlan = createPlanForL2GOrG2LUnderFilter( filterOp,
-			                                                (UnaryLogicalOp) op,
+			                                                op,
 			                                                subPlanUnderFilter.getSubPlan(0),
 			                                                inputPlan );
 		}
@@ -217,9 +217,9 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException("Unimplemented method 'visit'");
 		}
-		
+
 	} // end of Worker
-	
+
 	protected LogicalPlan createPlanForRequestUnderFilter( final LogicalOpFilter filterOp,
 	                                                       final LogicalOpRequest<?,?> reqOp,
 	                                                       final LogicalPlan inputPlan ) {
@@ -607,7 +607,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		final ExprList filterExprs = filterOp.getFilterExpressions();
 		final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
 
-		// Create the new non-optional subplan. 
+		// Create the new non-optional subplan.
 		final ExprList toBeKept = new ExprList(); // will be populated by 'pushToNonOptSubPlan'
 		final LogicalPlan newNonOptSubPlan = pushToNonOptSubPlan( filterExprsWithoutAND,
 		                                                          nonoptSubPlan,
@@ -672,7 +672,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		final ExprList filterExprs = filterOp.getFilterExpressions();
 		final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
 
-		// Create the new non-optional subplan. 
+		// Create the new non-optional subplan.
 		final ExprList toBeKept = new ExprList(); // will be populated by 'pushToNonOptSubPlan'
 		final LogicalPlan oldNonOptSubPlan = subPlanUnderFilter.getSubPlan(0);
 		newSubPlansUnderJoin[0] = pushToNonOptSubPlan( filterExprsWithoutAND,
@@ -788,7 +788,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 	                                                       final UnaryLogicalOp childOp,
 	                                                       final LogicalPlan subPlanUnderChildOp,
 	                                                       final LogicalPlan inputPlan ) {
-		// Apply the heuristic recursively within the given subplan. 
+		// Apply the heuristic recursively within the given subplan.
 		final LogicalPlan newPlanUnderChildRoot = apply(subPlanUnderChildOp);
 
 		// If the heuristic cannot be applied within the subplan (more
