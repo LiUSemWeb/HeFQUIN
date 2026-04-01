@@ -25,6 +25,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
@@ -121,7 +122,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			     && fm.getVocabularyMapping() != null ) {
 				throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a gpAdd operator with a federation member for which a vocabulary mapping is specified." );
 			}
-				
+
 			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
 			return new LogicalPlanWithUnaryRootImpl( gpAdd,
 			                                         null,
@@ -131,6 +132,13 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 		{
 			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
 			return new LogicalPlanWithUnaryRootImpl( dedupOp,
+			                                         null,
+			                                         rewrittenSubPlan );
+		}
+		else if ( rootOp instanceof LogicalOpProject projectOp )
+		{
+			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
+			return new LogicalPlanWithUnaryRootImpl( projectOp,
 			                                         null,
 			                                         rewrittenSubPlan );
 		}
@@ -162,7 +170,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			final SPARQLGraphPattern p = req.getQueryPattern();
 
 			final SPARQLGraphPattern newP = VocabularyMappingUtils.translateGraphPattern(p, fm.getVocabularyMapping());
-			return ( newP.equals(p) ) ? inputPlan : rewriteReqOf(newP, fm);			
+			return ( newP.equals(p) ) ? inputPlan : rewriteReqOf(newP, fm);
 		}
 		else  { // If no vocabulary mapping, nothing to translate.
 			return inputPlan;
@@ -176,7 +184,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 	public static LogicalPlan rewriteReqOf( final SPARQLGraphPattern pattern, final FederationMember fm ) {
 		// Right now there are just TPF-servers and SPARQL endpoints, but there may be more in the future.
 		// For now, we will not assume that third types of interfaces will necessarily support all patterns.
-	
+
 		// For SPARQL endpoints, the whole graph pattern can be sent in a single request.
 		if ( fm instanceof SPARQLEndpoint ) {
 			final SPARQLRequest reqP = new SPARQLRequestImpl(pattern);
@@ -194,7 +202,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm,req);
 				return new LogicalPlanWithNullaryRootImpl(reqOp, null);
 			}
-	
+
 			// For federation members that do not support BGP requests,
 			// break the BGP into triple pattern requests.
 			final List<LogicalPlan> subPlans = new ArrayList<>();
@@ -203,7 +211,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm,req);
 				subPlans.add( new LogicalPlanWithNullaryRootImpl(reqOp,null) );
 			}
-	
+
 			return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans, null);
 		}
 		else if( pattern instanceof SPARQLUnionPattern up ) {
@@ -212,7 +220,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
 				subPlans.add(subPlan);
 			}
-	
+
 			return LogicalPlanUtils.createPlanWithMultiwayUnion(subPlans, null);
 		}
 		else if( pattern instanceof SPARQLGroupPattern gp ) {
@@ -221,7 +229,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
 				subPlans.add(subPlan);
 			}
-	
+
 			return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans, null);
 		}
 		else {
