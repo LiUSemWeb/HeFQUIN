@@ -394,128 +394,127 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 				up.addSubPattern( req.getQueryPattern() );
 			}
-	
+
 			return up;
 		}
-	
-		/**
-		 * Assumes that the given list contains at least two plans and that
-		 * all plans in the list consist only of a request operator. Returns
-		 * {@code null} if the given federation member does not support the
-		 * merged pattern.
-		 */
-		private LogicalPlan mergeSPARQLRequestsViaJoin( final FederationMember fm,
-															final List<LogicalPlan> reqPlans ) {
-			final Iterator<LogicalPlan> it = reqPlans.iterator();
-	
-			final LogicalPlan plan1 = it.next();
-			final LogicalOpRequest<?,?> reqOp1 = (LogicalOpRequest<?,?>) plan1.getRootOperator();
-			final SPARQLRequest req1 = (SPARQLRequest) reqOp1.getRequest();
-			final SPARQLGraphPattern pattern1 = req1.getQueryPattern();
-	
-			final LogicalPlan plan2 = it.next();
-			final LogicalOpRequest<?,?> reqOp2 = (LogicalOpRequest<?,?>) plan2.getRootOperator();
-			final SPARQLRequest req2 = (SPARQLRequest) reqOp2.getRequest();
-			final SPARQLGraphPattern pattern2 = req2.getQueryPattern();
-	
-			SPARQLGraphPattern mergedPattern = pattern1.mergeWith(pattern2);
-	
-			// Do a first check of the merged pattern already at this point
-			// to avoid going into the following loop if there is no need
-			// for it anyways.
-			if ( ! fm.isSupportedPattern(mergedPattern) )
-				return null;
-	
-			// If there are no more subplans to consider, we can already
-			// return the plan with the merged pattern now (otherwise, we
-			// would end up repeating the check of the same merged pattern
-			// again after after the loop).
-			if ( ! it.hasNext() )
-				return createPlanWithSingleRequestOp(mergedPattern, fm);
-	
-			while ( it.hasNext() ) {
-				final LogicalPlan nextPlan = it.next();
-				final LogicalOpRequest<?,?> nextReqOp = (LogicalOpRequest<?,?>) nextPlan.getRootOperator();
-				final SPARQLRequest nextReq = (SPARQLRequest) nextReqOp.getRequest();
-				final SPARQLGraphPattern nextPattern = nextReq.getQueryPattern();
-	
-				mergedPattern = mergedPattern.mergeWith(nextPattern);
-			}
-	
-			// Now we need to do another check of the final merged pattern.
-			if ( ! fm.isSupportedPattern(mergedPattern) )
-				return null;
-	
+	} // end of Worker
+
+	/**
+	 * Assumes that the given list contains at least two plans and that
+	 * all plans in the list consist only of a request operator. Returns
+	 * {@code null} if the given federation member does not support the
+	 * merged pattern.
+	 */
+	protected LogicalPlan mergeSPARQLRequestsViaJoin( final FederationMember fm,
+														final List<LogicalPlan> reqPlans ) {
+		final Iterator<LogicalPlan> it = reqPlans.iterator();
+
+		final LogicalPlan plan1 = it.next();
+		final LogicalOpRequest<?,?> reqOp1 = (LogicalOpRequest<?,?>) plan1.getRootOperator();
+		final SPARQLRequest req1 = (SPARQLRequest) reqOp1.getRequest();
+		final SPARQLGraphPattern pattern1 = req1.getQueryPattern();
+
+		final LogicalPlan plan2 = it.next();
+		final LogicalOpRequest<?,?> reqOp2 = (LogicalOpRequest<?,?>) plan2.getRootOperator();
+		final SPARQLRequest req2 = (SPARQLRequest) reqOp2.getRequest();
+		final SPARQLGraphPattern pattern2 = req2.getQueryPattern();
+
+		SPARQLGraphPattern mergedPattern = pattern1.mergeWith(pattern2);
+
+		// Do a first check of the merged pattern already at this point
+		// to avoid going into the following loop if there is no need
+		// for it anyways.
+		if ( ! fm.isSupportedPattern(mergedPattern) )
+			return null;
+
+		// If there are no more subplans to consider, we can already
+		// return the plan with the merged pattern now (otherwise, we
+		// would end up repeating the check of the same merged pattern
+		// again after after the loop).
+		if ( ! it.hasNext() )
 			return createPlanWithSingleRequestOp(mergedPattern, fm);
+
+		while ( it.hasNext() ) {
+			final LogicalPlan nextPlan = it.next();
+			final LogicalOpRequest<?,?> nextReqOp = (LogicalOpRequest<?,?>) nextPlan.getRootOperator();
+			final SPARQLRequest nextReq = (SPARQLRequest) nextReqOp.getRequest();
+			final SPARQLGraphPattern nextPattern = nextReq.getQueryPattern();
+
+			mergedPattern = mergedPattern.mergeWith(nextPattern);
 		}
-	
-		private SPARQLGraphPattern mergePatternWithOptPatterns( final SPARQLGraphPattern pattern,
-																	final SPARQLGraphPattern ... optPatterns ) {
-			assert optPatterns.length > 0;
-	
-			final ElementGroup group = new ElementGroup();
-	
-			final Element elmt = QueryPatternUtils.convertToJenaElement(pattern);
-			if ( elmt instanceof ElementGroup ) {
-				for ( final Element subElmt : ((ElementGroup) elmt).getElements() ) {
-					group.addElement(subElmt);
-				}
+
+		// Now we need to do another check of the final merged pattern.
+		if ( ! fm.isSupportedPattern(mergedPattern) )
+			return null;
+
+		return createPlanWithSingleRequestOp(mergedPattern, fm);
+	}
+
+	protected SPARQLGraphPattern mergePatternWithOptPatterns( final SPARQLGraphPattern pattern,
+																final SPARQLGraphPattern ... optPatterns ) {
+		assert optPatterns.length > 0;
+
+		final ElementGroup group = new ElementGroup();
+
+		final Element elmt = QueryPatternUtils.convertToJenaElement(pattern);
+		if ( elmt instanceof ElementGroup ) {
+			for ( final Element subElmt : ((ElementGroup) elmt).getElements() ) {
+				group.addElement(subElmt);
 			}
-			else {
-				group.addElement(elmt);
-			}
-	
-			for ( int i = 0; i < optPatterns.length; i++ ) {
-				final Element elmtInOpt = QueryPatternUtils.convertToJenaElement( optPatterns[i] );
-				final ElementOptional opt = new ElementOptional(elmtInOpt);
-				group.addElement(opt);
-			}
-	
-			return new GenericSPARQLGraphPatternImpl1(group);
 		}
-	
-		private LogicalPlan createPlanWithSingleRequestOp( final SPARQLGraphPattern p,
-																final FederationMember fm ) {
-			final SPARQLRequest req;
-			if ( p instanceof TriplePattern tp ) {
-				req = new TriplePatternRequestImpl(tp);
-			}
-			else if ( p instanceof BGP bgp ) {
-				req = new BGPRequestImpl(bgp);
-			}
-			else {
-				req = new SPARQLRequestImpl(p);
-			}
-	
-			final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, req);
-			return new LogicalPlanWithNullaryRootImpl(reqOp, null);
+		else {
+			group.addElement(elmt);
 		}
-	
-		private void separateSubPlansOfMultiwayOps( final List<LogicalPlan> subPlans,
-														final Map<FederationMember,List<LogicalPlan>> reqOnlyPlansPerFedMember,
-														final List<LogicalPlan> nonReqSubPlans ) {
-			for ( final LogicalPlan p : subPlans ) {
-				final LogicalOperator rootOp = p.getRootOperator();
-				if ( rootOp instanceof LogicalOpRequest<?,?> reqOp ) {
-					final FederationMember fm = reqOp.getFederationMember();
-					if ( fm.supportsMoreThanTriplePatterns() ) {
-						List<LogicalPlan> reqPlansForFM = reqOnlyPlansPerFedMember.get(fm);
-						if ( reqPlansForFM == null ) {
-							reqPlansForFM = new ArrayList<>();
-							reqOnlyPlansPerFedMember.put(fm, reqPlansForFM);
-						}
-						reqPlansForFM.add(p);
+
+		for ( int i = 0; i < optPatterns.length; i++ ) {
+			final Element elmtInOpt = QueryPatternUtils.convertToJenaElement( optPatterns[i] );
+			final ElementOptional opt = new ElementOptional(elmtInOpt);
+			group.addElement(opt);
+		}
+
+		return new GenericSPARQLGraphPatternImpl1(group);
+	}
+
+	protected LogicalPlan createPlanWithSingleRequestOp( final SPARQLGraphPattern p,
+															final FederationMember fm ) {
+		final SPARQLRequest req;
+		if ( p instanceof TriplePattern tp ) {
+			req = new TriplePatternRequestImpl(tp);
+		}
+		else if ( p instanceof BGP bgp ) {
+			req = new BGPRequestImpl(bgp);
+		}
+		else {
+			req = new SPARQLRequestImpl(p);
+		}
+
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, req);
+		return new LogicalPlanWithNullaryRootImpl(reqOp, null);
+	}
+
+	protected void separateSubPlansOfMultiwayOps( final List<LogicalPlan> subPlans,
+													final Map<FederationMember,List<LogicalPlan>> reqOnlyPlansPerFedMember,
+													final List<LogicalPlan> nonReqSubPlans ) {
+		for ( final LogicalPlan p : subPlans ) {
+			final LogicalOperator rootOp = p.getRootOperator();
+			if ( rootOp instanceof LogicalOpRequest<?,?> reqOp ) {
+				final FederationMember fm = reqOp.getFederationMember();
+				if ( fm.supportsMoreThanTriplePatterns() ) {
+					List<LogicalPlan> reqPlansForFM = reqOnlyPlansPerFedMember.get(fm);
+					if ( reqPlansForFM == null ) {
+						reqPlansForFM = new ArrayList<>();
+						reqOnlyPlansPerFedMember.put(fm, reqPlansForFM);
 					}
-					else {
-						nonReqSubPlans.add(p);
-					}
+					reqPlansForFM.add(p);
 				}
 				else {
 					nonReqSubPlans.add(p);
 				}
 			}
+			else {
+				nonReqSubPlans.add(p);
+			}
 		}
-
-	} // end of Worker
+	}
 
 }
