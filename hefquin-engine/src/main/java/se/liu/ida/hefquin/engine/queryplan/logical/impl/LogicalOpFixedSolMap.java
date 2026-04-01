@@ -53,7 +53,9 @@ public class LogicalOpFixedSolMap extends BaseForLogicalOps implements NullaryLo
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof LogicalOpFixedSolMap oo && oo.sm.equals(sm);
+		return o instanceof LogicalOpFixedSolMap oo
+		    && oo.sm.equals(sm)
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override

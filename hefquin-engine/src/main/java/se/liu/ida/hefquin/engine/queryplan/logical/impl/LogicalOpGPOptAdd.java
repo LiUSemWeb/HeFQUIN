@@ -18,7 +18,7 @@ public class LogicalOpGPOptAdd extends BaseForLogicalOps implements UnaryLogical
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
 
-	// will be initialized on demand 
+	// will be initialized on demand
 	protected TriplePattern tp = null;
 	protected boolean tpCheckDone = false;
 
@@ -106,10 +106,11 @@ public class LogicalOpGPOptAdd extends BaseForLogicalOps implements UnaryLogical
 
 		if ( o instanceof LogicalOpGPOptAdd otherGPOptAdd ) {
 			return    otherGPOptAdd.fm.equals(fm)
-			       && otherGPOptAdd.pattern.equals(pattern);
+			       && otherGPOptAdd.pattern.equals(pattern)
+			       && otherGPOptAdd.mayReduce == mayReduce;
 		}
 
-		return false; 
+		return false;
 	}
 
 	@Override

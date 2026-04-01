@@ -485,7 +485,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
 
 		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(
-				new LogicalOpGPAdd(fm, tp2, null, true),
+				new LogicalOpGPAdd(fm, tp2, null, false),
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp, null) );
 
@@ -524,7 +524,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
 
 		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(
-				new LogicalOpGPAdd(fm, tp2, null, true),
+				new LogicalOpGPAdd(fm, tp2, null, false),
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp, null) );
 

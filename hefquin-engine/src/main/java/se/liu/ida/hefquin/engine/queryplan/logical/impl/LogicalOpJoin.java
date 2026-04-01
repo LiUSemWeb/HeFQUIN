@@ -19,7 +19,7 @@ public class LogicalOpJoin extends BaseForLogicalOps implements BinaryLogicalOp
 	}
 
 	/**
-	 * Returns the singleton instance of {@link LogicalOpJoin} that does <em>not</em> 
+	 * Returns the singleton instance of {@link LogicalOpJoin} that does <em>not</em>
 	 * reduce duplicates.
 	 *
 	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
@@ -56,7 +56,8 @@ public class LogicalOpJoin extends BaseForLogicalOps implements BinaryLogicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpJoin; 
+		return o instanceof LogicalOpJoin oo
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public class TestsForPhysicalOpFactories
 		@Override
 		public UnaryLogicalOp create( final FederationMember fm,
 		                              final SPARQLGraphPattern pattern ) {
-			return new LogicalOpGPAdd(fm, pattern, null, true);
+			return new LogicalOpGPAdd(fm, pattern, null, false);
 		}
 	};
 
@@ -126,7 +126,7 @@ public class TestsForPhysicalOpFactories
 
 		final Var v = Var.alloc("x");
 		final Expr e = new E_IsIRI( new ExprVar(v) );
-		final LogicalOpFilter lop = new LogicalOpFilter(e, true);
+		final LogicalOpFilter lop = new LogicalOpFilter(e, false);
 
 		assertEquals( PhysicalOpFilter.class, factory.create(lop).getClass() );
 		assertTrue( factory.supports(lop, (ExpectedVariables) null) );

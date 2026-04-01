@@ -24,7 +24,7 @@ public class LogicalOpGPAdd extends BaseForLogicalOps implements UnaryLogicalOp
 	protected final SPARQLGraphPattern pattern;
 	protected final Map<String,Var> paramVars;
 
-	// will be initialized on demand 
+	// will be initialized on demand
 	protected TriplePattern tp = null;
 	protected boolean tpCheckDone = false;
 
@@ -85,7 +85,7 @@ public class LogicalOpGPAdd extends BaseForLogicalOps implements UnaryLogicalOp
 	 * Returns {@code true} if this gpAdd operator has a (nonempty) list of
 	 * variables as parameter. If so, {@link #getParameterVariables()} can
 	 * be used to access this parameter.
-	 * 
+	 *
 	 */
 	public boolean hasParameterVariables() {
 		return paramVars != null && ! paramVars.isEmpty();
@@ -167,7 +167,8 @@ public class LogicalOpGPAdd extends BaseForLogicalOps implements UnaryLogicalOp
 		if ( o instanceof LogicalOpGPAdd otherGPAdd ) {
 			return    otherGPAdd.fm.equals(fm)
 			       && otherGPAdd.pattern.equals(pattern)
-			       && Objects.deepEquals(paramVars, otherGPAdd.paramVars);
+			       && Objects.deepEquals(paramVars, otherGPAdd.paramVars)
+			       && otherGPAdd.mayReduce == mayReduce;
 		}
 
 		return false;

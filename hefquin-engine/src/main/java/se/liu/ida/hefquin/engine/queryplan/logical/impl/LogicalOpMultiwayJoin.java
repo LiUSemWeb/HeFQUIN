@@ -19,7 +19,7 @@ public class LogicalOpMultiwayJoin extends BaseForLogicalOps implements NaryLogi
 	}
 
 	/**
-	 * Returns the singleton instance of {@link LogicalOpMultiwayJoin} that does <em>not</em> 
+	 * Returns the singleton instance of {@link LogicalOpMultiwayJoin} that does <em>not</em>
 	 * reduce duplicates.
 	 *
 	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
@@ -54,7 +54,8 @@ public class LogicalOpMultiwayJoin extends BaseForLogicalOps implements NaryLogi
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpMultiwayJoin; 
+		return o instanceof LogicalOpMultiwayJoin oo
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override

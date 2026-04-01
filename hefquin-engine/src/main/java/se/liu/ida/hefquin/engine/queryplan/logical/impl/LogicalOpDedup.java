@@ -4,7 +4,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpDedup extends BaseForLogicalOps implements UnaryLogicalOp 
+public class LogicalOpDedup extends BaseForLogicalOps implements UnaryLogicalOp
 {
 	protected static LogicalOpDedup singleton = new LogicalOpDedup();
 
@@ -26,7 +26,8 @@ public class LogicalOpDedup extends BaseForLogicalOps implements UnaryLogicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpDedup; 
+		return    o instanceof LogicalOpDedup oo
+		       && oo.mayReduce == mayReduce;
 	}
 
 	@Override

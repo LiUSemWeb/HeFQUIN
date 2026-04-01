@@ -150,7 +150,7 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, false, new TriplePatternRequestImpl(tp2) );
 
 		final Expr e = new E_IsIRI( new ExprVar(v2) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(e, true);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(e, false);
 
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
 				false,

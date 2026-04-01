@@ -70,7 +70,7 @@ public class FilterPushDownTest extends EngineTestBase
 				null );
 
 		final Expr e = new E_IsIRI( new ExprVar(v1) );
-		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, true);
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, joinSubPlan);
 
 		// test
@@ -132,7 +132,7 @@ public class FilterPushDownTest extends EngineTestBase
 				null );
 
 		final Expr e = new E_Equals( new ExprVar(v1), new ExprVar(v2) );
-		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, true);
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, joinSubPlan);
 
 		// test
@@ -168,11 +168,11 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalPlan gpOptAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpOptAdd, null, reqSubPlan);
 
 		final Expr e1 = new E_LogicalNot( new E_Bound(new ExprVar(v2)) );
-		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1, true);
+		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1, false);
 		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp1, null, gpOptAddSubPlan);
 
 		final Expr e2 = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter rootOp = new LogicalOpFilter(e2, true);
+		final LogicalOpFilter rootOp = new LogicalOpFilter(e2, false);
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, filterSubPlan);
 
 		// test
@@ -223,11 +223,11 @@ public class FilterPushDownTest extends EngineTestBase
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null) );
 
 		final Expr e1 = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1, true);
+		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1, false);
 		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp1, null, unionSubPlan);
 
 		final Expr e2 = new E_IsIRI( new ExprVar(v2) );
-		final LogicalOpFilter rootOp = new LogicalOpFilter(e2, true);
+		final LogicalOpFilter rootOp = new LogicalOpFilter(e2, false);
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, filterSubPlan);
 
 		// test
@@ -277,7 +277,7 @@ public class FilterPushDownTest extends EngineTestBase
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v2) ); // v2 !!!
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, false);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
@@ -315,7 +315,7 @@ public class FilterPushDownTest extends EngineTestBase
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, false);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
@@ -359,7 +359,7 @@ public class FilterPushDownTest extends EngineTestBase
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, false);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
@@ -400,7 +400,7 @@ public class FilterPushDownTest extends EngineTestBase
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v2) ); // v2 !!!
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, false);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
@@ -438,7 +438,7 @@ public class FilterPushDownTest extends EngineTestBase
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v3) ); // v3 !!!
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, false);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
@@ -475,7 +475,7 @@ public class FilterPushDownTest extends EngineTestBase
 
 		// - filter operator
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, true);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, false);
 
 		// - plan
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);

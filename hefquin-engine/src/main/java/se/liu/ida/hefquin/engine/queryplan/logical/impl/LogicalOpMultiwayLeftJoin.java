@@ -24,7 +24,7 @@ public class LogicalOpMultiwayLeftJoin extends BaseForLogicalOps implements Nary
 	}
 
 	/**
-	 * Returns the singleton instance of {@link LogicalOpMultiwayLeftJoin} that does <em>not</em> 
+	 * Returns the singleton instance of {@link LogicalOpMultiwayLeftJoin} that does <em>not</em>
 	 * reduce duplicates.
 	 *
 	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
@@ -59,7 +59,8 @@ public class LogicalOpMultiwayLeftJoin extends BaseForLogicalOps implements Nary
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpMultiwayLeftJoin; 
+		return o instanceof LogicalOpMultiwayLeftJoin oo
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override

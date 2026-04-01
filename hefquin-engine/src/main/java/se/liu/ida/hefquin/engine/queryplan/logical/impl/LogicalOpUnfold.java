@@ -99,7 +99,8 @@ public class LogicalOpUnfold extends BaseForLogicalOps implements UnaryLogicalOp
 		return    o instanceof LogicalOpUnfold oo
 		       && oo.expr.equals(expr)
 		       && oo.var1.equals(var1)
-		       && Objects.equals(oo.var2, var2); // oo.var2 may be null
+		       && Objects.equals(oo.var2, var2) // oo.var2 may be null
+		       && oo.mayReduce == mayReduce;
 	}
 
 	@Override
@@ -240,7 +241,7 @@ public class LogicalOpUnfold extends BaseForLogicalOps implements UnaryLogicalOp
 				if ( arg.isVariable() ) {
 					var1MayBeUnbound = ! certainVars.contains( arg.asVar() );
 				}
-				else if ( ! arg.isConstant() ) { 
+				else if ( ! arg.isConstant() ) {
 					var1MayBeUnbound = true;
 				}
 			}
@@ -279,7 +280,7 @@ public class LogicalOpUnfold extends BaseForLogicalOps implements UnaryLogicalOp
 						if ( ! certainVars.contains(arg.asVar()) )
 							var2MayBeUnbound = true;
 					}
-					else if ( ! arg.isConstant() ) { 
+					else if ( ! arg.isConstant() ) {
 						var2MayBeUnbound = true;
 					}
 				}

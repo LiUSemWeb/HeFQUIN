@@ -35,7 +35,9 @@ public class LogicalOpLocalToGlobal extends BaseForLogicalOps implements UnaryLo
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof LogicalOpLocalToGlobal oo && oo.vm.equals(vm);
+		return o instanceof LogicalOpLocalToGlobal oo
+		    && oo.vm.equals(vm)
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override

@@ -546,7 +546,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		final boolean mayReduce = filterOp.mayReduce();
 
-		// Create the new non-optional subplan. 
+		// Create the new non-optional subplan.
 		final ExprList toBeKept = new ExprList(); // will be populated by 'pushToNonOptSubPlan'
 		final LogicalPlan newNonOptSubPlan = pushToNonOptSubPlan( filterExprsWithoutAND,
 		                                                          nonoptSubPlan,
@@ -614,7 +614,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		final ExprList filterExprs = filterOp.getFilterExpressions();
 		final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
 
-		// Create the new non-optional subplan. 
+		// Create the new non-optional subplan.
 		final ExprList toBeKept = new ExprList(); // will be populated by 'pushToNonOptSubPlan'
 		final LogicalPlan oldNonOptSubPlan = subPlanUnderFilter.getSubPlan(0);
 		newSubPlansUnderJoin[0] = pushToNonOptSubPlan( filterExprsWithoutAND,
@@ -666,18 +666,9 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return inputPlan;
 		}
 
-		// Check if any of the root operators of each subplan can reduce duplicates
-		boolean mayReduce = false;
-		for (LogicalPlan sp : newSubPlansUnderJoin) {
-			if (sp.getRootOperator().mayReduce()) {
-				mayReduce = true;
-				break;
-			}
-		}
-
 		// Create the new rewritten plan to be returned.
 		final LogicalPlan newSubPlanUnderFilter = new LogicalPlanWithNaryRootImpl(
-				LogicalOpMultiwayLeftJoin.getInstance(mayReduce),
+				LogicalOpMultiwayLeftJoin.getInstance(filterOp.mayReduce()),
 				null,
 				newSubPlansUnderJoin );
 
@@ -741,7 +732,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 	                                                       final UnaryLogicalOp childOp,
 	                                                       final LogicalPlan subPlanUnderChildOp,
 	                                                       final LogicalPlan inputPlan ) {
-		// Apply the heuristic recursively within the given subplan. 
+		// Apply the heuristic recursively within the given subplan.
 		final LogicalPlan newPlanUnderChildRoot = apply(subPlanUnderChildOp);
 
 		// If the heuristic cannot be applied within the subplan (more

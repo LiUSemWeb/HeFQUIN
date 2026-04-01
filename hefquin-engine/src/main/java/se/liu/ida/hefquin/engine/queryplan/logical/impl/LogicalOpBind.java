@@ -82,7 +82,8 @@ public class LogicalOpBind extends BaseForLogicalOps implements UnaryLogicalOp
 		if ( o == this ) return true;
 
 		return    o instanceof LogicalOpBind oo
-		       && oo.bindExpressions.equals(bindExpressions);
+		       && oo.bindExpressions.equals(bindExpressions)
+		       && oo.mayReduce == mayReduce;
 	}
 
 	@Override

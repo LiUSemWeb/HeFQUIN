@@ -403,10 +403,10 @@ public class UnionPullUpTest extends EngineTestBase
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans );
 
-		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, true );
+		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, false );
 		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, null, unionPlan);
 
-		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, true );
+		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, false );
 		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, null, gpAddPlan1);
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(gpAddPlan2);
@@ -459,10 +459,10 @@ public class UnionPullUpTest extends EngineTestBase
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans );
 
-		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, true );
+		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, false );
 		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, null, unionPlan);
 
-		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, true );
+		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, false );
 		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, null, gpAddPlan1);
 
 		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null, false);

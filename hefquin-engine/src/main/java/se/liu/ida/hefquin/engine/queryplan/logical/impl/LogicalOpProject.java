@@ -56,7 +56,8 @@ public class LogicalOpProject extends BaseForLogicalOps implements UnaryLogicalO
 		if ( o == this ) return true;
 
 		return    o instanceof LogicalOpProject oo
-		       && oo.variables.equals(variables);
+		       && oo.variables.equals(variables)
+		       && oo.mayReduce == mayReduce;
 	}
 
 	@Override

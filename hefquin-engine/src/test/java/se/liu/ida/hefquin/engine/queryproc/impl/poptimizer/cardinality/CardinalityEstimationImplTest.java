@@ -419,7 +419,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	protected PhysicalPlan createGPAddPlan( final PhysicalPlan subplan,
 	                                        final TriplePattern tp ) {
 		final FederationMember fm = new TPFServerForTest();
-		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp, null, true);
+		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp, null, false);
 		return PhysicalPlanFactory.createPlan(gpAdd, getLOP2POPForTests(), subplan);
 	}
 

@@ -22,7 +22,7 @@ public class LogicalOpFilter extends BaseForLogicalOps implements UnaryLogicalOp
 
 	public LogicalOpFilter( final Expr filterExpression, final boolean mayReduce ) {
 		super( mayReduce );
-		
+
 		assert filterExpression != null;
 
 		this.filterExpressions = new ExprList(filterExpression);
@@ -49,7 +49,8 @@ public class LogicalOpFilter extends BaseForLogicalOps implements UnaryLogicalOp
 		if ( o == this ) return true;
 
 		return    o instanceof LogicalOpFilter oo
-		       && oo.filterExpressions.equals(filterExpressions); 
+		       && oo.filterExpressions.equals(filterExpressions)
+		       && oo.mayReduce == mayReduce;
 	}
 
 	@Override
