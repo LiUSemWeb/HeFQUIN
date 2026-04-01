@@ -383,21 +383,22 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			// nothing to do here
 		}
 
-		/**
-		 * Assumes that the given list contains at least two plans and that
-		 * all plans in the list consist only of a request operator.
-		 */
-		private SPARQLGraphPattern mergeSPARQLRequestsViaUnion( final List<LogicalPlan> reqPlans ) {
-			final SPARQLUnionPatternImpl up = new SPARQLUnionPatternImpl();
-			for ( final LogicalPlan reqPlan : reqPlans ) {
-				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?,?>) reqPlan.getRootOperator();
-				final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
-				up.addSubPattern( req.getQueryPattern() );
-			}
-
-			return up;
-		}
 	} // end of Worker
+
+	/**
+	 * Assumes that the given list contains at least two plans and that
+	 * all plans in the list consist only of a request operator.
+	 */
+	protected SPARQLGraphPattern mergeSPARQLRequestsViaUnion( final List<LogicalPlan> reqPlans ) {
+		final SPARQLUnionPatternImpl up = new SPARQLUnionPatternImpl();
+		for ( final LogicalPlan reqPlan : reqPlans ) {
+			final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?,?>) reqPlan.getRootOperator();
+			final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
+			up.addSubPattern( req.getQueryPattern() );
+		}
+
+		return up;
+	}
 
 	/**
 	 * Assumes that the given list contains at least two plans and that
