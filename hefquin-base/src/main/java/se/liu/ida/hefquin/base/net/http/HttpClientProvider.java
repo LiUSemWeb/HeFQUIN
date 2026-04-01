@@ -22,37 +22,43 @@ import javax.net.ssl.SSLParameters;
 /**
  * Provides shared {@link java.net.http.HttpClient} instances.
  *
+ * <p>
  * Each {@code HttpClient} instance manages its own internal connection pool. A
  * single client handles requests to many different hosts while reusing
  * connections where possible.
+ * </p>
  *
+ * <p>
  * The {@code connectTimeout} is a client-level configuration and cannot be
  * changed after a client has been created. To support different
  * connection-timeout values, this provider caches one client instance per
  * timeout. Each such client manages its own independent set of pooled
  * connections for all routes it is used with.
+ * </p>
  *
- * Returned clients are wrapped to enforce concurrency limits using
- * {@link Semaphore}s. Limits are applied per endpoint key, where the key is
- * derived from the request URI by {@link #toEndpointKey(URI)} unless explicitly
- * configured otherwise.
+ * <p>
+ * Returned {@link HttpClient} instances are backed by an internal
+ * {@link LimitedHttpClient} wrapper to enforce concurrency limits using
+ * {@link Semaphore}s. Applicable concurrency limits are applied based on
+ * hierarchical lookup by trimming path segments from the request URI.
+ * </p>
  */
 public class HttpClientProvider
 {
 	// No timeout
 	private static final long NO_TIMEOUT = -1;
 
-	// Default max number of parallel requests per endpoint
+	// Default max number of parallel requests per endpoint address
 	private static final int DEFAULT_MAX_PARALLEL_REQUESTS = 10;
 
 	// Mutable default (can be overridden)
 	private static int defaultMaxParallelRequests = DEFAULT_MAX_PARALLEL_REQUESTS;
 
-	/** One limiter per endpoint key, shared across all clients from this provider. */
-	protected static final Map<String, Semaphore> limiterMap = new ConcurrentHashMap<>();
+	/** One limiter per endpoint address. The limiter for an endpoint address is shared across all clients. */
+	protected static final Map<String, Semaphore> LIMITERS_BY_ENDPOINT_ADDRESS = new ConcurrentHashMap<>();
 
 	// Cache clients by connect timeout
-	protected static final Map<Long, HttpClient> BY_CONNECT_TIMEOUT = new ConcurrentHashMap<>();
+	protected static final Map<Long, HttpClient> CLIENT_BY_CONNECT_TIMEOUT = new ConcurrentHashMap<>();
 
 	/**
 	 * Returns a shared client with no configured connect timeout.
@@ -76,7 +82,7 @@ public class HttpClientProvider
 	public static HttpClient client( final long connectTimeout ) {
 		final long effectiveTimeout = connectTimeout <= 0 ? NO_TIMEOUT : connectTimeout;
 
-		return BY_CONNECT_TIMEOUT.computeIfAbsent( effectiveTimeout, t -> {
+		return CLIENT_BY_CONNECT_TIMEOUT.computeIfAbsent( effectiveTimeout, t -> {
 			final HttpClient.Builder builder = HttpClient.newBuilder()
 				.followRedirects( HttpClient.Redirect.ALWAYS )
 				.version( HttpClient.Version.HTTP_2 );
@@ -91,69 +97,118 @@ public class HttpClientProvider
 	}
 
 	/**
-	 * Sets the default maximum number of concurrent requests per endpoint key.
+	 * Sets the default maximum number of concurrent requests per endpoint address.
 	 *
 	 * This value is used when creating new endpoint limiters via
 	 * {@link #getOrCreateEndpointLimiter(String)}.
 	 *
 	 * @param maxParallelRequests maximum number of concurrent requests per
-	 *                            endpoint
+	 *                            endpoint address
 	 * @throws IllegalArgumentException if {@code maxParallelRequests} is non-positive
 	 */
 	public static void setDefaultMaxParallelRequests( final int maxParallelRequests ) {
 		if ( maxParallelRequests <= 0 ) {
-			throw new IllegalArgumentException( "maxParallelRequests must be greater than zero" );
+			throw new IllegalArgumentException("maxParallelRequests must be greater than zero");
 		}
 		defaultMaxParallelRequests = maxParallelRequests;
 	}
 
 	/**
-	 * Registers a concurrency limiter for the given endpoint key.
+	 * Registers a concurrency limiter for the given endpoint address.
 	 *
-	 * If a limiter is already registered for the key, it is replaced.
+	 * If a limiter is already registered for the endpoint address, it is replaced.
 	 *
-	 * @param key                 endpoint key
+	 * @param endpointAddress     endpoint address
 	 * @param maxParallelRequests maximum number of concurrent requests allowed for
-	 *                            the endpoint
+	 *                            the endpoint address
+	 * @throws IllegalArgumentException if maxParallelRequests is non-positive.
 	 */
-	public static void registerEndpointLimiter( final String key, final int maxParallelRequests ) {
-		limiterMap.put( key, new Semaphore(maxParallelRequests, true) );
+	public static void registerEndpointLimiter( final String endpointAddress, final int maxParallelRequests ) {
+		if ( maxParallelRequests <= 0 ) {
+			throw new IllegalArgumentException("maxParallelRequests must be greater than zero");
+		}
+		LIMITERS_BY_ENDPOINT_ADDRESS.put( endpointAddress, new Semaphore(maxParallelRequests, true) );
 	}
 
 	/**
-	 * Returns the limiter registered for the given endpoint key, creating one with
-	 * the default limit if none exists.
+	 * Returns the limiter for the given endpoint address, creating one with the
+	 * default limit if none exists.
 	 *
-	 * @param key endpoint key
-	 * @return limiter for the endpoint
+	 * @param endpointAddress endpoint address
+	 * @return limiter for the endpoint address
 	 */
-	private static Semaphore getOrCreateEndpointLimiter( final String key ) {
-		return limiterMap.computeIfAbsent( key, k -> new Semaphore(defaultMaxParallelRequests, true) );
+	private static Semaphore getOrCreateEndpointLimiter( final String endpointAddress ) {
+		return LIMITERS_BY_ENDPOINT_ADDRESS.computeIfAbsent( endpointAddress, k -> new Semaphore(defaultMaxParallelRequests, true) );
 	}
 
 	/**
-	 * Derives the endpoint key for the given URI.
+	 * Resolves the endpoint address for the given URI.
 	 *
-	 * The endpoint key is the request URI without query and fragment components.
+	 * <p>
+	 * If the URI has no path, or only the root path {@code "/"}, the origin (scheme
+	 * + authority) is returned. Otherwise, the method progressively removes path
+	 * segments while checking for a registered endpoint address, falling back to
+	 * the origin if none is found. Trailing slashes are removed before matching
+	 * endpoint addresses.
+	 * </p>
 	 *
-	 * @param uri request URI
-	 * @return endpoint key used for concurrency limiting
+	 * <p>
+	 * For example, for {@code http://example.org/part/of/url?q=x}:
+	 * </p>
+	 * <ul>
+	 * <li>{@code http://example.org/part/of/url}</li>
+	 * <li>{@code http://example.org/part/of}</li>
+	 * <li>{@code http://example.org/part}</li>
+	 * <li>{@code http://example.org}</li>
+	 * </ul>
+	 *
+	 * @param uri the request URI
+	 * @return the most specific matching endpoint address, or the origin if none
+	 *         matches
 	 */
-	private static String toEndpointKey( final URI uri ) {
-		return uri.resolve( uri.getPath() ).toString();
+	private static String resolveEndpointAddress( final URI uri ) {
+		final String origin = uri.getScheme() + "://" + uri.getAuthority();
+
+		if ( uri.getPath() == null || uri.getPath().isEmpty() || uri.getPath().equals( "/" ) ) {
+			return origin;
+		}
+
+		String candidate = origin + uri.getPath();
+		// Remove trailing slash
+		if ( candidate.endsWith("/") ) {
+			candidate = candidate.substring( 0, candidate.length() - 1 );
+		}
+
+		while ( candidate.length() >= origin.length() ) {
+			if ( LIMITERS_BY_ENDPOINT_ADDRESS.containsKey(candidate) ) {
+				return candidate;
+			}
+
+			final int lastSlash = candidate.lastIndexOf('/');
+			if ( lastSlash < origin.length() ) {
+				break;
+			}
+			candidate = candidate.substring(0, lastSlash);
+		}
+
+		return origin;
 	}
 
 	/**
 	 * Resets provider state to its default configuration.
 	 *
-	 * This clears all cached clients and registered endpoint limiters, and restores
-	 * the default maximum number of parallel requests per endpoint key.
+	 * <p>
+	 * This clears all cached clients and registered endpoint address limiters, and
+	 * restores the default maximum number of parallel requests.
+	 * </p>
 	 *
+	 * <p>
 	 * This method is primarily intended for test isolation.
+	 * </p>
 	 */
-	public static void resetForTests() {
-		BY_CONNECT_TIMEOUT.clear();
-		limiterMap.clear();
+	public static void reset() {
+		CLIENT_BY_CONNECT_TIMEOUT.clear();
+		LIMITERS_BY_ENDPOINT_ADDRESS.clear();
 		defaultMaxParallelRequests = DEFAULT_MAX_PARALLEL_REQUESTS;
 	}
 
@@ -169,8 +224,8 @@ public class HttpClientProvider
 		public <T> HttpResponse<T> send( final HttpRequest request,
 		                                 final HttpResponse.BodyHandler<T> responseBodyHandler )
 				throws IOException, InterruptedException {
-			final String endpointKey = toEndpointKey( request.uri() );
-			final Semaphore limiter = getOrCreateEndpointLimiter(endpointKey);
+			final String endpointAddress = resolveEndpointAddress( request.uri() );
+			final Semaphore limiter = getOrCreateEndpointLimiter(endpointAddress);
 			limiter.acquire();
 			try {
 				return delegate.send(request, responseBodyHandler);
@@ -182,12 +237,12 @@ public class HttpClientProvider
 		@Override
 		public <T> CompletableFuture<HttpResponse<T>> sendAsync( final HttpRequest request,
 		                                                         final HttpResponse.BodyHandler<T> responseBodyHandler ) {
-			final String endpointKey = toEndpointKey( request.uri() );
-			final Semaphore limiter = getOrCreateEndpointLimiter(endpointKey);
+			final String endpointAddress = resolveEndpointAddress( request.uri() );
+			final Semaphore limiter = getOrCreateEndpointLimiter(endpointAddress);
 
 			try {
 				limiter.acquire();
-			} catch ( final InterruptedException e ) {
+			} catch ( InterruptedException e ) {
 				final CompletableFuture<HttpResponse<T>> failed = new CompletableFuture<>();
 				failed.completeExceptionally(e);
 				Thread.currentThread().interrupt();
@@ -201,8 +256,8 @@ public class HttpClientProvider
 		public <T> CompletableFuture<HttpResponse<T>> sendAsync( final HttpRequest request,
 		                                                         final HttpResponse.BodyHandler<T> responseBodyHandler,
 		                                                         final HttpResponse.PushPromiseHandler<T> pushPromiseHandler ) {
-			final String endpointKey = toEndpointKey( request.uri() );
-			final Semaphore limiter = getOrCreateEndpointLimiter(endpointKey);
+			final String endpointAddress = resolveEndpointAddress( request.uri() );
+			final Semaphore limiter = getOrCreateEndpointLimiter(endpointAddress);
 			try {
 				limiter.acquire();
 			} catch ( InterruptedException e ) {
