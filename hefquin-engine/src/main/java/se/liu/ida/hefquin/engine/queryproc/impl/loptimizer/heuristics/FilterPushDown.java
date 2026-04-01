@@ -114,8 +114,9 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			// The filter cannot be pushed under this operator.
+			// (but it may be removed altogether TODO #572)
+			createdPlan = inputPlan;
 		}
 
 		@Override
