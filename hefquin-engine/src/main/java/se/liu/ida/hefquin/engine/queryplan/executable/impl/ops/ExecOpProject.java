@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -16,17 +15,16 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorSta
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
+/**
+ * To be used for PROJECT clauses. This operator restricts each input solution
+ * mapping to a given set of variables by removing bindings for all other variables.
+ * For every input solution mapping, exactly one output solution mapping is produced.
+ */
 public class ExecOpProject extends UnaryExecutableOpBaseWithoutBlocking
 {
 	private long numberOfOutputMappingsProduced = 0L;
 
 	protected final Set<Var> variables;
-
-	public ExecOpProject( final List<Var> variables,
-	                      final boolean collectExceptions,
-	                      final QueryPlanningInfo qpInfo ) {
-		this( new HashSet<>(variables), collectExceptions, qpInfo );
-	}
 
 	public ExecOpProject( final Set<Var> variables,
 	                      final boolean collectExceptions,
