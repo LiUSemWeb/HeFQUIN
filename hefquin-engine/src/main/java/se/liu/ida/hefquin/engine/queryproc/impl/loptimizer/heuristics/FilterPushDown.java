@@ -209,14 +209,16 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpDedup op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForUnaryOpUnderFilter( filterOp,
+			                                               op,
+			                                               subPlanUnderFilter.getSubPlan(0) );
 		}
 
 		@Override
 		public void visit( final LogicalOpProject op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForUnaryOpUnderFilter( filterOp,
+			                                               op,
+			                                               subPlanUnderFilter.getSubPlan(0) );
 		}
 
 	} // end of Worker
@@ -298,17 +300,8 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		if ( ! Collections.disjoint(varsInFilter, varsInBind) )
 			return inputPlan;
 
-		// The filter can be pushed. In this case, create a new subplan with
-		// the filter as root operator on top of the subplan that was under
-		// the bind, and apply this heuristic recursively to this new subplan.
-		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
-				filterOp,
-				null,
-				subPlanUnderBind );
-		final LogicalPlan newSubPlan2 = apply(newSubPlan1);
-
-		// Finally, put together the new plan with the bind operator as root.
-		return LogicalPlanUtils.createPlanWithSubPlans(bindOp, null, newSubPlan2);
+		// The filter can be pushed.
+		return createPlanForUnaryOpUnderFilter(filterOp, bindOp, subPlanUnderBind);
 	}
 
 	protected LogicalPlan createPlanForUnfoldUnderFilter(
@@ -736,6 +729,20 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return new LogicalPlanWithUnaryRootImpl( newFilterOp,
 			                                         null,
 			                                         newSubPlanUnderFilter );
+	}
+
+	protected LogicalPlan createPlanForUnaryOpUnderFilter( final LogicalOpFilter filterOp, final LogicalOperator op, final LogicalPlan subPlanUnderOp ) {
+		// Create a new subplan with the filter as root operator on top of the
+		// subplan that was under the given unary operator, and apply this
+		// heuristic recursively to this new subplan.
+		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
+		filterOp,
+		null,
+		subPlanUnderOp );
+		final LogicalPlan newSubPlan2 = apply(newSubPlan1);
+
+		// Put together the new plan with the given unary operator as root.
+		return LogicalPlanUtils.createPlanWithSubPlans(op, null, newSubPlan2);
 	}
 
 
