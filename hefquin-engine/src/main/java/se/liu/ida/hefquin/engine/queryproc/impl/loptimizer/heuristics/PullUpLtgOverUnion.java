@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
@@ -53,30 +54,130 @@ public class PullUpLtgOverUnion implements HeuristicForLogicalOptimization {
 	 */
 	public static boolean checkIfLtgCanBeExtractedOverUnion( final LogicalPlan unionPlan ){
 		final LogicalOperator rootOp = unionPlan.getRootOperator();
-		if ( !(rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion) ){
-			return false;
-		}
+		final Worker worker = new Worker( unionPlan );
+		rootOp.visit(worker);
 
-		final LogicalOperator firstLop = unionPlan.getSubPlan(0).getRootOperator();
-		if ( !(firstLop instanceof LogicalOpLocalToGlobal) ) {
-			return false;
-		}
-
-		final VocabularyMapping vm0 = ((LogicalOpLocalToGlobal) firstLop).getVocabularyMapping();
-		for ( int i = 1; i < unionPlan.numberOfSubPlans(); i++ ) {
-			final LogicalOperator lop = unionPlan.getSubPlan(i).getRootOperator();
-			if ( !(lop instanceof LogicalOpLocalToGlobal) ){
-				return false;
-			}
-
-			final VocabularyMapping vm = ((LogicalOpLocalToGlobal) lop).getVocabularyMapping();
-			if ( !( vm0.equals( vm ) ) ){
-				return false;
-			}
-		}
-
-		return true;
+		return worker.getLtgCanBeExtractedOverUnion();
 	}
+
+	protected static class Worker implements LogicalPlanVisitor {
+		protected final LogicalPlan unionPlan;
+		protected boolean ltgCanBeExtractedOverUnion = false;
+
+		public Worker( final LogicalPlan unionPlan ) {
+			this.unionPlan = unionPlan;
+		}
+
+		public boolean getLtgCanBeExtractedOverUnion() { return ltgCanBeExtractedOverUnion; }
+
+		@Override
+		public void visit( final LogicalOpRequest<?, ?> op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpFixedSolMap op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpGPAdd op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpGPOptAdd op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpJoin op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpLeftJoin op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpUnion op ) {
+			ltgCanBeExtractedOverUnion = checkSubPlans();
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayJoin op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayLeftJoin op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayUnion op ) {
+			ltgCanBeExtractedOverUnion = checkSubPlans();
+		}
+
+		@Override
+		public void visit( final LogicalOpFilter op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpBind op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpUnfold op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpLocalToGlobal op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpGlobalToLocal op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpDedup op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpProject op ) {
+			ltgCanBeExtractedOverUnion = false;
+		}
+
+		private boolean checkSubPlans() {
+			final LogicalOperator firstLop = unionPlan.getSubPlan(0).getRootOperator();
+			if ( !(firstLop instanceof LogicalOpLocalToGlobal) ) {
+				return false;
+			}
+
+			final VocabularyMapping vm0 = ((LogicalOpLocalToGlobal) firstLop).getVocabularyMapping();
+			for ( int i = 1; i < unionPlan.numberOfSubPlans(); i++ ) {
+				final LogicalOperator lop = unionPlan.getSubPlan(i).getRootOperator();
+				if ( !(lop instanceof LogicalOpLocalToGlobal) ){
+					return false;
+				}
+
+				final VocabularyMapping vm = ((LogicalOpLocalToGlobal) lop).getVocabularyMapping();
+				if ( !( vm0.equals( vm ) ) ){
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+	} // end of Worker
 
 	protected static LogicalPlan extractLtgOverNaryOp( final LogicalPlan inputPlan ) {
 		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
