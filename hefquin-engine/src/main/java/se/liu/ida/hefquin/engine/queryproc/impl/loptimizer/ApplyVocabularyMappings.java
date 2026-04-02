@@ -16,7 +16,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
-import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpDedup;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
@@ -146,7 +145,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			}
 
 			if ( rewritten )
-				rewrittenPlan = new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) op,
+				rewrittenPlan = new LogicalPlanWithNaryRootImpl(  op,
 				                                                  null,
 				                                                  rewrittenSubplans );
 			else
@@ -168,7 +167,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			}
 
 			if ( rewritten )
-				rewrittenPlan = new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) op,
+				rewrittenPlan = new LogicalPlanWithNaryRootImpl(  op,
 				                                                  null,
 				                                                  rewrittenSubplans );
 			else
@@ -190,7 +189,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			}
 
 			if ( rewritten )
-				rewrittenPlan = new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) op,
+				rewrittenPlan = new LogicalPlanWithNaryRootImpl(  op,
 				                                                  null,
 				                                                  rewrittenSubplans );
 			else
