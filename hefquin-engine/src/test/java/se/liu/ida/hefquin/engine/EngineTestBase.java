@@ -572,33 +572,11 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
-				final SPARQLRequest req,
-				final SPARQLEndpoint fm ) throws FederationAccessException
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
-				final TPFRequest req,
-				final TPFServer fm ) throws FederationAccessException
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
-				final TPFRequest req,
-				final BRTPFServer fm ) throws FederationAccessException
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
-				final BRTPFRequest req,
-				final BRTPFServer fm ) throws FederationAccessException
+		public < ReqType extends DataRetrievalRequest,
+		         MemberType extends FederationMember >
+		CompletableFuture<CardinalityResponse> issueCardinalityRequest( final ReqType req,
+		                                                                final MemberType fm )
+				throws FederationAccessException
 		{
 			throw new UnsupportedOperationException();
 		}

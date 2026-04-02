@@ -30,6 +30,7 @@ import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class CardinalityEstimationImplTest extends EngineTestBase
@@ -437,9 +438,26 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		}
 
 		@Override
-		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
-				final TPFRequest req,
-				final TPFServer fm ) throws FederationAccessException
+		public < ReqType extends DataRetrievalRequest,
+				MemberType extends FederationMember >
+		CompletableFuture<CardinalityResponse> issueCardinalityRequest( final ReqType req,
+		                                                                final MemberType fm )
+				throws FederationAccessException
+		{
+			if (    req instanceof TPFRequest tpfReq
+			     && fm instanceof TPFServer tpfServer )
+				return _issueCardinalityRequest(tpfReq, tpfServer);
+			else if (    req instanceof TPFRequest tpfReq
+			          && fm instanceof BRTPFServer brtpfServer )
+				return _issueCardinalityRequest(tpfReq, brtpfServer);
+			else
+				throw new IllegalStateException( "Unsupported request/federation member combination: " +
+				                                 req.getClass().getName() + "/" + fm.getClass().getName() );
+		}
+
+		public CompletableFuture<CardinalityResponse> _issueCardinalityRequest( final TPFRequest req,
+		                                                                        final TPFServer fm )
+				throws FederationAccessException
 		{
 			final Object o = req.getQueryPattern().asJenaTriple().getObject().getLiteralValue();
 			final int c = ((Integer) o).intValue();
