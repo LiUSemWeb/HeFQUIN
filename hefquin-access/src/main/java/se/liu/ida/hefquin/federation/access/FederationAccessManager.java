@@ -2,13 +2,8 @@ package se.liu.ida.hefquin.federation.access;
 
 import java.util.concurrent.CompletableFuture;
 
-import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.SPARQLQuery;
 import se.liu.ida.hefquin.base.utils.StatsProvider;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.members.BRTPFServer;
-import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public interface FederationAccessManager extends StatsProvider
 {
@@ -18,20 +13,10 @@ public interface FederationAccessManager extends StatsProvider
 	CompletableFuture<RespType> issueRequest( ReqType req, MemberType fm )
 			throws FederationAccessException;
 
-	/**
-	 * Requests the cardinality of the result of the given request.
-	 *
-	 * Assumes that the given request contains a {@link SPARQLGraphPattern}
-	 * rather than a full {@link SPARQLQuery}. If it does not, then this
-	 * method throws an {@link IllegalArgumentException}.
-	 */
-	CompletableFuture<CardinalityResponse> issueCardinalityRequest( SPARQLRequest req, SPARQLEndpoint fm ) throws FederationAccessException;
-
-	CompletableFuture<CardinalityResponse> issueCardinalityRequest( TPFRequest req, TPFServer fm ) throws FederationAccessException;
-
-	CompletableFuture<CardinalityResponse> issueCardinalityRequest( TPFRequest req, BRTPFServer fm ) throws FederationAccessException;
-
-	CompletableFuture<CardinalityResponse> issueCardinalityRequest( BRTPFRequest req, BRTPFServer fm ) throws FederationAccessException;
+	< ReqType extends DataRetrievalRequest,
+	  MemberType extends FederationMember >
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest( final ReqType req, final MemberType fm )
+			throws FederationAccessException;
 
 	@Override
 	FederationAccessStats getStats();
