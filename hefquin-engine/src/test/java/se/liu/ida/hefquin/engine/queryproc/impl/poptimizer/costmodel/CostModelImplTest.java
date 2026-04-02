@@ -185,7 +185,7 @@ public class CostModelImplTest extends EngineTestBase
 		final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 		final FederationMember fm = new TPFServerForTest();
 
-		return PhysicalPlanFactory.createPlanWithRequest(req, fm);
+		return PhysicalPlanFactory.createPlanWithRequest(req, false, fm);
 	}
 
 	/**

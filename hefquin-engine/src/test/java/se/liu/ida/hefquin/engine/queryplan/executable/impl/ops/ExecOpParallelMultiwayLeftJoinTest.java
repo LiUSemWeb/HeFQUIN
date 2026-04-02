@@ -1486,21 +1486,21 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 	                                                 final TriplePattern tp3,
 	                                                 final SPARQLEndpoint fm3 ) {
 		final TriplePatternRequest req1 = new TriplePatternRequestImpl(tp1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm1, req1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm1, false, req1);
 
 		if ( tp2 == null ) {
 			return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, reqOp1 );
 		}
 
 		final TriplePatternRequest req2 = new TriplePatternRequestImpl(tp2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(fm2, req2);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(fm2, false, req2);
 
 		if ( tp3 == null ) {
 			return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, reqOp1, reqOp2 );
 		}
 
 		final TriplePatternRequest req3 = new TriplePatternRequestImpl(tp3);
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>(fm3, req3);
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>(fm3, false, req3);
 
 		return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, reqOp1, reqOp2, reqOp3 );
 	}
