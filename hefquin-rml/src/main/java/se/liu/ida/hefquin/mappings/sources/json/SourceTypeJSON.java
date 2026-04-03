@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.mappings.algebra.sources.json;
+package se.liu.ida.hefquin.mappings.sources.json;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +18,8 @@ import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
 
 import net.minidev.json.JSONArray;
-import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceType;
+import se.liu.ida.hefquin.mappings.sources.DataObject;
+import se.liu.ida.hefquin.mappings.sources.SourceType;
 
 public class SourceTypeJSON implements SourceType< JsonObject,
                                                    JsonObject,

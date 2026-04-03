@@ -29,9 +29,9 @@ import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExpression;
 import se.liu.ida.hefquin.mappings.algebra.exprs.fcts.ExtnFct_ToBNode;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpExtend;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
-import se.liu.ida.hefquin.mappings.algebra.sources.json.JsonPathQuery;
-import se.liu.ida.hefquin.mappings.algebra.sources.json.MappingOpExtractJSON;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.json.JsonPathQuery;
+import se.liu.ida.hefquin.mappings.sources.json.MappingOpExtractJSON;
 
 public class WrappedRESTEndpointImplTest
 {

@@ -7,9 +7,9 @@ import java.util.Map;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.base.query.Query;
-import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceType;
+import se.liu.ida.hefquin.mappings.sources.DataObject;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.SourceType;
 
 public class BaseForMappingOperatorTests
 {

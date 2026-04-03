@@ -6,8 +6,8 @@ import java.util.Set;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingOperatorVisitor;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
-import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.DataObject;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
 
 /**
  * This operator simply returns the tuples given to its constructor.

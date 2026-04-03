@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.mappings.algebra.sources.json;
+package se.liu.ida.hefquin.mappings.sources.json;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;

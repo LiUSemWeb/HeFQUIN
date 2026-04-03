@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.mappings.algebra.sources.json;
+package se.liu.ida.hefquin.mappings.sources.json;
 
 public class JsonScalarValue extends JsonElement
 {

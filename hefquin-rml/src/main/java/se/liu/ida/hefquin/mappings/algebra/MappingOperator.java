@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.mappings.algebra;
 import java.util.Map;
 import java.util.Set;
 
-import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.DataObject;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
 
 public interface MappingOperator
 {

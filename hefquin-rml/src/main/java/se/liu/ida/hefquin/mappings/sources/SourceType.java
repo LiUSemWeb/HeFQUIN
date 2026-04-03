@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.mappings.algebra.sources;
+package se.liu.ida.hefquin.mappings.sources;
 
 import java.util.List;
 

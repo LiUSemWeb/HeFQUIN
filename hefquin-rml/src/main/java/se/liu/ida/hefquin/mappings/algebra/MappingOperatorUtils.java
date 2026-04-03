@@ -15,7 +15,7 @@ import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpExtract;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpJoin;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpProject;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
 
 public class MappingOperatorUtils
 {

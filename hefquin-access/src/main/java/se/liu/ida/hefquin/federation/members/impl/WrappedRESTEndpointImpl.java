@@ -22,9 +22,9 @@ import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperatorUtils;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationUtils;
-import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
-import se.liu.ida.hefquin.mappings.algebra.sources.json.JsonObject;
+import se.liu.ida.hefquin.mappings.sources.DataObject;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.json.JsonObject;
 
 public class WrappedRESTEndpointImpl extends RESTEndpointImpl
                                      implements WrappedRESTEndpoint

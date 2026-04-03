@@ -30,9 +30,9 @@ import se.liu.ida.hefquin.mappings.algebra.exprs.fcts.ExtnFct_ToIRI;
 import se.liu.ida.hefquin.mappings.algebra.exprs.fcts.ExtnFct_ToLiteral;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpExtend;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpJoin;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
-import se.liu.ida.hefquin.mappings.algebra.sources.json.JsonPathQuery;
-import se.liu.ida.hefquin.mappings.algebra.sources.json.MappingOpExtractJSON;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.json.JsonPathQuery;
+import se.liu.ida.hefquin.mappings.sources.json.MappingOpExtractJSON;
 import se.liu.ida.hefquin.rml.vocabulary.RMLVocab;
 
 /**

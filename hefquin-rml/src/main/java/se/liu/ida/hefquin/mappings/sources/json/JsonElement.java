@@ -1,6 +1,6 @@
-package se.liu.ida.hefquin.mappings.algebra.sources.json;
+package se.liu.ida.hefquin.mappings.sources.json;
 
-import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
+import se.liu.ida.hefquin.mappings.sources.DataObject;
 
 /**
  * Superclass for all types of elements of JSON documents.

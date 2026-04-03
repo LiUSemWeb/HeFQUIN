@@ -1,9 +1,9 @@
-package se.liu.ida.hefquin.mappings.algebra.sources.json;
+package se.liu.ida.hefquin.mappings.sources.json;
 
 import java.util.Map;
 
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpExtract;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
 
 /**
  * This class is a version of {@link MappingOpExtract} specifically for

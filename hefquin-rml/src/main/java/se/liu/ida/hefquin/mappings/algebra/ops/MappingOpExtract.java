@@ -16,9 +16,9 @@ import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
 import se.liu.ida.hefquin.mappings.algebra.impl.MappingRelationImplWithColumnLayout;
 import se.liu.ida.hefquin.mappings.algebra.impl.MappingRelationImplWithoutTuples;
-import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceType;
+import se.liu.ida.hefquin.mappings.sources.DataObject;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.SourceType;
 
 public class MappingOpExtract< DDS extends DataObject,
                                DC1 extends DataObject,
