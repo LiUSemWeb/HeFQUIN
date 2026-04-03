@@ -60,6 +60,9 @@ public class MappingOpExtract< DDS extends DataObject,
 		schema = P.keySet();
 	}
 
+	@Override
+	public int getExpectedNumberOfSubExpressions() { return 0; }
+
 	public SourceReference getSourceReference() { return sr; }
 
 	public SourceType<DDS, DC1, DC2, QL1, QL2> getSourceType() { return type; }

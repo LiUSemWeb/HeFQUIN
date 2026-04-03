@@ -20,6 +20,9 @@ public abstract class BaseForNaryMappingOperator extends BaseForMappingOperator
 		this.subOps = subOps;
 	}
 
+	@Override
+	public int getExpectedNumberOfSubExpressions() { return Integer.MAX_VALUE; }
+
 	public int getNumberOfSubOps() { return subOps.size(); }
 
 	public Iterable<MappingOperator> getSubOps() { return subOps; }

@@ -22,6 +22,9 @@ public class MappingOpConstant extends BaseForMappingOperator
 	}
 
 	@Override
+	public int getExpectedNumberOfSubExpressions() { return 0; }
+
+	@Override
 	public Set<String> getSchema() {
 		return new HashSet<>( r.getSchema() );
 	}

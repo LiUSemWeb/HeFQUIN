@@ -11,6 +11,9 @@ public abstract class BaseForUnaryMappingOperator extends BaseForMappingOperator
 		this.subOp = subOp;
 	}
 
+	@Override
+	public int getExpectedNumberOfSubExpressions() { return 1; }
+
 	public MappingOperator getSubOp() {
 		return subOp;
 	}

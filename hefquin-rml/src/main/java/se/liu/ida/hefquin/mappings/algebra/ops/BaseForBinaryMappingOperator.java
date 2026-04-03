@@ -16,6 +16,9 @@ public abstract class BaseForBinaryMappingOperator extends BaseForMappingOperato
 		this.subOp2 = subOp2;
 	}
 
+	@Override
+	public int getExpectedNumberOfSubExpressions() { return 2; }
+
 	public MappingOperator getSubOp1() {
 		return subOp1;
 	}
