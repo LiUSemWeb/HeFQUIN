@@ -16,12 +16,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import net.minidev.json.JSONArray;
-import se.liu.ida.hefquin.mappings.sources.json.JsonArray;
-import se.liu.ida.hefquin.mappings.sources.json.JsonElement;
-import se.liu.ida.hefquin.mappings.sources.json.JsonObject;
-import se.liu.ida.hefquin.mappings.sources.json.JsonPathQuery;
-import se.liu.ida.hefquin.mappings.sources.json.JsonScalarValue;
-import se.liu.ida.hefquin.mappings.sources.json.SourceTypeJSON;
 
 public class SourceTypeJSONTest
 {

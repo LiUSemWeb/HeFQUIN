@@ -17,9 +17,9 @@ import org.junit.Test;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
-import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExpression;
 import se.liu.ida.hefquin.mappings.algebra.impl.MappingRelationImplWithTupleLayout;
 import se.liu.ida.hefquin.mappings.algebra.impl.MappingRelationImplWithoutTuples;
+import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtendExpression;
 
 public class MappingOpExtendTest extends BaseForMappingOperatorTests
 {

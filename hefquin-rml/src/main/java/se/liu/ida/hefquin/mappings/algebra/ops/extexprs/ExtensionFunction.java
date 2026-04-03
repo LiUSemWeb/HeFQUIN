@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.mappings.algebra.exprs;
+package se.liu.ida.hefquin.mappings.algebra.ops.extexprs;
 
 import org.apache.jena.graph.Node;
 

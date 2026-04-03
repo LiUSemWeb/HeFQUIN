@@ -13,7 +13,7 @@ import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperatorVisitor;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
-import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExpression;
+import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtendExpression;
 import se.liu.ida.hefquin.mappings.sources.DataObject;
 import se.liu.ida.hefquin.mappings.sources.SourceReference;
 

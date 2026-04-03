@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.mappings.algebra.exprs.fcts;
+package se.liu.ida.hefquin.mappings.algebra.ops.extfcts;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

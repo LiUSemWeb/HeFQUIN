@@ -1,11 +1,11 @@
-package se.liu.ida.hefquin.mappings.algebra.exprs.fcts;
+package se.liu.ida.hefquin.mappings.algebra.ops.extfcts;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
-import se.liu.ida.hefquin.mappings.algebra.exprs.ExtensionFunction;
+import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtensionFunction;
 
 /**
  * Given an arbitrary number string literals, returns a string literal
