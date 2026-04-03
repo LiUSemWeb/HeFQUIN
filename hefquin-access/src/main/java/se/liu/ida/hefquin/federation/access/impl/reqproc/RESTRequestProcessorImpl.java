@@ -13,7 +13,7 @@ import java.util.Date;
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.http.HttpLib;
 
-import se.liu.ida.hefquin.base.shared.http.HttpClientProvider;
+import se.liu.ida.hefquin.base.net.http.HttpClientProvider;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.RESTRequest;
