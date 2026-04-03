@@ -9,6 +9,8 @@ import java.util.Set;
 
 import org.apache.jena.graph.Node;
 
+import se.liu.ida.hefquin.mappings.algebra.ops.extfcts.ExtensionFunction;
+
 public class ExtendExprFunction implements ExtendExpression
 {
 	protected final ExtensionFunction fct;

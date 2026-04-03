@@ -5,7 +5,6 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
-import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtensionFunction;
 
 /**
  * Given a string literal, returns a blank node that is unique per every
