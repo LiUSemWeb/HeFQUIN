@@ -71,10 +71,17 @@
       <artifactId>hefquin-graphqlconnector</artifactId>
       <version>0.0.11-SNAPSHOT</version>
     </dependency>
+    <!-- Chronicle Map -->
     <dependency>
       <groupId>net.openhft</groupId>
       <artifactId>chronicle-map</artifactId>
       <version>3.27ea0</version>
+    </dependency>
+    <!-- Commons codec -->
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.21.0</version>
     </dependency>
   </dependencies>
 </project>
