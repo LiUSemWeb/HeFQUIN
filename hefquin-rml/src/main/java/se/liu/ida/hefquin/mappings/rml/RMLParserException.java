@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.rml;
+package se.liu.ida.hefquin.mappings.rml;
 
 public class RMLParserException extends Exception
 {

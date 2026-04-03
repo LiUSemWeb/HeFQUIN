@@ -44,8 +44,8 @@ import se.liu.ida.hefquin.jenaext.ModelUtils;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpProject;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
-import se.liu.ida.hefquin.rml.RML2MappingAlgebra;
-import se.liu.ida.hefquin.rml.RMLParserException;
+import se.liu.ida.hefquin.mappings.rml.RML2MappingAlgebra;
+import se.liu.ida.hefquin.mappings.rml.RMLParserException;
 import se.liu.ida.hefquin.vocabulary.FDVocab;
 import se.liu.ida.hefquin.vocabulary.HydraVocab;
 
