@@ -30,8 +30,11 @@ public class MappingOpExtract< DDS extends DataObject,
 	protected final SourceReference sr;
 	protected final SourceType<DDS, DC1, DC2, QL1, QL2> type;
 	protected final QL1 query;
+	@Deprecated
 	protected final String[] attributesOfP;
+	@Deprecated
 	protected final List<QL2> queriesOfP;
+	protected final Map<String, QL2> P;
 
 	protected final Set<String> schema;
 
@@ -48,6 +51,7 @@ public class MappingOpExtract< DDS extends DataObject,
 		this.sr    = sr;
 		this.type  = type;
 		this.query = query;
+		this.P = P;
 
 		attributesOfP = new String[ P.size() ];
 		queriesOfP = new ArrayList<>( P.size() );
@@ -69,11 +73,15 @@ public class MappingOpExtract< DDS extends DataObject,
 
 	public QL1 getQuery() { return query; }
 
-	public int getSizeOfP() { return attributesOfP.length; }
+	public int getSizeOfP() { return P.size(); }
 
+	@Deprecated
 	public String getIthAttributeOfP( final int i ) { return attributesOfP[i]; }
 
+	@Deprecated
 	public Iterable<QL2> getQueriesOfP() { return queriesOfP; }
+
+	public Iterable<Map.Entry<String, QL2>> getEntriesOfP() { return P.entrySet(); }
 
 	@Override
 	public Set<String> getSchema() { return schema; }
