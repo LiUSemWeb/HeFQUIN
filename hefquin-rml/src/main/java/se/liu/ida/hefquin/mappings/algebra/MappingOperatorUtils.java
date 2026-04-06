@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import se.liu.ida.hefquin.base.query.Query;
@@ -15,6 +16,7 @@ import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpExtract;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpJoin;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpProject;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
+import se.liu.ida.hefquin.mappings.sources.DataObject;
 import se.liu.ida.hefquin.mappings.sources.SourceReference;
 
 public class MappingOperatorUtils
@@ -50,15 +52,21 @@ public class MappingOperatorUtils
 		}
 
 		@Override
-		public void visit( final MappingOpExtract<?,?,?,?,?> op ) {
+		public <DDS extends DataObject,
+		        DC1 extends DataObject,
+		        DC2 extends DataObject,
+		        QL1 extends Query,
+		        QL2 extends Query>
+		void visit( final MappingOpExtract<DDS, DC1, DC2, QL1, QL2> op ) {
 			final String rootOpAsString = "Extract (" + op.getID() + ")";
 
 			final List<String> props = new ArrayList<>();
 			props.add( "sr: " + op.getSourceReference().hashCode() );
 			props.add( "type: " + op.getSourceType().getClass().getSimpleName() );
-			int i = 0;
-			for ( final Query q : op.getQueriesOfP() ) {
-				final String attr = op.getIthAttributeOfP( i++ );
+
+			for ( final Map.Entry<String, ?> e : op.getEntriesOfP() ) {
+				final String attr = e.getKey();
+				final Object q = e.getValue();
 				props.add( attr + " -> " + q.toString() );
 			}
 
@@ -139,7 +147,12 @@ public class MappingOperatorUtils
 		}
 
 		@Override
-		public void visit( final MappingOpExtract<?, ?, ?, ?, ?> op ) {
+		public <DDS extends DataObject,
+		        DC1 extends DataObject,
+		        DC2 extends DataObject,
+		        QL1 extends Query,
+		        QL2 extends Query>
+		void visit( final MappingOpExtract<DDS, DC1, DC2, QL1, QL2> op ) {
 			extractedSrcRefs.add( op.getSourceReference() );
 		}
 

@@ -21,6 +21,10 @@ public class MappingOpConstant extends BaseForMappingOperator
 		this.r = r;
 	}
 
+	public MappingRelation getMappingRelation() {
+		return r;
+	}
+
 	@Override
 	public int getExpectedNumberOfSubExpressions() { return 0; }
 
