@@ -131,25 +131,14 @@ public class HttpClientProvider
 	}
 
 	/**
-	 * Returns the limiter for the given endpoint address, creating one with the
-	 * default limit if none exists.
-	 *
-	 * @param endpointAddress endpoint address
-	 * @return limiter for the endpoint address
-	 */
-	private static Semaphore getOrCreateEndpointLimiter( final String endpointAddress ) {
-		return LIMITERS_BY_ENDPOINT_ADDRESS.computeIfAbsent( endpointAddress, k -> new Semaphore(defaultMaxParallelRequests, true) );
-	}
-
-	/**
-	 * Resolves the endpoint address for the given URI.
+	 * Resolves the concurrency limiter for the given URI.
 	 *
 	 * <p>
-	 * If the URI has no path, or only the root path {@code "/"}, the origin (scheme
-	 * + authority) is returned. Otherwise, the method progressively removes path
-	 * segments while checking for a registered endpoint address, falling back to
-	 * the origin if none is found. Trailing slashes are removed before matching
-	 * endpoint addresses.
+	 * If the URI has no path, or only the root path {@code "/"}, the limiter for
+	 * the origin (scheme + authority) is returned, creating a default limiter if
+	 * none exists. Otherwise, the method progressively removes path segments while
+	 * checking for a registered limiter, falling back to the origin if none is
+	 * found. Trailing slashes are removed before matching endpoint addresses.
 	 * </p>
 	 *
 	 * <p>
@@ -162,15 +151,20 @@ public class HttpClientProvider
 	 * <li>{@code http://example.org}</li>
 	 * </ul>
 	 *
+	 * <p>
+	 * If no limiter is registered for any of the above, a default limiter is
+	 * created for the origin and returned.
+	 * </p>
+	 *
 	 * @param uri the request URI
-	 * @return the most specific matching endpoint address, or the origin if none
-	 *         matches
+	 * @return the most specific matching limiter, or a default limiter for the
+	 *         origin if none is found
 	 */
-	private static String resolveEndpointAddress( final URI uri ) {
+	private static Semaphore resolveLimiter( final URI uri ) {
 		final String origin = uri.getScheme() + "://" + uri.getAuthority();
 
 		if ( uri.getPath() == null || uri.getPath().isEmpty() || uri.getPath().equals( "/" ) ) {
-			return origin;
+			return LIMITERS_BY_ENDPOINT_ADDRESS.computeIfAbsent( origin, k -> newDefaultLimiter() );
 		}
 
 		String candidate = origin + uri.getPath();
@@ -180,8 +174,9 @@ public class HttpClientProvider
 		}
 
 		while ( candidate.length() >= origin.length() ) {
-			if ( LIMITERS_BY_ENDPOINT_ADDRESS.containsKey(candidate) ) {
-				return candidate;
+			final Semaphore limiter = LIMITERS_BY_ENDPOINT_ADDRESS.get(candidate);
+			if ( limiter != null ) {
+				return limiter;
 			}
 
 			final int lastSlash = candidate.lastIndexOf('/');
@@ -191,7 +186,21 @@ public class HttpClientProvider
 			candidate = candidate.substring(0, lastSlash);
 		}
 
-		return origin;
+		return LIMITERS_BY_ENDPOINT_ADDRESS.computeIfAbsent( origin, k -> newDefaultLimiter() );
+	}
+
+	/**
+	 * Creates a new default concurrency limiter.
+	 *
+	 * <p>
+	 * The returned limiter enforces the current {@link #defaultMaxParallelRequests}
+	 * and uses a fair (FIFO) scheduling policy.
+	 * </p>
+	 *
+	 * @return a new {@link Semaphore} configured with the default concurrency limit
+	 */
+	private static Semaphore newDefaultLimiter() {
+		return new Semaphore( defaultMaxParallelRequests, true );
 	}
 
 	/**
@@ -224,8 +233,7 @@ public class HttpClientProvider
 		public <T> HttpResponse<T> send( final HttpRequest request,
 		                                 final HttpResponse.BodyHandler<T> responseBodyHandler )
 				throws IOException, InterruptedException {
-			final String endpointAddress = resolveEndpointAddress( request.uri() );
-			final Semaphore limiter = getOrCreateEndpointLimiter(endpointAddress);
+			final Semaphore limiter = resolveLimiter( request.uri() );
 			limiter.acquire();
 			try {
 				return delegate.send(request, responseBodyHandler);
@@ -237,8 +245,7 @@ public class HttpClientProvider
 		@Override
 		public <T> CompletableFuture<HttpResponse<T>> sendAsync( final HttpRequest request,
 		                                                         final HttpResponse.BodyHandler<T> responseBodyHandler ) {
-			final String endpointAddress = resolveEndpointAddress( request.uri() );
-			final Semaphore limiter = getOrCreateEndpointLimiter(endpointAddress);
+			final Semaphore limiter = resolveLimiter( request.uri() );
 
 			try {
 				limiter.acquire();
@@ -256,8 +263,7 @@ public class HttpClientProvider
 		public <T> CompletableFuture<HttpResponse<T>> sendAsync( final HttpRequest request,
 		                                                         final HttpResponse.BodyHandler<T> responseBodyHandler,
 		                                                         final HttpResponse.PushPromiseHandler<T> pushPromiseHandler ) {
-			final String endpointAddress = resolveEndpointAddress( request.uri() );
-			final Semaphore limiter = getOrCreateEndpointLimiter(endpointAddress);
+			final Semaphore limiter = resolveLimiter( request.uri() );
 			try {
 				limiter.acquire();
 			} catch ( InterruptedException e ) {
