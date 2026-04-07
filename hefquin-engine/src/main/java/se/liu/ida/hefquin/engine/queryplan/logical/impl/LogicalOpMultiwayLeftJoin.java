@@ -14,13 +14,31 @@ import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
  * Hence, it is not to be confused with nested OPTIONAL clauses (which would,
  * instead, be captured as multiple nested multiway left joins).
  */
-public class LogicalOpMultiwayLeftJoin implements NaryLogicalOp
+public class LogicalOpMultiwayLeftJoin extends BaseForLogicalOps implements NaryLogicalOp
 {
-	protected static LogicalOpMultiwayLeftJoin singleton = new LogicalOpMultiwayLeftJoin();
+	protected static final LogicalOpMultiwayLeftJoin singletonWithoutReduction = new LogicalOpMultiwayLeftJoin(false);
+	protected static final LogicalOpMultiwayLeftJoin singletonThatMayReduce  = new LogicalOpMultiwayLeftJoin(true);
 
-	public static LogicalOpMultiwayLeftJoin getInstance() { return singleton; }
+	public static LogicalOpMultiwayLeftJoin getInstance( final boolean mayReduce ) {
+		return mayReduce ? singletonThatMayReduce : singletonWithoutReduction;
+	}
 
-	protected LogicalOpMultiwayLeftJoin() {}
+	/**
+	 * Returns the singleton instance of {@link LogicalOpMultiwayLeftJoin} that does <em>not</em>
+	 * reduce duplicates.
+	 *
+	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
+	 * {@code false}.
+	 *
+	 * @return the singleton instance that does not reduce duplicates
+	 */
+	public static LogicalOpMultiwayLeftJoin getInstance() {
+		return singletonWithoutReduction;
+	}
+
+	protected LogicalOpMultiwayLeftJoin( final boolean mayReduce ) {
+		super( mayReduce );
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
@@ -41,7 +59,8 @@ public class LogicalOpMultiwayLeftJoin implements NaryLogicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpMultiwayLeftJoin; 
+		return o instanceof LogicalOpMultiwayLeftJoin oo
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override

@@ -9,13 +9,31 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpMultiwayJoin implements NaryLogicalOp
+public class LogicalOpMultiwayJoin extends BaseForLogicalOps implements NaryLogicalOp
 {
-	protected static LogicalOpMultiwayJoin singleton = new LogicalOpMultiwayJoin();
+	protected static final LogicalOpMultiwayJoin singletonWithoutReduction = new LogicalOpMultiwayJoin(false);
+	protected static final LogicalOpMultiwayJoin singletonThatMayReduce  = new LogicalOpMultiwayJoin(true);
 
-	public static LogicalOpMultiwayJoin getInstance() { return singleton; }
+	public static LogicalOpMultiwayJoin getInstance( final boolean mayReduce ) {
+		return mayReduce ? singletonThatMayReduce : singletonWithoutReduction;
+	}
 
-	protected LogicalOpMultiwayJoin() {}
+	/**
+	 * Returns the singleton instance of {@link LogicalOpMultiwayJoin} that does <em>not</em>
+	 * reduce duplicates.
+	 *
+	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
+	 * {@code false}.
+	 *
+	 * @return the singleton instance that does not reduce duplicates
+	 */
+	public static LogicalOpMultiwayJoin getInstance() {
+		return singletonWithoutReduction;
+	}
+
+	protected LogicalOpMultiwayJoin( final boolean mayReduce ) {
+		super( mayReduce );
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
@@ -36,7 +54,8 @@ public class LogicalOpMultiwayJoin implements NaryLogicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpMultiwayJoin; 
+		return o instanceof LogicalOpMultiwayJoin oo
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override

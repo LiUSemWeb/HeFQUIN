@@ -50,20 +50,22 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, false,  new SPARQLRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false,  new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+				false,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 				null );
 
 		final LogicalPlan unionPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
+				false,
 				joinSubPlan,
 				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
 				null );
@@ -106,20 +108,22 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false,  new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false,  new SPARQLRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+				false,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 				null );
 
 		final LogicalPlan unionPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
+				false,
 				joinSubPlan,
 				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
 				null );
@@ -164,20 +168,22 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new TriplePatternRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+				false,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 				null );
 
 		final LogicalPlan unionPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
+				false,
 				joinSubPlan,
 				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
 				null );
@@ -211,15 +217,16 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -276,15 +283,16 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fm = new SPARQLEndpointForTest("http://exA.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fm, false,  new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -323,15 +331,16 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new TriplePatternRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -364,15 +373,16 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, new SPARQLRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayUnion(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -407,7 +417,7 @@ public class MergeRequestsTest extends EngineTestBase
 				assertEquals( 2, resultSubUnion.getNumberOfSubPatterns() );
 				assertTrue( resultSubUnion.getSubPatterns(0) == tp1 || resultSubUnion.getSubPatterns(0) == tp2 );
 				if ( resultSubUnion.getSubPatterns(0) == tp1 ) {
-					assertTrue( resultSubUnion.getSubPatterns(1) == tp2 );					
+					assertTrue( resultSubUnion.getSubPatterns(1) == tp2 );
 				}
 				else {
 					assertTrue( resultSubUnion.getSubPatterns(1) == tp1 );
@@ -433,15 +443,16 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, new TriplePatternRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, new TriplePatternRequestImpl(tp2) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, new SPARQLRequestImpl(tp3) );
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
 
 		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayUnion(
+				false,
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
@@ -469,12 +480,12 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fm = new SPARQLEndpointForTest("http://exA.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
 
 		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(
-				new LogicalOpGPAdd(fm, tp2, null),
+				new LogicalOpGPAdd(fm, tp2, null, false),
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp, null) );
 
@@ -508,12 +519,12 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
 
 		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(
-				new LogicalOpGPAdd(fm, tp2, null),
+				new LogicalOpGPAdd(fm, tp2, null, false),
 				null,
 				new LogicalPlanWithNullaryRootImpl(reqOp, null) );
 

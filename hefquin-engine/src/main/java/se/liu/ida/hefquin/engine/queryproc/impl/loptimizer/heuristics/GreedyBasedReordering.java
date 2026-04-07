@@ -50,6 +50,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
 
         final LogicalPlan newPlan;
         final LogicalOperator rootOp = inputPlan.getRootOperator();
+		final boolean mayReduce = rootOp.mayReduce();
         if ( noChanges )
             newPlan = inputPlan;
         else
@@ -59,12 +60,12 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
 
         if (    rootOp instanceof LogicalOpJoin
              || rootOp instanceof LogicalOpMultiwayJoin )
-            return reorderSubPlans(newPlan);
+            return reorderSubPlans(mayReduce, newPlan);
         else
             return newPlan;
     }
 
-    protected LogicalPlan reorderSubPlans( final LogicalPlan inputPlan ) {
+    protected LogicalPlan reorderSubPlans( final boolean mayReduce, final LogicalPlan inputPlan ) {
         // Initialize candidatePlans
         final List<QueryAnalyzer> candidatePlans = new ArrayList<>();
         for ( int i = 0; i < inputPlan.numberOfSubPlans(); i ++ ) {
@@ -80,7 +81,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
             candidatePlans.remove(bestSubPlan);
         }
 
-        return constructBinaryPlan(selectedSubPlans);
+        return constructBinaryPlan(mayReduce, selectedSubPlans);
     }
 
     protected QueryAnalyzer findNextPlan( final List<QueryAnalyzer> selectedSubPlans, final List<QueryAnalyzer> candidatePlans ) {
@@ -96,12 +97,12 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         return bestSubPlan;
     }
 
-    protected LogicalPlan constructBinaryPlan( final List<QueryAnalyzer> selectedSubPlans ) {
+    protected LogicalPlan constructBinaryPlan( final boolean mayReduce, final List<QueryAnalyzer> selectedSubPlans ) {
         final List<LogicalPlan> subPlans = new ArrayList<>( selectedSubPlans.size() );
         for ( final QueryAnalyzer query: selectedSubPlans  ) {
             subPlans.add( query.getPlan() );
         }
-        return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans, null);
+        return LogicalPlanUtils.createPlanWithMultiwayJoin(mayReduce, subPlans, null);
     }
 
 }

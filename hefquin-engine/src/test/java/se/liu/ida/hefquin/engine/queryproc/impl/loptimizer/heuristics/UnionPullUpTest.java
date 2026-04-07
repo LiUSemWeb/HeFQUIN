@@ -58,7 +58,7 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> plansWithNonUnionRoot = new ArrayList<>();
 		plansWithNonUnionRoot.add(lp5);
 
-		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithUnionRootAndUnionChild(plansWithUnionRoot, plansWithNonUnionRoot);
+		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithUnionRootAndUnionChild(false, plansWithUnionRoot, plansWithNonUnionRoot);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
 		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
@@ -102,7 +102,7 @@ public class UnionPullUpTest extends EngineTestBase
 		final List<LogicalPlan> plansWithNonUnionRoot = new ArrayList<>();
 		plansWithNonUnionRoot.add(lp5);
 
-		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithJoinOverUnion(plansWithUnionRoot, plansWithNonUnionRoot);
+		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithJoinOverUnion(false, plansWithUnionRoot, plansWithNonUnionRoot);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
 		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
@@ -151,7 +151,7 @@ public class UnionPullUpTest extends EngineTestBase
 		plansWithNonUnionRoot.add(lp2);
 		plansWithNonUnionRoot.add(lp3);
 
-		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithJoinOverUnion(plansWithUnionRoot, plansWithNonUnionRoot);
+		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithJoinOverUnion(false, plansWithUnionRoot, plansWithNonUnionRoot);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
 		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
@@ -191,9 +191,9 @@ public class UnionPullUpTest extends EngineTestBase
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans );
 
-		final UnaryLogicalOp rootOp = new LogicalOpFilter( Expr.NONE );
+		final UnaryLogicalOp rootOp = new LogicalOpFilter( Expr.NONE, false );
 
-		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithUnaryRootAndUnionChild(rootOp, unionPlan);
+		final LogicalPlan resultPlan = new UnionPullUp().rewritePlanWithUnaryRootAndUnionChild(false, rootOp, unionPlan);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
 		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
@@ -276,7 +276,7 @@ public class UnionPullUpTest extends EngineTestBase
 
 		assertTrue(join13Found);
 		assertTrue(join23Found);
-		
+
 	}
 
 	@Test
@@ -403,10 +403,10 @@ public class UnionPullUpTest extends EngineTestBase
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans );
 
-		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
+		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, false );
 		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, null, unionPlan);
 
-		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
+		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, false );
 		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, null, gpAddPlan1);
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(gpAddPlan2);
@@ -459,13 +459,13 @@ public class UnionPullUpTest extends EngineTestBase
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, subPlans );
 
-		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
+		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, false );
 		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, null, unionPlan);
 
-		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
+		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null, false );
 		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, null, gpAddPlan1);
 
-		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null);
+		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null, false);
 		final LogicalPlan l2gPlan = new LogicalPlanWithUnaryRootImpl(l2g, null, gpAddPlan2);
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(l2gPlan);
@@ -535,6 +535,7 @@ public class UnionPullUpTest extends EngineTestBase
 	protected static class DummyLogicalOp implements NullaryLogicalOp {
 		@Override public void visit(LogicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
 		@Override public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
+		@Override public boolean mayReduce() { return false; }
 	}
 
 	protected static class DummyTriplePattern extends TriplePatternImpl {
