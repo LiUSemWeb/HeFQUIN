@@ -153,7 +153,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final ChronicleMapCacheKey key;
 		try {
-			key = new ChronicleMapCacheKey( req, fm, ChronicleMapCacheKey.ResponseMode.RESULT );
+			key = new ChronicleMapCacheKey( req, fm, ResponseMode.RESULT );
 		} catch ( IllegalArgumentException e ) {
 			// Key creation not supported, skip cache usage
 			return fedAccMan.issueRequest(req, fm);
