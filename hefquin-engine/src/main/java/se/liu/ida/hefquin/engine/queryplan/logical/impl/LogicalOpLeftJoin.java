@@ -9,13 +9,31 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
-public class LogicalOpLeftJoin implements BinaryLogicalOp
+public class LogicalOpLeftJoin extends BaseForLogicalOps implements BinaryLogicalOp
 {
-	protected static LogicalOpLeftJoin singleton = new LogicalOpLeftJoin();
+	protected static final LogicalOpLeftJoin singletonWithoutReduction = new LogicalOpLeftJoin(false);
+	protected static final LogicalOpLeftJoin singletonThatMayReduce  = new LogicalOpLeftJoin(true);
 
-	public static LogicalOpLeftJoin getInstance() { return singleton; }
+	public static LogicalOpLeftJoin getInstance( final boolean mayReduce ) {
+		return mayReduce ? singletonThatMayReduce : singletonWithoutReduction;
+	}
 
-	protected LogicalOpLeftJoin() {}
+	/**
+	 * Returns the singleton instance of {@link LogicalOpLeftJoin} that does <em>not</em>
+	 * reduce duplicates.
+	 *
+	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
+	 * {@code false}.
+	 *
+	 * @return the singleton instance that does not reduce duplicates
+	 */
+	public static LogicalOpLeftJoin getInstance() {
+		return singletonWithoutReduction;
+	}
+
+	protected LogicalOpLeftJoin( final boolean mayReduce ) {
+		super( mayReduce );
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
@@ -42,7 +60,8 @@ public class LogicalOpLeftJoin implements BinaryLogicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpLeftJoin; 
+		return o instanceof LogicalOpLeftJoin oo
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override

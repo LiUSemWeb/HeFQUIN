@@ -25,14 +25,14 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * )
  * </code>
  * <br/>
- * 
+ *
  * In this case, the join can be implemented only by using a local join
  * algorithm (e.g., symmetric hash join), which also means that the two
  * requests within the union are executed by physical request operators
  * and, thus, end up retrieving all triples from fm2 and from fm3.
  * In contrast, after pulling up the union operator, the resulting plan
  * is:
- * 
+ *
  * <br/>
  * <code>
  * mu(
@@ -47,10 +47,10 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * )
  * </code>
  * <br/>
- * 
+ *
  * Now, the two joins can be turned into bind joins, and it is even possible
  * to pick two different join strategies for them.
- * 
+ *
  * Attention: It has turned out that UnionPullUp typically does more harm
  * than good, because it has the tendency to turn a join-over-union source
  * assignment into a (multiway) union with many join subplans (in particular
@@ -89,7 +89,7 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 			else
 				rewrittenSubPlansWithNonUnionRoot.add(rewrittenSubPlan);
 
-			if ( ! subPlansDiffer ) { // check for equivalence only if necessary 
+			if ( ! subPlansDiffer ) { // check for equivalence only if necessary
 				if ( ! subPlan.equals(rewrittenSubPlan) )
 					subPlansDiffer = true;
 			}
@@ -97,6 +97,7 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 
 		// Next, apply the heuristic to the root of the plan if possible.
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
+		final boolean mayReduce = rootOp.mayReduce();
 		if (    rootOp instanceof LogicalOpGPAdd
 		     || rootOp instanceof LogicalOpGPOptAdd
 		     || rootOp instanceof LogicalOpFilter
@@ -108,19 +109,22 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 			// then pull up the union (i.e., push the unary operator to be the
 			// root of each of the children of the union).
 			if ( ! rewrittenSubPlansWithUnionRoot.isEmpty() )
-				return rewritePlanWithUnaryRootAndUnionChild( (UnaryLogicalOp) rootOp,
+				return rewritePlanWithUnaryRootAndUnionChild( mayReduce,
+				                                              (UnaryLogicalOp) rootOp,
 				                                              rewrittenSubPlansWithUnionRoot.get(0) );
 		}
 		else if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion )
 		{
 			if ( ! rewrittenSubPlansWithUnionRoot.isEmpty() )
-				return rewritePlanWithUnionRootAndUnionChild( rewrittenSubPlansWithUnionRoot,
+				return rewritePlanWithUnionRootAndUnionChild( mayReduce,
+				                                              rewrittenSubPlansWithUnionRoot,
 				                                              rewrittenSubPlansWithNonUnionRoot );
 		}
 		else if ( rootOp instanceof LogicalOpJoin || rootOp instanceof LogicalOpMultiwayJoin )
 		{
 			if ( ! rewrittenSubPlansWithUnionRoot.isEmpty() )
-				return rewritePlanWithJoinOverUnion( rewrittenSubPlansWithUnionRoot,
+				return rewritePlanWithJoinOverUnion( mayReduce,
+				                                     rewrittenSubPlansWithUnionRoot,
 				                                     rewrittenSubPlansWithNonUnionRoot );
 		}
 		else if ( rootOp instanceof LogicalOpLeftJoin )
@@ -170,7 +174,8 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 	 * the given unary operator to be the root of each of the children of
 	 * the union.
 	 */
-	public LogicalPlan rewritePlanWithUnaryRootAndUnionChild( final UnaryLogicalOp rootOp,
+	public LogicalPlan rewritePlanWithUnaryRootAndUnionChild( final boolean mayReduce,
+	                                                          final UnaryLogicalOp rootOp,
 	                                                          final LogicalPlan subPlan ) {
 		final int numberOfSubPlansUnderUnion = subPlan.numberOfSubPlans();
 		final List<LogicalPlan> newSubPlans = new ArrayList<>(numberOfSubPlansUnderUnion);
@@ -184,7 +189,7 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 			newSubPlans.add(newSubPlan);
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayUnion(newSubPlans, null);
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(mayReduce, newSubPlans, null);
 	}
 
 	/**
@@ -195,7 +200,8 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 	 * union-rooted plans as its subplans, together with all the plans given
 	 * in the other list (plansWithNonUnionRoot).
 	 */
-	public LogicalPlan rewritePlanWithUnionRootAndUnionChild( final List<LogicalPlan> plansWithUnionRoot,
+	public LogicalPlan rewritePlanWithUnionRootAndUnionChild( final boolean mayReduce,
+	                                                          final List<LogicalPlan> plansWithUnionRoot,
 	                                                          final List<LogicalPlan> plansWithNonUnionRoot ) {
 		final List<LogicalPlan> newSubPlans = new ArrayList<>();
 
@@ -208,7 +214,7 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 
 		newSubPlans.addAll(plansWithNonUnionRoot);
 
-		return LogicalPlanUtils.createPlanWithMultiwayUnion(newSubPlans, null);
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(mayReduce, newSubPlans, null);
 	}
 
 	/**
@@ -218,7 +224,8 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 	 * all their subplans with one another, and also with all the plans given
 	 * in the other list (plansWithNonUnionRoot).
 	 */
-	public LogicalPlan rewritePlanWithJoinOverUnion( final List<LogicalPlan> plansWithUnionRoot,
+	public LogicalPlan rewritePlanWithJoinOverUnion( final boolean mayReduce,
+	                                                 final List<LogicalPlan> plansWithUnionRoot,
 	                                                 final List<LogicalPlan> plansWithNonUnionRoot ) {
 		final Iterator<LogicalPlan> it = plansWithUnionRoot.iterator();
 
@@ -249,10 +256,10 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 		for ( final List<LogicalPlan> join : unionsOverJoins ) {
 			join.addAll(plansWithNonUnionRoot);
 
-			newSubPlans.add( LogicalPlanUtils.createPlanWithMultiwayJoin(join,null) );
+			newSubPlans.add( LogicalPlanUtils.createPlanWithMultiwayJoin(mayReduce, join, null) );
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayUnion(newSubPlans, null); 
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(mayReduce, newSubPlans, null);
 	}
 
 }

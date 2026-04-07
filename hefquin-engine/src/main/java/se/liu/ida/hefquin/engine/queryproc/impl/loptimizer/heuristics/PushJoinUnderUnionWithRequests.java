@@ -39,7 +39,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * )
  * </code>
  * <br/>
- * 
+ *
  * In this case, the joins can be implemented only by using a local join
  * algorithm (e.g., symmetric hash join), which also means that the requests
  * inside the unions are executed by physical request operators and, thus,
@@ -156,6 +156,7 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 		}
 
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
+		final boolean mayReduce = rootOp.mayReduce();
 		if (    !(rootOp instanceof LogicalOpJoin)
 		     && !(rootOp instanceof LogicalOpMultiwayJoin) )
 		{
@@ -185,7 +186,7 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 					subPlansAsNextInput.add( currSubPlan.getSubPlan(0) );
 				}
 				else {
-					final LogicalPlan currSubPlanNew = rewrite(currSubPlan, subPlansAsNextInput);
+					final LogicalPlan currSubPlanNew = rewrite(mayReduce, currSubPlan, subPlansAsNextInput);
 
 					subPlansAsNextInput = new ArrayList<>();
 					subPlansAsNextInput.add(currSubPlanNew);
@@ -202,16 +203,18 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 
 		if ( subPlansAsNextInput.size() == 1 ) return subPlansAsNextInput.get(0);
 
-		return LogicalPlanUtils.createPlanWithMultiwayJoin( subPlansAsNextInput,
+		return LogicalPlanUtils.createPlanWithMultiwayJoin( mayReduce,
+		                                                    subPlansAsNextInput,
 		                                                    null );
 	}
 
-	protected LogicalPlan rewrite( final LogicalPlan unionPlan, final List<LogicalPlan> subPlansAsInput ) {
+	protected LogicalPlan rewrite( final boolean mayReduce, final LogicalPlan unionPlan, final List<LogicalPlan> subPlansAsInput ) {
 		final LogicalPlan inputPlan;
 		if ( subPlansAsInput.size() == 1 )
 			inputPlan = subPlansAsInput.get(0);
 		else
-			inputPlan = LogicalPlanUtils.createPlanWithMultiwayJoin( subPlansAsInput,
+			inputPlan = LogicalPlanUtils.createPlanWithMultiwayJoin( mayReduce,
+			                                                         subPlansAsInput,
 			                                                         null );
 
 		final int numberOfSubPlansUnderUnion = unionPlan.numberOfSubPlans();
@@ -236,7 +239,7 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 			}
 			else if ( oldSubPlanRootOp instanceof LogicalOpLocalToGlobal l2gLop
 					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest ) {
-				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping() );
+				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping(), mayReduce );
 				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, null, inputPlan );
 
 				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?, ?>) oldSubPlan.getSubPlan(0).getRootOperator();
@@ -249,7 +252,7 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpLocalToGlobal
 					&& oldSubPlan.getSubPlan(0).getSubPlan(0).getRootOperator() instanceof LogicalOpRequest ) {
 				final LogicalOpLocalToGlobal l2gLop = (LogicalOpLocalToGlobal) oldSubPlan.getSubPlan(0).getRootOperator();
-				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping() );
+				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping(), mayReduce );
 				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, null, inputPlan );
 
 				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?, ?>) oldSubPlan.getSubPlan(0).getSubPlan(0).getRootOperator();
@@ -260,13 +263,13 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 				newSubPlan = new LogicalPlanWithUnaryRootImpl( filterOp, null, l2gOpPlan );
 			}
 			else {
-				newSubPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(null, inputPlan, oldSubPlan);
+				newSubPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(mayReduce, null, inputPlan, oldSubPlan);
 			}
 
-			newUnionSubPlans[i] = newSubPlan; 
+			newUnionSubPlans[i] = newSubPlan;
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayUnion(null, newUnionSubPlans);
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(mayReduce, null, newUnionSubPlans);
 	}
 
 }
