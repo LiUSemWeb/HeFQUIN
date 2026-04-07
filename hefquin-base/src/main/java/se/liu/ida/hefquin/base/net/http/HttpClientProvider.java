@@ -127,7 +127,10 @@ public class HttpClientProvider
 		if ( maxParallelRequests <= 0 ) {
 			throw new IllegalArgumentException("maxParallelRequests must be greater than zero");
 		}
-		LIMITERS_BY_ENDPOINT_ADDRESS.put( endpointAddress, new Semaphore(maxParallelRequests, true) );
+		final String url = endpointAddress.endsWith( "/" )
+				? endpointAddress.substring( 0, endpointAddress.length() - 1 )
+				: endpointAddress;
+		LIMITERS_BY_ENDPOINT_ADDRESS.put( url, new Semaphore(maxParallelRequests, true) );
 	}
 
 	/**
