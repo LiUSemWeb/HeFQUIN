@@ -22,7 +22,7 @@ public class HttpClientProviderTest
 {
 	protected static HttpServer server;
 	protected static String url;
-	protected static final long REQUEST_DURATION = 100;
+	protected static final long REQUEST_DURATION = 50;
 	/**
 	 * Extra time buffer added to timing assertions to reduce flakiness caused by
 	 * thread scheduling, GC pauses, OS variability etc.
