@@ -35,7 +35,7 @@ public class PhysicalOpProject implements UnaryPhysicalOpForLogicalOp
 	}
 
 	@Override
-	public UnaryLogicalOp getLogicalOperator() {
+	public LogicalOpProject getLogicalOperator() {
 		return lop;
 	}
 
@@ -43,7 +43,8 @@ public class PhysicalOpProject implements UnaryPhysicalOpForLogicalOp
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof PhysicalOpProject;
+		return    o instanceof PhysicalOpProject oo
+		       && oo.lop.equals(lop);
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public class PhysicalOpProject implements UnaryPhysicalOpForLogicalOp
 
 	@Override
 	public String toString() {
-		return "project";
+		return lop.toString();
 	}
 
 	public static class Factory implements PhysicalOpFactory
