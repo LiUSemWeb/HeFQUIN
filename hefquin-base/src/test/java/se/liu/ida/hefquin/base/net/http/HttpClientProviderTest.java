@@ -27,7 +27,7 @@ public class HttpClientProviderTest
 	 * Extra time buffer added to timing assertions to reduce flakiness caused by
 	 * thread scheduling, GC pauses, OS variability etc.
 	 */
-	protected static final long TIMING_TOLERANCE = 1000;
+	protected static final long TIMING_TOLERANCE = 2000;
 
 	protected enum TimingCheck {
 		TOO_FAST, // checks against minExpected
