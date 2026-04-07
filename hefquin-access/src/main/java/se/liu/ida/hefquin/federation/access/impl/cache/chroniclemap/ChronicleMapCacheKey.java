@@ -88,7 +88,7 @@ public class ChronicleMapCacheKey implements Serializable {
 	 * SHA-256 digests are identical.
 	 */
 	@Override
-	public boolean equals( Object obj ) {
+	public boolean equals( final Object obj ) {
 		if ( this == obj )
 			return true;
 		if ( obj == null || getClass() != obj.getClass() )
