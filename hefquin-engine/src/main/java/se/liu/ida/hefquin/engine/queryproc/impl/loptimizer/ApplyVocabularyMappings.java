@@ -246,8 +246,10 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 
 		@Override
 		public void visit( final LogicalOpProject op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
+			rewrittenPlan = new LogicalPlanWithUnaryRootImpl( op,
+			                                                  null,
+			                                                  rewrittenSubPlan );
 		}
 	}
 
