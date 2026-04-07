@@ -91,10 +91,11 @@ public class ChronicleMapCacheKey implements Serializable {
 	public boolean equals( final Object obj ) {
 		if ( this == obj )
 			return true;
-		if ( obj == null || getClass() != obj.getClass() )
+		if ( obj == null )
 			return false;
-		final ChronicleMapCacheKey other = (ChronicleMapCacheKey) obj;
-		return Arrays.equals(requestDigest, other.requestDigest);
+
+		return    ( obj instanceof ChronicleMapCacheKey other )
+		       && Arrays.equals(requestDigest, other.requestDigest);
 	}
 
 	/**
