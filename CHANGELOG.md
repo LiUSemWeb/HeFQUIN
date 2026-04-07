@@ -7,7 +7,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- Support limits on the number of parallel request that can be executed against a specific endpoint/server ([#553](https://github.com/LiUSemWeb/HeFQUIN/pull/553))
+- Adding a limit on the number of parallel requests that are executed against any particular endpoint/server at any point in time ([#556](https://github.com/LiUSemWeb/HeFQUIN/pull/556))
 - Support for DISTINCT directly within the HeFQUIN engine ([#547](https://github.com/LiUSemWeb/HeFQUIN/pull/547), [#550](https://github.com/LiUSemWeb/HeFQUIN/pull/550), [#555](https://github.com/LiUSemWeb/HeFQUIN/pull/555), [#558](https://github.com/LiUSemWeb/HeFQUIN/pull/558)).
 - Adding a new hash join algorithm and a (logical) left join operator; removing the right join operator ([#561](https://github.com/LiUSemWeb/HeFQUIN/pull/561)).
 ### Changed
