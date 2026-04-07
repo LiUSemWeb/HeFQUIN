@@ -23,6 +23,8 @@ import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint.DataConversionException;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
+import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpression;
+import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpressionImpl;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpExtend;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
 import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtendExprConstant;
@@ -82,7 +84,7 @@ public class WrappedRESTEndpointImplTest
 		                                    createMappingExpressionForTests() );
 	}
 
-	protected MappingOperator createMappingExpressionForTests() {
+	protected MappingExpression createMappingExpressionForTests() {
 		final SourceReference sr = new SourceReference() {};
 		final JsonPathQuery query = new JsonPathQuery("$.current");
 
@@ -93,22 +95,28 @@ public class WrappedRESTEndpointImplTest
 
 		final MappingOperator op1 = new MappingOpExtractJSON(sr, query, P1);
 		final MappingOperator op2 = new MappingOpExtractJSON(sr, query, P2);
+		final MappingExpression expr1 = new MappingExpressionImpl(op1);
+		final MappingExpression expr2 = new MappingExpressionImpl(op2);
 
 		final Node bnodeLabel = NodeFactory.createLiteralString("b");
 		final ExtendExpression expr = new ExtendExprFunction( ExtnFct_ToBNode.instance,
 		                                                      new ExtendExprConstant(bnodeLabel) );
 		final MappingOperator op1S = new MappingOpExtend(op1, expr, MappingRelation.sAttr);
 		final MappingOperator op2S = new MappingOpExtend(op2, expr, MappingRelation.sAttr);
+		final MappingExpression expr1S = new MappingExpressionImpl(op1S, expr1);
+		final MappingExpression expr2S = new MappingExpressionImpl(op2S, expr2);
 
 		final Node uri1 = NodeFactory.createURI("http://example.org/temperature");
 		final Node uri2 = NodeFactory.createURI("http://example.org/windSpeed");
-		final ExtendExpression expr1 = new ExtendExprConstant(uri1);
-		final ExtendExpression expr2 = new ExtendExprConstant(uri2);
-		final MappingOperator op1P = new MappingOpExtend(op1S, expr1, MappingRelation.pAttr);
-		final MappingOperator op2P = new MappingOpExtend(op2S, expr2, MappingRelation.pAttr);
+		final ExtendExpression extExpr1 = new ExtendExprConstant(uri1);
+		final ExtendExpression extExpr2 = new ExtendExprConstant(uri2);
+		final MappingOperator op1P = new MappingOpExtend(op1S, extExpr1, MappingRelation.pAttr);
+		final MappingOperator op2P = new MappingOpExtend(op2S, extExpr2, MappingRelation.pAttr);
+		final MappingExpression expr1P = new MappingExpressionImpl(op1P, expr1S);
+		final MappingExpression expr2P = new MappingExpressionImpl(op2P, expr2S);
 
 		final MappingOperator op = new MappingOpUnion(op1P, op2P);
-		return op;
+		return new MappingExpressionImpl(op, expr1P, expr2P);
 	}
 
 }
