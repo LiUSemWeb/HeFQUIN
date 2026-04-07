@@ -47,10 +47,4 @@ public class MappingOpConstant extends BaseForMappingOperator
 	public boolean isValidInput( final Map<SourceReference, DataObject> srMap ) {
 		return true;
 	}
-
-	@Override
-	public MappingRelation evaluate( final Map<SourceReference, DataObject> srMap ) {
-		return r;
-	}
-
 }

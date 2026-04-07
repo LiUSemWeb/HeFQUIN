@@ -10,7 +10,6 @@ import org.apache.jena.atlas.lib.Pair;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperatorVisitor;
-import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.sources.DataObject;
 import se.liu.ida.hefquin.mappings.sources.SourceReference;
 
@@ -86,11 +85,5 @@ public class MappingOpJoin extends BaseForBinaryMappingOperator
 	@Override
 	public boolean isValidInput( final Map<SourceReference, DataObject> srMap ) {
 		return subOp1.isValidInput(srMap) && subOp2.isValidInput(srMap);
-	}
-
-	@Override
-	public MappingRelation evaluate( final Map<SourceReference, DataObject> srMap ) {
-		// TODO
-		throw new UnsupportedOperationException();
 	}
 }
