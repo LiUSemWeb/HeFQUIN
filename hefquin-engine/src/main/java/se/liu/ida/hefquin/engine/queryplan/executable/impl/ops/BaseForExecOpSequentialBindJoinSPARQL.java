@@ -21,14 +21,15 @@ public abstract class BaseForExecOpSequentialBindJoinSPARQL extends BaseForExecO
 			final boolean useOuterJoinSemantics,
 			final int batchSize,
 			final boolean collectExceptions,
-			final QueryPlanningInfo qpInfo ) {
-		super(p, p.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
+			final QueryPlanningInfo qpInfo,
+			final boolean mayReduce ) {
+		super(p, p.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo, mayReduce);
 	}
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
 		final SPARQLRequest req = new SPARQLRequestImpl(query);
-		return new ExecOpRequestSPARQL<>(req, fm, false, null);
+		return new ExecOpRequestSPARQL<>(req, fm, false, null, this.mayReduce);
 	}
 
 }

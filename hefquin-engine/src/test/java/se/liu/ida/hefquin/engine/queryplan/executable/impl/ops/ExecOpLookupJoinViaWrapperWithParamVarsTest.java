@@ -303,6 +303,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		                                                    ep,
 		                                                    batchSize,
 		                                                    false,
-		                                                    null );
+		                                                    null,
+		                                                    false );
 	}
 }

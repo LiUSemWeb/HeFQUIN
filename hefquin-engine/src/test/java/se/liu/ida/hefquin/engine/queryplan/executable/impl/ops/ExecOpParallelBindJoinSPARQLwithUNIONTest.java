@@ -142,7 +142,7 @@ public class ExecOpParallelBindJoinSPARQLwithUNIONTest extends TestsForTPAddAlgo
 		return new ExecOpParallelBindJoinSPARQLwithUNION(
 				tp, fm, expectedVariables, useOuterJoinSemantics,
 				ExecOpSequentialBindJoinSPARQLwithVALUES.DEFAULT_BATCH_SIZE,
-				false, null );
+				false, null, false );
 	}
 
 

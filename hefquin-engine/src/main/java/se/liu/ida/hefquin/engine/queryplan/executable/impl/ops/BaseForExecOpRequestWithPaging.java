@@ -24,8 +24,9 @@ public abstract class BaseForExecOpRequestWithPaging<
 	public BaseForExecOpRequestWithPaging( final ReqType req,
 	                                       final MemberType fm,
 	                                       final boolean collectExceptions,
-	                                       final QueryPlanningInfo qpInfo ) {
-		super(req, fm, collectExceptions, qpInfo);
+	                                       final QueryPlanningInfo qpInfo,
+	                                       final boolean mayReduce ) {
+		super(req, fm, collectExceptions, qpInfo, mayReduce);
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public abstract class BaseForExecOpRequestWithPaging<
 
 			// create and issue the request for the next page (processing
 			// the response is done in the 'process' method below, which
-			// may be executed in a separate thread) 
+			// may be executed in a separate thread)
 			final PageReqType pageRequest = createPageRequest(pageNumber);
 			final PageRespType pageResponse;
 			try {

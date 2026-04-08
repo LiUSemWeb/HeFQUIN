@@ -14,8 +14,9 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 
 	public ExecOpMultiwayUnion( final int numberOfChildren,
 	                            final boolean collectExceptions,
-	                            final QueryPlanningInfo qpInfo ) {
-		super(numberOfChildren, collectExceptions, qpInfo);
+	                            final QueryPlanningInfo qpInfo,
+	                            final boolean mayReduce ) {
+		super(numberOfChildren, collectExceptions, qpInfo, mayReduce);
 	}
 
 	@Override

@@ -98,10 +98,13 @@ public class PhysicalOpParallelMultiLeftJoin implements UnaryPhysicalOp
 
 
 	protected final List<LogicalOpRequest<?,?>> optionalParts;
+	protected final boolean mayReduce;
 
-	public PhysicalOpParallelMultiLeftJoin( final List<LogicalOpRequest<?,?>> optionalParts ) {
+	public PhysicalOpParallelMultiLeftJoin( final List<LogicalOpRequest<?,?>> optionalParts,
+	                                        final boolean mayReduce ) {
 		assert ! optionalParts.isEmpty();
 		this.optionalParts = optionalParts;
+		this.mayReduce = mayReduce;
 	}
 
 	@Override
@@ -131,7 +134,7 @@ public class PhysicalOpParallelMultiLeftJoin implements UnaryPhysicalOp
 	                                       final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 1;
 
-		return new ExecOpParallelMultiwayLeftJoin( collectExceptions, qpInfo, inputVars[0], optionalParts );
+		return new ExecOpParallelMultiwayLeftJoin( collectExceptions, qpInfo, inputVars[0], optionalParts, mayReduce );
 	}
 
 	@Override

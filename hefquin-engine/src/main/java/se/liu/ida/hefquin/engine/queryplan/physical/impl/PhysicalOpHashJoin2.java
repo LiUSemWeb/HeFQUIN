@@ -54,7 +54,8 @@ public class PhysicalOpHashJoin2 extends BaseForPhysicalOpBinaryJoin
 		return new ExecOpHashJoin2( inputVars[0], inputVars[1],
 		                            collectExceptions,
 		                            useOuterJoinSemantics,
-		                            qpInfo );
+		                            qpInfo,
+		                            getLogicalOperator().mayReduce() );
 	}
 
 	@Override

@@ -16,8 +16,9 @@ public class ExecOpRequestBRTPF extends BaseForExecOpRequestWithTPFPaging<Bindin
 	public ExecOpRequestBRTPF( final BindingsRestrictedTriplePatternRequest req,
 	                           final BRTPFServer fm,
 	                           final boolean collectExceptions,
-	                           final QueryPlanningInfo qpInfo ) {
-		super(req, fm, collectExceptions, qpInfo);
+	                           final QueryPlanningInfo qpInfo,
+	                           final boolean mayReduce ) {
+		super(req, fm, collectExceptions, qpInfo, mayReduce);
 	}
 
 	@Override

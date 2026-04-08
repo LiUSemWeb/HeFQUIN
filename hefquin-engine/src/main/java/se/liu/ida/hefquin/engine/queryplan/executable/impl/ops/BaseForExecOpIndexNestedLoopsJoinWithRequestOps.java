@@ -24,7 +24,7 @@ import se.liu.ida.hefquin.federation.FederationMember;
  * operators. The possibility to rely on a request operator is particularly
  * useful in cases in which this operator implements paging, because the
  * alternative would be the need to re-implement paging again in the nested
- * loops join algorithm of potential subclasses of this base class. 
+ * loops join algorithm of potential subclasses of this base class.
  *
  * For an abstract base class that issues requests directly (instead of using
  * request operators), use {@link BaseForExecOpIndexNestedLoopsJoinWithRequests}.
@@ -47,8 +47,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	                                                           final boolean useOuterJoinSemantics,
 	                                                           final int minimumInputBlockSize,
 	                                                           final boolean collectExceptions,
-	                                                           final QueryPlanningInfo qpInfo ) {
-		super(minimumInputBlockSize, collectExceptions, qpInfo);
+	                                                           final QueryPlanningInfo qpInfo,
+	                                                           final boolean mayReduce ) {
+		super(minimumInputBlockSize, collectExceptions, qpInfo, mayReduce);
 
 		assert query != null;
 		assert fm != null;

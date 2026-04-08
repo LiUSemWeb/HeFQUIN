@@ -85,7 +85,7 @@ public class ExecOpHashJoin1Test extends TestsForJoinAlgorithms
 		assert inputVars.length == 2;
 		assert useOuterJoinSemantics == false;
 
-		return new ExecOpHashJoin1( inputVars[0], inputVars[1], false, null );
+		return new ExecOpHashJoin1( inputVars[0], inputVars[1], false, null, false );
 	}
 
 }

@@ -34,7 +34,7 @@ public class ExecOpProjectTest
 		final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(var1, URI1);
 		final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(var1, URI1, var2, URI2);
 
-		final ExecOpProject op = new ExecOpProject(variables, false, null);
+		final ExecOpProject op = new ExecOpProject(variables, false, null, false);
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		op.process(sm1, sink, null);
@@ -72,7 +72,7 @@ public class ExecOpProjectTest
 		final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(var1, URI1, var3, URI2);
 		final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(var1, URI1, var2, URI2, var3, URI2);
 
-		final ExecOpProject op = new ExecOpProject(variables, false, null);
+		final ExecOpProject op = new ExecOpProject(variables, false, null, false);
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		op.process(sm1, sink, null);
@@ -117,7 +117,7 @@ public class ExecOpProjectTest
 		final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(var1, URI1, var2, URI2);
 		final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(var1, URI1, var2, URI2);
 
-		final ExecOpProject op = new ExecOpProject(variables, false, null);
+		final ExecOpProject op = new ExecOpProject(variables, false, null, false);
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		op.process(sm1, sink, null);
@@ -161,7 +161,7 @@ public class ExecOpProjectTest
 		final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(var1, URI1);
 		final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(var1, URI1, var2, URI2);
 
-		final ExecOpProject op = new ExecOpProject(variables, false, null);
+		final ExecOpProject op = new ExecOpProject(variables, false, null, false);
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		op.process(sm1, sink, null);

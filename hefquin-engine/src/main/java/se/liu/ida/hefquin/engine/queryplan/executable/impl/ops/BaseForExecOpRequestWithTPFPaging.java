@@ -35,8 +35,9 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 	public BaseForExecOpRequestWithTPFPaging( final ReqType req,
 	                                          final MemberType fm,
 	                                          final boolean collectExceptions,
-	                                          final QueryPlanningInfo qpInfo ) {
-		super(req, fm, collectExceptions, qpInfo);
+	                                          final QueryPlanningInfo qpInfo,
+	                                          final boolean mayReduce ) {
+		super(req, fm, collectExceptions, qpInfo, mayReduce);
 	}
 
 	@Override
@@ -100,7 +101,7 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 
 	protected boolean isLastPage( final TPFResponse response ) throws ExecOpExecutionException {
 		// To check whether the given response is the last page of the TPF
-		// we simply consider the page-related metadata in the response. 
+		// we simply consider the page-related metadata in the response.
 		final Boolean isLastPage = response.isLastPage();
 		if ( isLastPage != null ) {
 			return isLastPage.booleanValue();

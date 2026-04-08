@@ -55,8 +55,9 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
     public ExecOpSymmetricHashJoin( final ExpectedVariables inputVars1,
                                     final ExpectedVariables inputVars2,
                                     final boolean collectExceptions,
-                                    final QueryPlanningInfo qpInfo ) {
-        super(collectExceptions, qpInfo);
+                                    final QueryPlanningInfo qpInfo,
+                                    final boolean mayReduce ) {
+        super(collectExceptions, qpInfo, mayReduce);
 
         // determine the certain join variables
         final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);

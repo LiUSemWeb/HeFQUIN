@@ -137,6 +137,6 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVarsTest extends ExecOpTestBa
 				rdfMockUp,
 				null );
 
-		return new ExecOpLookupJoinViaWrapperWithoutParamVars(pattern, ep, false, null);
+		return new ExecOpLookupJoinViaWrapperWithoutParamVars(pattern, ep, false, null, false);
 	}
 }

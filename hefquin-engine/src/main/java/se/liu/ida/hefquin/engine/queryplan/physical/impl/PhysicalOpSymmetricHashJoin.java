@@ -40,7 +40,7 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 	                                        final ExpectedVariables ... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], collectExceptions, qpInfo );
+		return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], collectExceptions, qpInfo, getLogicalOperator().mayReduce() );
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 
 			// Determine the set of join variables ...
 			final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars);
-			// ... and check that it is not empty. 
+			// ... and check that it is not empty.
 			return ( ! joinVars.isEmpty() );
 		}
 

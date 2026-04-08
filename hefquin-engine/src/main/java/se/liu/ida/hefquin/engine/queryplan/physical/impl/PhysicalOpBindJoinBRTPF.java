@@ -98,7 +98,8 @@ public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 			                                useOuterJoinSemantics,
 			                                batchSize,
 			                                collectExceptions,
-			                                qpInfo );
+			                                qpInfo,
+			                                lop.mayReduce() );
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}

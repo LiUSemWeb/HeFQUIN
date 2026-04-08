@@ -203,7 +203,8 @@ public class ExecOpHashJoin2Test extends TestsForJoinAlgorithms
 		return new ExecOpHashJoin2( inputVars[0], inputVars[1],
 		                            useOuterJoinSemantics,
 		                            false,   // collectExceptions
-		                            null );  // qpInfo
+		                            null,               // qpInfo
+		                            false );         // mayReduce
 	}
 
 }

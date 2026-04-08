@@ -39,8 +39,9 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 
 	public NaryExecutableOpBase( final int numberOfChildren,
 	                             final boolean collectExceptions,
-	                             final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+	                             final QueryPlanningInfo qpInfo,
+	                             final boolean mayReduce ) {
+		super(collectExceptions, qpInfo, mayReduce);
 
 		this.numberOfChildren = numberOfChildren;
 

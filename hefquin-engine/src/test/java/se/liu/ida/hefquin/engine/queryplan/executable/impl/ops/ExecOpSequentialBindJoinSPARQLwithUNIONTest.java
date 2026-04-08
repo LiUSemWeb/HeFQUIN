@@ -144,7 +144,8 @@ public class ExecOpSequentialBindJoinSPARQLwithUNIONTest extends TestsForTPAddAl
 		                                          useOuterJoinSemantics,
 		                                          ExecOpSequentialBindJoinSPARQLwithUNION.DEFAULT_BATCH_SIZE,
 		                                          false,
-		                                          null );
+		                                          null,
+		                                          false );
 	}
 
 }

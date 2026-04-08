@@ -61,7 +61,7 @@ import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalEr
  * is passed to the operator. The full batches are used to create bind-join
  * requests, one per batch. The response to such a request is the subset of
  * the solutions for the query/pattern of this operator that are join partners
- * for at least one of the solutions that were used for creating the request. 
+ * for at least one of the solutions that were used for creating the request.
  * Each of the requests is issued using the asynchronous functionality of the
  * federation access manager, which results in a {@link CompletableFuture}.
  * The algorithm connects this future to a {@link MyResponseProcessor} to
@@ -127,7 +127,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 	 * {@link #currentBatch} are not necessarily the same; the ones in
 	 * {@link #currentBatch} are versions of the ones in this collection,
 	 * restricted to join variables.
-	 * 
+	 *
 	 * Once {@link #currentBatch} is full (i.e., the number of solution
 	 * mappings in it is equal to {@link #batchSize}), this list is appended
 	 * to {@link #solMapsCoveredPerBatch} and then set back to {@code null},
@@ -216,8 +216,9 @@ public abstract class BaseForExecOpParallelBindJoin<
 			final boolean useOuterJoinSemantics,
 			final int batchSize,
 			final boolean collectExceptions,
-			final QueryPlanningInfo qpInfo ) {
-		super(batchSize, collectExceptions, qpInfo);
+			final QueryPlanningInfo qpInfo,
+			final boolean mayReduce ) {
+		super(batchSize, collectExceptions, qpInfo, mayReduce);
 
 		assert query != null;
 		assert fm != null;

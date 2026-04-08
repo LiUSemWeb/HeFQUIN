@@ -142,7 +142,7 @@ public class ExecOpParallelBindJoinSPARQLwithVALUESTest extends TestsForTPAddAlg
 		return new ExecOpParallelBindJoinSPARQLwithVALUES(
 				tp, fm, expectedVariables, useOuterJoinSemantics,
 				ExecOpSequentialBindJoinSPARQLwithVALUES.DEFAULT_BATCH_SIZE,
-				false, null );
+				false, null, false );
 	}
 
 }

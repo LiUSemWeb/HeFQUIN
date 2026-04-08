@@ -28,8 +28,9 @@ public class ExecOpProject extends UnaryExecutableOpBaseWithoutBlocking
 
 	public ExecOpProject( final Set<Var> variables,
 	                      final boolean collectExceptions,
-	                      final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+	                      final QueryPlanningInfo qpInfo,
+	                      final boolean mayReduce ) {
+		super(collectExceptions, qpInfo, mayReduce);
 
 		assert variables != null;
 		assert ! variables.isEmpty();

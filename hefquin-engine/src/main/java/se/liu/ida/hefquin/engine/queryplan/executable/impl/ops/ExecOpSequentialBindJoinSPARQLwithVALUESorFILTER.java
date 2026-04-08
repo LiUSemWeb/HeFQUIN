@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
  * and, then, continues using the FILTER-based approach for the rest
  * of the requests. If the first VALUES-based request succeeds, however,
  * then the implementation continues using the VALUES-based approach for
- * the rest of the requests. 
+ * the rest of the requests.
  */
 public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 		extends BaseForExecOpSequentialBindJoinSPARQL
@@ -81,8 +81,9 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 			final boolean useOuterJoinSemantics,
 			final int batchSize,
 			final boolean collectExceptions,
-			final QueryPlanningInfo qpInfo ) {
-		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
+			final QueryPlanningInfo qpInfo,
+			final boolean mayReduce ) {
+		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo, mayReduce);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 	}
@@ -90,10 +91,10 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
 		if ( useFilterBasedApproach ) {
-			return ExecOpSequentialBindJoinSPARQLwithFILTER.createExecutableReqOp(solMaps, pattern, fm);
+			return ExecOpSequentialBindJoinSPARQLwithFILTER.createExecutableReqOp(solMaps, pattern, fm, this.mayReduce);
 		}
 		else {
-			return ExecOpSequentialBindJoinSPARQLwithVALUES.createExecutableReqOp(solMaps, pattern, fm);
+			return ExecOpSequentialBindJoinSPARQLwithVALUES.createExecutableReqOp(solMaps, pattern, fm, this.mayReduce);
 		}
 	}
 

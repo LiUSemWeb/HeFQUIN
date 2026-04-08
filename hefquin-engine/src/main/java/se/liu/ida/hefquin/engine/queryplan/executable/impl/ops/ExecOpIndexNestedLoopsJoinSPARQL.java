@@ -25,8 +25,9 @@ public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLo
 	                                         final boolean useOuterJoinSemantics,
 	                                         final int minimumInputBlockSize,
 	                                         final boolean collectExceptions,
-	                                         final QueryPlanningInfo qpInfo ) {
-		super(query, fm, minimumInputBlockSize, collectExceptions, qpInfo);
+	                                         final QueryPlanningInfo qpInfo,
+	                                         final boolean mayReduce ) {
+		super(query, fm, minimumInputBlockSize, collectExceptions, qpInfo, mayReduce);
 
 		// TODO extend this implementation to support outer join semantics similar
 		// to how it is implemented in ExecOpGenericIndexNestedLoopsJoinWithRequestOps
@@ -39,8 +40,9 @@ public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLo
 	                                         final SPARQLEndpoint fm,
 	                                         final boolean useOuterJoinSemantics,
 	                                         final boolean collectExceptions,
-	                                         final QueryPlanningInfo qpInfo ) {
-		this(query, fm, useOuterJoinSemantics, DEFAULT_INPUT_BLOCK_SIZE, collectExceptions, qpInfo);
+	                                         final QueryPlanningInfo qpInfo,
+	                                         final boolean mayReduce ) {
+		this(query, fm, useOuterJoinSemantics, DEFAULT_INPUT_BLOCK_SIZE, collectExceptions, qpInfo, mayReduce);
 	}
 
 	@Override

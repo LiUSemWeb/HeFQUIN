@@ -28,6 +28,13 @@ public abstract class BaseForExecOps implements ExecutableOperator
 	 */
 	protected final boolean collectExceptions;
 
+	/**
+	 * If {@code true}, then the executable operator is permitted to reduce
+	 * duplicate solution mappings as part of its execution; otherwise,
+	 * the operator must preserve duplicates.
+	 */
+	protected final boolean mayReduce;
+
 	private List<Exception> exceptionsCaughtDuringExecution = null;
 
 	/**
@@ -39,9 +46,11 @@ public abstract class BaseForExecOps implements ExecutableOperator
 	 * @param qpInfo - may be {@code null}
 	 */
 	public BaseForExecOps( final boolean collectExceptions,
-	                       final QueryPlanningInfo qpInfo ) {
+	                       final QueryPlanningInfo qpInfo,
+	                       final boolean mayReduce ) {
 		this.collectExceptions = collectExceptions;
 		this.qpInfo = qpInfo;
+		this.mayReduce = mayReduce;
 	}
 
 	@Override

@@ -40,12 +40,14 @@ public class PhysicalOpLookupJoinViaWrapper extends BaseForPhysicalOpSingleInput
 			                                                    gpAdd.getParameterVariables(),
 			                                                    ep,
 			                                                    collectExceptions,
-			                                                    qpInfo );
+			                                                    qpInfo,
+			                                                    lop.mayReduce() );
 		else
 			return new ExecOpLookupJoinViaWrapperWithoutParamVars( gpAdd.getPattern(),
 			                                                       ep,
 			                                                       collectExceptions,
-			                                                       qpInfo );
+			                                                       qpInfo,
+			                                                       lop.mayReduce() );
 	}
 
 	@Override

@@ -27,8 +27,9 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 	public ExecOpRequestOther( final SPARQLRequest req,
 	                           final WrappedRESTEndpoint fm,
 	                           final boolean collectExceptions,
-	                           final QueryPlanningInfo qpInfo ) {
-		super(req, fm, collectExceptions, qpInfo);
+	                           final QueryPlanningInfo qpInfo,
+	                           final boolean mayReduce ) {
+		super(req, fm, collectExceptions, qpInfo, mayReduce);
 
 		assert fm.getNumberOfParameters() != 0;
 	}

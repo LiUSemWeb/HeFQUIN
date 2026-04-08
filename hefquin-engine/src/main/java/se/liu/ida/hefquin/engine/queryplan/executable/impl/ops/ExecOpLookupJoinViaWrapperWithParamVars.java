@@ -72,10 +72,11 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	                                                final Map<String,Var> paramVars,
 	                                                final WrappedRESTEndpoint fm,
 	                                                final boolean collectExceptions,
-	                                                final QueryPlanningInfo qpInfo ) {
+	                                                final QueryPlanningInfo qpInfo,
+	                                                final boolean mayReduce ) {
 		this( pattern, paramVars, fm,
 		      DEFAULT_INPUT_BLOCK_SIZE,
-		      collectExceptions, qpInfo );
+		      collectExceptions, qpInfo, mayReduce );
 	}
 
 	public ExecOpLookupJoinViaWrapperWithParamVars( final SPARQLGraphPattern pattern,
@@ -83,8 +84,9 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	                                                final WrappedRESTEndpoint fm,
 	                                                final int minimumInputBlockSize,
 	                                                final boolean collectExceptions,
-	                                                final QueryPlanningInfo qpInfo ) {
-		super(minimumInputBlockSize, collectExceptions, qpInfo);
+	                                                final QueryPlanningInfo qpInfo,
+	                                                final boolean mayReduce ) {
+		super(minimumInputBlockSize, collectExceptions, qpInfo, mayReduce);
 
 		assert pattern   != null;
 		assert paramVars != null;

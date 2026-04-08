@@ -49,7 +49,7 @@ public class ExecOpMultiwayUnionTest extends TestsForUnionAlgorithms
 
 	@Override
 	protected NaryExecutableOp createExecOpForTest() {
-		return new ExecOpMultiwayUnion(2, false, null);
+		return new ExecOpMultiwayUnion(2, false, null, false);
 	}
 
 }

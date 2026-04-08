@@ -145,7 +145,8 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESTest extends TestsForTPAddA
 		                                           useOuterJoinSemantics,
 		                                           ExecOpSequentialBindJoinSPARQLwithVALUES.DEFAULT_BATCH_SIZE,
 		                                           false,
-		                                           null );
+		                                           null,
+		                                           false );
 	}
 
 }

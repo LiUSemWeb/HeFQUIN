@@ -292,7 +292,8 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTERTest extends TestsF
 		                                                   useOuterJoinSemantics,
 		                                                   ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER.DEFAULT_BATCH_SIZE,
 		                                                   false,
-		                                                   null );
+		                                                   null,
+		                                                   false );
 	}
 
 }

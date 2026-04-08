@@ -72,8 +72,9 @@ public class ExecOpSequentialBindJoinSPARQLwithUNION
 			final boolean useOuterJoinSemantics,
 			final int batchSize,
 			final boolean collectExceptions,
-			final QueryPlanningInfo qpInfo ) {
-		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
+			final QueryPlanningInfo qpInfo,
+			final boolean mayReduce ) {
+		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo, mayReduce);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 	}
@@ -81,7 +82,7 @@ public class ExecOpSequentialBindJoinSPARQLwithUNION
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
 		final SPARQLRequest request = createRequest(solMaps, pattern, varsInQuery);
-		return new ExecOpRequestSPARQL<>(request, fm, false, null);
+		return new ExecOpRequestSPARQL<>(request, fm, false, null, this.mayReduce);
 	}
 
 	public static SPARQLRequest createRequest( final Set<Binding> solMaps,

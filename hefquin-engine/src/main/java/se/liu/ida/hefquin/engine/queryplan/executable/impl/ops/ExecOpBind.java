@@ -33,8 +33,9 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 
 	public ExecOpBind( final VarExprList bindExpressions,
 	                   final boolean collectExceptions,
-	                   final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+	                   final QueryPlanningInfo qpInfo,
+	                   final boolean mayReduce ) {
+		super(collectExceptions, qpInfo, mayReduce);
 
 		if ( bindExpressions.size() == 1 ) {
 			final Var var = bindExpressions.getVars().get(0);
@@ -49,8 +50,9 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	public ExecOpBind( final Var var,
 	                   final Expr expr,
 	                   final boolean collectExceptions,
-	                   final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+	                   final QueryPlanningInfo qpInfo,
+	                   final boolean mayReduce ) {
+		super(collectExceptions, qpInfo, mayReduce);
 
 		assert var != null;
 		assert expr != null;

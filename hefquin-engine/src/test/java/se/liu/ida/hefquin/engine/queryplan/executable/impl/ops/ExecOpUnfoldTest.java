@@ -35,7 +35,7 @@ public class ExecOpUnfoldTest
 
 		final Expr expr = new ExprVar("unboundVar");
 		final Var v1 = Var.alloc("v1");
-		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, null, false, null);
+		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, null, false, null, false);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 		op.process(sm, sink, null);
@@ -61,7 +61,7 @@ public class ExecOpUnfoldTest
 
 		final Expr expr = new ExprVar(varIn);
 		final Var v1 = Var.alloc("v1");
-		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, null, false, null);
+		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, null, false, null, false);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 		op.process(sm, sink, null);
@@ -565,7 +565,7 @@ public class ExecOpUnfoldTest
 	                                                 final Var v1 )
 			throws ExecOpExecutionException {
 		final Expr expr = NodeValue.makeNode(lex, CompositeDatatypeList.type);
-		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, null, false, null);
+		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, null, false, null, false);
 
 		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(
 				Var.alloc("varIn"),
@@ -591,7 +591,7 @@ public class ExecOpUnfoldTest
 	                                                 final Var v2 )
 			throws ExecOpExecutionException {
 		final Expr expr = NodeValue.makeNode(lex, CompositeDatatypeList.type);
-		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, v2, false, null);
+		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, v2, false, null, false);
 
 		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(
 				Var.alloc("varIn"),
@@ -616,7 +616,7 @@ public class ExecOpUnfoldTest
 	                                                final Var v1 )
 			throws ExecOpExecutionException {
 		final Expr expr = NodeValue.makeNode(lex, CompositeDatatypeMap.type);
-		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, null, false, null);
+		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, null, false, null, false);
 
 		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(
 				Var.alloc("varIn"),
@@ -642,7 +642,7 @@ public class ExecOpUnfoldTest
 	                                                final Var v2 )
 			throws ExecOpExecutionException {
 		final Expr expr = NodeValue.makeNode(lex, CompositeDatatypeMap.type);
-		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, v2, false, null);
+		final ExecOpUnfold op = new ExecOpUnfold(expr, v1, v2, false, null, false);
 
 		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(
 				Var.alloc("varIn"),

@@ -27,8 +27,9 @@ public class ExecOpHashJoin2 extends BaseForExecOpHashJoin
 	                        final ExpectedVariables inputVars2,
 	                        final boolean useOuterJoinSemantics,
 	                        final boolean collectExceptions,
-	                        final QueryPlanningInfo qpInfo ) {
-		super(inputVars1, inputVars2, collectExceptions, qpInfo);
+	                        final QueryPlanningInfo qpInfo,
+	                        final boolean mayReduce ) {
+		super(inputVars1, inputVars2, collectExceptions, qpInfo, mayReduce);
 
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 	}
