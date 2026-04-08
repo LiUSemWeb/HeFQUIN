@@ -12,7 +12,7 @@ import java.time.Duration;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonParseException;
 
-import se.liu.ida.hefquin.base.shared.http.HttpClientProvider;
+import se.liu.ida.hefquin.base.net.http.HttpClientProvider;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
 

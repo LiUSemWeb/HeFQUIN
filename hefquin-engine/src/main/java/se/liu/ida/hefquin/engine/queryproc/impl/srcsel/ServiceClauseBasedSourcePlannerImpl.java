@@ -90,8 +90,11 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		else if ( jenaOp instanceof OpService opService ) {
 			return createPlanForServicePattern(opService, mayReduce, ctxt);
 		}
-		else if ( jenaOp instanceof OpDistinct opService ) {
-			return createPlanForDistinct(opService, ctxt);
+		else if ( jenaOp instanceof OpDistinct opDistinct ) {
+			return createPlanForDistinct(opDistinct, ctxt);
+		}
+		else if ( jenaOp instanceof OpProject opProject ) {
+			return createPlanForProject(opProject, mayReduce, ctxt);
 		}
 		else {
 			throw new IllegalArgumentException( "unsupported type of query pattern: " + jenaOp.getClass().getName() );
@@ -293,6 +296,14 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	                                             final QueryProcContext ctxt ) {
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), true, ctxt );
 		final LogicalOpDedup rootOp = LogicalOpDedup.getInstance();
+		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
+	}
+
+	protected LogicalPlan createPlanForProject( final OpProject jenaOp,
+	                                            final boolean mayReduce,
+	                                            final QueryProcContext ctxt ) {
+		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), mayReduce, ctxt );
+		final LogicalOpProject rootOp = new LogicalOpProject( jenaOp.getVars(), mayReduce );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
 	}
 

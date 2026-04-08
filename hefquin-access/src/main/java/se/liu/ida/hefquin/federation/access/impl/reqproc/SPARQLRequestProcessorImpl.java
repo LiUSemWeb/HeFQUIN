@@ -17,7 +17,7 @@ import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
-import se.liu.ida.hefquin.base.shared.http.HttpClientProvider;
+import se.liu.ida.hefquin.base.net.http.HttpClientProvider;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
