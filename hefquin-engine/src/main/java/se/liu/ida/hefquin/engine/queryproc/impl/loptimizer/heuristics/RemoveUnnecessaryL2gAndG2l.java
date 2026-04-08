@@ -74,145 +74,108 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 	}
 
 	protected static Set<TriplePattern> extractTPs( final LogicalPlan plan ) {
-		final LogicalOperator rootOp = plan.getRootOperator();
-		final Worker worker = new Worker( plan );
+		final TriplePatternsCollector tpCollector = new TriplePatternsCollector( plan );
 
-		rootOp.visit(worker);
-		final Set<TriplePattern> triplePattern = worker.getTriplePattern();
-		if ( triplePattern != null ) return triplePattern;
-		else {
-			throw new IllegalArgumentException("Unsupported type of root operator (" + rootOp.getClass().getName() + ")");
-		}
+		LogicalPlanWalker.walk(plan, tpCollector, null);
+
+		return tpCollector.getTriplePatterns();
 	}
 
-	protected static class Worker implements LogicalPlanVisitor {
+	protected static class TriplePatternsCollector implements LogicalPlanVisitor {
 		protected final LogicalPlan plan;
-		protected Set<TriplePattern> returnTriplePattern;
+		protected Set<TriplePattern> returnTriplePatterns = new HashSet<>();
 
-		public Worker( final LogicalPlan plan ) {
+		public TriplePatternsCollector( final LogicalPlan plan ) {
 			this.plan = plan;
 		}
 
-		public Set<TriplePattern> getTriplePattern() { return returnTriplePattern; }
+		public Set<TriplePattern> getTriplePatterns() { return returnTriplePatterns; }
 
 		@Override
 		public void visit( final LogicalOpRequest<?, ?> op ) {
-			returnTriplePattern = LogicalOpUtils.getTriplePatternsOfReq(op);
+			returnTriplePatterns.addAll( LogicalOpUtils.getTriplePatternsOfReq(op) );
 		}
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpGPAdd op ) {
-			final Set<TriplePattern> triplePatterns = op.getPattern().getAllMentionedTPs();
-			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
-			returnTriplePattern = triplePatterns;
+			returnTriplePatterns.addAll( op.getPattern().getAllMentionedTPs() );
 		}
 
 		@Override
 		public void visit( final LogicalOpGPOptAdd op ) {
-			final Set<TriplePattern> triplePatterns = op.getPattern().getAllMentionedTPs();
-			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
-			returnTriplePattern = triplePatterns;
+			returnTriplePatterns.addAll( op.getPattern().getAllMentionedTPs() );
 		}
 
 		@Override
 		public void visit( final LogicalOpJoin op ) {
-			final Set<TriplePattern> triplePatterns = new HashSet<>();
-			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
-				triplePatterns.addAll( extractTPs(plan.getSubPlan(i)) );
-			}
-			returnTriplePattern = triplePatterns;
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpLeftJoin op ) {
-			final Set<TriplePattern> triplePatterns = new HashSet<>();
-			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
-				triplePatterns.addAll( extractTPs(plan.getSubPlan(i)) );
-			}
-			returnTriplePattern = triplePatterns;
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpUnion op ) {
-			final Set<TriplePattern> triplePatterns = new HashSet<>();
-			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
-				triplePatterns.addAll( extractTPs(plan.getSubPlan(i)) );
-			}
-			returnTriplePattern = triplePatterns;
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayJoin op ) {
-			final Set<TriplePattern> triplePatterns = new HashSet<>();
-			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
-				triplePatterns.addAll( extractTPs(plan.getSubPlan(i)) );
-			}
-			returnTriplePattern = triplePatterns;
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayLeftJoin op ) {
-			final Set<TriplePattern> triplePatterns = new HashSet<>();
-			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
-				triplePatterns.addAll( extractTPs(plan.getSubPlan(i)) );
-			}
-			returnTriplePattern = triplePatterns;
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayUnion op ) {
-			final Set<TriplePattern> triplePatterns = new HashSet<>();
-			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
-				triplePatterns.addAll( extractTPs(plan.getSubPlan(i)) );
-			}
-			returnTriplePattern = triplePatterns;
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpFilter op ) {
-			returnTriplePattern = extractTPs( plan.getSubPlan(0) );
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpBind op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpUnfold op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) {
-			returnTriplePattern = extractTPs( plan.getSubPlan(0) );
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
-			returnTriplePattern = extractTPs( plan.getSubPlan(0) );
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpDedup op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
 		@Override
 		public void visit( final LogicalOpProject op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			// nothing to do here; this operator does not contain any triple pattern
 		}
 
-	} // end of Worker
+	} // end of TriplePatternsCollector
 
 }
