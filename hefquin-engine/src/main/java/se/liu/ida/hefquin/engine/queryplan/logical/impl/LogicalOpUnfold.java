@@ -23,7 +23,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpUnfold implements UnaryLogicalOp
+public class LogicalOpUnfold extends BaseForLogicalOps implements UnaryLogicalOp
 {
 	protected final Expr expr;
 	protected final Var var1;
@@ -34,7 +34,9 @@ public class LogicalOpUnfold implements UnaryLogicalOp
 	 * where the second variable may be {@code null} (in case the UNFOLD
 	 * clause does not contain two variables).
 	 */
-	public LogicalOpUnfold( final Expr expr, final Var var1, final Var var2 ) {
+	public LogicalOpUnfold( final Expr expr, final Var var1, final Var var2, final boolean mayReduce ) {
+		super( mayReduce );
+
 		assert expr != null;
 		assert var1 != null;
 
@@ -97,7 +99,8 @@ public class LogicalOpUnfold implements UnaryLogicalOp
 		return    o instanceof LogicalOpUnfold oo
 		       && oo.expr.equals(expr)
 		       && oo.var1.equals(var1)
-		       && Objects.equals(oo.var2, var2); // oo.var2 may be null
+		       && Objects.equals(oo.var2, var2) // oo.var2 may be null
+		       && oo.mayReduce == mayReduce;
 	}
 
 	@Override
@@ -238,7 +241,7 @@ public class LogicalOpUnfold implements UnaryLogicalOp
 				if ( arg.isVariable() ) {
 					var1MayBeUnbound = ! certainVars.contains( arg.asVar() );
 				}
-				else if ( ! arg.isConstant() ) { 
+				else if ( ! arg.isConstant() ) {
 					var1MayBeUnbound = true;
 				}
 			}
@@ -277,7 +280,7 @@ public class LogicalOpUnfold implements UnaryLogicalOp
 						if ( ! certainVars.contains(arg.asVar()) )
 							var2MayBeUnbound = true;
 					}
-					else if ( ! arg.isConstant() ) { 
+					else if ( ! arg.isConstant() ) {
 						var2MayBeUnbound = true;
 					}
 				}

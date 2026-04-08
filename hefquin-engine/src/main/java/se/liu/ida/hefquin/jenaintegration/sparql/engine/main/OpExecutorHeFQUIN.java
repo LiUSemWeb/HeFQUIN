@@ -149,6 +149,16 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		}
 	}
 
+	@Override
+	protected QueryIterator execute( final OpProject opProject, final QueryIterator input ) {
+		if ( isSupportedOp(opProject) ) {
+			return executeSupportedOp( opProject, input );
+		}
+		else {
+			return super.execute(opProject, input);
+		}
+	}
+
 	protected boolean isSupportedOp( final Op op ) {
 		final UnsupportedOpFinder f = new UnsupportedOpFinder();
 		new WalkerVisitorSkipService(f, null, null, null).walk(op);
@@ -288,7 +298,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		@Override public void visit(OpOrder op)        { unsupportedOp = op; }
 
-		@Override public void visit(OpProject op)      { unsupportedOp = op; }
+		@Override public void visit(OpProject op)      {} // supported
 
 		@Override public void visit(OpDistinct op)     {} // supported
 

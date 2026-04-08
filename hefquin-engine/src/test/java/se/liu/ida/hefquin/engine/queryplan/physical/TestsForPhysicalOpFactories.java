@@ -42,7 +42,7 @@ public class TestsForPhysicalOpFactories
 		@Override
 		public UnaryLogicalOp create( final FederationMember fm,
 		                              final SPARQLGraphPattern pattern ) {
-			return new LogicalOpGPAdd(fm, pattern, null);
+			return new LogicalOpGPAdd(fm, pattern, null, false);
 		}
 	};
 
@@ -50,7 +50,7 @@ public class TestsForPhysicalOpFactories
 		@Override
 		public UnaryLogicalOp create( final FederationMember fm,
 		                              final SPARQLGraphPattern pattern ) {
-			return new LogicalOpGPOptAdd(fm, pattern);
+			return new LogicalOpGPOptAdd(fm, pattern, false);
 		}
 	};
 
@@ -72,7 +72,7 @@ public class TestsForPhysicalOpFactories
 		final Var v = Var.alloc("x");
 		final Expr bindExpr = NodeValue.makeInteger(42);
 		final VarExprList bindExpressions = new VarExprList(v, bindExpr);
-		final LogicalOpBind lop_bind = new LogicalOpBind(bindExpressions);
+		final LogicalOpBind lop_bind = new LogicalOpBind(bindExpressions, false);
 
 		assertEquals( PhysicalOpBind.class, factory.create(lop_bind).getClass() );
 		assertTrue( factory.supports(lop_bind, (ExpectedVariables) null));
@@ -126,7 +126,7 @@ public class TestsForPhysicalOpFactories
 
 		final Var v = Var.alloc("x");
 		final Expr e = new E_IsIRI( new ExprVar(v) );
-		final LogicalOpFilter lop = new LogicalOpFilter(e);
+		final LogicalOpFilter lop = new LogicalOpFilter(e, false);
 
 		assertEquals( PhysicalOpFilter.class, factory.create(lop).getClass() );
 		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
@@ -136,7 +136,7 @@ public class TestsForPhysicalOpFactories
 	@Test
 	public void testPhysicalOpGlobalToLocal() {
 		final PhysicalOpFactory factory = PhysicalOpGlobalToLocal.getFactory();
-		final LogicalOpGlobalToLocal lop = new LogicalOpGlobalToLocal( TestUtils.getVocabularyMappingForTest() );
+		final LogicalOpGlobalToLocal lop = new LogicalOpGlobalToLocal( TestUtils.getVocabularyMappingForTest(), false );
 
 		assertEquals( PhysicalOpGlobalToLocal.class, factory.create(lop).getClass() );
 		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
@@ -160,7 +160,7 @@ public class TestsForPhysicalOpFactories
 		assertFalse( factory.supports(lop, vars1, vars5) ); // no overlap
 
 		assertEquals( PhysicalOpHashJoin1.class, factory.create(lop).getClass() );
-		assertFalse( factory.supports( new LogicalOpGlobalToLocal(null), (ExpectedVariables) null ) );
+		assertFalse( factory.supports( new LogicalOpGlobalToLocal(null, false), (ExpectedVariables) null ) );
 	}
 
 	@Test
@@ -199,7 +199,7 @@ public class TestsForPhysicalOpFactories
 	@Test
 	public void testPhysicalOpLocalToGlobal() {
 		final PhysicalOpFactory factory = PhysicalOpLocalToGlobal.getFactory();
-		final LogicalOpLocalToGlobal lop = new LogicalOpLocalToGlobal( TestUtils.getVocabularyMappingForTest() );
+		final LogicalOpLocalToGlobal lop = new LogicalOpLocalToGlobal( TestUtils.getVocabularyMappingForTest(), false );
 
 		assertEquals( PhysicalOpLocalToGlobal.class, factory.create(lop).getClass() );
 		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
@@ -244,7 +244,7 @@ public class TestsForPhysicalOpFactories
 		final Var v3 = Var.alloc("z");
 		final TriplePattern tp = new TriplePatternImpl(v1, v2, v3);
 		final FederationMember fm = new EngineTestBase.SPARQLEndpointForTest();
-		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp) );
+		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp) );
 
 		assertEquals( PhysicalOpRequest.class, factory.create(lop).getClass() );
 		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
@@ -268,7 +268,7 @@ public class TestsForPhysicalOpFactories
 		assertFalse( factory.supports(lop, vars1, vars5) ); // no overlap
 
 		assertEquals( PhysicalOpSymmetricHashJoin.class, factory.create(lop).getClass() );
-		assertFalse( factory.supports( new LogicalOpGlobalToLocal(null), (ExpectedVariables) null ) );
+		assertFalse( factory.supports( new LogicalOpGlobalToLocal(null, false), (ExpectedVariables) null ) );
 	}
 
 	// ---- helper functions -----
