@@ -2,10 +2,13 @@ package se.liu.ida.hefquin.mappings.algebra.exprs;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.base.utils.PlanPrinter;
+import se.liu.ida.hefquin.base.utils.PlanPrinter.PrintablePlan;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperatorVisitor;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.exec.*;
@@ -15,6 +18,12 @@ import se.liu.ida.hefquin.mappings.sources.SourceReference;
 
 public class MappingExpressionUtils
 {
+	public static void print( final MappingExpression expr ) {
+		final MyPrintablePlanCreator c = new MyPrintablePlanCreator();
+		final PrintablePlan pp = c.createPrintablePlan(expr);
+		PlanPrinter.print(pp);
+	}
+
 	/**
 	 * Returns a set of all source references mentioned within
 	 * the given mapping expression.
@@ -54,6 +63,121 @@ public class MappingExpressionUtils
 
 
 	// ---------- helpers ----------
+
+	protected static class MyPrintablePlanCreator implements MappingOperatorVisitor {
+		protected List<PrintablePlan> subPlansForVisitedOp;
+		protected int idForVisitedOp;
+		protected PrintablePlan ppOfVisitedOp;
+
+		public PrintablePlan createPrintablePlan( final MappingExpression expr ) {
+			final List<PrintablePlan> pps;
+			if ( expr.numberOfSubExpressions() == 0 ) {
+				pps = null;
+			}
+			else {
+				pps = new ArrayList<>( expr.numberOfSubExpressions() );
+				for ( int i = 0; i < expr.numberOfSubExpressions(); i++ ) {
+					pps.add( createPrintablePlan(expr.getSubExpression(i)) );
+				}
+			}
+
+			subPlansForVisitedOp = pps;
+			idForVisitedOp = expr.getID();
+			ppOfVisitedOp = null;
+
+			expr.getRootOperator().visit(this);
+
+			return ppOfVisitedOp;
+		}
+
+		@Override
+		public <DDS extends DataObject,
+		        DC1 extends DataObject,
+		        DC2 extends DataObject,
+		        QL1 extends Query,
+		        QL2 extends Query>
+		void visit( final MappingOpExtract<DDS, DC1, DC2, QL1, QL2> op ) {
+			assert subPlansForVisitedOp == null;
+
+			final String rootOpAsString = "Extract (" + idForVisitedOp + ")";
+
+			final List<String> props = new ArrayList<>();
+			props.add( "sr: " + op.getSourceReference().hashCode() );
+			props.add( "type: " + op.getSourceType().getClass().getSimpleName() );
+
+			for ( final Map.Entry<String, ?> e : op.getEntriesOfP() ) {
+				final String attr = e.getKey();
+				final Object q = e.getValue();
+				props.add( attr + " -> " + q.toString() );
+			}
+
+			ppOfVisitedOp = new PrintablePlan( rootOpAsString,
+			                                   props,
+			                                   null ); // no sub-plans
+		}
+
+		@Override
+		public void visit( final MappingOpConstant op ) {
+			assert subPlansForVisitedOp == null;
+
+			final String rootOpAsString = "Constant (" + idForVisitedOp + ")";
+
+			ppOfVisitedOp = new PrintablePlan( rootOpAsString,
+			                                   null, // no properties
+			                                   null ); // no sub-plans
+		}
+
+		@Override
+		public void visit( final MappingOpExtend op ) {
+			assert subPlansForVisitedOp != null;
+			assert subPlansForVisitedOp.size() == 1;
+
+			final String rootOpAsString = "Extend (" + idForVisitedOp + ")";
+			final String prop = op.getAttribute() + " -> " + op.getExtendExpression().toString();
+
+			ppOfVisitedOp = new PrintablePlan( rootOpAsString,
+			                                   List.of(prop),
+			                                   subPlansForVisitedOp );
+		}
+
+		@Override
+		public void visit( final MappingOpProject op ) {
+			assert subPlansForVisitedOp != null;
+			assert subPlansForVisitedOp.size() == 1;
+
+			final String rootOpAsString = "Project (" + idForVisitedOp + ")";
+			final String prop = "P: " + op.getP().toString();
+
+			ppOfVisitedOp = new PrintablePlan( rootOpAsString,
+			                                   List.of(prop),
+			                                   subPlansForVisitedOp );
+		}
+
+		@Override
+		public void visit( final MappingOpJoin op ) {
+			assert subPlansForVisitedOp != null;
+			assert subPlansForVisitedOp.size() == 2;
+
+			final String rootOpAsString = "Join (" + idForVisitedOp + ")";
+
+			ppOfVisitedOp = new PrintablePlan( rootOpAsString,
+			                                   null, // no properties
+			                                   subPlansForVisitedOp );
+		}
+
+		@Override
+		public void visit( final MappingOpUnion op ) {
+			assert subPlansForVisitedOp != null;
+			assert subPlansForVisitedOp.size() > 0;
+
+			final String rootOpAsString = "Union (" + idForVisitedOp + ")";
+
+			ppOfVisitedOp = new PrintablePlan( rootOpAsString,
+			                                   null, // no properties
+			                                   subPlansForVisitedOp );
+		}
+	}
+
 
 	protected static class SrcRefsExtractor implements MappingOperatorVisitor {
 		public final Set<SourceReference> extractedSrcRefs = new HashSet<>();
