@@ -45,10 +45,10 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 
 		final TriplePatternRequest req1 = new TriplePatternRequestImpl(tp);
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm, req1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm, false, req1);
 		final LogicalPlan leafPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
-		final LogicalOpLocalToGlobal l2gOp = new LogicalOpLocalToGlobal(null);
+		final LogicalOpLocalToGlobal l2gOp = new LogicalOpLocalToGlobal(null, false);
 		final LogicalPlan planWithL2g = new LogicalPlanWithUnaryRootImpl(l2gOp, null, leafPlan);
 
 		// test
@@ -72,10 +72,10 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 
 		final TriplePatternRequest req1 = new TriplePatternRequestImpl(tp);
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm, req1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm, false, req1);
 		final LogicalPlan leafPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
-		final LogicalOpGlobalToLocal g2lOp = new LogicalOpGlobalToLocal(null);
+		final LogicalOpGlobalToLocal g2lOp = new LogicalOpGlobalToLocal(null, false);
 		final LogicalPlan planWithG2L = new LogicalPlanWithUnaryRootImpl(g2lOp, null, leafPlan);
 
 		// test
@@ -99,15 +99,15 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 
 		final TriplePatternRequest req1 = new TriplePatternRequestImpl(tp);
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm, req1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm, false, req1);
 		final LogicalPlan leafPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
-		final LogicalOpLocalToGlobal l2gOp = new LogicalOpLocalToGlobal(null);
+		final LogicalOpLocalToGlobal l2gOp = new LogicalOpLocalToGlobal(null, false);
 		final LogicalPlan planWithL2g = new LogicalPlanWithUnaryRootImpl(l2gOp, null, leafPlan);
 
 		final Var v1 = Var.alloc("x");
 		final Expr e = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(e);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(e, false);
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, planWithL2g);
 
 		// test
@@ -138,17 +138,17 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 		                                                 NodeFactory.createURI( "http://ex.org/property" ),
 		                                                 NodeFactory.createVariable( "o" ) );
 		final TriplePatternRequest req1 = new TriplePatternRequestImpl(tp1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm, req1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm, false, req1);
 		final LogicalPlan leafPlan1 = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
-		final LogicalOpLocalToGlobal l2gOp = new LogicalOpLocalToGlobal(null);
+		final LogicalOpLocalToGlobal l2gOp = new LogicalOpLocalToGlobal(null, false);
 		final LogicalPlan planWithL2g = new LogicalPlanWithUnaryRootImpl(l2gOp, null, leafPlan1);
 
 		final TriplePattern tp2 = new TriplePatternImpl( NodeFactory.createVariable( "s" ),
 		                                                 NodeFactory.createVariable( "p" ),
 		                                                 NodeFactory.createVariable( "o" ) );
 		final TriplePatternRequest req2 = new TriplePatternRequestImpl(tp2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(fm, req2);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(fm, false, req2);
 		final LogicalPlan leafPlan2 = new LogicalPlanWithNullaryRootImpl(reqOp2, null);
 
 		final LogicalPlan binaryJoinPlan = new LogicalPlanWithBinaryRootImpl(
@@ -182,7 +182,7 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 
 		final TriplePatternRequest req1 = new TriplePatternRequestImpl(tp);
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm, req1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm, false, req1);
 		final LogicalPlan plan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
 		// test
@@ -204,13 +204,13 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 		TriplePattern tp1 = new TriplePatternImpl( NodeFactory.createVariable("s"),
 		                                           NodeFactory.createVariable("p"),
 		                                           NodeFactory.createVariable("o"));
-		LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, new TriplePatternRequestImpl(tp1));
+		LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, false, new TriplePatternRequestImpl(tp1));
 		LogicalPlan leafPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		TriplePattern tp2 = new TriplePatternImpl( NodeFactory.createVariable("x"),
 		                                           NodeFactory.createVariable("y"),
 		                                           NodeFactory.createVariable("z"));
-		LogicalOpGPAdd gpAddOp = new LogicalOpGPAdd(fm, tp2, null);
+		LogicalOpGPAdd gpAddOp = new LogicalOpGPAdd(fm, tp2, null, false);
 
 		LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(gpAddOp, null, leafPlan);
 
@@ -233,12 +233,12 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 		TriplePattern tp1 = new TriplePatternImpl( NodeFactory.createVariable("s"),
 		                                           NodeFactory.createVariable("p"),
 		                                           NodeFactory.createVariable("o"));
-		LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, new TriplePatternRequestImpl(tp1));
+		LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, false, new TriplePatternRequestImpl(tp1));
 		LogicalPlan leafPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		final Var v1 = Var.alloc("x");
 		final Expr e = new E_IsIRI( new ExprVar(v1) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(e);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(e, false);
 
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, leafPlan);
 
