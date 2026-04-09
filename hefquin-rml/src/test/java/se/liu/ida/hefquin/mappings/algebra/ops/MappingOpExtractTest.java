@@ -64,18 +64,4 @@ public class MappingOpExtractTest extends BaseForMappingTests
 		assertFalse( op.isValidInput(srMap) );
 	}
 
-
-	static class MappingOpExtractForTests extends MappingOpExtract<TestDataObject1,
-	                                                               TestDataObject2,
-	                                                               TestDataObject3,
-	                                                               TestQuery,
-	                                                               TestQuery> {
-		public MappingOpExtractForTests( final Map<String, TestQuery> P ) {
-			super( new SourceReference() {},
-			       new SourceTypeForTests(),
-			       new TestQuery(),
-			       P );
-		}
-	}
-
 }

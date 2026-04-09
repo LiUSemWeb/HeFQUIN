@@ -10,8 +10,10 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 
 import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpExtract;
 import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtendExpression;
 import se.liu.ida.hefquin.mappings.sources.DataObject;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
 import se.liu.ida.hefquin.mappings.sources.SourceType;
 
 public abstract class BaseForMappingTests
@@ -94,4 +96,20 @@ public abstract class BaseForMappingTests
 			return n;
 		}
 	}
+
+	protected static class MappingOpExtractForTests
+			extends MappingOpExtract<TestDataObject1,
+			                         TestDataObject2,
+			                         TestDataObject3,
+			                         TestQuery,
+			                         TestQuery>
+	{
+		public MappingOpExtractForTests( final Map<String, TestQuery> P ) {
+			super( new SourceReference() {},
+			       new SourceTypeForTests(),
+			       new TestQuery(),
+			       P );
+		}
+	}
+
 }

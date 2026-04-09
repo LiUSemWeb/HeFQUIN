@@ -43,7 +43,7 @@ import se.liu.ida.hefquin.federation.members.impl.WrappedRESTEndpointImpl;
 import se.liu.ida.hefquin.jenaext.ModelUtils;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
 import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpression;
-import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpressionImpl;
+import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpressionFactory;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpProject;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
 import se.liu.ida.hefquin.mappings.rml.RML2MappingAlgebra;
@@ -408,11 +408,11 @@ public class FederationDescriptionReader
 		int i = 0;
 		for ( final MappingExpression trMapExpr : trMaps ) {
 			elmts[i] = MappingOpProject.createWithSPOG( trMapExpr.getRootOperator() );
-			elmts2[i] = new MappingExpressionImpl( elmts[i], trMapExpr );
+			elmts2[i] = MappingExpressionFactory.createMappingExpression( elmts[i], trMapExpr );
 			i++;
 		}
 
-		final MappingExpression expr = new MappingExpressionImpl(
+		final MappingExpression expr = MappingExpressionFactory.createMappingExpression(
 				new MappingOpUnion(elmts),
 				elmts2 );
 		return new WrappedRESTEndpointImpl(uri, params, expr);

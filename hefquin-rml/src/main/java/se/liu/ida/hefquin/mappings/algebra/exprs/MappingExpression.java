@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.mappings.algebra.exprs;
 
+import java.util.Set;
+
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
 
 /**
@@ -19,6 +21,17 @@ public interface MappingExpression
 	 * the same expression.
 	 */
 	int getID();
+
+	/**
+	 * Returns {@code true} if this mapping expression is valid.
+	 */
+	boolean isValid();
+
+	/**
+	 * Returns the schema of the mapping relation that will
+	 * be the result of evaluating this mapping expression.
+	 */
+	Set<String> getSchema();
 
 	/**
 	 * Returns the root operator of this expression.

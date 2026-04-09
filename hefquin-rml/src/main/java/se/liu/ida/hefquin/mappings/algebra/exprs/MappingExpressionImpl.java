@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.mappings.algebra.exprs;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
 
@@ -15,12 +16,21 @@ public class MappingExpressionImpl implements MappingExpression
 	private static int counter = 0;
 
 	protected final int id;
+	protected final boolean valid;
+	protected final Set<String> schema;
 	protected final MappingOperator rootOp;
 	protected final List<MappingExpression> subExprs;
 
-	public MappingExpressionImpl( final MappingOperator rootOp,
-	                              final MappingExpression ... subExprs ) {
-		id = ++counter;
+	/**
+	 * Use {@link MappingExpressionFactory} instead.
+	 */
+	protected MappingExpressionImpl( final boolean valid,
+	                                 final Set<String> schema,
+	                                 final MappingOperator rootOp,
+	                                 final MappingExpression ... subExprs ) {
+		this.id = ++counter;
+		this.valid = valid;
+		this.schema = schema;
 		this.rootOp = rootOp;
 
 		// Check that the number of sub-expressions
@@ -39,6 +49,12 @@ public class MappingExpressionImpl implements MappingExpression
 
 	@Override
 	public int getID() { return id; }
+
+	@Override
+	public boolean isValid() { return valid; }
+
+	@Override
+	public Set<String> getSchema() { return schema; }
 
 	@Override
 	public MappingOperator getRootOperator() { return rootOp; }

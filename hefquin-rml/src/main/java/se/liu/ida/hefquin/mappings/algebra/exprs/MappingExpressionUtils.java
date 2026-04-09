@@ -18,6 +18,10 @@ import se.liu.ida.hefquin.mappings.sources.SourceReference;
 
 public class MappingExpressionUtils
 {
+	/**
+	 * Prints the given expression using the {@link PlanPrinter}
+	 * functionality of HeFQUIN.
+	 */
 	public static void print( final MappingExpression expr ) {
 		final MyPrintablePlanCreator c = new MyPrintablePlanCreator();
 		final PrintablePlan pp = c.createPrintablePlan(expr);
@@ -33,6 +37,23 @@ public class MappingExpressionUtils
 		final SrcRefsExtractor extractor = new SrcRefsExtractor();
 		MappingExpressionWalker.walk(expr, extractor, null);
 		return extractor.extractedSrcRefs;
+	}
+
+	/**
+	 * Returns {@code true} if the given source assignment
+	 * is valid input for the given mapping expression.
+	 * <p>
+	 * A source assignment is valid input for a mapping expression
+	 * if, for every {@link MappingOpExtract Extract operator} of
+	 * the mapping expression, it maps the source reference of that
+	 * operator to a data object that fits the source type of the
+	 * operator.
+	 */
+	public static boolean isValidInput(
+			final Map<SourceReference,DataObject> srMap,
+			final MappingExpression expr ) {
+		final ValidInputChecker c = new ValidInputChecker(srMap);
+		return c.checkForExpression(expr);
 	}
 
 	/**
@@ -77,7 +98,8 @@ public class MappingExpressionUtils
 			else {
 				pps = new ArrayList<>( expr.numberOfSubExpressions() );
 				for ( int i = 0; i < expr.numberOfSubExpressions(); i++ ) {
-					pps.add( createPrintablePlan(expr.getSubExpression(i)) );
+					final MappingExpression subExpr = expr.getSubExpression(i);
+					pps.add( createPrintablePlan(subExpr) );
 				}
 			}
 
@@ -208,6 +230,61 @@ public class MappingExpressionUtils
 		public void visit( final MappingOpUnion op )    {}  // do nothing
 	}
 
+
+	protected static class ValidInputChecker implements MappingOperatorVisitor {
+		protected final Map<SourceReference,DataObject> srMap;
+		protected boolean valid;
+
+		public ValidInputChecker( final Map<SourceReference,DataObject> srMap ) {
+			this.srMap = srMap;
+		}
+
+		public boolean checkForExpression( final MappingExpression expr ) {
+			// Recursively check for all sub-expressions first.
+			for ( int i = 0; i < expr.numberOfSubExpressions(); i++ ) {
+				final MappingExpression subExpr = expr.getSubExpression(i);
+				if ( ! checkForExpression(subExpr) )
+					return false;
+			}
+
+			// Now check for the root operator of the given expression.
+			valid = true;
+			expr.getRootOperator().visit(this);
+
+			return valid;
+		}
+
+		@Override
+		public <DDS extends DataObject,
+		        DC1 extends DataObject,
+		        DC2 extends DataObject,
+		        QL1 extends Query,
+		        QL2 extends Query>
+		void visit( final MappingOpExtract<DDS, DC1, DC2, QL1, QL2> op ) {
+			final DataObject d = srMap.get( op.getSourceReference() );
+			if ( d == null )
+				valid = false;
+			else
+				valid = op.getSourceType().isRelevantDataObject(d);
+		}
+
+		@Override
+		public void visit( final MappingOpConstant op ) { valid = true; }
+
+		@Override
+		public void visit( final MappingOpExtend op )   { valid = true; }
+
+		@Override
+		public void visit( final MappingOpProject op )  { valid = true; }
+
+		@Override
+		public void visit( final MappingOpJoin op )     { valid = true; }
+
+		@Override
+		public void visit( final MappingOpUnion op )    { valid = true; }
+	}
+
+
 	protected static EvaluateWorker evalWorker = new EvaluateWorker();
 
 	protected static class EvaluateWorker implements MappingOperatorVisitor
@@ -240,6 +317,9 @@ public class MappingExpressionUtils
 			assert inputs.length == 0;
 
 			final DataObject d = srMap.get( op.getSourceReference() );
+
+			if ( d == null )
+				throw new IllegalArgumentException();
 
 			@SuppressWarnings("unchecked")
 			final DDS dd = (DDS) d;

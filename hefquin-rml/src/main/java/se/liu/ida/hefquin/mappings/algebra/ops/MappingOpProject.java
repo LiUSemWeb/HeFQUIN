@@ -43,7 +43,7 @@ public class MappingOpProject extends BaseForUnaryMappingOperator
 		}
 	}
 
-	public Iterable<String> getP() { return P; }
+	public Set<String> getP() { return P; }
 
 	@Override
 	public Set<String> getSchema() {

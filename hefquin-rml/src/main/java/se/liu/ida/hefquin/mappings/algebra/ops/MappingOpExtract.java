@@ -52,6 +52,8 @@ public class MappingOpExtract< DDS extends DataObject,
 
 	public int getSizeOfP() { return P.size(); }
 
+	public Set<String> getAttributesOfP() { return P.keySet(); }
+
 	public Iterable<Map.Entry<String, QL2>> getEntriesOfP() { return P.entrySet(); }
 
 	@Override

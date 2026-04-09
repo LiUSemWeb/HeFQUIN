@@ -67,6 +67,8 @@ public class MappingOpJoin extends BaseForBinaryMappingOperator
 		return true;
 	}
 
+	public List<Pair<String,String>> getJ() { return J; }
+
 	@Override
 	public Set<String> getSchema() {
 		return schema;
