@@ -74,39 +74,103 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 	}
 
 	protected static Set<TriplePattern> extractTPs( final LogicalPlan plan ) {
-		final LogicalOperator rootOp = plan.getRootOperator();
+		final TriplePatternsCollector tpCollector = new TriplePatternsCollector();
 
-		if( rootOp instanceof LogicalOpRequest req ) {
-			return LogicalOpUtils.getTriplePatternsOfReq(req);
-		}
-		else if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion
-				|| rootOp instanceof LogicalOpJoin || rootOp instanceof LogicalOpMultiwayJoin
-				|| rootOp instanceof LogicalOpMultiwayLeftJoin
-				|| rootOp instanceof LogicalOpLeftJoin ) {
-			final Set<TriplePattern> triplePatterns = new HashSet<>();
-			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
-				triplePatterns.addAll( extractTPs(plan.getSubPlan(i)) );
-			}
-			return triplePatterns;
-		}
-		else if ( rootOp instanceof LogicalOpGPAdd gpAdd ) {
-			final Set<TriplePattern> triplePatterns = gpAdd.getPattern().getAllMentionedTPs();
-			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
-			return triplePatterns;
-		}
-		else if ( rootOp instanceof LogicalOpGPOptAdd gpOptAdd ) {
-			final Set<TriplePattern> triplePatterns = gpOptAdd.getPattern().getAllMentionedTPs();
-			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
-			return triplePatterns;
-		}
-		else if( rootOp instanceof LogicalOpFilter
-				|| rootOp instanceof LogicalOpLocalToGlobal
-				|| rootOp instanceof LogicalOpGlobalToLocal ) {
-			return extractTPs( plan.getSubPlan(0) );
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported type of root operator (" + rootOp.getClass().getName() + ")");
-		}
+		LogicalPlanWalker.walk(plan, tpCollector, null);
+
+		return tpCollector.getTriplePatterns();
 	}
+
+	protected static class TriplePatternsCollector implements LogicalPlanVisitor {
+		protected final Set<TriplePattern> collectedTPs = new HashSet<>();
+
+		public Set<TriplePattern> getTriplePatterns() { return collectedTPs; }
+
+		@Override
+		public void visit( final LogicalOpRequest<?, ?> op ) {
+			collectedTPs.addAll( LogicalOpUtils.getTriplePatternsOfReq(op) );
+		}
+
+		@Override
+		public void visit( final LogicalOpFixedSolMap op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpGPAdd op ) {
+			collectedTPs.addAll( op.getPattern().getAllMentionedTPs() );
+		}
+
+		@Override
+		public void visit( final LogicalOpGPOptAdd op ) {
+			collectedTPs.addAll( op.getPattern().getAllMentionedTPs() );
+		}
+
+		@Override
+		public void visit( final LogicalOpJoin op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpLeftJoin op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpUnion op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayJoin op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayLeftJoin op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayUnion op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpFilter op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpBind op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpUnfold op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpLocalToGlobal op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpGlobalToLocal op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpDedup op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+		@Override
+		public void visit( final LogicalOpProject op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
+	} // end of TriplePatternsCollector
 
 }
