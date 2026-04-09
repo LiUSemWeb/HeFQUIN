@@ -207,21 +207,21 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 		// set up
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
 
-		TriplePattern tp1 = new TriplePatternImpl( NodeFactory.createVariable("s"),
-		                                           NodeFactory.createVariable("p"),
-		                                           NodeFactory.createVariable("o"));
-		LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, false, new TriplePatternRequestImpl(tp1));
-		LogicalPlan leafPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+		final TriplePattern tp1 = new TriplePatternImpl( NodeFactory.createVariable("s"),
+		                                                 NodeFactory.createVariable("p"),
+		                                                 NodeFactory.createVariable("o"));
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, false, new TriplePatternRequestImpl(tp1));
+		final LogicalPlan leafPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
-		TriplePattern tp2 = new TriplePatternImpl( NodeFactory.createVariable("x"),
-		                                           NodeFactory.createVariable("y"),
-		                                           NodeFactory.createVariable("z"));
-		LogicalOpGPAdd gpAddOp = new LogicalOpGPAdd(fm, tp2, null, false);
+		final TriplePattern tp2 = new TriplePatternImpl( NodeFactory.createVariable("x"),
+		                                                 NodeFactory.createVariable("y"),
+		                                                 NodeFactory.createVariable("z"));
+		final LogicalOpGPAdd gpAddOp = new LogicalOpGPAdd(fm, tp2, null, false);
 
-		LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(gpAddOp, null, leafPlan);
+		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(gpAddOp, null, leafPlan);
 
 		// test
-		Set<TriplePattern> result = RemoveUnnecessaryL2gAndG2l.extractTPs(gpAddPlan);
+		final Set<TriplePattern> result = RemoveUnnecessaryL2gAndG2l.extractTPs(gpAddPlan);
 
 		// check
 		assertEquals( Set.of(tp1, tp2), result );
@@ -236,11 +236,11 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 
 		// set up
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
-		TriplePattern tp1 = new TriplePatternImpl( NodeFactory.createVariable("s"),
-		                                           NodeFactory.createVariable("p"),
-		                                           NodeFactory.createVariable("o"));
-		LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, false, new TriplePatternRequestImpl(tp1));
-		LogicalPlan leafPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+		final TriplePattern tp1 = new TriplePatternImpl( NodeFactory.createVariable("s"),
+		                                                 NodeFactory.createVariable("p"),
+		                                                 NodeFactory.createVariable("o"));
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, false, new TriplePatternRequestImpl(tp1));
+		final LogicalPlan leafPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		final Var v1 = Var.alloc("x");
 		final Expr e = new E_IsIRI( new ExprVar(v1) );
@@ -249,7 +249,7 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, leafPlan);
 
 		// test
-		Set<TriplePattern> result = RemoveUnnecessaryL2gAndG2l.extractTPs(filterPlan);
+		final Set<TriplePattern> result = RemoveUnnecessaryL2gAndG2l.extractTPs(filterPlan);
 
 		// check
 		assertEquals( Set.of(tp1), result );
