@@ -55,8 +55,8 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 		final LogicalPlan result = new RemoveUnnecessaryL2gAndG2l().apply(planWithL2g);
 
 		// check
-		assertFalse( result.getRootOperator() instanceof LogicalOpLocalToGlobal );
 		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
+		assertEquals( 0, result.numberOfSubPlans() );
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 
 		// check
 		assertFalse( result.getRootOperator() instanceof LogicalOpGlobalToLocal );
-		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
+		assertEquals( 0, result.numberOfSubPlans() );
 	}
 
 	@Test
@@ -115,12 +115,15 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 
 		// check
 		assertTrue( result.getRootOperator() instanceof LogicalOpFilter );
+		assertEquals( 1, result.numberOfSubPlans() );
 
-		LogicalPlan subPlan = result.getSubPlan(0);
+		final LogicalPlan subPlan = result.getSubPlan(0);
 		assertTrue( subPlan.getRootOperator() instanceof LogicalOpLocalToGlobal );
+		assertEquals( 1, subPlan.numberOfSubPlans() );
 
-		assertEquals( leafPlan, subPlan.getSubPlan(0) );
-		assertTrue( subPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest );
+		final LogicalPlan childOfSubPlan = subPlan.getSubPlan(0);
+		assertEquals( leafPlan, childOfSubPlan );
+		assertEquals( 0, childOfSubPlan.numberOfSubPlans() );
 	}
 
 	@Test
@@ -162,13 +165,16 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 
 		// check
 		assertTrue( result.getRootOperator() instanceof LogicalOpJoin );
+		assertEquals( 2, result.numberOfSubPlans() );
 
 		final LogicalPlan firstSubPlan = result.getSubPlan(0);
-		assertFalse( firstSubPlan.getRootOperator() instanceof LogicalOpLocalToGlobal );
 		assertTrue( firstSubPlan.getRootOperator() instanceof LogicalOpRequest );
+		assertEquals( 0, firstSubPlan.numberOfSubPlans() );
 
 		final LogicalPlan secondSubPlan = result.getSubPlan(1);
 		assertTrue( secondSubPlan.getRootOperator() instanceof LogicalOpRequest );
+		assertEquals( 0, secondSubPlan.numberOfSubPlans() );
+
 	}
 
 	@Test
@@ -193,7 +199,7 @@ public class RemoveUnnecessaryL2gAndG2lTest extends EngineTestBase
 	}
 
 	@Test
-	public void extractTPs_GPAddAboveRequestreturnsAllTPs() {
+	public void extractTPs_GPAddAboveRequestReturnsAllTPs() {
 		// Calls extractTPs with a request under a GPAdd operator.
 		// The extracted triple patterns are expected to be the combination
 		// of the triple patterns of the request- and GPAdd plans.

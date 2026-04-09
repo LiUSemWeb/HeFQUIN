@@ -74,7 +74,7 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 	}
 
 	protected static Set<TriplePattern> extractTPs( final LogicalPlan plan ) {
-		final TriplePatternsCollector tpCollector = new TriplePatternsCollector( plan );
+		final TriplePatternsCollector tpCollector = new TriplePatternsCollector();
 
 		LogicalPlanWalker.walk(plan, tpCollector, null);
 
@@ -82,18 +82,13 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 	}
 
 	protected static class TriplePatternsCollector implements LogicalPlanVisitor {
-		protected final LogicalPlan plan;
-		protected Set<TriplePattern> returnTriplePatterns = new HashSet<>();
+		protected final Set<TriplePattern> collectedTPs = new HashSet<>();
 
-		public TriplePatternsCollector( final LogicalPlan plan ) {
-			this.plan = plan;
-		}
-
-		public Set<TriplePattern> getTriplePatterns() { return returnTriplePatterns; }
+		public Set<TriplePattern> getTriplePatterns() { return collectedTPs; }
 
 		@Override
 		public void visit( final LogicalOpRequest<?, ?> op ) {
-			returnTriplePatterns.addAll( LogicalOpUtils.getTriplePatternsOfReq(op) );
+			collectedTPs.addAll( LogicalOpUtils.getTriplePatternsOfReq(op) );
 		}
 
 		@Override
@@ -103,12 +98,12 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 
 		@Override
 		public void visit( final LogicalOpGPAdd op ) {
-			returnTriplePatterns.addAll( op.getPattern().getAllMentionedTPs() );
+			collectedTPs.addAll( op.getPattern().getAllMentionedTPs() );
 		}
 
 		@Override
 		public void visit( final LogicalOpGPOptAdd op ) {
-			returnTriplePatterns.addAll( op.getPattern().getAllMentionedTPs() );
+			collectedTPs.addAll( op.getPattern().getAllMentionedTPs() );
 		}
 
 		@Override
