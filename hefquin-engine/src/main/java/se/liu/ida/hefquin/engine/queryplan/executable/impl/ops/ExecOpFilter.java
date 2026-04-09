@@ -24,9 +24,10 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 	protected final ExprList filterExpressions;
 
 	public ExecOpFilter( final ExprList filterExpressions,
+	                     final boolean mayReduce,
 	                     final boolean collectExceptions,
 	                     final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 
 		assert filterExpressions != null;
 		assert ! filterExpressions.isEmpty();
@@ -35,9 +36,10 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 	}
 
 	public ExecOpFilter( final Expr filterExpression,
+	                     final boolean mayReduce,
 	                     final boolean collectExceptions,
 	                     final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 
 		assert filterExpression != null;
 

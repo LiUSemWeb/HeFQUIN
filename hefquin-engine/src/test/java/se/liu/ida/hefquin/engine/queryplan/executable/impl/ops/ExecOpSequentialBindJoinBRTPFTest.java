@@ -143,8 +143,9 @@ public class ExecOpSequentialBindJoinBRTPFTest extends TestsForTPAddAlgorithms<B
 		                                fm,
 		                                expectedVariables,
 		                                useOuterJoinSemantics,
+		                                false,
 		                                ExecOpSequentialBindJoinBRTPF.DEFAULT_BATCH_SIZE,
 		                                false,
-		                                null);
+		                                null );
 	}
 }

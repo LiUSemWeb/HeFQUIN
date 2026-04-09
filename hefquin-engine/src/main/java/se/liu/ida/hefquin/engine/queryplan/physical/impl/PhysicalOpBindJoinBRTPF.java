@@ -96,6 +96,7 @@ public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 			                                brtpf,
 			                                inputVars[0],
 			                                useOuterJoinSemantics,
+			                                lop.mayReduce(),
 			                                batchSize,
 			                                collectExceptions,
 			                                qpInfo );

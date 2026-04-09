@@ -18,11 +18,12 @@ public abstract class BaseForExecOpHashJoin extends BinaryExecutableOpBase
 {
 	protected final SolutionMappingsIndex index;
 
-	protected BaseForExecOpHashJoin( final ExpectedVariables inputVars1,
+	protected BaseForExecOpHashJoin( final boolean mayReduce,
+	                                 final ExpectedVariables inputVars1,
 	                                 final ExpectedVariables inputVars2,
 	                                 final boolean collectExceptions,
 	                                 final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 
 		// determine the certain join variables
 		final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);

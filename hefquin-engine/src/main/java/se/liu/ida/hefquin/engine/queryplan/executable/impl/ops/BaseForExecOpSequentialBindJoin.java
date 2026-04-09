@@ -65,7 +65,7 @@ import se.liu.ida.hefquin.federation.FederationMember;
  * does not have a binding for any of the join variables (which may happen
  * only in cases in which at least one of the join variables is a certain
  * variable). Such an input solution mapping is compatible with (and, thus,
- * can be joined with) every solution mapping that the federation member has 
+ * can be joined with) every solution mapping that the federation member has
  * for the query/pattern of this bind-join operator. Therefore, when switching
  * into full-retrieval mode, this implementation performs a request to retrieve
  * the complete set of all these solution mappings and, then, uses this set to
@@ -109,7 +109,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	 * Note that these are not necessarily the solution mappings to be used
 	 * for forming the next bind-join request; those are collected in parallel
 	 * in {@link #currentSolMapsForRequest}.
-	 * 
+	 *
 	 * Once the response received for the next bind-join request has been
 	 * handled, this set will be cleared (and then populated again, by using
 	 * the next input solution mappings that will arrive afterwards).
@@ -128,7 +128,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	 * mappings in this set have been created are collected in parallel in
 	 * {@link #currentBatch}. It is possible that multiple input solution
 	 * mappings may result in the same restricted solution mapping.
-	 * 
+	 *
 	 * Once the response received for the next bind-join request has been
 	 * handled, this set will be cleared (and then populated again, by using
 	 * the next input solution mappings that will arrive afterwards).
@@ -181,10 +181,11 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	                                            final MemberType fm,
 	                                            final ExpectedVariables inputVars,
 	                                            final boolean useOuterJoinSemantics,
+												final boolean mayReduce,
 	                                            final int batchSize,
 	                                            final boolean collectExceptions,
 	                                            final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 
 		assert query != null;
 		assert fm != null;

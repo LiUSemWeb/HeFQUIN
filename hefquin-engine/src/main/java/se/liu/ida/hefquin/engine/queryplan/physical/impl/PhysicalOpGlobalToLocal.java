@@ -33,14 +33,14 @@ public class PhysicalOpGlobalToLocal implements UnaryPhysicalOpForLogicalOp
 	@Override
 	public void visit(final PhysicalPlanVisitor visitor) {
 		visitor.visit(this);
-		
+
 	}
 
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
-	                                       final ExpectedVariables... inputVars ) {
-		return new ExecOpGlobalToLocal( lop.getVocabularyMapping(), collectExceptions, qpInfo );
+	                                       final ExpectedVariables ... inputVars ) {
+		return new ExecOpGlobalToLocal( lop.getVocabularyMapping(), lop.mayReduce(), collectExceptions, qpInfo );
 	}
 
 	@Override

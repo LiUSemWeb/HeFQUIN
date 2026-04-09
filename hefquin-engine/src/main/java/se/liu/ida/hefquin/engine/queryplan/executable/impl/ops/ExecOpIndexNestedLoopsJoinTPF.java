@@ -30,18 +30,20 @@ public class ExecOpIndexNestedLoopsJoinTPF
 	public ExecOpIndexNestedLoopsJoinTPF( final TriplePattern query,
 	                                      final TPFServer fm,
 	                                      final boolean useOuterJoinSemantics,
+	                                      final boolean mayReduce,
 	                                      final int minimumInputBlockSize,
 	                                      final boolean collectExceptions,
 	                                      final QueryPlanningInfo qpInfo ) {
-		super(query, fm, useOuterJoinSemantics, minimumInputBlockSize, collectExceptions, qpInfo);
+		super(query, fm, useOuterJoinSemantics, mayReduce, minimumInputBlockSize, collectExceptions, qpInfo);
 	}
 
 	public ExecOpIndexNestedLoopsJoinTPF( final TriplePattern query,
 	                                      final TPFServer fm,
 	                                      final boolean useOuterJoinSemantics,
+	                                      final boolean mayReduce,
 	                                      final boolean collectExceptions,
 	                                      final QueryPlanningInfo qpInfo ) {
-		super(query, fm, useOuterJoinSemantics, DEFAULT_INPUT_BLOCK_SIZE, collectExceptions, qpInfo);
+		super(query, fm, useOuterJoinSemantics, mayReduce, DEFAULT_INPUT_BLOCK_SIZE, collectExceptions, qpInfo);
 	}
 
 	@Override
@@ -49,7 +51,7 @@ public class ExecOpIndexNestedLoopsJoinTPF
 			throws VariableByBlankNodeSubstitutionException
 	{
 		final TriplePatternRequest req = createRequest(inputSolMap);
-		return new ExecOpRequestTPF<>(req, fm, false, null);
+		return new ExecOpRequestTPF<>(req, fm, this.mayReduce, false, null);
 	}
 
 	protected TriplePatternRequest createRequest( final SolutionMapping inputSolMap )

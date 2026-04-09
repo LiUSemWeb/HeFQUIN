@@ -76,12 +76,12 @@ public class ResultElementIterWithNullaryExecOpTest
 		final List<SolutionMapping> list;
 
 		public NullaryExecutableOpForTest() {
-			super(false, null);
+			super(false, false, null);
 			list = null;
 		}
 
 		public NullaryExecutableOpForTest( final SolutionMapping[] elements ) {
-			super(false, null);
+			super(false, false, null);
 			list = Arrays.asList(elements);
 		}
 
