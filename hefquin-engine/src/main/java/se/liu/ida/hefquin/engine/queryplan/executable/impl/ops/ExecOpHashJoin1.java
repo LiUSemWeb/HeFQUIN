@@ -21,12 +21,12 @@ public class ExecOpHashJoin1 extends BaseForExecOpHashJoin
 	protected boolean child1InputComplete = false;
 	protected boolean child2InputComplete = false;
 
-	public ExecOpHashJoin1( final ExpectedVariables inputVars1,
+	public ExecOpHashJoin1( final boolean mayReduce,
+	                        final ExpectedVariables inputVars1,
 	                        final ExpectedVariables inputVars2,
 	                        final boolean collectExceptions,
-	                        final QueryPlanningInfo qpInfo,
-	                        final boolean mayReduce ) {
-		super(inputVars1, inputVars2, collectExceptions, qpInfo, mayReduce);
+	                        final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, inputVars1, inputVars2, collectExceptions, qpInfo);
 	}
 
 	@Override

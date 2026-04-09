@@ -89,11 +89,11 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 			final SPARQLEndpoint fm,
 			final ExpectedVariables inputVars,
 			final boolean useOuterJoinSemantics,
+			final boolean mayReduce,
 			final int batchSize,
 			final boolean collectExceptions,
-			final QueryPlanningInfo qpInfo,
-			final boolean mayReduce ) {
-		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo, mayReduce);
+			final QueryPlanningInfo qpInfo ) {
+		super(query, fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo);
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 
 		renamedVar = getVarForRenaming(query, inputVars);
@@ -134,7 +134,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 		final Element elmt = createUnion(solMaps);
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(elmt);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		return new ExecOpRequestSPARQL<>(request, fm, false, null, this.mayReduce);
+		return new ExecOpRequestSPARQL<>(request, fm, this.mayReduce, false, null);
 	}
 
 	protected Element createUnion( final Iterable<Binding> solMaps ) {

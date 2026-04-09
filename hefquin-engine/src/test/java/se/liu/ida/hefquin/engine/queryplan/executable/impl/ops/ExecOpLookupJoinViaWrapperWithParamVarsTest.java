@@ -301,9 +301,9 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		return new ExecOpLookupJoinViaWrapperWithParamVars( pattern,
 		                                                    paramVarsOfEndpoint,
 		                                                    ep,
+		                                                    false,
 		                                                    batchSize,
 		                                                    false,
-		                                                    null,
-		                                                    false );
+		                                                    null );
 	}
 }

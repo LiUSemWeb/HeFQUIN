@@ -143,10 +143,10 @@ public class ExecOpSequentialBindJoinSPARQLwithFILTERTest extends TestsForTPAddA
 		                                           fm,
 		                                           expectedVariables,
 		                                           useOuterJoinSemantics,
+		                                           false,
 		                                           ExecOpSequentialBindJoinSPARQLwithFILTER.DEFAULT_BATCH_SIZE,
 		                                           false,
-		                                           null,
-		                                           false );
+		                                           null );
 	}
 
 }

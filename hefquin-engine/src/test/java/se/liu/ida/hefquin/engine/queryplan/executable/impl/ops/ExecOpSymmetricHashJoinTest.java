@@ -85,7 +85,7 @@ public class ExecOpSymmetricHashJoinTest extends TestsForJoinAlgorithms
 		assert inputVars.length == 2;
 		assert useOuterJoinSemantics == false;
 
-		return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], false, null, false );
+		return new ExecOpSymmetricHashJoin( false, inputVars[0], inputVars[1], false, null );
 	}
 
 }

@@ -37,7 +37,7 @@ public class PhysicalOpFixedSolMap implements NullaryPhysicalOpForLogicalOp
 	public NullaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                         final QueryPlanningInfo qpInfo,
 	                                         final ExpectedVariables ... inputVars ) {
-		return new NullaryExecutableOpBase(collectExceptions, qpInfo, lop.mayReduce()) {
+		return new NullaryExecutableOpBase(lop.mayReduce(), collectExceptions, qpInfo) {
 			@Override
 			protected void _execute( final IntermediateResultElementSink sink,
 			                         final ExecutionContext execCxt ) {

@@ -181,11 +181,11 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	                                            final MemberType fm,
 	                                            final ExpectedVariables inputVars,
 	                                            final boolean useOuterJoinSemantics,
+												final boolean mayReduce,
 	                                            final int batchSize,
 	                                            final boolean collectExceptions,
-	                                            final QueryPlanningInfo qpInfo,
-	                                            final boolean mayReduce ) {
-		super(collectExceptions, qpInfo, mayReduce);
+	                                            final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, collectExceptions, qpInfo);
 
 		assert query != null;
 		assert fm != null;

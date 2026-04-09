@@ -31,7 +31,7 @@ public class PhysicalOpProject implements UnaryPhysicalOpForLogicalOp
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables... inputVars ) {
-		return new ExecOpProject( lop.getVariables(), collectExceptions, qpInfo, lop.mayReduce() );
+		return new ExecOpProject( lop.getVariables(), lop.mayReduce(), collectExceptions, qpInfo );
 	}
 
 	@Override

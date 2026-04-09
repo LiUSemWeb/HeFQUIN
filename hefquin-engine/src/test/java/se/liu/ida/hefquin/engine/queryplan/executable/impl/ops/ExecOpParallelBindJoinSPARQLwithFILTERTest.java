@@ -140,9 +140,9 @@ public class ExecOpParallelBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlg
 	                                                 final boolean useOuterJoinSemantics ) {
 
 		return new ExecOpParallelBindJoinSPARQLwithFILTER(
-				tp, fm, expectedVariables, useOuterJoinSemantics,
+				tp, fm, expectedVariables, useOuterJoinSemantics, false,
 				ExecOpSequentialBindJoinSPARQLwithVALUES.DEFAULT_BATCH_SIZE,
-				false, null, false );
+				false, null );
 	}
 
 

@@ -128,6 +128,6 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<T
 	                                                 final TPFServer fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		return new ExecOpIndexNestedLoopsJoinTPF(tp, fm, useOuterJoinSemantics, false, null, false);
+		return new ExecOpIndexNestedLoopsJoinTPF(tp, fm, useOuterJoinSemantics, false, false, null);
 	}
 }

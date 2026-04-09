@@ -39,20 +39,20 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 	protected final List<Var> joinVars; // using a list gives us a deterministic iteration order
 	protected final Set<List<Node>> bindingsForJoinVariable = new HashSet<>();
 
-	public ExecOpParallelMultiwayLeftJoin( final boolean collectExceptions,
+	public ExecOpParallelMultiwayLeftJoin( final boolean mayReduce,
+	                                       final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables inputVarsFromNonOptionalPart,
-	                                       final boolean mayReduce,
 	                                       final LogicalOpRequest<?,?> ... optionalParts ) {
-		this( collectExceptions, qpInfo, inputVarsFromNonOptionalPart, Arrays.asList(optionalParts), mayReduce );
+		this( mayReduce, collectExceptions, qpInfo, inputVarsFromNonOptionalPart, Arrays.asList(optionalParts) );
 	}
 
-	public ExecOpParallelMultiwayLeftJoin( final boolean collectExceptions,
+	public ExecOpParallelMultiwayLeftJoin( final boolean mayReduce,
+	                                       final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables inputVarsFromNonOptionalPart,
-	                                       final List<LogicalOpRequest<?,?>> optionalParts,
-	                                       final boolean mayReduce ) {
-		super(DEFAULT_BATCH_SIZE, collectExceptions, qpInfo, mayReduce);
+	                                       final List<LogicalOpRequest<?,?>> optionalParts ) {
+		super(mayReduce, DEFAULT_BATCH_SIZE, collectExceptions, qpInfo);
 
 		assert ! optionalParts.isEmpty();
 

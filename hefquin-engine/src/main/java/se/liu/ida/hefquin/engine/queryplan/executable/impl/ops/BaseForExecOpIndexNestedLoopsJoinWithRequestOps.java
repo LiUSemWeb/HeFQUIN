@@ -45,11 +45,11 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	protected BaseForExecOpIndexNestedLoopsJoinWithRequestOps( final QueryType query,
 	                                                           final MemberType fm,
 	                                                           final boolean useOuterJoinSemantics,
+															   final boolean mayReduce,
 	                                                           final int minimumInputBlockSize,
 	                                                           final boolean collectExceptions,
-	                                                           final QueryPlanningInfo qpInfo,
-	                                                           final boolean mayReduce ) {
-		super(minimumInputBlockSize, collectExceptions, qpInfo, mayReduce);
+	                                                           final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, minimumInputBlockSize, collectExceptions, qpInfo);
 
 		assert query != null;
 		assert fm != null;

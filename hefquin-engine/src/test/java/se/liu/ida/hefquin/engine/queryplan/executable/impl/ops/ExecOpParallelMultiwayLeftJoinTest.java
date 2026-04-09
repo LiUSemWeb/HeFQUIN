@@ -1489,20 +1489,20 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm1, false, req1);
 
 		if ( tp2 == null ) {
-			return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, false, reqOp1 );
+			return new ExecOpParallelMultiwayLeftJoin( false, false, null, expectedInputVariables, reqOp1 );
 		}
 
 		final TriplePatternRequest req2 = new TriplePatternRequestImpl(tp2);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(fm2, false, req2);
 
 		if ( tp3 == null ) {
-			return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, false, reqOp1, reqOp2 );
+			return new ExecOpParallelMultiwayLeftJoin( false, false, null, expectedInputVariables, reqOp1, reqOp2 );
 		}
 
 		final TriplePatternRequest req3 = new TriplePatternRequestImpl(tp3);
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>(fm3, false, req3);
 
-		return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, false, reqOp1, reqOp2, reqOp3 );
+		return new ExecOpParallelMultiwayLeftJoin( false, false, null, expectedInputVariables, reqOp1, reqOp2, reqOp3 );
 	}
 
 }

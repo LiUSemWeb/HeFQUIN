@@ -36,7 +36,7 @@ public class PhysicalOpBinaryUnion
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                        final QueryPlanningInfo qpInfo,
 	                                        final ExpectedVariables ... inputVars ) {
-		return new ExecOpBinaryUnion(collectExceptions, qpInfo, getLogicalOperator().mayReduce());
+		return new ExecOpBinaryUnion(getLogicalOperator().mayReduce(), collectExceptions, qpInfo);
 	}
 
 	@Override

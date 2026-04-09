@@ -26,10 +26,10 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 {
 	protected final List<SolutionMapping> inputLHS = new ArrayList<>();
 
-	public ExecOpNaiveNestedLoopsJoin( final boolean collectExceptions,
-	                                   final QueryPlanningInfo qpInfo,
-	                                   final boolean mayReduce ) {
-		super(collectExceptions, qpInfo, mayReduce);
+	public ExecOpNaiveNestedLoopsJoin( final boolean mayReduce,
+	                                   final boolean collectExceptions,
+	                                   final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

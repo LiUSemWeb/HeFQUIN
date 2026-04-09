@@ -56,11 +56,11 @@ public class ExecOpParallelBindJoinSPARQLwithUNION
 			final SPARQLEndpoint fm,
 			final ExpectedVariables inputVars,
 			final boolean useOuterJoinSemantics,
+			final boolean mayReduce,
 			final int batchSize,
 			final boolean collectExceptions,
-			final QueryPlanningInfo qpInfo,
-			final boolean mayReduce ) {
-		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo, mayReduce);
+			final QueryPlanningInfo qpInfo ) {
+		super(query, fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 	}

@@ -47,10 +47,10 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 	private long sumOfCDTSizes = 0L;
 
 	public ExecOpUnfold( final Expr expr, final Var var1, final Var var2,
+	                     final boolean mayReduce,
 	                     final boolean collectExceptions,
-	                     final QueryPlanningInfo qpInfo,
-	                     final boolean mayReduce ) {
-		super(collectExceptions, qpInfo, mayReduce);
+	                     final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, collectExceptions, qpInfo);
 
 		assert expr != null;
 		assert var1 != null;

@@ -71,22 +71,22 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	public ExecOpLookupJoinViaWrapperWithParamVars( final SPARQLGraphPattern pattern,
 	                                                final Map<String,Var> paramVars,
 	                                                final WrappedRESTEndpoint fm,
+	                                                final boolean mayReduce,
 	                                                final boolean collectExceptions,
-	                                                final QueryPlanningInfo qpInfo,
-	                                                final boolean mayReduce ) {
-		this( pattern, paramVars, fm,
+	                                                final QueryPlanningInfo qpInfo ) {
+		this( pattern, paramVars, fm, mayReduce,
 		      DEFAULT_INPUT_BLOCK_SIZE,
-		      collectExceptions, qpInfo, mayReduce );
+		      collectExceptions, qpInfo );
 	}
 
 	public ExecOpLookupJoinViaWrapperWithParamVars( final SPARQLGraphPattern pattern,
 	                                                final Map<String,Var> paramVars,
 	                                                final WrappedRESTEndpoint fm,
+	                                                final boolean mayReduce,
 	                                                final int minimumInputBlockSize,
 	                                                final boolean collectExceptions,
-	                                                final QueryPlanningInfo qpInfo,
-	                                                final boolean mayReduce ) {
-		super(minimumInputBlockSize, collectExceptions, qpInfo, mayReduce);
+	                                                final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, minimumInputBlockSize, collectExceptions, qpInfo);
 
 		assert pattern   != null;
 		assert paramVars != null;

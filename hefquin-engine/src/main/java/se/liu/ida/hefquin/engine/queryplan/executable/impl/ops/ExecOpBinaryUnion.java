@@ -12,10 +12,10 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 {
 	private long numberOfOutputMappingsProduced = 0L;
 
-	public ExecOpBinaryUnion( final boolean collectExceptions,
-	                          final QueryPlanningInfo qpInfo,
-	                          final boolean mayReduce ) {
-		super(collectExceptions, qpInfo, mayReduce);
+	public ExecOpBinaryUnion( final boolean mayReduce,
+	                          final boolean collectExceptions,
+	                          final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

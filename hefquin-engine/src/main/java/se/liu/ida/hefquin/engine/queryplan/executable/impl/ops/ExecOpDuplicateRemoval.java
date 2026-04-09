@@ -24,7 +24,7 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	public ExecOpDuplicateRemoval(
 	                     final boolean collectExceptions,
 	                     final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo, true);
+		super(true, collectExceptions, qpInfo);
 	}
 
 	@Override

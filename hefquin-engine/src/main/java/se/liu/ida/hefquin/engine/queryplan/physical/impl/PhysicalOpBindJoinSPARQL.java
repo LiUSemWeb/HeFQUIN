@@ -124,7 +124,7 @@ public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoin
 		}
 
 		if ( fm instanceof SPARQLEndpoint ep )
-			return createExecOp(gp, ep, useOuterJoin, collectExceptions, qpInfo, lop.mayReduce(), inputVars);
+			return createExecOp(gp, ep, useOuterJoin, lop.mayReduce(), collectExceptions, qpInfo, inputVars);
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}
@@ -132,28 +132,28 @@ public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoin
 	protected UnaryExecutableOp createExecOp( final SPARQLGraphPattern pattern,
 	                                          final SPARQLEndpoint sparqlEndpoint,
 	                                          final boolean useOuterJoinSemantics,
+	                                          final boolean mayReduce,
 	                                          final boolean collectExceptions,
 	                                          final QueryPlanningInfo qpInfo,
-	                                          final boolean mayReduce,
 	                                          final ExpectedVariables... inputVars ) {
 		if ( myFactory.useParallelVersion ) {
 			if ( myFactory.type.equals(VALUES_BASED) ) {
 				return new ExecOpParallelBindJoinSPARQLwithVALUES(
 						pattern, sparqlEndpoint, inputVars[0],
-						useOuterJoinSemantics, myFactory.batchSize,
-						collectExceptions, qpInfo, mayReduce );
+						useOuterJoinSemantics, mayReduce, myFactory.batchSize,
+						collectExceptions, qpInfo );
 			}
 			else if ( myFactory.type.equals(FILTER_BASED) ) {
 				return new ExecOpParallelBindJoinSPARQLwithFILTER(
 						pattern, sparqlEndpoint, inputVars[0],
-						useOuterJoinSemantics, myFactory.batchSize,
-						collectExceptions, qpInfo, mayReduce );
+						useOuterJoinSemantics, mayReduce, myFactory.batchSize,
+						collectExceptions, qpInfo );
 			}
 			else if ( myFactory.type.equals(UNION_BASED) ) {
 				return new ExecOpParallelBindJoinSPARQLwithUNION(
 						pattern, sparqlEndpoint, inputVars[0],
-						useOuterJoinSemantics, myFactory.batchSize,
-						collectExceptions, qpInfo, mayReduce );
+						useOuterJoinSemantics, mayReduce, myFactory.batchSize,
+						collectExceptions, qpInfo );
 			}
 			else if ( myFactory.type.equals(VALUES_OR_FILTER) ) {
 				throw new IllegalArgumentException("There is no parallel version of the " + myFactory.type + " bind join.");
@@ -169,32 +169,32 @@ public class PhysicalOpBindJoinSPARQL extends BaseForPhysicalOpSingleInputJoin
 			if ( myFactory.type.equals(VALUES_BASED) ) {
 				return new ExecOpSequentialBindJoinSPARQLwithVALUES(
 						pattern, sparqlEndpoint, inputVars[0],
-						useOuterJoinSemantics, myFactory.batchSize,
-						collectExceptions, qpInfo, mayReduce );
+						useOuterJoinSemantics, mayReduce, myFactory.batchSize,
+						collectExceptions, qpInfo );
 			}
 			else if ( myFactory.type.equals(FILTER_BASED) ) {
 				return new ExecOpSequentialBindJoinSPARQLwithFILTER(
 						pattern, sparqlEndpoint, inputVars[0],
-						useOuterJoinSemantics, myFactory.batchSize,
-						collectExceptions, qpInfo, mayReduce );
+						useOuterJoinSemantics, mayReduce, myFactory.batchSize,
+						collectExceptions, qpInfo );
 			}
 			else if ( myFactory.type.equals(UNION_BASED) ) {
 				return new ExecOpSequentialBindJoinSPARQLwithUNION(
 						pattern, sparqlEndpoint, inputVars[0],
-						useOuterJoinSemantics, myFactory.batchSize,
-						collectExceptions, qpInfo, mayReduce );
+						useOuterJoinSemantics, mayReduce, myFactory.batchSize,
+						collectExceptions, qpInfo );
 			}
 			else if ( myFactory.type.equals(VARIABLE_RENAMING) ) {
 				return new ExecOpSequentialBindJoinSPARQLwithVarRenaming(
 						pattern, sparqlEndpoint, inputVars[0],
-						useOuterJoinSemantics, myFactory.batchSize,
-						collectExceptions, qpInfo, mayReduce );
+						useOuterJoinSemantics, mayReduce, myFactory.batchSize,
+						collectExceptions, qpInfo );
 			}
 			else if ( myFactory.type.equals(VALUES_OR_FILTER) ) {
 				return new ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER(
 						pattern, sparqlEndpoint, inputVars[0],
-						useOuterJoinSemantics, myFactory.batchSize,
-						collectExceptions, qpInfo, mayReduce );
+						useOuterJoinSemantics, mayReduce, myFactory.batchSize,
+						collectExceptions, qpInfo );
 			}
 			else {
 				throw new UnsupportedOperationException("We do not yet have a parallel " + myFactory.type + " bind join.");

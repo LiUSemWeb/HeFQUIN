@@ -37,7 +37,7 @@ public class PhysicalOpFilter implements UnaryPhysicalOpForLogicalOp
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables ... inputVars ) {
-		return new ExecOpFilter( lop.getFilterExpressions(), collectExceptions, qpInfo, lop.mayReduce() );
+		return new ExecOpFilter( lop.getFilterExpressions(), lop.mayReduce(), collectExceptions, qpInfo );
 	}
 
 	@Override

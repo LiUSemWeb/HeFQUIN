@@ -39,7 +39,7 @@ public class PhysicalOpLocalToGlobal implements UnaryPhysicalOpForLogicalOp
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables... inputVars ) {
-		return new ExecOpLocalToGlobal( lop.getVocabularyMapping(), collectExceptions, qpInfo, lop.mayReduce() );
+		return new ExecOpLocalToGlobal( lop.getVocabularyMapping(), lop.mayReduce(), collectExceptions, qpInfo );
 	}
 
 	@Override

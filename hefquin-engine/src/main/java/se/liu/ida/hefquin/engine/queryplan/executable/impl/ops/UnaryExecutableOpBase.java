@@ -34,10 +34,10 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	private boolean executionConcluded = false;
 	private long numberOfInputMappingsProcessed = 0L;
 
-	public UnaryExecutableOpBase( final boolean collectExceptions,
-	                              final QueryPlanningInfo qpInfo,
-	                              final boolean mayReduce ) {
-		super(collectExceptions, qpInfo, mayReduce);
+	public UnaryExecutableOpBase( final boolean mayReduce,
+	                              final boolean collectExceptions,
+	                              final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

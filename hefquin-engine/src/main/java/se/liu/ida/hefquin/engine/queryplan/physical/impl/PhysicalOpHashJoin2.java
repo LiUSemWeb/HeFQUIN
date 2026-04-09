@@ -51,11 +51,11 @@ public class PhysicalOpHashJoin2 extends BaseForPhysicalOpBinaryJoin
 	                                        final ExpectedVariables ... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashJoin2( inputVars[0], inputVars[1],
+		return new ExecOpHashJoin2( useOuterJoinSemantics,
+		                            getLogicalOperator().mayReduce(),
+		                            inputVars[0], inputVars[1],
 		                            collectExceptions,
-		                            useOuterJoinSemantics,
-		                            qpInfo,
-		                            getLogicalOperator().mayReduce() );
+		                            qpInfo );
 	}
 
 	@Override

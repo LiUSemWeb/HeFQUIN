@@ -200,11 +200,11 @@ public class ExecOpHashJoin2Test extends TestsForJoinAlgorithms
 			final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashJoin2( inputVars[0], inputVars[1],
-		                            useOuterJoinSemantics,
-		                            false,   // collectExceptions
-		                            null,               // qpInfo
-		                            false );         // mayReduce
+		return new ExecOpHashJoin2( useOuterJoinSemantics,
+		                            false,            // mayReduce
+		                            inputVars[0], inputVars[1],
+		                            false,    // collectExceptions
+		                            null );              // qpInfo
 	}
 
 }

@@ -290,10 +290,10 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTERTest extends TestsF
 		                                                   fm,
 		                                                   expectedVariables,
 		                                                   useOuterJoinSemantics,
+		                                                   false,
 		                                                   ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER.DEFAULT_BATCH_SIZE,
 		                                                   false,
-		                                                   null,
-		                                                   false );
+		                                                   null );
 	}
 
 }

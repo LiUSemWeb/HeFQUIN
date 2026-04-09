@@ -185,9 +185,9 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenamingTest extends TestsForT
 		                                              fm,
 		                                              expectedVariables,
 		                                              useOuterJoinSemantics,
+		                                              false,
 		                                              ExecOpSequentialBindJoinSPARQLwithVarRenaming.DEFAULT_BATCH_SIZE,
 		                                              false,
-		                                              null,
-		                                              false );
+		                                              null );
 	}
 }

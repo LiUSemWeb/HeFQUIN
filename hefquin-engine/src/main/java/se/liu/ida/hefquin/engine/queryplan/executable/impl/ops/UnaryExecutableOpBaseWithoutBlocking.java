@@ -33,10 +33,10 @@ public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutab
 {
 	public static final int MAX_BATCH_SIZE = 100;
 
-	public UnaryExecutableOpBaseWithoutBlocking( final boolean collectExceptions,
-	                                             final QueryPlanningInfo qpInfo,
-	                                             final boolean mayReduce ) {
-		super(collectExceptions, qpInfo, mayReduce);
+	public UnaryExecutableOpBaseWithoutBlocking( final boolean mayReduce,
+	                                             final boolean collectExceptions,
+	                                             final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

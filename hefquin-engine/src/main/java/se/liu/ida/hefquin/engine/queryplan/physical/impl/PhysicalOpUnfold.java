@@ -34,9 +34,9 @@ public class PhysicalOpUnfold implements UnaryPhysicalOpForLogicalOp
 		return new ExecOpUnfold( lop.getExpr(),
 		                         lop.getVar1(),
 		                         lop.getVar2(),
+		                         lop.mayReduce(),
 		                         collectExceptions,
-		                         qpInfo,
-		                         lop.mayReduce() );
+		                         qpInfo );
 	}
 
 	@Override

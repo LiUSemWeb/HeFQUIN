@@ -30,170 +30,170 @@ import java.util.*;
  */
 public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 {
-    protected final SolutionMappingsIndex indexForChild1;
-    protected final SolutionMappingsIndex indexForChild2;
+	protected final SolutionMappingsIndex indexForChild1;
+	protected final SolutionMappingsIndex indexForChild2;
 
-    protected Stats statsOfIndexForChild1 = null;
-    protected Stats statsOfIndexForChild2 = null;
+	protected Stats statsOfIndexForChild1 = null;
+	protected Stats statsOfIndexForChild2 = null;
 
-    protected boolean child1InputComplete = false;
-    protected boolean child2InputComplete = false;
+	protected boolean child1InputComplete = false;
+	protected boolean child2InputComplete = false;
 
-    /**
-     * This list is used to collect output solution mappings within each
-     * of the various functions of this implementation. Capturing this
-     * type of intermediate buffer as a member object rather creating
-     * a new version of it over and over again within each function
-     * reduces the number of Java objects that the garbage collector
-     * has to deal with.
-     */
-    final List<SolutionMapping> buffer = new ArrayList<>();
+	/**
+	 * This list is used to collect output solution mappings within each
+	 * of the various functions of this implementation. Capturing this
+	 * type of intermediate buffer as a member object rather creating
+	 * a new version of it over and over again within each function
+	 * reduces the number of Java objects that the garbage collector
+	 * has to deal with.
+	 */
+	final List<SolutionMapping> buffer = new ArrayList<>();
 
-    // statistics
-    private long numberOfOutputMappingsProduced = 0L;
+	// statistics
+	private long numberOfOutputMappingsProduced = 0L;
 
-    public ExecOpSymmetricHashJoin( final ExpectedVariables inputVars1,
-                                    final ExpectedVariables inputVars2,
-                                    final boolean collectExceptions,
-                                    final QueryPlanningInfo qpInfo,
-                                    final boolean mayReduce ) {
-        super(collectExceptions, qpInfo, mayReduce);
+	public ExecOpSymmetricHashJoin( final boolean mayReduce,
+	                                final ExpectedVariables inputVars1,
+	                                final ExpectedVariables inputVars2,
+	                                final boolean collectExceptions,
+	                                final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, collectExceptions, qpInfo);
 
-        // determine the certain join variables
-        final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);
+		// determine the certain join variables
+		final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);
 
-        // set up the core part of the two indexes first; it is built on the certain join variables
-        SolutionMappingsIndex solMHashTableL;
-        SolutionMappingsIndex solMHashTableR;
-        if ( certainJoinVars.size() == 1 ) {
-            final Var joinVar = certainJoinVars.iterator().next();
-            solMHashTableL = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
-            solMHashTableR = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
-        }
-        else if ( certainJoinVars.size() == 2 ) {
-            final Iterator<Var> liVar = certainJoinVars.iterator();
-            final Var joinVar1 = liVar.next();
-            final Var joinVar2 = liVar.next();
+		// set up the core part of the two indexes first; it is built on the certain join variables
+		SolutionMappingsIndex solMHashTableL;
+		SolutionMappingsIndex solMHashTableR;
+		if ( certainJoinVars.size() == 1 ) {
+			final Var joinVar = certainJoinVars.iterator().next();
+			solMHashTableL = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
+			solMHashTableR = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
+		}
+		else if ( certainJoinVars.size() == 2 ) {
+			final Iterator<Var> liVar = certainJoinVars.iterator();
+			final Var joinVar1 = liVar.next();
+			final Var joinVar2 = liVar.next();
 
-            solMHashTableL = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
-            solMHashTableR = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
-        }
-        else{
-            solMHashTableL = new SolutionMappingsHashTable(certainJoinVars);
-            solMHashTableR = new SolutionMappingsHashTable(certainJoinVars);
-        }
+			solMHashTableL = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
+			solMHashTableR = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
+		}
+		else{
+			solMHashTableL = new SolutionMappingsHashTable(certainJoinVars);
+			solMHashTableR = new SolutionMappingsHashTable(certainJoinVars);
+		}
 
-        // Check whether there are other variables that may be relevant for
-        // the join and, if so, set up the indexes to use post-matching.
-        final Set<Var> potentialJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables(inputVars1, inputVars2);
-        if ( ! potentialJoinVars.equals(certainJoinVars) ) {
-            solMHashTableL = new SolutionMappingsIndexWithPostMatching(solMHashTableL);
-            solMHashTableR = new SolutionMappingsIndexWithPostMatching(solMHashTableR);
-        }
+		// Check whether there are other variables that may be relevant for
+		// the join and, if so, set up the indexes to use post-matching.
+		final Set<Var> potentialJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables(inputVars1, inputVars2);
+		if ( ! potentialJoinVars.equals(certainJoinVars) ) {
+			solMHashTableL = new SolutionMappingsIndexWithPostMatching(solMHashTableL);
+			solMHashTableR = new SolutionMappingsIndexWithPostMatching(solMHashTableR);
+		}
 
-        this.indexForChild1 = new SolutionMappingsIndexForMixedUsage(solMHashTableL);
-        this.indexForChild2 = new SolutionMappingsIndexForMixedUsage(solMHashTableR);
-    }
+		this.indexForChild1 = new SolutionMappingsIndexForMixedUsage(solMHashTableL);
+		this.indexForChild2 = new SolutionMappingsIndexForMixedUsage(solMHashTableR);
+	}
 
-    @Override
-    public boolean requiresCompleteChild1InputFirst() {
-        return false;
-    }
+	@Override
+	public boolean requiresCompleteChild1InputFirst() {
+		return false;
+	}
 
-    @Override
-    public boolean requiresCompleteChild2InputFirst() {
-        return false;
-    }
+	@Override
+	public boolean requiresCompleteChild2InputFirst() {
+		return false;
+	}
 
-    @Override
-    protected void _processInputFromChild1( final SolutionMapping inputSolMap,
-                                            final IntermediateResultElementSink sink,
-                                            final ExecutionContext execCxt ) {
-        buffer.clear();
+	@Override
+	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
+	                                        final IntermediateResultElementSink sink,
+	                                        final ExecutionContext execCxt ) {
+		buffer.clear();
 
-        _processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
+		_processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
 
-        numberOfOutputMappingsProduced += buffer.size();
-        sink.send(buffer);
+		numberOfOutputMappingsProduced += buffer.size();
+		sink.send(buffer);
 
-        buffer.clear();
-    }
+		buffer.clear();
+	}
 
-    @Override
-    protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
-                                            final IntermediateResultElementSink sink,
-                                            final ExecutionContext execCxt ) {
-        buffer.clear();
+	@Override
+	protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
+	                                        final IntermediateResultElementSink sink,
+	                                        final ExecutionContext execCxt ) {
+		buffer.clear();
 
-        for ( final SolutionMapping inputSolMap : inputSolMaps ) {
-            _processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
-        }
+		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
+			_processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
+		}
 
-        numberOfOutputMappingsProduced += buffer.size();
-        sink.send(buffer);
+		numberOfOutputMappingsProduced += buffer.size();
+		sink.send(buffer);
 
-        buffer.clear();
-    }
+		buffer.clear();
+	}
 
-    @Override
-    protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
-                                     final ExecutionContext execCxt ) {
-        child1InputComplete = true;
+	@Override
+	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
+									 final ExecutionContext execCxt ) {
+		child1InputComplete = true;
 
-        if ( child2InputComplete ) {
-            wrapUp();
-        }
-    }
+		if ( child2InputComplete ) {
+			wrapUp();
+		}
+	}
 
-    @Override
-    protected void _processInputFromChild2( final SolutionMapping inputSolMap,
-                                            final IntermediateResultElementSink sink,
-                                            final ExecutionContext execCxt ) {
-        buffer.clear();
+	@Override
+	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
+	                                        final IntermediateResultElementSink sink,
+	                                        final ExecutionContext execCxt ) {
+		buffer.clear();
 
-        _processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
+		_processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
 
-        numberOfOutputMappingsProduced += buffer.size();
-        sink.send(buffer);
+		numberOfOutputMappingsProduced += buffer.size();
+		sink.send(buffer);
 
-        buffer.clear();
-    }
+		buffer.clear();
+	}
 
-    @Override
-    protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
-                                            final IntermediateResultElementSink sink,
-                                            final ExecutionContext execCxt ) {
-        buffer.clear();
+	@Override
+	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
+	                                        final IntermediateResultElementSink sink,
+	                                        final ExecutionContext execCxt ) {
+		buffer.clear();
 
-        for ( final SolutionMapping inputSolMap : inputSolMaps ) {
-            _processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
-        }
+		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
+			_processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
+		}
 
-        numberOfOutputMappingsProduced += buffer.size();
-        sink.send(buffer);
+		numberOfOutputMappingsProduced += buffer.size();
+		sink.send(buffer);
 
-        buffer.clear();
-    }
+		buffer.clear();
+	}
 
-    @Override
-    protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
-                                     final ExecutionContext execCxt ) {
-        child2InputComplete = true;
+	@Override
+	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
+	                                 final ExecutionContext execCxt ) {
+		child2InputComplete = true;
 
-        if ( child1InputComplete ) {
-            wrapUp();
-        }
-    }
+		if ( child1InputComplete ) {
+			wrapUp();
+		}
+	}
 
-    protected void wrapUp() {
-        // clear both indexes to enable the GC to release memory early,
-        // but make sure we keep the final stats of the indexes
-        statsOfIndexForChild1 = indexForChild1.getStats();
-        statsOfIndexForChild2 = indexForChild2.getStats();
+	protected void wrapUp() {
+		// clear both indexes to enable the GC to release memory early,
+		// but make sure we keep the final stats of the indexes
+		statsOfIndexForChild1 = indexForChild1.getStats();
+		statsOfIndexForChild2 = indexForChild2.getStats();
 
-        indexForChild1.clear();
-        indexForChild2.clear();
-    }
+		indexForChild1.clear();
+		indexForChild2.clear();
+	}
 
 	@Override
 	public void resetStats() {
@@ -208,16 +208,16 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		return s;
 	}
 
-    protected static void _processInputSolMap( final SolutionMapping inputSolMap,
-                                               final SolutionMappingsIndex indexForInput,
-                                               final SolutionMappingsIndex indexForProbing,
-                                               final List<SolutionMapping> outputBuffer ) {
-        indexForInput.add(inputSolMap);
+	protected static void _processInputSolMap( final SolutionMapping inputSolMap,
+	                                           final SolutionMappingsIndex indexForInput,
+	                                           final SolutionMappingsIndex indexForProbing,
+	                                           final List<SolutionMapping> outputBuffer ) {
+		indexForInput.add(inputSolMap);
 
-        final Iterable<SolutionMapping> matchingSolMaps = indexForProbing.getJoinPartners(inputSolMap);
-        for ( final SolutionMapping matchingSolMap : matchingSolMaps ) {
-            outputBuffer.add( SolutionMappingUtils.merge(inputSolMap, matchingSolMap) );
-        }
-    }
+		final Iterable<SolutionMapping> matchingSolMaps = indexForProbing.getJoinPartners(inputSolMap);
+		for ( final SolutionMapping matchingSolMap : matchingSolMaps ) {
+			outputBuffer.add( SolutionMappingUtils.merge(inputSolMap, matchingSolMap) );
+		}
+	}
 
 }

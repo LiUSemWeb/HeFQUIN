@@ -13,10 +13,10 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 	private long numberOfOutputMappingsProduced = 0L;
 
 	public ExecOpMultiwayUnion( final int numberOfChildren,
+	                            final boolean mayReduce,
 	                            final boolean collectExceptions,
-	                            final QueryPlanningInfo qpInfo,
-	                            final boolean mayReduce ) {
-		super(numberOfChildren, collectExceptions, qpInfo, mayReduce);
+	                            final QueryPlanningInfo qpInfo ) {
+		super(numberOfChildren, mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

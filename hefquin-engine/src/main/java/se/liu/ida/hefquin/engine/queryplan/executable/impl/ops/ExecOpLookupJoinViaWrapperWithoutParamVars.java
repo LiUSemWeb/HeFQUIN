@@ -43,10 +43,10 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 
 	public ExecOpLookupJoinViaWrapperWithoutParamVars( final SPARQLGraphPattern pattern,
 	                                                   final WrappedRESTEndpoint fm,
+	                                                   final boolean mayReduce,
 	                                                   final boolean collectExceptions,
-	                                                   final QueryPlanningInfo qpInfo,
-	                                                   final boolean mayReduce ) {
-		super(collectExceptions, qpInfo, mayReduce);
+	                                                   final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, collectExceptions, qpInfo);
 
 		assert pattern != null;
 		assert fm != null;

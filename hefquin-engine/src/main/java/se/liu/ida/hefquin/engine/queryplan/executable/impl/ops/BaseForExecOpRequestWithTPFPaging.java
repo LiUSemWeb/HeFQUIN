@@ -34,10 +34,10 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 
 	public BaseForExecOpRequestWithTPFPaging( final ReqType req,
 	                                          final MemberType fm,
+	                                          final boolean mayReduce,
 	                                          final boolean collectExceptions,
-	                                          final QueryPlanningInfo qpInfo,
-	                                          final boolean mayReduce ) {
-		super(req, fm, collectExceptions, qpInfo, mayReduce);
+	                                          final QueryPlanningInfo qpInfo ) {
+		super(req, fm, mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

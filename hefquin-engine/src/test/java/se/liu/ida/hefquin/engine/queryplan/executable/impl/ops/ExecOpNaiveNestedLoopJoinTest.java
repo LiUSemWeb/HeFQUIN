@@ -114,6 +114,6 @@ public class ExecOpNaiveNestedLoopJoinTest extends TestsForJoinAlgorithms
 			final ExpectedVariables... inputVars ) {
 		assert useOuterJoinSemantics == false;
 
-		return new ExecOpNaiveNestedLoopsJoin(false, null, false);
+		return new ExecOpNaiveNestedLoopsJoin(false, false, null);
 	}
 }
