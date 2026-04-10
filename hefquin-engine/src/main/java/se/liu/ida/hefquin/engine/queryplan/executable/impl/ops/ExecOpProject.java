@@ -32,7 +32,6 @@ public class ExecOpProject extends UnaryExecutableOpBaseWithoutBlocking
 		super(collectExceptions, qpInfo);
 
 		assert variables != null;
-		assert ! variables.isEmpty();
 
 		this.variables = variables;
 	}

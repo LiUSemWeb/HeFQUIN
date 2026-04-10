@@ -1,11 +1,13 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprVars;
 
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
@@ -28,6 +30,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
@@ -109,96 +113,111 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			// The project cannot be pushed under this operator.
+			createdPlan = inputPlan;
 		}
 
 		@Override
 		public void visit( final LogicalOpGPAdd op ) {
 			createdPlan = createPlanForAddOpUnderProject( projectOp,
-			                                             op,
-			                                             subPlanUnderProject.getSubPlan(0),
-			                                             inputPlan );
+			                                              op,
+			                                              subPlanUnderProject.getSubPlan(0),
+			                                              inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpGPOptAdd op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForAddOpUnderProject( projectOp,
+			                                              op,
+			                                              subPlanUnderProject.getSubPlan(0),
+			                                              inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpJoin op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForJoinUnderProject( projectOp,
+			                                             subPlanUnderProject,
+			                                             inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpLeftJoin op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForLeftJoinUnderProject( projectOp,
+			                                                 subPlanUnderProject.getSubPlan(1), // non-optional subplan
+			                                                 subPlanUnderProject.getSubPlan(0), // optional subplan
+			                                                 inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpUnion op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForUnionUnderProject( projectOp, subPlanUnderProject );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayJoin op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForJoinUnderProject( projectOp,
+			                                             subPlanUnderProject,
+			                                             inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayLeftJoin op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForMultiwayLeftJoinUnderProject( projectOp,
+			                                                         subPlanUnderProject,
+			                                                         inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayUnion op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForUnionUnderProject( projectOp, subPlanUnderProject );
 		}
 
 		@Override
 		public void visit( final LogicalOpFilter op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			// Do not push the project operator below the filter operator.
+			// FilterPushDown has priority over ProjectPushDown because pushing
+			// filters reduces the number of solution mappings earlier, which
+			// is typically more beneficial than reducing their width.
+			createdPlan = inputPlan;
 		}
 
 		@Override
 		public void visit( final LogicalOpBind op ) {
 			createdPlan = createPlanForBindUnderProject( projectOp,
 			                                             op,
-			                                             subPlanUnderProject,
+			                                             subPlanUnderProject.getSubPlan(0),
 			                                             inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpUnfold op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForUnfoldUnderProject( projectOp,
+			                                               op,
+			                                               subPlanUnderProject.getSubPlan(0),
+			                                               inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForL2GOrG2LUnderProject( projectOp,
+			                                                 op,
+			                                                 subPlanUnderProject.getSubPlan(0),
+			                                                 inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForL2GOrG2LUnderProject( projectOp,
+			                                                 op,
+			                                                 subPlanUnderProject.getSubPlan(0),
+			                                                 inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpDedup op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			createdPlan = createPlanForUnaryOpUnderProject( projectOp,
+			                                                op,
+			                                                subPlanUnderProject.getSubPlan(0) );
 		}
 
 		@Override
@@ -217,51 +236,320 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		return inputPlan;
 	}
 
-	protected LogicalPlan createPlanForProjectUnderProject( final LogicalOpProject parentProjectOp,
-	                                                        final LogicalOpProject childProjectOp,
-	                                                        final LogicalPlan subPlanUnderChildProjectOp ) {
-		final Set<Var> combinedVariables = new HashSet<>();
-		combinedVariables.addAll(parentProjectOp.getVariables());
-		combinedVariables.addAll(childProjectOp.getVariables());
+	protected LogicalPlan createPlanForUnionUnderProject( final LogicalOpProject projectOp,
+	                                                      final LogicalPlan subPlanUnderProject ) {
+		// simply pushes the project operator into every subplan under the
+		// union operator and, then, applies this heuristic recursively to
+		// each such subplan; in the end, collects all resulting subplans
+		// again under a multiway union as new root operator
+		final int numberOfSubPlansUnderUnion = subPlanUnderProject.numberOfSubPlans();
+		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlansUnderUnion];
+		for ( int i = 0; i < numberOfSubPlansUnderUnion; i++ ) {
+			final LogicalPlan subPlanUnderUnion = subPlanUnderProject.getSubPlan(i);
+			final LogicalPlan newSubPlanWithProjectAsRoot = new LogicalPlanWithUnaryRootImpl(projectOp, null, subPlanUnderUnion);
+			final LogicalPlan newSubPlanWithProjectPushed = apply(newSubPlanWithProjectAsRoot);
+			newSubPlans[i] = newSubPlanWithProjectPushed;
+		}
 
-		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
-			new LogicalOpProject(combinedVariables),
-			null,
-			subPlanUnderChildProjectOp );
+		// If there is only one subplan under the union, then remove the union altogether.
+		if ( numberOfSubPlansUnderUnion == 1 ) return newSubPlans[0];
 
-		return apply(newPlan);
+		final LogicalOperator unionOp = subPlanUnderProject.getRootOperator(); // may be multiway union or binary union
+		return LogicalPlanUtils.createPlanWithSubPlans(unionOp, null, newSubPlans);
 	}
 
 	protected LogicalPlan createPlanForBindUnderProject( final LogicalOpProject projectOp,
-	                                                    final LogicalOpBind bindOp,
-	                                                    final LogicalPlan subPlanUnderBind,
-	                                                    final LogicalPlan inputPlan ) {
-		// Check whether the project can be pushed under the given bind operator,
-		// which is possible only if all of the projected variables are assigned
-		// either by the bind operator or by its children (i.e., they are available
-		// after the bind). Otherwise, the project must stay above the bind.
+	                                                     final LogicalOpBind bindOp,
+	                                                     final LogicalPlan subPlanUnderBind,
+	                                                     final LogicalPlan inputPlan ) {
+		// Check whether the project can be pushed under the bind operator.
+		// This is only safe if all variables required to evaluate the bind
+		// expressions are preserved by the projection. Otherwise, pushing
+		// the project would remove variables needed by the bind.
 		final Set<Var> varsInProject = projectOp.getVariables();
-		final List<Var> varsProducedByBindAndChild = bindOp.getBindExpressions().getVars();
-		//varsProducedByBindAndChild.addAll(subPlanUnderBind.getExpectedVariables()) CHECK THIS
-		if ( ! varsProducedByBindAndChild.containsAll(varsInProject) )
+		final Set<Var> varsUsedInBind = new HashSet<>();
+
+		for ( Expr expr : bindOp.getBindExpressions().getExprs().values() ) {
+			varsUsedInBind.addAll(ExprVars.getVarsMentioned(expr));
+		}
+
+		if ( ! varsInProject.containsAll(varsUsedInBind) )
 			return inputPlan;
 
 		// The project can be pushed.
 		return createPlanForUnaryOpUnderProject(projectOp, bindOp, subPlanUnderBind);
 	}
 
-	protected LogicalPlan createPlanForAddOpUnderProject( final LogicalOpProject projectOp,
+	protected LogicalPlan createPlanForUnfoldUnderProject(
+			final LogicalOpProject projectOp,
+			final LogicalOpUnfold unfoldOp,
+			final LogicalPlan subPlanUnderUnfold,
+			final LogicalPlan inputPlan ) {
+		// Check whether the project can be pushed under the given
+		// unfold operator, which is possible only if none of the
+		// variables assigned by the unfold operator are included in
+		// the project variables.
+		final Set<Var> varsInProject = projectOp.getVariables();
+		final Var unfoldVar1 = unfoldOp.getVar1();
+		final Var unfoldVar2 = unfoldOp.getVar2();
+		if ( varsInProject.contains(unfoldVar1) )
+			return inputPlan;
+		if ( unfoldVar2 != null && varsInProject.contains(unfoldVar2) )
+			return inputPlan;
+
+		// The project can be pushed. In this case, create a new subplan with
+		// the project as root operator on top of the subplan that was under
+		// the unfold, and apply this heuristic recursively to this new subplan.
+		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
+				projectOp,
+				null,
+				subPlanUnderUnfold );
+		final LogicalPlan newSubPlan2 = apply(newSubPlan1);
+
+		// Finally, put together the new plan with the unfold operator as root.
+		return LogicalPlanUtils.createPlanWithSubPlans(unfoldOp, null, newSubPlan2);
+	}
+
+	/**
+	 * Assumes that the given child operator is either a {@link LogicalOpLocalToGlobal}
+	 * or a {@link LogicalOpGlobalToLocal}.
+	 */
+	protected LogicalPlan createPlanForL2GOrG2LUnderProject( final LogicalOpProject parentProjectOp,
+	                                                         final UnaryLogicalOp childOp,
+	                                                         final LogicalPlan subPlanUnderChildOp,
+	                                                         final LogicalPlan inputPlan ) {
+		// The current implementation does not try to push project operators
+		// conditions under the vocabulary rewriting operators,
+		// LogicalOpLocalToGlobal and LogicalOpGlobalToLocal.
+
+		// For the time being, we only apply the project
+		// push-down heuristic to the subplan that is under the
+		// given vocabulary rewriting operator.
+		return createPlanAfterPushingInSubPlan(parentProjectOp, childOp, subPlanUnderChildOp, inputPlan);
+	}
+
+	/**
+	 * Assumes that the given child operator is either
+	 * a {@link LogicalOpTPAdd},
+	 * a {@link LogicalOpTPOptAdd},
+	 * a {@link LogicalOpBGPAdd},
+	 * a {@link LogicalOpBGPOptAdd},
+	 * a {@link LogicalOpGPAdd}, or
+	 * a {@link LogicalOpGPOptAdd}.
+	 */
+	protected LogicalPlan createPlanForAddOpUnderProject( final LogicalOpProject parentProjectOp,
 	                                                      final UnaryLogicalOp childOp,
 	                                                      final LogicalPlan subPlanUnderChildOp,
 	                                                      final LogicalPlan inputPlan ) {
-		return inputPlan;
+		// TODO: Consider pushing the project operator also into the pattern of the
+		// xxAdd operators (e.g., GPAdd, GPOptAdd) where possible. This is not handled
+		// currently, as such operators do not appear in the logical plans we optimize.
+		// This optimization can be revisited in the future, taking into account that
+		// for optional patterns (xxOptAdd), pushing projections may not always be safe.
+
+		final ExpectedVariables expVarsInSubPlan = subPlanUnderChildOp.getExpectedVariables();
+		final Set<Var> certainVarsInSubPlan = expVarsInSubPlan.getCertainVariables();
+		final Set<Var> varsInProject = parentProjectOp.getVariables();
+
+		// Can only push if all projected variables are guaranteed by subplan
+		if ( ! certainVarsInSubPlan.containsAll(varsInProject) ) {
+			return createPlanAfterPushingInSubPlan(parentProjectOp, childOp, subPlanUnderChildOp, inputPlan);
+		}
+
+		// Push the entire project
+		final LogicalPlan newSubPlanUnderChildOp = new LogicalPlanWithUnaryRootImpl(
+				parentProjectOp,
+				null,
+				subPlanUnderChildOp );
+
+		final LogicalPlan newSubPlanUnderChildOpRewritten = apply(newSubPlanUnderChildOp);
+
+		return new LogicalPlanWithUnaryRootImpl(childOp, null, newSubPlanUnderChildOpRewritten);
 	}
 
 	protected LogicalPlan createPlanForJoinUnderProject( final LogicalOpProject projectOp,
 	                                                     final LogicalPlan subPlanUnderProject,
 	                                                     final LogicalPlan inputPlan ) {
-		return inputPlan;
+		final int numberOfSubPlansUnderJoin = subPlanUnderProject.numberOfSubPlans();
+
+		// If there is only one subplan under the join, then remove the join altogether.
+		if (numberOfSubPlansUnderJoin == 1) {
+			final LogicalPlan subPlan = subPlanUnderProject.getSubPlan(0);
+			final LogicalPlan subPlanAfterProjectPushDown = apply(subPlan);
+			return new LogicalPlanWithUnaryRootImpl(projectOp, null, subPlanAfterProjectPushDown);
+		}
+
+		final Set<Var> varsInProject = projectOp.getVariables();
+		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlansUnderJoin];
+
+		// For each subplan under the join, compute the intersection between the
+		// projected variables and the variables produced by that subplan.
+		// If the intersection is non-empty, push a project operator with those
+		// variables into that subplan.
+		boolean noChanges = true; // set to false if something has changed in the plan
+		for (int i = 0; i < numberOfSubPlansUnderJoin; i++) {
+			final LogicalPlan subPlan = subPlanUnderProject.getSubPlan(i);
+
+			final Set<Var> varsInSubPlan = subPlan.getExpectedVariables().getCertainVariables();
+
+			// Compute intersection
+			final Set<Var> varsForThisBranch = new HashSet<>(varsInProject);
+			varsForThisBranch.retainAll(varsInSubPlan);
+
+			LogicalPlan newSubPlan;
+
+			if (varsForThisBranch.isEmpty()) {
+				// No projection needed for this branch
+				newSubPlan = apply(subPlan);
+			} else {
+				final LogicalOpProject branchProject = new LogicalOpProject(varsForThisBranch);
+				final LogicalPlan withProject = new LogicalPlanWithUnaryRootImpl(branchProject, null, subPlan);
+
+				newSubPlan = apply(withProject);
+			}
+
+			newSubPlans[i] = newSubPlan;
+			if (!newSubPlan.equals(subPlan))
+				noChanges = false;
+		}
+
+		if ( noChanges )
+			return inputPlan;
+
+		final LogicalOperator joinOp = subPlanUnderProject.getRootOperator();
+
+		final LogicalPlan newJoin = LogicalPlanUtils.createPlanWithSubPlans(
+				joinOp,
+				null,
+				newSubPlans );
+
+		// Keep original project on top
+		return new LogicalPlanWithUnaryRootImpl(projectOp, null, newJoin);
 	}
+
+	protected LogicalPlan createPlanForLeftJoinUnderProject( final LogicalOpProject projectOp,
+	                                                         final LogicalPlan nonoptSubPlan,
+	                                                         final LogicalPlan optSubPlan,
+	                                                         final LogicalPlan inputPlan ) {
+		// Pushes project operator over a left join operator by applying
+		// it to the non-optional (left) subplan only. The projection is
+		// restricted to variables that are both projected and certain in
+		// the non-optional subplan.
+		final Set<Var> varsInProject = projectOp.getVariables();
+
+		// Create the new non-optional subplan.
+		final LogicalPlan newNonOptSubPlan;
+		final Set<Var> varsInNonOpt = nonoptSubPlan.getExpectedVariables().getCertainVariables();
+		final Set<Var> varsForNonOpt = new HashSet<>(varsInProject);
+		varsForNonOpt.retainAll(varsInNonOpt);
+
+		if ( varsForNonOpt.isEmpty() ) {
+			newNonOptSubPlan = apply(nonoptSubPlan);
+		}
+		else {
+			final LogicalOpProject projectForNonOpt = new LogicalOpProject(varsForNonOpt);
+			final LogicalPlan newSubPlanWithProjectAsRoot = new LogicalPlanWithUnaryRootImpl(projectForNonOpt, null, nonoptSubPlan);
+			newNonOptSubPlan = apply(newSubPlanWithProjectAsRoot);
+		}
+
+		// Project should not be pushed to the optional subplan
+		final LogicalPlan newOptSubPlan = apply(optSubPlan);
+
+		if (    newNonOptSubPlan.equals(nonoptSubPlan)
+		     && newOptSubPlan.equals(optSubPlan) ) {
+			return inputPlan;
+		}
+
+		// Create the new rewritten plan to be returned.
+		final LogicalPlan newSubPlanUnderProject = new LogicalPlanWithBinaryRootImpl(
+			LogicalOpLeftJoin.getInstance(),
+			null,
+			newNonOptSubPlan,
+			newOptSubPlan );
+
+		return new LogicalPlanWithUnaryRootImpl( projectOp,
+		                                         null,
+		                                         newSubPlanUnderProject );
+	}
+
+	protected LogicalPlan createPlanForMultiwayLeftJoinUnderProject( final LogicalOpProject projectOp,
+	                                                                 final LogicalPlan subPlanUnderProject,
+	                                                                 final LogicalPlan inputPlan ) {
+		// Only push the project operator into the non-optional subplan.
+		// For the optional subplans, we only apply the heuristic recursively,
+		// but do not push the project operator into them.
+		final int numberOfSubPlansUnderJoin = subPlanUnderProject.numberOfSubPlans();
+		final LogicalPlan[] newSubPlansUnderJoin = new LogicalPlan[numberOfSubPlansUnderJoin];
+
+		final Set<Var> varsInProject = projectOp.getVariables();
+
+		// Create the new non-optional subplan.
+		final LogicalPlan oldNonOptSubPlan = subPlanUnderProject.getSubPlan(0);
+		final LogicalPlan newNonOptSubPlan;
+		final Set<Var> varsInNonOpt = oldNonOptSubPlan.getExpectedVariables().getCertainVariables();
+		final Set<Var> varsForNonOpt = new HashSet<>(varsInProject);
+		varsForNonOpt.retainAll(varsInNonOpt);
+
+		if ( varsForNonOpt.isEmpty() ) {
+			newNonOptSubPlan = apply(oldNonOptSubPlan);
+		}
+		else {
+			final LogicalOpProject projectForNonOpt = new LogicalOpProject(varsForNonOpt);
+			final LogicalPlan newSubPlanWithProjectAsRoot = new LogicalPlanWithUnaryRootImpl(projectForNonOpt, null, oldNonOptSubPlan);
+			newNonOptSubPlan = apply(newSubPlanWithProjectAsRoot);
+		}
+		newSubPlansUnderJoin[0] = newNonOptSubPlan;
+
+		// Now set up the new optional subplans of the join by
+		// applying this heuristic recursively to each of them.
+		boolean noChanges = true; // set to false if something has changed in the plan
+		for ( int i = 1; i < numberOfSubPlansUnderJoin; i++ ) {
+			final LogicalPlan oldSubPlan = subPlanUnderProject.getSubPlan(i);
+			final LogicalPlan newSubPlan = apply(oldSubPlan);
+
+			if ( newSubPlan.equals(oldSubPlan) ) {
+				// If the current subplan did not change when applying
+				// the heuristic to it, then simply keep that subplan.
+				newSubPlansUnderJoin[i] = oldSubPlan;
+			}
+			else {
+				// Otherwise, use the changed subplan and record that
+				// at least one of subplans is indeed a changed one.
+				newSubPlansUnderJoin[i] = newSubPlan;
+				noChanges = false;
+			}
+		}
+
+		// If nothing was changed, return the given input plan.
+		if ( noChanges && newSubPlansUnderJoin[0].equals(oldNonOptSubPlan) )
+			return inputPlan;
+
+		// Create the new rewritten plan to be returned.
+		final LogicalPlan newSubPlanUnderProject = new LogicalPlanWithNaryRootImpl(
+			LogicalOpMultiwayLeftJoin.getInstance(),
+			null,
+			newSubPlansUnderJoin );
+
+		return new LogicalPlanWithUnaryRootImpl( projectOp,
+		                                         null,
+		                                         newSubPlanUnderProject );
+	}
+
+	protected LogicalPlan createPlanForProjectUnderProject( final LogicalOpProject parentProjectOp,
+	                                                        final LogicalOpProject childProjectOp,
+	                                                        final LogicalPlan subPlanUnderChildProjectOp ) {
+		final Set<Var> intersectionOfVars = new HashSet<>(childProjectOp.getVariables());
+		intersectionOfVars.retainAll(parentProjectOp.getVariables());
+
+		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
+			new LogicalOpProject(intersectionOfVars),
+			null,
+			subPlanUnderChildProjectOp );
+
+		return apply(newPlan);
+	}
+
+
 
 	protected LogicalPlan createPlanForUnaryOpUnderProject( final LogicalOpProject projectOp, final UnaryLogicalOp op, final LogicalPlan subPlanUnderOp ) {
 		// Create a new subplan with the project as root operator on top of the
@@ -277,5 +565,31 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		return LogicalPlanUtils.createPlanWithSubPlans(op, null, newSubPlan2);
 	}
 
+	protected LogicalPlan createPlanAfterPushingInSubPlan( final LogicalOpProject parentProjectOp,
+	                                                       final UnaryLogicalOp childOp,
+	                                                       final LogicalPlan subPlanUnderChildOp,
+	                                                       final LogicalPlan inputPlan ) {
+		// Apply the heuristic recursively within the given subplan.
+		final LogicalPlan newPlanUnderChildRoot = apply(subPlanUnderChildOp);
+
+		// If the heuristic cannot be applied within the subplan (more
+		// precisely, if there are no project operators in the subplan that can
+		// be pushed), then we return the given input plan (instead of
+		// recreating another, identical version of that plan).
+		if ( newPlanUnderChildRoot.equals(subPlanUnderChildOp) ) {
+			return inputPlan;
+		}
+
+		// After pushing project in the subplan, create a new plan.
+		final LogicalPlan newPlanUnderProject = new LogicalPlanWithUnaryRootImpl(
+				childOp,
+				null,
+				newPlanUnderChildRoot );
+		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
+				parentProjectOp,
+				null,
+				newPlanUnderProject );
+		return newPlan;
+	}
 
 }
