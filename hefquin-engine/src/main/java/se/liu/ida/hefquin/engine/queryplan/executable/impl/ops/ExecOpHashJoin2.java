@@ -23,12 +23,13 @@ public class ExecOpHashJoin2 extends BaseForExecOpHashJoin
 
 	protected Stats statsOfIndex = null;
 
-	public ExecOpHashJoin2( final ExpectedVariables inputVars1,
+	public ExecOpHashJoin2( final boolean useOuterJoinSemantics,
+	                        final boolean mayReduce,
+	                        final ExpectedVariables inputVars1,
 	                        final ExpectedVariables inputVars2,
-	                        final boolean useOuterJoinSemantics,
 	                        final boolean collectExceptions,
 	                        final QueryPlanningInfo qpInfo ) {
-		super(inputVars1, inputVars2, collectExceptions, qpInfo);
+		super(mayReduce, inputVars1, inputVars2, collectExceptions, qpInfo);
 
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 	}

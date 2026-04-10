@@ -35,7 +35,7 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                        final QueryPlanningInfo qpInfo,
 	                                        final ExpectedVariables... inputVars ) {
-		return new ExecOpNaiveNestedLoopsJoin(collectExceptions, qpInfo);
+		return new ExecOpNaiveNestedLoopsJoin(getLogicalOperator().mayReduce(), collectExceptions, qpInfo);
 	}
 
 	@Override

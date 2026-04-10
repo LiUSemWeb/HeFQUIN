@@ -171,7 +171,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 			if ( keepMultiwayJoins ) {
 				final NaryPhysicalOp pop = new BaseForPhysicalOpMultiwayJoin(lop) {
 					@Override public void visit(PhysicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
-					@Override public NaryExecutableOp createExecOp(boolean collectExceptions, QueryPlanningInfo qpInfo, ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
+					@Override public NaryExecutableOp createExecOp(boolean collectExceptions, QueryPlanningInfo qpInfo, ExpectedVariables ... inputVars) { throw new UnsupportedOperationException(); }
 				};
 				return PhysicalPlanFactory.createPlan(pop, qpInfo, children);
 			}
@@ -225,7 +225,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 				final List<LogicalOpRequest<?,?>> optionalParts = PhysicalOpParallelMultiLeftJoin.checkApplicability(children);
 				if ( optionalParts != null ) {
 					// If the parallel multi-left-join can indeed be used, do so.
-					final UnaryPhysicalOp rootOp = new PhysicalOpParallelMultiLeftJoin(optionalParts);
+					final UnaryPhysicalOp rootOp = new PhysicalOpParallelMultiLeftJoin(optionalParts, lop.mayReduce());
 					return PhysicalPlanFactory.createPlan( rootOp, qpInfo, children[0] );
 				}
 			}

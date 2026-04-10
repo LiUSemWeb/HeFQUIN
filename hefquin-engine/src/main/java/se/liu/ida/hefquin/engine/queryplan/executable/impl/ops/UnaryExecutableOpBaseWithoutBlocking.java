@@ -27,15 +27,16 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * parent operator in the plan, then the parent operator may idle. Of course,
  * it is also possible to directly send all output solution mappings individually
  * to the parent operator, but that should be avoided to reduce the communication
- * between the threads that run these operators. 
+ * between the threads that run these operators.
  */
 public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutableOpBase
 {
 	public static final int MAX_BATCH_SIZE = 100;
 
-	public UnaryExecutableOpBaseWithoutBlocking( final boolean collectExceptions,
+	public UnaryExecutableOpBaseWithoutBlocking( final boolean mayReduce,
+	                                             final boolean collectExceptions,
 	                                             final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

@@ -30,10 +30,11 @@ public class PhysicalOpUnfold implements UnaryPhysicalOpForLogicalOp
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
-	                                       final ExpectedVariables... inputVars ) {
+	                                       final ExpectedVariables ... inputVars ) {
 		return new ExecOpUnfold( lop.getExpr(),
 		                         lop.getVar1(),
 		                         lop.getVar2(),
+		                         lop.mayReduce(),
 		                         collectExceptions,
 		                         qpInfo );
 	}

@@ -34,54 +34,56 @@ import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlannerImpl
 {
 	@Override
-	protected LogicalPlan createPlan( final Op jenaOp, final QueryProcContext ctxt ) {
+	protected LogicalPlan createPlan( final Op jenaOp, final boolean mayReduce, final QueryProcContext ctxt ) {
 		if ( jenaOp instanceof OpBGP bgp ) {
-			return createPlanForBGP(bgp, ctxt);
+			return createPlanForBGP(bgp, ctxt, mayReduce);
 		}
 		else if ( jenaOp instanceof OpService ) {
-			throw new IllegalArgumentException( "queries with SERVICE patterns are not supported by this source planner (" + getClass().getName() + ")" ); 
+			throw new IllegalArgumentException( "queries with SERVICE patterns are not supported by this source planner (" + getClass().getName() + ")" );
 		}
 
-		return super.createPlan(jenaOp, ctxt);
+		return super.createPlan(jenaOp, mayReduce, ctxt);
 	}
 
 	protected LogicalPlan createPlanForBGP( final OpBGP bgpOp,
-	                                        final QueryProcContext ctxt ) {
+	                                        final QueryProcContext ctxt,
+	                                        final boolean mayReduce ) {
 		final BasicPattern bgp = bgpOp.getPattern();
 		assert ! bgp.isEmpty();
 
 		if ( bgp.size() == 1 ) {
-			return createSubPlanForTP( bgp.get(0), ctxt );
+			return createSubPlanForTP( bgp.get(0), ctxt, mayReduce );
 		}
 
 		final List<LogicalPlan> subPlans = new ArrayList<>();
 		for ( final Triple tp : bgp.getList() ) {
-			subPlans.add( createSubPlanForTP(tp, ctxt) );
+			subPlans.add( createSubPlanForTP(tp, ctxt, mayReduce) );
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans, null);
+		return LogicalPlanUtils.createPlanWithMultiwayJoin(mayReduce, subPlans, null);
 	}
 
 	protected LogicalPlan createSubPlanForTP( final Triple tp,
-	                                          final QueryProcContext ctxt ) {
+	                                          final QueryProcContext ctxt,
+	                                          final boolean mayReduce ) {
 		final Set<FederationMember> allFMs = ctxt.getFederationCatalog().getAllFederationMembers();
 		assert ! allFMs.isEmpty();
 
 		if ( allFMs.size() == 1 ) {
-			return createRequestSubPlan( tp, allFMs.iterator().next() );
+			return createRequestSubPlan( tp, allFMs.iterator().next(), mayReduce );
 		}
 
 		final List<LogicalPlan> reqSubPlans = new ArrayList<>();
 		for ( final FederationMember fm : allFMs ) {
-			reqSubPlans.add( createRequestSubPlan(tp, fm) );
+			reqSubPlans.add( createRequestSubPlan(tp, fm, mayReduce) );
 		}
 
-		return LogicalPlanUtils.createPlanWithMultiwayUnion(reqSubPlans, null);
+		return LogicalPlanUtils.createPlanWithMultiwayUnion(mayReduce, reqSubPlans, null);
 	}
 
-	protected LogicalPlan createRequestSubPlan( final Triple tp, final FederationMember fm ) {
+	protected LogicalPlan createRequestSubPlan( final Triple tp, final FederationMember fm, final boolean mayReduce ) {
 		final TriplePatternRequest req = new TriplePatternRequestImpl( new TriplePatternImpl(tp) );
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, req);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, mayReduce, req);
 		return new LogicalPlanWithNullaryRootImpl(reqOp, null);
 	}
 }

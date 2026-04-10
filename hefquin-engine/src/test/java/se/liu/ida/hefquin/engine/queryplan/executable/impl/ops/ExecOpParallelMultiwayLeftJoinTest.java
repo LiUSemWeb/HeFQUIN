@@ -206,7 +206,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 
 		assertFalse( it.hasNext() );
 	}
-	
+
 	@Test
 	public void twoOptsWithOneJoinPartnerInOne() throws ExecutionException {
 		// Only one of the two OPTIONAL has a matching join-value.
@@ -265,7 +265,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 
 		assertFalse( it.hasNext() );
 	}
-	
+
 	@Test
 	public void twoOptsWithOneJoinPartnerInOneMirrored() throws ExecutionException {
 		// Same as the above, but it is the other one.
@@ -324,9 +324,9 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 
 		assertFalse( it.hasNext() );
 	}
-	
 
-	
+
+
 	@Test
 	public void twoOptsWithIdenticalNonOptionals() throws ExecutionException {
 		// Contains multiple solution mappings with the same join-value as
@@ -353,7 +353,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final Node w2  = NodeFactory.createURI("http://example.org/w2");
 		final Node w3  = NodeFactory.createURI("http://example.org/w3");
 		final Node w4  = NodeFactory.createURI("http://example.org/w4");
-		
+
 		// create input to the operator (as would be provided by the evaluation of the non-optional part)
 		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1, var3, w1) );
@@ -397,8 +397,8 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 
 		// verify that the outcome is as expected
 		final Set<Binding> result = new HashSet<>();
-		
-		
+
+
 		// All w1s
 		assertTrue( it.hasNext() );
 		result.add( it.next().asJenaBinding() );
@@ -418,7 +418,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		result.add( it.next().asJenaBinding() );
 		assertTrue( it.hasNext() );
 		result.add( it.next().asJenaBinding() );
-		
+
 		// All w2s
 		assertTrue( it.hasNext() );
 		result.add( it.next().asJenaBinding() );
@@ -438,7 +438,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		result.add( it.next().asJenaBinding() );
 		assertTrue( it.hasNext() );
 		result.add( it.next().asJenaBinding() );
-		
+
 		// All w3s
 		assertTrue( it.hasNext() );
 		result.add( it.next().asJenaBinding() );
@@ -458,7 +458,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		result.add( it.next().asJenaBinding() );
 		assertTrue( it.hasNext() );
 		result.add( it.next().asJenaBinding() );
-		
+
 		// The lone w4
 		assertTrue( it.hasNext() );
 		result.add( it.next().asJenaBinding() );
@@ -495,7 +495,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		boolean b331Found = false;
 		boolean b332Found = false;
 		boolean b333Found = false;
-		
+
 		for ( final Binding b : result ) {
 			if ( b.get(var3).getURI().equals("http://example.org/w1") ) {
 				assertEquals( 4, b.size() );
@@ -613,7 +613,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		assertTrue(b231Found);
 		assertTrue(b232Found);
 		assertTrue(b233Found);
-		
+
 		assertTrue(b311Found);
 		assertTrue(b312Found);
 		assertTrue(b313Found);
@@ -624,7 +624,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		assertTrue(b332Found);
 		assertTrue(b333Found);
 	}
-	
+
 	@Test
 	public void twoOptsWithMultiplePartnersInBoth() throws ExecutionException {
 		// Multiple triples in both OPTIONAL clauses have matching join-values.
@@ -777,7 +777,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		assertTrue(b32Found);
 		assertTrue(b33Found);
 	}
-	
+
 	@Test
 	public void twoOptsWithMultiplePartnersInBothAndMultipleNonOptionals() throws ExecutionException {
 		// The most complicated and thorough test. Multiple triples in both
@@ -857,8 +857,8 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 
 		// verify that the outcome is as expected
 		final Set<Binding> result = new HashSet<>();
-		
-		
+
+
 		// All x1s
 		assertTrue( it.hasNext() );
 		result.add( it.next().asJenaBinding() );
@@ -888,7 +888,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		result.add( it.next().asJenaBinding() );
 		assertTrue( it.hasNext() );
 		result.add( it.next().asJenaBinding() );
-		
+
 		// The x3s
 		assertTrue( it.hasNext() );
 		result.add( it.next().asJenaBinding() );
@@ -1181,7 +1181,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		assertFalse(b242Found);
 		assertFalse(b243Found);
 		assertFalse(b244Found);
-		
+
 
 		assertTrue(b311Found);
 		assertFalse(b312Found);
@@ -1199,7 +1199,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		assertFalse(b342Found);
 		assertFalse(b343Found);
 		assertFalse(b344Found);
-		
+
 		assertFalse(b411Found);
 		assertFalse(b412Found);
 		assertFalse(b413Found);
@@ -1217,7 +1217,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		assertFalse(b443Found);
 		assertFalse(b444Found);
 	}
-	
+
 	@Test
 	public void twoOptsWithMultiplePartnersInOne() throws ExecutionException {
 		// Multiple triples in one of the OPTIONAL clauses match.
@@ -1486,23 +1486,23 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 	                                                 final TriplePattern tp3,
 	                                                 final SPARQLEndpoint fm3 ) {
 		final TriplePatternRequest req1 = new TriplePatternRequestImpl(tp1);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm1, req1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(fm1, false, req1);
 
 		if ( tp2 == null ) {
-			return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, reqOp1 );
+			return new ExecOpParallelMultiwayLeftJoin( false, false, null, expectedInputVariables, reqOp1 );
 		}
 
 		final TriplePatternRequest req2 = new TriplePatternRequestImpl(tp2);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(fm2, req2);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(fm2, false, req2);
 
 		if ( tp3 == null ) {
-			return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, reqOp1, reqOp2 );
+			return new ExecOpParallelMultiwayLeftJoin( false, false, null, expectedInputVariables, reqOp1, reqOp2 );
 		}
 
 		final TriplePatternRequest req3 = new TriplePatternRequestImpl(tp3);
-		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>(fm3, req3);
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>(fm3, false, req3);
 
-		return new ExecOpParallelMultiwayLeftJoin( false, null, expectedInputVariables, reqOp1, reqOp2, reqOp3 );
+		return new ExecOpParallelMultiwayLeftJoin( false, false, null, expectedInputVariables, reqOp1, reqOp2, reqOp3 );
 	}
 
 }

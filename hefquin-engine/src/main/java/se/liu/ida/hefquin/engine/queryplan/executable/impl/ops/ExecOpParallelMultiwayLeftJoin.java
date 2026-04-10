@@ -34,23 +34,25 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 
 	protected final ExpectedVariables inputVarsFromNonOptionalPart;
 	protected final List<LogicalOpRequest<?,?>> optionalParts;
-	 
+
 	protected final List<SolutionMappingsIndex> indexes; // will contain as many entries as optionalParts
 	protected final List<Var> joinVars; // using a list gives us a deterministic iteration order
 	protected final Set<List<Node>> bindingsForJoinVariable = new HashSet<>();
 
-	public ExecOpParallelMultiwayLeftJoin( final boolean collectExceptions,
+	public ExecOpParallelMultiwayLeftJoin( final boolean mayReduce,
+	                                       final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables inputVarsFromNonOptionalPart,
 	                                       final LogicalOpRequest<?,?> ... optionalParts ) {
-		this( collectExceptions, qpInfo, inputVarsFromNonOptionalPart, Arrays.asList(optionalParts) );
+		this( mayReduce, collectExceptions, qpInfo, inputVarsFromNonOptionalPart, Arrays.asList(optionalParts) );
 	}
 
-	public ExecOpParallelMultiwayLeftJoin( final boolean collectExceptions,
+	public ExecOpParallelMultiwayLeftJoin( final boolean mayReduce,
+	                                       final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables inputVarsFromNonOptionalPart,
 	                                       final List<LogicalOpRequest<?,?>> optionalParts ) {
-		super(DEFAULT_BATCH_SIZE, collectExceptions, qpInfo);
+		super(mayReduce, DEFAULT_BATCH_SIZE, collectExceptions, qpInfo);
 
 		assert ! optionalParts.isEmpty();
 
@@ -141,7 +143,8 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 			                             indexes.get(i),
 										 inputForParallelProcess,
 			                             inputVarsFromNonOptionalPart,
-			                             execCxt );
+			                             execCxt,
+			                             mayReduce );
 			futures[i] = CompletableFuture.runAsync( w, execCxt.getExecutorServiceForPlanTasks() );
 		}
 
@@ -214,7 +217,8 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 		               final SolutionMappingsIndex index,
 		               final List<SolutionMapping> input,
 		               final ExpectedVariables inputVarsFromNonOptionalPart,
-		               final ExecutionContext execCxt ) {
+		               final ExecutionContext execCxt,
+		               final boolean mayReduce ) {
 			this.input = input;
 			this.execCxt = execCxt;
 

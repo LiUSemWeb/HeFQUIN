@@ -19,10 +19,11 @@ public class LogicalPlanUtils
 	 *                 plan; may be {@code null}, in which case plan is created
 	 *                 without initial query-planning info
 	 */
-	public static LogicalPlan createPlanWithBinaryJoin( final LogicalPlan subPlan1,
+	public static LogicalPlan createPlanWithBinaryJoin( final boolean mayReduce,
+	                                                    final LogicalPlan subPlan1,
 	                                                    final LogicalPlan subPlan2,
 	                                                    final Iterable<QueryPlanProperty> qpInfo ) {
-		return createPlanWithSubPlans( LogicalOpJoin.getInstance(), qpInfo, subPlan1, subPlan2 );
+		return createPlanWithSubPlans( LogicalOpJoin.getInstance(mayReduce), qpInfo, subPlan1, subPlan2 );
 	}
 
 	/**
@@ -33,9 +34,10 @@ public class LogicalPlanUtils
 	 *                 plan; may be {@code null}, in which case plan is created
 	 *                 without initial query-planning info
 	 */
-	public static LogicalPlan createPlanWithMultiwayJoin( final Iterable<QueryPlanProperty> qpInfo,
+	public static LogicalPlan createPlanWithMultiwayJoin( final boolean mayReduce,
+	                                                      final Iterable<QueryPlanProperty> qpInfo,
 	                                                      final LogicalPlan ... subPlans ) {
-		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(), qpInfo, subPlans );
+		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(mayReduce), qpInfo, subPlans );
 	}
 
 	/**
@@ -46,9 +48,10 @@ public class LogicalPlanUtils
 	 *                 plan; may be {@code null}, in which case plan is created
 	 *                 without initial query-planning info
 	 */
-	public static LogicalPlan createPlanWithMultiwayJoin( final List<LogicalPlan> subPlans,
+	public static LogicalPlan createPlanWithMultiwayJoin( final boolean mayReduce,
+	                                                      final List<LogicalPlan> subPlans,
 	                                                      final Iterable<QueryPlanProperty> qpInfo ) {
-		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(), qpInfo, subPlans );
+		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(mayReduce), qpInfo, subPlans );
 	}
 
 	/**
@@ -59,10 +62,11 @@ public class LogicalPlanUtils
 	 *                 plan; may be {@code null}, in which case plan is created
 	 *                 without initial query-planning info
 	 */
-	public static LogicalPlan createPlanWithBinaryUnion( final LogicalPlan subPlan1,
+	public static LogicalPlan createPlanWithBinaryUnion( final boolean mayReduce,
+	                                                     final LogicalPlan subPlan1,
 	                                                     final LogicalPlan subPlan2,
 	                                                     final Iterable<QueryPlanProperty> qpInfo ) {
-		return createPlanWithSubPlans( LogicalOpUnion.getInstance(), qpInfo, subPlan1, subPlan2 );
+		return createPlanWithSubPlans( LogicalOpUnion.getInstance(mayReduce), qpInfo, subPlan1, subPlan2 );
 	}
 
 	/**
@@ -73,9 +77,10 @@ public class LogicalPlanUtils
 	 *                 plan; may be {@code null}, in which case plan is created
 	 *                 without initial query-planning info
 	 */
-	public static LogicalPlan createPlanWithMultiwayUnion( final Iterable<QueryPlanProperty> qpInfo,
+	public static LogicalPlan createPlanWithMultiwayUnion( final boolean mayReduce,
+	                                                       final Iterable<QueryPlanProperty> qpInfo,
 	                                                       final LogicalPlan ... subPlans ) {
-		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(), qpInfo, subPlans );
+		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(mayReduce), qpInfo, subPlans );
 	}
 
 	/**
@@ -86,9 +91,10 @@ public class LogicalPlanUtils
 	 *                 plan; may be {@code null}, in which case plan is created
 	 *                 without initial query-planning info
 	 */
-	public static LogicalPlan createPlanWithMultiwayUnion( final List<LogicalPlan> subPlans,
+	public static LogicalPlan createPlanWithMultiwayUnion( final boolean mayReduce,
+	                                                       final List<LogicalPlan> subPlans,
 	                                                       final Iterable<QueryPlanProperty> qpInfo ) {
-		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(), qpInfo, subPlans );
+		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(mayReduce), qpInfo, subPlans );
 	}
 
 	/**
@@ -209,7 +215,7 @@ public class LogicalPlanUtils
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) { subplanCount++; }
-		
+
 		@Override
 		public void visit( final LogicalOpDedup op )         { subplanCount++; }
 

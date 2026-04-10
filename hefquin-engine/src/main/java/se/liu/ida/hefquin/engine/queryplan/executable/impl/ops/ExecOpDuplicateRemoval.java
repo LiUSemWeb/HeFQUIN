@@ -11,10 +11,10 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
  * To be used for DISTINCT clauses. This algorithm removes duplicates by collecting
- * input solution mappings in the same hash set. Passes only distinct solution mappings 
+ * input solution mappings in the same hash set. Passes only distinct solution mappings
  * to its output. Duplicates are based on SolutionMapping equality, not object identity.
  */
-public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase 
+public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 {
 	private long numberOfOutputMappingsProduced = 0L;
 	private long numberOfDuplicates = 0L;
@@ -24,7 +24,7 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	public ExecOpDuplicateRemoval(
 	                     final boolean collectExceptions,
 	                     final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(true, collectExceptions, qpInfo);
 	}
 
 	@Override

@@ -27,9 +27,10 @@ public class ExecOpProject extends UnaryExecutableOpBaseWithoutBlocking
 	protected final Set<Var> variables;
 
 	public ExecOpProject( final Set<Var> variables,
+	                      final boolean mayReduce,
 	                      final boolean collectExceptions,
 	                      final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 
 		assert variables != null;
 

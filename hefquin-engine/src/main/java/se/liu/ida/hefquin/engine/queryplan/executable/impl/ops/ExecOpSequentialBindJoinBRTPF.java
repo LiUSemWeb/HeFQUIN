@@ -75,10 +75,11 @@ public class ExecOpSequentialBindJoinBRTPF
 			final BRTPFServer fm,
 			final ExpectedVariables inputVars,
 			final boolean useOuterJoinSemantics,
+			final boolean mayReduce,
 			final int batchSize,
 			final boolean collectExceptions,
 			final QueryPlanningInfo qpInfo ) {
-		super( tp, tp.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo );
+		super( tp, tp.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo );
 	}
 
 	@Override
@@ -99,17 +100,17 @@ public class ExecOpSequentialBindJoinBRTPF
 			}
 
 			final TriplePatternRequest req = new TriplePatternRequestImpl(restrictedTP);
-			return new ExecOpRequestTPF<>(req, fm, false, null);
+			return new ExecOpRequestTPF<>(req, fm, this.mayReduce, false, null );
 		}
 
 		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl(query, solMaps);
-		return new ExecOpRequestBRTPF(req, fm, false, null);
+		return new ExecOpRequestBRTPF(req, fm, this.mayReduce, false, null );
 	}
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
 		final TriplePatternRequest req = new TriplePatternRequestImpl(query);
-		return new ExecOpRequestTPF<>(req, fm, false, null);
+		return new ExecOpRequestTPF<>(req, fm, this.mayReduce, false, null );
 	}
 
 }
