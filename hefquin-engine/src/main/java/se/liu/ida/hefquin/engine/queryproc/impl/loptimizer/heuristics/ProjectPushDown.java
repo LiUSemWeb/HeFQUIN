@@ -402,7 +402,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 				// No projection needed for this branch
 				newSubPlan = apply(subPlan);
 			} else {
-				final LogicalOpProject branchProject = new LogicalOpProject(varsForThisBranch);
+				final LogicalOpProject branchProject = new LogicalOpProject(varsForThisBranch, projectOp.mayReduce());
 				final LogicalPlan withProject = new LogicalPlanWithUnaryRootImpl(branchProject, null, subPlan);
 
 				newSubPlan = apply(withProject);
@@ -447,7 +447,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			newNonOptSubPlan = apply(nonoptSubPlan);
 		}
 		else {
-			final LogicalOpProject projectForNonOpt = new LogicalOpProject(varsForNonOpt);
+			final LogicalOpProject projectForNonOpt = new LogicalOpProject(varsForNonOpt, projectOp.mayReduce());
 			final LogicalPlan newSubPlanWithProjectAsRoot = new LogicalPlanWithUnaryRootImpl(projectForNonOpt, null, nonoptSubPlan);
 			newNonOptSubPlan = apply(newSubPlanWithProjectAsRoot);
 		}
@@ -494,7 +494,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			newNonOptSubPlan = apply(oldNonOptSubPlan);
 		}
 		else {
-			final LogicalOpProject projectForNonOpt = new LogicalOpProject(varsForNonOpt);
+			final LogicalOpProject projectForNonOpt = new LogicalOpProject(varsForNonOpt, projectOp.mayReduce());
 			final LogicalPlan newSubPlanWithProjectAsRoot = new LogicalPlanWithUnaryRootImpl(projectForNonOpt, null, oldNonOptSubPlan);
 			newNonOptSubPlan = apply(newSubPlanWithProjectAsRoot);
 		}
@@ -542,7 +542,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		intersectionOfVars.retainAll(parentProjectOp.getVariables());
 
 		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
-			new LogicalOpProject(intersectionOfVars),
+			new LogicalOpProject(intersectionOfVars, parentProjectOp.mayReduce()),
 			null,
 			subPlanUnderChildProjectOp );
 

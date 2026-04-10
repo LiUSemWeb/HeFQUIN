@@ -50,21 +50,24 @@ public class ProjectPushDownTest extends EngineTestBase
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v2);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
+			false,
 			new SPARQLRequestImpl(tp1) );
 
 		// Right request produces {y, z}
 		final TriplePattern tp2 = new TriplePatternImpl(v2, v3, v3);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exB.org"),
+			false,
 			new SPARQLRequestImpl(tp2) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+			false,
 			new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 			new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 			null );
 
 		// Project only keeps {y}
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2));
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, joinSubPlan);
 
 		// test
@@ -105,21 +108,24 @@ public class ProjectPushDownTest extends EngineTestBase
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v3, v3);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
+			false,
 			new SPARQLRequestImpl(tp1) );
 
 		// Right request produces {z, x}
 		final TriplePattern tp2 = new TriplePatternImpl(v3, v1, v1);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exB.org"),
+			false,
 			new SPARQLRequestImpl(tp2) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+			false,
 			new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 			new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 			null );
 
 		// Project only keeps {y}
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2));
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, joinSubPlan);
 
 		// test
@@ -153,17 +159,17 @@ public class ProjectPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
 		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
-		final LogicalOpGPOptAdd gpOptAdd = new LogicalOpGPOptAdd(fm, tp2);
+		final LogicalOpGPOptAdd gpOptAdd = new LogicalOpGPOptAdd(fm, tp2, false);
 		final LogicalPlan gpOptAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpOptAdd, null, reqSubPlan);
 
-		final LogicalOpProject projectOp1 = new LogicalOpProject(Set.of(v1));
+		final LogicalOpProject projectOp1 = new LogicalOpProject(Set.of(v1), false);
 		final LogicalPlan projectSubPlan = new LogicalPlanWithUnaryRootImpl(projectOp1, null, gpOptAddSubPlan);
 
-		final LogicalOpProject rootOp = new LogicalOpProject(Set.of(v2));
+		final LogicalOpProject rootOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, projectSubPlan);
 
 		// test
@@ -198,25 +204,28 @@ public class ProjectPushDownTest extends EngineTestBase
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v2);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
+			false,
 			new SPARQLRequestImpl(tp1) );
 
 		// Right request produces {y, z}
 		final TriplePattern tp2 = new TriplePatternImpl(v2, v3, v3);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exB.org"),
+			false,
 			new SPARQLRequestImpl(tp2) );
 
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
+			false,
 			new LogicalPlanWithNullaryRootImpl(reqOp1, null),
 			new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 			null );
 
 		// Project1 keeps {x, y}
-		final LogicalOpProject projectOp1 = new LogicalOpProject(Set.of(v1, v2));
+		final LogicalOpProject projectOp1 = new LogicalOpProject(Set.of(v1, v2), false);
 		final LogicalPlan projectSubPlan = new LogicalPlanWithUnaryRootImpl(projectOp1, null, unionSubPlan);
 
 		// Project2 only keeps {y}
-		final LogicalOpProject projectOp2 = new LogicalOpProject(Set.of(v2));
+		final LogicalOpProject projectOp2 = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp2, null, projectSubPlan);
 
 		// test
@@ -253,17 +262,18 @@ public class ProjectPushDownTest extends EngineTestBase
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v2);
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
+			false,
 			new SPARQLRequestImpl(tp1) );
 		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 
 		// Filter operator with y
 		final Expr filterExpr = new E_IsIRI( new ExprVar(v2) );
-		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(filterExpr, false);
 		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, reqSubPlan);
 
 		// Project operator with y
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2));
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, filterSubPlan);
 
 		// test
@@ -297,17 +307,17 @@ public class ProjectPushDownTest extends EngineTestBase
 
 		// Request produces {x, y}
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v2);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
 		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		// Bind with y
 		final Expr bindExpr = new ExprVar(v2);
 		final VarExprList bindExpressions = new VarExprList(v2, bindExpr);
-		final LogicalOpBind bindOp = new LogicalOpBind(bindExpressions);
+		final LogicalOpBind bindOp = new LogicalOpBind(bindExpressions, false);
 		final LogicalPlan bindSubPlan = new LogicalPlanWithUnaryRootImpl(bindOp, null, reqSubPlan);
 
 		// Project operator with x
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v1));
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v1), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, bindSubPlan);
 
 		// test
@@ -336,17 +346,17 @@ public class ProjectPushDownTest extends EngineTestBase
 
 		// Request produces {x, y}
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v2);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp1) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
 		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		// Bind with y
 		final Expr bindExpr = new ExprVar(v2);
 		final VarExprList bindExpressions = new VarExprList(v2, bindExpr);
-		final LogicalOpBind bindOp = new LogicalOpBind(bindExpressions);
+		final LogicalOpBind bindOp = new LogicalOpBind(bindExpressions, false);
 		final LogicalPlan bindSubPlan = new LogicalPlanWithUnaryRootImpl(bindOp, null, reqSubPlan);
 
 		// Project operator with y
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2));
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, bindSubPlan);
 
 		// test
@@ -373,17 +383,17 @@ public class ProjectPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final Var v1 = Var.alloc("x");
 		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp) );
 		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		// - unfold operator
 		final Var v2 = Var.alloc("y");
 		final Expr unfoldExpr = NodeValue.makeInteger(42);
-		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, null);
+		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, null, false);
 		final LogicalPlan unfoldPlan = new LogicalPlanWithUnaryRootImpl(unfoldOp, null, reqSubPlan);
 
 		// - project operator
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2));
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, unfoldPlan);
 
 		// test
@@ -407,17 +417,17 @@ public class ProjectPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final Var v1 = Var.alloc("x");
 		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp) );
 		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		// - unfold operator
 		final Var v2 = Var.alloc("y");
 		final Expr unfoldExpr = NodeValue.makeInteger(42);
-		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v1, v2);
+		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v1, v2, false);
 		final LogicalPlan unfoldPlan = new LogicalPlanWithUnaryRootImpl(unfoldOp, null, reqSubPlan);
 
 		// - project operator
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2));
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, unfoldPlan);
 
 		// test
@@ -441,17 +451,17 @@ public class ProjectPushDownTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final Var v1 = Var.alloc("x");
 		final TriplePattern tp = new TriplePatternImpl(v1, v1, v1);
-		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, new TriplePatternRequestImpl(tp) );
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp) );
 		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
 		// - unfold operator
 		final Var v2 = Var.alloc("y");
 		final Expr unfoldExpr = NodeValue.makeInteger(42);
-		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, null);
+		final LogicalOpUnfold unfoldOp = new LogicalOpUnfold(unfoldExpr, v2, null, false);
 		final LogicalPlan unfoldPlan = new LogicalPlanWithUnaryRootImpl(unfoldOp, null, reqSubPlan);
 
 		// - project operator
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v1));
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v1), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, unfoldPlan);
 
 		// test
