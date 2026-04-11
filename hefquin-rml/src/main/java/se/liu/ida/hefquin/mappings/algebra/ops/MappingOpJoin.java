@@ -31,4 +31,21 @@ public class MappingOpJoin implements MappingOperator
 	public void visit( final MappingOperatorVisitor visitor ) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public int hashCode() {
+		return J.hashCode();
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof MappingOpJoin j  &&  j.J.equals(J);
+	}
+
+	@Override
+	public String toString() {
+		return "join(" + J.toString() + ")";
+	}
 }

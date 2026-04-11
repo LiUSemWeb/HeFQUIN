@@ -28,6 +28,18 @@ public class ExtendExprAttribute implements ExtendExpression
 	}
 
 	@Override
-	public String toString() { return attribute; }
+	public int hashCode() {
+		return attribute.hashCode();
+	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return     o instanceof ExtendExprAttribute e
+		       &&  e.attribute.equals(attribute);
+	}
+
+	@Override
+	public String toString() { return attribute; }
 }

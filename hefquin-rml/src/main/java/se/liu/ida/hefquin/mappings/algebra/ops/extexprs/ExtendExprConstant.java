@@ -23,5 +23,20 @@ public class ExtendExprConstant implements ExtendExpression
 	public Node evaluate( final Map<String, Node> assg ) { return constant; }
 
 	@Override
-	public String toString() { return constant.toString(); }
+	public int hashCode() {
+		return constant.hashCode();
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return     o instanceof ExtendExprConstant e
+		       &&  e.constant.equals(constant);
+	}
+
+	@Override
+	public String toString() {
+		return "constant(" + constant.toString() + ")";
+	}
 }

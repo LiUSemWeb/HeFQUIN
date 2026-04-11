@@ -72,6 +72,20 @@ public class ExtendExprFunction implements ExtendExpression
 	}
 
 	@Override
+	public int hashCode() {
+		return fct.hashCode() ^ subExpressions.hashCode();
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return     o instanceof ExtendExprFunction e
+		       &&  e.fct.equals(fct)
+		       &&  e.subExpressions.equals(subExpressions);
+	}
+
+	@Override
 	public String toString() {
 		if ( subExpressions.isEmpty() )
 			return fct.toString() + "()";

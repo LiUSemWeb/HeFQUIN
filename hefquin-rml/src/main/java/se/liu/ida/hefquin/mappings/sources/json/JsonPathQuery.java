@@ -27,6 +27,19 @@ public class JsonPathQuery implements Query
 	}
 
 	@Override
+	public int hashCode() {
+		return jsonPath.hashCode();
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return     o instanceof JsonPathQuery q
+		       &&  q.jsonPath.equals(jsonPath);
+	}
+
+	@Override
 	public String toString() {
 		return jsonPath.getPath();
 	}

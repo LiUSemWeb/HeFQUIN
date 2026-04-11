@@ -29,4 +29,23 @@ public class MappingOpExtend implements MappingOperator
 	public void visit( final MappingOperatorVisitor visitor ) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public int hashCode() {
+		return expr.hashCode() ^ attribute.hashCode();
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return     o instanceof MappingOpExtend e
+		       &&  e.attribute.equals(attribute)
+		       &&  e.expr.equals(expr);
+	}
+
+	@Override
+	public String toString() {
+		return "extend(" + expr.toString() + ")";
+	}
 }

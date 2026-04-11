@@ -57,4 +57,25 @@ public class MappingOpExtract< DDS extends DataObject,
 	public void visit( final MappingOperatorVisitor visitor ) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public int hashCode() {
+		return sr.hashCode() ^ type.hashCode() ^ query.hashCode() ^ P.hashCode();
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return     o instanceof MappingOpExtract e
+		       &&  e.sr.equals(sr)
+		       &&  e.type.equals(type)
+		       &&  e.query.equals(query)
+		       &&  e.P.equals(P);
+	}
+
+	@Override
+	public String toString() {
+		return "extract(" + query.toString() + "; " + P.toString() + ")";
+	}
 }

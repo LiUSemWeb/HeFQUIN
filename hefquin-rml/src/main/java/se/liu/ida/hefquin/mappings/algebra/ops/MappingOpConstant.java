@@ -28,4 +28,20 @@ public class MappingOpConstant implements MappingOperator
 		visitor.visit(this);
 	}
 
+	@Override
+	public int hashCode() {
+		return r.hashCode();
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof MappingOpConstant c  &&  c.r.equals(r);
+	}
+
+	@Override
+	public String toString() {
+		return "constant";
+	}
 }

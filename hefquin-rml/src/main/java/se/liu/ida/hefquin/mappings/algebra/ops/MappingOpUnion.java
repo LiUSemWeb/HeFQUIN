@@ -18,4 +18,7 @@ public class MappingOpUnion implements MappingOperator
 	public void visit( final MappingOperatorVisitor visitor ) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public String toString() { return "union"; }
 }

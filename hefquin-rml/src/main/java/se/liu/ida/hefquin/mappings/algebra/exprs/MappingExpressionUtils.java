@@ -82,12 +82,6 @@ public class MappingExpressionUtils
 		return evalWorker.evaluate(expr, srMap, inputs);
 	}
 
-/*
-TODO: extend the code base such that
-i) add: equals, toString, hashCode to the operators and to the expressions
-ii) singleton for union operator
-iii) test that everything works for actual queries,
-*/
 
 	// ---------- helpers ----------
 

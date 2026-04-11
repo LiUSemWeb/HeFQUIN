@@ -30,4 +30,21 @@ public class MappingOpProject implements MappingOperator
 	public void visit( final MappingOperatorVisitor visitor ) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public int hashCode() {
+		return P.hashCode();
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this ) return true;
+
+		return o instanceof MappingOpProject p  &&  p.P.equals(P);
+	}
+
+	@Override
+	public String toString() {
+		return "project(" + P.toString() + ")";
+	}
 }
