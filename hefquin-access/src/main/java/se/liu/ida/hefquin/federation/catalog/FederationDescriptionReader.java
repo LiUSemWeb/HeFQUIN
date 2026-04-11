@@ -42,10 +42,12 @@ import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
 import se.liu.ida.hefquin.federation.members.impl.WrappedRESTEndpointImpl;
 import se.liu.ida.hefquin.jenaext.ModelUtils;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
+import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpression;
+import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpressionFactory;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpProject;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
-import se.liu.ida.hefquin.rml.RML2MappingAlgebra;
-import se.liu.ida.hefquin.rml.RMLParserException;
+import se.liu.ida.hefquin.mappings.rml.RML2MappingAlgebra;
+import se.liu.ida.hefquin.mappings.rml.RMLParserException;
 import se.liu.ida.hefquin.vocabulary.FDVocab;
 import se.liu.ida.hefquin.vocabulary.HydraVocab;
 
@@ -286,11 +288,11 @@ public class FederationDescriptionReader
 
 			final Iterator<RDFNode> rmTMsIterator = rmlTMsList.as( RDFList.class ).iterator();
 			final Node baseIRI = NodeFactory.createURI("http://example.org/FixedBaseIRI/HardcodedInFederationDescriptionReader/");
-			final List<MappingOperator> trMaps = new ArrayList<>();
+			final List<MappingExpression> trMaps = new ArrayList<>();
 			while ( rmTMsIterator.hasNext() ) {
 				final RDFNode tm = rmTMsIterator.next();
 				if ( tm.isResource() ) {
-					final MappingOperator trMap;
+					final MappingExpression trMap;
 					try {
 						trMap = RML2MappingAlgebra.convert( tm.asResource(),
 						                                    fd,
@@ -393,22 +395,25 @@ public class FederationDescriptionReader
 
 	protected FederationMember createWrappedRESTEndpoint( final String uri,
 	                                                      final List<RESTEndpoint.Parameter> params,
-	                                                      final List<MappingOperator> trMaps ) {
+	                                                      final List<MappingExpression> trMaps ) {
 		assert ! trMaps.isEmpty();
 
 		if ( trMaps.size() == 1 ) {
-			final MappingOperator mappingExpression = trMaps.get(0);
-			return new WrappedRESTEndpointImpl(uri, params, mappingExpression);
+			final MappingExpression expr = trMaps.get(0);
+			return new WrappedRESTEndpointImpl(uri, params, expr);
 		}
 
-		final MappingOperator[] elmts = new MappingOperator[ trMaps.size() ];
+		final MappingExpression[] exprs = new MappingExpression[ trMaps.size() ];
+		final MappingOperator op = MappingOpProject.createWithSPOG();
 		int i = 0;
-		for ( final MappingOperator trMapExpr : trMaps ) {
-			elmts[i++] = MappingOpProject.createWithSPOG(trMapExpr);
+		for ( final MappingExpression trMapExpr : trMaps ) {
+			exprs[i++] = MappingExpressionFactory.create(op, trMapExpr);
 		}
 
-		final MappingOperator mappingExpression = new MappingOpUnion(elmts);
-		return new WrappedRESTEndpointImpl(uri, params, mappingExpression);
+		final MappingExpression expr = MappingExpressionFactory.create(
+				MappingOpUnion.getInstance(),
+				exprs );
+		return new WrappedRESTEndpointImpl(uri, params, expr);
 	}
 
 	/**

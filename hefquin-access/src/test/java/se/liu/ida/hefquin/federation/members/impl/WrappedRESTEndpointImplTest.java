@@ -23,15 +23,17 @@ import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint.DataConversionException;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
-import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExprConstant;
-import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExprFunction;
-import se.liu.ida.hefquin.mappings.algebra.exprs.ExtendExpression;
-import se.liu.ida.hefquin.mappings.algebra.exprs.fcts.ExtnFct_ToBNode;
+import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpression;
+import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpressionFactory;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpExtend;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
-import se.liu.ida.hefquin.mappings.algebra.sources.json.JsonPathQuery;
-import se.liu.ida.hefquin.mappings.algebra.sources.json.MappingOpExtractJSON;
+import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtendExprConstant;
+import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtendExprFunction;
+import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtendExpression;
+import se.liu.ida.hefquin.mappings.algebra.ops.extfcts.ExtnFct_ToBNode;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.json.JsonPathQuery;
+import se.liu.ida.hefquin.mappings.sources.json.MappingOpExtractJSON;
 
 public class WrappedRESTEndpointImplTest
 {
@@ -82,7 +84,7 @@ public class WrappedRESTEndpointImplTest
 		                                    createMappingExpressionForTests() );
 	}
 
-	protected MappingOperator createMappingExpressionForTests() {
+	protected MappingExpression createMappingExpressionForTests() {
 		final SourceReference sr = new SourceReference() {};
 		final JsonPathQuery query = new JsonPathQuery("$.current");
 
@@ -93,22 +95,28 @@ public class WrappedRESTEndpointImplTest
 
 		final MappingOperator op1 = new MappingOpExtractJSON(sr, query, P1);
 		final MappingOperator op2 = new MappingOpExtractJSON(sr, query, P2);
+		final MappingExpression expr1 = MappingExpressionFactory.create(op1);
+		final MappingExpression expr2 = MappingExpressionFactory.create(op2);
 
 		final Node bnodeLabel = NodeFactory.createLiteralString("b");
 		final ExtendExpression expr = new ExtendExprFunction( ExtnFct_ToBNode.instance,
 		                                                      new ExtendExprConstant(bnodeLabel) );
-		final MappingOperator op1S = new MappingOpExtend(op1, expr, MappingRelation.sAttr);
-		final MappingOperator op2S = new MappingOpExtend(op2, expr, MappingRelation.sAttr);
+		final MappingOperator op1S = new MappingOpExtend(expr, MappingRelation.sAttr);
+		final MappingOperator op2S = new MappingOpExtend(expr, MappingRelation.sAttr);
+		final MappingExpression expr1S = MappingExpressionFactory.create(op1S, expr1);
+		final MappingExpression expr2S = MappingExpressionFactory.create(op2S, expr2);
 
 		final Node uri1 = NodeFactory.createURI("http://example.org/temperature");
 		final Node uri2 = NodeFactory.createURI("http://example.org/windSpeed");
-		final ExtendExpression expr1 = new ExtendExprConstant(uri1);
-		final ExtendExpression expr2 = new ExtendExprConstant(uri2);
-		final MappingOperator op1P = new MappingOpExtend(op1S, expr1, MappingRelation.pAttr);
-		final MappingOperator op2P = new MappingOpExtend(op2S, expr2, MappingRelation.pAttr);
+		final ExtendExpression extExpr1 = new ExtendExprConstant(uri1);
+		final ExtendExpression extExpr2 = new ExtendExprConstant(uri2);
+		final MappingOperator op1P = new MappingOpExtend(extExpr1, MappingRelation.pAttr);
+		final MappingOperator op2P = new MappingOpExtend(extExpr2, MappingRelation.pAttr);
+		final MappingExpression expr1P = MappingExpressionFactory.create(op1P, expr1S);
+		final MappingExpression expr2P = MappingExpressionFactory.create(op2P, expr2S);
 
-		final MappingOperator op = new MappingOpUnion(op1P, op2P);
-		return op;
+		final MappingOperator op = MappingOpUnion.getInstance();
+		return MappingExpressionFactory.create(op, expr1P, expr2P);
 	}
 
 }
