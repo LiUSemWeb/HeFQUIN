@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.mappings.sources.DataObject;
 
 public class MappingExpressionFactory
 {
-	public static MappingExpression createMappingExpression(
+	public static MappingExpression create(
 			final MappingOperator rootOp,
 			final MappingExpression ... subExprs ) {
 		return worker.createMappingExpression(rootOp, subExprs);

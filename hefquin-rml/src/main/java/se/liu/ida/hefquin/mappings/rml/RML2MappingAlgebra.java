@@ -103,7 +103,7 @@ public class RML2MappingAlgebra
 				createSourceReference(tm),
 				checkSourceAndGetRootQuery(tm),
 				P );
-		MappingExpression expr = MappingExpressionFactory.createMappingExpression(extractOp);
+		MappingExpression expr = MappingExpressionFactory.create(extractOp);
 
 		// data structure needed for the following steps
 		// (maps query strings to attributes)
@@ -112,14 +112,14 @@ public class RML2MappingAlgebra
 		// line 9 of Algorithm 1
 		final ExtendExpression sExt = createExtendExpression( sm, baseIRI,
 		                                                      reversePwithStrings );
-		final MappingOperator extendOp1 = new MappingOpExtend( extractOp, sExt, MappingRelation.sAttr );
-		expr = MappingExpressionFactory.createMappingExpression(extendOp1, expr);
+		final MappingOperator extendOp1 = new MappingOpExtend( sExt, MappingRelation.sAttr );
+		expr = MappingExpressionFactory.create(extendOp1, expr);
 
 		// line 10 of Algorithm 1
 		final ExtendExpression pExt = createExtendExpression( pm, baseIRI,
 		                                                      reversePwithStrings );
-		final MappingOperator extendOp2 = new MappingOpExtend( extendOp1, pExt, MappingRelation.pAttr );
-		expr = MappingExpressionFactory.createMappingExpression(extendOp2, expr);
+		final MappingOperator extendOp2 = new MappingOpExtend( pExt, MappingRelation.pAttr );
+		expr = MappingExpressionFactory.create(extendOp2, expr);
 
 		// lines 10-22 of Algorithm 1
 		if ( ptm != null ) {
@@ -144,7 +144,7 @@ public class RML2MappingAlgebra
 					createSourceReference(ptm),
 					checkSourceAndGetRootQuery(ptm),
 					P2 );
-			final MappingExpression expr2 = MappingExpressionFactory.createMappingExpression(extractOp2);
+			final MappingExpression expr2 = MappingExpressionFactory.create(extractOp2);
 
 			// - line 13
 			final List<Pair<String,String>> J = new ArrayList<>();
@@ -177,8 +177,9 @@ public class RML2MappingAlgebra
 			}
 
 			// - line 18
-			final MappingOperator joinOp = new MappingOpJoin(extendOp2, extractOp2, J);
-			expr = MappingExpressionFactory.createMappingExpression(joinOp, expr, expr2);
+			expr = MappingExpressionFactory.create(
+					new MappingOpJoin(J),
+					expr, expr2 );
 
 			// - line 19
 			final Resource sptm;
@@ -193,15 +194,15 @@ public class RML2MappingAlgebra
 			final Map<String, String> reversePwithStrings2 = createReverseP(PwithStrings2);
 			final ExtendExpression oExt = createExtendExpression( sptm, baseIRI,
 			                                                      reversePwithStrings2 );
-			final MappingOperator extendOp3 = new MappingOpExtend( joinOp, oExt, MappingRelation.oAttr );
-			expr = MappingExpressionFactory.createMappingExpression(extendOp3, expr);
+			final MappingOperator extendOp3 = new MappingOpExtend( oExt, MappingRelation.oAttr );
+			expr = MappingExpressionFactory.create(extendOp3, expr);
 		}
 		else  {
 			// line 22 of Algorithm 1
 			final ExtendExpression oExt = createExtendExpression( om, baseIRI,
 			                                                      reversePwithStrings );
-			final MappingOperator extendOp3 = new MappingOpExtend( extendOp2, oExt, MappingRelation.oAttr );
-			expr = MappingExpressionFactory.createMappingExpression(extendOp3, expr);
+			final MappingOperator extendOp3 = new MappingOpExtend( oExt, MappingRelation.oAttr );
+			expr = MappingExpressionFactory.create(extendOp3, expr);
 		}
 
 		// lines 23-26 of Algorithm 1
@@ -209,15 +210,15 @@ public class RML2MappingAlgebra
 			// - line 24
 			final ExtendExpression gExt = createExtendExpression( gm, baseIRI,
 			                                                      reversePwithStrings );
-			final MappingOperator extendOp4 = new MappingOpExtend( expr.getRootOperator(), gExt, MappingRelation.gAttr );
-			expr = MappingExpressionFactory.createMappingExpression(extendOp4, expr);
+			final MappingOperator extendOp4 = new MappingOpExtend( gExt, MappingRelation.gAttr );
+			expr = MappingExpressionFactory.create(extendOp4, expr);
 		}
 		else {
 			// - line 26
 			final Node dfltGraphURI = RMLVocab.defaultGraph.asNode();
 			final ExtendExpression gExt = new ExtendExprConstant(dfltGraphURI);
-			final MappingOperator extendOp4 = new MappingOpExtend( expr.getRootOperator(), gExt, MappingRelation.gAttr );
-			expr = MappingExpressionFactory.createMappingExpression(extendOp4, expr);
+			final MappingOperator extendOp4 = new MappingOpExtend( gExt, MappingRelation.gAttr );
+			expr = MappingExpressionFactory.create(extendOp4, expr);
 		}
 
 		return expr;

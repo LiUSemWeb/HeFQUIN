@@ -403,18 +403,16 @@ public class FederationDescriptionReader
 			return new WrappedRESTEndpointImpl(uri, params, expr);
 		}
 
-		final MappingOperator[] elmts = new MappingOperator[ trMaps.size() ];
-		final MappingExpression[] elmts2 = new MappingExpression[ trMaps.size() ];
+		final MappingExpression[] exprs = new MappingExpression[ trMaps.size() ];
+		final MappingOperator op = MappingOpProject.createWithSPOG();
 		int i = 0;
 		for ( final MappingExpression trMapExpr : trMaps ) {
-			elmts[i] = MappingOpProject.createWithSPOG( trMapExpr.getRootOperator() );
-			elmts2[i] = MappingExpressionFactory.createMappingExpression( elmts[i], trMapExpr );
-			i++;
+			exprs[i++] = MappingExpressionFactory.create(op, trMapExpr);
 		}
 
-		final MappingExpression expr = MappingExpressionFactory.createMappingExpression(
-				new MappingOpUnion(elmts),
-				elmts2 );
+		final MappingExpression expr = MappingExpressionFactory.create(
+				MappingOpUnion.getInstance(),
+				exprs );
 		return new WrappedRESTEndpointImpl(uri, params, expr);
 	}
 

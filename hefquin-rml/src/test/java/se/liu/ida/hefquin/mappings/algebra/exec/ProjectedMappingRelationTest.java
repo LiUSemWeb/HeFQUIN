@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -33,7 +34,7 @@ public class ProjectedMappingRelationTest
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation input = MappingRelationImplWithColumnLayout.createBasedOnTuples(s, t1, t2, t3, t4, t5);
 
-		final List<String> P = List.of("attr1");
+		final Set<String> P = Set.of("attr1");
 
 		final MappingRelation r = new ProjectedMappingRelation(P, input);
 
@@ -88,7 +89,7 @@ public class ProjectedMappingRelationTest
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation input = MappingRelationImplWithColumnLayout.createBasedOnTuples(s, t1, t2, t3, t4, t5);
 
-		final List<String> P = List.of("attr2");
+		final Set<String> P = Set.of("attr2");
 
 		final MappingRelation r = new ProjectedMappingRelation(P, input);
 
@@ -143,7 +144,7 @@ public class ProjectedMappingRelationTest
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation input = MappingRelationImplWithColumnLayout.createBasedOnTuples(s, t1, t2, t3, t4, t5);
 
-		final List<String> P = List.of("attr1", "attr2");
+		final Set<String> P = Set.of("attr1", "attr2");
 
 		final MappingRelation r = new ProjectedMappingRelation(P, input);
 
@@ -152,37 +153,69 @@ public class ProjectedMappingRelationTest
 		assertTrue( schemaOut.contains("attr1") );
 		assertTrue( schemaOut.contains("attr2") );
 
+		final boolean attr1IsFirst = schemaOut.get(0).equals("attr1");
+
 		final MappingRelationCursor c = r.getCursor();
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t1[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t1[1] );
+		if ( attr1IsFirst ) {
+			assertTrue( c.getValueOfCurrentTuple(0) == t1[0] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t1[1] );
+		}
+		else {
+			assertTrue( c.getValueOfCurrentTuple(0) == t1[1] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t1[0] );
+		}
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t2[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t2[1] );
+		if ( attr1IsFirst ) {
+			assertTrue( c.getValueOfCurrentTuple(0) == t2[0] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t2[1] );
+		}
+		else {
+			assertTrue( c.getValueOfCurrentTuple(0) == t2[1] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t2[0] );
+		}
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t3[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t3[1] );
+		if ( attr1IsFirst ) {
+			assertTrue( c.getValueOfCurrentTuple(0) == t3[0] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t3[1] );
+		}
+		else {
+			assertTrue( c.getValueOfCurrentTuple(0) == t3[1] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t3[0] );
+		}
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t4[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t4[1] );
+		if ( attr1IsFirst ) {
+			assertTrue( c.getValueOfCurrentTuple(0) == t4[0] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t4[1] );
+		}
+		else {
+			assertTrue( c.getValueOfCurrentTuple(0) == t4[1] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t4[0] );
+		}
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t5[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t5[1] );
+		if ( attr1IsFirst ) {
+			assertTrue( c.getValueOfCurrentTuple(0) == t5[0] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t5[1] );
+		}
+		else {
+			assertTrue( c.getValueOfCurrentTuple(0) == t5[1] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t5[0] );
+		}
 
 		assertFalse( c.hasNext() );
 	}
@@ -203,7 +236,7 @@ public class ProjectedMappingRelationTest
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation input = new MappingRelationImplWithTupleLayout(s, t1, t2, t3, t4, t5);
 
-		final List<String> P = List.of("attr1");
+		final Set<String> P = Set.of("attr1");
 
 		final MappingRelation r = new ProjectedMappingRelation(P, input);
 
@@ -258,7 +291,7 @@ public class ProjectedMappingRelationTest
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation input = new MappingRelationImplWithTupleLayout(s, t1, t2, t3, t4, t5);
 
-		final List<String> P = List.of("attr2");
+		final Set<String> P = Set.of("attr2");
 
 		final MappingRelation r = new ProjectedMappingRelation(P, input);
 
@@ -313,7 +346,7 @@ public class ProjectedMappingRelationTest
 		final List<String> s = List.of("attr1", "attr2");
 		final MappingRelation input = new MappingRelationImplWithTupleLayout(s, t1, t2, t3, t4, t5);
 
-		final List<String> P = List.of("attr1", "attr2");
+		final Set<String> P = Set.of("attr1", "attr2");
 
 		final MappingRelation r = new ProjectedMappingRelation(P, input);
 
@@ -322,37 +355,69 @@ public class ProjectedMappingRelationTest
 		assertTrue( schemaOut.contains("attr1") );
 		assertTrue( schemaOut.contains("attr2") );
 
+		final boolean attr1IsFirst = schemaOut.get(0).equals("attr1");
+
 		final MappingRelationCursor c = r.getCursor();
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t1[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t1[1] );
+		if ( attr1IsFirst ) {
+			assertTrue( c.getValueOfCurrentTuple(0) == t1[0] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t1[1] );
+		}
+		else {
+			assertTrue( c.getValueOfCurrentTuple(0) == t1[1] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t1[0] );
+		}
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t2[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t2[1] );
+		if ( attr1IsFirst ) {
+			assertTrue( c.getValueOfCurrentTuple(0) == t2[0] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t2[1] );
+		}
+		else {
+			assertTrue( c.getValueOfCurrentTuple(0) == t2[1] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t2[0] );
+		}
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t3[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t3[1] );
+		if ( attr1IsFirst ) {
+			assertTrue( c.getValueOfCurrentTuple(0) == t3[0] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t3[1] );
+		}
+		else {
+			assertTrue( c.getValueOfCurrentTuple(0) == t3[1] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t3[0] );
+		}
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t4[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t4[1] );
+		if ( attr1IsFirst ) {
+			assertTrue( c.getValueOfCurrentTuple(0) == t4[0] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t4[1] );
+		}
+		else {
+			assertTrue( c.getValueOfCurrentTuple(0) == t4[1] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t4[0] );
+		}
 
 		assertTrue( c.hasNext() );
 		c.advance();
 
-		assertTrue( c.getValueOfCurrentTuple(0) == t5[0] );
-		assertTrue( c.getValueOfCurrentTuple(1) == t5[1] );
+		if ( attr1IsFirst ) {
+			assertTrue( c.getValueOfCurrentTuple(0) == t5[0] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t5[1] );
+		}
+		else {
+			assertTrue( c.getValueOfCurrentTuple(0) == t5[1] );
+			assertTrue( c.getValueOfCurrentTuple(1) == t5[0] );
+		}
 
 		assertFalse( c.hasNext() );
 	}

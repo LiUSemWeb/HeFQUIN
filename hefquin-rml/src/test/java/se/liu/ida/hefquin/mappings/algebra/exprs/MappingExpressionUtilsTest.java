@@ -29,10 +29,10 @@ public class MappingExpressionUtilsTest extends BaseForMappingTests
 		final MappingOperator subOp1 = new MappingOpExtractForTests(sr, P);
 		final MappingOperator subOp2 = new MappingOpExtractForTests(sr, P);
 
-		final MappingExpression expr = MappingExpressionFactory.createMappingExpression(
-				new MappingOpUnion(subOp1, subOp2),
-				MappingExpressionFactory.createMappingExpression(subOp1),
-				MappingExpressionFactory.createMappingExpression(subOp2) );
+		final MappingExpression expr = MappingExpressionFactory.create(
+				MappingOpUnion.getInstance(),
+				MappingExpressionFactory.create(subOp1),
+				MappingExpressionFactory.create(subOp2) );
 
 		final Set<SourceReference> result = MappingExpressionUtils.extractAllSrcRefs(expr);
 
@@ -50,10 +50,10 @@ public class MappingExpressionUtilsTest extends BaseForMappingTests
 		final MappingOperator subOp1 = new MappingOpExtractForTests(sr1, P);
 		final MappingOperator subOp2 = new MappingOpExtractForTests(sr2, P);
 
-		final MappingExpression expr = MappingExpressionFactory.createMappingExpression(
-				new MappingOpUnion(subOp1, subOp2),
-				MappingExpressionFactory.createMappingExpression(subOp1),
-				MappingExpressionFactory.createMappingExpression(subOp2) );
+		final MappingExpression expr = MappingExpressionFactory.create(
+				MappingOpUnion.getInstance(),
+				MappingExpressionFactory.create(subOp1),
+				MappingExpressionFactory.create(subOp2) );
 
 		final Set<SourceReference> result = MappingExpressionUtils.extractAllSrcRefs(expr);
 
@@ -72,10 +72,10 @@ public class MappingExpressionUtilsTest extends BaseForMappingTests
 		final MappingOperator subOp1 = new MappingOpExtractForTests(sr1, P);
 		final MappingOperator subOp2 = new MappingOpExtractForTests(sr2, P);
 
-		final MappingExpression expr = MappingExpressionFactory.createMappingExpression(
-				new MappingOpUnion(subOp1, subOp2),
-				MappingExpressionFactory.createMappingExpression(subOp1),
-				MappingExpressionFactory.createMappingExpression(subOp2) );
+		final MappingExpression expr = MappingExpressionFactory.create(
+				MappingOpUnion.getInstance(),
+				MappingExpressionFactory.create(subOp1),
+				MappingExpressionFactory.create(subOp2) );
 
 		final TestDataObject1 d1 = new TestDataObject1();
 		final TestDataObject1 d2 = new TestDataObject1();

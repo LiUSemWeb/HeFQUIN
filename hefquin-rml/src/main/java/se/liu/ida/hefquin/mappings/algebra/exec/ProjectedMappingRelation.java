@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.mappings.algebra.exec;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.graph.Node;
 
@@ -23,13 +25,12 @@ public class ProjectedMappingRelation extends BaseForMappingRelationImpl
 	 */
 	protected final int[] schemaMapping;
 
-	/**
-	 * The given schema is assumed to consist of the projection variables
-	 * that are in the schema of the given input relation.
-	 */
-	public ProjectedMappingRelation( final List<String> schema,
+	public ProjectedMappingRelation( final Set<String> P,
 	                                 final MappingRelation input ) {
-		super(schema);
+		super( new ArrayList<>(P) );
+
+		if ( ! input.getSchema().containsAll(P) )
+			throw new IllegalArgumentException();
 
 		this.input = input;
 

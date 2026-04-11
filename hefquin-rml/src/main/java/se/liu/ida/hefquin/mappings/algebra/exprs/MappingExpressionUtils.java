@@ -82,6 +82,12 @@ public class MappingExpressionUtils
 		return evalWorker.evaluate(expr, srMap, inputs);
 	}
 
+/*
+TODO: extend the code base such that
+i) add: equals, toString, hashCode to the operators and to the expressions
+ii) singleton for union operator
+iii) test that everything works for actual queries,
+*/
 
 	// ---------- helpers ----------
 
@@ -324,7 +330,7 @@ public class MappingExpressionUtils
 			@SuppressWarnings("unchecked")
 			final DDS dd = (DDS) d;
 
-			output = new ExtractedMappingRelation<>( new ArrayList<>(op.getSchema()),
+			output = new ExtractedMappingRelation<>( new ArrayList<>(op.getAttributesOfP()),
 			                                         op.getSourceType(),
 			                                         op.getQuery(),
 			                                         op.getEntriesOfP(),
@@ -351,8 +357,7 @@ public class MappingExpressionUtils
 		public void visit( final MappingOpProject op ) {
 			assert inputs.length == 1;
 
-			output = new ProjectedMappingRelation( new ArrayList<>(op.getSchema()),
-			                                       inputs[0] );
+			output = new ProjectedMappingRelation( op.getP(), inputs[0] );
 		}
 
 		@Override
