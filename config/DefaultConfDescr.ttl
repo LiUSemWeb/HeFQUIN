@@ -39,6 +39,7 @@ _:bListOfHeuristics
     ec:elements (
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.ProjectPushDown" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.CardinalityBasedJoinOrderingWithRequests" ;
