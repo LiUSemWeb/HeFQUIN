@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.federation.access.impl;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -62,18 +60,13 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final long startTime = new Date().getTime();
 
 		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1);
-		final TPFResponse r1 = fr1.get();
+		fr1.get();
 
 		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req1, fm2);
-		final TPFResponse r2 = fr2.get();
+		fr2.get();
 
 		final long endTime = new Date().getTime();
 		if ( PRINT_TIME ) System.out.println( "twoRequestsInSequence \t milliseconds passed: " + (endTime - startTime) );
-
-		assertEquals( req1, r1.getRequest() );
-		assertEquals( req1, r2.getRequest() );
-		assertEquals( fm1, r1.getFederationMember() );
-		assertEquals( fm2, r2.getFederationMember() );
 	}
 
 	@Test
@@ -94,16 +87,11 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1);
 		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req1, fm2);
 
-		final TPFResponse r1 = fr1.get();
-		final TPFResponse r2 = fr2.get();
+		fr1.get();
+		fr2.get();
 
 		final long endTime = new Date().getTime();
 		if ( PRINT_TIME ) System.out.println( "twoRequestsInParallel \t milliseconds passed: " + (endTime - startTime) );
-
-		assertEquals( req1, r1.getRequest() );
-		assertEquals( req1, r2.getRequest() );
-		assertEquals( fm1, r1.getFederationMember() );
-		assertEquals( fm2, r2.getFederationMember() );
 	}
 
 	@Test

@@ -23,7 +23,6 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
-import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
@@ -447,11 +446,9 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 			final CardinalityResponse resp = new CardinalityResponse() {
 				@Override public Date getRetrievalEndTime() { return null; }
 				@Override public Date getRequestStartTime() { return null; }
-				@Override public DataRetrievalRequest getRequest() { return req; }
-				@Override public FederationMember getFederationMember() { return fm; }
 				@Override public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
 					if( isError() ){
-						throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
+						throw new UnsupportedOperationDueToRetrievalError(req, fm);
 					}
 					return c; }
 			};

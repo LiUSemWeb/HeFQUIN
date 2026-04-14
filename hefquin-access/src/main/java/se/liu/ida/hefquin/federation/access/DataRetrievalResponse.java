@@ -3,20 +3,8 @@ package se.liu.ida.hefquin.federation.access;
 import java.time.Duration;
 import java.util.Date;
 
-import se.liu.ida.hefquin.federation.FederationMember;
-
 public interface DataRetrievalResponse<T>
 {
-	/**
-	 * Returns the federation member where this response comes from.
-	 */
-	FederationMember getFederationMember();
-
-	/**
-	 * Returns the request that has been issued to obtain this response.
-	 */
-	DataRetrievalRequest getRequest();
-
 	/**
 	 * Returns the time at which the corresponding data retrieval
 	 * request (see {@link #getRequest()}) was started.

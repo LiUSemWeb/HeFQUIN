@@ -217,7 +217,7 @@ public abstract class EngineTestBase
 			} else {
 				result = getSolutions(req.getQueryPattern());
 			}
-			return new SolMapsResponseImpl( result, this, req, new Date() );
+			return new SolMapsResponseImpl( result, new Date() );
 		}
 
 	}
@@ -410,7 +410,7 @@ public abstract class EngineTestBase
 		public TPFResponseForTest( final List<Triple> matchingTriples,
 		                           final FederationMember fm,
 		                           final DataRetrievalRequest req ) {
-			super( matchingTriples, new ArrayList<Triple>(), null, fm, req, new Date() );
+			super( matchingTriples, new ArrayList<Triple>(), null, new Date() );
 		}
 
 		@Override
@@ -496,7 +496,8 @@ public abstract class EngineTestBase
 		{
 			final SolMapsResponse response;
 			if ( itSolMapsForResponse != null ) {
-				response = new SolMapsResponseImpl( itSolMapsForResponse.next(), fm, req, new Date() );
+				response = new SolMapsResponseImpl( itSolMapsForResponse.next(),
+				                                    new Date() );
 			}
 			else {
 				if (fm.getVocabularyMapping() != null) {
@@ -567,7 +568,8 @@ public abstract class EngineTestBase
 			else
 				throw new IllegalArgumentException();
 
-			final StringResponse response = new StringResponseImpl(data, fm, req, new Date());
+			final StringResponse response = new StringResponseImpl( data,
+			                                                        new Date() );
 			return CompletableFuture.completedFuture(response);
 		}
 

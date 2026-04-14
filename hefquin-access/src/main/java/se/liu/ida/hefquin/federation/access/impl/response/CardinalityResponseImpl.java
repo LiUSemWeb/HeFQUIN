@@ -3,34 +3,27 @@ package se.liu.ida.hefquin.federation.access.impl.response;
 import java.time.Duration;
 import java.util.Date;
 
-import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
-import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
 public class CardinalityResponseImpl implements CardinalityResponse
 {
 	protected final DataRetrievalResponse<?> wrappedResponse;
-	protected final DataRetrievalRequest request;
 	protected final int cardinality;
 
 	/**
-	 * Constructs a cardinality response that wraps the given data retrieval response and associates it with a request
-	 * and a cardinality value.
+	 * Constructs a cardinality response that wraps the given data
+	 * retrieval response and associates it with a cardinality value.
 	 *
 	 * @param wrappedResponse the wrapped data retrieval response (must not be null)
-	 * @param request         the original data retrieval request (must not be null)
 	 * @param cardinality     the cardinality of the request
 	 */
 	public CardinalityResponseImpl( final DataRetrievalResponse<?> wrappedResponse,
-	                                final DataRetrievalRequest request,
 	                                final int cardinality ) {
 		assert wrappedResponse != null;
-		assert request != null;
 
 		this.wrappedResponse = wrappedResponse;
-		this.request = request;
 		this.cardinality = cardinality;
 	}
 
@@ -41,26 +34,6 @@ public class CardinalityResponseImpl implements CardinalityResponse
 	 */
 	public DataRetrievalResponse<?> getWrappedResponse() {
 		return wrappedResponse;
-	}
-
-	/**
-	 * Returns the federation member associated with the wrapped response.
-	 *
-	 * @return the corresponding federation member
-	 */
-	@Override
-	public FederationMember getFederationMember() {
-		return wrappedResponse.getFederationMember();
-	}
-
-	/**
-	 * Returns the data retrieval request associated with this response.
-	 *
-	 * @return the associated {@link DataRetrievalRequest}
-	 */
-	@Override
-	public DataRetrievalRequest getRequest() {
-		return request;
 	}
 
 	/**
@@ -136,8 +109,8 @@ public class CardinalityResponseImpl implements CardinalityResponse
 			throw new UnsupportedOperationDueToRetrievalError(
 				getErrorStatusCode(),
 				getErrorDescription(),
-				getRequest(),
-				getFederationMember()
+				null,  // unknown request
+				null   // unknown federation member
 			);
 		}
 		return cardinality;

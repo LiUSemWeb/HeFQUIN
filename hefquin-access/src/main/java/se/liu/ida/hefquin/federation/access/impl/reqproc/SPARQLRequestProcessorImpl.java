@@ -90,7 +90,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 
 		result.close();
 
-		return new SolMapsResponseImpl(solMaps, fm, req, requestStartTime);
+		return new SolMapsResponseImpl(solMaps, requestStartTime);
 	}
 
 	protected SolMapsResponse performRequestWithRDFConnection( final SPARQLRequest req,
@@ -129,7 +129,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 			throw new FederationAccessException("Closing the connection to the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", ex, req, fm);
 		}
 
-		return new SolMapsResponseImpl(sink.solMaps, fm, req, requestStartTime);
+		return new SolMapsResponseImpl(sink.solMaps, requestStartTime);
 	}
 
 
