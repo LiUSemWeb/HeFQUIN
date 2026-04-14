@@ -69,6 +69,10 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 	}
 
 	public ExtPrintablePlan createPrintablePlan( final LogicalPlan lp ) {
+		if ( lp instanceof LogicalPlanWithoutResult ) {
+			return new ExtPrintablePlan( "empty plan", null, null, null, null );
+		}
+
 		final LogicalOperator rootOp = lp.getRootOperator();
 
 		rootOp.visit(snc);
