@@ -208,9 +208,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			}
 			else {
 				final CardinalityEstimationUnavailableError e = new CardinalityEstimationUnavailableError(
-					"Cardinality estimation is unavailable due to missing metadata triples.",
-					null,  // unknown request,
-					null   // unknown federation member
+					"Cardinality estimation is unavailable due to missing metadata triples."
 				);
 				return new CardinalityResponseImplWithoutCardinality(e, tpfResp);
 			}
