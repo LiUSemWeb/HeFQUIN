@@ -16,6 +16,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithUnaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.utils.BaseForTextBasedPlanPrinters.ExtPrintablePlan;
 
 /**
  * Internally, the functionality of this class is implemented based on
@@ -59,6 +60,10 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 	}
 
 	public ExtPrintablePlan createPrintablePlan( final PhysicalPlan p ) {
+		if ( p instanceof PhysicalPlanWithoutResult ) {
+			return new ExtPrintablePlan( "empty plan", null, null, null, null );
+		}
+
 		pe.graphPattern = null;
 		pe.fullStringForGraphPattern = null;
 		pe.rootOpString = null;
