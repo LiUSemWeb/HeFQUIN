@@ -14,6 +14,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Refactoring the code of the logical plan rewriting rules to use the visitor pattern ([#560](https://github.com/LiUSemWeb/HeFQUIN/pull/560), [#569](https://github.com/LiUSemWeb/HeFQUIN/pull/569), [#571](https://github.com/LiUSemWeb/HeFQUIN/pull/571), [#575](https://github.com/LiUSemWeb/HeFQUIN/pull/575)).
 - Separation of logical and physical plans for mapping algebra ([#581](https://github.com/LiUSemWeb/HeFQUIN/pull/581)).
+- Removes unused provenance-related methods from DataRetrievalResponse ([#582](https://github.com/LiUSemWeb/HeFQUIN/pull/582)).
 
 
 ## [0.0.10] - 2026-03-25
