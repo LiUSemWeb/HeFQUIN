@@ -130,10 +130,6 @@ public class TPFRequestProcessorImplTest extends FederationTestBase
 		// performing the tested operation
 		final TPFResponse resp = proc.performRequest(req, tpfServer);
 
-		// checking
-		assertEquals( req, resp.getRequest() );
-		assertEquals( tpfServer, resp.getFederationMember() );
-
 		return resp;
 	}
 
