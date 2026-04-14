@@ -213,11 +213,8 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 		public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
 			if( isError() ){
 				throw new UnsupportedOperationDueToRetrievalError(
-					getErrorStatusCode(),
-					getErrorDescription(),
-					null,  // unknown request
-					null   // unknown federation member
-				);
+						getErrorStatusCode(),
+						getErrorDescription() );
 			}
 			return cardinality;
 		}

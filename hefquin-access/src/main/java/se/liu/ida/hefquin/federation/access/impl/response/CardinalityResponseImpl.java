@@ -107,11 +107,8 @@ public class CardinalityResponseImpl implements CardinalityResponse
 	public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
 		if ( wrappedResponse.isError() ) {
 			throw new UnsupportedOperationDueToRetrievalError(
-				getErrorStatusCode(),
-				getErrorDescription(),
-				null,  // unknown request
-				null   // unknown federation member
-			);
+					getErrorStatusCode(),
+					getErrorDescription() );
 		}
 		return cardinality;
 	}

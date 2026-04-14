@@ -135,11 +135,8 @@ public abstract class DataRetrievalResponseBase<T> implements DataRetrievalRespo
 	public T getResponseData() throws UnsupportedOperationDueToRetrievalError {
 		if ( isError() ) {
 			throw new UnsupportedOperationDueToRetrievalError(
-				getErrorStatusCode(),
-				getErrorDescription(),
-				null,  // unknown request
-				null   // unknown federation member
-			);
+					getErrorStatusCode(),
+					getErrorDescription() );
 		}
 		return data;
 	}

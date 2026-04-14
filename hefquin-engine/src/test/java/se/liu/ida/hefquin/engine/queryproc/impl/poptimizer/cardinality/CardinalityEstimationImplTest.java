@@ -448,7 +448,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 				@Override public Date getRequestStartTime() { return null; }
 				@Override public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
 					if( isError() ){
-						throw new UnsupportedOperationDueToRetrievalError(req, fm);
+						throw new UnsupportedOperationDueToRetrievalError();
 					}
 					return c; }
 			};
