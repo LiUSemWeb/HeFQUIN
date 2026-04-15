@@ -14,16 +14,15 @@ public class CardinalityResponseImplWithoutCardinality extends CardinalityRespon
 	protected final Exception exception;
 
 	/**
-	 * Constructs a {@code CardinalityResponseImplWithoutCardinality} with the given exception.
+	 * Constructs a {@code CardinalityResponseImplWithoutCardinality} with
+	 * the given exception.
 	 *
 	 * @param exception       the exception that caused the absence of cardinality/cardinality estimate
 	 * @param wrappedResponse the original data retrieval response
-	 * @param request         the original data retrieval request
 	 */
 	public CardinalityResponseImplWithoutCardinality( final Exception exception,
-	                                                  final DataRetrievalResponse<?> wrappedResponse,
-	                                                  final DataRetrievalRequest request ) {
-		super( wrappedResponse, request, Integer.MAX_VALUE );
+	                                                  final DataRetrievalResponse<?> wrappedResponse ) {
+		super( wrappedResponse, Integer.MAX_VALUE );
 		this.exception = exception;
 	}
 

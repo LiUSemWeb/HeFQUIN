@@ -3,7 +3,9 @@ package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
@@ -81,8 +83,15 @@ public class QueryPlannerImpl implements QueryPlanner
 		if ( lplanPrinter != null ) {
 			lplanPrinter.print( lp, LogicalPlanStage.FINAL_LOGICAL_PLAN );
 		}
+
 		final long t3 = System.currentTimeMillis();
-		final Pair<PhysicalPlan, PhysicalOptimizationStats> planAndStats = poptimizer.optimize(lp, ctxt);
+
+		final Pair<PhysicalPlan, PhysicalOptimizationStats> planAndStats;
+		if ( lp instanceof LogicalPlanWithoutResult )
+			planAndStats = new Pair<>( PhysicalPlanWithoutResult.getInstance(),
+			                           null );  // no stats
+		else
+			planAndStats = poptimizer.optimize(lp, ctxt);
 
 		final long t4 = System.currentTimeMillis();
 

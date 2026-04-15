@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.federation.access.impl;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
@@ -72,10 +70,7 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
 
 		final CompletableFuture<TPFResponse> fr = fedAccessMgr.issueRequest(req, fm);
-		final TPFResponse resp = fr.get();
-
-		assertEquals( req, resp.getRequest() );
-		assertEquals( fm, resp.getFederationMember() );
+		fr.get();
 	}
 
 	@Test
@@ -91,10 +86,7 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
 
 		final CompletableFuture<TPFResponse> fr = fedAccessMgr.issueRequest(req, fm);
-		final TPFResponse resp = fr.get();
-
-		assertEquals( req, resp.getRequest() );
-		assertEquals( fm, resp.getFederationMember() );
+		fr.get();
 	}
 
 	@Test
@@ -114,18 +106,13 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		final long startTime = new Date().getTime();
 
 		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1);
-		final TPFResponse r1 = fr1.get();
+		fr1.get();
 
 		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req2, fm2);
-		final TPFResponse r2 = fr2.get();
+		fr2.get();
 
 		final long endTime = new Date().getTime();
 		if ( PRINT_TIME ) System.out.println( "twoRequestsInSequence \t milliseconds passed: " + (endTime - startTime) );
-
-		assertEquals( req1, r1.getRequest() );
-		assertEquals( req2, r2.getRequest() );
-		assertEquals( fm1, r1.getFederationMember() );
-		assertEquals( fm2, r2.getFederationMember() );
 	}
 
 	@Test
@@ -147,16 +134,11 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1);
 		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req2, fm2);
 
-		final TPFResponse r1 = fr1.get();
-		final TPFResponse r2 = fr2.get();
+		fr1.get();
+		fr2.get();
 
 		final long endTime = new Date().getTime();
 		if ( PRINT_TIME ) System.out.println( "twoRequestsInParallel \t milliseconds passed: " + (endTime - startTime) );
-
-		assertEquals( req1, r1.getRequest() );
-		assertEquals( req2, r2.getRequest() );
-		assertEquals( fm1, r1.getFederationMember() );
-		assertEquals( fm2, r2.getFederationMember() );
 	}
 
 	@Test
@@ -255,7 +237,7 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		@Override
 		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
 			sleep();
-			return new SolMapsResponseImpl( new ArrayList<>(), fm, req, new Date() );
+			return new SolMapsResponseImpl( new ArrayList<>(), new Date() );
 		}
 	}
 
@@ -267,13 +249,13 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		@Override
 		public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) {
 			sleep();
-			return new TPFResponseImpl( new ArrayList<>(), new ArrayList<>(), "dummy next page", fm, req, new Date() );
+			return new TPFResponseImpl( new ArrayList<>(), new ArrayList<>(), "dummy next page", new Date() );
 		}
 
 		@Override
 		public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm ) {
 			sleep();
-			return new TPFResponseImpl( new ArrayList<>(), new ArrayList<>(), "dummy next page", fm, req, new Date() );
+			return new TPFResponseImpl( new ArrayList<>(), new ArrayList<>(), "dummy next page", new Date() );
 		}
 	}
 
