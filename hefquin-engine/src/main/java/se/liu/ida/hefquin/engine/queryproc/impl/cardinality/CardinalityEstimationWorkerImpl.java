@@ -368,7 +368,7 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
 
 		// The maximum cardinality is simply the maximum possible because
-		// the lists and maps to be unfolded may be unboundedly large. 
+		// the lists and maps to be unfolded may be unboundedly large.
 		final int max = Integer.MAX_VALUE;
 		final Quality maxQuality = Quality.MIN_OR_MAX_POSSIBLE;
 		qpInfo.addProperty( QueryPlanProperty.maxCardinality(max, maxQuality) );
@@ -443,7 +443,7 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	public void visit( final LogicalOpMultiwayUnion op ) {
 		addCardinalityForUnion();
 	}
-	
+
 	@Override
 	public void visit( final LogicalOpDedup op ) {
 		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
