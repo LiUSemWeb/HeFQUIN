@@ -62,19 +62,26 @@ public class RemoveSubPlansWithEmptyResults implements HeuristicForLogicalOptimi
 		// Ensure all subplans have up-to-date cardinality estimates before rewriting.
 		cardEst.addCardinalities(inputPlan);
 
-		// If the entire plan is guaranteed to produce the empty result,
-		// replace it immediately.
-		if ( isProvablyEmpty(inputPlan) )
-			return LogicalPlanWithoutResult.getInstance();
-
 		return _apply(inputPlan);
 	}
 
 	protected LogicalPlan _apply( final LogicalPlan inputPlan ) {
-		// Recursively rewrite all subplans before handling the current operator.
+		// Top-down pruning step:
+		// If the current subplan is guaranteed to produce an empty result,
+		// replace it immediately and do not recurse into its children.
+		if ( isProvablyEmpty(inputPlan) )
+			return LogicalPlanWithoutResult.getInstance();
+
+		// Process the current node first; only then recurse into its subplans if needed.
 		final LogicalOperator op = inputPlan.getRootOperator();
 		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
 		final List<LogicalPlan> rewrittenSubPlans = new ArrayList<>(numberOfSubPlans);
+
+		// For left join operators, empty right collapses to left.
+		if ( op instanceof LogicalOpLeftJoin ) {
+			if ( isProvablyEmpty(inputPlan.getSubPlan(1)) )
+				return inputPlan.getSubPlan(0); // if the right subplan was pruned, return the left subplan
+		}
 
 		for ( int i = 0; i < numberOfSubPlans; i++ ) {
 			LogicalPlan child = inputPlan.getSubPlan(i);
@@ -91,16 +98,13 @@ public class RemoveSubPlansWithEmptyResults implements HeuristicForLogicalOptimi
 		if ( op instanceof LogicalOpUnion || op instanceof LogicalOpMultiwayUnion ) {
 			if ( rewrittenSubPlans.size() == 1 )
 				return rewrittenSubPlans.get(0);
-			else {
+			else if ( rewrittenSubPlans.size() > 1 ){
 				return LogicalPlanUtils.createPlanWithSubPlans( op, null, rewrittenSubPlans );
 			}
+			else
+				throw new IllegalStateException("All subplans of a union operator were removed, but the overall plan is not empty. This should not happen if cardinality estimates are correct.");
 		}
 
-		// For left join operators, empty right collapses to left.
-		if ( op instanceof LogicalOpLeftJoin ) {
-			if ( rewrittenSubPlans.size() != 2 )
-				return rewrittenSubPlans.get(0); // if the right subplan was pruned, return the left subplan
-		}
 
 		// Rebuild the plan with rewritten subplans, preserving operator and properties.
 		return LogicalPlanUtils.createPlanWithSubPlans( op,
@@ -109,8 +113,8 @@ public class RemoveSubPlansWithEmptyResults implements HeuristicForLogicalOptimi
 	}
 
 	protected boolean isProvablyEmpty ( final LogicalPlan plan ) {
-		// Returns true if the plan is guaranteed empty
-		// (via accurate cardinality 0).
+		// Returns true if the plan is guaranteed to produce an empty result
+		// according to the cardinality estimate that is determined for it.
 		final QueryPlanningInfo info = plan.getQueryPlanningInfo();
 		if (info == null) return false;
 
