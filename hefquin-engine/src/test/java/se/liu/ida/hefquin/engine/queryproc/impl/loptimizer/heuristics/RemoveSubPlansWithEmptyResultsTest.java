@@ -350,7 +350,7 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		assertEquals( 0, result.numberOfSubPlans() );
 	}
 
-	@Ignore("This test currently fails because the cardinality estimator degrades the cardinality quality.")
+	@Ignore("This test currently fails because the cardinality estimator degrades the cardinality quality (TODO #585).")
 	public void removeEmptySubPlansLeftJoinWithEmptyLeftBranch() {
 		// Left join with empty left and non-empty right subplan.
 		// Result is empty and entire plan is removed.
