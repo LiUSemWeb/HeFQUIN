@@ -21,27 +21,26 @@ import se.liu.ida.hefquin.engine.queryproc.impl.cardinality.RequestBasedCardinal
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
 /**
- * Recursively removes subplans that are guaranteed to produce empty results.
- * A subplan is considered empty only if it has a cardinality estimate of 0
- * with ACCURATE quality.
- *
+ * Removes every subplan that is guaranteed to produce an empty result
+ * according to the cardinality estimate that is determined for it. In
+ * particular, a subplan is removed if it has a cardinality estimate of
+ * 0 with the quality score being ACCURATE. The subplans are removed in
+ * a top-down manner (i.e., trying to remove bigger subplans first).
+ * <p>
  * The heuristic performs a recursive traversal of the logical plan and simplifies
  * the plan based on emptiness information:
- *
- * - If the root plan itself is provably empty, it is replaced by
- *   {@link LogicalPlanWithoutResult}.
- *
- * - For union and multiway union operators, empty subplans are removed.
+ * <ul>
+ * <li>If the overall plan itself is provably empty, it is replaced by
+ *   {@link LogicalPlanWithoutResult}.</li>
+ * <li>For union and multiway union operators, empty subplans are removed.
  *   If exactly one subplan remains, the union operator is removed and
- *   replaced by that subplan.
- *
- * - For left join operators, if the right subplan is empty, the left join is
- *   removed and replaced by its left subplan.
- *
- * For all other operators, empty subplans are not removed individually.
+ *   replaced by that subplan.</li>
+ * <li>For left join operators, if the right subplan is empty, the left join is
+ *   removed and replaced by its left subplan.</li>
+ * <li>For all other operators, empty subplans are not removed individually.
  * Instead, emptiness is propagated via cardinality estimates, allowing
- * higher-level simplifications when possible
- *
+ * higher-level simplifications when possible.</li>
+ * </ul>
  * The heuristic relies on precomputed cardinality estimates provided by
  * the {@link CardinalityEstimator}.
  */
@@ -63,7 +62,8 @@ public class RemoveSubPlansWithEmptyResults implements HeuristicForLogicalOptimi
 		// Ensure all subplans have up-to-date cardinality estimates before rewriting.
 		cardEst.addCardinalities(inputPlan);
 
-		// If the entire plan is provably empty, replace it immediately.
+		// If the entire plan is guaranteed to produce the empty result,
+		// replace it immediately.
 		if ( isProvablyEmpty(inputPlan) )
 			return LogicalPlanWithoutResult.getInstance();
 
@@ -111,10 +111,10 @@ public class RemoveSubPlansWithEmptyResults implements HeuristicForLogicalOptimi
 	protected boolean isProvablyEmpty ( final LogicalPlan plan ) {
 		// Returns true if the plan is guaranteed empty
 		// (via accurate cardinality 0).
-		QueryPlanningInfo info = plan.getQueryPlanningInfo();
+		final QueryPlanningInfo info = plan.getQueryPlanningInfo();
 		if (info == null) return false;
 
-		QueryPlanProperty crd = info.getProperty(CARDINALITY);
+		final QueryPlanProperty crd = info.getProperty(CARDINALITY);
 		return crd != null
 			&& crd.getValue() == 0
 			&& crd.getQuality() == Quality.ACCURATE;
