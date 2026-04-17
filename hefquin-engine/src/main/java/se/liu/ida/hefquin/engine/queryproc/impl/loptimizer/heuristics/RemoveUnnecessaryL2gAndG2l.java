@@ -171,6 +171,11 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 			// nothing to do here; this operator does not contain any triple pattern
 		}
 
+		@Override
+		public void visit( final LogicalOpMinus op ) {
+			// nothing to do here; this operator does not contain any triple pattern
+		}
+
 	} // end of TriplePatternsCollector
 
 }
