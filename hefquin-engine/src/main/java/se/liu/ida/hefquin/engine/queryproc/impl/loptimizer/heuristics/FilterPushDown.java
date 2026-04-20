@@ -370,10 +370,6 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 	/**
 	 * Assumes that the given child operator is either
-	 * a {@link LogicalOpTPAdd},
-	 * a {@link LogicalOpTPOptAdd},
-	 * a {@link LogicalOpBGPAdd},
-	 * a {@link LogicalOpBGPOptAdd},
 	 * a {@link LogicalOpGPAdd}, or
 	 * a {@link LogicalOpGPOptAdd}.
 	 */
@@ -438,6 +434,17 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		if ( toBePushed.isEmpty() ) {
 			return createPlanAfterPushingInSubPlan(parentFilterOp, childOp, subPlanUnderChildOp, inputPlan);
+		}
+
+		if ( childOp instanceof LogicalOpGPAdd gpAddOp
+		  && gpAddOp.getFederationMember().supportsMoreThanTriplePatterns() ) {
+			// The filter can be pushed into the pattern of the given GPAdd operator.
+			gpAddOp.getPattern().mergeWith(toBePushed);
+		}
+		else if ( childOp instanceof LogicalOpGPOptAdd gpOptAddOp
+		       && gpOptAddOp.getFederationMember().supportsMoreThanTriplePatterns() ) {
+			// The filter can be pushed into the pattern of the given GPOptAdd operator.
+			gpOptAddOp.getPattern().mergeWith(toBePushed);
 		}
 
 		final LogicalPlan newSubPlanUnderChildOp = new LogicalPlanWithUnaryRootImpl(
