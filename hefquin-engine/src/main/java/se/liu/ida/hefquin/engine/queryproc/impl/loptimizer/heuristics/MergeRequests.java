@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementMinus;
 import org.apache.jena.sparql.syntax.ElementOptional;
 
 import se.liu.ida.hefquin.base.query.BGP;
@@ -386,6 +387,27 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			// nothing to do here
 		}
 
+		@Override
+		public void visit( final LogicalOpMinus op ) {
+			final LogicalOperator childOp1 = rewrittenSubPlans.get(0).getRootOperator();
+			final LogicalOperator childOp2 = rewrittenSubPlans.get(1).getRootOperator();
+			if (   childOp1 instanceof LogicalOpRequest reqOp1
+				&& childOp2 instanceof LogicalOpRequest reqOp2
+				&& reqOp1.getRequest() instanceof SPARQLRequest req1
+				&& reqOp2.getRequest() instanceof SPARQLRequest req2
+				&& reqOp1.getFederationMember().equals(reqOp2.getFederationMember()) )
+			{
+				// the LHS is the non-optional part
+				final SPARQLGraphPattern merged = mergePatternWithMinusPatterns( req1.getQueryPattern(),
+				                                                                 req2.getQueryPattern() );
+
+				final FederationMember fm = reqOp1.getFederationMember();
+				if ( fm.isSupportedPattern(merged) ) {
+					returnPlan = createPlanWithSingleRequestOp(merged, mayReduce, fm);
+				}
+			}
+		}
+
 	} // end of Worker
 
 	/**
@@ -475,6 +497,31 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			final Element elmtInOpt = QueryPatternUtils.convertToJenaElement( optPatterns[i] );
 			final ElementOptional opt = new ElementOptional(elmtInOpt);
 			group.addElement(opt);
+		}
+
+		return new GenericSPARQLGraphPatternImpl1(group);
+	}
+
+	protected SPARQLGraphPattern mergePatternWithMinusPatterns( final SPARQLGraphPattern pattern,
+	                                                            final SPARQLGraphPattern ... minusPatterns ) {
+		assert minusPatterns.length > 0;
+
+		final ElementGroup group = new ElementGroup();
+
+		final Element elmt = QueryPatternUtils.convertToJenaElement(pattern);
+		if ( elmt instanceof ElementGroup eg ) {
+			for ( final Element subElmt : eg.getElements() ) {
+				group.addElement(subElmt);
+			}
+		}
+		else {
+			group.addElement(elmt);
+		}
+
+		for ( int i = 0; i < minusPatterns.length; i++ ) {
+			final Element elmtInMinus = QueryPatternUtils.convertToJenaElement( minusPatterns[i] );
+			final ElementMinus minus = new ElementMinus(elmtInMinus);
+			group.addElement(minus);
 		}
 
 		return new GenericSPARQLGraphPatternImpl1(group);

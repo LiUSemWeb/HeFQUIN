@@ -12,12 +12,13 @@ public interface LogicalPlanVisitor
 
 	void visit( final LogicalOpJoin op );
 	void visit( final LogicalOpLeftJoin op );
+	void visit( final LogicalOpMinus op );
 	void visit( final LogicalOpUnion op );
 
 	void visit( final LogicalOpMultiwayJoin op );
 	void visit( final LogicalOpMultiwayLeftJoin op );
 	void visit( final LogicalOpMultiwayUnion op );
-	
+
 	void visit( final LogicalOpFilter op );
 	void visit( final LogicalOpBind op );
 	void visit( final LogicalOpUnfold op );

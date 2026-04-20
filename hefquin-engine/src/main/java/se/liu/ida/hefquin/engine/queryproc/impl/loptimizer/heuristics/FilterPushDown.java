@@ -230,6 +230,13 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			                                               subPlanUnderFilter.getSubPlan(0) );
 		}
 
+		@Override
+		public void visit( final LogicalOpMinus op ) {
+			createdPlan = createPlanForMinusUnderFilter( filterOp,
+			                                             op,
+			                                             subPlanUnderFilter );
+		}
+
 	} // end of Worker
 
 	protected LogicalPlan createPlanForRequestUnderFilter( final LogicalOpFilter filterOp,
@@ -753,6 +760,19 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return new LogicalPlanWithUnaryRootImpl( newFilterOp,
 			                                         null,
 			                                         newSubPlanUnderFilter );
+	}
+
+	protected LogicalPlan createPlanForMinusUnderFilter( final LogicalOpFilter filterOp, final LogicalOpMinus op, final LogicalPlan subPlanUnderFilter ) {
+		// Create a new subplan with the filter as root operator on top of the
+		// left subplan that is under the given minus operator, and apply this
+		// heuristic recursively to this new subplan.
+		final LogicalPlan leftSubPlan = subPlanUnderFilter.getSubPlan(0);
+		final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterOp, null, leftSubPlan);
+		final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
+
+		// Put together the new plan with a minus operator as root and the new
+		// subplan with the filter pushed as left subplan and the unchanged right subplan.
+		return LogicalPlanUtils.createPlanWithSubPlans( op, null, newSubPlanWithFilterPushed, subPlanUnderFilter.getSubPlan(1) );
 	}
 
 	protected LogicalPlan createPlanForUnaryOpUnderFilter( final LogicalOpFilter filterOp, final UnaryLogicalOp op, final LogicalPlan subPlanUnderOp ) {

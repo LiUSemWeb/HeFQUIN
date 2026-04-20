@@ -12,6 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
@@ -84,13 +85,15 @@ public class RemoveSubPlansWithEmptyResults implements HeuristicForLogicalOptimi
 			return LogicalPlanWithoutResult.getInstance();
 
 		// Now consider the special case of a plan with a left join operator
-		// as root and the second subplan (i.e., the one that captures the
-		// optional part) is guaranteed to produce an empty result. In this
-		// case, the left-join operator and the second subplan can be removed;
-		// in other words, the given plan can be replaced by the first subplan
-		// under the left-join operator (i.e., the non-optional part).
+		// or a minus operator as root and the second subplan
+		// (i.e., the one that captures the optional part) is guaranteed
+		// to produce an empty result. In this case, the left-join operator
+		// and the second subplan can be removed; in other words, the given
+		// plan can be replaced by the first subplan under the left-join
+		// operator (i.e., the non-optional part).
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
-		if (    rootOp instanceof LogicalOpLeftJoin
+		if (   (rootOp instanceof LogicalOpLeftJoin
+		     || rootOp instanceof LogicalOpMinus)
 		     && isProvablyEmpty(inputPlan.getSubPlan(1)) ) {
 			return inputPlan.getSubPlan(0);
 		}

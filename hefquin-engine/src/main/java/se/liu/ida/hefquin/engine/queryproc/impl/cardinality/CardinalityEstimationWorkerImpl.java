@@ -514,6 +514,45 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
 	}
 
+	@Override
+	public void visit( final LogicalOpMinus op ) {
+		final int crdValue;
+		final Quality crdQuality;
+
+		final QueryPlan lhs = currentSubPlan.getSubPlan(0);
+		final QueryPlan rhs = currentSubPlan.getSubPlan(1);
+
+		final QueryPlanningInfo qpInfoSubPlan1 = lhs.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan2 = rhs.getQueryPlanningInfo();
+
+		final QueryPlanProperty lhsCrd = qpInfoSubPlan1.getProperty(CARDINALITY);
+		final QueryPlanProperty lhsMaxCrd = qpInfoSubPlan1.getProperty(MAX_CARDINALITY);
+		final QueryPlanProperty rhsCrd = qpInfoSubPlan2.getProperty(CARDINALITY);
+
+		if ( rhsCrd.getValue() == 0 && rhsCrd.getQuality() == Quality.ACCURATE ) {
+			// If the second input plan is guaranteed to produce an empty result,
+			// then the result of the MINUS operator is guaranteed to be the same as the first input plan.
+			crdValue = lhsCrd.getValue();
+			crdQuality = lhsCrd.getQuality();
+		}
+		else {
+			// Else, estimate the cardinality of the MINUS result by subtracting the estimated cardinality
+			// of the second input plan from the estimated cardinality of the first input plan.
+			// This is a very crude estimate that is likely to be a significant underestimation in many cases,
+			// but it is not clear how to do better without considering the actual query patterns and data statistics.
+			crdValue = Math.max(lhsCrd.getValue() - rhsCrd.getValue(), 0);
+			crdQuality = QueryPlanProperty.getReducedQuality( lhsCrd.getQuality() );
+		}
+
+		final int maxValue = lhsMaxCrd.getValue();
+		final Quality maxQuality = lhsMaxCrd.getQuality();
+
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+	}
+
 	public void addCardinalityForUnion() {
 		int crdValue = 0;
 		int maxValue = 0;
