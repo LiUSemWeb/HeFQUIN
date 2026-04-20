@@ -9,13 +9,12 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
 public class ExecOpHashBasedMinus extends ExecOpHashJoin2
 {
-	public ExecOpHashBasedMinus( final boolean useOuterJoinSemantics,
-	                             final boolean mayReduce,
+	public ExecOpHashBasedMinus( final boolean mayReduce,
 	                             final ExpectedVariables inputVars1,
 	                             final ExpectedVariables inputVars2,
 	                             final boolean collectExceptions,
 	                             final QueryPlanningInfo qpInfo ) {
-		super(useOuterJoinSemantics, mayReduce, inputVars1, inputVars2, collectExceptions, qpInfo);
+		super(true, mayReduce, inputVars1, inputVars2, collectExceptions, qpInfo);
 	}
 
 	@Override

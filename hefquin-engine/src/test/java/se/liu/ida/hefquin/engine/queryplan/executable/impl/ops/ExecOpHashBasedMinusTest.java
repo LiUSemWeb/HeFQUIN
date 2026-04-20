@@ -60,7 +60,7 @@ public class ExecOpHashBasedMinusTest
 		varsCertain2.add(var2);
 		Set<Var> varsPossible2 = new HashSet<>();
 
-		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+		final ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
 		final Iterator<SolutionMapping> it = runTest(input1, input2, false, false, inputVars);
 
