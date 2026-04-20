@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -25,9 +23,12 @@ public class ExecOpHashBasedMinusTest
 {
 	@Test
 	public void subtract() throws ExecutionException {
+		// Check that the operator correctly subtracts solution
+		// mappings from the left-hand side.
+
+		// Set up
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
-		final Var var3 = Var.alloc("v3");
 
 		final Node x1 = NodeFactory.createURI("http://example.org/x1");
 		final Node x2 = NodeFactory.createURI("http://example.org/x2");
@@ -35,35 +36,27 @@ public class ExecOpHashBasedMinusTest
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 		final Node y3 = NodeFactory.createURI("http://example.org/y3");
 
-		final List<SolutionMapping> input1 = new ArrayList<>();
-		input1.add( SolutionMappingUtils.createSolutionMapping(
-				var1, x1,
-				var2, y1) );
+		final List<SolutionMapping> input1 = List.of(
+			SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1),
+			// Remaining solution mapping after the subtraction.
+			SolutionMappingUtils.createSolutionMapping(var1, x2, var2, y2)
+		);
 
-		// Remaining solution mapping after the subtraction.
-		input1.add( SolutionMappingUtils.createSolutionMapping(
-				var1, x2,
-				var2, y2) );
+		final List<SolutionMapping> input2 = List.of(
+			SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1)
+		);
 
-		final List<SolutionMapping> input2 = new ArrayList<>();
-		input2.add( SolutionMappingUtils.createSolutionMapping(
-				var1, x1,
-				var2, y1) );
-
-		Set<Var> varsCertain1 = new HashSet<>();
-		varsCertain1.add(var1);
-		varsCertain1.add(var2);
-		Set<Var> varsPossible1 = new HashSet<>();
-
-		Set<Var> varsCertain2 = new HashSet<>();
-		varsCertain2.add(var1);
-		varsCertain2.add(var2);
-		Set<Var> varsPossible2 = new HashSet<>();
+		final Set<Var> varsCertain1 = Set.of(var1, var2);
+		final Set<Var> varsPossible1 = Set.of();
+		final Set<Var> varsCertain2 = Set.of(var1, var2);
+		final Set<Var> varsPossible2 = Set.of();
 
 		final ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, false, false, inputVars);
+		// Test
+		final Iterator<SolutionMapping> it = runTest(input1, input2, false, inputVars);
 
+		// Check
 		assertTrue( it.hasNext() );
 		final SolutionMapping sm = it.next();
 		assertEquals( x2, sm.asJenaBinding().get(var1) );
@@ -73,7 +66,12 @@ public class ExecOpHashBasedMinusTest
 	}
 
 	@Test
-	public void emptySubtractionResult() throws ExecutionException  {
+	public void emptySubtractionResult() throws ExecutionException {
+		// Check that the operator correctly produces an empty
+		// result if all solution mappings from the left-hand
+		// side are subtracted.
+
+		// Set up
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 
@@ -82,30 +80,63 @@ public class ExecOpHashBasedMinusTest
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 
-		final List<SolutionMapping> input1 = new ArrayList<>();
-		input1.add( SolutionMappingUtils.createSolutionMapping(
-				var1, x1,
-				var2, y1) );
+		final List<SolutionMapping> input1 = List.of(
+			SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1)
+		);
 
-		final List<SolutionMapping> input2 = new ArrayList<>();
-		input2.add( SolutionMappingUtils.createSolutionMapping(
-				var1, x1,
-				var2, y1) );
+		final List<SolutionMapping> input2 = List.of(
+			SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1)
+		);
 
-		Set<Var> varsCertain1 = new HashSet<>();
-		varsCertain1.add(var1);
-		varsCertain1.add(var2);
-		Set<Var> varsPossible1 = new HashSet<>();
-
-		Set<Var> varsCertain2 = new HashSet<>();
-		varsCertain2.add(var1);
-		varsCertain2.add(var2);
-		Set<Var> varsPossible2 = new HashSet<>();
+		final Set<Var> varsCertain1 = Set.of(var1, var2);
+		final Set<Var> varsPossible1 = Set.of();
+		final Set<Var> varsCertain2 = Set.of(var1, var2);
+		final Set<Var> varsPossible2 = Set.of();
 
 		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2, false, false, inputVars);
+		// Test
+		final Iterator<SolutionMapping> it = runTest(input1, input2, false, inputVars);
 
+		// Check
+		assertFalse( it.hasNext() );
+	}
+
+	@Test
+	public void oneCommonVariable() throws ExecutionException {
+		// Test where the two inputs have only one common variable,
+		// which is sufficient to make the solution mapping from
+		// the left-hand side be subtracted.
+
+		// Set up
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
+
+		final Node x1 = NodeFactory.createURI("http://example.org/x1");
+		final Node x2 = NodeFactory.createURI("http://example.org/x2");
+		final Node y1 = NodeFactory.createURI("http://example.org/y1");
+		final Node y2 = NodeFactory.createURI("http://example.org/y2");
+
+		final List<SolutionMapping> input1 = List.of(
+			SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1)
+		);
+
+		final List<SolutionMapping> input2 = List.of(
+			SolutionMappingUtils.createSolutionMapping(var1, x1, var3, y1)
+		);
+
+		final Set<Var> varsCertain1 = Set.of(var1, var2);
+		final Set<Var> varsPossible1 = Set.of();
+		final Set<Var> varsCertain2 = Set.of(var1, var3);
+		final Set<Var> varsPossible2 = Set.of();
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		// Test
+		final Iterator<SolutionMapping> it = runTest(input1, input2, false, inputVars);
+
+		// Check
 		assertFalse( it.hasNext() );
 	}
 
@@ -116,12 +147,11 @@ public class ExecOpHashBasedMinusTest
 			final List<SolutionMapping> input1,
 			final List<SolutionMapping> input2,
 			final boolean sendAllSolMapsSeparately,
-			final boolean useOuterJoinSemantics,
 			final ExpectedVariables... inputVars ) throws ExecutionException
 	{
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
-		final ExecOpHashBasedMinus op = createExecOpForTest( useOuterJoinSemantics, inputVars );
+		final ExecOpHashBasedMinus op = new ExecOpHashBasedMinus(sendAllSolMapsSeparately, inputVars[0], inputVars[1], sendAllSolMapsSeparately, null);
 
 		if ( sendAllSolMapsSeparately == true ) {
 			for ( final SolutionMapping sm : input2 ) {
@@ -171,8 +201,7 @@ public class ExecOpHashBasedMinusTest
 			final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashBasedMinus( useOuterJoinSemantics,
-		                                 false,            // mayReduce
+		return new ExecOpHashBasedMinus( false,            // mayReduce
 		                                 inputVars[0], inputVars[1],
 		                                 false,    // collectExceptions
 		                                 null );              // qpInfo

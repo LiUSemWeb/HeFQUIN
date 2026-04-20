@@ -7,6 +7,11 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
+/**
+ * To be used for MINUS clauses. This operator extends {@link ExecOpHashJoin2} to
+ * calculate solution mappings in the left-hand side that are not compatible with
+ * the solutions on the right-hand side.
+ */
 public class ExecOpHashBasedMinus extends ExecOpHashJoin2
 {
 	public ExecOpHashBasedMinus( final boolean mayReduce,
