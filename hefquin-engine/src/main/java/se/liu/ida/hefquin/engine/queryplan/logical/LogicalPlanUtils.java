@@ -106,9 +106,9 @@ public class LogicalPlanUtils
 	 *                 without initial query-planning info
 	 */
 	public static LogicalPlan createPlanWithMinus( final boolean mayReduce,
-	                                                     final LogicalPlan subPlan1,
-	                                                     final LogicalPlan subPlan2,
-	                                                     final Iterable<QueryPlanProperty> qpInfo ) {
+	                                               final LogicalPlan subPlan1,
+	                                               final LogicalPlan subPlan2,
+	                                               final Iterable<QueryPlanProperty> qpInfo ) {
 		return createPlanWithSubPlans( LogicalOpMinus.getInstance(mayReduce), qpInfo, subPlan1, subPlan2 );
 	}
 

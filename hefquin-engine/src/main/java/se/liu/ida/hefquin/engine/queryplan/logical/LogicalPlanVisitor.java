@@ -12,6 +12,7 @@ public interface LogicalPlanVisitor
 
 	void visit( final LogicalOpJoin op );
 	void visit( final LogicalOpLeftJoin op );
+	void visit( final LogicalOpMinus op );
 	void visit( final LogicalOpUnion op );
 
 	void visit( final LogicalOpMultiwayJoin op );
@@ -25,5 +26,4 @@ public interface LogicalPlanVisitor
 	void visit( final LogicalOpGlobalToLocal op );
 	void visit( final LogicalOpDedup op );
 	void visit( final LogicalOpProject op );
-	void visit( final LogicalOpMinus op );
 }

@@ -509,8 +509,8 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		final ElementGroup group = new ElementGroup();
 
 		final Element elmt = QueryPatternUtils.convertToJenaElement(pattern);
-		if ( elmt instanceof ElementGroup ) {
-			for ( final Element subElmt : ((ElementGroup) elmt).getElements() ) {
+		if ( elmt instanceof ElementGroup eg ) {
+			for ( final Element subElmt : eg.getElements() ) {
 				group.addElement(subElmt);
 			}
 		}
