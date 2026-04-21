@@ -155,8 +155,14 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		try {
 			key = new ChronicleMapCacheKey( req, fm, ResponseMode.RESULT );
 		} catch ( final IllegalArgumentException e ) {
-			throw new IllegalStateException( "Failed to create cache key for request/member combination: "
-					+ req.getClass().getName() + "/" + fm.getClass().getName(), e );
+			// TODO: Currently unsupported request/member types bypass the cache silently.
+			// This may cause bugs in the future if full cache coverage is assumed later.
+			// In a follow-up PR (#590):
+			// (i) extend the cache implementation to support all request/member types, and
+			// (ii) replace this fallback with an exception.
+			return fedAccMan.issueRequest(req, fm);
+			// throw new IllegalStateException( "Failed to create cache key for request/member combination: "
+			// 		+ req.getClass().getName() + "/" + fm.getClass().getName(), e );
 		}
 
 		final CompletableFuture<?> cachedResponse;
