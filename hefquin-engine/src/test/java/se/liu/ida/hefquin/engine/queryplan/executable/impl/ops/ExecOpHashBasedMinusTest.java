@@ -196,15 +196,4 @@ public class ExecOpHashBasedMinusTest
 		return inputVars;
 	}
 
-	protected ExecOpHashBasedMinus createExecOpForTest(
-			final boolean useOuterJoinSemantics,
-			final ExpectedVariables... inputVars ) {
-		assert inputVars.length == 2;
-
-		return new ExecOpHashBasedMinus( false,            // mayReduce
-		                                 inputVars[0], inputVars[1],
-		                                 false,    // collectExceptions
-		                                 null );              // qpInfo
-	}
-
 }
