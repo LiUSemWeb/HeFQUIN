@@ -11,6 +11,7 @@ import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVars;
 
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -114,9 +115,15 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
-			// The filter cannot be pushed under this operator.
-			// (but it may be removed altogether TODO #572)
-			createdPlan = inputPlan;
+			// The filter cannot be pushed below this operator. However, since the
+			// root operator of the subplan is a FixedSolMap with a known solution
+			// mapping, we can evaluate the filter expression directly on that mapping.
+			// - If the mapping satisfies the filter condition, the filter can be removed.
+			// - Otherwise, the filter is kept, which will result in an empty output during execution.
+			if ( SolutionMappingUtils.checkSolutionMapping(op.getSolutionMapping(), filterOp.getFilterExpressions()) == true ) {
+				createdPlan = inputPlan.getSubPlan(0);
+			}
+			else createdPlan = inputPlan;
 		}
 
 		@Override

@@ -16,6 +16,7 @@ import org.apache.jena.sparql.ARQConstants;
 import org.apache.jena.sparql.expr.ExprFunction;
 import org.apache.jena.sparql.expr.NodeValue;
 
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -238,9 +239,25 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		// TODO: perhaps we can be smarter here and somehow estimate the
 		// selectivity of the filter expression.
 
-		qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(crd) );
-		qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(max) );
-		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+		// If the filter is above a fixed solution mapping operator, evaluate
+		// the filter condition for the fixed solution mapping of that operator.
+		if ( currentSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpFixedSolMap childOp ) {
+			if ( SolutionMappingUtils.checkSolutionMapping(childOp.getSolutionMapping(), op.getFilterExpressions()) ) {
+				qpInfo.addProperty( QueryPlanProperty.cardinality(1, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(1, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(1, Quality.ACCURATE) );
+			}
+			else {
+				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+			}
+		}
+		else {
+			qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(crd) );
+			qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(max) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+		}
 	}
 
 	@Override
@@ -632,7 +649,6 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
 	}
-
 
 	public static int addWithoutExceedingMax( final int x, final int y ) {
 		if ( x == Integer.MAX_VALUE || y == Integer.MAX_VALUE )
