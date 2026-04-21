@@ -12,6 +12,6 @@ public class CachedCardinalityResponse extends DataRetrievalResponseBase<Integer
 	 * @param cardinality the cardinality of the request
 	 */
 	public CachedCardinalityResponse( final int cardinality ) {
-		super( cardinality, null, null, new Date() );
+		super( cardinality, new Date() );
 	}
 }
