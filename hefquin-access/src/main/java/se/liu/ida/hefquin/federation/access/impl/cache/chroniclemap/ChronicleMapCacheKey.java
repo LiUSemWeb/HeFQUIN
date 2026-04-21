@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -28,8 +30,14 @@ import se.liu.ida.hefquin.federation.members.TPFServer;
 public class ChronicleMapCacheKey implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	// Binary SHA-256 digest (32 bits)
-	private final byte[] requestDigest;
+	// Binary SHA-256 digest (32 bytes)
+	protected final byte[] requestDigest;
+
+	/**
+	 * Defines how the response of a request is interpreted when caching. RESULT
+	 * represents actual data retrieval, while COUNT represents requests that only
+	 * return the number of matching results.
+	 */
 	public enum ResponseMode { RESULT, COUNT }
 
 	/**
@@ -84,8 +92,9 @@ public class ChronicleMapCacheKey implements Serializable {
 	/**
 	 * Compares this key with another object for equality.
 	 *
-	 * Two {@code ChronicleMapCacheKey} instances are considered equal if their
-	 * SHA-256 digests are identical.
+	 * Two {@code ChronicleMapCacheKey} instances are considered equal if and only
+	 * if the other object is also a {@code ChronicleMapCacheKey} and their SHA-256
+	 * digests are identical.
 	 */
 	@Override
 	public boolean equals( final Object obj ) {
@@ -110,6 +119,6 @@ public class ChronicleMapCacheKey implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ChronicleMapCacheKey{" + requestDigest + "}";
+		return "ChronicleMapCacheKey{" + Hex.encodeHexString(requestDigest) + "}";
 	}
 }
