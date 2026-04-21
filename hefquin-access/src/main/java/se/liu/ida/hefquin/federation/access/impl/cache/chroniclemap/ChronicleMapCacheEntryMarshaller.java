@@ -213,7 +213,7 @@ public class ChronicleMapCacheEntryMarshaller
 				}
 				solutionMappings.add( new SolutionMappingImpl( builder.build() ) );
 			}
-			object = new SolMapsResponseImpl( solutionMappings, null, null, new Date() );
+			object = new SolMapsResponseImpl( solutionMappings, new Date() );
 		}
 		else if ( type.equals( CachedObjectType.TPF_RESPONSE ) ) {
 			// Matching triples
@@ -239,7 +239,7 @@ public class ChronicleMapCacheEntryMarshaller
 			// Next page URL
 			final String nextPageURL = in.readUtf8();
 
-			object = new TPFResponseImpl( matchingTriples, metadataTriples, nextPageURL, null, null, new Date() );
+			object = new TPFResponseImpl( matchingTriples, metadataTriples, nextPageURL, new Date() );
 		}
 		else if ( type.equals( CachedObjectType.CARDINALITY_RESPONSE ) ) {
 			final int count = in.readInt();
