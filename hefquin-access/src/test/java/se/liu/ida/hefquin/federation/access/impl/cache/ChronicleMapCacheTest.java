@@ -365,7 +365,7 @@ public class ChronicleMapCacheTest extends FederationTestBase
 			solMaps.add(sm);
 		}
 
-		return new SolMapsResponseImpl( solMaps, null, null, new Date() );
+		return new SolMapsResponseImpl( solMaps, new Date() );
 	}
 
 	protected TPFResponse makeTPFResponse( final int numberOfResults ) {
@@ -376,8 +376,6 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		return new TPFResponseImpl( matchingTriples,
 		                            new ArrayList<>(),
 		                            "http://example.org/page",
-		                            null,
-		                            null,
 		                            new Date() );
 	}
 
