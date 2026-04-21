@@ -1,53 +1,38 @@
 package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
 
-import net.openhft.chronicle.bytes.BytesMarshallable;
-import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
+import java.util.concurrent.CompletableFuture;
+
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryBase;
+import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 
 /**
- * ChronicleMap-native ({@link BytesMarshallable}) cache entry storing a cached
- * object together with its creation timestamp.
+ * Cache entry implementation for ChronicleMap-based caching.
+ *
+ * <p>
+ * Wraps a {@link CompletableFuture} holding a {@link DataRetrievalResponse}
+ * together with its creation timestamp.
+ * </p>
+ *
+ * <p>
+ * The response is represented as a future to allow asynchronous retrieval, but
+ * may be already completed when stored in or retrieved from the cache.
+ * </p>
  */
-public class ChronicleMapCacheEntry implements CacheEntry<ChronicleMapCacheObject>
+public class ChronicleMapCacheEntry extends CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>
 {
-	protected final ChronicleMapCacheObject object;
-	protected final long creationTime;
-
-
-	public ChronicleMapCacheEntry( final ChronicleMapCacheObject object, final long creationTime ) {
-		assert object != null;
-
-		this.object = object;
-		this.creationTime = creationTime;
+	/**
+	 * Creates a new cache entry.
+	 *
+	 * @param object       a future providing the cached {@link DataRetrievalResponse}
+	 * @param creationTime the timestamp representing when this entry was created
+	 */
+	public ChronicleMapCacheEntry( final CompletableFuture<? extends DataRetrievalResponse<?>> object,
+	                               final long creationTime ) {
+		super(object, creationTime);
 	}
 
 	@Override
 	public String toString() {
-		return "ChronicleMapCacheEntry{object=" + object + ", creationTime=" + creationTime + "}";
-	}
-
-	@Override
-	public ChronicleMapCacheObject getObject() {
-		return object;
-	}
-
-	@Override
-	public long createdAt() {
-		return creationTime;
-	}
-
-	@Override
-	public boolean equals( final Object obj ) {
-		if ( this == obj )
-			return true;
-		if ( obj == null || getClass() != obj.getClass() )
-			return false;
-
-		final ChronicleMapCacheEntry other = (ChronicleMapCacheEntry) obj;
-		return object.equals(other.object);
-	}
-
-	@Override
-	public int hashCode() {
-		return object.hashCode();
+		return "ChronicleMapCacheEntry{object=" + getObject() + ", creationTime=" + creationTime + "}";
 	}
 }
