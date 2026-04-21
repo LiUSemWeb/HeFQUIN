@@ -92,8 +92,8 @@ public class SolutionMappingUtils
 	}
 
 	/**
-	 * Returns true if the given solution mapping satisfies all of the filter
-	 * expressions of this operator and, thus, can be passed on to the output.
+	 * Returns true if, for every expression in the given list, the result of
+	 * evaluating the expression based on the given solution mapping is true.
 	 */
 	public static boolean checkSolutionMapping( final SolutionMapping sm, final ExprList filterExpressions ) {
 		final Binding b = sm.asJenaBinding();

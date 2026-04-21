@@ -581,7 +581,6 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
 
 		// check
-		assertTrue( result.getRootOperator() instanceof LogicalOpFixedSolMap );
 		assertEquals( fixedSolMapPlan, result );
 	}
 
@@ -611,9 +610,7 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
 
 		// check
-		assertTrue( result.getRootOperator() instanceof LogicalOpFilter );
-		assertTrue( result.getSubPlan(0).getRootOperator() instanceof LogicalOpFixedSolMap );
-		assertEquals( fixedSolMapPlan, result.getSubPlan(0) );
+		assertEquals( filterPlan, result );
 	}
 
 }
