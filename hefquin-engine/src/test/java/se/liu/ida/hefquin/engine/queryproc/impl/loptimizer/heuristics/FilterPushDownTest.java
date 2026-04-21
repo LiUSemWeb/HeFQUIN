@@ -15,6 +15,7 @@ import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
@@ -25,11 +26,13 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
@@ -547,5 +550,50 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalOpRequest<?,?> resultReqOp2 = (LogicalOpRequest<?,?>) subResult2.getRootOperator();
 		assertTrue( resultReqOp2.getFederationMember() == fmB );
 		assertTrue( ((TriplePatternRequest) resultReqOp2.getRequest()).getQueryPattern().equals(tp2) );
+	}
+
+	@Test
+	public void pushFilterUnderGPAdd() {
+		// a filter on top of a GPAdd operator, where filter expressions
+		// are pushed into the GPAdd pattern and also pushed into the
+		// subplan request under the GPAdd operator
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final FederationMember fm = new GraphCapableFederationMemberForTest(GraphFactory.createDefaultGraph());
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
+		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+
+		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
+		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp2, null, false);
+		final LogicalPlan gpAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpAdd, null, reqSubPlan);
+
+		final Expr e1 = new E_IsIRI( new ExprVar(v1) );
+		final LogicalOpFilter rootOp = new LogicalOpFilter(e1, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, gpAddSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		final LogicalOperator resultGPAddOp = result.getRootOperator();
+		assertTrue( resultGPAddOp instanceof LogicalOpGPAdd );
+		assertEquals( fm, ((LogicalOpGPAdd) resultGPAddOp).getFederationMember() );
+		assertTrue( ((LogicalOpGPAdd) resultGPAddOp).getPattern().toString().contains("FILTER") );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fm );
+
+		final SPARQLRequest resultReq1 = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq1.getQueryPattern() );
+		assertTrue(                                        resultElmt1 instanceof ElementGroup );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(0) instanceof ElementTriplesBlock );
+		assertTrue( ((ElementTriplesBlock) ((ElementGroup) resultElmt1).get(0)).getPattern().get(0).equals(tp1.asJenaTriple()) );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
+		assertTrue(       ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr().equals(e1) );
 	}
 }

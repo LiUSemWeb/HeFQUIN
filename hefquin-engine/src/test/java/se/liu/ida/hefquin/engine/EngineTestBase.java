@@ -180,7 +180,7 @@ public abstract class EngineTestBase
 				final Binding b = qIter.nextBinding() ;
 				results.add(new SolutionMappingImpl(b));
 			}
-			return results;	
+			return results;
 		}
 	}
 
@@ -389,6 +389,23 @@ public abstract class EngineTestBase
 		@Override
 		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
 			throw new UnsupportedOperationException();
+		}
+	}
+
+	public static class GraphCapableFederationMemberForTest extends FederationMemberBaseForTest
+	{
+		public GraphCapableFederationMemberForTest( final Graph data ) {
+			super(data);
+		}
+
+		@Override
+		public boolean supportsMoreThanTriplePatterns() {
+			return true;
+		}
+
+		@Override
+		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
+			return true; // keep it permissive for unit tests
 		}
 	}
 
