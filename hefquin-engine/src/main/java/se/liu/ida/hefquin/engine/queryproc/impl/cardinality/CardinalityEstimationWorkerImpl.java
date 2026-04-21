@@ -13,13 +13,10 @@ import org.apache.jena.cdt.CompositeDatatypeList;
 import org.apache.jena.cdt.CompositeDatatypeMap;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.ARQConstants;
-import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprFunction;
 import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.expr.VariableNotBoundException;
-import org.apache.jena.sparql.util.ExprUtils;
 
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -245,7 +242,7 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		// If the filter is above a fixed solution mapping operator, evaluate
 		// the filter condition for the fixed solution mapping of that operator.
 		if ( currentSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpFixedSolMap childOp ) {
-			if ( evaluateFilter(op, childOp) ) {
+			if ( SolutionMappingUtils.checkSolutionMapping(childOp.getSolutionMapping(), op.getFilterExpressions()) ) {
 				qpInfo.addProperty( QueryPlanProperty.cardinality(1, Quality.ACCURATE) );
 				qpInfo.addProperty( QueryPlanProperty.maxCardinality(1, Quality.ACCURATE) );
 				qpInfo.addProperty( QueryPlanProperty.minCardinality(1, Quality.ACCURATE) );
@@ -651,32 +648,6 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
 		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
-	}
-
-
-	protected boolean evaluateFilter( final LogicalOpFilter filterOp, final LogicalOpFixedSolMap fixedSolMapOp ) {
-		final Binding sm = fixedSolMapOp.getSolutionMapping().asJenaBinding();
-			for ( final Expr e : filterOp.getFilterExpressions().getList() ) {
-				final NodeValue evaluationResult;
-				try {
-					evaluationResult = ExprUtils.eval(e, sm);
-				}
-				catch ( final VariableNotBoundException ex ) {
-					// If evaluating the filter expression based on the given
-					// solution mapping results in this error, then this solution
-					// mapping does not satisfy the filter condition.
-					return false;
-				}
-
-				if( evaluationResult.equals(NodeValue.FALSE) ) {
-					return false;
-				}
-				else if ( ! evaluationResult.equals(NodeValue.TRUE) ) {
-					throw new IllegalArgumentException("The result of the eval is neither TRUE nor FALSE!");
-				}
-			}
-
-		return true;
 	}
 
 	public static int addWithoutExceedingMax( final int x, final int y ) {

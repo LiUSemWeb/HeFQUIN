@@ -499,6 +499,7 @@ public class FilterPushDownTest extends EngineTestBase
 		assertTrue( subResult1.getRootOperator() instanceof LogicalOpFilter );
 	}
 
+	@Test
 	public void pushFilterUnderMinus() {
 		// a filter on top of a minus of two triple pattern requests,
 		// where the filter is expected to push into the first request
@@ -581,7 +582,7 @@ public class FilterPushDownTest extends EngineTestBase
 
 		// check
 		assertTrue( result.getRootOperator() instanceof LogicalOpFixedSolMap );
-		assertEquals( sm, ((LogicalOpFixedSolMap) result.getRootOperator()).getSolutionMapping() );
+		assertEquals( fixedSolMapPlan, result );
 	}
 
 	@Test
@@ -612,7 +613,7 @@ public class FilterPushDownTest extends EngineTestBase
 		// check
 		assertTrue( result.getRootOperator() instanceof LogicalOpFilter );
 		assertTrue( result.getSubPlan(0).getRootOperator() instanceof LogicalOpFixedSolMap );
-		assertEquals( sm, ((LogicalOpFixedSolMap) result.getSubPlan(0).getRootOperator()).getSolutionMapping() );
+		assertEquals( fixedSolMapPlan, result.getSubPlan(0) );
 	}
 
 }

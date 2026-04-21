@@ -6,15 +6,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.E_LogicalAnd;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVars;
-import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.expr.VariableNotBoundException;
-import org.apache.jena.sparql.util.ExprUtils;
 
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -118,11 +115,12 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
-			// The filter cannot be pushed under this operator, but if it satisfies the filter condition,
-			// then simply remove the filter operator and return the subplan under the filter as new plan;
-			// otherwise, keep the filter operator as it is, which will lead to an empty result when evaluated.
-			final boolean evaluateFilter = evaluateFilter(filterOp, op);
-			if ( evaluateFilter ) {
+			// The filter cannot be pushed below this operator. However, since the
+			// root operator of the subplan is a FixedSolMap with a known solution
+			// mapping, we can evaluate the filter expression directly on that mapping.
+			// - If the mapping satisfies the filter condition, the filter can be removed.
+			// - Otherwise, the filter is kept, which will result in an empty output during execution.
+			if ( SolutionMappingUtils.checkSolutionMapping(op.getSolutionMapping(), filterOp.getFilterExpressions()) == true ) {
 				createdPlan = inputPlan.getSubPlan(0);
 			}
 			else createdPlan = inputPlan;
@@ -862,31 +860,6 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 				null,
 				newPlanUnderFilter );
 		return newPlan;
-	}
-
-	protected boolean evaluateFilter( final LogicalOpFilter filterOp, final LogicalOpFixedSolMap childOp ) {
-		final Binding sm = childOp.getSolutionMapping().asJenaBinding();
-		for ( final Expr e : filterOp.getFilterExpressions().getList() ) {
-			final NodeValue evaluationResult;
-			try {
-				evaluationResult = ExprUtils.eval(e, sm);
-			}
-			catch ( final VariableNotBoundException ex ) {
-				// If evaluating the filter expression based on the given
-				// solution mapping results in this error, then this solution
-				// mapping does not satisfy the filter condition.
-				return false;
-			}
-
-			if( evaluationResult.equals(NodeValue.FALSE) ) {
-				return false;
-			}
-			else if ( ! evaluationResult.equals(NodeValue.TRUE) ) {
-				throw new IllegalArgumentException("The result of the eval is neither TRUE nor FALSE!");
-			}
-		}
-
-		return true;
 	}
 
 	protected ExprList splitConjunctions( final ExprList l ) {

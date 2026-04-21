@@ -11,7 +11,12 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.*;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.expr.VariableNotBoundException;
 import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.FmtUtils;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
@@ -84,6 +89,35 @@ public class SolutionMappingUtils
 		b.add(var2, node2);
 		b.add(var3, node3);
 		return new SolutionMappingImpl(b.build());
+	}
+
+	/**
+	 * Returns true if the given solution mapping satisfies all of the filter
+	 * expressions of this operator and, thus, can be passed on to the output.
+	 */
+	public static boolean checkSolutionMapping( final SolutionMapping sm, final ExprList filterExpressions ) {
+		final Binding b = sm.asJenaBinding();
+		for ( final Expr e : filterExpressions.getList() ) {
+			final NodeValue evaluationResult;
+			try {
+				evaluationResult = ExprUtils.eval(e, b);
+			}
+			catch ( final VariableNotBoundException ex ) {
+				// If evaluating the filter expression based on the given
+				// solution mapping results in this error, then this solution
+				// mapping does not satisfy the filter condition.
+				return false;
+			}
+
+			if( evaluationResult.equals(NodeValue.FALSE) ) {
+				return false;
+			}
+			else if ( ! evaluationResult.equals(NodeValue.TRUE) ) {
+				throw new IllegalArgumentException("The result of the eval is neither TRUE nor FALSE!");
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -302,7 +336,7 @@ public class SolutionMappingUtils
 		}
 		return output.build();
 	}
-	
+
 	/**
 	 * Restricts the given solution mapping to the given set of variables.
 	 * Hence, the returned solution mapping will be compatible with the
