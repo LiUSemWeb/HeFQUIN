@@ -1,9 +1,7 @@
 package se.liu.ida.hefquin.federation.access.impl;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicyTimeToLive;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
@@ -19,15 +17,11 @@ import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
-import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntry;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntryFactory;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheObject;
-import se.liu.ida.hefquin.federation.access.impl.response.CachedCardinalityResponseImpl;
-import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
-import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey.ResponseMode;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
@@ -47,9 +41,15 @@ import se.liu.ida.hefquin.federation.members.TPFServer;
  * </p>
  *
  * <p>
- * Cache writes happen asynchronously and the returned futures represents the
+ * Cache writes happen asynchronously and the returned futures represent the
  * underlying retrieval results. Cache population is performed after successful
  * completion of that future.
+ * </p>
+ *
+ * <p>
+ * Synchronization in this class is performed on the {@link ChronicleMapCache}
+ * instance to avoid issuing duplicate requests concurrently. This is
+ * independent of the internal synchronization used by the cache itself.
  * </p>
  */
 public class FederationAccessManagerWithChronicleMapCache extends FederationAccessManagerWithCache implements AutoCloseable
@@ -67,7 +67,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 */
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
-	                                                     final CachePolicies<ChronicleMapCacheKey, ChronicleMapCacheObject, ChronicleMapCacheEntry> chronicleMapCachePolicies )
+	                                                     final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, ChronicleMapCacheEntry> chronicleMapCachePolicies )
 			throws IOException
 	{
 		super(fedAccMan, cacheCapacity);
@@ -155,58 +155,39 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		try {
 			key = new ChronicleMapCacheKey( req, fm, ResponseMode.RESULT );
 		} catch ( final IllegalArgumentException e ) {
-			// Key creation not supported, skip cache usage
-			return fedAccMan.issueRequest(req, fm);
+			throw new IllegalStateException( "Failed to create cache key for request/member combination: "
+					+ req.getClass().getName() + "/" + fm.getClass().getName(), e );
 		}
 
-		final Date accessStartTime = new Date();
-		final ChronicleMapCacheObject cachedObject = chronicleMapCache.get(key);
+		final CompletableFuture<?> cachedResponse;
 
-		// Check cache
-		if ( cachedObject != null ) {
-			if( req instanceof TPFRequest )
-				cacheHitsTPF++;
-			else if( req instanceof BRTPFRequest )
-				cacheHitsBRTPF++;
-			else if( req instanceof SPARQLRequest )
-				cacheHitsSPARQL++;
-
-			final DataRetrievalResponse<?> cachedResponse;
-			if (    req instanceof TPFRequest
-			     || req instanceof BRTPFRequest )
-				cachedResponse = new TPFResponseImpl( cachedObject.getMatchingTriples(),
-				                                      cachedObject.getMetadataTriples(),
-				                                      cachedObject.getNextPageURL(),
-				                                      fm,
-				                                      req,
-				                                      accessStartTime,
-				                                      new Date() );
-			else if ( req instanceof SPARQLRequest )
-				cachedResponse = new SolMapsResponseImpl( cachedObject.getSolutionMappings(),
-				                                          fm,
-				                                          req,
-				                                          accessStartTime,
-				                                          new Date() );
-			else
-				throw new IllegalStateException( "Unsupported request type: " + req.getClass().getName() );
-
-			@SuppressWarnings("unchecked")
-			final CompletableFuture<RespType> cachedResponse2 = (CompletableFuture<RespType>) CompletableFuture
-					.completedFuture(cachedResponse);
-			return cachedResponse2;
-		}
-
-		// Issue request and add it to the cache
-		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm);
-		newResponse.thenAccept( value -> {
-			try {
-				final ChronicleMapCacheObject object = ChronicleMapCacheObject.create(value);
-				chronicleMapCache.put(key, object);
-			} catch ( UnsupportedOperationDueToRetrievalError e ) {
-				throw new CompletionException(e);
+		// We synchronize on the chronicleMapCache instance to prevent multiple threads
+		// from issuing the same request concurrently and inserting duplicate
+		// CompletableFutures. We cache the CompletableFuture immediately (before
+		// completion), so that concurrent callers can share the same future. The actual
+		// response data can only be persisted on disk once the future completes.
+		synchronized (chronicleMapCache) {
+			cachedResponse = chronicleMapCache.get(key);
+			if ( cachedResponse == null ) {
+				final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm);
+				chronicleMapCache.put(key, newResponse);
+				return newResponse;
 			}
-		} );
-		return newResponse;
+		}
+
+		// cache hit, update the statistics
+		if( req instanceof TPFRequest )
+			cacheHitsTPF++;
+		else if( req instanceof BRTPFRequest )
+			cacheHitsBRTPF++;
+		else if( req instanceof SPARQLRequest )
+			cacheHitsSPARQL++;
+		else
+			throw new IllegalArgumentException("Unrecognized request type: " + req.getClass().getName());
+
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<RespType> cachedResponse2 = (CompletableFuture<RespType>) cachedResponse;
+		return cachedResponse2;
 	}
 
 	/**
@@ -233,53 +214,59 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	                                                     final MemberType fm )
 			throws FederationAccessException
 	{
-		final Date accessStartTime = new Date();
-		final ChronicleMapCacheKey key = new ChronicleMapCacheKey( req, fm, ChronicleMapCacheKey.ResponseMode.COUNT );
-		final ChronicleMapCacheObject cachedObject = chronicleMapCache.get(key);
-
-		// Check cache
-		if ( cachedObject != null ) {
-			if( req instanceof TPFRequest )
-				cacheHitsTPFCardinality++;
-			else if( req instanceof BRTPFRequest )
-				cacheHitsBRTPFCardinality++;
-			else if( req instanceof SPARQLRequest )
-				cacheHitsSPARQLCardinality++;
-
-			final int count = cachedObject.getCount();
-			CardinalityResponse cachedResponse = new CachedCardinalityResponseImpl( count,
-			                                                                        fm,
-			                                                                        req,
-			                                                                        accessStartTime,
-			                                                                        new Date() );
-			return (CompletableFuture<CardinalityResponse>) CompletableFuture.completedFuture( cachedResponse );
+		final ChronicleMapCacheKey key;
+		try {
+			key = new ChronicleMapCacheKey( req, fm, ResponseMode.COUNT );
+		} catch ( final IllegalArgumentException e ) {
+			throw new IllegalStateException( "Failed to create cache key for request/member combination: "
+					+ req.getClass().getName() + "/" + fm.getClass().getName(), e );
 		}
 
-		final CompletableFuture<CardinalityResponse> newResponse;
-		if (    req instanceof TPFRequest tpfReq
-			 && fm instanceof TPFServer tpfServer )
-			newResponse = fedAccMan.issueCardinalityRequest(tpfReq, tpfServer);
-		else if (    req instanceof TPFRequest tpfReq
-		          && fm instanceof BRTPFServer brtpfServer )
-			newResponse = fedAccMan.issueCardinalityRequest(tpfReq, brtpfServer);
-		else if (    req instanceof BRTPFRequest brtpfReq
-		          && fm instanceof BRTPFServer brtpfServer )
-			newResponse = fedAccMan.issueCardinalityRequest(brtpfReq, brtpfServer);
-		else if (    req instanceof SPARQLRequest sparqlReq
-		          && fm instanceof SPARQLEndpoint sparqlEndpoint )
-			newResponse = fedAccMan.issueCardinalityRequest(sparqlReq, sparqlEndpoint);
-		else
-			throw new IllegalStateException( "Unsupported request/federation member combination: " +
-			                                 req.getClass().getName() + "/" + fm.getClass().getName() );
+		final CompletableFuture<?> cachedResponse;
 
-		newResponse.thenAccept( value -> {
-			try {
-				chronicleMapCache.put( key, new ChronicleMapCacheObject( value.getCardinality() ) );
-			} catch ( UnsupportedOperationDueToRetrievalError e ) {
-				// intentionally ignored
+		// We synchronize on the chronicleMapCache instance to prevent multiple threads
+		// from issuing the same request concurrently and inserting duplicate
+		// CompletableFutures. We cache the CompletableFuture immediately (before
+		// completion), so that concurrent callers can share the same future. The actual
+		// response data can only be persisted on disk once the future completes.
+		synchronized (chronicleMapCache) {
+			cachedResponse = chronicleMapCache.get(key);
+			if ( cachedResponse == null ) {
+				final CompletableFuture<CardinalityResponse> newResponse;
+				if (    req instanceof TPFRequest tpfReq
+					&& fm instanceof TPFServer tpfServer )
+					newResponse = fedAccMan.issueCardinalityRequest(tpfReq, tpfServer);
+				else if (    req instanceof TPFRequest tpfReq
+						&& fm instanceof BRTPFServer brtpfServer )
+					newResponse = fedAccMan.issueCardinalityRequest(tpfReq, brtpfServer);
+				else if (    req instanceof BRTPFRequest brtpfReq
+						&& fm instanceof BRTPFServer brtpfServer )
+					newResponse = fedAccMan.issueCardinalityRequest(brtpfReq, brtpfServer);
+				else if (    req instanceof SPARQLRequest sparqlReq
+						&& fm instanceof SPARQLEndpoint sparqlEndpoint )
+					newResponse = fedAccMan.issueCardinalityRequest(sparqlReq, sparqlEndpoint);
+				else
+					throw new IllegalStateException( "Unsupported request/federation member combination: " +
+													req.getClass().getName() + "/" + fm.getClass().getName() );
+
+				chronicleMapCache.put(key, newResponse);
+				return newResponse;
 			}
-		} );
-		return newResponse;
+		}
+
+		// cache hit, update the statistics
+		if( req instanceof TPFRequest )
+			cacheHitsTPFCardinality++;
+		else if( req instanceof BRTPFRequest )
+			cacheHitsBRTPFCardinality++;
+		else if( req instanceof SPARQLRequest )
+			cacheHitsSPARQLCardinality++;
+		else
+			throw new IllegalArgumentException("Unrecognized request type: " + req.getClass().getName());
+
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<CardinalityResponse> cachedResponse2 = (CompletableFuture<CardinalityResponse>) cachedResponse;
+		return cachedResponse2;
 	}
 
 	@Override
@@ -309,26 +296,34 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		chronicleMapCache.close();
 	}
 
+	/**
+	 * Default cache policies for {@link ChronicleMapCache}.
+	 *
+	 * <p>
+	 * Uses a least-recently-used (LRU) replacement policy and a time-to-live-based
+	 * invalidation policy.
+	 * </p>
+	 */
 	public static class DefaultChronicleMapCachePolicies
 				implements CachePolicies<ChronicleMapCacheKey,
-				                         ChronicleMapCacheObject,
+				                         CompletableFuture<? extends DataRetrievalResponse<?>>,
 				                         ChronicleMapCacheEntry>
 	{
 		final ChronicleMapCacheEntryFactory cef = new ChronicleMapCacheEntryFactory();
 
 		final CacheReplacementPolicyFactory<ChronicleMapCacheKey,
-		                                    ChronicleMapCacheObject,
+		                                    CompletableFuture<? extends DataRetrievalResponse<?>>,
 		                                    ChronicleMapCacheEntry
 		                                   > crpf= new CacheReplacementPolicyFactory<>() {
 			@Override
 			public CacheReplacementPolicy<ChronicleMapCacheKey,
-			                              ChronicleMapCacheObject,
+			                              CompletableFuture<? extends DataRetrievalResponse<?>>,
 			                              ChronicleMapCacheEntry> create() {
 				return new CacheReplacementPolicyLRU<>();
 			}
 		};
 
-		final CacheInvalidationPolicy<ChronicleMapCacheEntry, ChronicleMapCacheObject> cip;
+		final CacheInvalidationPolicy<ChronicleMapCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> cip;
 
 		public DefaultChronicleMapCachePolicies( final long timeToLive ) {
 			cip = new CacheInvalidationPolicyTimeToLive<>(timeToLive);
@@ -341,14 +336,14 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		@Override
 		public CacheReplacementPolicyFactory<ChronicleMapCacheKey,
-		                                     ChronicleMapCacheObject,
+		                                     CompletableFuture<? extends DataRetrievalResponse<?>>,
 		                                     ChronicleMapCacheEntry> getReplacementPolicyFactory() {
 			return crpf;
 		}
 
 		@Override
 		public CacheInvalidationPolicy<ChronicleMapCacheEntry,
-		                               ChronicleMapCacheObject> getInvalidationPolicy() {
+		                               CompletableFuture<? extends DataRetrievalResponse<?>>> getInvalidationPolicy() {
 			return cip;
 		}
 	} // end of DefaultChronicleMapCachePolicies
