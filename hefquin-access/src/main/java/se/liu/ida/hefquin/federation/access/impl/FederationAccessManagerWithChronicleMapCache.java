@@ -61,8 +61,27 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 * Creates a federation access manager with a ChronicleMap-backed persistent
 	 * cache using the given capacity and cache policies.
 	 *
-	 * @param fedAccMan     the wrapped federation access manager
-	 * @param cacheCapacity the maximum cache capacity
+	 * @param fedAccMan           the wrapped federation access manager
+	 * @param cacheCapacity       the maximum cache capacity
+	 * @param maxParallelRequests the maximum default number of parallel request to a given endpoint address
+	 * @throws IOException if the persistent cache cannot be created or opened
+	 */
+	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
+	                                                     final int cacheCapacity,
+	                                                     final int maxParallelRequests,
+	                                                     final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, ChronicleMapCacheEntry> chronicleMapCachePolicies )
+			throws IOException
+	{
+		super(fedAccMan, cacheCapacity, maxParallelRequests);
+		chronicleMapCache = new ChronicleMapCache(cacheCapacity, chronicleMapCachePolicies);
+	}
+
+	/**
+	 * Creates a federation access manager with a ChronicleMap-backed persistent
+	 * cache using the given capacity and cache policies.
+	 *
+	 * @param fedAccMan           the wrapped federation access manager
+	 * @param cacheCapacity       the maximum cache capacity
 	 * @throws IOException if the persistent cache cannot be created or opened
 	 */
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
@@ -90,7 +109,31 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 */
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
-	                                                     final long timeToLive )
+	                                                     final int timeToLive )
+			throws IOException
+	{
+		this(fedAccMan, cacheCapacity, new DefaultChronicleMapCachePolicies(timeToLive) );
+	}
+
+	/**
+	 * Creates a federation access manager with a ChronicleMap-backed persistent
+	 * cache using the given capacity and the default cache policies.
+	 *
+	 * <p>
+	 * The cache uses a least-recently-used (LRU) replacement policy and the
+	 * specified time-to-live for cache entry invalidation.
+	 * </p>
+	 *
+	 * @param fedAccMan           the wrapped federation access manager
+	 * @param cacheCapacity       the maximum cache capacity
+	 * @param timeToLive          the cache entry time-to-live in milliseconds
+	 * @param maxParallelRequests the maximum default number of parallel request to a given endpoint address
+	 * @throws IOException if the persistent cache cannot be created or opened
+	 */
+	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
+	                                                     final int cacheCapacity,
+	                                                     final int timeToLive,
+	                                                     final int maxParallelRequests )
 			throws IOException 
 	{
 		this(fedAccMan, cacheCapacity, new DefaultChronicleMapCachePolicies(timeToLive) );
@@ -111,7 +154,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 */
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity )
-			throws IOException 
+			throws IOException
 	{
 		this(fedAccMan, cacheCapacity, new DefaultChronicleMapCachePolicies(DEFAULT_TIME_TO_LIVE) );
 	}
