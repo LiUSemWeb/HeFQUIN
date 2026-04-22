@@ -16,6 +16,7 @@ import org.apache.jena.sparql.ARQConstants;
 import org.apache.jena.sparql.expr.ExprFunction;
 import org.apache.jena.sparql.expr.NodeValue;
 
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -111,7 +112,22 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 
 	@Override
 	public void visit( final LogicalOpGPAdd op ) {
-		// TODO: add support for gpAdd
+		// TODO: add proper support for gpAdd
+		// For the moment, we only handle gpAdd operators that have been
+		// created for SERVICE clauses with a PARAMS clause, which are
+		// meant to access Web APIs. The current quick-and-dirty solution
+		// for these kinds of gpAdd operators is to assume that their
+		// graph pattern does not affect the cardinality of the result,
+		// which can easily be a wrong assumption for many cases.
+		if ( op.hasParameterVariables() ) {
+			final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+			final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
+			return;
+		}
+
 		throw new UnsupportedOperationException("Cardinality estimation for gpAdd not supported yet.");
 	}
 
@@ -250,9 +266,25 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		// TODO: perhaps we can be smarter here and somehow estimate the
 		// selectivity of the filter expression.
 
-		qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(crd) );
-		qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(max) );
-		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+		// If the filter is above a fixed solution mapping operator, evaluate
+		// the filter condition for the fixed solution mapping of that operator.
+		if ( currentSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpFixedSolMap childOp ) {
+			if ( SolutionMappingUtils.checkSolutionMapping(childOp.getSolutionMapping(), op.getFilterExpressions()) ) {
+				qpInfo.addProperty( QueryPlanProperty.cardinality(1, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(1, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(1, Quality.ACCURATE) );
+			}
+			else {
+				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+			}
+		}
+		else {
+			qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(crd) );
+			qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(max) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+		}
 	}
 
 	@Override
@@ -681,7 +713,6 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
 	}
-
 
 	public static int addWithoutExceedingMax( final int x, final int y ) {
 		if ( x == Integer.MAX_VALUE || y == Integer.MAX_VALUE )
