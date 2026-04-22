@@ -392,9 +392,9 @@ public abstract class EngineTestBase
 		}
 	}
 
-	public static class GraphCapableFederationMemberForTest extends FederationMemberBaseForTest
+	public static class RejectingGraphFederationMemberForTest extends FederationMemberBaseForTest
 	{
-		public GraphCapableFederationMemberForTest( final Graph data ) {
+		public RejectingGraphFederationMemberForTest( final Graph data ) {
 			super(data);
 		}
 
@@ -405,7 +405,7 @@ public abstract class EngineTestBase
 
 		@Override
 		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
-			return true; // keep it permissive for unit tests
+			return false; // keep it false to make sure that pattern pushdown fails in the tests
 		}
 	}
 
