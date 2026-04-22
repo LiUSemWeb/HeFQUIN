@@ -141,6 +141,18 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		final int crdValue = crd1.getValue();
 		final int maxValue = multiplyWithoutExceedingMax( max1.getValue(), max2.getValue() );
 
+		// Check first whether we have a case in which the left subplan is
+		// guaranteed to produce an empty result. If so, we can stop
+		// here because the join cardinality is then guaranteed to be
+		// zero as well.
+		if ( crdValue == 0 && crd1.getQuality() == Quality.ACCURATE ) {
+			final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+			return;
+		}
+
 		final Quality crdQuality;
 		if ( crd1.getQuality() == Quality.ACCURATE )
 			crdQuality = Quality.ESTIMATE_BASED_ON_ACCURATES;
@@ -455,7 +467,13 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 
 		final int crdValue;
 		final Quality crdQuality;
-		if ( crdIn.getValue() == 0 || crdIn.getValue() == 1 ) {
+		if ( crdIn.getValue() == 0 && crdIn.getQuality() == Quality.ACCURATE ) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the DEDUP operator is guaranteed to be empty as well.
+			crdValue = 0;
+			crdQuality = Quality.ACCURATE;
+		}
+		else if ( crdIn.getValue() == 0 || crdIn.getValue() == 1 ) {
 			crdValue = crdIn.getValue();
 			crdQuality = crdIn.getQuality();
 		}
@@ -488,10 +506,20 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	public void visit( final LogicalOpProject op ) {
 		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
 		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+		final QueryPlanProperty crdSubPlan = qpInfoSubPlan.getProperty(CARDINALITY);
 
-		qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
-		qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
-		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+		if ( crdSubPlan.getValue() == 0 && crdSubPlan.getQuality() == Quality.ACCURATE ) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the PROJECT operator is guaranteed to be empty as well.
+			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+		}
+		else {
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+		}
 	}
 
 	@Override
@@ -509,7 +537,13 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		final QueryPlanProperty lhsMaxCrd = qpInfoSubPlan1.getProperty(MAX_CARDINALITY);
 		final QueryPlanProperty rhsCrd = qpInfoSubPlan2.getProperty(CARDINALITY);
 
-		if ( rhsCrd.getValue() == 0 && rhsCrd.getQuality() == Quality.ACCURATE ) {
+		if ( lhsCrd.getValue() == 0 && lhsCrd.getQuality() == Quality.ACCURATE ) {
+			// If the first input plan is guaranteed to produce an empty result,
+			// then the result of the MINUS operator is guaranteed to be empty as well.
+			crdValue = 0;
+			crdQuality = Quality.ACCURATE;
+		}
+		else if ( rhsCrd.getValue() == 0 && rhsCrd.getQuality() == Quality.ACCURATE ) {
 			// If the second input plan is guaranteed to produce an empty result,
 			// then the result of the MINUS operator is guaranteed to be the same as the first input plan.
 			crdValue = lhsCrd.getValue();
@@ -541,11 +575,16 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		Quality maxQuality = Quality.ACCURATE;
 		Quality minQuality = Quality.ACCURATE;
 
+		boolean allEmpty = true;
 		for ( int x = 0; x < currentSubPlan.numberOfSubPlans(); x++ ) {
 			final QueryPlanningInfo qpInfoSubPlanX = currentSubPlan.getSubPlan(x).getQueryPlanningInfo();
 			final QueryPlanProperty crdX = qpInfoSubPlanX.getProperty(CARDINALITY);
 			final QueryPlanProperty maxX = qpInfoSubPlanX.getProperty(MAX_CARDINALITY);
 			final QueryPlanProperty minX = qpInfoSubPlanX.getProperty(MIN_CARDINALITY);
+
+			if ( crdX.getValue() != 0 || crdX.getQuality() != Quality.ACCURATE ) {
+				allEmpty = false;
+			}
 
 			crdValue = addWithoutExceedingMax( crdValue, crdX.getValue() );
 			maxValue = addWithoutExceedingMax( maxValue, maxX.getValue() );
@@ -554,6 +593,16 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 			crdQuality = pickWorse( crdQuality, crdX.getQuality() );
 			maxQuality = pickWorse( maxQuality, maxX.getQuality() );
 			minQuality = pickWorse( minQuality, minX.getQuality() );
+		}
+
+		// If all of the subplans under the UNION is guaranteed to produce an empty result,
+		// then the result of the UNION operator is guaranteed to be empty as well.
+		if ( allEmpty ) {
+			final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+			return;
 		}
 
 		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
