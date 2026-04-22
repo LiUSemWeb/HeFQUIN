@@ -112,7 +112,22 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 
 	@Override
 	public void visit( final LogicalOpGPAdd op ) {
-		// TODO: add support for gpAdd
+		// TODO: add proper support for gpAdd
+		// For the moment, we only handle gpAdd operators that have been
+		// created for SERVICE clauses with a PARAMS clause, which are
+		// meant to access Web APIs. The current quick-and-dirty solution
+		// for these kinds of gpAdd operators is to assume that their
+		// graph pattern does not affect the cardinality of the result,
+		// which can easily be a wrong assumption for many cases.
+		if ( op.hasParameterVariables() ) {
+			final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+			final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
+			return;
+		}
+
 		throw new UnsupportedOperationException("Cardinality estimation for gpAdd not supported yet.");
 	}
 
