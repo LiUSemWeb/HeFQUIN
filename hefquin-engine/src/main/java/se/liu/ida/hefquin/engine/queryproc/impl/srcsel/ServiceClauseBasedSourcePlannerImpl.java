@@ -192,7 +192,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), mayReduce, ctxt );
 		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), mayReduce, ctxt );
 		final LogicalOpMinus rootOp = LogicalOpMinus.getInstance(mayReduce);
-		return new LogicalPlanWithBinaryRootImpl(rootOp,null, leftSubPlan, rightSubPlan);
+		return new LogicalPlanWithBinaryRootImpl(rootOp, null, leftSubPlan, rightSubPlan);
 	}
 
 	protected LogicalPlan createPlanForUnion( final OpUnion jenaOp,
