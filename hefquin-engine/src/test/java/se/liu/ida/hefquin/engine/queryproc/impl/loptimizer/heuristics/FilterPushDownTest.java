@@ -5,10 +5,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.E_Bound;
 import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_IsBlank;
 import org.apache.jena.sparql.expr.E_IsIRI;
 import org.apache.jena.sparql.expr.E_LogicalNot;
 import org.apache.jena.sparql.expr.Expr;
@@ -21,6 +24,8 @@ import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.junit.Test;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
@@ -30,8 +35,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
@@ -490,6 +497,120 @@ public class FilterPushDownTest extends EngineTestBase
 
 		final LogicalPlan subResult1 = result.getSubPlan(0);
 		assertTrue( subResult1.getRootOperator() instanceof LogicalOpFilter );
+	}
+
+	@Test
+	public void pushFilterUnderMinus() {
+		// a filter on top of a minus of two triple pattern requests,
+		// where the filter is expected to push into the first request
+		// but not the second
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final FederationMember fmA = new SPARQLEndpointForTest("http://exA.org");
+		final FederationMember fmB = new TPFServerForTest();
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
+
+		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, false, new TriplePatternRequestImpl(tp2) );
+
+		final LogicalPlan minusSubPlan = LogicalPlanUtils.createPlanWithMinus(
+				false,
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				null );
+
+		final Expr e = new E_IsIRI( new ExprVar(v1) );
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, minusSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpMinus );
+
+		final LogicalPlan subResult1 = result.getSubPlan(0);
+		assertTrue( subResult1.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> resultReqOp1 = (LogicalOpRequest<?,?>) subResult1.getRootOperator();
+		assertTrue( resultReqOp1.getFederationMember() == fmA );
+
+		final SPARQLRequest resultReq1 = (SPARQLRequest) resultReqOp1.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq1.getQueryPattern() );
+		assertTrue(                                        resultElmt1 instanceof ElementGroup );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(0) instanceof ElementTriplesBlock );
+		assertTrue( ((ElementTriplesBlock) ((ElementGroup) resultElmt1).get(0)).getPattern().get(0).equals(tp1.asJenaTriple()) );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
+		assertTrue(       ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr().equals(e) );
+
+		final LogicalPlan subResult2 = result.getSubPlan(1);
+		assertTrue( subResult2.getRootOperator() instanceof LogicalOpRequest );
+
+		final LogicalOpRequest<?,?> resultReqOp2 = (LogicalOpRequest<?,?>) subResult2.getRootOperator();
+		assertTrue( resultReqOp2.getFederationMember() == fmB );
+		assertTrue( ((TriplePatternRequest) resultReqOp2.getRequest()).getQueryPattern().equals(tp2) );
+	}
+
+	@Test
+	public void pushFilterUnderFixedSolMapSatisfied() {
+		// a filter above a FixedSolMap where the filter evaluates to true
+		// under the fixed solution mapping; the filter is removed and only
+		// the FixedSolMap remains.
+
+		// set up
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+
+		final Node x1 = NodeFactory.createURI("http://example.org/x1");
+		final Node y1 = NodeFactory.createURI("http://example.org/y1");
+
+		final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1);
+
+		final LogicalOpFixedSolMap fixedSolMap = new LogicalOpFixedSolMap(sm);
+		final LogicalPlan fixedSolMapPlan = new LogicalPlanWithNullaryRootImpl(fixedSolMap, null);
+
+		final Expr e = new E_IsIRI( new ExprVar(var1) );
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, fixedSolMapPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertEquals( fixedSolMapPlan, result );
+	}
+
+	@Test
+	public void pushFilterUnderFixedSolMapUnsatisfied() {
+		// a filter above a FixedSolMap where the filter evaluates to false
+		// under the fixed solution mapping; the filter is NOT removed
+		// and remains above the FixedSolMap.
+
+		// set up
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+
+		final Node x1 = NodeFactory.createURI("http://example.org/x1");
+		final Node y1 = NodeFactory.createURI("http://example.org/y1");
+
+		final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1);
+
+		final LogicalOpFixedSolMap fixedSolMap = new LogicalOpFixedSolMap(sm);
+		final LogicalPlan fixedSolMapPlan = new LogicalPlanWithNullaryRootImpl(fixedSolMap, null);
+
+		final Expr e = new E_IsBlank( new ExprVar(var1) );
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, fixedSolMapPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertEquals( filterPlan, result );
 	}
 
 }

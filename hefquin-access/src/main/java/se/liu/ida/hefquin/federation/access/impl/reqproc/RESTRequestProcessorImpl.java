@@ -78,7 +78,7 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 		}
 		catch ( final HttpException e ) {
 			if ( e.getStatusCode() > 0 )
-				return new StringResponseImpl( "", fm, req,
+				return new StringResponseImpl( "",
 				                               requestStartTime,
 				                               e.getStatusCode(),
 				                               e.getMessage() );
@@ -86,7 +86,7 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 				throw new FederationAccessException( "Unexpected response for request to REST API (requested URI: <" + uri.toString() + ">, message: " + e.getMessage() + ")", e, req, fm );
 		}
 
-		return new StringResponseImpl(body, fm, req, requestStartTime);
+		return new StringResponseImpl(body, requestStartTime);
 	}
 
 }

@@ -116,9 +116,16 @@ public class TPFResponseBuilder
 			}
 		}
 		if ( tripleCount < 0 )
-			return new TPFResponseImpl(matchingTriples, metadataTriples, nextPageURL, fm, request, requestStartTime);
+			return new TPFResponseImpl( matchingTriples,
+			                            metadataTriples,
+			                            nextPageURL,
+			                            requestStartTime );
 		else
-			return new TPFResponseImpl(matchingTriples, metadataTriples, nextPageURL, tripleCount, fm, request, requestStartTime);
+			return new TPFResponseImpl( matchingTriples,
+			                            metadataTriples,
+			                            nextPageURL,
+			                            tripleCount,
+			                            requestStartTime );
 	}
 
 	protected boolean tryExtractCountMetadataOrNextPageURL( final Triple t ) {

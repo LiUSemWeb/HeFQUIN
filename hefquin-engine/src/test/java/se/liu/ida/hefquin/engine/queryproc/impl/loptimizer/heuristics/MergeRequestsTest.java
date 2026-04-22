@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementMinus;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
 import org.junit.Test;
@@ -539,6 +541,61 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpGPAdd resultGPAddOp = (LogicalOpGPAdd) result.getRootOperator();
 		assertTrue( resultGPAddOp.getFederationMember() == fm );
 		assertTrue( resultGPAddOp.getTP() == tp2 );
+	}
+
+	@Test
+	public void mergeMinus() {
+		// two request operators under a MINUS, same federation member,
+		// should be merged into a single request with a MINUS pattern
+
+		// setup
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+
+		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1) );
+
+		final TriplePattern tp2 = new TriplePatternImpl(v2, v2, v2);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2) );
+
+		final LogicalPlan minusPlan = LogicalPlanUtils.createPlanWithMinus(
+			false,
+			new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+			new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+			null );
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(minusPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) result.getRootOperator();
+
+		assertTrue( resultReqOp.getFederationMember() == fm );
+		assertTrue( resultReqOp.getRequest() instanceof SPARQLRequest );
+
+		final SPARQLRequest resultReq = (SPARQLRequest) resultReqOp.getRequest();
+
+		// inspect the resulting pattern
+		final Element elmt = QueryPatternUtils.convertToJenaElement(
+				resultReq.getQueryPattern() );
+
+		assertTrue( elmt instanceof ElementGroup );
+
+		final ElementGroup group = (ElementGroup) elmt;
+
+		boolean hasMinus = false;
+		for ( Element e : group.getElements() ) {
+			if ( e instanceof ElementMinus ) {
+				hasMinus = true;
+				break;
+			}
+		}
+
+		assertTrue( hasMinus );
 	}
 
 }

@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +19,6 @@ import se.liu.ida.hefquin.engine.wrappers.graphql.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.GraphQLRequest;
-import se.liu.ida.hefquin.federation.access.JSONResponse;
 import se.liu.ida.hefquin.federation.access.impl.req.GraphQLRequestImpl;
 import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
 import se.liu.ida.hefquin.federation.members.impl.GraphQLEndpointImpl;
@@ -100,10 +97,7 @@ public class GraphQLRequestProcessorImplTest extends FederationTestBase
             final GraphQLRequest req = new GraphQLRequestImpl(query);
             final GraphQLEndpoint fm = new GraphQLEndpointTest();
             final GraphQLRequestProcessor processor = new GraphQLRequestProcessorImpl(3000, 3000);
-            final JSONResponse response = processor.performRequest(req, fm);
-			
-            assertEquals(fm, response.getFederationMember());
-            assertEquals(req, response.getRequest());
+            processor.performRequest(req, fm);
         }
     }
 }

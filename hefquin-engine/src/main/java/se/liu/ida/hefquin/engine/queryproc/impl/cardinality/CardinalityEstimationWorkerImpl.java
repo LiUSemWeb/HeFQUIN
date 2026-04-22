@@ -16,6 +16,7 @@ import org.apache.jena.sparql.ARQConstants;
 import org.apache.jena.sparql.expr.ExprFunction;
 import org.apache.jena.sparql.expr.NodeValue;
 
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -111,7 +112,22 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 
 	@Override
 	public void visit( final LogicalOpGPAdd op ) {
-		// TODO: add support for gpAdd
+		// TODO: add proper support for gpAdd
+		// For the moment, we only handle gpAdd operators that have been
+		// created for SERVICE clauses with a PARAMS clause, which are
+		// meant to access Web APIs. The current quick-and-dirty solution
+		// for these kinds of gpAdd operators is to assume that their
+		// graph pattern does not affect the cardinality of the result,
+		// which can easily be a wrong assumption for many cases.
+		if ( op.hasParameterVariables() ) {
+			final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+			final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
+			return;
+		}
+
 		throw new UnsupportedOperationException("Cardinality estimation for gpAdd not supported yet.");
 	}
 
@@ -238,9 +254,25 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		// TODO: perhaps we can be smarter here and somehow estimate the
 		// selectivity of the filter expression.
 
-		qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(crd) );
-		qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(max) );
-		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+		// If the filter is above a fixed solution mapping operator, evaluate
+		// the filter condition for the fixed solution mapping of that operator.
+		if ( currentSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpFixedSolMap childOp ) {
+			if ( SolutionMappingUtils.checkSolutionMapping(childOp.getSolutionMapping(), op.getFilterExpressions()) ) {
+				qpInfo.addProperty( QueryPlanProperty.cardinality(1, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(1, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(1, Quality.ACCURATE) );
+			}
+			else {
+				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+			}
+		}
+		else {
+			qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(crd) );
+			qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(max) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+		}
 	}
 
 	@Override
@@ -368,7 +400,7 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
 
 		// The maximum cardinality is simply the maximum possible because
-		// the lists and maps to be unfolded may be unboundedly large. 
+		// the lists and maps to be unfolded may be unboundedly large.
 		final int max = Integer.MAX_VALUE;
 		final Quality maxQuality = Quality.MIN_OR_MAX_POSSIBLE;
 		qpInfo.addProperty( QueryPlanProperty.maxCardinality(max, maxQuality) );
@@ -443,7 +475,7 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	public void visit( final LogicalOpMultiwayUnion op ) {
 		addCardinalityForUnion();
 	}
-	
+
 	@Override
 	public void visit( final LogicalOpDedup op ) {
 		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
@@ -492,6 +524,45 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+	}
+
+	@Override
+	public void visit( final LogicalOpMinus op ) {
+		final int crdValue;
+		final Quality crdQuality;
+
+		final QueryPlan lhs = currentSubPlan.getSubPlan(0);
+		final QueryPlan rhs = currentSubPlan.getSubPlan(1);
+
+		final QueryPlanningInfo qpInfoSubPlan1 = lhs.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan2 = rhs.getQueryPlanningInfo();
+
+		final QueryPlanProperty lhsCrd = qpInfoSubPlan1.getProperty(CARDINALITY);
+		final QueryPlanProperty lhsMaxCrd = qpInfoSubPlan1.getProperty(MAX_CARDINALITY);
+		final QueryPlanProperty rhsCrd = qpInfoSubPlan2.getProperty(CARDINALITY);
+
+		if ( rhsCrd.getValue() == 0 && rhsCrd.getQuality() == Quality.ACCURATE ) {
+			// If the second input plan is guaranteed to produce an empty result,
+			// then the result of the MINUS operator is guaranteed to be the same as the first input plan.
+			crdValue = lhsCrd.getValue();
+			crdQuality = lhsCrd.getQuality();
+		}
+		else {
+			// Else, estimate the cardinality of the MINUS result by subtracting the estimated cardinality
+			// of the second input plan from the estimated cardinality of the first input plan.
+			// This is a very crude estimate that is likely to be a significant underestimation in many cases,
+			// but it is not clear how to do better without considering the actual query patterns and data statistics.
+			crdValue = Math.max(lhsCrd.getValue() - rhsCrd.getValue(), 0);
+			crdQuality = QueryPlanProperty.getReducedQuality( lhsCrd.getQuality() );
+		}
+
+		final int maxValue = lhsMaxCrd.getValue();
+		final Quality maxQuality = lhsMaxCrd.getQuality();
+
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
 	}
 
 	public void addCardinalityForUnion() {
@@ -593,7 +664,6 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
 	}
-
 
 	public static int addWithoutExceedingMax( final int x, final int y ) {
 		if ( x == Integer.MAX_VALUE || y == Integer.MAX_VALUE )

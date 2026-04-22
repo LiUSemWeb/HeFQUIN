@@ -11,6 +11,7 @@ import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVars;
 
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -114,9 +115,15 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
-			// The filter cannot be pushed under this operator.
-			// (but it may be removed altogether TODO #572)
-			createdPlan = inputPlan;
+			// The filter cannot be pushed below this operator. However, since the
+			// root operator of the subplan is a FixedSolMap with a known solution
+			// mapping, we can evaluate the filter expression directly on that mapping.
+			// - If the mapping satisfies the filter condition, the filter can be removed.
+			// - Otherwise, the filter is kept, which will result in an empty output during execution.
+			if ( SolutionMappingUtils.checkSolutionMapping(op.getSolutionMapping(), filterOp.getFilterExpressions()) == true ) {
+				createdPlan = inputPlan.getSubPlan(0);
+			}
+			else createdPlan = inputPlan;
 		}
 
 		@Override
@@ -219,6 +226,13 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			createdPlan = createPlanForUnaryOpUnderFilter( filterOp,
 			                                               op,
 			                                               subPlanUnderFilter.getSubPlan(0) );
+		}
+
+		@Override
+		public void visit( final LogicalOpMinus op ) {
+			createdPlan = createPlanForMinusUnderFilter( filterOp,
+			                                             op,
+			                                             subPlanUnderFilter );
 		}
 
 	} // end of Worker
@@ -744,6 +758,19 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return new LogicalPlanWithUnaryRootImpl( newFilterOp,
 			                                         null,
 			                                         newSubPlanUnderFilter );
+	}
+
+	protected LogicalPlan createPlanForMinusUnderFilter( final LogicalOpFilter filterOp, final LogicalOpMinus op, final LogicalPlan subPlanUnderFilter ) {
+		// Create a new subplan with the filter as root operator on top of the
+		// left subplan that is under the given minus operator, and apply this
+		// heuristic recursively to this new subplan.
+		final LogicalPlan leftSubPlan = subPlanUnderFilter.getSubPlan(0);
+		final LogicalPlan newSubPlanWithFilterAsRoot = new LogicalPlanWithUnaryRootImpl(filterOp, null, leftSubPlan);
+		final LogicalPlan newSubPlanWithFilterPushed = apply(newSubPlanWithFilterAsRoot);
+
+		// Put together the new plan with a minus operator as root and the new
+		// subplan with the filter pushed as left subplan and the unchanged right subplan.
+		return LogicalPlanUtils.createPlanWithSubPlans( op, null, newSubPlanWithFilterPushed, subPlanUnderFilter.getSubPlan(1) );
 	}
 
 	protected LogicalPlan createPlanForUnaryOpUnderFilter( final LogicalOpFilter filterOp, final UnaryLogicalOp op, final LogicalPlan subPlanUnderOp ) {

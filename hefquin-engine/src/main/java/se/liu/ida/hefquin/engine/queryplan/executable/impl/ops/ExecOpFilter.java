@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
-import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.expr.VariableNotBoundException;
-import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -51,7 +48,7 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
 		// Check whether the given solution mapping satisfies each of the filter expressions
-		if ( checkSolutionMapping(inputSolMap) == true ) {
+		if ( SolutionMappingUtils.checkSolutionMapping(inputSolMap, filterExpressions) == true ) {
 			sink.send(inputSolMap);
 			numberOfOutputMappingsProduced++;
 		}
@@ -72,7 +69,7 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 		while ( firstOutput == null && cnt < maxBatchSize && inputSolMaps.hasNext() ) {
 			final SolutionMapping inputSolMap = inputSolMaps.next();
 			cnt++;
-			if ( checkSolutionMapping(inputSolMap) == true ) {
+			if ( SolutionMappingUtils.checkSolutionMapping(inputSolMap, filterExpressions) == true ) {
 				firstOutput = inputSolMap;
 			}
 		}
@@ -86,7 +83,7 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 		while ( cnt < maxBatchSize && inputSolMaps.hasNext() ) {
 			final SolutionMapping inputSolMap = inputSolMaps.next();
 			cnt++;
-			if ( checkSolutionMapping(inputSolMap) == true ) {
+			if ( SolutionMappingUtils.checkSolutionMapping(inputSolMap, filterExpressions) == true ) {
 				// We found another output solution mapping. Check whether
 				// we have already created the list; if not, create it now
 				// and add earlier-found first output solution mapping to it.
@@ -128,35 +125,6 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 		final ExecutableOperatorStatsImpl s = super.createStats();
 		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
 		return s;
-	}
-
-	/**
-	 * Returns true if the given solution mapping satisfies all of the filter
-	 * expressions of this operator and, thus, can be passed on to the output.
-	 */
-	protected boolean checkSolutionMapping( final SolutionMapping inputSolMap ) {
-		final Binding sm = inputSolMap.asJenaBinding();
-		for ( final Expr e : filterExpressions.getList() ) {
-			final NodeValue evaluationResult;
-			try {
-				evaluationResult = ExprUtils.eval(e, sm);
-			}
-			catch ( final VariableNotBoundException ex ) {
-				// If evaluating the filter expression based on the given
-				// solution mapping results in this error, then this solution
-				// mapping does not satisfy the filter condition.
-				return false;
-			}
-
-			if( evaluationResult.equals(NodeValue.FALSE) ) {
-				return false;
-			}
-			else if ( ! evaluationResult.equals(NodeValue.TRUE) ) {
-				throw new IllegalArgumentException("The result of the eval is neither TRUE nor FALSE!");
-			}
-		}
-
-		return true;
 	}
 
 }

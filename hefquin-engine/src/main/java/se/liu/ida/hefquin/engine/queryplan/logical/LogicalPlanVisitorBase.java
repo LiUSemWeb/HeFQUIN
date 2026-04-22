@@ -48,10 +48,13 @@ public class LogicalPlanVisitorBase implements LogicalPlanVisitor
 
 	@Override
 	public void visit( final LogicalOpGlobalToLocal op )     {}
-	
+
 	@Override
 	public void visit( final LogicalOpDedup op )             {}
 
 	@Override
 	public void visit( final LogicalOpProject op )           {}
+
+	@Override
+	public void visit( final LogicalOpMinus op )             {}
 }
