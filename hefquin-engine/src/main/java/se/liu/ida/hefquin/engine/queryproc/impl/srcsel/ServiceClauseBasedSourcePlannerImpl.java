@@ -69,6 +69,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		else if ( jenaOp instanceof OpLeftJoin opLJoin ) {
 			return createPlanForLeftJoin(opLJoin, mayReduce, ctxt);
 		}
+		else if ( jenaOp instanceof OpMinus opMinus ) {
+			return createPlanForMinus(opMinus, mayReduce, ctxt);
+		}
 		else if ( jenaOp instanceof OpConditional opCond ) {
 			return createPlanForLeftJoin(opCond, mayReduce, ctxt);
 		}
@@ -181,6 +184,15 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), mayReduce, ctxt );
 		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), mayReduce, ctxt );
 		return mergeIntoMultiwayLeftJoin(leftSubPlan, rightSubPlan, mayReduce);
+	}
+
+	protected LogicalPlan createPlanForMinus( final OpMinus jenaOp,
+	                                          final boolean mayReduce,
+	                                          final QueryProcContext ctxt ) {
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), mayReduce, ctxt );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), mayReduce, ctxt );
+		final LogicalOpMinus rootOp = LogicalOpMinus.getInstance(mayReduce);
+		return new LogicalPlanWithBinaryRootImpl(rootOp,null, leftSubPlan, rightSubPlan);
 	}
 
 	protected LogicalPlan createPlanForUnion( final OpUnion jenaOp,
