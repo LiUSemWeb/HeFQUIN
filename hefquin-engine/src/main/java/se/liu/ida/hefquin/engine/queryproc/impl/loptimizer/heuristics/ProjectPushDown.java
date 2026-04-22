@@ -39,9 +39,12 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
 
 /**
  * Pushes project operators as much as possible towards the leaf nodes
- * of a given logical plan. Whether and how a particular project operator
- * can be pushed depends on the variables that are required and produced
- * by the operators in the plan.
+ * of a given logical plan. This implementation works recursively in a
+ * top-down manner such that, after pushing a project operator under
+ * some other operator, the pushed project is considered again for
+ * further pushing. Whether and how a particular project operator
+ * can be pushed depends on the variables that are required and
+ * produced by the operators in the plan.
  *
  * For unary operators such as bind and unfold, the projection is adjusted
  * before being pushed:
@@ -101,16 +104,17 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	protected LogicalPlan applyToPlanWithProjectAsRootOperator( final LogicalOpProject projectOp,
 	                                                            final LogicalPlan subPlanUnderProject,
 	                                                            final LogicalPlan inputPlan ) {
-		final LogicalOperator childOpUnderProject = subPlanUnderProject.getRootOperator();
-		final Worker worker = new Worker( projectOp, subPlanUnderProject, inputPlan );
+		// Visit the operator directly under the project operator using
+		// a worked that attempts to create a new plan by pushing the
+		// project operator.
+		final Worker worker = new Worker(projectOp, subPlanUnderProject, inputPlan);
+		subPlanUnderProject.getRootOperator().visit(worker);
 
-		childOpUnderProject.visit(worker);
 		final LogicalPlan createdPlan = worker.getCreatedPlan();
 		if ( createdPlan != null ) return createdPlan;
-		else
-		{
-			throw new IllegalArgumentException( childOpUnderProject.getClass().getName() );
-		}
+
+		// We may end up here only if there is a bug in the worker.
+		throw new IllegalArgumentException( childOpUnderProject.getClass().getName() );
 	}
 
 	protected class Worker implements LogicalPlanVisitor {
@@ -166,8 +170,8 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		@Override
 		public void visit( final LogicalOpLeftJoin op ) {
 			createdPlan = createPlanForLeftJoinUnderProject( projectOp,
-			                                                 subPlanUnderProject.getSubPlan(1), // non-optional subplan
-			                                                 subPlanUnderProject.getSubPlan(0), // optional subplan
+			                                                 subPlanUnderProject.getSubPlan(0), // non-optional subplan
+			                                                 subPlanUnderProject.getSubPlan(1), // optional subplan
 			                                                 inputPlan );
 		}
 
