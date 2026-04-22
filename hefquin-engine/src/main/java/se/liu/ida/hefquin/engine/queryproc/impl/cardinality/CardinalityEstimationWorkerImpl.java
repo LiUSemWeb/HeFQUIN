@@ -258,33 +258,38 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	@Override
 	public void visit( final LogicalOpFilter op ) {
 		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
-		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
 
+		// Special case: If the filter is on top of a fixed solution mapping
+		// operator, then we can accurately determine the cardinality.
+		// To this end, we evaluate the filter conditions based on the (fixed)
+		// solution mapping of the child operator. If this evaluation results in
+		// 'true' for every filter condition, then the solution mapping will pass
+		// the filter and, thus, the result of the filter plan is guaranteed to
+		// have a cardinality of 1. Otherwise, the solution mapping will not pass
+		// the filter and, thus, the cardinality will be 0.
+		final QueryPlan subPlanUnderFilter = currentSubPlan.getSubPlan(0);
+		if ( subPlanUnderFilter.getRootOperator() instanceof LogicalOpFixedSolMap smOp ) {
+			final boolean evalResult = SolutionMappingUtils.checkSolutionMapping( smOp.getSolutionMapping(),
+			                                                                      op.getFilterExpressions() );
+			final int crd = ( evalResult == true ) ? 1 : 0;
+
+			qpInfo.addProperty( QueryPlanProperty.cardinality(crd, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(crd, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(crd, Quality.ACCURATE) );
+			return;
+		}
+
+		// Now we cover all non-special cases. For the moment, we simply copy
+		// the cardinality estimate of the subplan, pretending the filter does not
+		// have any effect. TODO: perhaps we can be smarter here and somehow
+		// estimate the selectivity of the filter expressions.
+		final QueryPlanningInfo qpInfoSubPlan = subPlanUnderFilter.getQueryPlanningInfo();
 		final QueryPlanProperty crd = qpInfoSubPlan.getProperty(CARDINALITY);
 		final QueryPlanProperty max = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
 
-		// TODO: perhaps we can be smarter here and somehow estimate the
-		// selectivity of the filter expression.
-
-		// If the filter is above a fixed solution mapping operator, evaluate
-		// the filter condition for the fixed solution mapping of that operator.
-		if ( currentSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpFixedSolMap childOp ) {
-			if ( SolutionMappingUtils.checkSolutionMapping(childOp.getSolutionMapping(), op.getFilterExpressions()) ) {
-				qpInfo.addProperty( QueryPlanProperty.cardinality(1, Quality.ACCURATE) );
-				qpInfo.addProperty( QueryPlanProperty.maxCardinality(1, Quality.ACCURATE) );
-				qpInfo.addProperty( QueryPlanProperty.minCardinality(1, Quality.ACCURATE) );
-			}
-			else {
-				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
-				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
-				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
-			}
-		}
-		else {
-			qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(crd) );
-			qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(max) );
-			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
-		}
+		qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(crd) );
+		qpInfo.addProperty( max );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
 	}
 
 	@Override
