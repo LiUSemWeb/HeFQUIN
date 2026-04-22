@@ -296,6 +296,15 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	public void visit( final LogicalOpBind op ) {
 		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
 		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+		final QueryPlanProperty crdSubPlan = qpInfoSubPlan.getProperty(CARDINALITY);
+
+		if ( crdSubPlan.getValue() == 0 && crdSubPlan.getQuality() == Quality.ACCURATE ) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the BIND operator is guaranteed to be empty as well.
+			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+		}
 
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
@@ -310,7 +319,16 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		// Before considering the general case, we consider a few special
 		// cases for which we may be more accurate than in the general case.
 
-		// Special case 1: if the expression of the UNFOLD clause is
+		// Special case 1: if the input plan is guaranteed to produce an empty result,
+		// then the result of the UNFOLD operator is guaranteed to be empty as well.
+		if ( qpInfoSubPlan.getProperty(CARDINALITY).getValue() == 0 && qpInfoSubPlan.getProperty(CARDINALITY).getQuality() == Quality.ACCURATE ) {
+			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+			return;
+		}
+
+		// Special case 2: if the expression of the UNFOLD clause is
 		// a constant that is *not* a well-formed cdt:List or cdt:Map
 		// literal, then we know that the output cardinality will be
 		// the same as the input cardinality.
@@ -337,7 +355,7 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 				return;
 			}
 
-			// Special case 2: if the expression is a well-formed cdt:List
+			// Special case 3: if the expression is a well-formed cdt:List
 			// or cdt:Map literal, then we can use the size of the list/map
 			// for estimating the output cardinality.
 			final int size;
@@ -379,7 +397,7 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 			}
 		}
 
-		// Special case 3: if the expression of the UNFOLD clause is
+		// Special case 4: if the expression of the UNFOLD clause is
 		// function call using the cdt:List or the cdt:Map constructor
 		// function and there are no arguments for this function call,
 		// then we know that the produced list/map will be empty and,
@@ -388,14 +406,14 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		if ( fct != null ) {
 			final String fctIRI = fct.getFunctionIRI();
 
-			final boolean case3Found;
+			final boolean case4Found;
 			if (    ! fctIRI.equals(ARQConstants.CDTFunctionLibraryURI + "List")
 			     && ! fctIRI.equals(ARQConstants.CDTFunctionLibraryURI + "Map") )
-				case3Found = false;
+				case4Found = false;
 			else
-				case3Found = fct.getArgs().isEmpty();
+				case4Found = fct.getArgs().isEmpty();
 
-			if ( case3Found ) {
+			if ( case4Found ) {
 				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
 				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
 				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
