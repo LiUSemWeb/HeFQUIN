@@ -15,6 +15,8 @@ import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.expr.E_IsIRI;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
@@ -22,6 +24,7 @@ import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.junit.Test;
 
+import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.EngineTestBase;
@@ -29,6 +32,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
@@ -47,6 +51,70 @@ import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
 public class ProjectPushDownTest extends EngineTestBase
 {
+	@Test
+	public void pushProjectIntoFixedSolMapEqual() {
+		// A project on top of a fixed solution mapping operator;
+		// set of project variables equal to the set of variables
+		// in the fixed solution mapping, so project is removed.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+
+		// Fixed solution mapping with x
+		final Binding jenaBinding = Binding.builder().add(v1, NodeValue.makeString("a").asNode()).build();
+		final LogicalOpFixedSolMap fixedSolMapOp = new LogicalOpFixedSolMap( new SolutionMappingImpl(jenaBinding) );
+		final LogicalPlan fixedSolMapPlan = new LogicalPlanWithNullaryRootImpl(fixedSolMapOp, null);
+
+		// Project keeps x
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v1), false);
+		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, fixedSolMapPlan);
+
+		// test
+		final LogicalPlan result = new ProjectPushDown().apply(projectPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpFixedSolMap );
+		final LogicalOpFixedSolMap resultFixedSolMap = (LogicalOpFixedSolMap) result.getRootOperator();
+		final Binding resultBinding = resultFixedSolMap.getSolutionMapping().asJenaBinding();
+		assertEquals( Set.of(v1), resultBinding.varsMentioned() );
+		assertEquals( "a", resultBinding.get(v1).getLiteralLexicalForm() );
+	}
+
+	@Test
+	public void pushProjectIntoFixedSolMapNotEqual() {
+		// A project on top of a fixed solution mapping operator;
+		// project variables are a subset of the variables in the
+		// fixed solution mapping, so fixed solution mapping is
+		// projected.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+
+		// Fixed solution mapping with x, y
+		final BindingBuilder bb = Binding.builder();
+		bb.add( v1, NodeValue.makeString("a").asNode() );
+		bb.add( v2, NodeValue.makeString("b").asNode() );
+		final Binding jenaBinding = bb.build();
+
+		final LogicalOpFixedSolMap fixedSolMapOp = new LogicalOpFixedSolMap( new SolutionMappingImpl(jenaBinding) );
+		final LogicalPlan fixedSolMapPlan = new LogicalPlanWithNullaryRootImpl(fixedSolMapOp, null);
+
+		// Project keeps y
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
+		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, fixedSolMapPlan);
+
+		// test
+		final LogicalPlan result = new ProjectPushDown().apply(projectPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpFixedSolMap );
+		final LogicalOpFixedSolMap resultFixedSolMap = (LogicalOpFixedSolMap) result.getRootOperator();
+		final Binding resultBinding = resultFixedSolMap.getSolutionMapping().asJenaBinding();
+		assertEquals( Set.of(v2), resultBinding.varsMentioned() );
+		assertEquals( "b", resultBinding.get(v2).getLiteralLexicalForm() );
+	}
+
 	@Test
 	public void pushProjectUnderJoinImpossible() {
 		// A project on top of a join where variables cannot

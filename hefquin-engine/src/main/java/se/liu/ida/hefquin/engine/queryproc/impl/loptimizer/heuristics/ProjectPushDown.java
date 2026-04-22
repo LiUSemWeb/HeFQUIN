@@ -5,10 +5,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprVars;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -34,6 +39,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
@@ -114,7 +120,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		if ( createdPlan != null ) return createdPlan;
 
 		// We may end up here only if there is a bug in the worker.
-		throw new IllegalArgumentException( childOpUnderProject.getClass().getName() );
+		throw new IllegalArgumentException( subPlanUnderProject.getRootOperator().getClass().getName() );
 	}
 
 	protected class Worker implements LogicalPlanVisitor {
@@ -140,8 +146,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
-			// The project cannot be pushed under this operator.
-			createdPlan = inputPlan;
+			createdPlan = createPlanForFixedSolMapUnderProject(projectOp, op, inputPlan);
 		}
 
 		@Override
@@ -240,7 +245,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpDedup op ) {
-			createdPlan = createPlanForL2GOrG2LUnderProject( projectOp,
+			createdPlan = createPlanForUnaryOpUnderProject( projectOp,
 			                                                op,
 			                                                subPlanUnderProject.getSubPlan(0) );
 		}
@@ -259,6 +264,38 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	                                                        final LogicalPlan inputPlan ) {
 		// Pushing a project operator into request operator is not possible yet TODO #570
 		return inputPlan;
+	}
+
+	protected LogicalPlan createPlanForFixedSolMapUnderProject( final LogicalOpProject projectOp,
+	                                                            final LogicalOpFixedSolMap fixedSolMapOp,
+	                                                            final LogicalPlan inputPlan ) {
+		// Apply the projection directly to the solution mappings
+		// produced by the fixed solution mapping operator.
+		final Set<Var> projectedVars = projectOp.getVariables();
+		final Binding b = fixedSolMapOp.getSolutionMapping().asJenaBinding();
+		final Set<Var> bindingVars = b.varsMentioned();
+		// Special case: If set of variables in solution mapping
+		// equals set of projection variables; then simply drop
+		// the project operator.
+		if ( bindingVars.equals(projectedVars) ) {
+			return inputPlan.getSubPlan(0);
+		}
+
+		// Create new LogicalOpFixedSolMap with a solution mapping
+		// that only contains the variables in the original
+		// LogicalOpFixedSolMap and in the projection variables.
+		final BindingBuilder bb = Binding.builder();
+		for ( final Var v : projectedVars ) {
+			final Node value = b.get(v);
+			if ( value != null )
+				bb.add(v, value);
+		}
+		final Binding projected = bb.build();
+		final SolutionMapping newSolMap = new SolutionMappingImpl(projected);
+
+		return new LogicalPlanWithNullaryRootImpl(
+			new LogicalOpFixedSolMap(newSolMap),
+			null);
 	}
 
 	protected LogicalPlan createPlanForUnionUnderProject( final LogicalOpProject projectOp,
@@ -298,31 +335,40 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		// If this adjustment does not change the projection, the whole project
 		// can be pushed below the bind.
 		//
+		// If the adjusted projection contains all the variables of the subplan
+		// under the bind (including both the certain and the possible variables),
+		// then there is no need to push the adjusted projection at all and the
+		// plan can remain as is.
+		//
 		// Otherwise, the project is split: the adjusted projection is pushed below
 		// the bind, while the original projection remains on top.
-		final Set<Var> bindVars = new HashSet<>(bindOp.getBindExpressions().getVars());
-		final Set<Var> varsUsedInBind = new HashSet<>();
-
-		for ( final Expr expr : bindOp.getBindExpressions().getExprs().values() ) {
-			varsUsedInBind.addAll(ExprVars.getVarsMentioned(expr));
-		}
 
 		// Compute pushed vars
 		final Set<Var> pushedProjectVars = new HashSet<>(projectOp.getVariables());
 
 		// Remove vars produced by bind
-		pushedProjectVars.removeAll(bindVars);
+		pushedProjectVars.removeAll( bindOp.getBindExpressions().getVars() );
 
 		// Add vars needed for evaluating bind
-		pushedProjectVars.addAll(varsUsedInBind);
+		for ( final Expr expr : bindOp.getBindExpressions().getExprs().values() ) {
+			pushedProjectVars.addAll( ExprVars.getVarsMentioned(expr) );
+		}
 
 		// If nothing changes, push whole project
 		if ( pushedProjectVars.equals(projectOp.getVariables()) )
 			return createPlanForUnaryOpUnderProject(projectOp, bindOp, subPlanUnderBind);
 
+		// If adjusted projection contains all variables of the subplan under bind,
+		// return the plan as is
+		final Set<Var> subPlanVars = new HashSet<>(subPlanUnderBind.getExpectedVariables().getCertainVariables());
+		subPlanVars.addAll(subPlanUnderBind.getExpectedVariables().getPossibleVariables());
+		if ( pushedProjectVars.containsAll(subPlanVars) ) {
+			return inputPlan;
+		}
+
 		// Otherwise, split
 		final LogicalPlan pushed = new LogicalPlanWithUnaryRootImpl(
-			new LogicalOpProject(pushedProjectVars, false),
+			new LogicalOpProject(pushedProjectVars, projectOp.mayReduce()),
 			null,
 			subPlanUnderBind );
 
@@ -350,26 +396,37 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		// If this adjustment does not change the projection, the whole project
 		// can be pushed below the unfold.
 		//
+		// If the adjusted projection contains all the variables of the subplan
+		// under the bind (including both the certain and the possible variables),
+		// then there is no need to push the adjusted projection at all and the
+		// plan can remain as is.
+		//
 		// Otherwise, the project is split: the adjusted projection is pushed below
 		// the unfold, while the original projection remains on top.
-		final Set<Var> varsUsedInUnfold = ExprVars.getVarsMentioned(unfoldOp.getExpr());
-		final Set<Var> unfoldVars = new HashSet<>();
-		unfoldVars.add(unfoldOp.getVar1());
-		if ( unfoldOp.getVar2() != null )
-			unfoldVars.add(unfoldOp.getVar2());
 
 		// Compute pushed vars
 		final Set<Var> pushedProjectVars = new HashSet<>(projectOp.getVariables());
 
 		// Remove vars produced by unfold
-		pushedProjectVars.removeAll(unfoldVars);
+		pushedProjectVars.remove( unfoldOp.getVar1() );
+		if ( unfoldOp.getVar2() != null ) {
+			pushedProjectVars.remove( unfoldOp.getVar2() );
+		}
 
 		// Add vars needed for evaluating unfold
-		pushedProjectVars.addAll(varsUsedInUnfold);
+		pushedProjectVars.addAll( ExprVars.getVarsMentioned(unfoldOp.getExpr()) );
 
 		// If nothing changes, push whole project
 		if ( pushedProjectVars.equals(projectOp.getVariables()) )
 			return createPlanForUnaryOpUnderProject(projectOp, unfoldOp, subPlanUnderUnfold);
+
+		// If adjusted projection contains all variables of the subplan under bind,
+		// return the plan as is
+		final Set<Var> subPlanVars = new HashSet<>(subPlanUnderUnfold.getExpectedVariables().getCertainVariables());
+		subPlanVars.addAll(subPlanUnderUnfold.getExpectedVariables().getPossibleVariables());
+		if ( pushedProjectVars.containsAll(subPlanVars) ) {
+			return inputPlan;
+		}
 
 		// Otherwise, split
 		final LogicalPlan pushed = new LogicalPlanWithUnaryRootImpl(
