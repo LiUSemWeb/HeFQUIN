@@ -451,7 +451,14 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		final QueryPlanProperty max = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
 		final QueryPlanProperty min = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
 
-		if ( op.getVocabularyMapping().isEquivalenceOnly() ) {
+		if ( crd.getValue() == 0 && crd.getQuality() == Quality.ACCURATE ) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the L2g operator is guaranteed to be empty as well.
+			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+		}
+		else if ( op.getVocabularyMapping().isEquivalenceOnly() ) {
 			// If the vocabulary mapping contains only equivalence
 			// rules, applying this vocabulary mapping to a set of
 			// solution mappings cannot result in fewer or more
@@ -481,7 +488,14 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		final QueryPlanProperty max = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
 		final QueryPlanProperty min = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
 
-		if ( op.getVocabularyMapping().isEquivalenceOnly() ) {
+		if ( crd.getValue() == 0 && crd.getQuality() == Quality.ACCURATE ) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the G2l operator is guaranteed to be empty as well.
+			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+		}
+		else if ( op.getVocabularyMapping().isEquivalenceOnly() ) {
 			// If the vocabulary mapping contains only equivalence
 			// rules, applying this vocabulary mapping to a set of
 			// solution mappings cannot result in fewer or more
