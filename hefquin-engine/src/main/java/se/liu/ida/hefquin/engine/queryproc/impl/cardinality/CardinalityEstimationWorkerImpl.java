@@ -304,6 +304,7 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
 			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
 			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+			return;
 		}
 
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
