@@ -262,8 +262,8 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			final LogicalPlan leftRewritten  = apply(leftOriginal);
 			final LogicalPlan rightRewritten = apply(rightOriginal);
 
-			final boolean rewritten = ! leftOriginal.equals(leftRewritten)
-			                       || ! rightOriginal.equals(rightRewritten);
+			final boolean rewritten = ! leftOriginal.isSamePlan(leftRewritten)
+			                       || ! rightOriginal.isSamePlan(rightRewritten);
 
 			if (rewritten) {
 				rewrittenPlan = new LogicalPlanWithBinaryRootImpl(

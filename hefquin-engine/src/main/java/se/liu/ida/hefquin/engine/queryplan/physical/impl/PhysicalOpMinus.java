@@ -1,6 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashBasedMinus;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -15,8 +20,10 @@ public class PhysicalOpMinus extends BaseForPhysicalOpBinaryJoin
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected PhysicalOpMinus() {
-		super(true);
+	private static PhysicalOpMinus singleton = null;
+
+	protected PhysicalOpMinus( final boolean mayReduce ) {
+		super(true, mayReduce);
 	}
 
 	@Override
@@ -25,7 +32,7 @@ public class PhysicalOpMinus extends BaseForPhysicalOpBinaryJoin
 	                                        final ExpectedVariables ... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashBasedMinus( getLogicalOperator().mayReduce(),
+		return new ExecOpHashBasedMinus( mayReduce,
 		                                 inputVars[0], inputVars[1],
 		                                 collectExceptions,
 		                                 qpInfo );
@@ -40,12 +47,13 @@ public class PhysicalOpMinus extends BaseForPhysicalOpBinaryJoin
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof PhysicalOpMinus;
+		return o instanceof PhysicalOpMinus oo
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() ^ getLogicalOperator().hashCode();
+		return getClass().hashCode() ^ (mayReduce ? 1 : 0);
 	}
 
 	@Override
@@ -65,16 +73,23 @@ public class PhysicalOpMinus extends BaseForPhysicalOpBinaryJoin
 				if ( vars == null ) return false;
 			}
 
-			return true;
+			final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars);
+			return ( joinVars != null && ! joinVars.isEmpty() );
 		}
 
 		@Override
 		public PhysicalOpMinus create( final BinaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpMinus ) {
-				return new PhysicalOpMinus();
+				return new PhysicalOpMinus(lop.mayReduce());
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
+	}
+
+	public static PhysicalOpMinus getInstance( final boolean mayReduce ) {
+		if ( singleton == null ) singleton = new PhysicalOpMinus(mayReduce);
+
+		return singleton;
 	}
 }

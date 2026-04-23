@@ -29,13 +29,15 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 
 	private static PhysicalOpNaiveNestedLoopsJoin singleton = null;
 
-	protected PhysicalOpNaiveNestedLoopsJoin() { super(false); }
+	protected PhysicalOpNaiveNestedLoopsJoin( final boolean mayReduce ) {
+		super(false, mayReduce);
+	}
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                        final QueryPlanningInfo qpInfo,
 	                                        final ExpectedVariables... inputVars ) {
-		return new ExecOpNaiveNestedLoopsJoin(getLogicalOperator().mayReduce(), collectExceptions, qpInfo);
+		return new ExecOpNaiveNestedLoopsJoin(mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override
@@ -69,14 +71,14 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 
 		@Override
 		public PhysicalOpNaiveNestedLoopsJoin create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpJoin ) return getInstance();
+			if ( lop instanceof LogicalOpJoin ) return getInstance(lop.mayReduce());
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
 	}
 
-	public static PhysicalOpNaiveNestedLoopsJoin getInstance() {
-		if ( singleton == null ) singleton = new PhysicalOpNaiveNestedLoopsJoin();
+	public static PhysicalOpNaiveNestedLoopsJoin getInstance( final boolean mayReduce ) {
+		if ( singleton == null ) singleton = new PhysicalOpNaiveNestedLoopsJoin(mayReduce);
 
 		return singleton;
 	}

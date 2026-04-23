@@ -32,7 +32,9 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 
 	private static PhysicalOpSymmetricHashJoin singleton = null;
 
-	protected PhysicalOpSymmetricHashJoin() { super(false); }
+	protected PhysicalOpSymmetricHashJoin( final boolean mayReduce ) {
+		 super(false, mayReduce);
+	}
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
@@ -40,7 +42,7 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 	                                        final ExpectedVariables ... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpSymmetricHashJoin( getLogicalOperator().mayReduce(), inputVars[0], inputVars[1], collectExceptions, qpInfo );
+		return new ExecOpSymmetricHashJoin( mayReduce, inputVars[0], inputVars[1], collectExceptions, qpInfo );
 	}
 
 	@Override
@@ -95,15 +97,15 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 		public PhysicalOpSymmetricHashJoin create( final BinaryLogicalOp lop ) {
 			if (    lop instanceof LogicalOpJoin
 			     || lop instanceof LogicalOpMultiwayJoin ) {
-				return getInstance();
+				return getInstance(lop.mayReduce());
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
 	}
 
-	public static PhysicalOpSymmetricHashJoin getInstance() {
-		if ( singleton == null ) singleton = new PhysicalOpSymmetricHashJoin();
+	public static PhysicalOpSymmetricHashJoin getInstance( final boolean mayReduce ) {
+		if ( singleton == null ) singleton = new PhysicalOpSymmetricHashJoin(mayReduce);
 
 		return singleton;
 	}

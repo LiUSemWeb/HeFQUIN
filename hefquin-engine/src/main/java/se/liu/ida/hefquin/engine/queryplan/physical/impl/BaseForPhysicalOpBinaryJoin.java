@@ -17,9 +17,11 @@ public abstract class BaseForPhysicalOpBinaryJoin
 		implements BinaryPhysicalOpForLogicalOp
 {
 	protected final boolean useOuterJoinSemantics;
+	protected final boolean mayReduce;
 
-	protected BaseForPhysicalOpBinaryJoin( final boolean useOuterJoinSemantics ) {
+	protected BaseForPhysicalOpBinaryJoin( final boolean useOuterJoinSemantics, final boolean mayReduce ) {
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
+		this.mayReduce = mayReduce;
 	}
 
 	@Override

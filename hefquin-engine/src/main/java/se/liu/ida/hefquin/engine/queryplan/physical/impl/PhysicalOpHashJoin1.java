@@ -39,7 +39,9 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 
 	private static PhysicalOpHashJoin1 singleton = null;
 
-	protected PhysicalOpHashJoin1() { super(false); }
+	protected PhysicalOpHashJoin1( final boolean mayReduce ) {
+		super(false, mayReduce);
+	}
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
@@ -47,7 +49,7 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 	                                        final ExpectedVariables ... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashJoin1( getLogicalOperator().mayReduce(), inputVars[0], inputVars[1], collectExceptions, qpInfo );
+		return new ExecOpHashJoin1( mayReduce, inputVars[0], inputVars[1], collectExceptions, qpInfo );
 	}
 
 	@Override
@@ -88,15 +90,15 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 		@Override
 		public PhysicalOpHashJoin1 create( final BinaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpJoin ) {
-				return getInstance();
+				return getInstance(lop.mayReduce());
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
 	}
 
-	public static PhysicalOpHashJoin1 getInstance() {
-		if ( singleton == null ) singleton = new PhysicalOpHashJoin1();
+	public static PhysicalOpHashJoin1 getInstance( final boolean mayReduce ) {
+		if ( singleton == null ) singleton = new PhysicalOpHashJoin1(mayReduce);
 
 		return singleton;
 	}
