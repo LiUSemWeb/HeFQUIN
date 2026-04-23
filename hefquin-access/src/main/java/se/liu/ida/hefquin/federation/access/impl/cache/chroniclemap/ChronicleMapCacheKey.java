@@ -38,7 +38,7 @@ public class ChronicleMapCacheKey implements Serializable {
 	 * represents actual data retrieval, while COUNT represents requests that only
 	 * return the number of matching results.
 	 */
-	public enum ResponseMode { RESULT, COUNT }
+	public static enum ResponseMode { RESULT, COUNT }
 
 	/**
 	 * Creates a cache key for the given request, federation member, and response
