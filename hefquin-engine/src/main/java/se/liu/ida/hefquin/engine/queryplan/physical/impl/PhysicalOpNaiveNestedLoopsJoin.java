@@ -27,7 +27,8 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	private static PhysicalOpNaiveNestedLoopsJoin singleton = null;
+	private static PhysicalOpNaiveNestedLoopsJoin singletonWithoutReduction = null;
+	private static PhysicalOpNaiveNestedLoopsJoin singletonThatMayReduce = null;
 
 	protected PhysicalOpNaiveNestedLoopsJoin( final boolean mayReduce ) {
 		super(false, mayReduce);
@@ -78,8 +79,15 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 	}
 
 	public static PhysicalOpNaiveNestedLoopsJoin getInstance( final boolean mayReduce ) {
-		if ( singleton == null ) singleton = new PhysicalOpNaiveNestedLoopsJoin(mayReduce);
-
-		return singleton;
+		if ( mayReduce ) {
+			if ( singletonThatMayReduce == null )
+				singletonThatMayReduce = new PhysicalOpNaiveNestedLoopsJoin(true);
+			return singletonThatMayReduce;
+		}
+		else {
+			if ( singletonWithoutReduction == null )
+				singletonWithoutReduction = new PhysicalOpNaiveNestedLoopsJoin(false);
+			return singletonWithoutReduction;
+		}
 	}
 }

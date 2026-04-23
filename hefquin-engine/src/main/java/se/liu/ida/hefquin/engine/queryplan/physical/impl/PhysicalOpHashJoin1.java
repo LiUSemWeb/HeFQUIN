@@ -37,7 +37,8 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	private static PhysicalOpHashJoin1 singleton = null;
+	private static PhysicalOpHashJoin1 singletonWithoutReduction = null;
+	private static PhysicalOpHashJoin1 singletonThatMayReduce = null;
 
 	protected PhysicalOpHashJoin1( final boolean mayReduce ) {
 		super(false, mayReduce);
@@ -98,8 +99,15 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 	}
 
 	public static PhysicalOpHashJoin1 getInstance( final boolean mayReduce ) {
-		if ( singleton == null ) singleton = new PhysicalOpHashJoin1(mayReduce);
-
-		return singleton;
+		if ( mayReduce ) {
+			if ( singletonThatMayReduce == null )
+				singletonThatMayReduce = new PhysicalOpHashJoin1(true);
+			return singletonThatMayReduce;
+		}
+		else {
+			if ( singletonWithoutReduction == null )
+				singletonWithoutReduction = new PhysicalOpHashJoin1(false);
+			return singletonWithoutReduction;
+		}
 	}
 }

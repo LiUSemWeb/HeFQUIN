@@ -30,7 +30,8 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	private static PhysicalOpSymmetricHashJoin singleton = null;
+	private static PhysicalOpSymmetricHashJoin singletonWithoutReduction = null;
+	private static PhysicalOpSymmetricHashJoin singletonThatMayReduce = null;
 
 	protected PhysicalOpSymmetricHashJoin( final boolean mayReduce ) {
 		 super(false, mayReduce);
@@ -105,8 +106,15 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 	}
 
 	public static PhysicalOpSymmetricHashJoin getInstance( final boolean mayReduce ) {
-		if ( singleton == null ) singleton = new PhysicalOpSymmetricHashJoin(mayReduce);
-
-		return singleton;
+		if ( mayReduce ) {
+			if ( singletonThatMayReduce == null )
+				singletonThatMayReduce = new PhysicalOpSymmetricHashJoin(true);
+			return singletonThatMayReduce;
+		}
+		else {
+			if ( singletonWithoutReduction == null )
+				singletonWithoutReduction = new PhysicalOpSymmetricHashJoin(false);
+			return singletonWithoutReduction;
+		}
 	}
 }

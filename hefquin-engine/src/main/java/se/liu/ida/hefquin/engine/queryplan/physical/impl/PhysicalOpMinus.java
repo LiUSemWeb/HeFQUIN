@@ -20,7 +20,8 @@ public class PhysicalOpMinus extends BaseForPhysicalOpBinaryJoin
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	private static PhysicalOpMinus singleton = null;
+	private static PhysicalOpMinus singletonWithoutReduction = null;
+	private static PhysicalOpMinus singletonThatMayReduce = null;
 
 	protected PhysicalOpMinus( final boolean mayReduce ) {
 		super(true, mayReduce);
@@ -80,16 +81,23 @@ public class PhysicalOpMinus extends BaseForPhysicalOpBinaryJoin
 		@Override
 		public PhysicalOpMinus create( final BinaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpMinus ) {
-				return new PhysicalOpMinus(lop.mayReduce());
+				return getInstance(lop.mayReduce());
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
 	}
 
-	public static PhysicalOpMinus getInstance( final boolean mayReduce ) {
-		if ( singleton == null ) singleton = new PhysicalOpMinus(mayReduce);
-
-		return singleton;
+	public static PhysicalOpMinus getInstance(final boolean mayReduce) {
+		if ( mayReduce ) {
+			if ( singletonThatMayReduce == null )
+				singletonThatMayReduce = new PhysicalOpMinus(true);
+			return singletonThatMayReduce;
+		}
+		else {
+			if ( singletonWithoutReduction == null )
+				singletonWithoutReduction = new PhysicalOpMinus(false);
+			return singletonWithoutReduction;
+		}
 	}
 }
