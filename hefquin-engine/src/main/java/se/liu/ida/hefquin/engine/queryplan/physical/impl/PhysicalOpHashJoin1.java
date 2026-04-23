@@ -62,12 +62,13 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof PhysicalOpHashJoin1;
+		return o instanceof PhysicalOpHashJoin1 oo
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() ^ getLogicalOperator().hashCode();
+		return getClass().hashCode() ^ (mayReduce ? 1 : 0);
 	}
 
 	@Override
