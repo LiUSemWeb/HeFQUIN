@@ -7,12 +7,14 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
+- Support for ChronicleMap-based persistent cache for federation requests (including cardinality requests), with support for cache replacement and invalidation policies ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
 - Adding a limit on the number of parallel requests that are executed against any particular endpoint/server at any point in time ([#556](https://github.com/LiUSemWeb/HeFQUIN/pull/556)).
 - Support for DISTINCT directly within the HeFQUIN engine ([#547](https://github.com/LiUSemWeb/HeFQUIN/pull/547), [#550](https://github.com/LiUSemWeb/HeFQUIN/pull/550), [#555](https://github.com/LiUSemWeb/HeFQUIN/pull/555), [#558](https://github.com/LiUSemWeb/HeFQUIN/pull/558)).
 - Support for projection directly within the HeFQUIN engine ([#566](https://github.com/LiUSemWeb/HeFQUIN/pull/566), [#568](https://github.com/LiUSemWeb/HeFQUIN/pull/568), [#574](https://github.com/LiUSemWeb/HeFQUIN/pull/574)).
 - Adding a new hash join algorithm and a (logical) left join operator; removing the right join operator ([#561](https://github.com/LiUSemWeb/HeFQUIN/pull/561)).
 - Adding a logical plan rewriting that removes subplans that are guaranteed to produce the empty result ([#584](https://github.com/LiUSemWeb/HeFQUIN/pull/584)).
 ### Changed
+- Remove ChronicleMap-based cardinality-specific cache implementation (ChronicleMapCardinalityCache) and related files ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
 - Refactoring the code of the logical plan rewriting rules to use the visitor pattern ([#560](https://github.com/LiUSemWeb/HeFQUIN/pull/560), [#569](https://github.com/LiUSemWeb/HeFQUIN/pull/569), [#571](https://github.com/LiUSemWeb/HeFQUIN/pull/571), [#575](https://github.com/LiUSemWeb/HeFQUIN/pull/575)).
 - More effective filter push down and cardinality estimation for the case of a filter over a fixed-solmap operator ([#588](https://github.com/LiUSemWeb/HeFQUIN/pull/588)).
 - Separation of logical and physical plans for mapping algebra ([#581](https://github.com/LiUSemWeb/HeFQUIN/pull/581)).

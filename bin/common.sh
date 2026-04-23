@@ -66,3 +66,15 @@ if [ ! -f ${HEFQUIN_CP} ]; then
   echo "Cannot find the HeFQUIN JAR file in ${HEFQUIN_JAR_DIR}"
   exit 3  # Exit the script with an error code
 fi
+
+# JVM arguments required for ChronicleMap on Java 11+ used for persistent cache
+JVM_ARGS="$JVM_ARGS \
+  --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED \
+  --add-exports=java.base/sun.nio.ch=ALL-UNNAMED \
+  --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED \
+  --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
+  --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED \
+  --add-opens=java.base/java.lang=ALL-UNNAMED \
+  --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
+  --add-opens=java.base/java.io=ALL-UNNAMED \
+  --add-opens=java.base/java.util=ALL-UNNAMED"
