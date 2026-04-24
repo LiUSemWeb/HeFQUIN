@@ -40,6 +40,11 @@ public class PhysicalOpMinus extends BaseForPhysicalOpBinaryJoin
 	}
 
 	@Override
+	public BinaryLogicalOp getLogicalOperator() {
+		return LogicalOpMinus.getInstance(mayReduce);
+	}
+
+	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
