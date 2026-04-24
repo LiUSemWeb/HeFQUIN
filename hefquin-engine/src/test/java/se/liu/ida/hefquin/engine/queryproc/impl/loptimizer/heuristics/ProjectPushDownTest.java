@@ -179,15 +179,16 @@ public class ProjectPushDownTest extends EngineTestBase
 		final Var v1 = Var.alloc("x");
 		final Var v2 = Var.alloc("y");
 		final Var v3 = Var.alloc("z");
+		final Var v4 = Var.alloc("w");
 
-		// Left request produces x, y
-		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v2);
+		// Left request produces x, y, w
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v4);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
 			false,
 			new SPARQLRequestImpl(tp1) );
 
-		// Right request produces x, z
+		// Right request produces x, z, w
 		final TriplePattern tp2 = new TriplePatternImpl(v1, v3, v3);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exB.org"),
@@ -233,23 +234,24 @@ public class ProjectPushDownTest extends EngineTestBase
 
 	@Test
 	public void pushProjectUnderJoinWhole() {
-		// A project on top of a join where variables can be
-		// fully pushed to each branch.
+		// A project on top of a join where the projection can be fully pushed
+		// into both branches, but join variables must still be preserved locally.
 
 		// set up
 		final Var v1 = Var.alloc("x");
 		final Var v2 = Var.alloc("y");
 		final Var v3 = Var.alloc("z");
+		final Var v4 = Var.alloc("w");
 
 		// Left request produces x, y
-		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v2);
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v4);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
 			false,
 			new SPARQLRequestImpl(tp1) );
 
 		// Right request produces y, z
-		final TriplePattern tp2 = new TriplePatternImpl(v2, v3, v3);
+		final TriplePattern tp2 = new TriplePatternImpl(v2, v3, v4);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exB.org"),
 			false,
@@ -271,6 +273,9 @@ public class ProjectPushDownTest extends EngineTestBase
 		// check
 		assertTrue( result.getRootOperator() instanceof LogicalOpProject );
 
+		final LogicalOpProject rootProj = (LogicalOpProject) result.getRootOperator();
+		assertEquals( Set.of(v2), rootProj.getVariables() );
+
 		final LogicalPlan joinResult = result.getSubPlan(0);
 		assertTrue( joinResult.getRootOperator() instanceof LogicalOpJoin );
 
@@ -279,14 +284,14 @@ public class ProjectPushDownTest extends EngineTestBase
 		assertTrue( left.getRootOperator() instanceof LogicalOpProject );
 
 		final LogicalOpProject leftProj = (LogicalOpProject) left.getRootOperator();
-		assertEquals( Set.of(v2), leftProj.getVariables() );
+		assertEquals( Set.of(v2,v4), leftProj.getVariables() );
 
 		// Right branch
 		final LogicalPlan right = joinResult.getSubPlan(1);
 		assertTrue( right.getRootOperator() instanceof LogicalOpProject );
 
 		final LogicalOpProject rightProj = (LogicalOpProject) right.getRootOperator();
-		assertEquals( Set.of(v2), rightProj.getVariables() );
+		assertEquals( Set.of(v2,v4), rightProj.getVariables() );
 	}
 
 	@Test
@@ -294,7 +299,7 @@ public class ProjectPushDownTest extends EngineTestBase
 		// A project on top of another project on top of a gpOptAdd operator.
 		// The two project operators have disjoint variable sets and are expected
 		// to be merged into a single project operator with an empty set of variables.
-		// This resulting project operator is then pushed under the gpOptAdd operator.
+		// This resulting project operator is not pushed under the gpOptAdd operator.
 
 		// set up
 		final Var v1 = Var.alloc("x");
@@ -319,15 +324,14 @@ public class ProjectPushDownTest extends EngineTestBase
 		final LogicalPlan result = new ProjectPushDown().apply(projectPlan);
 
 		// check
-		assertTrue( result.getRootOperator() instanceof LogicalOpGPOptAdd );
-		assertTrue( result.getRootOperator().equals(gpOptAdd) );
-
-		final LogicalPlan subResult = result.getSubPlan(0);
-		assertTrue( subResult.getRootOperator() instanceof LogicalOpProject );
-
-		final LogicalOpProject resultProjectOp = (LogicalOpProject) subResult.getRootOperator();
+		assertTrue( result.getRootOperator() instanceof LogicalOpProject );
+		final LogicalOpProject resultProjectOp = (LogicalOpProject) result.getRootOperator();
 		assertEquals( 0, resultProjectOp.getVariables().size() );
 		assertTrue( resultProjectOp.getVariables().isEmpty() );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpGPOptAdd );
+		assertTrue( subResult.getRootOperator().equals(gpOptAdd) );
 
 		assertTrue( subResult.getSubPlan(0).equals(reqSubPlan) );
 	}
@@ -792,26 +796,28 @@ public class ProjectPushDownTest extends EngineTestBase
 
 	@Test
 	public void pushProjectUnderAddSplit() {
-		// Verifies partial pushdown of a projection into GPAdd:
-		// - top projection is preserved
-		// - a reduced projection is pushed below GPAdd where safe
+		// Verifies partial projection pushdown under GPAdd:
+		// - the original projection remains at the top
+		// - a reduced projection is pushed below GPAdd
+		// - the pushed projection includes both projected variables and required join variables
+		// - unnecessary variables from the subplan are eliminated where possible
 
 		// set up
 		// - request operator
 		final FederationMember fm = new TPFServerForTest();
 		final Var v1 = Var.alloc("x");
 		final Var v2 = Var.alloc("y");
-		final TriplePattern tp = new TriplePatternImpl(v1, v2, v2);
+		final Var v3 = Var.alloc("z");
+		final TriplePattern tp = new TriplePatternImpl(v1, v2, v3);
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp) );
 		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
 
-		// gpAdd operator with x, y
-		final LogicalOpGPAdd gpAddOp = new LogicalOpGPAdd(fm, tp, null, false);
+		// gpAdd operator with x (join variables = x)
+		final LogicalOpGPAdd gpAddOp = new LogicalOpGPAdd(fm, new TriplePatternImpl(v1,v1,v1), null, false);
 		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(gpAddOp, null, reqSubPlan);
 
-		// Project operator with y, z
-		final Var v3 = Var.alloc("z");
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2,v3), false);
+		// Project operator with y
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, gpAddPlan);
 
 		// test
@@ -821,7 +827,7 @@ public class ProjectPushDownTest extends EngineTestBase
 		assertTrue( result.getRootOperator() instanceof LogicalOpProject );
 
 		final LogicalOpProject resultProj1 = (LogicalOpProject) result.getRootOperator();
-		assertEquals( Set.of(v2,v3), resultProj1.getVariables() );
+		assertEquals( Set.of(v2), resultProj1.getVariables() );
 
 		final LogicalPlan subResult = result.getSubPlan(0);
 		assertTrue( subResult.getRootOperator() instanceof LogicalOpGPAdd );
@@ -830,7 +836,7 @@ public class ProjectPushDownTest extends EngineTestBase
 		assertTrue( subsubResult.getRootOperator() instanceof LogicalOpProject );
 
 		final LogicalOpProject resultProj2 = (LogicalOpProject) subsubResult.getRootOperator();
-		assertEquals( Set.of(v2), resultProj2.getVariables() );
+		assertEquals( Set.of(v1,v2), resultProj2.getVariables() );
 
 		final LogicalPlan subsubsubResult = subsubResult.getSubPlan(0);
 		assertTrue( subsubsubResult.getRootOperator() instanceof LogicalOpRequest );
