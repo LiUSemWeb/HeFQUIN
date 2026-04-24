@@ -70,12 +70,13 @@ public class PhysicalOpHashJoin2 extends BaseForPhysicalOpBinaryJoin
 		if ( o == this ) return true;
 
 		return o instanceof PhysicalOpHashJoin2 oo
-		    && oo.mayReduce == mayReduce;
+		    && oo.mayReduce == mayReduce
+		    && oo.useOuterJoinSemantics == useOuterJoinSemantics;
 	}
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() ^ (mayReduce ? 1 : 0);
+		return getClass().hashCode() ^ (mayReduce ? 1 : 0) ^ (useOuterJoinSemantics ? 1 : 0);
 	}
 
 	@Override
