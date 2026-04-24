@@ -34,6 +34,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
@@ -255,8 +256,22 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 
 		@Override
 		public void visit( final LogicalOpMinus op ) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			final LogicalPlan leftOriginal  = inputPlan.getSubPlan(0);
+			final LogicalPlan rightOriginal = inputPlan.getSubPlan(1);
+
+			final LogicalPlan leftRewritten  = apply(leftOriginal);
+			final LogicalPlan rightRewritten = apply(rightOriginal);
+
+			final boolean rewritten = ! leftOriginal.isSamePlan(leftRewritten)
+			                       || ! rightOriginal.isSamePlan(rightRewritten);
+
+			if (rewritten) {
+				rewrittenPlan = new LogicalPlanWithBinaryRootImpl(
+						op,
+						null,
+						leftRewritten,
+						rightRewritten );
+			} else rewrittenPlan = inputPlan;
 		}
 	}
 

@@ -27,15 +27,18 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	private static PhysicalOpNaiveNestedLoopsJoin singleton = null;
+	private static PhysicalOpNaiveNestedLoopsJoin singletonWithoutReduction = null;
+	private static PhysicalOpNaiveNestedLoopsJoin singletonThatMayReduce = null;
 
-	protected PhysicalOpNaiveNestedLoopsJoin() { super(false); }
+	protected PhysicalOpNaiveNestedLoopsJoin( final boolean mayReduce ) {
+		super(false, mayReduce);
+	}
 
 	@Override
 	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                        final QueryPlanningInfo qpInfo,
 	                                        final ExpectedVariables... inputVars ) {
-		return new ExecOpNaiveNestedLoopsJoin(getLogicalOperator().mayReduce(), collectExceptions, qpInfo);
+		return new ExecOpNaiveNestedLoopsJoin(mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override
@@ -47,12 +50,13 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof PhysicalOpNaiveNestedLoopsJoin;
+		return o instanceof PhysicalOpNaiveNestedLoopsJoin oo
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() ^ getLogicalOperator().hashCode();
+		return getClass().hashCode() ^ (mayReduce ? 1 : 0);
 	}
 
 	@Override
@@ -69,15 +73,22 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 
 		@Override
 		public PhysicalOpNaiveNestedLoopsJoin create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpJoin ) return getInstance();
+			if ( lop instanceof LogicalOpJoin ) return getInstance(lop.mayReduce());
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
 	}
 
-	public static PhysicalOpNaiveNestedLoopsJoin getInstance() {
-		if ( singleton == null ) singleton = new PhysicalOpNaiveNestedLoopsJoin();
-
-		return singleton;
+	public static PhysicalOpNaiveNestedLoopsJoin getInstance( final boolean mayReduce ) {
+		if ( mayReduce ) {
+			if ( singletonThatMayReduce == null )
+				singletonThatMayReduce = new PhysicalOpNaiveNestedLoopsJoin(true);
+			return singletonThatMayReduce;
+		}
+		else {
+			if ( singletonWithoutReduction == null )
+				singletonWithoutReduction = new PhysicalOpNaiveNestedLoopsJoin(false);
+			return singletonWithoutReduction;
+		}
 	}
 }

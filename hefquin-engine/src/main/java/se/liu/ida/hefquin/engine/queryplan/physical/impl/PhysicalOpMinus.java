@@ -7,41 +7,24 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin1;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashBasedMinus;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-/**
- * A physical operator that implements the hash join algorithm to perform an
- * inner join of two sequences of input solution mappings (produced by the two
- * sub-plans under this operator). The hash join algorithm builds a hash table
- * with the solution mappings of the first input sequence (using the values
- * that they have for the join variables to decide where to place them in the
- * hash table) and, thereafter, probes the hash table to find join partners for
- * each of the solution mappings of the second input sequence.
- * <p>
- * The actual algorithm of this operator is implemented in the
- * {@link ExecOpHashJoin1} class.
- * <p>
- * In addition to this class, we also have {@link PhysicalOpHashJoin2}
- * which does essentially the same thing but builds the has table over
- * the second input. I contrast to this class, {@link PhysicalOpHashJoin2}
- * even supports outer-join semantics.
- */
-public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
+public class PhysicalOpMinus extends BaseForPhysicalOpBinaryJoin
 {
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	private static PhysicalOpHashJoin1 singletonWithoutReduction = null;
-	private static PhysicalOpHashJoin1 singletonThatMayReduce = null;
+	private static PhysicalOpMinus singletonWithoutReduction = null;
+	private static PhysicalOpMinus singletonThatMayReduce = null;
 
-	protected PhysicalOpHashJoin1( final boolean mayReduce ) {
-		super(false, mayReduce);
+	protected PhysicalOpMinus( final boolean mayReduce ) {
+		super(true, mayReduce);
 	}
 
 	@Override
@@ -50,7 +33,15 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 	                                        final ExpectedVariables ... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashJoin1( mayReduce, inputVars[0], inputVars[1], collectExceptions, qpInfo );
+		return new ExecOpHashBasedMinus( mayReduce,
+		                                 inputVars[0], inputVars[1],
+		                                 collectExceptions,
+		                                 qpInfo );
+	}
+
+	@Override
+	public BinaryLogicalOp getLogicalOperator() {
+		return LogicalOpMinus.getInstance(mayReduce);
 	}
 
 	@Override
@@ -62,7 +53,7 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof PhysicalOpHashJoin1 oo
+		return o instanceof PhysicalOpMinus oo
 		    && oo.mayReduce == mayReduce;
 	}
 
@@ -73,25 +64,28 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 
 	@Override
 	public String toString() {
-		return "hash join 1";
+		return "minus";
 	}
 
 	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			if ( ! (lop instanceof LogicalOpMinus) )
+				return false;
+
 			// inputVars contains null value?
 			for ( final ExpectedVariables vars : inputVars ) {
 				if ( vars == null ) return false;
 			}
 
 			final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars);
-			return ( joinVars != null && ! joinVars.isEmpty() && lop instanceof LogicalOpJoin );
+			return ( joinVars != null && ! joinVars.isEmpty() );
 		}
 
 		@Override
-		public PhysicalOpHashJoin1 create( final BinaryLogicalOp lop ) {
-			if ( lop instanceof LogicalOpJoin ) {
+		public PhysicalOpMinus create( final BinaryLogicalOp lop ) {
+			if ( lop instanceof LogicalOpMinus ) {
 				return getInstance(lop.mayReduce());
 			}
 
@@ -99,15 +93,15 @@ public class PhysicalOpHashJoin1 extends BaseForPhysicalOpBinaryJoin
 		}
 	}
 
-	public static PhysicalOpHashJoin1 getInstance( final boolean mayReduce ) {
+	public static PhysicalOpMinus getInstance(final boolean mayReduce) {
 		if ( mayReduce ) {
 			if ( singletonThatMayReduce == null )
-				singletonThatMayReduce = new PhysicalOpHashJoin1(true);
+				singletonThatMayReduce = new PhysicalOpMinus(true);
 			return singletonThatMayReduce;
 		}
 		else {
 			if ( singletonWithoutReduction == null )
-				singletonWithoutReduction = new PhysicalOpHashJoin1(false);
+				singletonWithoutReduction = new PhysicalOpMinus(false);
 			return singletonWithoutReduction;
 		}
 	}

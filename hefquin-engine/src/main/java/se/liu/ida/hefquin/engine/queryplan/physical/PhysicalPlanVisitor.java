@@ -14,6 +14,7 @@ public interface PhysicalPlanVisitor
 
 	void visit( PhysicalOpHashJoin1 op );
 	void visit( PhysicalOpHashJoin2 op );
+	void visit( PhysicalOpMinus op );
 	void visit( PhysicalOpSymmetricHashJoin op );
 	void visit( PhysicalOpNaiveNestedLoopsJoin op );
 

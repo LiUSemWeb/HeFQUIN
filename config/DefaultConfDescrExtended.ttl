@@ -119,6 +119,7 @@ _:bListOfPhysicalOpFactories
         #                           30) ]  # batch size
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin2$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMinus$Factory" ]
         #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin1$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLookupJoinViaWrapper$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin$Factory" ]

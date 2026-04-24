@@ -38,11 +38,13 @@ public class PhysicalOpHashJoin2 extends BaseForPhysicalOpBinaryJoin
 	protected static final Factory factory = new Factory();
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	private static PhysicalOpHashJoin2 singletonForInnerJoin = null;
-	private static PhysicalOpHashJoin2 singletonForOuterJoin = null;
+	private static PhysicalOpHashJoin2 innerJoinMayReduce = null;
+	private static PhysicalOpHashJoin2 innerJoinNoReduce = null;
+	private static PhysicalOpHashJoin2 outerJoinMayReduce = null;
+	private static PhysicalOpHashJoin2 outerJoinNoReduce = null;
 
-	protected PhysicalOpHashJoin2( final boolean useOuterJoinSemantics ) {
-		super(useOuterJoinSemantics);
+	protected PhysicalOpHashJoin2( final boolean useOuterJoinSemantics, final boolean mayReduce ) {
+		super(useOuterJoinSemantics, mayReduce);
 	}
 
 	@Override
@@ -52,7 +54,7 @@ public class PhysicalOpHashJoin2 extends BaseForPhysicalOpBinaryJoin
 		assert inputVars.length == 2;
 
 		return new ExecOpHashJoin2( useOuterJoinSemantics,
-		                            getLogicalOperator().mayReduce(),
+		                            mayReduce,
 		                            inputVars[0], inputVars[1],
 		                            collectExceptions,
 		                            qpInfo );
@@ -67,12 +69,14 @@ public class PhysicalOpHashJoin2 extends BaseForPhysicalOpBinaryJoin
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof PhysicalOpHashJoin2;
+		return o instanceof PhysicalOpHashJoin2 oo
+		    && oo.mayReduce == mayReduce
+		    && oo.useOuterJoinSemantics == useOuterJoinSemantics;
 	}
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() ^ getLogicalOperator().hashCode();
+		return getClass().hashCode() ^ (mayReduce ? 1 : 0) ^ (useOuterJoinSemantics ? 1 : 0);
 	}
 
 	@Override
@@ -100,28 +104,40 @@ public class PhysicalOpHashJoin2 extends BaseForPhysicalOpBinaryJoin
 		@Override
 		public PhysicalOpHashJoin2 create( final BinaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpJoin ) {
-				return getInstanceForInnerJoin();
+				return getInstanceForInnerJoin(lop.mayReduce());
 			}
 
 			if ( lop instanceof LogicalOpLeftJoin ) {
-				return getInstanceForOuterJoin();
+				return getInstanceForOuterJoin(lop.mayReduce());
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
 	}
 
-	public static PhysicalOpHashJoin2 getInstanceForInnerJoin() {
-		if ( singletonForInnerJoin == null )
-			singletonForInnerJoin = new PhysicalOpHashJoin2(false);
-
-		return singletonForInnerJoin;
+	public static PhysicalOpHashJoin2 getInstanceForInnerJoin( final boolean mayReduce ) {
+		if ( mayReduce ) {
+			if ( innerJoinMayReduce == null )
+				innerJoinMayReduce = new PhysicalOpHashJoin2(false, true);
+			return innerJoinMayReduce;
+		}
+		else {
+			if ( innerJoinNoReduce == null )
+				innerJoinNoReduce = new PhysicalOpHashJoin2(false, false);
+			return innerJoinNoReduce;
+		}
 	}
 
-	public static PhysicalOpHashJoin2 getInstanceForOuterJoin() {
-		if ( singletonForOuterJoin == null )
-			singletonForOuterJoin = new PhysicalOpHashJoin2(true);
-
-		return singletonForOuterJoin;
-	}
+	public static PhysicalOpHashJoin2 getInstanceForOuterJoin(final boolean mayReduce) {
+		if ( mayReduce ) {
+			if ( outerJoinMayReduce == null )
+				outerJoinMayReduce = new PhysicalOpHashJoin2(true, true);
+			return outerJoinMayReduce;
+		}
+		else {
+			if ( outerJoinNoReduce == null )
+				outerJoinNoReduce = new PhysicalOpHashJoin2(true, false);
+			return outerJoinNoReduce;
+		}
+}
 }

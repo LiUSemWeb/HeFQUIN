@@ -175,6 +175,12 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
+		public void visit( final PhysicalOpMinus op ) {
+			rootOpString = "minus";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
 		public void visit( final PhysicalOpSymmetricHashJoin op ) {
 			rootOpString = "SHJ";
 			record( op.getLogicalOperator() );

@@ -268,7 +268,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		@Override public void visit(OpConditional op)  {} // supported
 
-		@Override public void visit(OpMinus op)        { unsupportedOp = op; }
+		@Override public void visit(OpMinus op)        {} // supported
 
 		@Override public void visit(OpUnion op)        {} // supported
 
