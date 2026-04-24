@@ -8,7 +8,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - Adding a limit on the number of parallel requests that are executed against any particular endpoint/server at any point in time ([#556](https://github.com/LiUSemWeb/HeFQUIN/pull/556)).
-- Support for MINUS directly within the HeFQUIN engine ([#586](https://github.com/LiUSemWeb/HeFQUIN/pull/586), [#587](https://github.com/LiUSemWeb/HeFQUIN/pull/587), [#555](https://github.com/LiUSemWeb/HeFQUIN/pull/555), [#592](https://github.com/LiUSemWeb/HeFQUIN/pull/592)).
+- Support for MINUS directly within the HeFQUIN engine ([#586](https://github.com/LiUSemWeb/HeFQUIN/pull/586), [#587](https://github.com/LiUSemWeb/HeFQUIN/pull/587), [#592](https://github.com/LiUSemWeb/HeFQUIN/pull/592)).
 - Support for DISTINCT directly within the HeFQUIN engine ([#547](https://github.com/LiUSemWeb/HeFQUIN/pull/547), [#550](https://github.com/LiUSemWeb/HeFQUIN/pull/550), [#555](https://github.com/LiUSemWeb/HeFQUIN/pull/555), [#558](https://github.com/LiUSemWeb/HeFQUIN/pull/558)).
 - Support for projection directly within the HeFQUIN engine ([#566](https://github.com/LiUSemWeb/HeFQUIN/pull/566), [#568](https://github.com/LiUSemWeb/HeFQUIN/pull/568), [#574](https://github.com/LiUSemWeb/HeFQUIN/pull/574)).
 - Adding a new hash join algorithm and a (logical) left join operator; removing the right join operator ([#561](https://github.com/LiUSemWeb/HeFQUIN/pull/561)).
