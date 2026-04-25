@@ -384,39 +384,6 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 	                                                     final UnaryLogicalOp childOp,
 	                                                     final LogicalPlan subPlanUnderChildOp,
 	                                                     final LogicalPlan inputPlan ) {
-		// The following snippets of code will be needed if we try to push
-		// the filter conditions also into the pattern of the xxAdd operator.
-		// Trying to do so is not necessary at the moment because we do not
-		// actually have xxAdd operators in the logical plans to which we
-		// apply the heuristics (because the initial logical plan is always
-		// a source assignment and we currently don't have any heuristics
-		// that rewrite the multiway joins of such source assignments into
-		// xxAdd operators). Even once we have heuristics that rewrite joins
-		// into xxAdd operators, as long as we apply the MergeRequest heuristic
-		// before such a heuristic (and after FilterPushDown), we would never
-		// need to try pushing filter conditions also into the pattern of the
-		// xxAdd operator.
-		// However, should we ever try to push the filter conditions also
-		// into the pattern of the xxAdd operator, notice that the xxOptAdd
-		// operators are special because not every filter condition can be
-		// pushed into the pattern of such an operator even if the certain
-		// variables of that pattern contain all of the variables mention
-		// in the filter condition. For instance, if the optional pattern
-		// has ?x as a certain variable and the filter condition is
-		// !BOUND(?x), then pushing this condition is not possible.
-
-		//final SPARQLGraphPattern patternOfAddOp;
-		//if      ( childOp instanceof LogicalOpTPAdd )     patternOfAddOp = ((LogicalOpTPAdd) childOp).getTP();
-		//else if ( childOp instanceof LogicalOpTPOptAdd )  patternOfAddOp = ((LogicalOpTPOptAdd) childOp).getTP();
-		//else if ( childOp instanceof LogicalOpBGPAdd )    patternOfAddOp = ((LogicalOpBGPAdd) childOp).getBGP();
-		//else if ( childOp instanceof LogicalOpBGPOptAdd ) patternOfAddOp = ((LogicalOpBGPOptAdd) childOp).getBGP();
-		//else if ( childOp instanceof LogicalOpGPAdd )     patternOfAddOp = ((LogicalOpGPAdd) childOp).getPattern();
-		//else if ( childOp instanceof LogicalOpGPOptAdd )  patternOfAddOp = ((LogicalOpGPOptAdd) childOp).getPattern();
-		//else throw new IllegalArgumentException( childOp.getClass().getName() );
-
-		//final ExpectedVariables expVarsInPattern = QueryPatternUtils.getExpectedVariablesInPattern(patternOfAddOp);
-		//final Set<Var> certainVarsInPattern = expVarsInPattern.getCertainVariables();
-
 		final SPARQLGraphPattern pattern;
 		final FederationMember fm;
 		if ( childOp instanceof LogicalOpGPAdd gpAddOp ) {
@@ -431,66 +398,78 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			throw new IllegalArgumentException( childOp.getClass().getName() );
 		}
 
-		final ExpectedVariables expVarsInSubPlan = subPlanUnderChildOp.getExpectedVariables();
-		final Set<Var> certainVarsInSubPlan = expVarsInSubPlan.getCertainVariables();
-		final Set<Var> certainVarsInPattern = pattern.getCertainVariables();
+		// Create the following four lists to group the filter expressions.
+		final ExprList toBePushedIntoSubPlan = new ExprList();
+		final ExprList toBePushedIntoPattern = new ExprList();
+		final ExprList toBeKeptIfPatternPushFails = new ExprList();
+		final ExprList toBeKeptInAnyCase = new ExprList();
 
+		// For grouping the filter expressions, we need to know the certain
+		// variables both of the pattern of the gpAdd / gpOptAdd operator
+		// and of the sub-plan under that operator.
+		final Set<Var> certainVarsInPattern = pattern.getCertainVariables();
+		final Set<Var> certainVarsInSubPlan = subPlanUnderChildOp.getExpectedVariables()
+		                                                         .getCertainVariables();
+
+		// Now we can group the filter expressions.
 		final ExprList filterExprs = parentFilterOp.getFilterExpressions();
 		final ExprList filterExprsWithoutAND = splitConjunctions(filterExprs);
-
-		final ExprList toBePushedIntoSubPlan = new ExprList();
-		final ExprList toBePushedIntoPatternOrKept = new ExprList();
-		final ExprList toBePushedIntoPatternOrDropped = new ExprList();
-		final ExprList toBeKept = new ExprList();
-
-		final boolean mayReduce = parentFilterOp.mayReduce();
-
 		for ( final Expr e : filterExprsWithoutAND ) {
 			final Set<Var> varsInExpr = ExprVars.getVarsMentioned(e);
 
-			// If the expression only depends on variables that are certain in
-			// the subplan, it can safely be pushed below the GPAdd operator.
-			// If it also only depends on variables certain in the pattern
-			// (and the federation member supports complex patterns), then it
-			// is also a candidate for pattern pushdown; in that case, it may be
-			// dropped from the top filter if the pattern push succeeds.
+			// If the expression depends only on variables that are certain
+			// in the sub-plan, it can safely be pushed below the gpAdd/gpOptAdd
+			// operator. If it also depends only on variables certain in the
+			// pattern (and the federation member supports complex patterns),
+			// then it is also a candidate for pattern pushdown; in that case,
+			// it may be dropped from the top filter if the pattern push
+			// succeeds.
 			if ( certainVarsInSubPlan.containsAll(varsInExpr) ) {
 				toBePushedIntoSubPlan.add(e);
 
-				if ( fm.supportsMoreThanTriplePatterns()
-				  && certainVarsInPattern.containsAll(varsInExpr)
-				  && childOp instanceof LogicalOpGPAdd ) {
-					toBePushedIntoPatternOrDropped.add(e);
+				if (    fm.supportsMoreThanTriplePatterns()
+				     && childOp instanceof LogicalOpGPAdd
+				     && certainVarsInPattern.containsAll(varsInExpr) ) {
+					toBePushedIntoPattern.add(e);
 				}
 			}
-			// If the expression cannot be pushed to the subplan but only depends on
-			// variables certain in the pattern (and the federation member supports
-			// complex patterns), then it is a candidate for pattern pushdown but must
-			// be kept in the top filter if pattern pushdown fails.
-			else if ( fm.supportsMoreThanTriplePatterns()
-			       && certainVarsInPattern.containsAll(varsInExpr)
-			       && childOp instanceof LogicalOpGPAdd ) {
-				toBePushedIntoPatternOrKept.add(e);
+			// If the expression cannot be pushed to the sub-plan but depends
+			// only on variables certain in the pattern (and the federation
+			// member supports complex patterns), then it is a candidate for
+			// pattern pushdown but must be kept in the top filter if pattern
+			// pushdown fails.
+			else if (    fm.supportsMoreThanTriplePatterns()
+			          && childOp instanceof LogicalOpGPAdd
+			          && certainVarsInPattern.containsAll(varsInExpr) ) {
+				toBePushedIntoPattern.add(e);
+				toBeKeptIfPatternPushFails.add(e);
 			}
-			else toBeKept.add(e);
+			else {
+				toBeKeptInAnyCase.add(e);
+			}
 		}
 
-		if ( toBePushedIntoSubPlan.isEmpty() && toBePushedIntoPatternOrKept.isEmpty() && toBePushedIntoPatternOrDropped.isEmpty() ) {
-			return createPlanAfterPushingInSubPlan(parentFilterOp, childOp, subPlanUnderChildOp, inputPlan);
+		// After grouping the filter expressions, we now check whether
+		// any of them can be pushed. If that's not the case, we simply
+		// keep the filter operator where it is, but recurse into the
+		// sub-plan under the gpAdd / gpOptAdd operator.
+		if ( toBePushedIntoSubPlan.isEmpty() && toBePushedIntoPattern.isEmpty() ) {
+			return createPlanAfterPushingInSubPlan( parentFilterOp,
+			                                        childOp,
+			                                        subPlanUnderChildOp,
+			                                        inputPlan );
 		}
 
-		// Apply pattern-level filter pushdown (only if it is a GPAdd operator,
-		// it is not always correct to push filter conditions into the pattern
-		// of a GPOptAdd operator, so we do not even try at the moment):
+		// Apply pattern-level filter pushdown (only if it is a gpAdd operator,
+		// because it is not always correct to push filter conditions into the
+		// pattern of a gpOptAdd operator, so we do not even try at the moment):
 		// expressions that depend only on variables guaranteed by the pattern
-		// are merged into the SPARQL graph pattern itself, so they become part
-		// of the remote request.
+		// are merged into the graph pattern itself, so they become part of the
+		// remote request.
 		UnaryLogicalOp newChildOp = childOp;
-		if ( childOp instanceof LogicalOpGPAdd gpAdd && (! toBePushedIntoPatternOrKept.isEmpty() || ! toBePushedIntoPatternOrDropped.isEmpty()) ) {
-			final ExprList patternCandidates = new ExprList();
-			patternCandidates.addAll(toBePushedIntoPatternOrKept);
-			patternCandidates.addAll(toBePushedIntoPatternOrDropped);
-			final SPARQLGraphPattern newPattern = pattern.mergeWith(patternCandidates);
+		if (    ! toBePushedIntoPattern.isEmpty()
+		     && childOp instanceof LogicalOpGPAdd gpAdd ) {
+			final SPARQLGraphPattern newPattern = pattern.mergeWith(toBePushedIntoPattern);
 
 			if ( fm.isSupportedPattern(newPattern) ) {
 				newChildOp = new LogicalOpGPAdd(
@@ -500,35 +479,47 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 					childOp.mayReduce() );
 			}
 			else {
-				// Backtrack: pattern push failed and we need to keep the "pattern-only" expressions
-				toBeKept.addAll(toBePushedIntoPatternOrKept);
+				// Backtrack: pattern push failed
+				toBeKeptInAnyCase.addAll(toBeKeptIfPatternPushFails);
 			}
 		}
 
-		final LogicalPlan newSubPlanUnderChildOpRewritten;
-		if ( toBePushedIntoSubPlan.isEmpty() ) {
-			newSubPlanUnderChildOpRewritten = apply(subPlanUnderChildOp);
+		// If we found filter expressions that can safely be pushed
+		// under the gpAdd / gpOptAdd operator, we push them now.
+		final LogicalPlan newSubPlanUnderAddOp;
+		if ( ! toBePushedIntoSubPlan.isEmpty() ) {
+			final LogicalOpFilter pushedFilter = new LogicalOpFilter(
+					toBePushedIntoSubPlan,
+					parentFilterOp.mayReduce() );
+			newSubPlanUnderAddOp = new LogicalPlanWithUnaryRootImpl(
+					pushedFilter,
+					null,
+					subPlanUnderChildOp );
 		}
 		else {
-			final LogicalPlan newSubPlanUnderChildOp = new LogicalPlanWithUnaryRootImpl(
-				new LogicalOpFilter(toBePushedIntoSubPlan, mayReduce), // pushed filter op.
-				null,
-				subPlanUnderChildOp );
-
-			newSubPlanUnderChildOpRewritten = apply(newSubPlanUnderChildOp);
+			newSubPlanUnderAddOp = subPlanUnderChildOp;
 		}
 
+		// Now we recurse, applying the filter-pushdown heuristic
+		// to the sub-plan under the gpAdd / gpOptAdd operator.
+		final LogicalPlan rewrittenSubPlanUnderAddOp = apply(newSubPlanUnderAddOp);
+		
 		final LogicalPlan newSubPlanUnderRootOp = new LogicalPlanWithUnaryRootImpl(
 				newChildOp,
 				null,
-				newSubPlanUnderChildOpRewritten );
+				rewrittenSubPlanUnderAddOp );
 
-		if ( toBeKept.isEmpty() ) {
+		if ( toBeKeptInAnyCase.isEmpty() ) {
 			return newSubPlanUnderRootOp;
 		}
 
-		final LogicalOpFilter newRootFilterOp = new LogicalOpFilter(toBeKept, mayReduce);
-		return new LogicalPlanWithUnaryRootImpl(newRootFilterOp, null, newSubPlanUnderRootOp);
+		// Create a plan with a new filter operator at the top, where this
+		// operator contains all the filter expressions to be kept.
+		return new LogicalPlanWithUnaryRootImpl(
+				new LogicalOpFilter( toBeKeptInAnyCase,
+				                     parentFilterOp.mayReduce() ),
+				null,
+				newSubPlanUnderRootOp );
 	}
 
 	protected LogicalPlan createPlanForJoinUnderFilter( final LogicalOpFilter filterOp,
