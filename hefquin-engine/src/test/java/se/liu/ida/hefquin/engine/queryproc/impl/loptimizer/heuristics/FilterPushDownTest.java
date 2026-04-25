@@ -1,9 +1,11 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -18,6 +20,7 @@ import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
@@ -30,11 +33,13 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
@@ -613,4 +618,207 @@ public class FilterPushDownTest extends EngineTestBase
 		assertEquals( filterPlan, result );
 	}
 
+	@Test
+	public void pushFilterBothUnderAndIntoGPAdd() {
+		// a filter on top of a GPAdd operator, where filter expressions
+		// are pushed into the GPAdd pattern and also pushed into the
+		// subplan request under the GPAdd operator
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final FederationMember fm = new SPARQLEndpointForTest();
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
+		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+
+		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
+		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp2, null, false);
+		final LogicalPlan gpAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpAdd, null, reqSubPlan);
+
+		final Expr e1 = new E_IsIRI( new ExprVar(v1) );
+		final LogicalOpFilter rootOp = new LogicalOpFilter(e1, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, gpAddSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		final LogicalOperator resultGPAddOp = result.getRootOperator();
+		assertTrue( resultGPAddOp instanceof LogicalOpGPAdd );
+		assertEquals( fm, ((LogicalOpGPAdd) resultGPAddOp).getFederationMember() );
+		assertTrue( ((LogicalOpGPAdd) resultGPAddOp).getPattern().toString().contains("FILTER") );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest<?,?> );
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fm );
+
+		final SPARQLRequest resultReq1 = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq1.getQueryPattern() );
+		assertTrue(                                        resultElmt1 instanceof ElementGroup );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(0) instanceof ElementTriplesBlock );
+		assertTrue( ((ElementTriplesBlock) ((ElementGroup) resultElmt1).get(0)).getPattern().get(0).equals(tp1.asJenaTriple()) );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
+		assertTrue(       ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr().equals(e1) );
+	}
+
+	@Test
+	public void pushFilterPartiallyUnderAndIntoGPAdd() {
+		// a filter on top of a GPAdd operator, where filter expressions are
+		// distributed across three locations:
+		// - some expressions are pushed into the subplan request
+		// - some expressions are pushed into the GPAdd pattern
+		// - remaining expressions stay in the top-level filter
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final Var v3 = Var.alloc("z");
+		final FederationMember fm = new SPARQLEndpointForTest();
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
+		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+
+		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
+		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp2, null, false);
+		final LogicalPlan gpAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpAdd, null, reqSubPlan);
+
+		final Expr e1 = new E_IsIRI( new ExprVar(v1) );
+		final Expr e3 = new E_IsIRI( new ExprVar(v3) );
+		final ExprList exprList = new ExprList( Arrays.asList(
+				e1,
+				new E_IsIRI( new ExprVar(v2) ),
+				e3 ) );
+		final LogicalOpFilter rootOp = new LogicalOpFilter(exprList, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, gpAddSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		final LogicalOperator resultRootOp = result.getRootOperator();
+		assertTrue( resultRootOp instanceof LogicalOpFilter );
+		assertEquals( new ExprList(List.of(e3)), ((LogicalOpFilter) resultRootOp).getFilterExpressions() );
+		assertEquals( 1, ((LogicalOpFilter) resultRootOp).getFilterExpressions().size() );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		final LogicalOperator resultGPAddOp = subResult.getRootOperator();
+		assertTrue( resultGPAddOp instanceof LogicalOpGPAdd );
+		assertEquals( fm, ((LogicalOpGPAdd) resultGPAddOp).getFederationMember() );
+		assertTrue( ((LogicalOpGPAdd) resultGPAddOp).getPattern().toString().contains("FILTER") );
+		assertTrue( ((LogicalOpGPAdd) resultGPAddOp).getPattern().getCertainVariables().contains(v2));
+
+		final LogicalPlan subsubResult = subResult.getSubPlan(0);
+		assertTrue( subsubResult.getRootOperator() instanceof LogicalOpRequest<?,?> );
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subsubResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fm );
+
+		final SPARQLRequest resultReq1 = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq1.getQueryPattern() );
+		assertTrue(                                        resultElmt1 instanceof ElementGroup );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(0) instanceof ElementTriplesBlock );
+		assertTrue( ((ElementTriplesBlock) ((ElementGroup) resultElmt1).get(0)).getPattern().get(0).equals(tp1.asJenaTriple()) );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
+		assertTrue(       ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr().equals(e1) );
+	}
+
+	@Test
+	public void pushFilterGPAddPushdownFails() {
+		// a filter on top of a GPAdd operator, where filter expressions cannot be
+		// pushed into the GPAdd pattern or into the underlying request because
+		// the federation member rejects the merged pattern; therefore, the filter
+		// remains above the GPAdd subtree
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final FederationMember fm = new RejectingGraphFederationMemberForTest(GraphFactory.createDefaultGraph());
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
+		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+
+		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
+		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp2, null, false);
+		final LogicalPlan gpAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpAdd, null, reqSubPlan);
+
+		final Expr e1 = new E_IsIRI( new ExprVar(v1) );
+		final LogicalOpFilter rootOp = new LogicalOpFilter(e1, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, gpAddSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		final LogicalOperator resultGPAddOp = result.getRootOperator();
+		assertTrue( resultGPAddOp instanceof LogicalOpGPAdd );
+		assertEquals( fm, ((LogicalOpGPAdd) resultGPAddOp).getFederationMember() );
+		// Ensure that the pattern of the GPAdd operator is unchanged
+		// (i.e. filter expressions have not been pushed into it).
+		assertEquals( tp2, ((LogicalOpGPAdd) resultGPAddOp).getPattern() );
+
+		// Because of the rejecting federation member, the filter cannot be pushed into the request
+		// and remains above it.
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpFilter );
+
+		final LogicalPlan subsubResult = subResult.getSubPlan(0);
+		assertTrue( subsubResult.getRootOperator() instanceof LogicalOpRequest<?,?> );
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subsubResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fm );
+
+		final SPARQLRequest resultReq1 = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq1.getQueryPattern() );
+		assertTrue(                                         resultElmt1 instanceof ElementTriplesBlock );
+		assertTrue(                  ((ElementTriplesBlock) resultElmt1).getPattern().get(0).equals(tp1.asJenaTriple()) );
+	}
+
+	@Test
+	public void pushFilterUnderButNotIntoGPOptAdd() {
+		// a filter on top of a GPOptAdd operator, where filter expressions
+		// are pushed under the GPOptAdd operator but not into the GPOptAdd pattern
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final FederationMember fm = new SPARQLEndpointForTest();
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
+		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+
+		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
+		final LogicalOpGPOptAdd gpAdd = new LogicalOpGPOptAdd(fm, tp2, false);
+		final LogicalPlan gpAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpAdd, null, reqSubPlan);
+
+		final Expr e1 = new E_IsIRI( new ExprVar(v1) );
+		final LogicalOpFilter rootOp = new LogicalOpFilter(e1, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, gpAddSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		final LogicalOperator resultGPOptAddOp = result.getRootOperator();
+		assertTrue( resultGPOptAddOp instanceof LogicalOpGPOptAdd );
+		assertEquals( fm, ((LogicalOpGPOptAdd) resultGPOptAddOp).getFederationMember() );
+		assertEquals( tp2, ((LogicalOpGPOptAdd) resultGPOptAddOp).getPattern() );
+		assertFalse( ((LogicalOpGPOptAdd) resultGPOptAddOp).getPattern().toString().contains("FILTER") );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest<?,?> );
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fm );
+
+		final SPARQLRequest resultReq1 = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq1.getQueryPattern() );
+		assertTrue(                                        resultElmt1 instanceof ElementGroup );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(0) instanceof ElementTriplesBlock );
+		assertTrue( ((ElementTriplesBlock) ((ElementGroup) resultElmt1).get(0)).getPattern().get(0).equals(tp1.asJenaTriple()) );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
+		assertTrue(       ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr().equals(e1) );
+	}
 }
