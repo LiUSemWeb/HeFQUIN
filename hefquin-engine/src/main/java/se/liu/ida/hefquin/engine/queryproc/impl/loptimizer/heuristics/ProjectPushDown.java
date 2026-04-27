@@ -93,7 +93,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			for ( int i = 0; i < numberOfSubPlans; i++ ) {
 				final LogicalPlan oldSubPlan = inputPlan.getSubPlan(i);
 				newSubPlans[i] = apply(oldSubPlan);
-				if ( ! newSubPlans[i].equals(oldSubPlan) ) {
+				if ( ! newSubPlans[i].isSamePlan(oldSubPlan) ) {
 					noChanges = false;
 				}
 			}
@@ -489,13 +489,13 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	}
 
 	/**
-	 * Pushes a project operator below a GPAdd or GPOptAdd operator.
+	 * Pushes a project operator below a gpAdd or gpOptAdd operator.
 	 *
 	 * The pushdown must preserve:
 	 * <ul>
 	 * 	<li>variables required by the parent projection</li>
 	 * 	<li>variables required by the operator (e.g., parameter variables or optional bindings)</li>
-	 * 	<li>join variables between the subplan and the operator pattern
+	 * 	<li>join variables between the subplan and the operator pattern</li>
 	 * </ul>
 	 *
 	 * If all projected variables are guaranteed by the subplan and include all required variables,
@@ -508,44 +508,29 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	                                                      final UnaryLogicalOp childOp,
 	                                                      final LogicalPlan subPlanUnderChildOp,
 	                                                      final LogicalPlan inputPlan ) {
-		final Set<Var> certainVarsInSubPlan = subPlanUnderChildOp.getExpectedVariables().getCertainVariables();
-		final Set<Var> possibleVarsInSubPlan = subPlanUnderChildOp.getExpectedVariables().getPossibleVariables();
+		final ExpectedVariables expVarsInSubPlan = subPlanUnderChildOp.getExpectedVariables();
 
-		final Set<Var> patternCertain;
-		final Set<Var> patternPossible;
+		final ExpectedVariables expVarsInPattern;
 		if ( childOp instanceof LogicalOpGPAdd gpAdd ) {
-			patternCertain = gpAdd.getPattern().getExpectedVariables().getCertainVariables();
-			patternPossible = gpAdd.getPattern().getExpectedVariables().getPossibleVariables();
+			expVarsInPattern = gpAdd.getPattern().getExpectedVariables();
 		}
 		else {
 			final LogicalOpGPOptAdd op = (LogicalOpGPOptAdd) childOp;
-			patternCertain = op.getPattern().getExpectedVariables().getCertainVariables();
-			patternPossible = op.getPattern().getExpectedVariables().getPossibleVariables();
+			expVarsInPattern = op.getPattern().getExpectedVariables();
 		}
 
-		final Set<Var> joinVars = new HashSet<>();
-		// intersect with certain vars
-		for ( final Var v : patternCertain ) {
-			if ( certainVarsInSubPlan.contains(v)
-			  || possibleVarsInSubPlan.contains(v) )
-				joinVars.add(v);
-		}
-
-		// intersect with possible vars
-		for ( final Var v : patternPossible ) {
-			if ( certainVarsInSubPlan.contains(v)
-			  || possibleVarsInSubPlan.contains(v) )
-				joinVars.add(v);
-		}
+		final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfAllVariables(
+				expVarsInPattern,
+				expVarsInSubPlan );
 
 		// Case 1:
-		// We can push the full projection below the GPAdd/GPOptAdd operator
+		// We can push the full projection below the gpAdd/gpOptAdd operator
 		// only if:
 		//	(1) the subplan guarantees all projected variables,
 		//	(2) the operator does not require any extra variables
 		//	  (e.g., parameter variables would be lost by projection), and
 		//	(3) the projected variables include all join variables
-		if ( certainVarsInSubPlan.containsAll(parentProjectOp.getVariables())
+		if ( expVarsInSubPlan.getCertainVariables().containsAll(parentProjectOp.getVariables())
 		  && operatorDoesNotRequireExtraVars(childOp, parentProjectOp)
 		  && parentProjectOp.getVariables().containsAll(joinVars) ) {
 			final LogicalPlan pushed = new LogicalPlanWithUnaryRootImpl(parentProjectOp, null, subPlanUnderChildOp);
@@ -561,8 +546,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		//	(3) join variables
 		//
 		// The remaining projection is kept above the operator.
-		final Set<Var> varsInSubPlan = new HashSet<>(certainVarsInSubPlan);
-		varsInSubPlan.addAll( possibleVarsInSubPlan );
+		final Set<Var> varsInSubPlan = ExpectedVariablesUtils.unionOfAllVariables(expVarsInSubPlan);
 		final Set<Var> neededByProject = new HashSet<>(parentProjectOp.getVariables());
 		neededByProject.retainAll( varsInSubPlan );
 
@@ -570,7 +554,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		if ( childOp instanceof LogicalOpGPAdd gpAdd && gpAdd.hasParameterVariables() ) {
 			// GPAdd parameter variables must be preserved by the projection.
 			// If they are not present in the outer projection, we must abort pushdown.
-			final Set<Var> paramVars = new HashSet<>(gpAdd.getParameterVariables().values());
+			final Collection<Var> paramVars = gpAdd.getParameterVariables().values();
 
 			if ( ! parentProjectOp.getVariables().containsAll(paramVars) )
 				return inputPlan; // cannot push at all
@@ -612,9 +596,8 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 *
 	 * Each branch must retain:
 	 * <ul>
-	 *	<li>variables required by the parent projection</li>
-	 *	<li>variables required to preserve operator semantics (e.g., join compatibility,
-	 *      or variables required by asymmetric operators such as left join or minus)</li>
+	 *	<li>its subset of the variables of the parent projection</li>
+	 *	<li>its subset of the join variables</li>
 	 * </ul>
 	 */
 	protected LogicalPlan createPlanForNaryOpUnderProject( final LogicalOpProject projectOp,
@@ -643,34 +626,27 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		final Set<Var> allPushdownVars = new HashSet<>();
 		for (int i = 0; i < numberOfSubPlansUnderJoin; i++) {
 			final LogicalPlan subPlan = subPlanUnderProject.getSubPlan(i);
-
 			final Set<Var> varsInSubPlan = ExpectedVariablesUtils.unionOfAllVariables( subPlan.getExpectedVariables() );
 
-			final Set<Var> neededByProject = new HashSet<>(projectOp.getVariables());
-			neededByProject.retainAll( varsInSubPlan );
-
-			final Set<Var> neededByJoin = new HashSet<>(joinVars);
-			neededByJoin.retainAll( varsInSubPlan );
-
 			final Set<Var> pushDownVars = new HashSet<>();
-			pushDownVars.addAll( neededByProject );
-			pushDownVars.addAll( neededByJoin );
-			allPushdownVars.addAll( pushDownVars );
+			pushDownVars.addAll( projectOp.getVariables() );
+			pushDownVars.addAll( joinVars );
+			pushDownVars.retainAll( varsInSubPlan );
 
-			final LogicalPlan newSubPlan;
+			allPushdownVars.addAll( pushDownVars );
 
 			if ( pushDownVars.isEmpty() || pushDownVars.equals(varsInSubPlan) ) {
 				// No projection needed for this branch
-				newSubPlan = apply(subPlan);
-			} else {
+				newSubPlans[i] = apply(subPlan);
+			}
+			else {
 				final LogicalOpProject branchProject = new LogicalOpProject(pushDownVars, projectOp.mayReduce());
 				final LogicalPlan withProject = new LogicalPlanWithUnaryRootImpl(branchProject, null, subPlan);
 
-				newSubPlan = apply(withProject);
+				newSubPlans[i] = apply(withProject);
 			}
 
-			newSubPlans[i] = newSubPlan;
-			if ( !newSubPlan.isSamePlan(subPlan) )
+			if ( !newSubPlans[i].isSamePlan(subPlan) )
 				noChanges = false;
 		}
 
@@ -729,7 +705,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			final LogicalPlan oldSubPlan = subPlanUnderProject.getSubPlan(i);
 			final LogicalPlan newSubPlan = apply(oldSubPlan);
 
-			if ( newSubPlan.equals(oldSubPlan) ) {
+			if ( newSubPlan.isSamePlan(oldSubPlan) ) {
 				// If the current subplan did not change when applying
 				// the heuristic to it, then simply keep that subplan.
 				newSubPlansUnderJoin[i] = oldSubPlan;
@@ -779,10 +755,15 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 
 
-	protected LogicalPlan createPlanForUnaryOpUnderProject( final LogicalOpProject projectOp, final UnaryLogicalOp op, final LogicalPlan subPlanUnderOp ) {
-		// Create a new subplan with the project as root operator on top of the
-		// subplan that was under the given unary operator, and apply this
-		// heuristic recursively to this new subplan.
+	/**
+	 * Returns a plan in which the given project operator is pushed under the
+	 * given unary operator, with the subplan underneath being a version of
+	 * the given subplan in which the project push down heuristic has been
+	 * applied recursively.
+	 */
+	protected LogicalPlan createPlanForUnaryOpUnderProject( final LogicalOpProject projectOp,
+	                                                        final UnaryLogicalOp op,
+	                                                        final LogicalPlan subPlanUnderOp ) {
 		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
 				projectOp,
 				null,
@@ -804,7 +785,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		// precisely, if there are no project operators in the subplan that can
 		// be pushed), then we return the given input plan (instead of
 		// recreating another, identical version of that plan).
-		if ( newPlanUnderChildRoot.equals(subPlanUnderChildOp) ) {
+		if ( newPlanUnderChildRoot.isSamePlan(subPlanUnderChildOp) ) {
 			return inputPlan;
 		}
 
