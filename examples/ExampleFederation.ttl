@@ -7,45 +7,52 @@ PREFIX ex:     <http://example.org/>
 PREFIX hydra:  <http://www.w3.org/ns/hydra/core#>
 
 
-ex:dbpediaSPARQL
-      fd:serviceURI "http://dbpedia.org/sparql"^^xsd:anyURI ;
-      fd:interface [ a                  fd:SPARQLEndpointInterface ;
-                     fd:endpointAddress "http://dbpedia.org/sparql"^^xsd:anyURI ] .
+ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://dbpedia.org/sparql"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://dbpedia.org/sparql"^^xsd:anyURI ] .
 
-ex:dbpediaTPF
-      fd:serviceURI "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI ] .
+ex:dbpediaTPF a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI ;
+    fd:interface [ a                         fd:FragmentInterface ;
+                   fd:supportedProtocol      fd:TPFProtocol ;
+                   fd:exampleFragmentAddress "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI ] .
 
-ex:wikidataSPARQL
-      fd:serviceURI "https://query.wikidata.org/sparql"^^xsd:anyURI ;
-      fd:interface [ a                  fd:SPARQLEndpointInterface ;
-                     fd:endpointAddress "https://query.wikidata.org/sparql"^^xsd:anyURI ] .
+ex:wikidataSPARQL a fd:RDFBasedFederationMember ;
+    fd:serviceURI "https://query.wikidata.org/sparql"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "https://query.wikidata.org/sparql"^^xsd:anyURI ] .
 
-ex:dbpediaSPARQLWithVocabMappings
-      fd:serviceURI "http://example.org/DBpediaWrapper"^^xsd:anyURI ;
-      fd:interface [ a                  fd:SPARQLEndpointInterface ;
-                     fd:endpointAddress "http://dbpedia.org/sparql"^^xsd:anyURI ] ;
-      fd:vocabularyMappingsFile "examples/ExampleVocabMappingDBpedia.ttl" .
+ex:dbpediaSPARQLWithVocabMappings a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://example.org/DBpediaWrapper"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://dbpedia.org/sparql"^^xsd:anyURI ] ;
+    fd:vocabularyMappingsFile "examples/ExampleVocabMappingDBpedia.ttl" .
 
-ex:wikidataSPARQLWithVocabMappings
-      fd:serviceURI "http://example.org/WikidataWrapper"^^xsd:anyURI ;
-      fd:interface [ a                  fd:SPARQLEndpointInterface ;
-                     fd:endpointAddress "https://query.wikidata.org/sparql"^^xsd:anyURI ];
-      fd:vocabularyMappingsFile "examples/ExampleVocabMappingWikidata.ttl" .
+ex:wikidataSPARQLWithVocabMappings a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://example.org/WikidataWrapper"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "https://query.wikidata.org/sparql"^^xsd:anyURI ];
+    fd:vocabularyMappingsFile "examples/ExampleVocabMappingWikidata.ttl" .
 
-ex:europaSPARQL
-      fd:serviceURI "https://data.europa.eu/sparql"^^xsd:anyURI ;
-      fd:interface [ a                  fd:SPARQLEndpointInterface ;
-                     fd:endpointAddress "https://data.europa.eu/sparql"^^xsd:anyURI ] .
+ex:europaSPARQL a fd:RDFBasedFederationMember ;
+    fd:serviceURI "https://data.europa.eu/sparql"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "https://data.europa.eu/sparql"^^xsd:anyURI ] .
 
-ex:openMeteo
+ex:openMeteo a fd:WrappedFederationMember ;
       fd:serviceURI "http://example.org/OpenMeteoWrapper"^^xsd:anyURI ;
       fd:interface _:openMeteoRestEndpoint ;
       fd:wrapper _:openMeteoWrapper .
 
-_:openMeteoRestEndpoint a fd:RESTInterface ;
-      fd:iriTemplate [
+_:openMeteoRestEndpoint a fd:TemplateBasedInterface ;
+      fd:supportedProtocol fd:GenericWebAPIProtocol ;
+      fd:uriTemplate [
             hydra:template "https://api.open-meteo.com/v1/forecast{?latitude,longitude,current,hourly}" ;
             hydra:mapping [ hydra:variable "latitude" ;
                             hydra:required true ;
@@ -63,16 +70,14 @@ _:openMeteoRestEndpoint a fd:RESTInterface ;
                           ]
           ] .                   
 
-ex:openMeteo2
+ex:openMeteo2 a fd:WrappedFederationMember ;
       fd:serviceURI "http://example.org/OpenMeteoWrapperWithFixedParams"^^xsd:anyURI ;
-      fd:interface [ a fd:RESTInterface ;
-            fd:iriTemplate [
-                  hydra:template "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m" ;
-            ] 
-      ] ;
+      fd:interface [ a fd:FixedEndpointInterface ;
+                     fd:supportedProtocol  fd:GenericWebAPIProtocol ;
+                     fd:endpointAddress    "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m"^^xsd:anyURI ] ;
       fd:wrapper _:openMeteoWrapper .
 
-_:openMeteoWrapper
+_:openMeteoWrapper a fd:Wrapper ;
       fd:rmlTriplesMaps (
             _:openMeteoTM1
             _:openMeteoTM2
@@ -117,10 +122,11 @@ _:openMeteoTM4
                                rml:objectMap [ rml:reference "hourly.temperature_2m" ; rml:datatype cdt:List ] ] .
 
 
-ex:covid19API
+ex:covid19API a fd:WrappedFederationMember ;
       fd:serviceURI "http://example.org/Covid19APIWrapper"^^xsd:anyURI ;
       fd:interface _:covid19APIEndpoint ;
-      fd:wrapper [ fd:rmlTriplesMaps ( _:covid19TM_totalCases
+      fd:wrapper [ a fd:Wrapper ;
+                   fd:rmlTriplesMaps ( _:covid19TM_totalCases
                                        _:covid19TM_todayCases
                                        _:covid19TM_totalDeaths
                                        _:covid19TM_todayDeaths
@@ -128,8 +134,9 @@ ex:covid19API
                                        _:covid19TM_updated )
                  ] .
 
-_:covid19APIEndpoint a fd:RESTInterface ;
-      fd:iriTemplate [ hydra:template "https://disease.sh/v3/covid-19/countries/{country}" ;
+_:covid19APIEndpoint a fd:TemplateBasedInterface ;
+      fd:supportedProtocol  fd:GenericWebAPIProtocol ;
+      fd:uriTemplate [ hydra:template "https://disease.sh/v3/covid-19/countries/{country}" ;
                        hydra:mapping [ hydra:variable "country" ;
                                        hydra:required true ;
                                        fd:paramType xsd:string ]
@@ -200,20 +207,21 @@ _:covid19TM_updated
 # Open Library Search API (JSON REST)
 # ============================================================
 
-ex:openLibraryBooks
+ex:openLibraryBooks a fd:WrappedFederationMember ;
       fd:serviceURI "http://example.org/OpenLibraryWrapper"^^xsd:anyURI ;
       fd:interface _:booksEndpoint ;
       fd:wrapper _:booksWrapper .
 
-_:booksEndpoint a fd:RESTInterface ;
-      fd:iriTemplate [
+_:booksEndpoint a fd:TemplateBasedInterface ;
+      fd:supportedProtocol  fd:GenericWebAPIProtocol ;
+      fd:uriTemplate [
             hydra:template "https://openlibrary.org/search.json{?author,limit}" ;
             hydra:mapping
                   [ hydra:variable "author" ; hydra:required true ; fd:paramType xsd:string ],
                   [ hydra:variable "limit" ; hydra:required false ; fd:paramType xsd:integer ]
           ] .
 
-_:booksWrapper
+_:booksWrapper a fd:Wrapper ;
       fd:rmlTriplesMaps ( _:bookTitleTM _:bookAuthorTM _:bookPublishedTM _:bookEditionsTM ) .
 
 _:bookTitleTM
@@ -254,19 +262,20 @@ _:bookEditionsTM
 # Returns country data with currency codes in simpler array format
 # ============================================================
 
-ex:countriesAPI
+ex:countriesAPI a fd:WrappedFederationMember ;
       fd:serviceURI "http://example.org/CountriesAPIWrapper"^^xsd:anyURI ;
       fd:interface _:countriesEndpoint ;
       fd:wrapper _:countriesWrapper .
 
-_:countriesEndpoint a fd:RESTInterface ;
-      fd:iriTemplate [
+_:countriesEndpoint a fd:TemplateBasedInterface ;
+      fd:supportedProtocol  fd:GenericWebAPIProtocol ;
+      fd:uriTemplate [
             hydra:template "https://restcountries.com/v2/name/{country}" ;
             hydra:mapping
                   [ hydra:variable "country" ; hydra:required true ; fd:paramType xsd:string ]
           ] .
 
-_:countriesWrapper
+_:countriesWrapper a fd:Wrapper ;
       fd:rmlTriplesMaps ( _:countryNameTM _:countryCapitalTM _:countryPopulationTM _:countryCurrencyTM _:countryRegionTM ) .
 
 _:countryNameTM
@@ -314,19 +323,20 @@ _:countryRegionTM
 # Exchange Rates API - Get currency exchange rates
 # ============================================================
 
-ex:exchangeRatesAPI
+ex:exchangeRatesAPI a fd:WrappedFederationMember ;
       fd:serviceURI "http://example.org/ExchangeRatesAPIWrapper"^^xsd:anyURI ;
       fd:interface _:exchangeEndpoint ;
       fd:wrapper _:exchangeWrapper .
 
-_:exchangeEndpoint a fd:RESTInterface ;
-      fd:iriTemplate [
+_:exchangeEndpoint a fd:TemplateBasedInterface ;
+      fd:supportedProtocol  fd:GenericWebAPIProtocol ;
+      fd:uriTemplate [
             hydra:template "https://api.exchangerate-api.com/v4/latest/{base}" ;
             hydra:mapping
                   [ hydra:variable "base" ; hydra:required true ; fd:paramType xsd:string ]
           ] .
 
-_:exchangeWrapper
+_:exchangeWrapper a fd:Wrapper ;
       fd:rmlTriplesMaps ( _:exchangeRateEURTM _:exchangeDateTM ) .
 
 _:exchangeRateEURTM
@@ -347,20 +357,24 @@ _:exchangeDateTM
 
 
 
-#ex:neo4jTest
-#      a            fd:FederationMember ;
-#      fd:interface [ a                  fd:BoltInterface ;
-#                     fd:endpointAddress "http://localhost:7474/db/neo4j/tx"^^xsd:anyURI ;
-#                     fd:mappingConfiguration  [ a fd:LPGToRDFConfiguration ;
-#                                                # ...
-#                                              ]
-#                   ] .
+#ex:neo4jTest a fd:WrappedFederationMember ;
+#      fd:interface [ a                  fd:FixedEndpointInterface ;
+#                     fd:supportedProtocol  fd:BoltProtocol ;
+#                     fd:endpointAddress "http://localhost:7474/db/neo4j/tx"^^xsd:anyURI
+#                   ] ;
+#      fd:wrapper [ a fd:Wrapper ;
+#                   fd:mappingConfiguration  [ a fd:LPGToRDFConfiguration ;
+#                                              # ...
+#                                            ]
+#                 ] .
 
-#ex:graphqlTest
-#      a            fd:FederationMember ;
-#      fd:interface [ a                  fd:GraphQLEndpointInterface ;
-#                     fd:endpointAddress "http://localhost:4000/graphql"^^xsd:anyURI ;
-#                     fd:mappingConfiguration  [ a fd:GraphQLToRDFConfiguration ;
-#                                                # ...
-#                                              ]
-#                   ] .
+#ex:graphqlTest a fd:WrappedFederationMember ;
+#      fd:interface [ a                  fd:FixedEndpointInterface ;
+#                     fd:supportedProtocol  fd:GraphQLProtocol ;
+#                     fd:endpointAddress "http://localhost:4000/graphql"^^xsd:anyURI
+#                   ] ;
+#      fd:wrapper [ a fd:Wrapper ;
+#                   fd:mappingConfiguration  [ a fd:GraphQLToRDFConfiguration ;
+#                                              # ...
+#                                            ]
+#                 ] .
