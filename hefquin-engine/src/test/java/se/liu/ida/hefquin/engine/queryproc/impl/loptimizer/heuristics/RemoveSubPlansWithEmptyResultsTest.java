@@ -10,7 +10,6 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.NodeValue;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
@@ -355,7 +354,7 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		assertEquals( 0, result.numberOfSubPlans() );
 	}
 
-	@Ignore("This test currently fails because the cardinality estimator degrades the cardinality quality (TODO #585).")
+	@Test
 	public void leftJoinWithEmptyLeftBranch() {
 		// Left join with empty left and non-empty right subplan.
 		// Result is empty and entire plan is removed.
