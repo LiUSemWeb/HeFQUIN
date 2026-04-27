@@ -66,6 +66,9 @@ public class MappingExpressionUtils
 	public static MappingRelation evaluate(
 			final MappingExpression expr,
 			final Map<SourceReference,DataObject> srMap ) {
+
+		final EvaluateWorker evalWorker = new EvaluateWorker();
+
 		// If the given expression does not have any
 		// sub-expressions, we can evaluate it directly.
 		if ( expr.numberOfSubExpressions() == 0 )
@@ -283,9 +286,6 @@ public class MappingExpressionUtils
 		@Override
 		public void visit( final MappingOpUnion op )    { valid = true; }
 	}
-
-
-	protected static EvaluateWorker evalWorker = new EvaluateWorker();
 
 	protected static class EvaluateWorker implements MappingOperatorVisitor
 	{
