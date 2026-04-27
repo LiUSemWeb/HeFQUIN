@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import org.apache.jena.sparql.expr.ExprVars;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -36,7 +38,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
@@ -165,16 +166,16 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpJoin op ) {
-			createdPlan = createPlanForNaryOpUnderProject( projectOp,
-			                                                 subPlanUnderProject,
-			                                                 inputPlan );
+			createdPlan = createPlanForJoinLikeOpUnderProject( projectOp,
+			                                                   subPlanUnderProject,
+			                                                   inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpLeftJoin op ) {
-			createdPlan = createPlanForNaryOpUnderProject( projectOp,
-			                                                 subPlanUnderProject,
-			                                                 inputPlan );
+			createdPlan = createPlanForJoinLikeOpUnderProject( projectOp,
+			                                                   subPlanUnderProject,
+			                                                   inputPlan );
 		}
 
 		@Override
@@ -184,16 +185,16 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpMultiwayJoin op ) {
-			createdPlan = createPlanForNaryOpUnderProject( projectOp,
-			                                                 subPlanUnderProject,
-			                                                 inputPlan );
+			createdPlan = createPlanForJoinLikeOpUnderProject( projectOp,
+			                                                   subPlanUnderProject,
+			                                                   inputPlan );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayLeftJoin op ) {
-			createdPlan = createPlanForMultiwayLeftJoinUnderProject( projectOp,
-			                                                         subPlanUnderProject,
-			                                                         inputPlan );
+			createdPlan = createPlanForJoinLikeOpUnderProject( projectOp,
+			                                                   subPlanUnderProject,
+			                                                   inputPlan );
 		}
 
 		@Override
@@ -256,7 +257,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpMinus op ) {
-			createdPlan = createPlanForNaryOpUnderProject( projectOp,
+			createdPlan = createPlanForJoinLikeOpUnderProject( projectOp,
 			                                                 subPlanUnderProject,
 			                                                 inputPlan );
 		}
@@ -502,7 +503,8 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 * the projection is fully pushed below the operator.
 	 * Otherwise, a reduced projection is pushed down while the original projection is retained above.
 	 *
-	 * If pushing the projection would remove required variables, no transformation is applied.
+	 * If no beneficial pushdown is possible, the operator is left unchanged, but the heuristic
+	 * is still applied recursively to the subplan.
 	 */
 	protected LogicalPlan createPlanForAddOpUnderProject( final LogicalOpProject parentProjectOp,
 	                                                      final UnaryLogicalOp childOp,
@@ -542,7 +544,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		// We attempt a partial pushdown of the projection.
 		// We push down only:
 		//	(1) variables from the projection that are needed by the subplan output
-		//	(2) variables required by the operator (e.g., GPAdd parameters, optional bindings)
+		//	(2) variables required by the operator (e.g., gpAdd parameters, optional bindings)
 		//	(3) join variables
 		//
 		// The remaining projection is kept above the operator.
@@ -552,17 +554,10 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		final Set<Var> neededByOperator = new HashSet<>();
 		if ( childOp instanceof LogicalOpGPAdd gpAdd && gpAdd.hasParameterVariables() ) {
-			// GPAdd parameter variables must be preserved by the projection.
-			// If they are not present in the outer projection, we must abort pushdown.
+			// gpAdd parameter variables must be preserved by the projection.
+			// Ensure they are included in the pushed projection.
 			final Collection<Var> paramVars = gpAdd.getParameterVariables().values();
-
-			if ( ! parentProjectOp.getVariables().containsAll(paramVars) )
-				return inputPlan; // cannot push at all
-
 			neededByOperator.addAll( paramVars );
-		}
-		else if ( childOp instanceof LogicalOpGPOptAdd ) {
-			neededByOperator.addAll( possibleVarsInSubPlan );
 		}
 		neededByOperator.retainAll( varsInSubPlan );
 
@@ -573,11 +568,21 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		if ( pushDownVars.isEmpty() || pushDownVars.equals(varsInSubPlan) ) {
 			// No projection needed for this branch
-			return inputPlan;
+			final LogicalPlan newChild = apply(subPlanUnderChildOp);
+
+			if ( newChild.isSamePlan(subPlanUnderChildOp) )
+				return inputPlan;
+
+			final LogicalPlan newSubTree = new LogicalPlanWithUnaryRootImpl(
+				childOp,
+				null,
+				newChild );
+
+			return new LogicalPlanWithUnaryRootImpl(parentProjectOp, null, newSubTree);
 		}
 
 		final LogicalPlan pushed = new LogicalPlanWithUnaryRootImpl(
-			new LogicalOpProject(pushDownVars, false),
+			new LogicalOpProject(pushDownVars, parentProjectOp.mayReduce()),
 			null,
 			subPlanUnderChildOp );
 
@@ -600,7 +605,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 *	<li>its subset of the join variables</li>
 	 * </ul>
 	 */
-	protected LogicalPlan createPlanForNaryOpUnderProject( final LogicalOpProject projectOp,
+	protected LogicalPlan createPlanForJoinLikeOpUnderProject( final LogicalOpProject projectOp,
 	                                                       final LogicalPlan subPlanUnderProject,
 	                                                       final LogicalPlan inputPlan ) {
 		final int numberOfSubPlansUnderJoin = subPlanUnderProject.numberOfSubPlans();
@@ -670,70 +675,6 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	}
 
 	/**
-	 * Only pushes the project operator into the non-optional subplan.
-	 *
-	 * For the optional subplans, we only apply the heuristic recursively,
-	 * but do not push the project operator into them.
-	 */
-	protected LogicalPlan createPlanForMultiwayLeftJoinUnderProject( final LogicalOpProject projectOp,
-	                                                                 final LogicalPlan subPlanUnderProject,
-	                                                                 final LogicalPlan inputPlan ) {
-		// Create the new non-optional subplan.
-		final LogicalPlan oldNonOptSubPlan = subPlanUnderProject.getSubPlan(0);
-		final LogicalPlan newNonOptSubPlan;
-		final Set<Var> varsInNonOpt = oldNonOptSubPlan.getExpectedVariables().getCertainVariables();
-		final Set<Var> varsForNonOpt = new HashSet<>(projectOp.getVariables());
-		varsForNonOpt.retainAll( varsInNonOpt );
-
-		if ( varsForNonOpt.isEmpty() ) {
-			newNonOptSubPlan = apply(oldNonOptSubPlan);
-		}
-		else {
-			final LogicalOpProject projectForNonOpt = new LogicalOpProject(varsForNonOpt, projectOp.mayReduce());
-			final LogicalPlan newSubPlanWithProjectAsRoot = new LogicalPlanWithUnaryRootImpl(projectForNonOpt, null, oldNonOptSubPlan);
-			newNonOptSubPlan = apply(newSubPlanWithProjectAsRoot);
-		}
-
-		final int numberOfSubPlansUnderJoin = subPlanUnderProject.numberOfSubPlans();
-		final LogicalPlan[] newSubPlansUnderJoin = new LogicalPlan[numberOfSubPlansUnderJoin];
-		newSubPlansUnderJoin[0] = newNonOptSubPlan;
-
-		// Now set up the new optional subplans of the join by
-		// applying this heuristic recursively to each of them.
-		boolean noChanges = true; // set to false if something has changed in the plan
-		for ( int i = 1; i < numberOfSubPlansUnderJoin; i++ ) {
-			final LogicalPlan oldSubPlan = subPlanUnderProject.getSubPlan(i);
-			final LogicalPlan newSubPlan = apply(oldSubPlan);
-
-			if ( newSubPlan.isSamePlan(oldSubPlan) ) {
-				// If the current subplan did not change when applying
-				// the heuristic to it, then simply keep that subplan.
-				newSubPlansUnderJoin[i] = oldSubPlan;
-			}
-			else {
-				// Otherwise, use the changed subplan and record that
-				// at least one of subplans is indeed a changed one.    return createPlanForUnaryOpUnderProject(projectOp, bindOp, subPlanUnderBind);
-				newSubPlansUnderJoin[i] = newSubPlan;
-				noChanges = false;
-			}
-		}
-
-		// If nothing was changed, return the given input plan.
-		if ( noChanges && newSubPlansUnderJoin[0].equals(oldNonOptSubPlan) )
-			return inputPlan;
-
-		// Create the new rewritten plan to be returned.
-		final LogicalPlan newSubPlanUnderProject = new LogicalPlanWithNaryRootImpl(
-			LogicalOpMultiwayLeftJoin.getInstance(),
-			null,
-			newSubPlansUnderJoin );
-
-		return new LogicalPlanWithUnaryRootImpl( projectOp,
-		                                         null,
-		                                         newSubPlanUnderProject );
-	}
-
-	/**
 	 * Merges a parent and child project operator into a single project operator.
 	 *
 	 * The resulting projection contains the intersection of the variables from
@@ -752,8 +693,6 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		return apply(newPlan);
 	}
-
-
 
 	/**
 	 * Returns a plan in which the given project operator is pushed under the
@@ -774,33 +713,13 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		return LogicalPlanUtils.createPlanWithSubPlans(op, null, newSubPlan2);
 	}
 
-	protected LogicalPlan createPlanAfterPushingInSubPlan( final LogicalOpProject parentProjectOp,
-	                                                       final UnaryLogicalOp childOp,
-	                                                       final LogicalPlan subPlanUnderChildOp,
-	                                                       final LogicalPlan inputPlan ) {
-		// Apply the heuristic recursively within the given subplan.
-		final LogicalPlan newPlanUnderChildRoot = apply(subPlanUnderChildOp);
 
-		// If the heuristic cannot be applied within the subplan (more
-		// precisely, if there are no project operators in the subplan that can
-		// be pushed), then we return the given input plan (instead of
-		// recreating another, identical version of that plan).
-		if ( newPlanUnderChildRoot.isSamePlan(subPlanUnderChildOp) ) {
-			return inputPlan;
-		}
 
-		// After pushing project in the subplan, create a new plan.
-		final LogicalPlan newPlanUnderProject = new LogicalPlanWithUnaryRootImpl(
-				childOp,
-				null,
-				newPlanUnderChildRoot );
-		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
-				parentProjectOp,
-				null,
-				newPlanUnderProject );
-		return newPlan;
-	}
-
+	/**
+	 * Determines the set of all join variables between the subplans of the
+	 * given plan, where a join variable is a variable (certain or possible)
+	 * that occurs in at least two subplan.
+	 */
 	protected Set<Var> computeJoinVars( final LogicalPlan joinPlan ) {
 		final Set<Var> seen = new HashSet<>();
 		final Set<Var> joinVars = new HashSet<>();
