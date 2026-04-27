@@ -150,8 +150,8 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		@Override
 		public void visit( final LogicalOpLeftJoin op ) {
 			createdPlan = createPlanForLeftJoinUnderFilter( filterOp,
-			                                                subPlanUnderFilter.getSubPlan(1), // non-optional subplan
-			                                                subPlanUnderFilter.getSubPlan(0), // optional subplan
+			                                                subPlanUnderFilter.getSubPlan(0), // non-optional subplan
+			                                                subPlanUnderFilter.getSubPlan(1), // optional subplan
 			                                                inputPlan );
 		}
 
@@ -816,7 +816,9 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			                                         newSubPlanUnderFilter );
 	}
 
-	protected LogicalPlan createPlanForMinusUnderFilter( final LogicalOpFilter filterOp, final LogicalOpMinus op, final LogicalPlan subPlanUnderFilter ) {
+	protected LogicalPlan createPlanForMinusUnderFilter( final LogicalOpFilter filterOp,
+	                                                     final LogicalOpMinus op,
+	                                                     final LogicalPlan subPlanUnderFilter ) {
 		// Create a new subplan with the filter as root operator on top of the
 		// left subplan that is under the given minus operator, and apply this
 		// heuristic recursively to this new subplan.
