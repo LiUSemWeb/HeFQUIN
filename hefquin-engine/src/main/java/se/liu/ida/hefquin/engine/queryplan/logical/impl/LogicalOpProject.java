@@ -22,7 +22,6 @@ public class LogicalOpProject extends BaseForLogicalOps implements UnaryLogicalO
 		super( mayReduce );
 
 		assert variables != null;
-		assert ! variables.isEmpty();
 
 		this.variables = variables;
 	}
