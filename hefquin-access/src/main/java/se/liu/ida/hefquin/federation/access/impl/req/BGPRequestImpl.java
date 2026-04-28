@@ -1,5 +1,10 @@
 package se.liu.ida.hefquin.federation.access.impl.req;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.federation.access.BGPRequest;
@@ -36,6 +41,16 @@ public class BGPRequestImpl implements BGPRequest
 	@Override
 	public String toString(){
 		return bgp.toString();
+	}
+
+	@Override
+	public Set<Var> getProjectionVars() {
+		return Collections.emptySet();
+	}
+
+	@Override
+	public boolean isDistinct() {
+		return false;
 	}
 
 }

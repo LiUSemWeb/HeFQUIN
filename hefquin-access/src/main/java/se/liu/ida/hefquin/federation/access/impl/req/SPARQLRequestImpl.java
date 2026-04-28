@@ -1,5 +1,11 @@
 package se.liu.ida.hefquin.federation.access.impl.req;
 
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLQuery;
@@ -10,11 +16,15 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	protected final SPARQLGraphPattern pattern;
 	protected final SPARQLQuery query;
 	protected final ExpectedVariables expectedVars;
+	protected final Set<Var> projectionVars;
+	protected final boolean isDistinct;
 
 	public SPARQLRequestImpl( final SPARQLGraphPattern pattern ) {
 		assert pattern != null;
 		this.pattern = pattern;
 		this.query = null;
+		this.projectionVars = Collections.emptySet();
+		this.isDistinct = false;
 
 		// we materialize the ExpectedVariables in this case
 		// to avoid producing it again whenever it is used
@@ -25,6 +35,22 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		assert query != null;
 		this.query = query;
 		this.pattern = null;
+		this.projectionVars = query.getProjectionVars();
+		this.isDistinct = query.isDistinct();
+
+		// we materialize the ExpectedVariables in this case
+		// to avoid producing it again whenever it is used
+		expectedVars = query.getExpectedVariables();
+	}
+
+	public SPARQLRequestImpl( final SPARQLQuery query,
+	                          final Set<Var> projectionVars,
+	                          final boolean distinct ) {
+		assert query != null;
+		this.query = query;
+		this.pattern = null;
+		this.projectionVars = projectionVars;
+		this.isDistinct = distinct;
 
 		// we materialize the ExpectedVariables in this case
 		// to avoid producing it again whenever it is used
@@ -37,25 +63,34 @@ public class SPARQLRequestImpl implements SPARQLRequest
 			return false;
 
 		final SPARQLRequest oo = (SPARQLRequest) o;
-		if ( pattern == null ) {
-			return oo.getQueryPattern() == null && query.equals( oo.getQuery() );
-		}
-		else {
-			return pattern.equals( oo.getQueryPattern() );
-		}
+
+		return Objects.equals( getQueryPattern(), oo.getQueryPattern() )
+			&& getProjectionVars().equals( oo.getProjectionVars() )
+			&& isDistinct() == oo.isDistinct();
 	}
 
 	@Override
-	public int hashCode(){
-		if ( pattern == null )
-			return query.hashCode();
-		else
-			return pattern.hashCode();
+	public int hashCode() {
+		return Objects.hash(
+			getQueryPattern(),
+			getProjectionVars(),
+			isDistinct()
+		);
 	}
 
 	@Override
 	public SPARQLGraphPattern getQueryPattern() {
 		return pattern;
+	}
+
+	@Override
+	public Set<Var> getProjectionVars() {
+		return projectionVars;
+	}
+
+	@Override
+	public boolean isDistinct() {
+		return isDistinct;
 	}
 
 	@Override

@@ -57,12 +57,32 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 	{
 		// see https://jena.apache.org/documentation/sparql-apis/#query-execution
 
+		// Clone the query to avoid mutating the original request
+		final Query q = req.getQuery().asJenaQuery().cloneQuery();
+
+		// Apply request-level projection if specified and safe.
+		// This replaces the SELECT clause with the given variables.
+		// Note: This is only done when it does not interfere with query semantics
+		// (e.g., no aggregation or grouping present).
+		if ( req.getProjectionVars() != null
+		&& ! req.getProjectionVars().isEmpty()
+		  && isSafeToOverrideProjection(q) ) {
+			q.setQueryResultStar(false);
+			q.getProject().clear();
+			req.getProjectionVars().forEach(q::addResultVar);
+		}
+
+		// Apply DISTINCT if requested.
+		// This enforces duplicate elimination at the endpoint level.
+		if ( req.isDistinct() )
+			q.setDistinct( true );
+
 		final QueryExecution qe;
 		try {
 			qe = QueryExecutionHTTPBuilder.create()
 					.endpoint(   fm.getURL() )
 					.httpClient( httpClient )
-					.query(      req.getQuery().asJenaQuery() )
+					.query(      q )
 					.timeout(    overallTimeout, TimeUnit.MILLISECONDS )
 					.httpHeader( "User-Agent", BuildInfo.getUserAgent() )
 					.build();
@@ -141,7 +161,43 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 		public void accept( final QuerySolution s ) {
 			solMaps.add( SolutionMappingUtils.createSolutionMapping(s) );
 		}
-		
+
 	} // end of MySolutionConsumer
 
+	/**
+	 * Determines whether it is semantically safe to override the projection
+	 * of the given query.
+	 *
+	 * <p>Overriding the projection means replacing the SELECT clause with a
+	 * new set of variables (e.g., for projection pushdown). This is only safe
+	 * for "simple" SELECT queries without features that depend on the original
+	 * projection.</p>
+	 *
+	 * <p>In particular, projection must not be overridden if the query contains:
+	 * <ul>
+	 *   <li>GROUP BY (projection affects grouping semantics)</li>
+	 *   <li>HAVING clauses (depends on grouped results)</li>
+	 *   <li>Aggregators (e.g., COUNT, SUM), which rely on specific projection expressions</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param q the query to inspect
+	 * @return {@code true} if projection can be safely overridden; {@code false} otherwise
+	 */
+	protected static boolean isSafeToOverrideProjection(final Query q)
+	{
+		// Query must be SELECT type
+		if ( ! q.isSelectType() ) return false;
+
+		// Must not contain GROUP BY
+		if ( q.hasGroupBy() ) return false;
+
+		// Must not contain HAVING (optional but safe)
+		if ( q.hasHaving() ) return false;
+
+		// Must not have expressions in SELECT
+		if ( q.hasAggregators() ) return false;
+
+		return true;
+	}
 }

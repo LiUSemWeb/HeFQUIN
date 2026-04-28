@@ -1,5 +1,9 @@
 package se.liu.ida.hefquin.federation.access;
 
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLQuery;
 import se.liu.ida.hefquin.base.query.impl.SPARQLQueryImpl;
@@ -13,6 +17,28 @@ public interface SPARQLRequest extends DataRetrievalRequest
 	 * accessed via the method {@link #getQuery()}.
 	 */
 	SPARQLGraphPattern getQueryPattern();
+
+	/**
+	 * Returns the set of variables that should be projected in the result.
+	 *
+	 * <p>If non-empty, this set represents a request-level projection that may
+	 * be applied when constructing the SPARQL query sent to an endpoint.
+	 * Implementations may ignore this information if applying it would not be
+	 * semantically safe (e.g., for queries with aggregation or expression-based
+	 * projections).</p>
+	 *
+	 */
+	Set<Var> getProjectionVars();
+
+	/**
+	 * Indicates whether the results of this request should be duplicate-free.
+	 *
+	 * <p>If {@code true}, the request processor may enforce this by issuing
+	 * a {@code DISTINCT} query to the endpoint (if supported).</p>
+	 *
+	 * @return {@code true} if duplicate elimination is requested; {@code false} otherwise
+	 */
+	boolean isDistinct();
 
 	/**
 	 * Returns the SPARQL query for which solutions

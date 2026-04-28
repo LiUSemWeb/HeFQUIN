@@ -1,7 +1,11 @@
 package se.liu.ida.hefquin.base.query.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -23,11 +27,21 @@ public class SPARQLQueryImpl implements SPARQLQuery
 
 	protected SPARQLQueryImpl( final Element jenaElement ) {
 		assert jenaElement != null;
-		
+
 		jenaQuery = QueryFactory.create();
 		jenaQuery.setQuerySelectType();
-		jenaQuery.setQueryResultStar(true);
+		jenaQuery.setQueryResultStar( true );
 		jenaQuery.setQueryPattern( jenaElement );
+	}
+
+	@Override
+	public Set<Var> getProjectionVars() {
+		return new HashSet<>( jenaQuery.getProjectVars() );
+	}
+
+	@Override
+	public boolean isDistinct() {
+		return jenaQuery.isDistinct();
 	}
 
 	@Override
