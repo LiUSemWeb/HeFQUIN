@@ -75,7 +75,7 @@
     <dependency>
       <groupId>net.openhft</groupId>
       <artifactId>chronicle-map</artifactId>
-      <version>3.27ea0</version>
+      <version>2026.1</version>
     </dependency>
     <!-- Commons codec -->
     <dependency>
