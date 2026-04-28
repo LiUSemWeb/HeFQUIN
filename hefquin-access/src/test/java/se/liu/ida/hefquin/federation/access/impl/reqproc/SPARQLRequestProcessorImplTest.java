@@ -219,8 +219,6 @@ public class SPARQLRequestProcessorImplTest extends FederationTestBase
 		// executing the tested method
 		final SolMapsResponse resp = recProc.performRequest(req, fm);
 
-		resp.getSize();
-
 		return resp.getResponseData().iterator();
 	}
 
