@@ -241,7 +241,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 				}
 			}
 		}
-	}	
+	}
 
     /**
      * Rturns the SPARQL query to be executed.
@@ -294,13 +294,13 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		final long executionTime = statsAndExceptions.getExecutionTime();
 		final String queryProcStats = overallQueryProcessingTime + ", " + planningTime + ", " + compilationTime
 				+ ", " + executionTime;
-		return queryProcStats;	
+		return queryProcStats;
 	}
 
 	/**
 	 * Validates the output destination for statistics by checking if it starts with a hyphen.
 	 * If the output destination is invalid, an error message is printed and the method returns false. Otherwise, it returns true.
-	 * 
+	 *
 	 * @param outputDest the output destination to validate
 	 * @return true if the output destination is valid, false otherwise
 	 */
