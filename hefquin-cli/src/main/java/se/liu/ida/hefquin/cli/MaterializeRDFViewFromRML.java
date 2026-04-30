@@ -100,19 +100,13 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	}
 
 	/**
-	 * Executes the RML materialization process.
-	 * <p>
-	 * The method performs the full pipeline of reading an RDF file containing RML triples maps,
-	 * converting each triples map into a mapping expression, combining all expressions into a
-	 * single union expression and evaluating the resulting mapping against a fixed JSON data
-	 * source.
-	 * <p>
-	 * The evaluation result is transformed into an RDF dataset, which is then serialized and
-	 * written either to standard output or to a user-specified file. Optionally, a base IRI
-	 * can be provided for the mapping process; otherwise, a default base IRI is used.
-	 * <p>
+	 * Parses command-line arguments and prepares execution parameters for the RML materialization process.
 	 *
-	 * @throws IllegalArgumentException if the RML mapping is invalid or cannot be parsed
+	 * <p>
+	 * This includes loading the RML mapping file into a Jena Model, determining the base IRI
+	 * and configuring the output destination. The actual materialization logic is delegated
+	 * to {@link #exec(Model, Node, OutputStream)}.
+	 * </p>
 	 */
 	@Override
 	protected void exec() {
@@ -125,20 +119,48 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 			contains(argBaseIRI) ? NodeFactory.createURI( getValue( argBaseIRI ) ) :
 		                           NodeFactory.createURI( "http://example.org/FixedBaseIRI/HardcodedInMaterializeRDFViewFromRML/" );
 
-		final OutputStream outputStream = setupOutputStream();
+		OutputStream outputStream = System.out;
+		if ( contains(argOutputToFile) ) {
+			try {
+				// Appends to file rather than overwriting
+				outputStream = new FileOutputStream( getValue( argOutputToFile ), true );
+			} catch ( final FileNotFoundException e ) {
+				cmdError( "Failed to create print stream for output destination: " + getValue( argOutputToFile ), false );
+			}
+		}
 
-		final ResIterator iter = rdfModel.listResourcesWithProperty( RDF.type, RMLVocab.TriplesMap );
+		exec( rdfModel, chosenBaseIRI, outputStream );
+	}
+
+	/**
+	 * Executes the RML materialization process.
+	 * <p>
+	 * The method performs the full pipeline of reading an RDF file containing RML triples maps,
+	 * converting each triples map into a mapping expression, combining all expressions into a
+	 * single union expression and evaluating the resulting mapping against a fixed JSON data
+	 * source.
+	 * <p>
+	 * The evaluation result is transformed into an RDF dataset, which is then serialized and
+	 * written either to standard output or to a user-specified file. Optionally, a base IRI
+	 * can be provided for the mapping process; otherwise, a default base IRI is used.
+	 * <p>
+	 */
+	protected void exec( final Model rmlDescr,
+	                     final Node baseIRI,
+	                     final OutputStream out ) {
+		final ResIterator iter = rmlDescr.listResourcesWithProperty( RDF.type, RMLVocab.TriplesMap );
 		final List<MappingExpression> trMaps = new ArrayList<>();
 		while ( iter.hasNext() ) {
 			final Resource tm = iter.next();
 			final MappingExpression trMap;
 			try {
 				trMap = RML2MappingAlgebra.convert( tm,
-				                                    rdfModel,
-				                                    chosenBaseIRI );
+				                                    rmlDescr,
+				                                    baseIRI );
 			}
 			catch ( final RMLParserException e ) {
-				throw new IllegalArgumentException("There is a problem in the RML mapping: " +  e.getMessage(), e );
+				cmdError("There is a problem in the RML mapping: " +  e.getMessage(), true );
+				return;
 			}
 
 			trMaps.add(trMap);
@@ -164,7 +186,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		try {
 			jsonString = Files.readString(Path.of("examples/ExampleJSONSource.json"));
 		}
-		catch ( Exception e ) {
+		catch ( final Exception e ) {
 			cmdError( "Failed to read sources.json: " + e.getMessage(), true );
 			return; // Primarily used to avoid "variable not initialized" compiler error
 		}
@@ -173,7 +195,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		try {
 			jsonObject = new JsonObject(jsonString);
 		}
-		catch ( JsonPathException e ) {
+		catch ( final JsonPathException e ) {
 			cmdError( "Invalid JSON input: failed to parse JSON string.", true );
 			return;
 		}
@@ -193,32 +215,11 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		final Dataset dataset = MappingRelationUtils.convertToRDF(mappingRelation);
 
 		// Write the model to assigned output stream
-		RDFDataMgr.write( outputStream, dataset.getDefaultModel(), modLangOut.getOutputStreamFormat() );
+		RDFDataMgr.write( out, dataset.getDefaultModel(), modLangOut.getOutputStreamFormat() );
 
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
 			System.out.println("Overall Processing Time: " + modTime.timeStr(time) + " sec");
 		}
-	}
-
-	/**
-	 * Creates and returns an OutputStream for writing data.
-	 * If an output file is specified, the stream writes to that file (in append mode);
-	 * otherwise, it defaults to System.out.
-	 *
-	 * @return the configured OutputStream
-	 */
-	protected OutputStream setupOutputStream() {
-		OutputStream outputStream = System.out;
-		if ( contains(argOutputToFile) ) {
-			try {
-				// Appends to file rather than overwriting
-				outputStream = new FileOutputStream( getValue( argOutputToFile ), true );
-			} catch ( final FileNotFoundException e ) {
-				cmdError( "Failed to create print stream for output destination: " + getValue( argOutputToFile ), false );
-			}
-		}
-
-		return outputStream;
 	}
 }
