@@ -81,8 +81,8 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		addModule(modLangOut);
 
 		add( argRdfFile, "--mapping", "RML mapping file" );
-		add( argOutputToFile, "--output", "Output file" );
-		add( argBaseIRI, "--baseIRI", "Base IRI for mapping" );
+		add( argOutputToFile, "--output", "Output file (optional, printing to stdout if omitted)" );
+		add( argBaseIRI, "--baseIRI", "Base IRI for mapping (optional, hardcoded IRI used if omitted)" );
 	}
 
 	/**
