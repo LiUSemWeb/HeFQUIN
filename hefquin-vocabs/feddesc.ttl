@@ -11,7 +11,7 @@
     dc:creator       "Olaf Hartig",
                      "Robin Keskisärkkä",
                      "Jonas Westman" ;
-    dc:date          "2026-04-27" ;
+    dc:date          "2026-04-30" ;
     dc:format        "RDF" ;
     dc:identifier    <http://w3id.org/hefquin/feddesc> ;
     dc:title         "Federation Description Vocabulary for HeFQUIN"@en ;
@@ -57,7 +57,6 @@ fd:FragmentInterface a owl:Class ;
 fd:Wrapper a owl:Class ;
     rdfs:label "Wrapper"@en ;
     rdfs:comment "A wrapper provides a mapping for data of federation members that do not support RDF and SPARQL natively. For the time being, every such wrapper must have either an fd:rmlTriplesMaps property or an fd:mappingConfiguration property. In particular, for wrappers associated with a federation member whose interface has fd:GenericWebAPIProtocol as the fd:supportedProtocol, the wrapper must have an fd:rmlTriplesMaps property; and for wrappers associated with a federation member whose interface has fd:BoltProtocol or fd:GraphQLProtocol as the fd:supportedProtocol, the wrapper must have an fd:mappingConfiguration property."@en .
-    TODO: also the one for PG and grpahQL
 
 fd:DataRetrievalProtocol a owl:Class ;
     rdfs:label "Data Retrieval Protocol"@en ;
