@@ -3,11 +3,13 @@ package se.liu.ida.hefquin.federation.access.impl.req;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.jena.query.Query;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLQuery;
+import se.liu.ida.hefquin.base.query.impl.SPARQLQueryImpl;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 
 public class SPARQLRequestImpl implements SPARQLRequest
@@ -101,10 +103,30 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 	@Override
 	public SPARQLQuery getQuery() {
-		if ( query != null )
-			return query;
-		else
-			return SPARQLRequest.convertToQuery( getQueryPattern(), projectionVars, isDistinct );
+		final SPARQLQuery baseQuery = query != null ? query : SPARQLRequest.convertToQuery( getQueryPattern() );
+
+		if ( getProjectionVars() == null && ! isDistinct() )
+			return baseQuery;
+
+		// Clone the query to avoid mutating the original request
+		final Query q = baseQuery.asJenaQuery().cloneQuery();
+
+		// Apply request-level projection if specified and safe.
+		// This replaces the SELECT clause with the given variables.
+		// Note: This is only done when it does not interfere with query semantics
+		// (e.g., no aggregation or grouping present).
+		if ( getProjectionVars() != null && isSafeToOverrideProjection(q) ) {
+			q.setQueryResultStar(false);
+			q.getProject().clear();
+			getProjectionVars().forEach(q::addResultVar);
+		}
+
+		// Apply DISTINCT if requested.
+		// This enforces duplicate elimination at the endpoint level.
+		if ( isDistinct() )
+			q.setDistinct( true );
+
+		return new SPARQLQueryImpl(q);
 	}
 
 	@Override
@@ -120,4 +142,40 @@ public class SPARQLRequestImpl implements SPARQLRequest
 			return "SPARQLRequest with pattern: " + pattern.toString();
 	}
 
+	/**
+	 * Determines whether it is semantically safe to override the projection
+	 * of the given query.
+	 *
+	 * <p>Overriding the projection means replacing the SELECT clause with a
+	 * new set of variables (e.g., for projection pushdown). This is only safe
+	 * for "simple" SELECT queries without features that depend on the original
+	 * projection.</p>
+	 *
+	 * <p>In particular, projection must not be overridden if the query contains:
+	 * <ul>
+	 *   <li>GROUP BY (projection affects grouping semantics)</li>
+	 *   <li>HAVING clauses (depends on grouped results)</li>
+	 *   <li>Aggregators (e.g., COUNT, SUM), which rely on specific projection expressions</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param q the query to inspect
+	 * @return {@code true} if projection can be safely overridden; {@code false} otherwise
+	 */
+	protected static boolean isSafeToOverrideProjection(final Query q)
+	{
+		// Query must be SELECT type
+		if ( ! q.isSelectType() ) return false;
+
+		// Must not contain GROUP BY
+		if ( q.hasGroupBy() ) return false;
+
+		// Must not contain HAVING (optional but safe)
+		if ( q.hasHaving() ) return false;
+
+		// Must not have expressions in SELECT
+		if ( q.hasAggregators() ) return false;
+
+		return true;
+	}
 }

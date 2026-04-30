@@ -12,7 +12,7 @@ public abstract class FederationTestBase
 	 * If this flag is true, tests that access servers on the actual
 	 * Web will be skipped.
 	 */
-	public static boolean skipLiveWebTests = true;
+	public static boolean skipLiveWebTests = false;
 
 	/**
 	 * If this flag is true, tests that make requests to local neo4j
