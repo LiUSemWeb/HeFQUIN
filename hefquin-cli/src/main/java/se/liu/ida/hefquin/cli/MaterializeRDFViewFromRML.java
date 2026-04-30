@@ -54,7 +54,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	protected final ModLangOutput modLangOut =   new ModLangOutput();
 
 	protected final ArgDecl argRdfFile =      new ArgDecl( ArgDecl.HasValue, "mapping" );
-	protected final ArgDecl argOutputToFile = new ArgDecl( ArgDecl.HasValue, "output" );
+	protected final ArgDecl argOutputToFile = new ArgDecl( ArgDecl.HasValue, "outputToFile" );
 	protected final ArgDecl argBaseIRI =      new ArgDecl( ArgDecl.HasValue, "baseIRI" );
 
 	/**
@@ -81,7 +81,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		addModule(modLangOut);
 
 		add( argRdfFile, "--mapping", "RML mapping file" );
-		add( argOutputToFile, "--output", "Output file" );
+		add( argOutputToFile, "--outputToFile", "Output file" );
 		add( argBaseIRI, "--baseIRI", "Base IRI for mapping" );
 	}
 
@@ -95,7 +95,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	protected String getSummary() {
 		return "Usage: " + getCommandName() + " " +
 			"--mapping=<rdf-file> " +
-			"[--output=<file-name>] " +
+			"[--outputToFile=<file-name>] " +
 			"[--baseIRI=<iri>]";
 	}
 
@@ -162,7 +162,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		// NOTE: currently using a fixed JSON source for evaluation.
 		final String jsonString;
 		try {
-			jsonString = Files.readString(Path.of("sources.json"));
+			jsonString = Files.readString(Path.of("examples/ExampleJSONSource.json"));
 		}
 		catch ( Exception e ) {
 			cmdError( "Failed to read sources.json: " + e.getMessage(), true );
@@ -193,7 +193,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		final Dataset dataset = MappingRelationUtils.convertToRDF(mappingRelation);
 
 		// Write the model to assigned output stream
-		RDFDataMgr.write( outputStream, dataset.getDefaultModel(), modLangOut.getOutputFormatted() );
+		RDFDataMgr.write( outputStream, dataset.getDefaultModel(), modLangOut.getOutputStreamFormat() );
 
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
