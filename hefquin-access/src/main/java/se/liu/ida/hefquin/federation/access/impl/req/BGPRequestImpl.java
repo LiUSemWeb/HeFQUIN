@@ -45,7 +45,7 @@ public class BGPRequestImpl implements BGPRequest
 
 	@Override
 	public Set<Var> getProjectionVars() {
-		return Collections.emptySet();
+		return null;
 	}
 
 	@Override

@@ -47,7 +47,7 @@ public class TriplePatternRequestImpl implements TriplePatternRequest
 
 	@Override
 	public Set<Var> getProjectionVars() {
-		return Collections.emptySet();
+		return null;
 	}
 
 	@Override

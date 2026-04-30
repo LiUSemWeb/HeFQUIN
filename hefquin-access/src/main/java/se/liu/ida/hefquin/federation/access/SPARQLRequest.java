@@ -31,10 +31,8 @@ public interface SPARQLRequest extends DataRetrievalRequest
 	Set<Var> getProjectionVars();
 
 	/**
-	 * Indicates whether the results of this request should be duplicate-free.
-	 *
-	 * <p>If {@code true}, the request processor may enforce this by issuing
-	 * a {@code DISTINCT} query to the endpoint (if supported).</p>
+	 * Returns {@code true} if this request <em>explicit</em> requires that the requested
+	 * result is duplicate free.
 	 *
 	 * @return {@code true} if duplicate elimination is requested; {@code false} otherwise
 	 */
