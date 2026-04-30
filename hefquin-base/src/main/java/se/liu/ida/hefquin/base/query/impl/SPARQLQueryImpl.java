@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.base.query.impl;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jena.query.Query;
@@ -25,6 +24,27 @@ public class SPARQLQueryImpl implements SPARQLQuery
 		this( QueryPatternUtils.convertToJenaElement(p) );
 	}
 
+	public SPARQLQueryImpl( final SPARQLGraphPattern p,
+	                        final Set<Var> projectionVars,
+	                        final boolean isDistinct ) {
+		this( QueryPatternUtils.convertToJenaElement(p) );
+
+		// Apply request-level projection if specified and safe.
+		// This replaces the SELECT clause with the given variables.
+		// Note: This is only done when it does not interfere with query semantics
+		// (e.g., no aggregation or grouping present).
+		if ( projectionVars != null && ! projectionVars.isEmpty() ) {
+			jenaQuery.setQueryResultStar(false);
+			jenaQuery.getProject().clear();
+			projectionVars.forEach(jenaQuery::addResultVar);
+		}
+
+		// Apply DISTINCT if requested.
+		// This enforces duplicate elimination at the endpoint level.
+		if ( isDistinct )
+			jenaQuery.setDistinct( true );
+	}
+
 	protected SPARQLQueryImpl( final Element jenaElement ) {
 		assert jenaElement != null;
 
@@ -32,16 +52,6 @@ public class SPARQLQueryImpl implements SPARQLQuery
 		jenaQuery.setQuerySelectType();
 		jenaQuery.setQueryResultStar( true );
 		jenaQuery.setQueryPattern( jenaElement );
-	}
-
-	@Override
-	public Set<Var> getProjectionVars() {
-		return new HashSet<>( jenaQuery.getProjectVars() );
-	}
-
-	@Override
-	public boolean isDistinct() {
-		return jenaQuery.isDistinct();
 	}
 
 	@Override

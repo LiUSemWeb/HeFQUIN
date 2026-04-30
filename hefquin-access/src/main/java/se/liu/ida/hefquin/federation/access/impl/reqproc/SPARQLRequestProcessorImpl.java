@@ -57,32 +57,12 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 	{
 		// see https://jena.apache.org/documentation/sparql-apis/#query-execution
 
-		// Clone the query to avoid mutating the original request
-		final Query q = req.getQuery().asJenaQuery().cloneQuery();
-
-		// Apply request-level projection if specified and safe.
-		// This replaces the SELECT clause with the given variables.
-		// Note: This is only done when it does not interfere with query semantics
-		// (e.g., no aggregation or grouping present).
-		if ( req.getProjectionVars() != null
-		&& ! req.getProjectionVars().isEmpty()
-		  && isSafeToOverrideProjection(q) ) {
-			q.setQueryResultStar(false);
-			q.getProject().clear();
-			req.getProjectionVars().forEach(q::addResultVar);
-		}
-
-		// Apply DISTINCT if requested.
-		// This enforces duplicate elimination at the endpoint level.
-		if ( req.isDistinct() )
-			q.setDistinct( true );
-
 		final QueryExecution qe;
 		try {
 			qe = QueryExecutionHTTPBuilder.create()
 					.endpoint(   fm.getURL() )
 					.httpClient( httpClient )
-					.query(      q )
+					.query(      req.getQuery().asJenaQuery() )
 					.timeout(    overallTimeout, TimeUnit.MILLISECONDS )
 					.httpHeader( "User-Agent", BuildInfo.getUserAgent() )
 					.build();

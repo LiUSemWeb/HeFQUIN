@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.federation.access.impl.req;
 
-import java.util.Collections;
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
@@ -23,8 +22,22 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		assert pattern != null;
 		this.pattern = pattern;
 		this.query = null;
-		this.projectionVars = Collections.emptySet();
+		this.projectionVars = null;
 		this.isDistinct = false;
+
+		// we materialize the ExpectedVariables in this case
+		// to avoid producing it again whenever it is used
+		expectedVars = pattern.getExpectedVariables();
+	}
+
+	public SPARQLRequestImpl( final SPARQLGraphPattern pattern,
+	                          final Set<Var> projectionVars,
+	                          final boolean distinct ) {
+		assert pattern != null;
+		this.pattern = pattern;
+		this.query = null;
+		this.projectionVars = projectionVars;
+		this.isDistinct = distinct;
 
 		// we materialize the ExpectedVariables in this case
 		// to avoid producing it again whenever it is used
@@ -35,22 +48,8 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		assert query != null;
 		this.query = query;
 		this.pattern = null;
-		this.projectionVars = query.getProjectionVars();
-		this.isDistinct = query.isDistinct();
-
-		// we materialize the ExpectedVariables in this case
-		// to avoid producing it again whenever it is used
-		expectedVars = query.getExpectedVariables();
-	}
-
-	public SPARQLRequestImpl( final SPARQLQuery query,
-	                          final Set<Var> projectionVars,
-	                          final boolean distinct ) {
-		assert query != null;
-		this.query = query;
-		this.pattern = null;
-		this.projectionVars = projectionVars;
-		this.isDistinct = distinct;
+		this.projectionVars = new HashSet<>( query.asJenaQuery().getProjectVars() );
+		this.isDistinct = query.asJenaQuery().isDistinct();
 
 		// we materialize the ExpectedVariables in this case
 		// to avoid producing it again whenever it is used
@@ -64,18 +63,25 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 		final SPARQLRequest oo = (SPARQLRequest) o;
 
-		return Objects.equals( getQueryPattern(), oo.getQueryPattern() )
-			&& getProjectionVars().equals( oo.getProjectionVars() )
-			&& isDistinct() == oo.isDistinct();
+		if ( pattern == null ) {
+			return oo.getQueryPattern() == null
+			    && query.equals( oo.getQuery() )
+			    && getProjectionVars().equals(oo.getProjectionVars())
+			    && isDistinct() == oo.isDistinct();
+		}
+		else {
+			return pattern.equals( oo.getQueryPattern() )
+			    && getProjectionVars().equals(oo.getProjectionVars())
+			    && isDistinct() == oo.isDistinct();
+		}
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(
-			getQueryPattern(),
-			getProjectionVars(),
-			isDistinct()
-		);
+		if ( pattern == null )
+			return query.hashCode() ^ getProjectionVars().hashCode() ^ (isDistinct() ? 1 : 0);
+		else
+			return pattern.hashCode() ^ getProjectionVars().hashCode() ^ (isDistinct() ? 1 : 0);
 	}
 
 	@Override
@@ -98,7 +104,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		if ( query != null )
 			return query;
 		else
-			return SPARQLRequest.convertToQuery( getQueryPattern() );
+			return SPARQLRequest.convertToQuery( getQueryPattern(), projectionVars, isDistinct );
 	}
 
 	@Override

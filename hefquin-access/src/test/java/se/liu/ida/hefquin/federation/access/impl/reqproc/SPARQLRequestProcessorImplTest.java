@@ -13,6 +13,7 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.syntax.Element;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
@@ -120,9 +121,9 @@ public class SPARQLRequestProcessorImplTest extends FederationTestBase
 
 			final SPARQLRequest req1 = new SPARQLRequestImpl(baseQuery);
 
-			final SPARQLRequest req2 = new SPARQLRequestImpl(baseQuery) {
-				@Override public boolean isDistinct() { return true; }
-			};
+			final Element el = QueryFactory.create(queryString).getQueryPattern();
+			final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
+			final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), true);
 
 			// performing the tested operation
 			final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://dbpedia.org/sparql");
@@ -134,7 +135,7 @@ public class SPARQLRequestProcessorImplTest extends FederationTestBase
 
 			// checking
 			// the base query does not contain DISTINCT
-			assertFalse( baseQuery.isDistinct() );
+			assertFalse( baseQuery.asJenaQuery().isDistinct() );
 
 			// req1 inherits DISTINCT=false, req2 explicitly enforces DISTINCT
 			assertFalse( req1.isDistinct() );
@@ -172,9 +173,9 @@ public class SPARQLRequestProcessorImplTest extends FederationTestBase
 
 			final SPARQLRequest req1 = new SPARQLRequestImpl(baseQuery);
 
-			final SPARQLRequest req2 = new SPARQLRequestImpl(baseQuery) {
-				@Override public Set<Var> getProjectionVars() { return Set.of(Var.alloc("s")); }
-			};
+			final Element el = QueryFactory.create(queryString).getQueryPattern();
+			final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
+			final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), false);
 
 			// performing the tested operation
 			final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://dbpedia.org/sparql");
