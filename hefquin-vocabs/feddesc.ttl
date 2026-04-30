@@ -28,7 +28,7 @@ fd:FederationMember a owl:Class ;
 fd:RDFBasedFederationMember a owl:Class ;
     rdfs:subClassOf fd:FederationMember ;
     rdfs:label "RDF-based Federation Member"@en ;
-    rdfs:comment "A federation member that provides access to RDF data (which may be an RDF view of some underlying data source). Every such federation member must have the two properties that are expected for any kind of federation member (i.e., fd:serviceURI and fd:interface), where the fd:interface may be either an fd:FixedEndpointInterface with the fd:supportedProtocol being fd:SPARQLProtocol or an fd:FragmentInterface. Additionally, an RDF-based federation member may have an fd:vocabularyMappingsFile property."@en .
+    rdfs:comment "A federation member whose interface exposes RDF data. Every such federation member must have the two properties that are expected for any kind of federation member (i.e., fd:serviceURI and fd:interface), where the fd:interface may be either an fd:FixedEndpointInterface with the fd:supportedProtocol being fd:SPARQLProtocol or an fd:FragmentInterface. Additionally, an RDF-based federation member may have an fd:vocabularyMappingsFile property."@en .
 
 fd:WrappedFederationMember a owl:Class ;
     rdfs:subClassOf fd:FederationMember ;
@@ -42,7 +42,7 @@ fd:Interface a owl:Class ;
 fd:FixedEndpointInterface a owl:Class ;
     rdfs:subClassOf fd:Interface ;
     rdfs:label "Fixed Endpoint Interface"@en ;
-    rdfs:comment "An interface that can be accessed via a single, fixed HTTP endpoint. Every such interface must have an fd:endpointAddress property and an fd:supportedProtocol property. The value for the fd:supportedProtocol property is expected to be one of the following: fd:SPARQLProtocol, fd:BoltProtocol, fd:GraphQLProtocol, or fd:GenericWebAPIProtocol."@en .
+    rdfs:comment "An interface that can be accessed via a single, fixed endpoint address. Every such interface must have an fd:endpointAddress property and an fd:supportedProtocol property. The value for the fd:supportedProtocol property is expected to be one of the following: fd:SPARQLProtocol, fd:BoltProtocol, fd:GraphQLProtocol, or fd:GenericWebAPIProtocol."@en .
 
 fd:TemplateBasedInterface a owl:Class ;
     rdfs:subClassOf fd:Interface ;
@@ -98,7 +98,7 @@ fd:uriTemplate a owl:ObjectProperty ;
 
 fd:paramType a owl:ObjectProperty ;
     rdfs:domain hydra:IriTemplateMapping ;
-    rdfs:range  rdf:Resource ;
+    rdfs:range  rdfs:Resource ;
     rdfs:label "type of template parameter"@en ;
     rdfs:comment "The type of values to be used for a variable part of a URI template. This type is expected to be specified as a datatype URI (e.g., xsd:string, xsd:float)."@en .
 
@@ -128,7 +128,7 @@ fd:rmlTriplesMaps a owl:ObjectProperty ;
 
 fd:mappingConfiguration a owl:ObjectProperty ;
     rdfs:domain fd:Wrapper ;
-    rdfs:range  rdf:Resource ;
+    rdfs:range  rdfs:Resource ;
     rdfs:label "mapping configuration"@en ;
     rdfs:comment "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, PG)."@en .
 
