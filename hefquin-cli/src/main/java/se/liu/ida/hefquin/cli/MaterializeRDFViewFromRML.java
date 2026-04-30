@@ -20,6 +20,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 
+import com.jayway.jsonpath.JsonPathException;
+
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModLangOutput;
 import arq.cmdline.ModTime;
@@ -57,7 +59,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 
 	/**
 	 * Main entry point of the tool, accepting command-line arguments to specify the
-	 * Neo4j connection details and output format options.
+	 * mapping details and output format options.
 	 *
 	 * @param args Command-line arguments.
 	 */
@@ -67,7 +69,8 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 
 	/**
 	 * Constructor that initializes the command-line tool with necessary argument
-	 * modules for endpoint configuration, output format, and timing options.
+	 * modules for output format and timing options and defines command-line options
+	 * for the RML mapping file, output destination and base IRI.
 	 *
 	 * @param argv Command-line arguments.
 	 */
@@ -92,8 +95,8 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	protected String getSummary() {
 		return "Usage: " + getCommandName() + " " +
 			"--mapping=<rdf-file> " +
-			"--output=<file-name> " +
-			"--baseIRI=<iri>";
+			"[--output=<file-name>] " +
+			"[--baseIRI=<iri>]";
 	}
 
 	/**
@@ -122,23 +125,23 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 			contains(argBaseIRI) ? NodeFactory.createURI( getValue( argBaseIRI ) ) :
 		                           NodeFactory.createURI( "http://example.org/FixedBaseIRI/HardcodedInMaterializeRDFViewFromRML/" );
 
+		final OutputStream outputStream = setupOutputStream();
+
 		final ResIterator iter = rdfModel.listResourcesWithProperty( RDF.type, RMLVocab.TriplesMap );
 		final List<MappingExpression> trMaps = new ArrayList<>();
 		while ( iter.hasNext() ) {
 			final Resource tm = iter.next();
-			if ( tm.isResource() ) {
-				final MappingExpression trMap;
-				try {
-					trMap = ( RML2MappingAlgebra.convert( tm,
-					                                      rdfModel,
-					                                      chosenBaseIRI ) );
-				}
-				catch ( final RMLParserException e ) {
-					throw new IllegalArgumentException("There is a problem in the RML mapping: " +  e.getMessage(), e );
-				}
-
-				trMaps.add(trMap);
+			final MappingExpression trMap;
+			try {
+				trMap = RML2MappingAlgebra.convert( tm,
+				                                    rdfModel,
+				                                    chosenBaseIRI );
 			}
+			catch ( final RMLParserException e ) {
+				throw new IllegalArgumentException("There is a problem in the RML mapping: " +  e.getMessage(), e );
+			}
+
+			trMaps.add(trMap);
 		}
 
 		if ( trMaps.isEmpty() ) {
@@ -160,14 +163,22 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		final String jsonString;
 		try {
 			jsonString = Files.readString(Path.of("sources.json"));
-		} catch ( Exception e ) {
+		}
+		catch ( Exception e ) {
 			cmdError( "Failed to read sources.json: " + e.getMessage(), true );
 			return; // Primarily used to avoid "variable not initialized" compiler error
 		}
 
-		final JsonObject jsonObject = new JsonObject(jsonString);
-		final Map<SourceReference,DataObject> map = new HashMap<>();
+		final JsonObject jsonObject;
+		try {
+			jsonObject = new JsonObject(jsonString);
+		}
+		catch ( JsonPathException e ) {
+			cmdError( "Invalid JSON input: failed to parse JSON string.", true );
+			return;
+		}
 
+		final Map<SourceReference,DataObject> map = new HashMap<>();
 		for ( final SourceReference sr : MappingExpressionUtils.extractAllSrcRefs(expr) ) {
 			map.put( sr, jsonObject );
 		}
@@ -181,6 +192,23 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 
 		final Dataset dataset = MappingRelationUtils.convertToRDF(mappingRelation);
 
+		// Write the model to assigned output stream
+		RDFDataMgr.write( outputStream, dataset.getDefaultModel(), modLangOut.getOutputFormatted() );
+
+		if ( modTime.timingEnabled() ) {
+			final long time = modTime.endTimer();
+			System.out.println("Overall Processing Time: " + modTime.timeStr(time) + " sec");
+		}
+	}
+
+	/**
+	 * Creates and returns an OutputStream for writing data.
+	 * If an output file is specified, the stream writes to that file (in append mode);
+	 * otherwise, it defaults to System.out.
+	 *
+	 * @return the configured OutputStream
+	 */
+	protected OutputStream setupOutputStream() {
 		OutputStream outputStream = System.out;
 		if ( contains(argOutputToFile) ) {
 			try {
@@ -191,12 +219,6 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 			}
 		}
 
-		// Write the model to assigned output stream
-		RDFDataMgr.write( outputStream, dataset.getDefaultModel(), modLangOut.getOutputFormatted() );
-
-		if ( modTime.timingEnabled() ) {
-			final long time = modTime.endTimer();
-			System.out.println("Overall Processing Time: " + modTime.timeStr(time) + " sec");
-		}
+		return outputStream;
 	}
 }
