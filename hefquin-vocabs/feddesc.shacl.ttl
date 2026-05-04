@@ -1,0 +1,182 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX sh:     <http://www.w3.org/ns/shacl#>
+PREFIX fd:     <http://w3id.org/hefquin/feddesc#>
+PREFIX hydra:  <http://www.w3.org/ns/hydra/core#>
+PREFIX rml:    <http://w3id.org/rml/>
+
+# Main shape for FederationMember
+fd:FederationMemberShape
+    a sh:NodeShape ;
+    sh:targetClass fd:FederationMember ;
+    sh:property [
+        sh:path fd:serviceURI ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+        sh:message "Each federation member must have exactly one fd:serviceURI." ;
+    ] ;
+    sh:property [
+        sh:path fd:interface ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:node fd:InterfaceShape ;
+        sh:message "Each federation member must have exactly one fd:interface." ;
+    ] ;
+    sh:property [
+        sh:path fd:wrapper ;
+        sh:maxCount 1 ;
+        sh:node fd:WrapperShape ;
+        sh:message "A federation member can have at most one fd:wrapper." ;
+    ] ;
+    sh:property [
+        sh:path fd:vocabularyMappingsFile ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "A federation member can have at most one fd:vocabularyMappingsFile." ;
+    ] .
+
+# Shape for interfaces
+fd:InterfaceShape
+    a sh:NodeShape ;
+    sh:or (
+        [ sh:class fd:SPARQLEndpointInterface ;
+            sh:node fd:SPARQLEndpointInterfaceShape ]
+        [ sh:class fd:TPFInterface ;
+            sh:node fd:TPFInterfaceShape ]
+        [ sh:class fd:brTPFInterface ;
+            sh:node fd:brTPFInterfaceShape ]
+        [ sh:class fd:RESTInterface ;
+            sh:node fd:RESTInterfaceShape ]
+    ) ;
+    sh:message "Interface must be one of the supported types" .
+
+# Shape for SPARQL Endpoint Interface
+fd:SPARQLEndpointInterfaceShape
+    a sh:NodeShape ;
+    sh:targetClass fd:SPARQLEndpointInterface ;
+    sh:property [
+        sh:path fd:endpointAddress ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+        sh:message "SPARQL endpoint interface must have exactly one fd:endpointAddress." ;
+    ] ;
+    sh:property [
+        sh:path fd:mappingConfiguration ;
+        sh:maxCount 1 ;
+        sh:message "SPARQL endpoint interface can have at most one fd:mappingConfiguration." ;
+    ] .
+
+# Shape for TPF Interface
+fd:TPFInterfaceShape
+    a sh:NodeShape ;
+    sh:targetClass fd:TPFInterface ;
+    sh:property [
+        sh:path fd:exampleFragmentAddress ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+        sh:message "TPF interface must have exactly one fd:exampleFragmentAddress." ;
+    ] .
+
+# Shape for brTPF Interface
+fd:brTPFInterfaceShape
+    a sh:NodeShape ;
+    sh:targetClass fd:brTPFInterface ;
+    sh:property [
+        sh:path fd:exampleFragmentAddress ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+        sh:message "brTPF interface must have exactly one fd:exampleFragmentAddress." ;
+    ] .
+
+# Shape for REST Interface
+fd:RESTInterfaceShape
+    a sh:NodeShape ;
+    sh:targetClass fd:RESTInterface ;
+    sh:property [
+        sh:path fd:vocabularyMappingsFile ;
+        sh:maxCount 0 ;
+        sh:datatype xsd:string ;
+        sh:message "REST interface cannot have a vocabulary mapping." ;
+    ] ;
+    sh:property [
+        sh:path fd:iriTemplate ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:node fd:IriTemplateShape ;
+        sh:message "REST interface must have exactly one fd:iriTemplate." ;
+    ] .
+
+# Shape for IRI Template
+fd:IriTemplateShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path hydra:template ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "IRI template must have exactly one hydra:template." ;
+    ] ;
+    sh:property [
+        sh:path hydra:mapping ;
+        sh:node fd:MappingShape ;
+        sh:message "IRI template mappings must conform to mapping shape." ;
+    ] .
+
+# Shape for Hydra Mapping
+fd:MappingShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path hydra:variable ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Mapping must have exactly one hydra:variable." ;
+    ] ;
+    sh:property [
+        sh:path hydra:required ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+    ] ;
+    sh:property [
+        sh:path fd:paramType ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:in ( xsd:string xsd:integer xsd:float xsd:double ) ;
+        sh:message "Parameter type must be either xsd:string, xsd:integer, xsd:float or xsd:double." ;
+    ] .
+
+# Shape for Wrapper
+fd:WrapperShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path fd:rmlTriplesMaps ;
+        sh:maxCount 1 ;
+        sh:node fd:RmlTriplesMapShape ;
+        sh:message "Wrapper can have at most one fd:rmlTriplesMaps." ;
+    ] .
+
+# Shape for RML TriplesMap
+fd:RmlTriplesMapShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path rml:logicalSource ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:message "TriplesMap must have a logicalSource." ;
+    ] ;
+    sh:property [
+        sh:path rml:subjectMap ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:message "TriplesMap must have a subjectMap." ;
+    ] ;
+    sh:property [
+        sh:path rml:predicateObjectMap ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:message "TriplesMap must have at least one predicateObjectMap." ;
+    ] .
