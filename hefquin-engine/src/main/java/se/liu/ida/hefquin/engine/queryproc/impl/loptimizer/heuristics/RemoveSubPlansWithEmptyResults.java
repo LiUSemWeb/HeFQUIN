@@ -130,12 +130,15 @@ public class RemoveSubPlansWithEmptyResults implements HeuristicForLogicalOptimi
 		// if there is only one subplan left, we can replace the given
 		// union plan by that subplan (i.e., removing the union operator
 		// altogether).
+		// If more than one subplan remains, the union structure is preserved
+		// and the original query planning info can be retained because the
+		// transformation only removes provably empty alternatives.
 		if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion ) {
 			if ( rewrittenSubPlans.size() == 1 )
 				return rewrittenSubPlans.get(0); // remove union altogether
 
 			if ( rewrittenSubPlans.size() > 1 )
-				return LogicalPlanUtils.createPlanWithSubPlans(rootOp, null, rewrittenSubPlans);
+				return LogicalPlanUtils.createPlanWithSubPlans(rootOp, inputPlan.getQueryPlanningInfo().getProperties(), rewrittenSubPlans);
 
 			// We should never end up here.
 			throw new IllegalStateException("All subplans of a union operator were removed, but the overall plan is not empty. This should not happen if cardinality estimates are correct.");
