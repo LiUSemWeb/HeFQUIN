@@ -621,10 +621,13 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
 	}
 
+	/**
+	 * Checks whether the given cardinality property guarantees that the query plan
+	 * will produce an empty result. If so, it updates the provided {@link QueryPlanningInfo}
+	 * with accurate cardinality properties (min, max and exact cardinality all set to 0).
+	 */
 	public boolean checkAndSetIfGuaranteedEmpty( final QueryPlanningInfo qpInfo, final QueryPlanProperty crd ) {
 		if ( crd.getValue() == 0 && crd.getQuality() == Quality.ACCURATE ) {
-			// If the input plan is guaranteed to produce an empty result,
-			// then the result of the output is guaranteed to be empty as well.
 			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
 			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
 			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
