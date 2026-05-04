@@ -145,7 +145,9 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
-			createdPlan = createPlanForFixedSolMapUnderProject(projectOp, op, inputPlan);
+			createdPlan = createPlanForFixedSolMapUnderProject( projectOp,
+			                                                    op,
+			                                                    inputPlan );
 		}
 
 		@Override
@@ -229,37 +231,38 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) {
-			createdPlan = createPlanForUnaryOpUnderProject( projectOp,
-			                                                op,
-			                                                subPlanUnderProject.getSubPlan(0) );
+			createdPlan = createPlanForUnaryOpUnderProjectDropQP( projectOp,
+			                                                      op,
+			                                                      subPlanUnderProject.getSubPlan(0) );
 		}
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
 			createdPlan = createPlanForL2GOrG2LUnderProject( projectOp,
-			                                                op,
-			                                                subPlanUnderProject.getSubPlan(0) );
+			                                                 op,
+			                                                 subPlanUnderProject.getSubPlan(0) );
 		}
 
 		@Override
 		public void visit( final LogicalOpDedup op ) {
-			createdPlan = createPlanForUnaryOpUnderProject( projectOp,
-			                                                op,
-			                                                subPlanUnderProject.getSubPlan(0) );
+			createdPlan = createPlanForUnaryOpUnderProjectDropQP( projectOp,
+			                                                      op,
+			                                                      subPlanUnderProject.getSubPlan(0) );
 		}
 
 		@Override
 		public void visit( final LogicalOpProject op ) {
 			createdPlan = createPlanForProjectUnderProject( projectOp,
 			                                                op,
+			                                                subPlanUnderProject,
 			                                                subPlanUnderProject.getSubPlan(0) );
 		}
 
 		@Override
 		public void visit( final LogicalOpMinus op ) {
 			createdPlan = createPlanForJoinLikeOpUnderProject( projectOp,
-			                                                 subPlanUnderProject,
-			                                                 inputPlan );
+			                                                   subPlanUnderProject,
+			                                                   inputPlan );
 		}
 
 	} // end of Worker
@@ -357,6 +360,10 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 *
 	 * Otherwise, the project is split: the adjusted projection is pushed below
 	 * the bind, while the original projection remains on top.
+	 *
+	 * Query planning information is preserved for the bind subtree because this
+	 * transformation is cardinality-preserving and does not change the number of
+	 * solution mappings produced by the bind operator.
 	 */
 	protected LogicalPlan createPlanForBindUnderProject( final LogicalOpProject projectOp,
 	                                                     final LogicalOpBind bindOp,
@@ -375,7 +382,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		// If nothing changes, push whole project
 		if ( pushedProjectVars.equals(projectOp.getVariables()) )
-			return createPlanForUnaryOpUnderProject(projectOp, bindOp, subPlanUnderBind);
+			return createPlanForUnaryOpUnderProjectPreserveQP(projectOp, bindOp, subPlanUnderBind, inputPlan);
 
 		// If adjusted projection contains all variables of the subplan under bind,
 		// return the plan as is
@@ -390,9 +397,11 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			null,
 			subPlanUnderBind );
 
+		// Preserve QP for the bind subtree since this rewrite is cardinality-preserving
+		// (bind does not change the number of solution mappings).
 		final LogicalPlan newBind = LogicalPlanUtils.createPlanWithSubPlans(
 			bindOp,
-			null,
+			inputPlan.getQueryPlanningInfo().getProperties(),
 			pushed );
 
 		return new LogicalPlanWithUnaryRootImpl(projectOp, null, newBind);
@@ -419,6 +428,10 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 *
 	 * Otherwise, the project is split: the adjusted projection is pushed below
 	 * the unfold, while the original projection remains on top.
+	 *
+	 * Query planning information is preserved for the unfold subtree under the
+	 * assumption that unfold is cardinality-preserving in the same way as bind,
+	 * i.e., it does not change the number of solution mappings, only their shape.
 	 */
 	protected LogicalPlan createPlanForUnfoldUnderProject(
 			final LogicalOpProject projectOp,
@@ -439,7 +452,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		// If nothing changes, push whole project
 		if ( pushedProjectVars.equals(projectOp.getVariables()) )
-			return createPlanForUnaryOpUnderProject(projectOp, unfoldOp, subPlanUnderUnfold);
+			return createPlanForUnaryOpUnderProjectPreserveQP(projectOp, unfoldOp, subPlanUnderUnfold, inputPlan);
 
 		// If adjusted projection contains all variables of the subplan under the unfold operator,
 		// return the plan as is
@@ -454,9 +467,10 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			null,
 			subPlanUnderUnfold );
 
+		// Preserve QP since unfold is cardinality-preserving (same assumption as bind).
 		final LogicalPlan newUnfold = LogicalPlanUtils.createPlanWithSubPlans(
 			unfoldOp,
-			null,
+			inputPlan.getQueryPlanningInfo().getProperties(),
 			pushed );
 
 		return new LogicalPlanWithUnaryRootImpl(projectOp, null, newUnfold);
@@ -484,8 +498,8 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 * TODO: think more about cases in which pushing a project operator is safe.
 	 */
 	protected LogicalPlan createPlanForL2GOrG2LUnderProject( final LogicalOpProject projectOp,
-	                                                        final UnaryLogicalOp childOp,
-	                                                        final LogicalPlan subPlanUnderChildOp ) {
+	                                                         final UnaryLogicalOp childOp,
+	                                                         final LogicalPlan subPlanUnderChildOp ) {
 		return apply(subPlanUnderChildOp);
 	}
 
@@ -500,7 +514,10 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 * </ul>
 	 *
 	 * If all projected variables are guaranteed by the subplan and include all required variables,
-	 * the projection is fully pushed below the operator.
+	 * the projection is fully pushed below the operator. In this case, the query planning info
+	 * of the subplan is preserved since the transformation is cardinality-preserving and does not
+	 * alter the result size of the operator subtree.
+	 *
 	 * Otherwise, a reduced projection is pushed down while the original projection is retained above.
 	 *
 	 * If no beneficial pushdown is possible, the operator is left unchanged, but the heuristic
@@ -537,7 +554,11 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		  && parentProjectOp.getVariables().containsAll(joinVars) ) {
 			final LogicalPlan pushed = new LogicalPlanWithUnaryRootImpl(parentProjectOp, null, subPlanUnderChildOp);
 
-			return new LogicalPlanWithUnaryRootImpl(childOp, null, apply(pushed));
+			// Preserve child subtree QP since the transformation is cardinality-preserving
+			// and does not change the result size of the child plan.
+			final LogicalPlan rewritten = apply(pushed);
+
+			return new LogicalPlanWithUnaryRootImpl(childOp, subPlanUnderChildOp.getQueryPlanningInfo().getProperties(), rewritten);
 		}
 
 		// Case 2:
@@ -578,7 +599,9 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 				null,
 				newChild );
 
-			return new LogicalPlanWithUnaryRootImpl(parentProjectOp, null, newSubTree);
+			// Preserve query planning info since this rewrite is semantically neutral
+			// at this level and does not affect cardinality or variable expectations.
+			return new LogicalPlanWithUnaryRootImpl(parentProjectOp, inputPlan.getQueryPlanningInfo().getProperties(), newSubTree);
 		}
 
 		final LogicalPlan pushed = new LogicalPlanWithUnaryRootImpl(
@@ -677,21 +700,36 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	/**
 	 * Merges a parent and child project operator into a single project operator.
 	 *
-	 * The resulting projection contains the intersection of the variables from
-	 * both operators and is applied to the subplan under the child project.
+	 * The parent and child projections are combined by computing the intersection of their
+	 * variable sets. The resulting projection is applied above the child subplan.
+	 *
+	 * If the parent projection does not further restrict the child projection (i.e., the
+	 * intersection equals the child's projection), the parent project is redundant and is
+	 * removed, leaving the child project as the new root.
+	 *
+	 * Query planning information from the child subtree is preserved in the rewritten plan
+	 * since this transformation is cardinality-preserving and does not affect the structure
+	 * or size of the underlying solution mappings.
 	 */
 	protected LogicalPlan createPlanForProjectUnderProject( final LogicalOpProject parentProjectOp,
 	                                                        final LogicalOpProject childProjectOp,
+	                                                        final LogicalPlan subPlanUnderParentProjectOp,
 	                                                        final LogicalPlan subPlanUnderChildProjectOp ) {
 		final Set<Var> intersectionOfVars = new HashSet<>(childProjectOp.getVariables());
 		intersectionOfVars.retainAll( parentProjectOp.getVariables() );
 
-		final LogicalPlan newPlan = new LogicalPlanWithUnaryRootImpl(
+		// If the parent projection does not further restrict the variables,
+		// it is redundant and can be removed. Continue optimization from the child project.
+		if ( intersectionOfVars.equals(childProjectOp.getVariables()) ) {
+			return apply(subPlanUnderParentProjectOp.getSubPlan(0));
+		}
+
+		final LogicalPlan rewritten = new LogicalPlanWithUnaryRootImpl(
 			new LogicalOpProject(intersectionOfVars, parentProjectOp.mayReduce()),
-			null,
+			subPlanUnderChildProjectOp.getQueryPlanningInfo().getProperties(),
 			subPlanUnderChildProjectOp );
 
-		return apply(newPlan);
+		return apply(rewritten);
 	}
 
 	/**
@@ -699,10 +737,13 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 * given unary operator, with the subplan underneath being a version of
 	 * the given subplan in which the project push down heuristic has been
 	 * applied recursively.
+	 *
+	 * The resulting plan is created without preserving the original
+	 * query planning info.
 	 */
-	protected LogicalPlan createPlanForUnaryOpUnderProject( final LogicalOpProject projectOp,
-	                                                        final UnaryLogicalOp op,
-	                                                        final LogicalPlan subPlanUnderOp ) {
+	protected LogicalPlan createPlanForUnaryOpUnderProjectDropQP( final LogicalOpProject projectOp,
+	                                                              final UnaryLogicalOp op,
+	                                                              final LogicalPlan subPlanUnderOp ) {
 		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
 				projectOp,
 				null,
@@ -711,6 +752,29 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		// Put together the new plan with the given unary operator as root.
 		return LogicalPlanUtils.createPlanWithSubPlans(op, null, newSubPlan2);
+	}
+
+	/**
+	 * Returns a plan in which the given project operator is pushed under the
+	 * given unary operator, with the subplan underneath being a version of
+	 * the given subplan in which the project push down heuristic has been
+	 * applied recursively.
+	 *
+	 * The resulting plan preserves the query planning info of the input plan.
+	 */
+	protected LogicalPlan createPlanForUnaryOpUnderProjectPreserveQP( final LogicalOpProject projectOp,
+	                                                                  final UnaryLogicalOp op,
+	                                                                  final LogicalPlan subPlanUnderOp,
+	                                                                  final LogicalPlan inputPlan ) {
+		final LogicalPlan newSubPlan1 = LogicalPlanUtils.createPlanWithSubPlans(
+				projectOp,
+				null,
+				subPlanUnderOp );
+		final LogicalPlan newSubPlan2 = apply(newSubPlan1);
+
+		// Put together the new plan with the given unary operator as root while
+		// preserving the query planning info.
+		return LogicalPlanUtils.createPlanWithSubPlans(op, inputPlan.getQueryPlanningInfo().getProperties(), newSubPlan2);
 	}
 
 
