@@ -9,10 +9,10 @@ import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
 public abstract class FederationTestBase
 {
 	/**
-	 * Change this flag to true if you also want to run the
-	 * unit tests that access servers on the actual Web.
+	 * If this flag is true, tests that access servers on the actual
+	 * Web will be skipped.
 	 */
-	public static boolean skipLiveWebTests = true;
+	public static boolean skipLiveWebTests = false;
 
 	/**
 	 * If this flag is true, tests that make requests to local neo4j

@@ -23,10 +23,10 @@ public class SPARQLQueryImpl implements SPARQLQuery
 
 	protected SPARQLQueryImpl( final Element jenaElement ) {
 		assert jenaElement != null;
-		
+
 		jenaQuery = QueryFactory.create();
 		jenaQuery.setQuerySelectType();
-		jenaQuery.setQueryResultStar(true);
+		jenaQuery.setQueryResultStar( true );
 		jenaQuery.setQueryPattern( jenaElement );
 	}
 

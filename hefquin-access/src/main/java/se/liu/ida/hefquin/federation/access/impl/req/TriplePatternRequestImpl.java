@@ -4,7 +4,11 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
 
 public class TriplePatternRequestImpl implements TriplePatternRequest
 {
@@ -39,6 +43,16 @@ public class TriplePatternRequestImpl implements TriplePatternRequest
 	@Override
 	public String toString(){
 		return tp.toString();
+	}
+
+	@Override
+	public Set<Var> getProjectionVars() {
+		return null;
+	}
+
+	@Override
+	public boolean isDistinct() {
+		return false;
 	}
 
 }
