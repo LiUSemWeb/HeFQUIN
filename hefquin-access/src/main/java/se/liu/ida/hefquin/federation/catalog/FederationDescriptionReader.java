@@ -371,7 +371,7 @@ public class FederationDescriptionReader
 	}
 
 	protected FederationMember createNeo4jServer( final String uri ) {
-		// verifyExpectedURI(uri);
+		verifyExpectedURI(uri);
 		return new Neo4jServerImpl(uri);
 	}
 
