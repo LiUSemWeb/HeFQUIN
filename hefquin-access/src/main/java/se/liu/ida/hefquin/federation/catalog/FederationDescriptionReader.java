@@ -16,6 +16,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -60,11 +61,11 @@ public class FederationDescriptionReader
 	public static FederationCatalog readFromFiles( final List<String> filenames ) {
 		return  instance.parseFedDescr(filenames);
 	}
-	
+
 	public static FederationCatalog readFromModel( final Model fd ) {
 		return instance.parseFedDescr(fd);
 	}
-	
+
 	public static FederationCatalog readFromModels( final List<Model> fds ) {
 		final Model mergedModel = ModelFactory.createDefaultModel();
 		for ( final Model fd : fds ) {
@@ -82,7 +83,7 @@ public class FederationDescriptionReader
 		final Model fd = RDFDataMgr.loadModel(filename);
 		return parseFedDescr(fd);
 	}
-	
+
 	public FederationCatalog parseFedDescr( final List<String> filenames ) {
 		final Model mergedModel = ModelFactory.createDefaultModel();
 		for ( final String filename : filenames ) {
@@ -118,116 +119,154 @@ public class FederationDescriptionReader
 
 		final Resource iface = fedMember.getProperty(FDVocab.interface_).getResource();
 		final RDFNode ifaceType = fd.getRequiredProperty(iface, RDF.type).getObject();
+		final Resource protocol = iface.getProperty(FDVocab.supportedProtocol).getResource();
 
 		// Check the type of interface
-		if ( ifaceType.equals(FDVocab.SPARQLEndpointInterface) )
+		if ( ifaceType.equals(FDVocab.FixedEndpointInterface) )
 		{
-			final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
-			if ( ! endpointAddressesIterator.hasNext() )
-				throw new IllegalArgumentException("SPARQL endpointAddress is required!");
+			return handleFixedEndpointInterface( iface, protocol, vocabMap );
+		}
+		else if ( ifaceType.equals(FDVocab.FragmentInterface) )
+		{
+			return handleFragmentInterface( iface, protocol, vocabMap );
+		}
+		else if ( ifaceType.equals(FDVocab.TemplateBasedInterface) )
+		{
+			return handleTemplateInterface( iface, protocol, vocabMap, fedMember, fd, serviceURI );
+		}
+		else {
+			throw new IllegalArgumentException( ifaceType.toString() );
+		}
+	}
 
-			final RDFNode addr = endpointAddressesIterator.next().getObject();
+	/**
+	 * Attempts to retrieve and parse the vocabulary mapping associated with the
+	 * given RDF resource {@code fm}, representing a {@link FederationMember}, in
+	 * the given federation description {@code fd}.
+	 *
+	 * The method attempts to load the vocabulary mapping from the specified path or
+	 * URL and caches the result for reuse. If no vocabulary mappings file is
+	 * present, the method returns {@code null}.
+	 *
+	 * @param fm RDF resource for the federation member
+	 * @param fd RDF model of the federation description
+	 * @return parsed {@link VocabularyMapping}, or {@code null} if not specified
+	 * @throws IllegalArgumentException if the mapping file cannot be loaded or parsed
+	 */
+	protected VocabularyMapping parseVocabMapping( final Resource fm, final Model fd ) {
+		if ( ! fd.contains( fm, FDVocab.vocabularyMappingsFile ) ) {
+			return null;
+		}
 
-			if ( endpointAddressesIterator.hasNext() )
-				throw new IllegalArgumentException("More Than One SPARQL endpointAddress!");
+		final RDFNode pathToMappingFile = fd.getRequiredProperty( fm, FDVocab.vocabularyMappingsFile ).getObject();
 
-			final String addrStr = getAsURIString(addr);
-			if ( addrStr == null ) {
-				throw new IllegalArgumentException();
+		final String path = pathToMappingFile.toString();
+		VocabularyMapping vm = vocabMappingByPath.get( path );
+		if ( vm == null ) {
+			final Graph g;
+			try {
+				g = RDFDataMgr.loadGraph( path );
+			} catch ( Exception e ) {
+				throw new IllegalArgumentException( e );
 			}
+			vm = new VocabularyMappingWrappingImpl( g );
+			vocabMappingByPath.put( path, vm );
+		}
+		return vm;
+	}
+
+	/**
+	 * Creates a federation member for a fixed endpoint interface (SPARQL, Bolt, GraphQL).
+	 */
+	protected FederationMember handleFixedEndpointInterface( final Resource iface,
+	                                                         final Resource protocol,
+	                                                         final VocabularyMapping vocabMap ) {
+		if ( protocol.equals(FDVocab.SPARQLProtocol) ) {
+			final String addrStr = getSingleURIProperty(
+				iface,
+				FDVocab.endpointAddress,
+				"SPARQL endpointAddress is required!",
+				"More Than One SPARQL endpointAddress!" );
 
 			return createSPARQLEndpoint(addrStr, vocabMap);
 		}
-		else if ( ifaceType.equals(FDVocab.TPFInterface) )
-		{
-			final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FDVocab.exampleFragmentAddress);
-			if ( ! exampleFragmentAddressesIterator.hasNext() )
-				throw new IllegalArgumentException("TPF exampleFragmentAddress is required!");
-
-			final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
-
-			if ( exampleFragmentAddressesIterator.hasNext() )
-				throw new IllegalArgumentException("More Than One TPF exampleFragmentAddress!");
-
-			final String addrStr = getAsURIString(addr);
-			if ( addrStr == null ) {
-				throw new IllegalArgumentException();
-			}
-
-			return createTPFServer(addrStr, vocabMap);
-		}
-		else if ( ifaceType.equals(FDVocab.brTPFInterface) )
-		{
-			final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FDVocab.exampleFragmentAddress);
-			if ( ! exampleFragmentAddressesIterator.hasNext() )
-				throw new IllegalArgumentException("brTPF exampleFragmentAddress is required!");
-
-			final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
-
-			if ( exampleFragmentAddressesIterator.hasNext() )
-				throw new IllegalArgumentException("More Than One brTPF exampleFragmentAddress!");
-
-			final String addrStr = getAsURIString(addr);
-			if ( addrStr == null ) {
-				throw new IllegalArgumentException();
-			}
-
-			return createBRTPFServer(addrStr, vocabMap);
-		}
-		else if ( ifaceType.equals(FDVocab.BoltInterface) )
-		{
+		else if ( protocol.equals(FDVocab.BoltProtocol) ) {
 			if ( vocabMap != null )
 				throw new IllegalArgumentException("Neo4j endpoints cannot have a vocabulary mapping.");
 
-			final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
-			if ( ! endpointAddressesIterator.hasNext() )
-				throw new IllegalArgumentException("Bolt endpointAddress is required!");
-
-			final RDFNode addr = endpointAddressesIterator.next().getObject();
-
-			if ( endpointAddressesIterator.hasNext() )
-				throw new IllegalArgumentException("More Than One Bolt endpointAddress!");
-
-			final String addrStr = getAsURIString(addr);
-			if ( addrStr == null ) {
-				throw new IllegalArgumentException();
-			}
+			final String addrStr = getSingleURIProperty(
+				iface,
+				FDVocab.endpointAddress,
+				"Bolt endpointAddress is required!",
+				"More Than One Bolt endpointAddress!" );
 
 			return createNeo4jServer(addrStr);
 		}
-		else if ( ifaceType.equals(FDVocab.GraphQLEndpointInterface) )
-		{
+		else if ( protocol.equals(FDVocab.GraphQLProtocol) ) {
 			if ( vocabMap != null )
 				throw new IllegalArgumentException("GraphQL endpoints cannot have a vocabulary mapping.");
 
-			final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
-			if ( ! endpointAddressesIterator.hasNext() )
-				throw new IllegalArgumentException("GraphQL endpointAddress is required!");
-
-			final RDFNode addr = endpointAddressesIterator.next().getObject();
-
-			if ( endpointAddressesIterator.hasNext() )
-				throw new IllegalArgumentException("More Than One GraphQL endpointAddress!");
-
-			final String addrStr = getAsURIString(addr);
-			if ( addrStr == null ) {
-				throw new IllegalArgumentException();
-			}
+			final String addrStr = getSingleURIProperty(
+				iface,
+				FDVocab.endpointAddress,
+				"GraphQL endpointAddress is required!",
+				"More Than One GraphQL endpointAddress!" );
 
 			return createGraphQLServer(addrStr);
 		}
-		else if ( ifaceType.equals(FDVocab.RESTInterface) )
-		{
+		else {
+			throw new IllegalArgumentException( protocol.toString() );
+		}
+	}
+
+	/**
+	 * Creates a federation member for a fixed endpoint interface (SPARQL, Bolt, GraphQL).
+	 */
+	protected FederationMember handleFragmentInterface( final Resource iface,
+	                                                    final Resource protocol,
+	                                                    final VocabularyMapping vocabMap ) {
+		if ( protocol.equals(FDVocab.TPFProtocol) ) {
+			final String addrStr = getSingleURIProperty(
+				iface,
+				FDVocab.exampleFragmentAddress,
+				"TPF exampleFragmentAddress is required!",
+				"More Than One TPF exampleFragmentAddress!" );
+
+			return createTPFServer(addrStr, vocabMap);
+		}
+		else if ( protocol.equals(FDVocab.brTPFProtocol) ) {
+			final String addrStr = getSingleURIProperty(
+				iface,
+				FDVocab.exampleFragmentAddress,
+				"brTPF exampleFragmentAddress is required!",
+				"More Than One brTPF exampleFragmentAddress!" );
+
+			return createBRTPFServer(addrStr, vocabMap);
+		}
+		else {
+			throw new IllegalArgumentException( protocol.toString() );
+		}
+	}
+
+	/**
+	 * Creates a federation member for a template-based interface, including parameter
+	 * and mapping handling.
+	 */
+	protected FederationMember handleTemplateInterface( final Resource iface,
+	                                                    final Resource protocol,
+	                                                    final VocabularyMapping vocabMap,
+	                                                    final Resource fedMember,
+	                                                    final Model fd,
+	                                                    final String serviceURI ) {
+		if ( protocol.equals(FDVocab.GenericWebAPIProtocol) ) {
 			if ( vocabMap != null )
 				throw new IllegalArgumentException("REST APIs cannot have a vocabulary mapping.");
 
-			
+			final Resource uriTemplate = ModelUtils.getSingleMandatoryResourceProperty(iface, FDVocab.uriTemplate);
 
-			final Resource iriTemplate = ModelUtils.getSingleMandatoryResourceProperty( iface, FDVocab.iriTemplate);
+			final String uriTemplateString = ModelUtils.getSingleMandatoryProperty_XSDString(uriTemplate, HydraVocab.template);
 
-			final String iriTemplateString = ModelUtils.getSingleMandatoryProperty_XSDString(iriTemplate, HydraVocab.template );
-
-			final StmtIterator paramIter = iriTemplate.listProperties(HydraVocab.mapping);
+			final StmtIterator paramIter = uriTemplate.listProperties(HydraVocab.mapping);
 
 			final List<RESTEndpoint.Parameter> params = new ArrayList<>();
 			while (paramIter.hasNext()) {
@@ -307,49 +346,13 @@ public class FederationDescriptionReader
 			}
 
 			if ( trMaps.isEmpty() )
-				throw new IllegalArgumentException("The wrapped RESt endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
+				throw new IllegalArgumentException("The wrapped REST endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
 
-			return createWrappedRESTEndpoint(iriTemplateString, params, trMaps);
+			return createWrappedRESTEndpoint(uriTemplateString, params, trMaps);
 		}
 		else {
-			throw new IllegalArgumentException( ifaceType.toString() );
+			throw new IllegalArgumentException( protocol.toString() );
 		}
-	}
-
-	/**
-	 * Attempts to retrieve and parse the vocabulary mapping associated with the
-	 * given RDF resource {@code fm}, representing a {@link FederationMember}, in
-	 * the given federation description {@code fd}.
-	 *
-	 * The method attempts to load the vocabulary mapping from the specified path or
-	 * URL and caches the result for reuse. If no vocabulary mappings file is
-	 * present, the method returns {@code null}.
-	 *
-	 * @param fm RDF resource for the federation member
-	 * @param fd RDF model of the federation description
-	 * @return parsed {@link VocabularyMapping}, or {@code null} if not specified
-	 * @throws IllegalArgumentException if the mapping file cannot be loaded or parsed
-	 */
-	protected VocabularyMapping parseVocabMapping( final Resource fm, final Model fd ) {
-		if ( ! fd.contains( fm, FDVocab.vocabularyMappingsFile ) ) {
-			return null;
-		}
-
-		final RDFNode pathToMappingFile = fd.getRequiredProperty( fm, FDVocab.vocabularyMappingsFile ).getObject();
-
-		final String path = pathToMappingFile.toString();
-		VocabularyMapping vm = vocabMappingByPath.get( path );
-		if ( vm == null ) {
-			final Graph g;
-			try {
-				g = RDFDataMgr.loadGraph( path );
-			} catch ( Exception e ) {
-				throw new IllegalArgumentException( e );
-			}
-			vm = new VocabularyMappingWrappingImpl( g );
-			vocabMappingByPath.put( path, vm );
-		}
-		return vm;
 	}
 
 	protected FederationMember createSPARQLEndpoint( final String uri, final VocabularyMapping vm ) {
@@ -368,7 +371,7 @@ public class FederationDescriptionReader
 	}
 
 	protected FederationMember createNeo4jServer( final String uri ) {
-		verifyExpectedURI(uri);
+		// verifyExpectedURI(uri);
 		return new Neo4jServerImpl(uri);
 	}
 
@@ -417,6 +420,32 @@ public class FederationDescriptionReader
 	}
 
 	/**
+	 * Returns the single URI value of the given property from the resource.
+	 * Throws an exception if the property is missing, occurs more than once
+	 * or is not a valid URI.
+	 */
+	protected String getSingleURIProperty( final Resource iface,
+	                                       final Property p,
+	                                       final String errorMsg1,
+	                                       final String errorMsg2 ) {
+		final StmtIterator addressesIterator = iface.listProperties(p);
+		if ( ! addressesIterator.hasNext() )
+			throw new IllegalArgumentException(errorMsg1);
+
+		final RDFNode addr = addressesIterator.next().getObject();
+
+		if ( addressesIterator.hasNext() )
+			throw new IllegalArgumentException(errorMsg2);
+
+		final String addrStr = getAsURIString(addr);
+		if ( addrStr == null ) {
+			throw new IllegalArgumentException();
+		}
+
+		return addrStr;
+	}
+
+	/**
 	 * Verifies that the given string represents an HTTP URI
 	 * or an HTTPS URI and, if so, returns that URI.
 	 */
@@ -425,7 +454,7 @@ public class FederationDescriptionReader
 		try {
 			uri = new URI(uriString);
 			if (    ! uri.isAbsolute()
-			     || (uri.getScheme().equals("http") && uri.getScheme().equals("https")) ) {
+			     || ! (uri.getScheme().equals("http") || uri.getScheme().equals("https")) ) {
 				throw new IllegalArgumentException( "The following URI is of an unexpected type; it should be an HTTP URI or an HTTPS URI: " + uriString );
 			}
 		}

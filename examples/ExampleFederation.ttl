@@ -2,10 +2,9 @@ PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
 PREFIX fd:     <http://w3id.org/hefquin/feddesc#>
 PREFIX rml:    <http://w3id.org/rml/>
-PREFIX cdt:	   <http://w3id.org/awslabs/neptune/SPARQL-CDTs/>
+PREFIX cdt:    <http://w3id.org/awslabs/neptune/SPARQL-CDTs/>
 PREFIX ex:     <http://example.org/>
 PREFIX hydra:  <http://www.w3.org/ns/hydra/core#>
-
 
 ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;
     fd:serviceURI "http://dbpedia.org/sparql"^^xsd:anyURI ;
@@ -68,7 +67,7 @@ _:openMeteoRestEndpoint a fd:TemplateBasedInterface ;
                           [ hydra:variable "hourly" ;
                             fd:paramType xsd:string
                           ]
-          ] .                   
+          ] .
 
 ex:openMeteo2 a fd:WrappedFederationMember ;
       fd:serviceURI "http://example.org/OpenMeteoWrapperWithFixedParams"^^xsd:anyURI ;

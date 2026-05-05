@@ -23,18 +23,21 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void twoFMs() {
 		final String turtle =
-				  "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+				  "PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>\n"
+				+ "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 				+ "PREFIX ex:     <http://example.org/>\n"
 				+ "\n"
-				+ "ex:dbpediaSPARQL\n"
-				+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
-				+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
-				+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ] .\n"
+				+ "ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;\n"
+				+ "      fd:serviceURI \"http://dbpedia.org/sparql\"^^xsd:anyURI ;\n"
+				+ "      fd:interface [ a                    fd:FixedEndpointInterface ;\n"
+				+ "                     fd:supportedProtocol fd:SPARQLProtocol ;\n"
+				+ "                     fd:endpointAddress   \"http://dbpedia.org/sparql\"^^xsd:anyURI ] .\n"
 				+ "\n"
-				+ "ex:dbpediaTPF\n"
-				+ "      fd:serviceURI <http://fragments.dbpedia.org/2016-04/en> ;\n"
-				+ "      fd:interface [ a                         fd:TPFInterface ;\n"
-				+ "                     fd:exampleFragmentAddress <http://fragments.dbpedia.org/2016-04/en> ] .";
+				+ "ex:dbpediaTPF a fd:RDFBasedFederationMember ;\n"
+				+ "      fd:serviceURI \"http://fragments.dbpedia.org/2016-04/en\"^^xsd:anyURI ;\n"
+				+ "      fd:interface [ a                         fd:FragmentInterface ;\n"
+				+ "                     fd:supportedProtocol      fd:TPFProtocol ;\n"
+				+ "                     fd:exampleFragmentAddress \"http://fragments.dbpedia.org/2016-04/en\"^^xsd:anyURI ] .";
 
 		final Model fd = ModelFactory.createDefaultModel();
 
@@ -58,14 +61,16 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void sparqlFMWithTwoEndpoints() {
 		final String turtle =
-				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
-						+ "PREFIX ex:     <http://example.org/>\n"
-						+ "\n"
-						+ "ex:dbpediaSPARQL\n"
-						+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
-						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
-						+ "                     fd:endpointAddress <http://dbpedia.org/sparql>, <http://localhost:7474/db/neo4j/tx> ];\n"
-						+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\".";
+				  "PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>\n"
+				+ "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+				+ "PREFIX ex:     <http://example.org/>\n"
+				+ "\n"
+				+ "ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;\n"
+				+ "      fd:serviceURI \"http://dbpedia.org/sparql\"^^xsd:anyURI ;\n"
+				+ "      fd:interface [ a                         fd:FixedEndpointInterface ;\n"
+				+ "                     fd:supportedProtocol      fd:SPARQLProtocol ;\n"
+				+ "                     fd:endpointAddress        \"http://dbpedia.org/sparql\"^^xsd:anyURI, \"http://localhost:7474/db/neo4j/tx\"^^xsd:anyURI ] ;\n"
+				+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\" .";
 
 		final Model fd = ModelFactory.createDefaultModel();
 		FederationDescriptionReader.readFromModel(fd);
@@ -84,13 +89,15 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void sparqlFMWithoutRequiredProperty() {
 		final String turtle =
-				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
-						+ "PREFIX ex:     <http://example.org/>\n"
-						+ "\n"
-						+ "ex:dbpediaSPARQL\n"
-						+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
-						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
-						+ "                     fd:exampleFragmentAddress <http://dbpedia.org/sparql>, <http://localhost:7474/db/neo4j/tx> ].\n";
+				  "PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>\n"
+				+ "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+				+ "PREFIX ex:     <http://example.org/>\n"
+				+ "\n"
+				+ "ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;\n"
+				+ "      fd:serviceURI \"http://dbpedia.org/sparql\"^^xsd:anyURI ;\n"
+				+ "      fd:interface [ a                         fd:FixedEndpointInterface ;\n"
+				+ "                     fd:supportedProtocol      fd:SPARQLProtocol ;\n"
+				+ "                     fd:exampleFragmentAddress \"http://dbpedia.org/sparql\"^^xsd:anyURI, \"http://localhost:7474/db/neo4j/tx\"^^xsd:anyURI ] .";
 
 		final Model fd = ModelFactory.createDefaultModel();
 
@@ -109,13 +116,15 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void tpfFMWithTwoEndpoints() {
 		final String turtle =
-				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
-						+ "PREFIX ex:     <http://example.org/>\n"
-						+ "\n"
-						+ "ex:dbpediaTPF\n"
-						+ "      fd:serviceURI <http://fragments.dbpedia.org/2016-04/en> ;\n"
-						+ "      fd:interface [ a                  fd:TPFInterface ;\n"
-						+ "                     fd:exampleFragmentAddress <http://fragments.dbpedia.org/2016-04/en>, <http://localhost:7474/db/neo4j/tx> ].\n";
+				  "PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>\n"
+				+ "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+				+ "PREFIX ex:     <http://example.org/>\n"
+				+ "\n"
+				+ "ex:dbpediaTPF a fd:RDFBasedFederationMember ;\n"
+				+ "      fd:serviceURI \"http://fragments.dbpedia.org/2016-04/en\"^^xsd:anyURI ;\n"
+				+ "      fd:interface [ a                         fd:FragmentInterface ;\n"
+				+ "                     fd:supportedProtocol      fd:TPFProtocol ;\n"
+				+ "                     fd:exampleFragmentAddress \"http://fragments.dbpedia.org/2016-04/en\"^^xsd:anyURI, \"http://localhost:7474/db/neo4j/tx\"^^xsd:anyURI ] .";
 
 		final Model fd = ModelFactory.createDefaultModel();
 
@@ -134,13 +143,15 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void tpfFMWithoutRequiredProperty() {
 		final String turtle =
-				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
-						+ "PREFIX ex:     <http://example.org/>\n"
-						+ "\n"
-						+ "ex:dbpediaTPF\n"
-						+ "      fd:serviceURI <http://fragments.dbpedia.org/2016-04/en> ;\n"
-						+ "      fd:interface [ a                  fd:TPFInterface ;\n"
-						+ "                     fd:endpointAddress <http://fragments.dbpedia.org/2016-04/en>, <http://localhost:7474/db/neo4j/tx> ].\n";
+				  "PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>\n"
+				+ "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+				+ "PREFIX ex:     <http://example.org/>\n"
+				+ "\n"
+				+ "ex:dbpediaTPF a fd:RDFBasedFederationMember ;\n"
+				+ "      fd:serviceURI \"http://fragments.dbpedia.org/2016-04/en\"^^xsd:anyURI ;\n"
+				+ "      fd:interface [ a                    fd:FragmentInterface ;\n"
+				+ "                     fd:supportedProtocol fd:TPFProtocol ;\n"
+				+ "                     fd:endpointAddress   \"http://fragments.dbpedia.org/2016-04/en\"^^xsd:anyURI, \"http://localhost:7474/db/neo4j/tx\"^^xsd:anyURI ] .";
 
 		final Model fd = ModelFactory.createDefaultModel();
 
@@ -159,14 +170,16 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void vocabularyMappingFileIsLoadedFromClasspathResource() {
 		final String turtle =
-				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
-						+ "PREFIX ex:     <http://example.org/>\n"
-						+ "\n"
-						+ "ex:dbpediaSPARQL\n"
-						+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
-						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
-						+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ];\n"
-						+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\".";
+				  "PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>\n"
+				+ "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+				+ "PREFIX ex:     <http://example.org/>\n"
+				+ "\n"
+				+ "ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;\n"
+				+ "      fd:serviceURI \"http://dbpedia.org/sparql\"^^xsd:anyURI ;\n"
+				+ "      fd:interface [ a                         fd:FixedEndpointInterface ;\n"
+				+ "                     fd:supportedProtocol      fd:SPARQLProtocol ;\n"
+				+ "                     fd:endpointAddress        \"http://dbpedia.org/sparql\"^^xsd:anyURI ] ;\n"
+				+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\" .";
 
 		final Model fd = ModelFactory.createDefaultModel();
 		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
@@ -181,14 +194,16 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void vocabularyMappingFileIsLoadedFromLocalPath() {
 		final String turtle =
-				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
-						+ "PREFIX ex:     <http://example.org/>\n"
-						+ "\n"
-						+ "ex:dbpediaSPARQL\n"
-						+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
-						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
-						+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ];\n"
-						+ "                     fd:vocabularyMappingsFile \"src/test/resources/dbpedia/vocabularyMappings.nt\".";
+				  "PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>\n"
+				+ "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+				+ "PREFIX ex:     <http://example.org/>\n"
+				+ "\n"
+				+ "ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;\n"
+				+ "      fd:serviceURI \"http://dbpedia.org/sparql\"^^xsd:anyURI ;\n"
+				+ "      fd:interface [ a                         fd:FixedEndpointInterface ;\n"
+				+ "                     fd:supportedProtocol      fd:SPARQLProtocol ;\n"
+				+ "                     fd:endpointAddress        \"http://dbpedia.org/sparql\"^^xsd:anyURI ] ;\n"
+				+ "                     fd:vocabularyMappingsFile \"src/test/resources/dbpedia/vocabularyMappings.nt\" .";
 
 		final Model fd = ModelFactory.createDefaultModel();
 		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
@@ -203,14 +218,16 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void missingVocabularyMappingFileThrowsExpectedException() {
 		final String turtle =
-				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
-						+ "PREFIX ex:     <http://example.org/>\n"
-						+ "\n"
-						+ "ex:dbpediaSPARQL\n"
-						+ "      fd:serviceURI <http://dbpedia.org/sparql> ;\n"
-						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
-						+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ];\n"
-						+ "                     fd:vocabularyMappingsFile \"dummy/vocab.nt\".";
+				  "PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>\n"
+				+ "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+				+ "PREFIX ex:     <http://example.org/>\n"
+				+ "\n"
+				+ "ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;\n"
+				+ "      fd:serviceURI \"http://dbpedia.org/sparql\"^^xsd:anyURI ;\n"
+				+ "      fd:interface [ a                         fd:FixedEndpointInterface ;\n"
+				+ "                     fd:supportedProtocol      fd:SPARQLProtocol ;\n"
+				+ "                     fd:endpointAddress        \"http://dbpedia.org/sparql\"^^xsd:anyURI ] ;\n"
+				+ "                     fd:vocabularyMappingsFile \"dummy/vocab.nt\" .";
 
 		final Model fd = ModelFactory.createDefaultModel();
 		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
@@ -219,7 +236,6 @@ public class FederationDescriptionReaderTest
 		final Exception exception = assertThrows( IllegalArgumentException.class, () -> {
 			FederationDescriptionReader.readFromModel( fd );
 		} );
-
 
 		assertTrue( "Expected cause to be RiotNotFoundException, but was: " + exception.getCause(),
 			exception.getCause() instanceof RiotNotFoundException );

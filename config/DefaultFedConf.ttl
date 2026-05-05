@@ -1,28 +1,28 @@
-@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
-@prefix fd:     <http://w3id.org/hefquin/feddesc#> .
-@prefix ex:     <http://example.org/> .
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX fd:     <http://w3id.org/hefquin/feddesc#>
+PREFIX ex:     <http://example.org/>
 
-ex:dbpediaSPARQL
-      a            fd:FederationMember ;
-      fd:serviceURI <http://dbpedia.org/sparql> ;
-      fd:interface [ a                  fd:SPARQLEndpointInterface ;
-                     fd:endpointAddress <http://dbpedia.org/sparql> ] .
+ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://dbpedia.org/sparql"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://dbpedia.org/sparql"^^xsd:anyURI ] .
 
-ex:dbpediaTPF
-      a            fd:FederationMember ;
-      fd:serviceURI <http://fragments.dbpedia.org/2016-04/en> ;
-      fd:interface [ a                         fd:TPFInterface ;
-                     fd:exampleFragmentAddress <http://fragments.dbpedia.org/2016-04/en> ] .
+ex:dbpediaTPF a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI ;
+    fd:interface [ a                         fd:FragmentInterface ;
+                   fd:supportedProtocol      fd:TPFProtocol ;
+                   fd:exampleFragmentAddress "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI ] .
 
-ex:wikidataSPARQL
-      a            fd:FederationMember ;
-      fd:serviceURI <https://query.wikidata.org/sparql> ;
-      fd:interface [ a                  fd:SPARQLEndpointInterface ;
-                     fd:endpointAddress <https://query.wikidata.org/sparql> ] .
+ex:wikidataSPARQL a fd:RDFBasedFederationMember ;
+    fd:serviceURI "https://query.wikidata.org/sparql"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "https://query.wikidata.org/sparql"^^xsd:anyURI ] .
 
-ex:europaSPARQL
-      a            fd:FederationMember ;
-      fd:serviceURI <https://data.europa.eu/sparql> ;
-      fd:interface [ a                  fd:SPARQLEndpointInterface ;
-                     fd:endpointAddress <https://data.europa.eu/sparql> ] .
+ex:europaSPARQL a fd:RDFBasedFederationMember ;
+    fd:serviceURI "https://data.europa.eu/sparql"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "https://data.europa.eu/sparql"^^xsd:anyURI ] .
