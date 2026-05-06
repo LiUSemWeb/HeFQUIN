@@ -725,7 +725,7 @@ public class ProjectPushDownTest extends EngineTestBase
 	@Test
 	public void pushProjectUnderL2g() {
 		// A project on top of an l2g operator with a TPF request underneath
-		// The project and l2g operator are expected to swap places.
+		// Both the project and l2g operator are expected to be dropped.
 
 		// set up
 		// - request operator
@@ -747,13 +747,7 @@ public class ProjectPushDownTest extends EngineTestBase
 		final LogicalPlan result = new ProjectPushDown().apply(projectPlan);
 
 		// check
-		assertTrue( result.getRootOperator() instanceof LogicalOpLocalToGlobal );
-
-		final LogicalPlan subResult = result.getSubPlan(0);
-		assertTrue( subResult.getRootOperator() instanceof LogicalOpProject );
-
-		final LogicalPlan subsubResult = subResult.getSubPlan(0);
-		assertTrue( subsubResult.getRootOperator() instanceof LogicalOpRequest );
+		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
 	}
 
 	@Test
