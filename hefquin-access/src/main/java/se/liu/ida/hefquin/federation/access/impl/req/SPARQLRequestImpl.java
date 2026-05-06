@@ -15,21 +15,15 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 public class SPARQLRequestImpl implements SPARQLRequest
 {
 	protected final SPARQLGraphPattern pattern;
-	protected final SPARQLQuery query;
-	protected final ExpectedVariables expectedVars;
 	protected final Set<Var> projectionVars;
 	protected final boolean isDistinct;
 
-	public SPARQLRequestImpl( final SPARQLGraphPattern pattern ) {
-		assert pattern != null;
-		this.pattern = pattern;
-		this.query = null;
-		this.projectionVars = null;
-		this.isDistinct = false;
+	protected final SPARQLQuery query;
 
-		// we materialize the ExpectedVariables in this case
-		// to avoid producing it again whenever it is used
-		expectedVars = pattern.getExpectedVariables();
+	protected final ExpectedVariables expectedVars;
+
+	public SPARQLRequestImpl( final SPARQLGraphPattern pattern ) {
+		this(pattern, null, false);
 	}
 
 	public SPARQLRequestImpl( final SPARQLGraphPattern pattern,
@@ -81,7 +75,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	@Override
 	public int hashCode() {
 		if ( pattern == null )
-			return query.hashCode() ^ getProjectionVars().hashCode() ^ (isDistinct() ? 1 : 0);
+			return query.hashCode();
 		else
 			return pattern.hashCode() ^ getProjectionVars().hashCode() ^ (isDistinct() ? 1 : 0);
 	}
