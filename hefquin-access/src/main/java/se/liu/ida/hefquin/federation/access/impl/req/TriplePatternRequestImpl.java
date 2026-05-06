@@ -4,7 +4,6 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 

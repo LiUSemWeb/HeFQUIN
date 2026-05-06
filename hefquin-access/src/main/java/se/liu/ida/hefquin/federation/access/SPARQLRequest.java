@@ -33,7 +33,7 @@ public interface SPARQLRequest extends DataRetrievalRequest
 	Set<Var> getProjectionVars();
 
 	/**
-	 * Returns {@code true} if this request <em>explicit</em> requires that the requested
+	 * Returns {@code true} if this request <em>explicitly</em> requires that the requested
 	 * result is duplicate free.
 	 *
 	 * @return {@code true} if duplicate elimination is requested; {@code false} otherwise
@@ -45,11 +45,13 @@ public interface SPARQLRequest extends DataRetrievalRequest
 	 * should be requested.
 	 */
 	default SPARQLQuery getQuery() {
-		return convertToQuery( getQueryPattern() );
+		return convertToQuery( getQueryPattern(), getProjectionVars(), isDistinct() );
 	}
 
-	static SPARQLQuery convertToQuery( final SPARQLGraphPattern pattern ) {
-		return new SPARQLQueryImpl( pattern );
+	static SPARQLQuery convertToQuery( final SPARQLGraphPattern pattern,
+	                                   final Set<Var> projectionVars,
+	                                   final boolean isDistinct ) {
+		return new SPARQLQueryImpl( pattern, projectionVars, isDistinct );
 	}
 
 }

@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.federation.access.impl.req;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
