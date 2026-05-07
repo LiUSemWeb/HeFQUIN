@@ -54,7 +54,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 
 	public ExecOpBind( final Var var,
 	                   final Expr expr,
-					   final boolean mayReduce,
+	                   final boolean mayReduce,
 	                   final boolean collectExceptions,
 	                   final QueryPlanningInfo qpInfo ) {
 		super(mayReduce, collectExceptions, qpInfo);
