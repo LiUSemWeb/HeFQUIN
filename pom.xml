@@ -170,6 +170,27 @@
         </configuration>
       </plugin>
 
+      <!-- Clean up cache directories -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.3.2</version>
+        <configuration>
+          <filesets>
+            <!-- Root-level cache -->
+            <fileset>
+              <directory>${project.basedir}/cache</directory>
+            </fileset>
+            <!-- Module-level cache directories (one level deep) -->
+            <fileset>
+              <directory>${project.basedir}</directory>
+              <includes>
+                <include>*/cache/**</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+
       <!-- Add config/ to classpath -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
