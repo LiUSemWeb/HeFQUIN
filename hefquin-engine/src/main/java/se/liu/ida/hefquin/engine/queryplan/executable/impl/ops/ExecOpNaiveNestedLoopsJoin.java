@@ -9,6 +9,9 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Attention, this is a purely local implementation of the nested loops
  * join algorithm---nothing fancy, no requests to federation members or
@@ -24,12 +27,15 @@ import java.util.List;
  */
 public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpNaiveNestedLoopsJoin.class );
 	protected final List<SolutionMapping> inputLHS = new ArrayList<>();
 
 	public ExecOpNaiveNestedLoopsJoin( final boolean mayReduce,
 	                                   final boolean collectExceptions,
 	                                   final QueryPlanningInfo qpInfo ) {
 		super(mayReduce, collectExceptions, qpInfo);
+
+		log.info( "Initialized ExecOpNaiveNestedLoopsJoin." );
 	}
 
 	@Override
@@ -46,6 +52,7 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
+		log.info( "Adding solution mapping to left-hand-side input." );
 		inputLHS.add(inputSolMap);
 	}
 
@@ -53,12 +60,14 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
 	                                 final ExecutionContext execCxt ) {
 		// nothing to be done here
+		log.info( "Completed build phase for child 1 with {} solution mappings.", inputLHS.size() );
 	}
 
 	@Override
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
+		log.info( "Processing probe-side solution mapping." );
 		final List<SolutionMapping> output = new ArrayList<>();
 		for ( final SolutionMapping smL : inputLHS ) {
 			if ( SolutionMappingUtils.compatible(smL,inputSolMap) ) {
@@ -66,6 +75,7 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 			}
 		}
 
+		log.info( "Produced {} joined solution mappings.", output.size() );
 		sink.send(output);
 	}
 
@@ -73,6 +83,7 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
+		log.info( "Processing batch of {} probe-side solution mappings.", inputSolMaps.size() );
 		final List<SolutionMapping> output = new ArrayList<>();
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
 			for ( final SolutionMapping smL : inputLHS ) {
@@ -82,6 +93,7 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 			}
 		}
 
+		log.info( "Produced {} joined solution mappings.", output.size() );
 		sink.send(output);
 	}
 
@@ -90,6 +102,7 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 	                                 final ExecutionContext execCxt ) {
 		// clear the list of collected first-input solution
 		// mappings to enable the GC to release memory early
+		log.info( "Nested loops join execution completed. Clearing left-hand-side input." );
 		inputLHS.clear();
 	}
 

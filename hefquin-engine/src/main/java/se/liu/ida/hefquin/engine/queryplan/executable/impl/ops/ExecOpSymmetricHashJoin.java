@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import org.apache.jena.sparql.core.Var;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
@@ -30,6 +32,7 @@ import java.util.*;
  */
 public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpSymmetricHashJoin.class );
 	protected final SolutionMappingsIndex indexForChild1;
 	protected final SolutionMappingsIndex indexForChild2;
 
@@ -62,11 +65,14 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		// determine the certain join variables
 		final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);
 
+		log.info( "Initializing symmetric hash join operator with join variables {}.", certainJoinVars );
+
 		// set up the core part of the two indexes first; it is built on the certain join variables
 		SolutionMappingsIndex solMHashTableL;
 		SolutionMappingsIndex solMHashTableR;
 		if ( certainJoinVars.size() == 1 ) {
 			final Var joinVar = certainJoinVars.iterator().next();
+			log.info( "Using one-variable hash table for join variable {}.", joinVar );
 			solMHashTableL = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
 			solMHashTableR = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
 		}
@@ -75,10 +81,13 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 			final Var joinVar1 = liVar.next();
 			final Var joinVar2 = liVar.next();
 
+			log.info( "Using two-variable hash table for join variables {}, {}.", joinVar1, joinVar2 );
+
 			solMHashTableL = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
 			solMHashTableR = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
 		}
-		else{
+		else {
+			log.info( "Using generic hash table for join variables {}.", certainJoinVars );
 			solMHashTableL = new SolutionMappingsHashTable(certainJoinVars);
 			solMHashTableR = new SolutionMappingsHashTable(certainJoinVars);
 		}
@@ -87,6 +96,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		// the join and, if so, set up the indexes to use post-matching.
 		final Set<Var> potentialJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables(inputVars1, inputVars2);
 		if ( ! potentialJoinVars.equals(certainJoinVars) ) {
+			log.info( "Post-matching enabled for potential join variables {}.", potentialJoinVars );
 			solMHashTableL = new SolutionMappingsIndexWithPostMatching(solMHashTableL);
 			solMHashTableR = new SolutionMappingsIndexWithPostMatching(solMHashTableR);
 		}
@@ -109,11 +119,14 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
+		log.info( "Processing solution mapping from child 1." );
+
 		buffer.clear();
 
 		_processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
 
 		numberOfOutputMappingsProduced += buffer.size();
+		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -123,6 +136,8 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
+		log.info( "Processing batch of {} solution mappings from child 1.", inputSolMaps.size() );
+
 		buffer.clear();
 
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
@@ -130,6 +145,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		}
 
 		numberOfOutputMappingsProduced += buffer.size();
+		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -138,6 +154,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
 									 final ExecutionContext execCxt ) {
+		log.info( "Completed input processing for child 1." );
 		child1InputComplete = true;
 
 		if ( child2InputComplete ) {
@@ -149,11 +166,14 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
+		log.info( "Processing solution mapping from child 2." );
+
 		buffer.clear();
 
 		_processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
 
 		numberOfOutputMappingsProduced += buffer.size();
+		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -163,6 +183,8 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
+		log.info( "Processing batch of {} solution mappings from child 2.", inputSolMaps.size() );
+
 		buffer.clear();
 
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
@@ -170,6 +192,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		}
 
 		numberOfOutputMappingsProduced += buffer.size();
+		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -178,6 +201,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
 	                                 final ExecutionContext execCxt ) {
+		log.info( "Completed input processing for child 2." );
 		child2InputComplete = true;
 
 		if ( child1InputComplete ) {
@@ -188,8 +212,12 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void wrapUp() {
 		// clear both indexes to enable the GC to release memory early,
 		// but make sure we keep the final stats of the indexes
+		log.info( "Symmetric hash join execution completed. Clearing indexes." );
+
 		statsOfIndexForChild1 = indexForChild1.getStats();
 		statsOfIndexForChild2 = indexForChild2.getStats();
+		log.info( "Final index statistics for child 1: {}.", statsOfIndexForChild1 );
+		log.info( "Final index statistics for child 2: {}.", statsOfIndexForChild2 );
 
 		indexForChild1.clear();
 		indexForChild2.clear();
