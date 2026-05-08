@@ -81,7 +81,7 @@ public class FederationDescriptionReaderTest
 			FederationDescriptionReader.readFromModel(fd);
 		});
 		// Test that the error message is correct
-		final String expectedErrorMessage = "More Than One SPARQL endpointAddress!";
+		final String expectedErrorMessage = "More than one SPARQL endpointAddress!";
 		final String actualErrorMessage = exception.getMessage();
 		assertEquals(expectedErrorMessage, actualErrorMessage);
 	}
@@ -135,7 +135,7 @@ public class FederationDescriptionReaderTest
 			FederationDescriptionReader.readFromModel(fd);
 		});
 		// Test that the error message is correct
-		final String expectedErrorMessage = "More Than One TPF exampleFragmentAddress!";
+		final String expectedErrorMessage = "More than one TPF exampleFragmentAddress!";
 		final String actualErrorMessage = exception.getMessage();
 		assertEquals(expectedErrorMessage, actualErrorMessage);
 	}

@@ -124,7 +124,7 @@ public class FederationDescriptionReader
 		// Check the type of interface
 		if ( ifaceType.equals(FDVocab.FixedEndpointInterface) )
 		{
-			return handleFixedEndpointInterface( iface, protocol, vocabMap );
+			return handleFixedEndpointInterface( iface, protocol, vocabMap, fedMember, fd, serviceURI );
 		}
 		else if ( ifaceType.equals(FDVocab.FragmentInterface) )
 		{
@@ -180,17 +180,39 @@ public class FederationDescriptionReader
 	 */
 	protected FederationMember handleFixedEndpointInterface( final Resource iface,
 	                                                         final Resource protocol,
-	                                                         final VocabularyMapping vocabMap ) {
+	                                                         final VocabularyMapping vocabMap,
+	                                                         final Resource fedMember,
+	                                                         final Model fd,
+	                                                         final String serviceURI ) {
 		if ( protocol.equals(FDVocab.SPARQLProtocol) ) {
 			final String addrStr = getSingleURIProperty(
 				iface,
 				FDVocab.endpointAddress,
 				"SPARQL endpointAddress is required!",
-				"More Than One SPARQL endpointAddress!" );
+				"More than one SPARQL endpointAddress!" );
 
 			return createSPARQLEndpoint(addrStr, vocabMap);
 		}
-		else if ( protocol.equals(FDVocab.BoltProtocol) ) {
+
+		if ( protocol.equals(FDVocab.GenericWebAPIProtocol) ) {
+			if ( vocabMap != null )
+				throw new IllegalArgumentException("REST APIs cannot have a vocabulary mapping.");
+
+			final String addrStr = getSingleURIProperty(
+				iface,
+				FDVocab.endpointAddress,
+				"REST endpointAddress is required!",
+				"More than one REST endpointAddress!" );
+
+			final List<MappingExpression> trMaps = parseRMLMapping(fedMember, fd, serviceURI);
+
+			if ( trMaps.isEmpty() )
+				throw new IllegalArgumentException("The wrapped REST endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
+
+			return createWrappedRESTEndpoint(addrStr, null, trMaps);
+		}
+
+		if ( protocol.equals(FDVocab.BoltProtocol) ) {
 			if ( vocabMap != null )
 				throw new IllegalArgumentException("Neo4j endpoints cannot have a vocabulary mapping.");
 
@@ -198,11 +220,12 @@ public class FederationDescriptionReader
 				iface,
 				FDVocab.endpointAddress,
 				"Bolt endpointAddress is required!",
-				"More Than One Bolt endpointAddress!" );
+				"More than one Bolt endpointAddress!" );
 
 			return createNeo4jServer(addrStr);
 		}
-		else if ( protocol.equals(FDVocab.GraphQLProtocol) ) {
+
+		if ( protocol.equals(FDVocab.GraphQLProtocol) ) {
 			if ( vocabMap != null )
 				throw new IllegalArgumentException("GraphQL endpoints cannot have a vocabulary mapping.");
 
@@ -210,17 +233,16 @@ public class FederationDescriptionReader
 				iface,
 				FDVocab.endpointAddress,
 				"GraphQL endpointAddress is required!",
-				"More Than One GraphQL endpointAddress!" );
+				"More than one GraphQL endpointAddress!" );
 
 			return createGraphQLServer(addrStr);
 		}
-		else {
-			throw new IllegalArgumentException( protocol.toString() );
-		}
+
+		throw new IllegalArgumentException( protocol.toString() );
 	}
 
 	/**
-	 * Creates a federation member for a fixed endpoint interface (SPARQL, Bolt, GraphQL).
+	 * Creates a federation member for a fragment interface (TPF, brTPF).
 	 */
 	protected FederationMember handleFragmentInterface( final Resource iface,
 	                                                    final Resource protocol,
@@ -230,7 +252,7 @@ public class FederationDescriptionReader
 				iface,
 				FDVocab.exampleFragmentAddress,
 				"TPF exampleFragmentAddress is required!",
-				"More Than One TPF exampleFragmentAddress!" );
+				"More than one TPF exampleFragmentAddress!" );
 
 			return createTPFServer(addrStr, vocabMap);
 		}
@@ -239,7 +261,7 @@ public class FederationDescriptionReader
 				iface,
 				FDVocab.exampleFragmentAddress,
 				"brTPF exampleFragmentAddress is required!",
-				"More Than One brTPF exampleFragmentAddress!" );
+				"More than one brTPF exampleFragmentAddress!" );
 
 			return createBRTPFServer(addrStr, vocabMap);
 		}
@@ -269,81 +291,49 @@ public class FederationDescriptionReader
 			final StmtIterator paramIter = uriTemplate.listProperties(HydraVocab.mapping);
 
 			final List<RESTEndpoint.Parameter> params = new ArrayList<>();
-			while (paramIter.hasNext()) {
+			while ( paramIter.hasNext() ) {
 				final RDFNode x = paramIter.next().getObject();
-				if (!x.isResource())
+				if ( !x.isResource() )
 					throw new IllegalArgumentException("One of the query parameters of " + iface.toString()
 							+ " is not a resource (but, probably, a literal instead).");
 
 				final Resource p = x.asResource();
 				final String name = ModelUtils.getSingleMandatoryProperty_XSDString(p, HydraVocab.variable);
 				final String type = getAsURIString(ModelUtils.getSingleMandatoryProperty(p, FDVocab.paramType));
-				if (type == null)
+				
+				if ( type == null )
 					throw new IllegalArgumentException();
+
 				final Statement isRequiredStmt = p.getProperty(HydraVocab.required);
 				final boolean isRequired = isRequiredStmt == null ? false : isRequiredStmt.getBoolean();
 
 				final RDFDatatype dt;
-				if (XSDDatatype.XSDstring.getURI().equals(type)) {
+				if ( XSDDatatype.XSDstring.getURI().equals(type) ) {
 					dt = XSDDatatype.XSDstring;
-				} else if (XSDDatatype.XSDinteger.getURI().equals(type)) {
+				}
+				else if ( XSDDatatype.XSDinteger.getURI().equals(type) ) {
 					dt = XSDDatatype.XSDinteger;
-				} else if (XSDDatatype.XSDfloat.getURI().equals(type)) {
+				}
+				else if ( XSDDatatype.XSDfloat.getURI().equals(type) ) {
 					dt = XSDDatatype.XSDfloat;
-				} else if (XSDDatatype.XSDdouble.getURI().equals(type)) {
+				}
+				else if ( XSDDatatype.XSDdouble.getURI().equals(type) ) {
 					dt = XSDDatatype.XSDdouble;
-				} else {
+				}
+				else {
 					throw new IllegalArgumentException("Unexpected data type for query parameter: " + type.toString());
 				}
 
 				final RESTEndpoint.Parameter param = new RESTEndpoint.Parameter() {
-					@Override
-					public String getName() {
-						return name;
-					}
-
-					@Override
-					public RDFDatatype getType() {
-						return dt;
-					}
-
-					@Override
-					public boolean isRequired() {
-						return isRequired;
-					}
+					@Override public String getName() { return name; }
+					@Override public RDFDatatype getType() { return dt; }
+					@Override public boolean isRequired() { return isRequired; }
 				};
 
 				params.add(param);
 			}
 
-			final Resource wrapper = ModelUtils.getSingleMandatoryResourceProperty( fedMember, FDVocab.wrapper );
-
-			// TODO: Each of the TrMap-expressions created in the following
-			// should be cached to avoid producing it again if another federation
-			// member uses the exact same triples map.
-			final Resource rmlTMsList = ModelUtils.getSingleMandatoryResourceProperty( wrapper, FDVocab.rmlTriplesMaps );
-			if ( ! rmlTMsList.canAs(RDFList.class) )
-				throw new IllegalArgumentException( FDVocab.rmlTriplesMaps.getLocalName() + " property of " + wrapper.toString() + " should be a list." );
-
-			final Iterator<RDFNode> rmTMsIterator = rmlTMsList.as( RDFList.class ).iterator();
-			final Node baseIRI = NodeFactory.createURI("http://example.org/FixedBaseIRI/HardcodedInFederationDescriptionReader/");
-			final List<MappingExpression> trMaps = new ArrayList<>();
-			while ( rmTMsIterator.hasNext() ) {
-				final RDFNode tm = rmTMsIterator.next();
-				if ( tm.isResource() ) {
-					final MappingExpression trMap;
-					try {
-						trMap = RML2MappingAlgebra.convert( tm.asResource(),
-						                                    fd,
-						                                    baseIRI );
-					}
-					catch ( final RMLParserException e ) {
-						throw new IllegalArgumentException("There is a problem in the RML mapping for <" + serviceURI + ">: " +  e.getMessage(), e );
-					}
-
-					trMaps.add(trMap);
-				}
-			}
+			final List<MappingExpression> trMaps = parseRMLMapping(fedMember, fd, serviceURI);
 
 			if ( trMaps.isEmpty() )
 				throw new IllegalArgumentException("The wrapped REST endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
@@ -353,6 +343,41 @@ public class FederationDescriptionReader
 		else {
 			throw new IllegalArgumentException( protocol.toString() );
 		}
+	}
+
+	protected List<MappingExpression> parseRMLMapping( final Resource fedMember,
+	                                                   final Model fd,
+	                                                   final String serviceURI ) {
+		final Resource wrapper = ModelUtils.getSingleMandatoryResourceProperty( fedMember, FDVocab.wrapper );
+
+		// TODO: Each of the TrMap-expressions created in the following
+		// should be cached to avoid producing it again if another federation
+		// member uses the exact same triples map.
+		final Resource rmlTMsList = ModelUtils.getSingleMandatoryResourceProperty( wrapper, FDVocab.rmlTriplesMaps );
+		if ( ! rmlTMsList.canAs(RDFList.class) )
+			throw new IllegalArgumentException( FDVocab.rmlTriplesMaps.getLocalName() + " property of " + wrapper.toString() + " should be a list." );
+
+		final Iterator<RDFNode> rmTMsIterator = rmlTMsList.as( RDFList.class ).iterator();
+		final Node baseIRI = NodeFactory.createURI("http://example.org/FixedBaseIRI/HardcodedInFederationDescriptionReader/");
+		final List<MappingExpression> trMaps = new ArrayList<>();
+		while ( rmTMsIterator.hasNext() ) {
+			final RDFNode tm = rmTMsIterator.next();
+			if ( tm.isResource() ) {
+				final MappingExpression trMap;
+				try {
+					trMap = RML2MappingAlgebra.convert( tm.asResource(),
+					                                    fd,
+					                                    baseIRI );
+				}
+				catch ( final RMLParserException e ) {
+					throw new IllegalArgumentException("There is a problem in the RML mapping for <" + serviceURI + ">: " +  e.getMessage(), e );
+				}
+
+				trMaps.add(trMap);
+			}
+		}
+
+		return trMaps;
 	}
 
 	protected FederationMember createSPARQLEndpoint( final String uri, final VocabularyMapping vm ) {
