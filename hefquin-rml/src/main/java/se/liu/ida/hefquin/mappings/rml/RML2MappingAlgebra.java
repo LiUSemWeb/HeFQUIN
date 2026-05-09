@@ -29,6 +29,7 @@ import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtendExprConstant;
 import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtendExprFunction;
 import se.liu.ida.hefquin.mappings.algebra.ops.extexprs.ExtendExpression;
 import se.liu.ida.hefquin.mappings.algebra.ops.extfcts.ExtnFct_Concat;
+import se.liu.ida.hefquin.mappings.algebra.ops.extfcts.ExtnFct_NewBNode;
 import se.liu.ida.hefquin.mappings.algebra.ops.extfcts.ExtnFct_ToBNode;
 import se.liu.ida.hefquin.mappings.algebra.ops.extfcts.ExtnFct_ToIRI;
 import se.liu.ida.hefquin.mappings.algebra.ops.extfcts.ExtnFct_ToLiteral;
@@ -510,15 +511,32 @@ public class RML2MappingAlgebra
 					                                  subExpressions );
 				}
 			}
+			else if ( t == null && r == null ) {
+				// Not explicitly part of Algorithm 3, but needed to cover
+				// the case of a term maps with rml:termType rml:BlankNode
+				// (which is not covered by the algorithm!).
+				extExpr = null;
+			}
 			else {
-				throw new RMLParserException( "One of the term maps (" + u.toString() + ") does not have an rml:reference or rml:template statement, or has both of them.");
+				throw new RMLParserException( "One of the term maps (" + u.toString() + ") has both an rml:reference and an rml:template statement.");
 			}
 
 			// line 13 of Algorithm 3
 			final RDFNode type = ModelUtils.getSingleOptionalProperty( u, RMLVocab.termType );
 			if ( type != null && RMLVocab.BlankNode.equals(type) ) {
-				return new ExtendExprFunction( ExtnFct_ToBNode.instance,
-				                               extExpr );
+				if ( extExpr == null ) {
+					// This case is not covered by Algorithm 3,
+					// which is a bug in the algorithm.
+					return new ExtendExprFunction( ExtnFct_NewBNode.instance );
+				}
+				else {
+					return new ExtendExprFunction( ExtnFct_ToBNode.instance,
+					                               extExpr );
+				}
+			}
+
+			if ( extExpr == null ) {
+				throw new RMLParserException( "One of the term maps (" + u.toString() + ") does not have an rml:reference or rml:template statement.");
 			}
 
 			// line 14 of Algorithm 3
