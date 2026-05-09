@@ -49,7 +49,7 @@ public class RESTRequestImpl implements RESTRequest
 
 	private static String expandTemplate( final String urlTemplate, final Map<String,String> bindings ) {
         String result = urlTemplate;
-        
+
         // First, expand path variables {var} - these are mandatory
         for ( final Map.Entry<String,String> e : bindings.entrySet() ) {
             final String placeholder = "{" + e.getKey() + "}";
@@ -57,7 +57,7 @@ public class RESTRequestImpl implements RESTRequest
                 result = result.replace( placeholder, urlEncode(e.getValue()) );
             }
         }
-        
+
         // Handle query parameters {?arg1,arg2,...}
         final Pattern queryPattern = Pattern.compile("\\{\\?([^}]+)\\}");
         final Matcher queryMatcher = queryPattern.matcher(result);
@@ -87,10 +87,36 @@ public class RESTRequestImpl implements RESTRequest
             // Replace the {?...} pattern with the built query string
             result = queryMatcher.replaceAll(queryString.toString());
         }
-        
+
+        // Handle additional query parameters {&arg1,arg2,...}
+        final Pattern queryPattern2 = Pattern.compile("\\{\\&([^}]+)\\}");
+        final Matcher queryMatcher2 = queryPattern2.matcher(result);
+
+        if ( queryMatcher2.find() ) {
+            final String queryVars = queryMatcher2.group(1);
+            final String[] varNames = queryVars.split(",");
+
+            final StringBuilder queryString = new StringBuilder();
+
+            for ( String varName : varNames ) {
+                varName = varName.trim();
+                String value = bindings.get(varName);
+
+                if ( value != null && ! value.isEmpty() ) {
+                    queryString.append("&");
+                    queryString.append(varName);
+                    queryString.append("=");
+                    queryString.append( urlEncode(value) );
+                }
+            }
+
+            // Replace the {&...} pattern with the built query string
+            result = queryMatcher2.replaceAll( queryString.toString() );
+        }
+
         return result;
     }
-    
+
     private static String urlEncode( final String value) {
         try {
             return URLEncoder.encode(value, "UTF-8");
