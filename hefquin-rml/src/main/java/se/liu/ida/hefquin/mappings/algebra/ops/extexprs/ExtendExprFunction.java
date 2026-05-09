@@ -27,6 +27,9 @@ public class ExtendExprFunction implements ExtendExpression
 	                           final List<ExtendExpression> subExpressions ) {
 		assert fct != null;
 		assert fct.isCorrectNumberOfArgument( subExpressions.size() );
+		for ( final ExtendExpression sub : subExpressions ) {
+			assert sub != null;
+		}
 
 		this.fct = fct;
 		this.subExpressions = subExpressions;
