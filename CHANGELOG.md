@@ -22,6 +22,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Extending filter push down with the option to push also into the pattern of a gpAdd operator ([#589](https://github.com/LiUSemWeb/HeFQUIN/pull/589)).
 - Separation of logical and physical plans for mapping algebra ([#581](https://github.com/LiUSemWeb/HeFQUIN/pull/581), [#596](https://github.com/LiUSemWeb/HeFQUIN/pull/596)).
 - Fix in RML-to-algebra translation algorithm ([#610](https://github.com/LiUSemWeb/HeFQUIN/pull/610)).
+- Fix in code that expands URI templates ([#611](https://github.com/LiUSemWeb/HeFQUIN/pull/611)).
 - Removes unused provenance-related methods from DataRetrievalResponse ([#582](https://github.com/LiUSemWeb/HeFQUIN/pull/582)).
 
 
