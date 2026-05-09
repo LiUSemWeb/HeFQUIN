@@ -20,6 +20,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Refactoring the code of the logical plan rewriting rules to use the visitor pattern ([#560](https://github.com/LiUSemWeb/HeFQUIN/pull/560), [#569](https://github.com/LiUSemWeb/HeFQUIN/pull/569), [#571](https://github.com/LiUSemWeb/HeFQUIN/pull/571), [#575](https://github.com/LiUSemWeb/HeFQUIN/pull/575)).
 - More effective filter push down and cardinality estimation for the case of a filter over a fixed-solmap operator ([#588](https://github.com/LiUSemWeb/HeFQUIN/pull/588)).
 - Extending filter push down with the option to push also into the pattern of a gpAdd operator ([#589](https://github.com/LiUSemWeb/HeFQUIN/pull/589)).
+- Bug fix in the executable operator for BIND ([#612](https://github.com/LiUSemWeb/HeFQUIN/pull/612)).
 - Separation of logical and physical plans for mapping algebra ([#581](https://github.com/LiUSemWeb/HeFQUIN/pull/581), [#596](https://github.com/LiUSemWeb/HeFQUIN/pull/596)).
 - Fix in RML-to-algebra translation algorithm ([#610](https://github.com/LiUSemWeb/HeFQUIN/pull/610)).
 - Fix in code that expands URI templates ([#611](https://github.com/LiUSemWeb/HeFQUIN/pull/611)).

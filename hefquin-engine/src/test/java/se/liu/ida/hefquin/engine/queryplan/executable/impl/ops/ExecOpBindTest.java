@@ -245,4 +245,38 @@ public class ExecOpBindTest
 		assertFalse( it.hasNext() );
 	}
 
+	@Test
+	public void extendSolMapTwiceWithDependency() throws ExecOpExecutionException {
+		// Extends a solution mapping using an ExecOpBind that has
+		// two bind expressions, where the second bind expression
+		// uses the variable bound by the first bind expression.
+		final Node lit8 = NodeFactory.createLiteralDT( "8", XSDDatatype.XSDinteger );
+		final Var v1 = Var.alloc("v1");
+
+		final List<SolutionMapping> input = new ArrayList<>(1);
+		input.add( SolutionMappingUtils.createSolutionMapping(v1, lit8) );
+
+		final Var v2 = Var.alloc("v2");
+		final Var v3 = Var.alloc("v3");
+		final VarExprList veList = new VarExprList();
+		veList.add( v2, ExprUtils.parse("?v1 + 1") );
+		veList.add( v3, ExprUtils.parse("?v2 - 1") ); // <--- ?v2 !!
+
+		final ExecOpBind op = new ExecOpBind(veList, false, false, null);
+
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
+
+		op.process(input, sink, null);
+
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
+
+		assertTrue( it.hasNext() );
+		final Binding sm = it.next().asJenaBinding();
+		final Node lit9 = NodeFactory.createLiteralDT( "9", XSDDatatype.XSDinteger );
+		assertEquals( lit9, sm.get(v2) );
+		assertEquals( lit8, sm.get(v3) );
+
+		assertFalse( it.hasNext() );
+	}
+
 }

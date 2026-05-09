@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.NodeValue;
@@ -179,8 +178,13 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 		{
 			logger.info( "Evaluating multiple bind expressions." );
 
-			final Binding sm = solmap.asJenaBinding();
-			final BindingBuilder smBuilder = BindingFactory.builder(sm);
+			// This Binding will be replaced by extended versions of
+			// it within the following for-loop. Extending it stepwise
+			// is necessary because the variable bound by one of the
+			// expressions in 'exprs' may be used in a subsequent
+			// expressions in 'exprs'.
+			Binding sm = solmap.asJenaBinding();
+
 			boolean extended = false;
 
 			for ( final Map.Entry<Var, Expr> e : exprs.getExprs().entrySet() ) {
@@ -199,7 +203,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 				// to the output solution mapping.
 				try {
 					final NodeValue evaluationResult = ExprUtils.eval(expr, sm);
-					smBuilder.add( var, evaluationResult.asNode() );
+					sm = BindingFactory.binding(sm, var, evaluationResult.asNode() );
 					extended = true;
 
 					logger.info( "Successfully extended solution mapping with variable {}.", var );
@@ -212,7 +216,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 			}
 
 			if ( extended )
-				return new SolutionMappingImpl( smBuilder.build() );
+				return new SolutionMappingImpl(sm);
 			else {
 				logger.info( "No bind expressions could be evaluated successfully." );
 				return solmap;
