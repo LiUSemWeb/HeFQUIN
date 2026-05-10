@@ -300,7 +300,7 @@ public class FederationDescriptionReader
 				final Resource p = x.asResource();
 				final String name = ModelUtils.getSingleMandatoryProperty_XSDString(p, HydraVocab.variable);
 				final String type = getAsURIString(ModelUtils.getSingleMandatoryProperty(p, FDVocab.paramType));
-				
+
 				if ( type == null )
 					throw new IllegalArgumentException();
 
@@ -319,6 +319,9 @@ public class FederationDescriptionReader
 				}
 				else if ( XSDDatatype.XSDdouble.getURI().equals(type) ) {
 					dt = XSDDatatype.XSDdouble;
+				}
+				else if ( XSDDatatype.XSDdecimal.getURI().equals(type) ) {
+					dt = XSDDatatype.XSDdecimal;
 				}
 				else {
 					throw new IllegalArgumentException("Unexpected data type for query parameter: " + type.toString());
