@@ -61,7 +61,6 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 
 		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
 
-		assertEquals( fm, r.getFederationMember() );
 		assertEquals( card, r.getCardinality() );
 	}
 
@@ -80,7 +79,6 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 
 		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
 
-		assertEquals( fm, r.getFederationMember() );
 		assertEquals( card, r.getCardinality() );
 	}
 
@@ -112,8 +110,6 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 			System.out.println( "twoCardinalityRequestsInParallel \t milliseconds passed: " + (endTime - startTime) );
 		}
 
-		assertEquals( fm1, r1.getFederationMember() );
-		assertEquals( fm2, r2.getFederationMember() );
 		assertEquals( card, r1.getCardinality() );
 		assertEquals( card, r2.getCardinality() );
 	}
@@ -146,8 +142,6 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 			System.out.println( "twoCardinalityRequestsInSequence \t milliseconds passed: " + (endTime - startTime) );
 		}
 
-		assertEquals( fm1, r1.getFederationMember() );
-		assertEquals( fm2, r2.getFederationMember() );
 		assertEquals( card, r1.getCardinality() );
 		assertEquals( card, r2.getCardinality() );
 	}
@@ -275,9 +269,9 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 			final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping( countVar, countNode );
 			final SolMapsResponse r;
 			if ( ! simulateError ) {
-				r = new SolMapsResponseImpl( Arrays.asList(sm), fm, req, new Date() );
+				r = new SolMapsResponseImpl( Arrays.asList(sm), new Date() );
 			} else {
-				r = new SolMapsResponseImpl( Arrays.asList(sm), fm, req, new Date(), 400, "Response error" );
+				r = new SolMapsResponseImpl( Arrays.asList(sm), new Date(), 400, "Response error" );
 			}
 
 			return CompletableFuture.supplyAsync( () -> {
@@ -301,8 +295,6 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 				r = new TPFResponseImpl( Collections.emptyList(),
 				                         Collections.emptyList(),
 				                         null,
-				                         fm,
-				                         req,
 				                         new Date() ) {
 					@Override
 					public Integer getCardinalityEstimate() {
@@ -314,8 +306,6 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 				r = new TPFResponseImpl( Collections.emptyList(),
 				                         Collections.emptyList(),
 				                         null,
-				                         fm,
-				                         req,
 				                         new Date(),
 				                         400,
 				                         "Response error" );

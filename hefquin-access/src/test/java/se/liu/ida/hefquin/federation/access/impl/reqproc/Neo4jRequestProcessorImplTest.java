@@ -5,11 +5,8 @@ import org.junit.Test;
 import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.Neo4jRequest;
-import se.liu.ida.hefquin.federation.access.RecordsResponse;
 import se.liu.ida.hefquin.federation.access.impl.req.Neo4jRequestImpl;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
-
-import static org.junit.Assert.assertEquals;
 
 public class Neo4jRequestProcessorImplTest extends FederationTestBase {
 
@@ -23,10 +20,7 @@ public class Neo4jRequestProcessorImplTest extends FederationTestBase {
 
             final Neo4jRequestProcessor processor = new Neo4jRequestProcessorImpl();
 
-            final RecordsResponse response = processor.performRequest(req, fm);
-
-            assertEquals( fm, response.getFederationMember() );
-            assertEquals( req, response.getRequest() );
+            processor.performRequest(req, fm);
         }
     }
 

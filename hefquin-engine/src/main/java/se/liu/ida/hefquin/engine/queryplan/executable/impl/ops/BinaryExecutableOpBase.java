@@ -44,9 +44,10 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	private long maxRightProcessingTime              = 0L;
 	protected long timeAtCurrentRightProcStart       = 0L;
 
-	public BinaryExecutableOpBase( final boolean collectExceptions,
+	public BinaryExecutableOpBase( final boolean mayReduce,
+	                               final boolean collectExceptions,
 	                               final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

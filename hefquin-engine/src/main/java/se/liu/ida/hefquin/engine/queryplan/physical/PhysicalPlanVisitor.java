@@ -12,11 +12,12 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpIndexNestedLoopsJoin op );
 	void visit( PhysicalOpLookupJoinViaWrapper op );
 
-	void visit( PhysicalOpHashJoin op );
+	void visit( PhysicalOpHashJoin1 op );
+	void visit( PhysicalOpHashJoin2 op );
+	void visit( PhysicalOpMinus op );
 	void visit( PhysicalOpSymmetricHashJoin op );
 	void visit( PhysicalOpNaiveNestedLoopsJoin op );
 
-	void visit( PhysicalOpHashRJoin op );
 	void visit( PhysicalOpParallelMultiLeftJoin op );
 
 	void visit( PhysicalOpBinaryUnion op );
@@ -24,6 +25,9 @@ public interface PhysicalPlanVisitor
 
 	void visit( PhysicalOpFilter op );
 	void visit( PhysicalOpBind op );
+	void visit( PhysicalOpUnfold op );
 	void visit( PhysicalOpLocalToGlobal op );
 	void visit( PhysicalOpGlobalToLocal op );
+	void visit( PhysicalOpDuplicateRemoval op );
+	void visit( PhysicalOpProject op );
 }

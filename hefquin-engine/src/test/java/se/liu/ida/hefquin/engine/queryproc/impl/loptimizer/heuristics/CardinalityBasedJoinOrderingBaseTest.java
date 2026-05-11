@@ -76,7 +76,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 		@SuppressWarnings("unchecked")
 		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(null, null);
 
-		final LogicalOpFilter f = new LogicalOpFilter( Expr.NONE );
+		final LogicalOpFilter f = new LogicalOpFilter( Expr.NONE, false );
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(f, null, joinPlan);
 
 		final Map<LogicalPlan,Integer> cards = new HashMap<>();
@@ -99,7 +99,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 		@SuppressWarnings("unchecked")
 		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(null, null);
 
-		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null);
+		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null, false);
 		final LogicalPlan l2gPlan = new LogicalPlanWithUnaryRootImpl(l2g, null, joinPlan);
 
 		final Map<LogicalPlan,Integer> cards = new HashMap<>();
@@ -204,7 +204,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 				@Override public TriplePattern getQueryPattern() { throw new UnsupportedOperationException(); }
 			};
 
-			subPlans[i] = new LogicalPlanWithNullaryRootImpl( new LogicalOpRequest<>(srv, req), null );
+			subPlans[i] = new LogicalPlanWithNullaryRootImpl( new LogicalOpRequest<>(srv, false, req), null );
 		}
 
 		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayJoin.getInstance(), null, subPlans );

@@ -140,7 +140,7 @@ public class ExecOpParallelBindJoinSPARQLwithVALUESTest extends TestsForTPAddAlg
 	                                                 final boolean useOuterJoinSemantics ) {
 
 		return new ExecOpParallelBindJoinSPARQLwithVALUES(
-				tp, fm, expectedVariables, useOuterJoinSemantics,
+				tp, fm, expectedVariables, useOuterJoinSemantics, false,
 				ExecOpSequentialBindJoinSPARQLwithVALUES.DEFAULT_BATCH_SIZE,
 				false, null );
 	}

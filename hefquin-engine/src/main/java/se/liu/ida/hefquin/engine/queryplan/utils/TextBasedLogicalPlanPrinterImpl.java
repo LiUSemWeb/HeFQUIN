@@ -37,15 +37,42 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 {
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
 
+	protected final PrintStream[] outs;
+
+	public TextBasedLogicalPlanPrinterImpl( final PrintStream ... outs ) {
+		assert outs.length > 0;
+		this.outs = outs;
+	}
+
+	public TextBasedLogicalPlanPrinterImpl( ) {
+		this.outs = new PrintStream[]{System.out};
+	}
+
 	@Override
-	public void print( final LogicalPlan plan, final PrintStream out ) {
+	public void print( final LogicalPlan plan, final PrintStream out, final LogicalPlanStage planType ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		out.println("--------- " + planType.name + " ---------");
 		PlanPrinter.print(pp, out);
 		printFullStringsForGraphPatterns(pp, out);
 		out.flush();
 	}
 
+	@Override
+	public void print( final LogicalPlan plan, final LogicalPlanStage planType ) {
+		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		for ( final PrintStream out : outs ) {
+			out.println("--------- " + planType.name + " ---------");
+			PlanPrinter.print(pp, out);
+			printFullStringsForGraphPatterns(pp, out);
+			out.flush();
+		}
+	}
+
 	public ExtPrintablePlan createPrintablePlan( final LogicalPlan lp ) {
+		if ( lp instanceof LogicalPlanWithoutResult ) {
+			return new ExtPrintablePlan( "empty plan", null, null, null, null );
+		}
+
 		final LogicalOperator rootOp = lp.getRootOperator();
 
 		rootOp.visit(snc);
@@ -107,7 +134,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		public List<String> props = null;
 
 		/**
-		 * The graph pattern of  the most recently visited operator (if any).
+		 * The graph pattern of the most recently visited operator (if any).
 		 */
 		public SPARQLGraphPattern graphPattern;
 
@@ -123,11 +150,14 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		public void visit( final LogicalOpRequest<?,?> op ) {
 			record( op.getFederationMember() );
 			record( op.getRequest() );
+
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
 			props.add( "solmap: " + op.getSolutionMapping().toString() );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -145,42 +175,51 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 			props.add( b.toString() );
 
 			record( op.getPattern() );
+
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpGPOptAdd op ) {
 			record( op.getFederationMember() );
 			record( op.getPattern() );
+
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpJoin op ) {
-			// nothing extra
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
-		public void visit( final LogicalOpRightJoin op ) {
-			// nothing extra
+		public void visit( final LogicalOpLeftJoin op ) {
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpUnion op ) {
-			// nothing extra
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayJoin op ) {
-			// nothing extra
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayLeftJoin op ) {
-			// nothing extra
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayUnion op ) {
-			// nothing extra
+			props.add( "may reduce duplicates: " + op.mayReduce() );
+		}
+
+		@Override
+		public void visit( final LogicalOpDedup op ) {
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -197,6 +236,8 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 					props.add( "expression " + (i+1) + ": " + ExprUtils.fmtSPARQL(expr) );
 				}
 			}
+
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
@@ -209,16 +250,50 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				final Expr expr = e.getValue();
 				props.add( var.toString() + " <-- " + ExprUtils.fmtSPARQL(expr) );
 			}
+
+			props.add( "may reduce duplicates: " + op.mayReduce() );
+		}
+
+		@Override
+		public void visit( final LogicalOpUnfold op ) {
+			final String v;
+			if ( op.getVar2() != null )
+				v = op.getVar1().toString() + "," + op.getVar2();
+			else
+				v = op.getVar1().toString();
+
+			props.add( v + " <-- " + ExprUtils.fmtSPARQL(op.getExpr()) );
+
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) {
 			props.add( "vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
 			props.add( "vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
+			props.add( "may reduce duplicates: " + op.mayReduce() );
+		}
+
+		@Override
+		public void visit( final LogicalOpProject op ) {
+			String varsStr = "variables: ";
+			final Iterator<Var> it = op.getVariables().iterator();
+			varsStr += it.hasNext() ? it.next().toString() : "none";
+			while ( it.hasNext() ) {
+				varsStr += ", " + it.next().toString();
+			}
+
+			props.add( varsStr );
+		}
+
+		@Override
+		public void visit( final LogicalOpMinus op ) {
+			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 
 		protected void record( final FederationMember fm ) {

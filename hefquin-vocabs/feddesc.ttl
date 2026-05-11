@@ -11,7 +11,7 @@
     dc:creator       "Olaf Hartig",
                      "Robin Keskisärkkä",
                      "Jonas Westman" ;
-    dc:date          "2026-03-06" ;
+    dc:date          "2026-04-30" ;
     dc:format        "RDF" ;
     dc:identifier    <http://w3id.org/hefquin/feddesc> ;
     dc:title         "Federation Description Vocabulary for HeFQUIN"@en ;
@@ -23,124 +23,137 @@
 
 fd:FederationMember a owl:Class ;
     rdfs:label "Federation Member"@en ;
-    rdfs:comment "An entity that is part of the federation and provides data via a specific interface."@en .
+    rdfs:comment "An entity that is part of the federation and provides access to data via a specific interface. Every federation member must have an fd:serviceURI property and an fd:interface property. This class is a superclass of any kind of federation member and should not be used directly within federation descriptions. Concrete types of federation members, to be used in federation descriptions, are captured by the subclasses of this class."@en .
+
+fd:RDFBasedFederationMember a owl:Class ;
+    rdfs:subClassOf fd:FederationMember ;
+    rdfs:label "RDF-based Federation Member"@en ;
+    rdfs:comment "A federation member whose interface exposes RDF data. Every such federation member must have the two properties that are expected for any kind of federation member (i.e., fd:serviceURI and fd:interface), where the fd:interface may be either an fd:FixedEndpointInterface with the fd:supportedProtocol being fd:SPARQLProtocol or an fd:FragmentInterface. Additionally, an RDF-based federation member may have an fd:vocabularyMappingsFile property."@en .
 
 fd:WrappedFederationMember a owl:Class ;
     rdfs:subClassOf fd:FederationMember ;
     rdfs:label "Wrapped Federation Member"@en ;
-    rdfs:comment "An federation member that is accessed via a wrapper."@en .
+    rdfs:comment "A federation member that provides access to non-RDF data, for which it is associated with a wrapper that defines and RDF view of the data of that federation member. In addition to the properties that are expected for any kind of federation member (i.e., fd:serviceURI and fd:interface), such a wrapped federation member must have an fd:wrapper property."@en .
 
 fd:Interface a owl:Class ;
     rdfs:label "Interface"@en ;
     rdfs:comment "An interface is a means to issue data retrieval requests to a federation member. This class is a superclass of any kind of interface and should not be used directly within federation descriptions. Concrete types of interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
 
-fd:EndpointInterface a owl:Class ;
+fd:FixedEndpointInterface a owl:Class ;
     rdfs:subClassOf fd:Interface ;
-    rdfs:label "Endpoint Interface"@en ;
-    rdfs:comment "An endpoint interface is an interface that can be accessed via a single HTTP endpoint. This class is a superclass of any kind of endpoint interface and should not be used directly within federation descriptions. Concrete types of endpoint interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
+    rdfs:label "Fixed Endpoint Interface"@en ;
+    rdfs:comment "An interface that can be accessed via a single, fixed endpoint address. Every such interface must have an fd:endpointAddress property and an fd:supportedProtocol property. The value for the fd:supportedProtocol property is expected to be one of the following: fd:SPARQLProtocol, fd:BoltProtocol, fd:GraphQLProtocol, or fd:GenericWebAPIProtocol."@en .
 
-fd:SPARQLEndpointInterface a owl:Class ;
-    rdfs:subClassOf fd:EndpointInterface ;
-    rdfs:label "SPARQL Endpoint Interface"@en ;
-    rdfs:comment "An interface to access a federation member via the SPARQL protocol."@en .
-
-fd:MultipleEndpointsInterface a owl:Class ;
+fd:TemplateBasedInterface a owl:Class ;
     rdfs:subClassOf fd:Interface ;
-    rdfs:label "Multiple-Endpoints Interface"@en ;
-    rdfs:comment "An interface that can be accessed via multiple HTTP endpoints. This class is a superclass of any kind of such interface and should not be used directly within federation descriptions. Concrete types of such interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
-
-fd:RESTInterface a owl:Class ;
-    rdfs:subClassOf fd:EndpointInterface ;
-    rdfs:label "REST Endpoint Interface"@en ;
-    rdfs:comment "An interface to access a federation member that provides a REST API."@en .
+    rdfs:label "Template-based Interface"@en ;
+    rdfs:comment "An interface that can be accessed via request URIs that can be created based on a URI template. Every such interface must have an fd:uriTemplate property and an fd:supportedProtocol property. For the time being, the value for the fd:supportedProtocol property is expected to be fd:GenericWebAPIProtocol."@en .
 
 fd:FragmentInterface a owl:Class ;
     rdfs:subClassOf fd:Interface ;
     rdfs:label "Fragment Interface"@en ;
-    rdfs:comment "A fragment interface is an interface to request a fragment (i.e., a specific subset) of the dataset of a federation member. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
-
-fd:TPFInterface a owl:Class ;
-    rdfs:subClassOf fd:FragmentInterface ;
-    rdfs:label "TPF Interface"@en ;
-    rdfs:comment "An interface to access a federation member via Triple Pattern Fragments."@en .
-
-fd:brTPFInterface a owl:Class ;
-    rdfs:subClassOf fd:FragmentInterface ;
-    rdfs:label "brTPF Interface"@en ;
-    rdfs:comment "An interface to access a federation member via Bindings-Restricted Triple Pattern Fragments."@en .
-
-fd:BoltInterface a owl:Class ;
-    rdfs:subClassOf fd:EndpointInterface ;
-    rdfs:label "Bolt Interface"@en ;
-    rdfs:comment "An interface to access a federation member using the Bolt protocol (e.g., for Neo4j)."@en .
-
-fd:GraphQLEndpointInterface a owl:Class ;
-    rdfs:subClassOf fd:EndpointInterface ;
-    rdfs:label "GraphQL Endpoint Interface"@en ;
-    rdfs:comment "An interface to access a federation member via a GraphQL API."@en .
+    rdfs:comment "An interface that can be accessed via URIs that denote fragments (i.e., specific subsets) of the dataset of the corresponding federation member, where the way in which these URIs are formed is communicated in responses to requests to such an interface. Every such interface must have an fd:exampleFragmentAddress property and an fd:supportedProtocol property. The value for the fd:supportedProtocol property is expected to be either fd:TPFProtocol or fd:brTPFProtocol."@en .
 
 fd:Wrapper a owl:Class ;
     rdfs:label "Wrapper"@en ;
-    rdfs:comment "A wrapper provides access to federation members that do not support RDF and SPARQL natively."@en .
+    rdfs:comment "A wrapper provides a mapping for data of federation members that do not support RDF and SPARQL natively. For the time being, every such wrapper must have either an fd:rmlTriplesMaps property or an fd:mappingConfiguration property. In particular, for wrappers associated with a federation member whose interface has fd:GenericWebAPIProtocol as the fd:supportedProtocol, the wrapper must have an fd:rmlTriplesMaps property; and for wrappers associated with a federation member whose interface has fd:BoltProtocol or fd:GraphQLProtocol as the fd:supportedProtocol, the wrapper must have an fd:mappingConfiguration property."@en .
+
+fd:DataRetrievalProtocol a owl:Class ;
+    rdfs:label "Data Retrieval Protocol"@en ;
+    rdfs:comment "Instances of this class represent the different protocols to be used when interacting with the interface of a federation member."@en .
+
 
 ### ===== PROPERTY DECLARATIONS =====
 
-fd:serviceURI a rdf:Property ;
+fd:serviceURI a owl:DatatypeProperty ;
     rdfs:domain fd:FederationMember ;
     rdfs:range  xsd:anyURI ;
     rdfs:label "service URI"@en ;
     rdfs:comment "The URI via which the federation member is identified in a SERVICE clause."@en .
 
-fd:interface a rdf:Property ;
+fd:interface a owl:ObjectProperty ;
     rdfs:domain fd:FederationMember ;
     rdfs:range  fd:Interface ;
     rdfs:label "interface"@en ;
-    rdfs:comment "The interface description for accessing the federation member."@en .
+    rdfs:comment "The interface for accessing the federation member."@en .
 
-fd:endpointAddress a rdf:Property ;
-    rdfs:domain fd:EndpointInterface ;
+fd:supportedProtocol a owl:ObjectProperty ;
+    rdfs:domain fd:Interface ;
+    rdfs:range  fd:DataRetrievalProtocol ;
+    rdfs:label "supported protocol"@en ;
+    rdfs:comment "The data retrieval protocol supported by the interface."@en .
+
+fd:endpointAddress a owl:DatatypeProperty ;
+    rdfs:domain fd:FixedEndpointInterface ;
     rdfs:range  xsd:anyURI ;
     rdfs:label "endpoint address"@en ;
     rdfs:comment "The network address (URI) of the endpoint of the federation member."@en .
 
-fd:iriTemplate a rdf:Property ;
-    rdfs:domain fd:RESTInterface ;
+fd:uriTemplate a owl:ObjectProperty ;
+    rdfs:domain fd:TemplateBasedInterface ;
     rdfs:range  hydra:IriTemplate ;
-    rdfs:label "iri template"@en ;
-    rdfs:comment "The template for creating IRIs of endpoints of the federation member."@en .
+    rdfs:label "URI template"@en ;
+    rdfs:comment "The template for creating URIs that can be used for issuing requests to the interface. The template is captured as a hydra:IriTemplate, which must have a hydra:template property and, if the template contains variable parts, there must also be a hydra:mapping property for each of these variable parts."@en .
 
-fd:paramType a rdf:Property ;
+fd:paramType a owl:ObjectProperty ;
     rdfs:domain hydra:IriTemplateMapping ;
-    rdfs:range  rdf:Resource ;
+    rdfs:range  rdfs:Resource ;
     rdfs:label "type of template parameter"@en ;
-    rdfs:comment "The type of values to be used for a variable part of an IRI template, which is expected to be specified as a datatype IRI (e.g., xsd:string, xsd:float)."@en .
+    rdfs:comment "The type of values to be used for a variable part of a URI template. This type is expected to be specified as a datatype URI (e.g., xsd:string, xsd:float)."@en .
 
-fd:exampleFragmentAddress a rdf:Property ;
+fd:exampleFragmentAddress a owl:DatatypeProperty ;
     rdfs:domain fd:FragmentInterface ;
     rdfs:range  xsd:anyURI ;
     rdfs:label "example fragment address"@en ;
-    rdfs:comment "An example URL of a fragment for pattern fragment interfaces."@en .
+    rdfs:comment "An example URI of a fragment for the fragment interface."@en .
 
-fd:vocabularyMappingsFile a rdf:Property ;
-    rdfs:domain fd:FederationMember ;
+fd:vocabularyMappingsFile a owl:DatatypeProperty ;
+    rdfs:domain fd:RDFBasedFederationMember ;
     rdfs:range  xsd:string ;
     rdfs:label "vocabulary mappings file"@en ;
     rdfs:comment "Path to a file with RDF mappings to align different vocabularies."@en .
 
-fd:mappingConfiguration a rdf:Property ;
-    rdfs:domain fd:FederationMember ;
-    rdfs:range  rdf:Resource ;
-    rdfs:label "mapping configuration"@en ;
-    rdfs:comment "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, LPG)."@en .
-
-fd:wrapper a rdf:Property ;
+fd:wrapper a owl:ObjectProperty ;
     rdfs:domain fd:WrappedFederationMember ;
     rdfs:range  fd:Wrapper ;
     rdfs:label "wrapper"@en ;
     rdfs:comment "The wrapper of a wrapped federation member."@en .
 
-fd:rmlTriplesMaps a rdf:Property ;
+fd:rmlTriplesMaps a owl:ObjectProperty ;
     rdfs:domain fd:Wrapper ;
     rdfs:range  rdf:List ;
     rdfs:label "RML triples maps"@en ;
     rdfs:comment "List of RML triples maps that define the mapping for a wrapper. The elements of such a list are expected to be of type rml:TriplesMap. ATTENTION: for the time being, these triples maps must all be normalized as per the definition in Section 5 of the paper titled 'An Algebraic Foundation for Knowledge Graph Construction'."@en .
+
+fd:mappingConfiguration a owl:ObjectProperty ;
+    rdfs:domain fd:Wrapper ;
+    rdfs:range  rdfs:Resource ;
+    rdfs:label "mapping configuration"@en ;
+    rdfs:comment "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, PG)."@en .
+
+
+### ===== INSTANCES =====
+
+fd:SPARQLProtocol a fd:DataRetrievalProtocol ;
+    rdfs:label "SPARQL protocol"@en ;
+    rdfs:comment "The protocol to be used for SPARQL endpoints."@en .
+
+fd:BoltProtocol a fd:DataRetrievalProtocol ;
+    rdfs:label "Bolt protocol"@en ;
+    rdfs:comment "The protocol to be used when interacting with a Neo4j server."@en .
+
+fd:GraphQLProtocol a fd:DataRetrievalProtocol ;
+    rdfs:label "GraphQL protocol"@en ;
+    rdfs:comment "The protocol to be used when interacting with a GraphQL server."@en .
+
+fd:TPFProtocol a fd:DataRetrievalProtocol ;
+    rdfs:label "TPF protocol"@en ;
+    rdfs:comment "The protocol to be used when interacting with a TPF server."@en .
+
+fd:brTPFProtocol a fd:DataRetrievalProtocol ;
+    rdfs:label "brTPF protocol"@en ;
+    rdfs:comment "The protocol to be used when interacting with a brTPF server."@en .
+
+fd:GenericWebAPIProtocol a fd:DataRetrievalProtocol ;
+    rdfs:label "Generic Web API protocol"@en ;
+    rdfs:comment "The protocol to be used when interacting with a generic Web API."@en .

@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
@@ -61,29 +62,26 @@ public class QueryProcessorImpl implements QueryProcessor
 	{
 		final long t1 = System.currentTimeMillis();
 		final Pair<PhysicalPlan, QueryPlanningStats> qepAndStats = planner.createPlan(query, ctxt);
+		final PhysicalPlan qep = qepAndStats.object1;
 
 		final long t2 = System.currentTimeMillis();
 
 		final long t3, t4;
-		final ExecutablePlan prg;
 		final ExecutionStats execStats;
 		final List<Exception> exceptionsCaughtDuringExecution;
 
-		if ( ctxt.skipExecution() ) {
+		if ( ctxt.skipExecution() || qep instanceof PhysicalPlanWithoutResult ) {
 			t3 = System.currentTimeMillis();
 			t4 = System.currentTimeMillis();
-			prg = null;
 			execStats = null;
 			exceptionsCaughtDuringExecution = null;
 		}
 		else {
-			prg = planCompiler.compile(qepAndStats.object1);
+			final ExecutablePlan prg = planCompiler.compile(qepAndStats.object1);
 
 			if ( planner.getExecutablePlanPrinter() != null ) {
-				System.out.println("--------- Executable Plan ---------");
-				planner.getExecutablePlanPrinter().print( prg, System.out );
+				planner.getExecutablePlanPrinter().print( prg );
 			}
-
 			t3 = System.currentTimeMillis();
 			execStats = execEngine.execute(prg, resultSink);
 

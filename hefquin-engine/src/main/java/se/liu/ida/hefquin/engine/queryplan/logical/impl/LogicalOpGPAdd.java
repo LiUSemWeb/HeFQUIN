@@ -18,19 +18,22 @@ import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint.Parameter;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
-public class LogicalOpGPAdd implements UnaryLogicalOp
+public class LogicalOpGPAdd extends BaseForLogicalOps implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
 	protected final Map<String,Var> paramVars;
 
-	// will be initialized on demand 
+	// will be initialized on demand
 	protected TriplePattern tp = null;
 	protected boolean tpCheckDone = false;
 
 	public LogicalOpGPAdd( final FederationMember fm,
 	                       final SPARQLGraphPattern pattern,
-	                       final Map<String,Var> paramVars ) {
+	                       final Map<String,Var> paramVars,
+	                       final boolean mayReduce ) {
+		super( mayReduce );
+
 		assert fm != null;
 		assert pattern != null;
 
@@ -82,7 +85,7 @@ public class LogicalOpGPAdd implements UnaryLogicalOp
 	 * Returns {@code true} if this gpAdd operator has a (nonempty) list of
 	 * variables as parameter. If so, {@link #getParameterVariables()} can
 	 * be used to access this parameter.
-	 * 
+	 *
 	 */
 	public boolean hasParameterVariables() {
 		return paramVars != null && ! paramVars.isEmpty();
@@ -164,7 +167,8 @@ public class LogicalOpGPAdd implements UnaryLogicalOp
 		if ( o instanceof LogicalOpGPAdd otherGPAdd ) {
 			return    otherGPAdd.fm.equals(fm)
 			       && otherGPAdd.pattern.equals(pattern)
-			       && Objects.deepEquals(paramVars, otherGPAdd.paramVars);
+			       && Objects.deepEquals(paramVars, otherGPAdd.paramVars)
+			       && otherGPAdd.mayReduce == mayReduce;
 		}
 
 		return false;

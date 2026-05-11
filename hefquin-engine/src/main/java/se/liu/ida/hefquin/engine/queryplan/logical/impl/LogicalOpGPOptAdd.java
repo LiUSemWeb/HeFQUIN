@@ -13,16 +13,18 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.federation.FederationMember;
 
-public class LogicalOpGPOptAdd implements UnaryLogicalOp
+public class LogicalOpGPOptAdd extends BaseForLogicalOps implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
 
-	// will be initialized on demand 
+	// will be initialized on demand
 	protected TriplePattern tp = null;
 	protected boolean tpCheckDone = false;
 
-	public LogicalOpGPOptAdd( final FederationMember fm, final SPARQLGraphPattern pattern ) {
+	public LogicalOpGPOptAdd( final FederationMember fm, final SPARQLGraphPattern pattern, final boolean mayReduce ) {
+		super( mayReduce );
+
 		assert fm != null;
 		assert pattern != null;
 
@@ -104,10 +106,11 @@ public class LogicalOpGPOptAdd implements UnaryLogicalOp
 
 		if ( o instanceof LogicalOpGPOptAdd otherGPOptAdd ) {
 			return    otherGPOptAdd.fm.equals(fm)
-			       && otherGPOptAdd.pattern.equals(pattern);
+			       && otherGPOptAdd.pattern.equals(pattern)
+			       && otherGPOptAdd.mayReduce == mayReduce;
 		}
 
-		return false; 
+		return false;
 	}
 
 	@Override

@@ -20,9 +20,10 @@ public class ExecOpRequestTPF<MemberType extends FederationMember>
 {
 	public ExecOpRequestTPF( final TriplePatternRequest req,
 	                         final MemberType fm,
+	                         final boolean mayReduce,
 	                         final boolean collectExceptions,
 	                         final QueryPlanningInfo qpInfo ) {
-		super(req, fm, collectExceptions, qpInfo);
+		super(req, fm, mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

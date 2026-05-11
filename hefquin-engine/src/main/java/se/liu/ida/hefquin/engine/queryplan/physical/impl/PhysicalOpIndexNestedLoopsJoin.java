@@ -114,9 +114,9 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 		}
 
 		if ( fm instanceof TPFServer tpf ) // this include brTPF servers
-			return new ExecOpIndexNestedLoopsJoinTPF(tp, tpf, useOuterJoin, collectExceptions, qpInfo);
+			return new ExecOpIndexNestedLoopsJoinTPF(tp, tpf, useOuterJoin, lop.mayReduce(), collectExceptions, qpInfo);
 		else if ( fm instanceof SPARQLEndpoint ep )
-			return new ExecOpIndexNestedLoopsJoinSPARQL(gp, ep, useOuterJoin, collectExceptions, qpInfo);
+			return new ExecOpIndexNestedLoopsJoinSPARQL(gp, ep, useOuterJoin, lop.mayReduce(), collectExceptions, qpInfo);
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}

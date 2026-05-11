@@ -33,6 +33,6 @@ public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor
                     + fm.getURL() + "' caused an exception.", ex, req, fm);
         }
 
-        return new RecordsResponseImpl(result, fm, req, requestStartTime);
+        return new RecordsResponseImpl(result, requestStartTime);
     }
 }

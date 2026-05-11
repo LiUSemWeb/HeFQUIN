@@ -14,9 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 import se.liu.ida.hefquin.base.datastructures.PersistableCache;
-import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
-import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
 /**
@@ -202,16 +200,6 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 		}
 
 		@Override
-		public FederationMember getFederationMember() {
-			throw new UnsupportedOperationException( "Method 'getFederationMember' is not implemented." );
-		}
-
-		@Override
-		public DataRetrievalRequest getRequest() {
-			throw new UnsupportedOperationException( "Method 'getRequest' is not implemented." );
-		}
-
-		@Override
 		public Date getRequestStartTime() {
 			throw new UnsupportedOperationException( "Method 'getRequestStartTime' is not implemented." );
 		}
@@ -225,11 +213,8 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 		public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
 			if( isError() ){
 				throw new UnsupportedOperationDueToRetrievalError(
-					getErrorStatusCode(),
-					getErrorDescription(),
-					getRequest(),
-					getFederationMember()
-				);
+						getErrorStatusCode(),
+						getErrorDescription() );
 			}
 			return cardinality;
 		}

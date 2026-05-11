@@ -30,8 +30,8 @@ public class PhysicalOpBind implements UnaryPhysicalOpForLogicalOp
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final QueryPlanningInfo qpInfo,
-	                                       final ExpectedVariables... inputVars ) {
-		return new ExecOpBind( lop.getBindExpressions(), collectExceptions, qpInfo );
+	                                       final ExpectedVariables ... inputVars ) {
+		return new ExecOpBind( lop.getBindExpressions(), lop.mayReduce(), collectExceptions, qpInfo );
 	}
 
 	@Override

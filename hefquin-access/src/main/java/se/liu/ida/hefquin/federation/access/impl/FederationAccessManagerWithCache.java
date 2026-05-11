@@ -18,6 +18,7 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyF
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyLRU;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.GenericCacheImpl;
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.net.http.HttpClientProvider;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
@@ -68,6 +69,15 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
 	}
 
+	public FederationAccessManagerWithCache( final FederationAccessManager fedAccMan,
+	                                         final int cacheCapacity,
+	                                         final int maxParallelRequests )
+	{
+		this(fedAccMan, cacheCapacity);
+		// Set default number of parallel request to a given endpoint address
+		HttpClientProvider.setDefaultMaxParallelRequests(maxParallelRequests);
+	}
+
 	/**
 	 * Creates a {@link FederationAccessManagerWithCache} with a default configuration.
 	 */
@@ -88,12 +98,12 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 			throws FederationAccessException
 	{
 		// update the statistics
-		if ( req instanceof SPARQLRequest )
-			cacheRequestsSPARQL++;
-		else if ( req instanceof TPFRequest )
+		if ( req instanceof TPFRequest )
 			cacheRequestsTPF++;
 		else if ( req instanceof BRTPFRequest )
 			cacheRequestsBRTPF++;
+		else if ( req instanceof SPARQLRequest )
+			cacheRequestsSPARQL++;
 		else
 			cacheRequestsOther++;
 
@@ -101,12 +111,12 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			// update the statistics
-			if ( req instanceof SPARQLRequest )
-				cacheHitsSPARQL++;
-			else if ( req instanceof TPFRequest )
+			if ( req instanceof TPFRequest )
 				cacheHitsTPF++;
 			else if ( req instanceof BRTPFRequest )
 				cacheHitsBRTPF++;
+			else if ( req instanceof SPARQLRequest )
+				cacheHitsSPARQL++;
 			else
 				cacheHitsOther++;
 

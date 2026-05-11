@@ -9,13 +9,31 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpMultiwayUnion implements NaryLogicalOp
+public class LogicalOpMultiwayUnion extends BaseForLogicalOps implements NaryLogicalOp
 {
-	protected static LogicalOpMultiwayUnion singleton = new LogicalOpMultiwayUnion();
+	protected static final LogicalOpMultiwayUnion singletonWithoutReduction = new LogicalOpMultiwayUnion(false);
+	protected static final LogicalOpMultiwayUnion singletonThatMayReduce  = new LogicalOpMultiwayUnion(true);
 
-	public static LogicalOpMultiwayUnion getInstance() { return singleton; }
+	public static LogicalOpMultiwayUnion getInstance( final boolean mayReduce ) {
+		return mayReduce ? singletonThatMayReduce : singletonWithoutReduction;
+	}
 
-	protected LogicalOpMultiwayUnion() {}
+	/**
+	 * Returns the singleton instance of {@link LogicalOpMultiwayUnion} that does <em>not</em>
+	 * reduce duplicates.
+	 *
+	 * <p>This is equivalent to calling {@link #getInstance(boolean)} with the argument
+	 * {@code false}.
+	 *
+	 * @return the singleton instance that does not reduce duplicates
+	 */
+	public static LogicalOpMultiwayUnion getInstance() {
+		return singletonWithoutReduction;
+	}
+
+	protected LogicalOpMultiwayUnion( final boolean mayReduce ) {
+		super( mayReduce );
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
@@ -36,7 +54,8 @@ public class LogicalOpMultiwayUnion implements NaryLogicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpMultiwayUnion;
+		return o instanceof LogicalOpMultiwayUnion oo
+		    && oo.mayReduce == mayReduce;
 	}
 
 	@Override

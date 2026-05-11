@@ -47,6 +47,6 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 			throw new FederationAccessException("Issuing a request to a GraphQL endpoint caused an exception.", e, req, fm);
 		}
 
-		return new JSONResponseImpl(jsonObj, fm, req, startTime);
+		return new JSONResponseImpl(jsonObj, startTime);
 	}
 }

@@ -41,10 +41,11 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 	protected final int minimumCollectionSize;
 	protected final List<SolutionMapping> collectedInputSolMaps;
 
-	public BaseForUnaryExecOpWithCollectedInput( final int minimumCollectionSize,
+	public BaseForUnaryExecOpWithCollectedInput( final boolean mayReduce,
+	                                             final int minimumCollectionSize,
 	                                             final boolean collectExceptions,
 	                                             final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 
 		assert minimumCollectionSize > 0;
 

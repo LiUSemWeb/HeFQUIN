@@ -170,10 +170,10 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				cardinality = extractCardinality( smResp );
 			}
 			catch ( final UnsupportedOperationDueToRetrievalError | IllegalArgumentException e ) {
-				return new CardinalityResponseImplWithoutCardinality( e, smResp, smResp.getRequest() );
+				return new CardinalityResponseImplWithoutCardinality(e, smResp);
 			}
 
-			return new CardinalityResponseImpl( smResp, smResp.getRequest(), cardinality );
+			return new CardinalityResponseImpl(smResp, cardinality);
 		}
 
 		protected Integer extractCardinality( final SolMapsResponse smResp ) throws UnsupportedOperationDueToRetrievalError {
@@ -204,15 +204,13 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final Integer cardinality = tpfResp.getCardinalityEstimate();
 			if ( cardinality != null ) {
 				final int c = cardinality;
-				return new CardinalityResponseImpl( tpfResp, tpfResp.getRequest(), c );
+				return new CardinalityResponseImpl(tpfResp, c);
 			}
 			else {
 				final CardinalityEstimationUnavailableError e = new CardinalityEstimationUnavailableError(
-					"Cardinality estimation is unavailable due to missing metadata triples.",
-					tpfResp.getRequest(),
-					tpfResp.getFederationMember()
+					"Cardinality estimation is unavailable due to missing metadata triples."
 				);
-				return new CardinalityResponseImplWithoutCardinality( e, tpfResp, tpfResp.getRequest() );
+				return new CardinalityResponseImplWithoutCardinality(e, tpfResp);
 			}
 		}
 	}

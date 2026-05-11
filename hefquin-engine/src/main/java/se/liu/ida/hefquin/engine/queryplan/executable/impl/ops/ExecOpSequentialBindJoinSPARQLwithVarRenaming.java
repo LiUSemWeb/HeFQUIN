@@ -89,10 +89,11 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 			final SPARQLEndpoint fm,
 			final ExpectedVariables inputVars,
 			final boolean useOuterJoinSemantics,
+			final boolean mayReduce,
 			final int batchSize,
 			final boolean collectExceptions,
 			final QueryPlanningInfo qpInfo ) {
-		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
+		super(query, fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo);
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 
 		renamedVar = getVarForRenaming(query, inputVars);
@@ -120,7 +121,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 	public Var getVarForRenaming( final SPARQLGraphPattern query,
 	                              final ExpectedVariables inputVars ) {
 		for ( final Var v : query.getCertainVariables() ) {
-			if (    ! inputVars.getCertainVariables().contains(v) 
+			if (    ! inputVars.getCertainVariables().contains(v)
 			     && ! inputVars.getPossibleVariables().contains(v) ) {
 				return v;
 			}
@@ -133,7 +134,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 		final Element elmt = createUnion(solMaps);
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(elmt);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		return new ExecOpRequestSPARQL<>(request, fm, false, null);
+		return new ExecOpRequestSPARQL<>(request, fm, this.mayReduce, false, null);
 	}
 
 	protected Element createUnion( final Iterable<Binding> solMaps ) {
@@ -159,7 +160,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 				throw new IllegalArgumentException(e);
 			}
 
-			// Create new variable 
+			// Create new variable
 			final Var v = Var.alloc( renamedVarPrefix + i );
 
 			// Rename the variable in the pattern
@@ -262,7 +263,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 
 	/**
 	 * Renames a variable within a single Jena binding.
-	 * 
+	 *
 	 * Iterates over all (variable, value) pairs in the original binding and builds
 	 * a new binding the occurrence of {@code oldVar} is replaced by {@code newVar}.
 	 *

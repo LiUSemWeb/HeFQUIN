@@ -82,10 +82,21 @@ public class HeFQUINEngineBuilder
 	/**
 	 * Sets the federation catalog to be used by the engine.
 	 *
+	 * @param fedCatFiles a list of federation catalog files
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withFederationCatalogInFiles( final List<String> fedCatFiles ) {
+		this.fedCat = FederationDescriptionReader.readFromFiles(fedCatFiles);
+		return this;
+	}
+
+	/**
+	 * Sets the federation catalog to be used by the engine.
+	 *
 	 * @param fedCatModels a list of federation catalog models
 	 * @return this builder instance for method chaining
 	 */
-	public HeFQUINEngineBuilder withFederationCatalog( final List<Model> fedCatModels ) {
+	public HeFQUINEngineBuilder withFederationCatalogInModels( final List<Model> fedCatModels ) {
 		this.fedCat = FederationDescriptionReader.readFromModels(fedCatModels);
 		return this;
 	}

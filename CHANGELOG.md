@@ -7,9 +7,34 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- nothing yet
+- Adding a limit on the number of parallel requests that are executed against any particular endpoint/server at any point in time ([#556](https://github.com/LiUSemWeb/HeFQUIN/pull/556)).
+- Support for MINUS directly within the HeFQUIN engine ([#586](https://github.com/LiUSemWeb/HeFQUIN/pull/586), [#587](https://github.com/LiUSemWeb/HeFQUIN/pull/587), [#592](https://github.com/LiUSemWeb/HeFQUIN/pull/592)).
+- Support for DISTINCT directly within the HeFQUIN engine ([#547](https://github.com/LiUSemWeb/HeFQUIN/pull/547), [#550](https://github.com/LiUSemWeb/HeFQUIN/pull/550), [#555](https://github.com/LiUSemWeb/HeFQUIN/pull/555), [#558](https://github.com/LiUSemWeb/HeFQUIN/pull/558)).
+- Support for projection directly within the HeFQUIN engine ([#566](https://github.com/LiUSemWeb/HeFQUIN/pull/566), [#568](https://github.com/LiUSemWeb/HeFQUIN/pull/568), [#574](https://github.com/LiUSemWeb/HeFQUIN/pull/574)).
+- Adding a new hash join algorithm and a (logical) left join operator; removing the right join operator ([#561](https://github.com/LiUSemWeb/HeFQUIN/pull/561)).
+- Adding a logical plan rewriting that removes subplans that are guaranteed to produce the empty result ([#584](https://github.com/LiUSemWeb/HeFQUIN/pull/584), [#593](https://github.com/LiUSemWeb/HeFQUIN/pull/593)).
+- Adding a logical plan rewriting that pushes project operators ([#580](https://github.com/LiUSemWeb/HeFQUIN/pull/580)).
+- Initial version of a CLI tool to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601)).
 ### Changed
-- nothing yet
+- Reorganization of the vocabulary for federation descriptions ([#597](https://github.com/LiUSemWeb/HeFQUIN/pull/597)).
+- Refactoring the code of the logical plan rewriting rules to use the visitor pattern ([#560](https://github.com/LiUSemWeb/HeFQUIN/pull/560), [#569](https://github.com/LiUSemWeb/HeFQUIN/pull/569), [#571](https://github.com/LiUSemWeb/HeFQUIN/pull/571), [#575](https://github.com/LiUSemWeb/HeFQUIN/pull/575)).
+- More effective filter push down and cardinality estimation for the case of a filter over a fixed-solmap operator ([#588](https://github.com/LiUSemWeb/HeFQUIN/pull/588)).
+- Extending filter push down with the option to push also into the pattern of a gpAdd operator ([#589](https://github.com/LiUSemWeb/HeFQUIN/pull/589)).
+- Bug fix in the executable operator for BIND ([#612](https://github.com/LiUSemWeb/HeFQUIN/pull/612)).
+- Separation of logical and physical plans for mapping algebra ([#581](https://github.com/LiUSemWeb/HeFQUIN/pull/581), [#596](https://github.com/LiUSemWeb/HeFQUIN/pull/596)).
+- Fix in RML-to-algebra translation algorithm ([#610](https://github.com/LiUSemWeb/HeFQUIN/pull/610)).
+- Fix in code that expands URI templates ([#611](https://github.com/LiUSemWeb/HeFQUIN/pull/611)).
+- Removes unused provenance-related methods from DataRetrievalResponse ([#582](https://github.com/LiUSemWeb/HeFQUIN/pull/582)).
+
+
+## [0.0.10] - 2026-03-25
+
+### Added
+- Support for the UNFOLD operator for CDT literals ([#539](https://github.com/LiUSemWeb/HeFQUIN/pull/539)).
+- Support for multiple --fd arguments for the CLI tools, to split the federation description into multiple files ([#529](https://github.com/LiUSemWeb/HeFQUIN/pull/529), [#534](https://github.com/LiUSemWeb/HeFQUIN/pull/534), [#538](https://github.com/LiUSemWeb/HeFQUIN/pull/538)).
+- New arguments for the CLI tool to specify files into which the query plans and the statistics should be printed ([#531](https://github.com/LiUSemWeb/HeFQUIN/pull/531), [#536](https://github.com/LiUSemWeb/HeFQUIN/pull/536)).
+### Changed
+- Bug fix: cache-related statistics for TPF have not been recorded correctly by the federation access manager ([#548](https://github.com/LiUSemWeb/HeFQUIN/pull/548)).
 
 
 ## [0.0.9] - 2026-03-07

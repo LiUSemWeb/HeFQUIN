@@ -62,10 +62,11 @@ public class LogicalOpUtils
     public static UnaryLogicalOp createLogicalAddOpFromLogicalReqOp( final LogicalOpRequest<?, ?> reqOp ) {
         final DataRetrievalRequest req = reqOp.getRequest();
         final FederationMember fm = reqOp.getFederationMember();
+		final boolean mayReduce = reqOp.mayReduce();
 
         if( req instanceof SPARQLRequest sparqlReq ) {
             final SPARQLGraphPattern pattern = sparqlReq.getQueryPattern();
-            return new LogicalOpGPAdd(fm, pattern, null);
+            return new LogicalOpGPAdd(fm, pattern, null, mayReduce);
         }
         else {
             throw new IllegalArgumentException( "unsupported type of request: " + req.getClass().getName() );
@@ -82,10 +83,11 @@ public class LogicalOpUtils
         final LogicalOpRequest<?, ?> reqOp = (LogicalOpRequest<?, ?>) lop;
         final DataRetrievalRequest req = reqOp.getRequest();
         final FederationMember fm = reqOp.getFederationMember();
+		final boolean mayReduce = lop.mayReduce();
 
         if( req instanceof SPARQLRequest sparqlReq ) {
             final SPARQLGraphPattern pattern = sparqlReq.getQueryPattern();
-            return new LogicalOpGPOptAdd( fm, pattern );
+            return new LogicalOpGPOptAdd( fm, pattern, mayReduce );
         }
         else {
             throw new IllegalArgumentException( "unsupported type of request: " + req.getClass().getName() );

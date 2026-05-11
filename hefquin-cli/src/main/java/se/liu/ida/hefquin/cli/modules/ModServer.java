@@ -1,5 +1,11 @@
 package se.liu.ida.hefquin.cli.modules;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.CmdArgModule;
 import org.apache.jena.cmd.CmdGeneral;
@@ -15,7 +21,7 @@ public class ModServer extends ModBase
 	protected final ArgDecl argFedDescr = new ArgDecl( ArgDecl.HasValue, "federationDescription", "fd" );
 
 	protected int port;
-	protected String fedDescr;
+	protected List<String> fedDescr;
 	protected String confDescr;
 
 	@Override
@@ -42,10 +48,30 @@ public class ModServer extends ModBase
 			confDescr = "config/DefaultConfDescr.ttl";
 		}
 		if ( cmdLine.contains( argFedDescr ) ) {
-			fedDescr = cmdLine.getValue( argFedDescr );
-		} else {
-			fedDescr = "config/DefaultFedConf.ttl";
+			final List<String> filenames = cmdLine.getValues( argFedDescr );
+			fedDescr = new ArrayList<>( filenames.size() );
+			
+			for ( final String filename : filenames ) {
+				if ( isURIOrExistingFile(filename) )
+					fedDescr.add(filename);
+				else
+					cmdLine.cmdError( "Invalid federation description file: " + filename, false );
+			}
 		}
+		else {
+			fedDescr = List.of( "config/DefaultFedConf.ttl" );
+		}
+	}
+	
+	protected boolean isURIOrExistingFile( final String filename ) {
+		if ( new File(filename).isFile() ) return true;
+
+		try {
+			new URI(filename);
+		} catch ( final URISyntaxException e ) {
+			return false;
+		}
+		return true;
 	}
 
 	public int getPort() {
@@ -57,7 +83,7 @@ public class ModServer extends ModBase
 
 	}
 
-	public String getFederationDescription() {
+	public List<String> getFederationDescriptions() {
 		return fedDescr;
 	}
 }

@@ -4,26 +4,26 @@ import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINA
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.MAX_CARDINALITY;
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.MIN_CARDINALITY;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.jena.cdt.CDTKey;
+import org.apache.jena.cdt.CDTValue;
+import org.apache.jena.cdt.CompositeDatatypeList;
+import org.apache.jena.cdt.CompositeDatatypeMap;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.ARQConstants;
+import org.apache.jena.sparql.expr.ExprFunction;
+import org.apache.jena.sparql.expr.NodeValue;
+
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.Quality;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
@@ -112,7 +112,22 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 
 	@Override
 	public void visit( final LogicalOpGPAdd op ) {
-		// TODO: add support for gpAdd
+		// TODO: add proper support for gpAdd
+		// For the moment, we only handle gpAdd operators that have been
+		// created for SERVICE clauses with a PARAMS clause, which are
+		// meant to access Web APIs. The current quick-and-dirty solution
+		// for these kinds of gpAdd operators is to assume that their
+		// graph pattern does not affect the cardinality of the result,
+		// which can easily be a wrong assumption for many cases.
+		if ( op.hasParameterVariables() ) {
+			final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+			final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+			qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
+			return;
+		}
+
 		throw new UnsupportedOperationException("Cardinality estimation for gpAdd not supported yet.");
 	}
 
@@ -123,18 +138,26 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	}
 
 	@Override
-	public void visit( final LogicalOpRightJoin op ) {
+	public void visit( final LogicalOpLeftJoin op ) {
 		// As the estimated cardinality, we simply use the estimated
-		// cardinality of right-hand-side input plan (i.e., the non-
+		// cardinality of left-hand-side input plan (i.e., the non-
 		// optional input). This may be a gross underestimation!
 		// TODO: There is probably a slightly better approach.
-
-		// The min.cardinality is 0 and the max.cardinality is the
-		// product of the max.cardinalities of the two input plans.
 
 		final QueryPlanningInfo qpInfoSubPlan1 = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
 		final QueryPlanProperty crd1 = qpInfoSubPlan1.getProperty(CARDINALITY);
 		final QueryPlanProperty max1 = qpInfoSubPlan1.getProperty(MAX_CARDINALITY);
+
+		// Check first whether we have a case in which the left subplan is
+		// guaranteed to produce an empty result. If so, we can stop
+		// here because the join cardinality is then guaranteed to be
+		// zero as well.
+		if ( checkAndSetIfGuaranteedEmpty(currentSubPlan.getQueryPlanningInfo(), crd1) ) {
+			return;
+		}
+
+		// The min.cardinality is 0 and the max.cardinality is the
+		// product of the max.cardinalities of the two input plans.
 
 		final QueryPlanningInfo qpInfoSubPlan2 = currentSubPlan.getSubPlan(1).getQueryPlanningInfo();
 		final QueryPlanProperty max2 = qpInfoSubPlan2.getProperty(MAX_CARDINALITY);
@@ -231,16 +254,37 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	@Override
 	public void visit( final LogicalOpFilter op ) {
 		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
-		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
 
+		// Special case: If the filter is on top of a fixed solution mapping
+		// operator, then we can accurately determine the cardinality.
+		// To this end, we evaluate the filter conditions based on the (fixed)
+		// solution mapping of the child operator. If this evaluation results in
+		// 'true' for every filter condition, then the solution mapping will pass
+		// the filter and, thus, the result of the filter plan is guaranteed to
+		// have a cardinality of 1. Otherwise, the solution mapping will not pass
+		// the filter and, thus, the cardinality will be 0.
+		final QueryPlan subPlanUnderFilter = currentSubPlan.getSubPlan(0);
+		if ( subPlanUnderFilter.getRootOperator() instanceof LogicalOpFixedSolMap smOp ) {
+			final boolean evalResult = SolutionMappingUtils.checkSolutionMapping( smOp.getSolutionMapping(),
+			                                                                      op.getFilterExpressions() );
+			final int crd = ( evalResult == true ) ? 1 : 0;
+
+			qpInfo.addProperty( QueryPlanProperty.cardinality(crd, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(crd, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(crd, Quality.ACCURATE) );
+			return;
+		}
+
+		// Now we cover all non-special cases. For the moment, we simply copy
+		// the cardinality estimate of the subplan, pretending the filter does not
+		// have any effect. TODO: perhaps we can be smarter here and somehow
+		// estimate the selectivity of the filter expressions.
+		final QueryPlanningInfo qpInfoSubPlan = subPlanUnderFilter.getQueryPlanningInfo();
 		final QueryPlanProperty crd = qpInfoSubPlan.getProperty(CARDINALITY);
 		final QueryPlanProperty max = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
 
-		// TODO: perhaps we can be smarter here and somehow estimate the
-		// selectivity of the filter expression.
-
 		qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(crd) );
-		qpInfo.addProperty( QueryPlanProperty.copyWithReducedQuality(max) );
+		qpInfo.addProperty( max );
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
 	}
 
@@ -248,10 +292,144 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	public void visit( final LogicalOpBind op ) {
 		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
 		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+		final QueryPlanProperty crdSubPlan = qpInfoSubPlan.getProperty(CARDINALITY);
+
+		// If the input plan is guaranteed to produce an empty result, then
+		// the result of the BIND operator is guaranteed to be empty as well.
+		if ( checkAndSetIfGuaranteedEmpty(qpInfo, crdSubPlan) ) {
+			return;
+		}
 
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+	}
+
+	@Override
+	public void visit( final LogicalOpUnfold op ) {
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+
+		// Before considering the general case, we consider a few special
+		// cases for which we may be more accurate than in the general case.
+
+		// Special case 1: if the input plan is guaranteed to produce an empty result,
+		// then the result of the UNFOLD operator is guaranteed to be empty as well.
+		if ( checkAndSetIfGuaranteedEmpty(qpInfo, qpInfoSubPlan.getProperty(CARDINALITY)) ) {
+			return;
+		}
+
+		// Special case 2: if the expression of the UNFOLD clause is
+		// a constant that is *not* a well-formed cdt:List or cdt:Map
+		// literal, then we know that the output cardinality will be
+		// the same as the input cardinality.
+		final NodeValue nv = op.getExpr().getConstant();
+		if ( nv != null ) {
+			final Node n = nv.asNode();
+
+			boolean isWellFormedCDTList = false;
+			boolean isWellFormedCDTMap = false;
+			if ( n.isLiteral() ) {
+				final String dtURI = n.getLiteralDatatypeURI();
+
+				isWellFormedCDTList = ( CompositeDatatypeList.uri.equals(dtURI)
+				                        && n.getLiteral().isWellFormed() );
+
+				isWellFormedCDTMap = ( CompositeDatatypeMap.uri.equals(dtURI)
+				                       && n.getLiteral().isWellFormed() );
+			}
+
+			if ( ! isWellFormedCDTList && ! isWellFormedCDTMap ) {
+				qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+				qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
+				qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+				return;
+			}
+
+			// Special case 3: if the expression is a well-formed cdt:List
+			// or cdt:Map literal, then we can use the size of the list/map
+			// for estimating the output cardinality.
+			final int size;
+			if ( isWellFormedCDTList ) {
+				@SuppressWarnings("unchecked")
+				final List<CDTValue> list = (List<CDTValue>) n.getLiteralValue();
+				size = list.size();
+			}
+			else if ( isWellFormedCDTMap ) {
+				@SuppressWarnings("unchecked")
+				final Map<CDTKey,CDTValue> list = (Map<CDTKey,CDTValue>) n.getLiteralValue();
+				size = list.size();
+			}
+			else {
+				size = -1;
+			}
+
+			if ( size == 0 ) {
+				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+				return;
+			}
+
+			if ( size > 0 ) {
+				final QueryPlanProperty crdIn = qpInfoSubPlan.getProperty(CARDINALITY);
+				final QueryPlanProperty maxIn = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
+				final QueryPlanProperty minIn = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
+
+				final int crd = multiplyWithoutExceedingMax( crdIn.getValue(), size );
+				final int max = multiplyWithoutExceedingMax( maxIn.getValue(), size );
+				final Quality crdQ = QueryPlanProperty.getReducedQuality( crdIn.getQuality() );
+				final Quality maxQ = QueryPlanProperty.getReducedQuality( maxIn.getQuality() );
+
+				qpInfo.addProperty( QueryPlanProperty.cardinality(crd, crdQ) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(max, maxQ) );
+				qpInfo.addProperty( minIn );
+				return;
+			}
+		}
+
+		// Special case 4: if the expression of the UNFOLD clause is
+		// function call using the cdt:List or the cdt:Map constructor
+		// function and there are no arguments for this function call,
+		// then we know that the produced list/map will be empty and,
+		// thus, the output cardinality will be zero.
+		final ExprFunction fct = op.getExpr().getFunction();
+		if ( fct != null ) {
+			final String fctIRI = fct.getFunctionIRI();
+
+			final boolean case4Found;
+			if (    ! fctIRI.equals(ARQConstants.CDTFunctionLibraryURI + "List")
+			     && ! fctIRI.equals(ARQConstants.CDTFunctionLibraryURI + "Map") )
+				case4Found = false;
+			else
+				case4Found = fct.getArgs().isEmpty();
+
+			if ( case4Found ) {
+				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+				return;
+			}
+		}
+
+		// Now we come to the general case.
+
+		// We take a wild guess and assume that, for every input solution
+		// mapping, the list or map to be unfolded contains 10 elements.
+		final QueryPlanProperty crdIn = qpInfoSubPlan.getProperty(CARDINALITY);
+		final QueryPlanProperty crd = QueryPlanProperty.cardinality(
+				multiplyWithoutExceedingMax( crdIn.getValue(), 10 ),
+				QueryPlanProperty.getReducedQuality( crdIn.getQuality() ) );
+		qpInfo.addProperty(crd);
+
+		// The minimum cardinality is not changed by UNFOLD.
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+
+		// The maximum cardinality is simply the maximum possible because
+		// the lists and maps to be unfolded may be unboundedly large.
+		final int max = Integer.MAX_VALUE;
+		final Quality maxQuality = Quality.MIN_OR_MAX_POSSIBLE;
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(max, maxQuality) );
 	}
 
 	@Override
@@ -262,6 +440,12 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		final QueryPlanProperty crd = qpInfoSubPlan.getProperty(CARDINALITY);
 		final QueryPlanProperty max = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
 		final QueryPlanProperty min = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
+
+		if ( checkAndSetIfGuaranteedEmpty(qpInfo, crd) ) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the l2g operator is guaranteed to be empty as well.
+			return;
+		}
 
 		if ( op.getVocabularyMapping().isEquivalenceOnly() ) {
 			// If the vocabulary mapping contains only equivalence
@@ -292,6 +476,12 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		final QueryPlanProperty crd = qpInfoSubPlan.getProperty(CARDINALITY);
 		final QueryPlanProperty max = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
 		final QueryPlanProperty min = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
+
+		if ( checkAndSetIfGuaranteedEmpty(qpInfo, crd) ) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the g2l operator is guaranteed to be empty as well.
+			return;
+		}
 
 		if ( op.getVocabularyMapping().isEquivalenceOnly() ) {
 			// If the vocabulary mapping contains only equivalence
@@ -324,6 +514,128 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		addCardinalityForUnion();
 	}
 
+	@Override
+	public void visit( final LogicalOpDedup op ) {
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+
+		final QueryPlanProperty crdIn = qpInfoSubPlan.getProperty(CARDINALITY);
+		final QueryPlanProperty maxIn = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
+		final QueryPlanProperty minIn = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
+
+		if ( checkAndSetIfGuaranteedEmpty(qpInfo, crdIn)) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the DEDUP operator is guaranteed to be empty as well.
+			return;
+		}
+
+		final int crdValue;
+		final Quality crdQuality;
+		if ( crdIn.getValue() == 0 || crdIn.getValue() == 1 ) {
+			crdValue = crdIn.getValue();
+			crdQuality = crdIn.getQuality();
+		}
+		else {
+			// Heuristic: assume 50% duplicates
+			crdValue = crdIn.getValue() / 2;
+			crdQuality = QueryPlanProperty.getReducedQuality( crdIn.getQuality() );
+		}
+
+		final int maxValue = maxIn.getValue();
+		final Quality maxQuality = maxIn.getQuality();
+
+		final int minValue;
+		final Quality minQuality;
+		if ( minIn.getValue() == 0 ) {
+			minValue = minIn.getValue();
+			minQuality = minIn.getQuality();
+		}
+		else {
+			minValue = 1;
+			minQuality = Quality.MIN_OR_MAX_POSSIBLE;
+		}
+
+		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(minValue, minQuality) );
+	}
+
+	@Override
+	public void visit( final LogicalOpProject op ) {
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+		final QueryPlanProperty crdSubPlan = qpInfoSubPlan.getProperty(CARDINALITY);
+
+		if ( checkAndSetIfGuaranteedEmpty(qpInfo, crdSubPlan) ) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the PROJECT operator is guaranteed to be empty as well.
+			return;
+		}
+
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+	}
+
+	@Override
+	public void visit( final LogicalOpMinus op ) {
+		final int crdValue;
+		final Quality crdQuality;
+
+		final QueryPlan lhs = currentSubPlan.getSubPlan(0);
+		final QueryPlan rhs = currentSubPlan.getSubPlan(1);
+
+		final QueryPlanningInfo qpInfoSubPlan1 = lhs.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan2 = rhs.getQueryPlanningInfo();
+
+		final QueryPlanProperty lhsCrd = qpInfoSubPlan1.getProperty(CARDINALITY);
+		final QueryPlanProperty lhsMaxCrd = qpInfoSubPlan1.getProperty(MAX_CARDINALITY);
+
+		if ( checkAndSetIfGuaranteedEmpty(currentSubPlan.getQueryPlanningInfo(), lhsCrd) )
+			// If the first input plan is guaranteed to produce an empty result,
+			// then the result of the MINUS operator is guaranteed to be empty as well.
+			return;
+
+		// If the second input plan is guaranteed to produce an empty result,
+		// then the result of the MINUS operator is guaranteed to be the same as the first input plan.
+		final QueryPlanProperty rhsCrd = qpInfoSubPlan2.getProperty(CARDINALITY);
+		if ( rhsCrd.getValue() == 0 && rhsCrd.getQuality() == Quality.ACCURATE ) {
+			crdValue = lhsCrd.getValue();
+			crdQuality = lhsCrd.getQuality();
+		}
+		else {
+			// Else, estimate the cardinality of the MINUS result by subtracting the estimated cardinality
+			// of the second input plan from the estimated cardinality of the first input plan.
+			// This is a very crude estimate that is likely to be a significant underestimation in many cases,
+			// but it is not clear how to do better without considering the actual query patterns and data statistics.
+			crdValue = Math.max(lhsCrd.getValue() - rhsCrd.getValue(), 0);
+			crdQuality = QueryPlanProperty.getReducedQuality( lhsCrd.getQuality() );
+		}
+
+		final int maxValue = lhsMaxCrd.getValue();
+		final Quality maxQuality = lhsMaxCrd.getQuality();
+
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+	}
+
+	/**
+	 * Checks whether the given cardinality property guarantees that the query plan
+	 * will produce an empty result. If so, it updates the provided {@link QueryPlanningInfo}
+	 * with accurate cardinality properties (min, max and exact cardinality all set to 0).
+	 */
+	public boolean checkAndSetIfGuaranteedEmpty( final QueryPlanningInfo qpInfo, final QueryPlanProperty crd ) {
+		if ( crd.getValue() == 0 && crd.getQuality() == Quality.ACCURATE ) {
+			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+			return true;
+		}
+
+		return false;
+	}
 
 	public void addCardinalityForUnion() {
 		int crdValue = 0;
@@ -333,11 +645,16 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		Quality maxQuality = Quality.ACCURATE;
 		Quality minQuality = Quality.ACCURATE;
 
+		boolean allEmpty = true;
 		for ( int x = 0; x < currentSubPlan.numberOfSubPlans(); x++ ) {
 			final QueryPlanningInfo qpInfoSubPlanX = currentSubPlan.getSubPlan(x).getQueryPlanningInfo();
 			final QueryPlanProperty crdX = qpInfoSubPlanX.getProperty(CARDINALITY);
 			final QueryPlanProperty maxX = qpInfoSubPlanX.getProperty(MAX_CARDINALITY);
 			final QueryPlanProperty minX = qpInfoSubPlanX.getProperty(MIN_CARDINALITY);
+
+			if ( crdX.getValue() != 0 || crdX.getQuality() != Quality.ACCURATE ) {
+				allEmpty = false;
+			}
 
 			crdValue = addWithoutExceedingMax( crdValue, crdX.getValue() );
 			maxValue = addWithoutExceedingMax( maxValue, maxX.getValue() );
@@ -346,6 +663,16 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 			crdQuality = pickWorse( crdQuality, crdX.getQuality() );
 			maxQuality = pickWorse( maxQuality, maxX.getQuality() );
 			minQuality = pickWorse( minQuality, minX.getQuality() );
+		}
+
+		// If each of the subplans under the UNION is guaranteed to produce the empty result,
+		// then the result of the UNION operator is guaranteed to be empty as well.
+		if ( allEmpty ) {
+			final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+			qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
+			qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+			return;
 		}
 
 		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
@@ -386,11 +713,7 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 			// guaranteed to produce an empty result. If so, we can stop
 			// here because the join cardinality is then guaranteed to be
 			// zero as well.
-			if ( crdX.getValue() == 0 && crdX.getQuality() == Quality.ACCURATE ) {
-				final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
-				qpInfo.addProperty( QueryPlanProperty.cardinality(0, Quality.ACCURATE) );
-				qpInfo.addProperty( QueryPlanProperty.maxCardinality(0, Quality.ACCURATE) );
-				qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.ACCURATE) );
+			if ( checkAndSetIfGuaranteedEmpty(currentSubPlan.getQueryPlanningInfo(), crdX) ) {
 				return;
 			}
 
@@ -424,7 +747,6 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
 	}
-
 
 	public static int addWithoutExceedingMax( final int x, final int y ) {
 		if ( x == Integer.MAX_VALUE || y == Integer.MAX_VALUE )

@@ -18,29 +18,29 @@ import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.jenaintegration.HeFQUINConstants;
-import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
-import se.liu.ida.hefquin.mappings.algebra.MappingOperatorUtils;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationUtils;
-import se.liu.ida.hefquin.mappings.algebra.sources.DataObject;
-import se.liu.ida.hefquin.mappings.algebra.sources.SourceReference;
-import se.liu.ida.hefquin.mappings.algebra.sources.json.JsonObject;
+import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpression;
+import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpressionUtils;
+import se.liu.ida.hefquin.mappings.sources.DataObject;
+import se.liu.ida.hefquin.mappings.sources.SourceReference;
+import se.liu.ida.hefquin.mappings.sources.json.JsonObject;
 
 public class WrappedRESTEndpointImpl extends RESTEndpointImpl
                                      implements WrappedRESTEndpoint
 {
-	protected final MappingOperator mappingExpression;
+	protected final MappingExpression mappingExpression;
 	protected final Set<SourceReference> srcRefs;
 
 	public WrappedRESTEndpointImpl( final String urlTemplate,
 	                                final List<RESTEndpoint.Parameter> params,
-	                                final MappingOperator mappingExpression ) {
+	                                final MappingExpression mappingExpression ) {
 		super(urlTemplate, params);
 
 		assert mappingExpression != null;
 		this.mappingExpression = mappingExpression;
 
-		srcRefs = MappingOperatorUtils.extractAllSrcRefs(mappingExpression);
+		srcRefs = MappingExpressionUtils.extractAllSrcRefs(mappingExpression);
 	}
 
 	@Override
@@ -115,7 +115,8 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 			srMap.put(sr, dataObj);
 		}
 
-		final MappingRelation r = mappingExpression.evaluate(srMap);
+		final MappingRelation r = MappingExpressionUtils.evaluate( mappingExpression,
+		                                                           srMap );
 
 		final Dataset ds = MappingRelationUtils.convertToRDF(r);
 

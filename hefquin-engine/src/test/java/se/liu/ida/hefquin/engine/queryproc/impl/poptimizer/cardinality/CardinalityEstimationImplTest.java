@@ -23,7 +23,6 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
-import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
@@ -377,7 +376,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 
-		final LogicalOpRequest<?,?>  reqOp = new LogicalOpRequest<>(fm, req);
+		final LogicalOpRequest<?,?>  reqOp = new LogicalOpRequest<>(fm, false, req);
 
 		return PhysicalPlanFactory.createPlan( reqOp, getLOP2POPForTests() );
 	}
@@ -419,7 +418,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	protected PhysicalPlan createGPAddPlan( final PhysicalPlan subplan,
 	                                        final TriplePattern tp ) {
 		final FederationMember fm = new TPFServerForTest();
-		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp, null);
+		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp, null, false);
 		return PhysicalPlanFactory.createPlan(gpAdd, getLOP2POPForTests(), subplan);
 	}
 
@@ -447,11 +446,9 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 			final CardinalityResponse resp = new CardinalityResponse() {
 				@Override public Date getRetrievalEndTime() { return null; }
 				@Override public Date getRequestStartTime() { return null; }
-				@Override public DataRetrievalRequest getRequest() { return req; }
-				@Override public FederationMember getFederationMember() { return fm; }
 				@Override public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
 					if( isError() ){
-						throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
+						throw new UnsupportedOperationDueToRetrievalError();
 					}
 					return c; }
 			};

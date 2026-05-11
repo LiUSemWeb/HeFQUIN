@@ -706,7 +706,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 			// Wrap in a list and return the response
 			List<SolutionMapping> mockResult = Collections.singletonList( solMap );
-			return new SolMapsResponseImpl( mockResult, fm, req, new Date() );
+			return new SolMapsResponseImpl( mockResult, new Date() );
 		}
 	}
 
@@ -736,8 +736,6 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 			final TPFResponse r = new TPFResponseImpl( Collections.emptyList(),
 			                                           Collections.emptyList(),
 			                                           null,
-			                                           fm,
-			                                           req,
 			                                           new Date() ) {
 				final int cardinalityEstimate = card;
 
@@ -756,8 +754,6 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 			final TPFResponse r = new TPFResponseImpl( Collections.emptyList(),
 			                                           Collections.emptyList(),
 			                                           null,
-			                                           fm,
-			                                           req,
 			                                           new Date() ) {
 				final int cardinalityEstimate = card;
 
@@ -797,8 +793,6 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 			final TPFResponse r = new TPFResponseImpl( Collections.emptyList(),
 			                                           Collections.emptyList(),
 			                                           null,
-			                                           fm,
-			                                           req,
 			                                           new Date() ) {
 				final int cardinalityEstimate = card;
 

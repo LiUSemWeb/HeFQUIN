@@ -38,9 +38,10 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	protected long[] timeAtCurrentProcStartXthInput;
 
 	public NaryExecutableOpBase( final int numberOfChildren,
+	                             final boolean mayReduce,
 	                             final boolean collectExceptions,
 	                             final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 
 		this.numberOfChildren = numberOfChildren;
 

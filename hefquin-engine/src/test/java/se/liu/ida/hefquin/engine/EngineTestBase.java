@@ -26,19 +26,7 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpNaiveNestedLoopsJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
@@ -98,9 +86,9 @@ public abstract class EngineTestBase
 				new PhysicalOpBindJoinSPARQL.Factory("VARIABLE_RENAMING", false, 30),
 				new PhysicalOpBindJoinSPARQL.Factory("VALUES_OR_FILTER", false, 30),
 				PhysicalOpSymmetricHashJoin.getFactory(),
-				PhysicalOpHashRJoin.getFactory(),
-				PhysicalOpIndexNestedLoopsJoin.getFactory(),
+				PhysicalOpHashJoin2.getFactory(),
 				//PhysicalOpHashJoin.getFactory(),
+				PhysicalOpIndexNestedLoopsJoin.getFactory(),
 				PhysicalOpNaiveNestedLoopsJoin.getFactory()
 			)
 		);
@@ -192,7 +180,7 @@ public abstract class EngineTestBase
 				final Binding b = qIter.nextBinding() ;
 				results.add(new SolutionMappingImpl(b));
 			}
-			return results;	
+			return results;
 		}
 	}
 
@@ -229,7 +217,7 @@ public abstract class EngineTestBase
 			} else {
 				result = getSolutions(req.getQueryPattern());
 			}
-			return new SolMapsResponseImpl( result, this, req, new Date() );
+			return new SolMapsResponseImpl( result, new Date() );
 		}
 
 	}
@@ -404,6 +392,23 @@ public abstract class EngineTestBase
 		}
 	}
 
+	public static class RejectingGraphFederationMemberForTest extends FederationMemberBaseForTest
+	{
+		public RejectingGraphFederationMemberForTest( final Graph data ) {
+			super(data);
+		}
+
+		@Override
+		public boolean supportsMoreThanTriplePatterns() {
+			return true;
+		}
+
+		@Override
+		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
+			return false; // keep it false to make sure that pattern pushdown fails in the tests
+		}
+	}
+
 	protected static class BRTPFServerWithVocabularyMappingForTest extends BRTPFServerForTest
 	{
 		final VocabularyMapping vm;
@@ -422,7 +427,7 @@ public abstract class EngineTestBase
 		public TPFResponseForTest( final List<Triple> matchingTriples,
 		                           final FederationMember fm,
 		                           final DataRetrievalRequest req ) {
-			super( matchingTriples, new ArrayList<Triple>(), null, fm, req, new Date() );
+			super( matchingTriples, new ArrayList<Triple>(), null, new Date() );
 		}
 
 		@Override
@@ -508,7 +513,8 @@ public abstract class EngineTestBase
 		{
 			final SolMapsResponse response;
 			if ( itSolMapsForResponse != null ) {
-				response = new SolMapsResponseImpl( itSolMapsForResponse.next(), fm, req, new Date() );
+				response = new SolMapsResponseImpl( itSolMapsForResponse.next(),
+				                                    new Date() );
 			}
 			else {
 				if (fm.getVocabularyMapping() != null) {
@@ -579,7 +585,8 @@ public abstract class EngineTestBase
 			else
 				throw new IllegalArgumentException();
 
-			final StringResponse response = new StringResponseImpl(data, fm, req, new Date());
+			final StringResponse response = new StringResponseImpl( data,
+			                                                        new Date() );
 			return CompletableFuture.completedFuture(response);
 		}
 

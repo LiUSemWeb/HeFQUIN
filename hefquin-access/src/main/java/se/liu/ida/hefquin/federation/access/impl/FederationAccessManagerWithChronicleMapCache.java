@@ -83,8 +83,6 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		if ( cachedEntry != null ) {
 			cacheHitsSPARQLCardinality++;
 			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
-			                                                                  fm,
-			                                                                  req,
 			                                                                  requestStartTime,
 			                                                                  requestEndTime );
 			return CompletableFuture.completedFuture( cr );
@@ -113,8 +111,6 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		if ( cachedEntry != null ) {
 			cacheHitsTPFCardinality++;
 			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
-			                                                                  fm,
-			                                                                  req,
 			                                                                  requestStartTime,
 			                                                                  requestEndTime );
 			return CompletableFuture.completedFuture( cr );
@@ -143,8 +139,6 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		if ( cachedEntry != null ) {
 			cacheHitsTPFCardinality++;
 			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
-			                                                                  fm,
-			                                                                  req,
 			                                                                  requestStartTime,
 			                                                                  requestEndTime );
 			return CompletableFuture.completedFuture( cr );
@@ -173,8 +167,6 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		if ( cachedEntry != null ) {
 			cacheHitsTPFCardinality++;
 			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
-			                                                                  fm,
-			                                                                  req,
 			                                                                  requestStartTime,
 			                                                                  requestEndTime );
 			return CompletableFuture.completedFuture( cr );

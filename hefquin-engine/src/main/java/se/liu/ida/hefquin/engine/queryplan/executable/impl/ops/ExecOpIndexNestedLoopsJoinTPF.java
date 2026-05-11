@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
@@ -17,6 +20,8 @@ import se.liu.ida.hefquin.federation.members.TPFServer;
 public class ExecOpIndexNestedLoopsJoinTPF
            extends BaseForExecOpIndexNestedLoopsJoinWithRequestOps<TriplePattern,TPFServer>
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpIndexNestedLoopsJoinTPF.class );
+
 	// Since this algorithm processes the input solution mappings
 	// in parallel, we should use an input block size with which
 	// we can leverage this parallelism. However, I am not sure
@@ -30,18 +35,24 @@ public class ExecOpIndexNestedLoopsJoinTPF
 	public ExecOpIndexNestedLoopsJoinTPF( final TriplePattern query,
 	                                      final TPFServer fm,
 	                                      final boolean useOuterJoinSemantics,
+	                                      final boolean mayReduce,
 	                                      final int minimumInputBlockSize,
 	                                      final boolean collectExceptions,
 	                                      final QueryPlanningInfo qpInfo ) {
-		super(query, fm, useOuterJoinSemantics, minimumInputBlockSize, collectExceptions, qpInfo);
+		super(query, fm, useOuterJoinSemantics, mayReduce, minimumInputBlockSize, collectExceptions, qpInfo);
+
+		log.info("Initialized ExecOpIndexNestedLoopsJoinTPF for server {}", fm);
 	}
 
 	public ExecOpIndexNestedLoopsJoinTPF( final TriplePattern query,
 	                                      final TPFServer fm,
 	                                      final boolean useOuterJoinSemantics,
+	                                      final boolean mayReduce,
 	                                      final boolean collectExceptions,
 	                                      final QueryPlanningInfo qpInfo ) {
-		super(query, fm, useOuterJoinSemantics, DEFAULT_INPUT_BLOCK_SIZE, collectExceptions, qpInfo);
+		super(query, fm, useOuterJoinSemantics, mayReduce, DEFAULT_INPUT_BLOCK_SIZE, collectExceptions, qpInfo);
+
+		log.info("Initialized ExecOpIndexNestedLoopsJoinTPF for server {}", fm);
 	}
 
 	@Override
@@ -49,7 +60,7 @@ public class ExecOpIndexNestedLoopsJoinTPF
 			throws VariableByBlankNodeSubstitutionException
 	{
 		final TriplePatternRequest req = createRequest(inputSolMap);
-		return new ExecOpRequestTPF<>(req, fm, false, null);
+		return new ExecOpRequestTPF<>(req, fm, this.mayReduce, false, null);
 	}
 
 	protected TriplePatternRequest createRequest( final SolutionMapping inputSolMap )

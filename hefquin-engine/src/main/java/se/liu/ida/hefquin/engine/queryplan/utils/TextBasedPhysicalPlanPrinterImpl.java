@@ -16,6 +16,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithUnaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.utils.BaseForTextBasedPlanPrinters.ExtPrintablePlan;
 
 /**
  * Internally, the functionality of this class is implemented based on
@@ -27,15 +28,42 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 {
 	public static final MyPropertiesExtractor pe = new MyPropertiesExtractor();
 
+	protected final PrintStream[] outs;
+
+	public TextBasedPhysicalPlanPrinterImpl( final PrintStream ... outs ) {
+		assert outs.length > 0;
+		this.outs = outs;
+	}
+
+	public TextBasedPhysicalPlanPrinterImpl( ) {
+		this.outs = new PrintStream[]{System.out};
+	}
+
 	@Override
 	public void print( final PhysicalPlan plan, final PrintStream out ) {
 		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		out.println("--------- Physical Plan ---------");
 		PlanPrinter.print(pp, out);
 		printFullStringsForGraphPatterns(pp, out);
 		out.flush();
 	}
 
+	@Override
+	public void print( final PhysicalPlan plan ) {
+		final ExtPrintablePlan pp = createPrintablePlan(plan);
+		for ( final PrintStream out : outs ) {
+			out.println("--------- Physical Plan ---------");
+			PlanPrinter.print(pp, out);
+			printFullStringsForGraphPatterns(pp, out);
+			out.flush();
+		}
+	}
+
 	public ExtPrintablePlan createPrintablePlan( final PhysicalPlan p ) {
+		if ( p instanceof PhysicalPlanWithoutResult ) {
+			return new ExtPrintablePlan( "empty plan", null, null, null, null );
+		}
+
 		pe.graphPattern = null;
 		pe.fullStringForGraphPattern = null;
 		pe.rootOpString = null;
@@ -135,8 +163,20 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
-		public void visit( final PhysicalOpHashJoin op ) {
-			rootOpString = "hash join";
+		public void visit( final PhysicalOpHashJoin1 op ) {
+			rootOpString = "hash join 1";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpHashJoin2 op ) {
+			rootOpString = "hash join 2";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpMinus op ) {
+			rootOpString = "minus";
 			record( op.getLogicalOperator() );
 		}
 
@@ -149,12 +189,6 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		@Override
 		public void visit( final PhysicalOpNaiveNestedLoopsJoin op ) {
 			rootOpString = "naive NLJ";
-			record( op.getLogicalOperator() );
-		}
-
-		@Override
-		public void visit( final PhysicalOpHashRJoin op ) {
-			rootOpString = "right-outer hash join";
 			record( op.getLogicalOperator() );
 		}
 
@@ -188,6 +222,12 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
+		public void visit( final PhysicalOpUnfold op ) {
+			rootOpString = "unfold";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
 		public void visit( final PhysicalOpLocalToGlobal op ) {
 			rootOpString = "l2g";
 			record( op.getLogicalOperator() );
@@ -196,6 +236,18 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		@Override
 		public void visit( final PhysicalOpGlobalToLocal op ) {
 			rootOpString = "g2l";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpDuplicateRemoval op ) {
+			rootOpString = "dedup";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpProject op ) {
+			rootOpString = "project";
 			record( op.getLogicalOperator() );
 		}
 

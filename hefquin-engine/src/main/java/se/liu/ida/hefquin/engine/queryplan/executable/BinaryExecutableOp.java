@@ -18,7 +18,7 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 * the assumption that the COMPLETE input from the first
 	 * operand has been sent to it before input from the
 	 * second operand is sent.
-	 *
+	 * <p>
 	 * An example of an operator that may return true here is
 	 * a hash join (which first needs to add all result elements
 	 * from the first operand into its hash table and, then, can
@@ -26,8 +26,11 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 * by probing into the hash table). In contrast, a symmetric
 	 * hash join (which has two hash tables and can consume result
 	 * elements from both inputs in any order) would return false.
-	 *
-	 * Operators that return true here may throw an {@link IllegalStateException} if their methods
+	 * <p>
+	 * Operators that return {@code true} here must return {@code false}
+	 * for {@link #requiresCompleteChild2InputFirst()}.
+	 * <p>
+	 * Operators that return {@code true} here may throw an {@link IllegalStateException} if their methods
 	 * {@link #processBlockFromChild2(IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)}
 	 * or {@link #wrapUpForChild2(IntermediateResultElementSink, ExecutionContext)} are called before
 	 * {@link #wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)} has been called.
@@ -35,9 +38,37 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	boolean requiresCompleteChild1InputFirst();
 
 	/**
+	 * Returns true if this operator is implemented based on
+	 * the assumption that the COMPLETE input from the second
+	 * operand has been sent to it before input from the
+	 * first operand is sent.
+	 * <p>
+	 * An example of an operator that may return true here is
+	 * a hash join that first adds all result elements from the
+	 * second operand into its hash table and, then, can start
+	 * consuming the result elements from the first operand by
+	 * probing into the hash table (which may be useful especially
+	 * for a left outer join.
+	 * <p>
+	 * Operators that return {@code true} here must return {@code false}
+	 * for {@link #requiresCompleteChild1InputFirst()}.
+	 * <p>
+	 * Operators that return {@code true} here may throw an {@link IllegalStateException} if their methods
+	 * {@link #processBlockFromChild1(IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)}
+	 * or {@link #wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)} are called before
+	 * {@link #wrapUpForChild2(IntermediateResultElementSink, ExecutionContext)} has been called.
+	 */
+	boolean requiresCompleteChild2InputFirst();
+
+	/**
 	 * Processes the given solution mapping as input coming from the
 	 * first operand and sends the produced result elements (if any)
 	 * to the given sink.
+	 * <p>
+	 * May throw {@link IllegalStateException} for operators for which
+	 * {@link #requiresCompleteChild2InputFirst()} returns true and
+	 * {@link #wrapUpForChild2(IntermediateResultElementSink, ExecutionContext)}
+	 * has not been called yet.
 	 */
 	void processInputFromChild1( SolutionMapping inputSolMap,
 	                             IntermediateResultElementSink sink,
@@ -47,11 +78,11 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 * Processes the solution mappings of the given list as input coming
 	 * from the first operand and sends the produced result elements (if
 	 * any) to the given sink.
-	 *
+	 * <p>
 	 * The default implementation of this method simply calls
 	 * {@link #processInputFromChild1(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
 	 * for every solution mapping of the given list
-	 *
+	 * <p>
 	 * Subclasses may override this behavior to send a greater number of output
 	 * solution mappings to the given sink at a time (which is useful to reduce
 	 * the communication between threads in the push-based execution model).
@@ -68,10 +99,15 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 * Finishes up any processing related to the input coming
 	 * from the first operand and sends the remaining result
 	 * elements (if any) to the given sink.
-	 *
+	 * <p>
 	 * This method will be called only once, after the sub-plan
 	 * that produces the input coming from the first operand has
 	 * finished producing its result.
+	 * <p>
+	 * May throw {@link IllegalStateException} for operators for which
+	 * {@link #requiresCompleteChild2InputFirst()} returns true and
+	 * {@link #wrapUpForChild2(IntermediateResultElementSink, ExecutionContext)}
+	 * has not been called yet.
 	 */
 	void wrapUpForChild1( IntermediateResultElementSink sink,
 	                      ExecutionContext execCxt ) throws ExecOpExecutionException;
@@ -80,7 +116,7 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 * Processes the given solution mapping as input coming from the
 	 * second operand and sends the produced result elements (if any)
 	 * to the given sink.
-	 *
+	 * <p>
 	 * May throw {@link IllegalStateException} for operators for which
 	 * {@link #requiresCompleteChild1InputFirst()} returns true and
 	 * {@link #wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)}

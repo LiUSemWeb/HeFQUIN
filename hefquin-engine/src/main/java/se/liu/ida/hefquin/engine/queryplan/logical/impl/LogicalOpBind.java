@@ -11,11 +11,13 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpBind implements UnaryLogicalOp
+public class LogicalOpBind extends BaseForLogicalOps implements UnaryLogicalOp
 {
 	protected final VarExprList bindExpressions;
 
-	public LogicalOpBind( final VarExprList bindExpressions ) {
+	public LogicalOpBind( final VarExprList bindExpressions, final boolean mayReduce ) {
+		super( mayReduce );
+
 		assert bindExpressions != null;
 		assert ! bindExpressions.isEmpty();
 
@@ -80,7 +82,8 @@ public class LogicalOpBind implements UnaryLogicalOp
 		if ( o == this ) return true;
 
 		return    o instanceof LogicalOpBind oo
-		       && oo.bindExpressions.equals(bindExpressions);
+		       && oo.bindExpressions.equals(bindExpressions)
+		       && oo.mayReduce == mayReduce;
 	}
 
 	@Override

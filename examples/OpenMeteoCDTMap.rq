@@ -12,8 +12,9 @@ PREFIX ex:     <http://example.org/>
 # are obtained from DBpedia) but it also demonstrates that the RML processor of
 # HeFQUIN creates cdt:Map literals for cases in which the object map of an RML
 # triples map refers to a JSON object (rather than to scalars value within a
-# JSON object). The BIND clauses at the end of the query apply functions that
-# have been defined for cdt:Map literals.
+# JSON object). The BIND clauses at the end of the query applies a function
+# that has been defined for cdt:Map literals, and the UNFOLD operator unfolds
+# the cdt:List literal obtained from the cdt:keys function.
 
 SELECT * WHERE {
 	SERVICE <http://dbpedia.org/sparql> {
@@ -29,6 +30,6 @@ SELECT * WHERE {
 		?x ex:current ?c .
 	}
 
-	BIND ( cdt:size(?c) AS ?size )
-	BIND ( cdt:get(?c, "temperature_2m") AS ?temp )
+	BIND ( cdt:keys(?c) AS ?keys )
+	UNFOLD( ?keys AS ?key )
 }

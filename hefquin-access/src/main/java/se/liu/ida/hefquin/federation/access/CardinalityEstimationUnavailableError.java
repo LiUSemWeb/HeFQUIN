@@ -1,32 +1,23 @@
 package se.liu.ida.hefquin.federation.access;
 
-import se.liu.ida.hefquin.federation.FederationMember;
-
 public class CardinalityEstimationUnavailableError extends FederationAccessException
 {
 	private static final long serialVersionUID = 1L;
 
 	public CardinalityEstimationUnavailableError( final String message,
-	                                              final Throwable cause,
-	                                              final DataRetrievalRequest req,
-	                                              final FederationMember fm ) {
-		super( message, cause, req, fm );
+	                                              final Throwable cause ) {
+		super( message, cause, null, null );
 	}
 
-	public CardinalityEstimationUnavailableError( final String message,
-	                                              final DataRetrievalRequest req,
-	                                              final FederationMember fm ) {
-		super( message, req, fm );
+	public CardinalityEstimationUnavailableError( final String message ) {
+		super( message, null, null );
 	}
 
-	public CardinalityEstimationUnavailableError( final Throwable cause,
-	                                              final DataRetrievalRequest req,
-	                                              final FederationMember fm ) {
-		super( cause, req, fm );
+	public CardinalityEstimationUnavailableError( final Throwable cause ) {
+		super( cause, null, null );
 	}
 
-	public CardinalityEstimationUnavailableError( final DataRetrievalRequest req,
-	                                              final FederationMember fm ) {
-		super( req, fm );
+	public CardinalityEstimationUnavailableError() {
+		super( null, null );
 	}
 }

@@ -17,7 +17,7 @@ import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
-import se.liu.ida.hefquin.base.shared.http.HttpClientProvider;
+import se.liu.ida.hefquin.base.net.http.HttpClientProvider;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -90,7 +90,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 
 		result.close();
 
-		return new SolMapsResponseImpl(solMaps, fm, req, requestStartTime);
+		return new SolMapsResponseImpl(solMaps, requestStartTime);
 	}
 
 	protected SolMapsResponse performRequestWithRDFConnection( final SPARQLRequest req,
@@ -129,7 +129,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 			throw new FederationAccessException("Closing the connection to the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", ex, req, fm);
 		}
 
-		return new SolMapsResponseImpl(sink.solMaps, fm, req, requestStartTime);
+		return new SolMapsResponseImpl(sink.solMaps, requestStartTime);
 	}
 
 

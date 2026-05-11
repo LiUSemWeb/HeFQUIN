@@ -3,10 +3,13 @@ package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter.LogicalPlanStage;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
@@ -65,10 +68,8 @@ public class QueryPlannerImpl implements QueryPlanner
 		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query, ctxt);
 
 		if ( srcasgPrinter != null ) {
-			System.out.println("--------- Source Assignment ---------");
-			srcasgPrinter.print( saAndStats.object1, System.out );
+			srcasgPrinter.print( saAndStats.object1, LogicalPlanStage.SOURCE_ASSIGNMENT );
 		}
-
 		final long t2 = System.currentTimeMillis();
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
@@ -78,20 +79,24 @@ public class QueryPlannerImpl implements QueryPlanner
 		else {
 			lp = saAndStats.object1;
 		}
-
+		
 		if ( lplanPrinter != null ) {
-			System.out.println("--------- Logical Plan ---------");
-			lplanPrinter.print( lp, System.out );
+			lplanPrinter.print( lp, LogicalPlanStage.FINAL_LOGICAL_PLAN );
 		}
 
 		final long t3 = System.currentTimeMillis();
-		final Pair<PhysicalPlan, PhysicalOptimizationStats> planAndStats = poptimizer.optimize(lp, ctxt);
+
+		final Pair<PhysicalPlan, PhysicalOptimizationStats> planAndStats;
+		if ( lp instanceof LogicalPlanWithoutResult )
+			planAndStats = new Pair<>( PhysicalPlanWithoutResult.getInstance(),
+			                           null );  // no stats
+		else
+			planAndStats = poptimizer.optimize(lp, ctxt);
 
 		final long t4 = System.currentTimeMillis();
 
 		if ( pplanPrinter != null ) {
-			System.out.println("--------- Physical Plan ---------");
-			pplanPrinter.print( planAndStats.object1, System.out );
+			pplanPrinter.print( planAndStats.object1 );
 		}
 
 		final QueryPlanningStats myStats = new QueryPlanningStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3,
@@ -108,5 +113,4 @@ public class QueryPlannerImpl implements QueryPlanner
 	public ExecutablePlanPrinter getExecutablePlanPrinter() {
 		return eplanPrinter;
 	}
-
 }

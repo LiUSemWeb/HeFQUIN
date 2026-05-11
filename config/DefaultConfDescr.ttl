@@ -24,6 +24,7 @@ _:bFederationAccessManager rdf:type ec:FederationAccessManager ;
           ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl" ;
           ec:constructorArguments ( ec:value:ExecServiceForFedAccess ) ]
         100  # cacheCapacity
+        10   # defaultMaxParallelRequests
     ) .
 
 _:bSourcePlanner rdf:type ec:SourcePlanner ;
@@ -36,8 +37,11 @@ _:bLogicalOptimizer rdf:type ec:LogicalOptimizer ;
 _:bListOfHeuristics
     ec:elementsTypeName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization" ;
     ec:elements (
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemoveSubPlansWithEmptyResults" ;
+          ec:constructorArguments (ec:value:QueryProcContext) ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.ProjectPushDown" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.CardinalityBasedJoinOrderingWithRequests" ;
@@ -69,7 +73,10 @@ _:bListOfPhysicalOpFactories
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpUnfold$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpDuplicateRemoval$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpProject$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal$Factory" ]
@@ -100,10 +107,11 @@ _:bListOfPhysicalOpFactories
         #                           false  # false = sequential version
         #                           30) ]  # batch size
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin$Factory" ]
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin2$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMinus$Factory" ]
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin1$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLookupJoinViaWrapper$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin$Factory" ]
-        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpNaiveNestedLoopsJoin$Factory" ]
     ) .
 

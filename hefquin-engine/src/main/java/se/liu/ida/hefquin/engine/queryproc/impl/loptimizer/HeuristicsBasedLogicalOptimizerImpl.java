@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
@@ -63,6 +64,11 @@ public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 		LogicalPlan resultPlan = inputPlan;
 		for ( final HeuristicForLogicalOptimization h : heuristics ) {
 			resultPlan = h.apply(resultPlan);
+
+			// If the plan has been rewritten into the plan that produces
+			// the empty result, then this plan can be returned immediately.
+			if ( resultPlan instanceof LogicalPlanWithoutResult )
+				return resultPlan;
 		}
 
 		return resultPlan;

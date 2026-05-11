@@ -11,14 +11,20 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 {
 	private long numberOfOutputMappingsProduced = 0L;
-	
-	public ExecOpBinaryUnion( final boolean collectExceptions,
+
+	public ExecOpBinaryUnion( final boolean mayReduce,
+	                          final boolean collectExceptions,
 	                          final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override
 	public boolean requiresCompleteChild1InputFirst() {
+		return false;
+	}
+
+	@Override
+	public boolean requiresCompleteChild2InputFirst() {
 		return false;
 	}
 

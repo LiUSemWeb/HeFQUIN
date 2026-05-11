@@ -32,7 +32,8 @@ public class TestsForPhysicalOpRegistry
 		registry.register( PhysicalOpRequest.getFactory() );
 
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1( new ElementTriplesBlock() );
-		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>( new EngineTestBase.SPARQLEndpointForTest(),
+		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>( new EngineTestBase.SPARQLEndpointForTest(), 
+		                                               false,
 		                                                          new SPARQLRequestImpl(p) );
 
 		assertEquals( PhysicalOpRequest.class, registry.create(lop).getClass() );

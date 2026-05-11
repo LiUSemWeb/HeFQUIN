@@ -122,10 +122,6 @@ public class SPARQLRequestProcessorImplTest extends FederationTestBase
 		// executing the tested method
 		final SolMapsResponse resp = recProc.performRequest(req, fm);
 
-		// checking
-		assertEquals( fm, resp.getFederationMember() );
-		assertEquals( req, resp.getRequest() );
-
 		return resp.getResponseData().iterator();
 	}
 

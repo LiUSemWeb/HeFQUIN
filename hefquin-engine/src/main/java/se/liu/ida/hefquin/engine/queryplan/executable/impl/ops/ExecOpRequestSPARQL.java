@@ -23,9 +23,10 @@ public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
 
 	public ExecOpRequestSPARQL( final ReqType req,
 	                            final MemberType fm,
+	                            final boolean mayReduce,
 	                            final boolean collectExceptions,
 	                            final QueryPlanningInfo qpInfo ) {
-		super(req, fm, collectExceptions, qpInfo);
+		super(req, fm, mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

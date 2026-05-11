@@ -27,9 +27,10 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 	protected long timeAtExecStart  = 0L;
 	protected long timeAtExecEnd    = 0L;
 
-	public NullaryExecutableOpBase( final boolean collectExceptions,
+	public NullaryExecutableOpBase( final boolean mayReduce,
+	                                final boolean collectExceptions,
 	                                final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 	}
 
 	@Override

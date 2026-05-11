@@ -19,9 +19,10 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 	protected final VocabularyMapping vm;
 
 	public ExecOpGlobalToLocal( final VocabularyMapping vm,
+	                            final boolean mayReduce,
 	                            final boolean collectExceptions,
 	                            final QueryPlanningInfo qpInfo ) {
-		super(collectExceptions, qpInfo);
+		super(mayReduce, collectExceptions, qpInfo);
 
 		assert vm != null;
 		this.vm = vm;

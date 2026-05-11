@@ -33,7 +33,7 @@ public class PhysicalOpMultiwayUnion implements NaryPhysicalOpForLogicalOp
 	public NaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                      final QueryPlanningInfo qpInfo,
 	                                      final ExpectedVariables... inputVars) {
-		return new ExecOpMultiwayUnion( inputVars.length, collectExceptions, qpInfo );
+		return new ExecOpMultiwayUnion( inputVars.length, getLogicalOperator().mayReduce(), collectExceptions, qpInfo );
 	}
 
 	@Override

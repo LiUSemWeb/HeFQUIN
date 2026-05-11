@@ -6,6 +6,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.Query;
@@ -24,7 +27,7 @@ import se.liu.ida.hefquin.federation.FederationMember;
  * operators. The possibility to rely on a request operator is particularly
  * useful in cases in which this operator implements paging, because the
  * alternative would be the need to re-implement paging again in the nested
- * loops join algorithm of potential subclasses of this base class. 
+ * loops join algorithm of potential subclasses of this base class.
  *
  * For an abstract base class that issues requests directly (instead of using
  * request operators), use {@link BaseForExecOpIndexNestedLoopsJoinWithRequests}.
@@ -33,6 +36,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
                                                                       MemberType extends FederationMember>
               extends BaseForUnaryExecOpWithCollectedInput
 {
+	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpIndexNestedLoopsJoinWithRequestOps.class );
 	protected final QueryType query;
 	protected final MemberType fm;
 	protected final boolean useOuterJoinSemantics;
@@ -45,10 +49,13 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	protected BaseForExecOpIndexNestedLoopsJoinWithRequestOps( final QueryType query,
 	                                                           final MemberType fm,
 	                                                           final boolean useOuterJoinSemantics,
+															   final boolean mayReduce,
 	                                                           final int minimumInputBlockSize,
 	                                                           final boolean collectExceptions,
 	                                                           final QueryPlanningInfo qpInfo ) {
-		super(minimumInputBlockSize, collectExceptions, qpInfo);
+		super(mayReduce, minimumInputBlockSize, collectExceptions, qpInfo);
+
+		log.info( "Initialized IndexNestedLoopsJoinWithRequestOps for query {} on federation member {}", query, fm );
 
 		assert query != null;
 		assert fm != null;
@@ -64,6 +71,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	                              final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
+		log.info( "Starting request-based index nested loops join with {} input mappings", input.size() );
 		final CompletableFuture<?>[] futures = initiateProcessing( input, sink, execCxt );
 
 		// wait for all the futures to be completed
@@ -177,6 +185,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	                                   final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
+		log.info( "Completed request-based index nested loops join. Requests issued: {}, outputs produced: {}",
+		numberOfRequestOpsUsed,
+		numberOfOutputMappingsProduced );
 		if ( input != null && ! input.isEmpty() ) {
 			_processCollectedInput(input, sink, execCxt);
 		}

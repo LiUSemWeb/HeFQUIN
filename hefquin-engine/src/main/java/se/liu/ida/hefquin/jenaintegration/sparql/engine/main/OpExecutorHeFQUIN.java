@@ -110,6 +110,16 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	}
 
 	@Override
+	protected QueryIterator execute( final OpUnfold opUnfold, final QueryIterator input ) {
+		if ( isSupportedOp(opUnfold) ) {
+			return executeSupportedOp( opUnfold, input );
+		}
+		else {
+			return super.execute(opUnfold, input);
+		}
+	}
+
+	@Override
 	protected QueryIterator execute( final OpFilter opFilter, final QueryIterator input ) {
 		if ( isSupportedOp(opFilter) ) {
 			return executeSupportedOp( opFilter, input );
@@ -129,6 +139,25 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		}
 	}
 
+	@Override
+	protected QueryIterator execute( final OpDistinct opDistinct, final QueryIterator input ) {
+		if ( isSupportedOp(opDistinct) ) {
+			return executeSupportedOp( opDistinct, input );
+		}
+		else {
+			return super.execute(opDistinct, input);
+		}
+	}
+
+	@Override
+	protected QueryIterator execute( final OpProject opProject, final QueryIterator input ) {
+		if ( isSupportedOp(opProject) ) {
+			return executeSupportedOp( opProject, input );
+		}
+		else {
+			return super.execute(opProject, input);
+		}
+	}
 
 	protected boolean isSupportedOp( final Op op ) {
 		final UnsupportedOpFinder f = new UnsupportedOpFinder();
@@ -239,7 +268,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		@Override public void visit(OpConditional op)  {} // supported
 
-		@Override public void visit(OpMinus op)        { unsupportedOp = op; }
+		@Override public void visit(OpMinus op)        {} // supported
 
 		@Override public void visit(OpUnion op)        {} // supported
 
@@ -263,15 +292,15 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		@Override public void visit(OpExtend op)       {} // supported
 
-		@Override public void visit(OpUnfold op)       { unsupportedOp = op; }
+		@Override public void visit(OpUnfold op)       {} // supported
 
 		@Override public void visit(OpList op)         { unsupportedOp = op; }
 
 		@Override public void visit(OpOrder op)        { unsupportedOp = op; }
 
-		@Override public void visit(OpProject op)      { unsupportedOp = op; }
+		@Override public void visit(OpProject op)      {} // supported
 
-		@Override public void visit(OpDistinct op)     { unsupportedOp = op; }
+		@Override public void visit(OpDistinct op)     {} // supported
 
 		@Override public void visit(OpReduced op)      { unsupportedOp = op; }
 

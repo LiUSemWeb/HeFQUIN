@@ -29,7 +29,7 @@ import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalEr
  * An alternative option to this base class is the abstract base class
  * {@link BaseForExecOpIndexNestedLoopsJoinWithRequestOps} which relies
  * on executable request operators rather than issuing requests directly.
- * This option may come handy in cases in which a single request per 
+ * This option may come handy in cases in which a single request per
  * input solution mapping is not enough because of paging.
  */
 public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
@@ -49,10 +49,11 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query,
 	                                                      final MemberType fm,
+	                                                      final boolean mayReduce,
 	                                                      final int minimumInputBlockSize,
 	                                                      final boolean collectExceptions,
-	                                                      final QueryPlanningInfo qpInfo) {
-		super(minimumInputBlockSize, collectExceptions, qpInfo);
+	                                                      final QueryPlanningInfo qpInfo ) {
+		super(mayReduce, minimumInputBlockSize, collectExceptions, qpInfo);
 
 		assert query != null;
 		assert fm != null;
