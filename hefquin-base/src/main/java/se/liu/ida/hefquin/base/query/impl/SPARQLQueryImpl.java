@@ -50,7 +50,7 @@ public class SPARQLQueryImpl implements SPARQLQuery
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
 
-		return o instanceof SPARQLQuery && ((SPARQLQuery) o).asJenaQuery().equals(jenaQuery);
+		return o instanceof SPARQLQuery oo && oo.asJenaQuery().equals(jenaQuery);
 	}
 
 	@Override

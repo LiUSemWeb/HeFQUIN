@@ -62,14 +62,11 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		final SPARQLRequest oo = (SPARQLRequest) o;
 
 		if ( pattern == null ) {
-			return oo.getQueryPattern() == null
-			    && query.equals( oo.getQuery() )
-			    && Objects.equals( getProjectionVars(), (oo.getProjectionVars()) )
-			    && isDistinct() == oo.isDistinct();
+			return oo.getQueryPattern() == null && query.equals( oo.getQuery() );
 		}
 		else {
 			return pattern.equals( oo.getQueryPattern() )
-			    && Objects.equals( getProjectionVars(), (oo.getProjectionVars()) )
+			    && Objects.equals( getProjectionVars(), oo.getProjectionVars() )
 			    && isDistinct() == oo.isDistinct();
 		}
 	}
@@ -115,12 +112,10 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	@Override
 	public String toString(){
 		if ( query != null )
-			return "SPARQLRequest with query: " + query.toString()
-			     + ", projection variables: " + ( projectionVars == null ? "null" : projectionVars.toString() )
-			     + ", distinct: " + isDistinct;
+			return "SPARQLRequest with query: " + query.toString();
 		else
 			return "SPARQLRequest with pattern: " + pattern.toString()
-			     + ", projection variables: " + ( projectionVars == null ? "null" : projectionVars.toString() )
+			     + ", projection variables: " + projectionVars
 			     + ", distinct: " + isDistinct;
 	}
 }
