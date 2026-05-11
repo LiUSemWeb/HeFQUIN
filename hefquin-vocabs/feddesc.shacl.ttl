@@ -214,10 +214,20 @@ fd:MappingShape
 fd:WrapperShape
     a sh:NodeShape ;
     sh:or (
-        [ sh:node fd:RMLWrapperShape ]
         [ sh:node fd:MappingConfigWrapperShape ]
+        [ sh:node fd:RMLWrapperShape ]
     ) ;
     sh:message "Wrapper must be one of the supported types" .
+
+# Shape for Mapping Config Wrapper Shape
+fd:MappingConfigWrapperShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path fd:mappingConfiguration ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Wrapper must have exactly one fd:mappingConfiguration." ;
+    ] .
 
 # Shape for RML wrappers
 fd:RMLWrapperShape
@@ -228,16 +238,6 @@ fd:RMLWrapperShape
         sh:maxCount 1 ;
         sh:node fd:RmlTriplesMapShape ;
         sh:message "Wrapper must have exactly one fd:rmlTriplesMaps." ;
-    ] .
-
-# Shape for Mapping Config Wrapper Shape
-fd:MappingConfigWrapperShape
-    a sh:NodeShape ;
-    sh:property [
-        sh:path fd:mappingConfiguration ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:message "Wrapper must have exactly one fd:mappingConfiguration." ;
     ] .
 
 # Shape for RML TriplesMap
