@@ -48,7 +48,7 @@ public class BGPRequestImpl implements BGPRequest
 	}
 
 	@Override
-	public boolean isDistinct() {
+	public boolean getDistinctRequired() {
 		return false;
 	}
 

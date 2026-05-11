@@ -22,13 +22,13 @@ public class SPARQLQueryImpl implements SPARQLQuery
 
 	public SPARQLQueryImpl( final SPARQLGraphPattern p,
 	                        final Set<Var> projectionVars,
-	                        final boolean isDistinct ) {
-		this( QueryPatternUtils.convertToJenaElement(p), projectionVars, isDistinct );
+	                        final boolean distinctRequired ) {
+		this( QueryPatternUtils.convertToJenaElement(p), projectionVars, distinctRequired );
 	}
 
 	protected SPARQLQueryImpl( final Element jenaElement,
 	                           final Set<Var> projectionVars,
-	                           final boolean isDistinct ) {
+	                           final boolean distinctRequired ) {
 		assert jenaElement != null;
 
 		jenaQuery = QueryFactory.create();
@@ -42,7 +42,7 @@ public class SPARQLQueryImpl implements SPARQLQuery
 			jenaQuery.setQueryResultStar( true );
 
 
-		jenaQuery.setDistinct( isDistinct );
+		jenaQuery.setDistinct( distinctRequired );
 		jenaQuery.setQueryPattern( jenaElement );
 	}
 

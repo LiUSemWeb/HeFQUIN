@@ -16,7 +16,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 {
 	protected final SPARQLGraphPattern pattern;
 	protected final Set<Var> projectionVars;
-	protected final boolean isDistinct;
+	protected final boolean distinctRequired;
 
 	protected final SPARQLQuery query;
 
@@ -28,12 +28,12 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 	public SPARQLRequestImpl( final SPARQLGraphPattern pattern,
 	                          final Set<Var> projectionVars,
-	                          final boolean distinct ) {
+	                          final boolean distinctRequired ) {
 		assert pattern != null;
 		this.pattern = pattern;
 		this.query = null;
 		this.projectionVars = projectionVars;
-		this.isDistinct = distinct;
+		this.distinctRequired = distinctRequired;
 
 		// we materialize the ExpectedVariables in this case
 		// to avoid producing it again whenever it is used
@@ -47,7 +47,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 		final Query jena = query.asJenaQuery();
 		this.projectionVars = jena.isQueryResultStar() ? null : new HashSet<>( jena.getProjectVars() );
-		this.isDistinct = jena.isDistinct();
+		this.distinctRequired = jena.isDistinct();
 
 		// we materialize the ExpectedVariables in this case
 		// to avoid producing it again whenever it is used
@@ -67,7 +67,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		else {
 			return pattern.equals( oo.getQueryPattern() )
 			    && Objects.equals( getProjectionVars(), oo.getProjectionVars() )
-			    && isDistinct() == oo.isDistinct();
+			    && getDistinctRequired() == oo.getDistinctRequired();
 		}
 	}
 
@@ -76,9 +76,9 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		if ( pattern == null )
 			return query.hashCode();
 		else if ( pattern != null && getProjectionVars() != null )
-			return pattern.hashCode() ^ getProjectionVars().hashCode() ^ (isDistinct() ? 1 : 0);
+			return pattern.hashCode() ^ getProjectionVars().hashCode() ^ (getDistinctRequired() ? 1 : 0);
 		else
-			return pattern.hashCode() ^ (isDistinct() ? 1 : 0);
+			return pattern.hashCode() ^ (getDistinctRequired() ? 1 : 0);
 	}
 
 	@Override
@@ -92,8 +92,8 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	}
 
 	@Override
-	public boolean isDistinct() {
-		return isDistinct;
+	public boolean getDistinctRequired() {
+		return distinctRequired;
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		if ( query != null )
 			return query;
 		else
-			return SPARQLRequest.convertToQuery( getQueryPattern(), getProjectionVars(), isDistinct() );
+			return SPARQLRequest.convertToQuery( getQueryPattern(), getProjectionVars(), getDistinctRequired() );
 	}
 
 	@Override
@@ -116,6 +116,6 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		else
 			return "SPARQLRequest with pattern: " + pattern.toString()
 			     + ", projection variables: " + projectionVars
-			     + ", distinct: " + isDistinct;
+			     + ", distinct required: " + distinctRequired;
 	}
 }

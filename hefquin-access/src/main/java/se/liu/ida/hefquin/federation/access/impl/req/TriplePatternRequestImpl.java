@@ -50,7 +50,7 @@ public class TriplePatternRequestImpl implements TriplePatternRequest
 	}
 
 	@Override
-	public boolean isDistinct() {
+	public boolean getDistinctRequired() {
 		return false;
 	}
 

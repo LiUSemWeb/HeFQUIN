@@ -38,20 +38,20 @@ public interface SPARQLRequest extends DataRetrievalRequest
 	 *
 	 * @return {@code true} if duplicate elimination is requested; {@code false} otherwise
 	 */
-	boolean isDistinct();
+	boolean getDistinctRequired();
 
 	/**
 	 * Returns the SPARQL query for which solutions
 	 * should be requested.
 	 */
 	default SPARQLQuery getQuery() {
-		return convertToQuery( getQueryPattern(), getProjectionVars(), isDistinct() );
+		return convertToQuery( getQueryPattern(), getProjectionVars(), getDistinctRequired() );
 	}
 
 	static SPARQLQuery convertToQuery( final SPARQLGraphPattern pattern,
 	                                   final Set<Var> projectionVars,
-	                                   final boolean isDistinct ) {
-		return new SPARQLQueryImpl( pattern, projectionVars, isDistinct );
+	                                   final boolean distinctRequired ) {
+		return new SPARQLQueryImpl( pattern, projectionVars, distinctRequired );
 	}
 
 }
