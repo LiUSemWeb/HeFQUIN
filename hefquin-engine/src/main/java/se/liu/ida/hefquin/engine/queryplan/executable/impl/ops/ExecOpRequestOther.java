@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -21,6 +24,7 @@ import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint.DataConversionE
 public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
                                                              WrappedRESTEndpoint>
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpRequestOther.class );
 	private long timeAfterResponse = 0L;
 	private long numberOfOutputMappingsProduced = 0L;
 
@@ -32,6 +36,8 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 		super(req, fm, mayReduce, collectExceptions, qpInfo);
 
 		assert fm.getNumberOfParameters() != 0;
+
+		log.info( "Initialized ExecOpRequestOther for {}", fm );
 	}
 
 	@Override
@@ -39,6 +45,8 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 	                               final ExecutionContext execCxt )
 		throws ExecOpExecutionException
 	{
+		log.info( "Issuing REST request to endpoint {}", fm.getURLTemplate() );
+
 		final StringResponse response;
 		try {
 			response = FederationAccessUtils.performRequest( execCxt.getFederationAccessMgr(),
@@ -57,6 +65,8 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 		} catch ( final UnsupportedOperationDueToRetrievalError e ) {
 			throw new ExecOpExecutionException( "Accessing the response data caused an exception, which indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
 		}
+
+		log.info( "Received REST response from {}", fm.getURLTemplate() );
 
 		process(data, sink);
 	}
@@ -78,6 +88,7 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 
 		final int cnt = sink.send(solmaps);
 		numberOfOutputMappingsProduced += cnt;
+		log.info( "Processed REST response: produced {} solution mappings", numberOfOutputMappingsProduced );
 	}
 
 	@Override
