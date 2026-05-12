@@ -99,7 +99,7 @@ fd:paramType a owl:ObjectProperty ;
     rdfs:domain hydra:IriTemplateMapping ;
     rdfs:range  rdfs:Resource ;
     rdfs:label "type of template parameter"@en ;
-    rdfs:comment "The type of values to be used for a variable part of a URI template. This type is expected to be specified as a datatype URI (e.g., xsd:string, xsd:float)."@en .
+    rdfs:comment "The type of values to be used for a variable part of a URI template. This type is expected to be specified as a datatype URI (e.g., xsd:string, xsd:float). This property is optional; i.e., not every IriTemplateMapping needs to have it. If a IriTemplateMapping has this property, the datatype specified via this property is enforced when creating request URIs from the corresponding IriTemplate; i.e., the IriTemplate will be instantiated only for parameter values that have the specified datatype."@en .
 
 fd:exampleFragmentAddress a owl:DatatypeProperty ;
     rdfs:domain fd:FragmentInterface ;

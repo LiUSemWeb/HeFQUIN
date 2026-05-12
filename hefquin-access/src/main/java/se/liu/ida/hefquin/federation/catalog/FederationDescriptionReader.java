@@ -14,6 +14,7 @@ import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -299,16 +300,16 @@ public class FederationDescriptionReader
 
 				final Resource p = x.asResource();
 				final String name = ModelUtils.getSingleMandatoryProperty_XSDString(p, HydraVocab.variable);
-				final String type = getAsURIString(ModelUtils.getSingleMandatoryProperty(p, FDVocab.paramType));
-
-				if ( type == null )
-					throw new IllegalArgumentException();
+				final String type = getAsURIString(ModelUtils.getSingleOptionalProperty(p, FDVocab.paramType));
 
 				final Statement isRequiredStmt = p.getProperty(HydraVocab.required);
 				final boolean isRequired = isRequiredStmt == null ? false : isRequiredStmt.getBoolean();
 
 				final RDFDatatype dt;
-				if ( XSDDatatype.XSDstring.getURI().equals(type) ) {
+				if ( type == null ) {
+					dt = null;
+				}
+				else if ( XSDDatatype.XSDstring.getURI().equals(type) ) {
 					dt = XSDDatatype.XSDstring;
 				}
 				else if ( XSDDatatype.XSDinteger.getURI().equals(type) ) {
@@ -498,18 +499,24 @@ public class FederationDescriptionReader
 	 * In particular, if the node is a URI, then that URI is returned (as a
 	 * string); if the node is an xsd:anyURI literal with a valid URI as its
 	 * lexical form, then that URI is returned; otherwise, {@code null} is
-	 * returned.
+	 * returned (including for the case that the given node is already
+	 * {@code null}).
 	 */
 	protected String getAsURIString( final RDFNode n ) {
-		if ( n.isLiteral() && n.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI()) ) {
-			return n.asLiteral().getLexicalForm();
-		}
-		else if ( n.isURIResource() ) {
-			return n.asResource().getURI();
-		}
-		else {
+		if ( n == null )
 			return null;
+
+		if ( n.isURIResource() )
+			return n.asResource().getURI();
+
+		if ( n.isLiteral() ) {
+			final Literal lit = n.asLiteral();
+			final String anyURI = XSD.anyURI.getURI();
+			if ( lit.getDatatypeURI().equals(anyURI) )
+				return lit.getLexicalForm();
 		}
+
+		return null;
 	}
 
 }

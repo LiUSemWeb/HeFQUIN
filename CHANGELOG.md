@@ -16,7 +16,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Adding a logical plan rewriting that pushes project operators ([#580](https://github.com/LiUSemWeb/HeFQUIN/pull/580)).
 - Initial version of a CLI tool to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601)).
 ### Changed
-- Reorganization of the vocabulary for federation descriptions ([#597](https://github.com/LiUSemWeb/HeFQUIN/pull/597)).
+- Reorganization of the vocabulary for federation descriptions ([#597](https://github.com/LiUSemWeb/HeFQUIN/pull/597), [#615](https://github.com/LiUSemWeb/HeFQUIN/pull/615)).
 - Refactoring the code of the logical plan rewriting rules to use the visitor pattern ([#560](https://github.com/LiUSemWeb/HeFQUIN/pull/560), [#569](https://github.com/LiUSemWeb/HeFQUIN/pull/569), [#571](https://github.com/LiUSemWeb/HeFQUIN/pull/571), [#575](https://github.com/LiUSemWeb/HeFQUIN/pull/575)).
 - More effective filter push down and cardinality estimation for the case of a filter over a fixed-solmap operator ([#588](https://github.com/LiUSemWeb/HeFQUIN/pull/588)).
 - Extending filter push down with the option to push also into the pattern of a gpAdd operator ([#589](https://github.com/LiUSemWeb/HeFQUIN/pull/589)).
