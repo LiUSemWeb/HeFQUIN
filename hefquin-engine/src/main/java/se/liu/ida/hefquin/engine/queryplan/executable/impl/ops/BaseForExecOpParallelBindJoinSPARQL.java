@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -21,6 +24,8 @@ public abstract class BaseForExecOpParallelBindJoinSPARQL
 		                                                  SPARQLRequest,
 		                                                  SolMapsResponse>
 {
+	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpParallelBindJoinSPARQL.class );
+
 	public BaseForExecOpParallelBindJoinSPARQL( final SPARQLGraphPattern p,
 	                                            final SPARQLEndpoint fm,
 	                                            final ExpectedVariables inputVars,
@@ -30,6 +35,13 @@ public abstract class BaseForExecOpParallelBindJoinSPARQL
 	                                            final boolean collectExceptions,
 	                                            final QueryPlanningInfo qpInfo ) {
 		super(p, p.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo);
+
+		log.info(
+			"Initialized parallel SPARQL bind-join base for endpoint {} (outerJoin={}, mayReduce={}, batchSize={})",
+			fm,
+			useOuterJoinSemantics,
+			mayReduce,
+			batchSize );
 	}
 
 	@Override
@@ -40,6 +52,8 @@ public abstract class BaseForExecOpParallelBindJoinSPARQL
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
+		log.info( "Creating FULL RETRIEVAL SPARQL request for endpoint {}", fm );
+
 		final SPARQLRequest req = new SPARQLRequestImpl(query);
 		return new ExecOpRequestSPARQL<>(req, fm, this.mayReduce, false, null);
 	}

@@ -4,6 +4,8 @@ import java.util.Set;
 
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.syntax.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -23,6 +25,7 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 public class ExecOpParallelBindJoinSPARQLwithUNION
 		extends BaseForExecOpParallelBindJoinSPARQL
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpParallelBindJoinSPARQLwithUNION.class );
 	protected final Element pattern;
 
 	/**
@@ -63,10 +66,21 @@ public class ExecOpParallelBindJoinSPARQLwithUNION
 		super(query, fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
+
+		log.info(
+			"Initialized ExecOpParallelBindJoinSPARQLwithUNION for endpoint {} (patternType={}, batchSize={}, outerJoin={})",
+			fm,
+			pattern.getClass().getSimpleName(),
+			batchSize,
+			useOuterJoinSemantics );
 	}
 
 	@Override
 	protected SPARQLRequest createRequest( final Set<Binding> batch ) {
+		log.info(
+			"Creating parallel UNION-based SPARQL bind-join request with {} bindings for endpoint {}",
+			batch.size(),
+			fm );
 		return ExecOpSequentialBindJoinSPARQLwithUNION.createRequest(batch, pattern, varsInQuery);
 	}
 
