@@ -228,21 +228,23 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			if ( paramValueAsNode == null ) return null;
 			if ( ! paramValueAsNode.isLiteral() ) return null;
 
-			// Check that the datatype of the literal equals
-			// the datatype expected for the parameter.
-			final RDFDatatype typeOfNode = paramValueAsNode.getLiteralDatatype();
-			if ( paramDecl.getType().equals(XSDDatatype.XSDstring) ) {
-				// Special case: If the expected datatype is xsd:string but
-				// the actual one is rdf:langString or rdf:dirLangString,
-				// then the value is still accepted.
-				if (    ! typeOfNode.equals(XSDDatatype.XSDstring)
-				     && ! RDFLangString.isRDFLangString(typeOfNode)
-				     && ! RDFDirLangString.isRDFDirLangString(typeOfNode) ) {
+			// If the parameter has an expected datatype, then check that
+			// the datatype of the literal equals that expected datatype.
+			if ( paramDecl.getType() != null ) {
+				final RDFDatatype typeOfNode = paramValueAsNode.getLiteralDatatype();
+				if ( paramDecl.getType().equals(XSDDatatype.XSDstring) ) {
+					// Special case: If the expected datatype is xsd:string but
+					// the actual one is rdf:langString or rdf:dirLangString,
+					// then the value is still accepted.
+					if (    ! typeOfNode.equals(XSDDatatype.XSDstring)
+							&& ! RDFLangString.isRDFLangString(typeOfNode)
+							&& ! RDFDirLangString.isRDFDirLangString(typeOfNode) ) {
+						return null;
+					}
+				}
+				else if ( ! paramDecl.getType().equals(typeOfNode) ) {
 					return null;
 				}
-			}
-			else if ( ! paramDecl.getType().equals(typeOfNode) ) {
-				return null;
 			}
 
 			result.put( paramDecl.getName(), paramValueAsNode );
