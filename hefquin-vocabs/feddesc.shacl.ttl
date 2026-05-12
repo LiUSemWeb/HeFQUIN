@@ -1,0 +1,263 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX sh:     <http://www.w3.org/ns/shacl#>
+PREFIX fd:     <http://w3id.org/hefquin/feddesc#>
+PREFIX hydra:  <http://www.w3.org/ns/hydra/core#>
+PREFIX rml:    <http://w3id.org/rml/>
+
+# Main shape for FederationMember
+fd:FederationMemberShape
+    a sh:NodeShape ;
+    sh:or (
+        [ sh:class fd:RDFBasedFederationMember ;
+          sh:node  fd:RDFBasedFederationMemberShape ]
+        [ sh:class fd:WrappedFederationMember ;
+          sh:node  fd:WrappedFederationMemberShape ]
+    ) ;
+    sh:message "Interface must be one of the supported types" ;
+    sh:targetClass fd:FederationMember ;
+    sh:property [
+        sh:path fd:serviceURI ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+        sh:message "Each federation member must have exactly one fd:serviceURI." ;
+    ] ;
+    sh:property [
+        sh:path fd:interface ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:node fd:InterfaceShape ;
+        sh:message "Each federation member must have exactly one fd:interface." ;
+    ] .
+
+fd:RDFBasedFederationMemberShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path fd:vocabularyMappingsFile ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "A federation member can have at most one fd:vocabularyMappingsFile." ;
+    ] .
+
+fd:WrappedFederationMemberShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path fd:wrapper ;
+        sh:maxCount 1 ;
+        sh:node fd:WrapperShape ;
+        sh:message "A federation member can have at most one fd:wrapper." ;
+    ] ;
+    sh:or (
+        [
+            sh:property [
+                sh:path fd:interface ;
+                sh:node [
+                    sh:property [
+                        sh:path fd:supportedProtocol ;
+                        sh:hasValue fd:GenericWebAPIProtocol ;
+                    ]
+                ]
+            ] ;
+            sh:property [
+                sh:path fd:wrapper ;
+                sh:node fd:RMLWrapperShape
+            ] ;
+            sh:message "Wrapped federation members using fd:GenericWebAPIProtocol must have a wrapper with fd:rmlTriplesMaps."
+        ]
+        [
+            sh:property [
+                sh:path fd:interface ;
+                sh:node [
+                    sh:property [
+                        sh:path fd:supportedProtocol ;
+                        sh:in (
+                            fd:BoltProtocol
+                            fd:GraphQLProtocol
+                        ) ;
+                    ]
+                ]
+            ] ;
+            sh:property [
+                sh:path fd:wrapper ;
+                sh:node fd:MappingConfigWrapperShape
+            ] ;
+            sh:message "Wrapped federation members using fd:BoltProtocol or fd:GraphQLProtocol must have a wrapper with fd:mappingConfiguration." ;
+        ]
+    ) ;
+    sh:message "Wrapper requirements depend on the supported protocol of the interface." .
+
+# Shape for interfaces
+fd:InterfaceShape
+    a sh:NodeShape ;
+    sh:or (
+        [ sh:class fd:FixedEndpointInterface ;
+          sh:node  fd:FixedEndpointInterfaceShape ]
+        [ sh:class fd:TemplateBasedInterface ;
+          sh:node  fd:TemplateBasedInterfaceShape ]
+        [ sh:class fd:FragmentInterface ;
+          sh:node  fd:FragmentInterfaceShape ]
+    ) ;
+    sh:message "Interface must be one of the supported types" .
+
+# Shape for Fixed Endpoint interfaces
+fd:FixedEndpointInterfaceShape
+    a sh:NodeShape ;
+    sh:targetClass fd:FixedEndpointInterface ;
+    sh:property [
+        sh:path fd:endpointAddress ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+        sh:message "Fixed endpoint interface must have exactly one fd:endpointAddress." ;
+    ] ;
+    sh:property [
+        sh:path fd:supportedProtocol ;
+        sh:or (
+            [ sh:hasValue fd:SPARQLProtocol ]
+            [ sh:hasValue fd:BoltProtocol ]
+            [ sh:hasValue fd:GraphQLProtocol ]
+            [ sh:hasValue fd:GenericWebAPIProtocol ]
+        ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Fixed endpoint interface must have exactly one fd:supportedProtocol." ;
+    ] .
+
+# Shape for Fragment interfaces
+fd:FragmentInterfaceShape
+    a sh:NodeShape ;
+    sh:targetClass fd:FragmentInterface ;
+    sh:property [
+        sh:path fd:exampleFragmentAddress ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+        sh:message "Fragment interface must have exactly one fd:exampleFragmentAddress." ;
+    ] ;
+    sh:property [
+        sh:path fd:supportedProtocol ;
+        sh:or (
+            [ sh:hasValue fd:TPFProtocol ]
+            [ sh:hasValue fd:brTPFProtocol ]
+        ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Fixed endpoint interface must have exactly one fd:supportedProtocol." ;
+    ] .
+
+# Shape for Template-based interfaces
+fd:TemplateBasedInterfaceShape
+    a sh:NodeShape ;
+    sh:targetClass fd:TemplateBasedInterface ;
+    sh:property [
+        sh:path fd:vocabularyMappingsFile ;
+        sh:maxCount 0 ;
+        sh:datatype xsd:string ;
+        sh:message "Template-based interface cannot have a vocabulary mapping." ;
+    ] ;
+    sh:property [
+        sh:path fd:uriTemplate ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:node fd:UriTemplateShape ;
+        sh:message "Template-based interface must have exactly one fd:uriTemplate." ;
+    ] ;
+    sh:property [
+        sh:path fd:supportedProtocol ;
+        sh:hasValue fd:GenericWebAPIProtocol ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Template-based interface must have exactly one fd:supportedProtocol." ;
+    ] .
+
+# Shape for URI Template
+fd:UriTemplateShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path hydra:template ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "URI template must have exactly one hydra:template." ;
+    ] ;
+    sh:property [
+        sh:path hydra:mapping ;
+        sh:node fd:MappingShape ;
+        sh:message "URI template mappings must conform to mapping shape." ;
+    ] .
+
+# Shape for Hydra Mapping
+fd:MappingShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path hydra:variable ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Mapping must have exactly one hydra:variable." ;
+    ] ;
+    sh:property [
+        sh:path hydra:required ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+    ] ;
+    sh:property [
+        sh:path fd:paramType ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:in ( xsd:string xsd:integer xsd:float xsd:double ) ;
+        sh:message "Parameter type must be either xsd:string, xsd:integer, xsd:float or xsd:double." ;
+    ] .
+
+# Shape for wrappers
+fd:WrapperShape
+    a sh:NodeShape ;
+    sh:or (
+        [ sh:node fd:MappingConfigWrapperShape ]
+        [ sh:node fd:RMLWrapperShape ]
+    ) ;
+    sh:message "Wrapper must be one of the supported types" .
+
+# Shape for Mapping Config Wrapper Shape
+fd:MappingConfigWrapperShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path fd:mappingConfiguration ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Wrapper must have exactly one fd:mappingConfiguration." ;
+    ] .
+
+# Shape for RML wrappers
+fd:RMLWrapperShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path fd:rmlTriplesMaps ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:node fd:RmlTriplesMapShape ;
+        sh:message "Wrapper must have exactly one fd:rmlTriplesMaps." ;
+    ] .
+
+# Shape for RML TriplesMap
+fd:RmlTriplesMapShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path rml:logicalSource ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:message "TriplesMap must have a logicalSource." ;
+    ] ;
+    sh:property [
+        sh:path rml:subjectMap ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:message "TriplesMap must have a subjectMap." ;
+    ] ;
+    sh:property [
+        sh:path rml:predicateObjectMap ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:message "TriplesMap must have at least one predicateObjectMap." ;
+    ] .
