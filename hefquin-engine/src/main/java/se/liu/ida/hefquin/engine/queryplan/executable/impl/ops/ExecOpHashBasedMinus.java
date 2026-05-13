@@ -3,6 +3,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -14,12 +17,20 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
  */
 public class ExecOpHashBasedMinus extends ExecOpHashJoin2
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpHashBasedMinus.class );
+
 	public ExecOpHashBasedMinus( final boolean mayReduce,
 	                             final ExpectedVariables inputVars1,
 	                             final ExpectedVariables inputVars2,
 	                             final boolean collectExceptions,
 	                             final QueryPlanningInfo qpInfo ) {
 		super(true, mayReduce, inputVars1, inputVars2, collectExceptions, qpInfo);
+
+		log.info(
+			"Initialized ExecOpHashBasedMinus with mayReduce={}, inputVarsLeft={}, inputVarsRight={}",
+			mayReduce,
+			inputVars1,
+			inputVars2 );
 	}
 
 	@Override

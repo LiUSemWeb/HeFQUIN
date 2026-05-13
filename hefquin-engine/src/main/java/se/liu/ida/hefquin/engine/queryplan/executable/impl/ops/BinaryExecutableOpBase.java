@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -29,6 +32,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class BinaryExecutableOpBase extends BaseForExecOps implements BinaryExecutableOp
 {
+	private static final Logger log = LoggerFactory.getLogger( BinaryExecutableOpBase.class );
+
 	private boolean leftInputConsumed           = false;
 	private boolean rightInputConsumed          = false;
 
@@ -48,6 +53,11 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	                               final boolean collectExceptions,
 	                               final QueryPlanningInfo qpInfo ) {
 		super(mayReduce, collectExceptions, qpInfo);
+
+		log.info(
+			"Initialized {} with collectExceptions={}.",
+			getClass().getSimpleName(),
+			collectExceptions );
 	}
 
 	@Override

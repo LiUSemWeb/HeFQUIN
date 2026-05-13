@@ -3,6 +3,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -36,6 +39,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutableOpBase
 {
+	private static final Logger log = LoggerFactory.getLogger( BaseForUnaryExecOpWithCollectedInput.class );
+
 	private int numberOfCollectionsProcessed = 0;
 
 	protected final int minimumCollectionSize;
@@ -51,6 +56,11 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 
 		this.minimumCollectionSize = minimumCollectionSize;
 		collectedInputSolMaps = new ArrayList<>(minimumCollectionSize);
+
+		log.info(
+			"Initialized unary batching operator: minimumCollectionSize={}, mayReduce={}.",
+			minimumCollectionSize,
+			mayReduce );
 	}
 
 	@Override
@@ -61,6 +71,8 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 	{
 		// Add the given solution mapping to the current collection.
 		collectedInputSolMaps.add(inputSolMap);
+
+		log.info( "Processing collected batch of {} solution mappings.", collectedInputSolMaps.size() );
 
 		// If enough solution mappings have been collected, process them now
 		// and, afterwards, remove them from the collection.
@@ -84,6 +96,7 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 		// next collection to be processed.
 		if (    inputSolMaps.size() >= minimumCollectionSize
 		     && collectedInputSolMaps.isEmpty()  ) {
+			log.info( "Passing through batch of {} mappings directly.", inputSolMaps.size() );
 			_processCollectedInput(inputSolMaps, sink, execCxt);
 			numberOfCollectionsProcessed++;
 			return;
@@ -106,6 +119,7 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 	                                         final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
+		log.info( "Concluding execution with remaining batch size {}.", collectedInputSolMaps.size() );
 		_concludeExecution(collectedInputSolMaps, sink, execCxt);
 
 		if ( ! collectedInputSolMaps.isEmpty() ) {

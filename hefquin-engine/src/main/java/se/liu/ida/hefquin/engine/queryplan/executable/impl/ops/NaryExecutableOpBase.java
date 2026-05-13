@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
@@ -28,6 +31,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class NaryExecutableOpBase extends BaseForExecOps implements NaryExecutableOp
 {
+	private static final Logger log = LoggerFactory.getLogger( NaryExecutableOpBase.class );
+
 	protected final int numberOfChildren;
 
 	private boolean[] xthInputConsumed;
@@ -53,6 +58,13 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 		timeAtCurrentProcStartXthInput         = new long[numberOfChildren];
 
 		resetStats();
+
+		log.info(
+			"Initialized {} with {} children, mayReduce={}, collectExceptions={}.",
+			getClass().getSimpleName(),
+			numberOfChildren,
+			mayReduce,
+			collectExceptions );
 	}
 
 	@Override

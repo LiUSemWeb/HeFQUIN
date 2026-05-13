@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
@@ -30,6 +32,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollectedInput
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpParallelMultiwayLeftJoin.class );
 	public final static int DEFAULT_BATCH_SIZE = 30;
 
 	protected final ExpectedVariables inputVarsFromNonOptionalPart;
@@ -92,13 +95,28 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 				indexes.add( new SolutionMappingsHashTable(joinVars) );
 			}
 		}
+
+		log.info(
+			"Initialized ExecOpParallelMultiwayLeftJoin with {} optional parts and {} join vars: {}.",
+			optionalParts.size(),
+			joinVars.size(),
+			joinVars );
+
+		log.info(
+			"Selected index implementation {} for {} join variables.",
+			indexes.get(0).getClass().getSimpleName(),
+			joinVars.size() );
 	}
 
 	@Override
 	protected void _processCollectedInput( final List<SolutionMapping> input,
 	                              final IntermediateResultElementSink sink,
 	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		log.info( "Processing batch of {} input solution mappings.", input.size() );
+
 		final List<SolutionMapping> inputForParallelProcess = determineInputForParallelProcess(input);
+
+		log.info( "Reduced batch to {} unique join-key bindings for parallel phase.", inputForParallelProcess.size() );
 
 		if ( inputForParallelProcess.size() > 0 ) {
 			parallelPhase(inputForParallelProcess, execCxt);
@@ -136,6 +154,7 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 
 	protected void parallelPhase( final List<SolutionMapping> inputForParallelProcess,
 	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		log.info( "Starting parallel phase with {} workers.", optionalParts.size() );
 		// begin the parallel phase by starting the workers for the optional parts
 		final CompletableFuture<?>[] futures = new CompletableFuture<?>[ optionalParts.size() ];
 		for ( int i = 0; i < optionalParts.size(); i++ ) {
@@ -160,14 +179,17 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 				throw new ExecOpExecutionException("The execution of the futures that run the executable operators caused an exception.", e, this);
 			}
 		}
+		log.info( "Parallel phase completed." );
 	}
 
 	protected void mergePhase( final Iterable<SolutionMapping> inputSolMaps,
 	                           final IntermediateResultElementSink sink ) {
+		log.info( "Starting merge phase." );
 		for( final SolutionMapping inputSolMap : inputSolMaps ) {
 			final Set<SolutionMapping> outputSolMaps = merge(inputSolMap);
 			sink.send(outputSolMaps);
 		}
+		log.info( "Merge phase completed." );
 	}
 
 	protected Set<SolutionMapping> merge( final SolutionMapping inputSol ) {
@@ -243,13 +265,18 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 
 		@Override
 		public void run() {
+			log.info(
+				"Worker started processing {} input solution mappings.",
+				input.size() );
 			try {
 				execOp.process(input, mySink, execCxt);
 				execOp.concludeExecution(mySink, execCxt);
 			}
 			catch ( final ExecOpExecutionException e ) {
+				log.info( "Worker execution failed." );
 				throw new RuntimeException("Executing an add operator used by this parallel multi left join caused an exception.", e);
 			}
+			log.info( "Worker completed successfully." );
 		}
 	}
 
