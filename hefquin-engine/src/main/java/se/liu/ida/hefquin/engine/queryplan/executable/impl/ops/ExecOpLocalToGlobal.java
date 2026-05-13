@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -14,6 +17,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpLocalToGlobal extends UnaryExecutableOpBaseWithoutBlocking
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpLocalToGlobal.class );
 	private long numberOfOutputMappingsProduced = 0L;
 
 	protected final VocabularyMapping vm;
@@ -26,6 +30,11 @@ public class ExecOpLocalToGlobal extends UnaryExecutableOpBaseWithoutBlocking
 
 		assert vm != null;
 		this.vm = vm;
+
+		log.info(
+			"Initialized ExecOpLocalToGlobal with VocabularyMapping {} (class={}).",
+			vm,
+			vm.getClass().getSimpleName() );
 	}
 
 	@Override
@@ -42,6 +51,7 @@ public class ExecOpLocalToGlobal extends UnaryExecutableOpBaseWithoutBlocking
 	                         final int maxBatchSize,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
+		log.info( "Processing batch of up to {} solution mappings (LocalToGlobal).", maxBatchSize );
 		final List<SolutionMapping> output = new ArrayList<>();
 
 		// Produce the output solution mappings
@@ -55,12 +65,18 @@ public class ExecOpLocalToGlobal extends UnaryExecutableOpBaseWithoutBlocking
 
 		numberOfOutputMappingsProduced += output.size();
 		sink.send(output);
+
+		log.info(
+			"Batch translated: {} output mappings produced from {} input mappings.",
+			output.size(),
+			cnt );
 	}
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
 		// nothing to be done here
+		log.info( "ExecOpLocalToGlobal concluded execution." );
 	}
 
 	@Override

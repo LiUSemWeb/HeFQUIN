@@ -28,7 +28,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 {
-	private static final Logger logger = LoggerFactory.getLogger( ExecOpBind.class );
+	private static final Logger log = LoggerFactory.getLogger( ExecOpBind.class );
 	private long numberOfOutputMappingsProduced = 0L;
 
 	protected final Worker worker;
@@ -39,7 +39,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	                   final QueryPlanningInfo qpInfo ) {
 		super(mayReduce, collectExceptions, qpInfo);
 
-		logger.info( "Initialized ExecOpBind with {} bind expression(s).", bindExpressions.size() );
+		log.info( "Initialized ExecOpBind with {} bind expression(s).", bindExpressions.size() );
 
 		if ( bindExpressions.size() == 1 ) {
 			final Var var = bindExpressions.getVars().get(0);
@@ -61,7 +61,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 		assert var != null;
 		assert expr != null;
 
-		logger.info( "Initialized ExecOpBind for variable {} with expression {}.", var, expr );
+		log.info( "Initialized ExecOpBind for variable {} with expression {}.", var, expr );
 
 		worker = new OneVarWorker(var, expr);
 	}
@@ -71,9 +71,9 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt )
 			 throws ExecOpExecutionException {
-		logger.info( "Processing solution mapping in ExecOpBind." );
+		log.info( "Processing solution mapping in ExecOpBind." );
 		sink.send( worker.extend(inputSolMap) );
-		logger.info( "Produced extended solution mapping." );
+		log.info( "Produced extended solution mapping." );
 		numberOfOutputMappingsProduced++;
 	}
 
@@ -84,7 +84,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	                         final ExecutionContext execCxt )
 		 throws ExecOpExecutionException
 	{
-		logger.info( "Processing batch of solution mappings with max batch size {}.", maxBatchSize );
+		log.info( "Processing batch of solution mappings with max batch size {}.", maxBatchSize );
 		final List<SolutionMapping> output = new ArrayList<>();
 
 		// Produce the output solution mappings
@@ -98,7 +98,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 		}
 
 		numberOfOutputMappingsProduced += output.size();
-		logger.info( "Produced {} output solution mappings in batch.", output.size() );
+		log.info( "Produced {} output solution mappings in batch.", output.size() );
 		sink.send(output);
 	}
 
@@ -106,7 +106,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
 		// nothing to be done here
-		logger.info( "ExecOpBind execution concluded. Produced {} output mappings.", numberOfOutputMappingsProduced );
+		log.info( "ExecOpBind execution concluded. Produced {} output mappings.", numberOfOutputMappingsProduced );
 	}
 
 	@Override
@@ -140,11 +140,11 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 		public SolutionMapping extend( final SolutionMapping solmap )
 				 throws ExecOpExecutionException
 		{
-			logger.info( "Evaluating bind expression {} for variable {}.", expr, var );
+			log.info( "Evaluating bind expression {} for variable {}.", expr, var );
 			final Binding sm = solmap.asJenaBinding();
 
 			if ( sm.contains(var) ) {
-				logger.info( "Cannot bind variable {} because it is already bound.", var );
+				log.info( "Cannot bind variable {} because it is already bound.", var );
 				throwExecOpExecutionException( "Variable '" + var.getVarName() + "' already bound in the given solution mapping." );
 			}
 
@@ -155,10 +155,10 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 			catch ( final Exception ex ) {
 				// If evaluating the expression based on the current input solution
 				// mapping failed, pass on the solution mapping without extending it.
-				logger.info( "Evaluation failed for variable {}. Returning original solution mapping.", var );
+				log.info( "Evaluation failed for variable {}. Returning original solution mapping.", var );
 				return solmap;
 			}
-			logger.info( "Successfully evaluated expression for variable {}.", var );
+			log.info( "Successfully evaluated expression for variable {}.", var );
 
 			final Binding smOut = BindingFactory.binding( sm, var, evaluationResult.asNode() );
 			return new SolutionMappingImpl(smOut);
@@ -176,7 +176,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 		public SolutionMapping extend( final SolutionMapping solmap )
 				 throws ExecOpExecutionException
 		{
-			logger.info( "Evaluating multiple bind expressions." );
+			log.info( "Evaluating multiple bind expressions." );
 
 			// This Binding will be replaced by extended versions of
 			// it within the following for-loop. Extending it stepwise
@@ -191,10 +191,10 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 				final Var var = e.getKey();
 				final Expr expr = e.getValue();
 
-				logger.info( "Evaluating bind expression {} for variable {}.", expr, var );
+				log.info( "Evaluating bind expression {} for variable {}.", expr, var );
 
 				if ( sm.contains(var) ) {
-					logger.info( "Cannot bind variable {} because it is already bound.", var );
+					log.info( "Cannot bind variable {} because it is already bound.", var );
 					throwExecOpExecutionException( "Variable '" + var.getVarName() + "' already bound in the given solution mapping." );
 				}
 
@@ -206,19 +206,19 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 					sm = BindingFactory.binding(sm, var, evaluationResult.asNode() );
 					extended = true;
 
-					logger.info( "Successfully extended solution mapping with variable {}.", var );
+					log.info( "Successfully extended solution mapping with variable {}.", var );
 				}
 				catch ( final Exception ex ) {
 					// If evaluating the expression based on the current
 					// input solution mapping failed, then do nothing.
-					logger.info( "Evaluation failed for variable {}. Skipping extension.", var );
+					log.info( "Evaluation failed for variable {}. Skipping extension.", var );
 				}
 			}
 
 			if ( extended )
 				return new SolutionMappingImpl(sm);
 			else {
-				logger.info( "No bind expressions could be evaluated successfully." );
+				log.info( "No bind expressions could be evaluated successfully." );
 				return solmap;
 			}
 		}

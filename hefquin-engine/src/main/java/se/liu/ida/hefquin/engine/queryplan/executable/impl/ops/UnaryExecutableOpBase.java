@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
@@ -31,6 +34,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class UnaryExecutableOpBase extends BaseForExecOps implements UnaryExecutableOp
 {
+	private static final Logger log = LoggerFactory.getLogger( UnaryExecutableOpBase.class );
+
 	private boolean executionConcluded = false;
 	private long numberOfInputMappingsProcessed = 0L;
 
@@ -38,6 +43,12 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	                              final boolean collectExceptions,
 	                              final QueryPlanningInfo qpInfo ) {
 		super(mayReduce, collectExceptions, qpInfo);
+
+		log.info(
+			"Initialized {} (mayReduce={}, collectExceptions={}).",
+			getClass().getSimpleName(),
+			mayReduce,
+			collectExceptions );
 	}
 
 	@Override
