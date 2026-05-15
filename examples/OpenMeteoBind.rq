@@ -15,11 +15,9 @@ PREFIX ex:     <http://example.org/>
 SELECT * WHERE {
 	BIND ( "52.52"^^xsd:float AS ?lat )
 	BIND ( "13.41"^^xsd:float AS ?long )
-	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
 
 	SERVICE <http://example.org/OpenMeteoWrapper> PARAMS(?lat AS "latitude",
-	                                                     ?long AS "longitude",
-	                                                     ?req AS "current") {
+	                                                     ?long AS "longitude") {
 		?x ex:temperature ?temp .
 		?x ex:windSpeed ?wind .
 	}

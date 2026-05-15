@@ -17,16 +17,15 @@ PREFIX ex:     <http://example.org/>
 # the cdt:List literal obtained from the cdt:keys function.
 
 SELECT * WHERE {
-	SERVICE <http://dbpedia.org/sparql> {
+	SERVICE <https://qlever.dev/api/dbpedia>
+	{
 		<http://dbpedia.org/resource/Berlin> geo:lat ?lat ;
 		                                     geo:long ?long .
 	}
 
-	BIND ( "temperature_2m,wind_speed_10m" AS ?req)
-
 	SERVICE <http://example.org/OpenMeteoWrapper> PARAMS(?lat AS "latitude",
-	                                                     ?long AS "longitude",
-	                                                     ?req AS "current") {
+	                                                     ?long AS "longitude")
+	{
 		?x ex:current ?c .
 	}
 
