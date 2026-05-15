@@ -8,7 +8,7 @@ PREFIX dbo:    <http://dbpedia.org/ontology/>
 # now is that this one uses VALUES clauses to specify the federation members.
 # Notice that, while there are two separate VALUES clauses here, it is also
 # possible to merge them into one VALUE clause:
-#   VALUES (?s1 ?s2) { (<http://dbpedia.org/sparql> <https://query.wikidata.org/sparql>) }
+#   VALUES (?s1 ?s2) { (<https://qlever.dev/api/dbpedia> <https://qlever.dev/api/wikidata>) }
 #
 # In the query plan for this query, you can see that the service IRIs from the
 # VALUES clause(s) become an explicit argument of the corresponding operators
@@ -18,8 +18,8 @@ PREFIX dbo:    <http://dbpedia.org/ontology/>
 # optimize these subplans differently.
 
 SELECT * WHERE {
-	VALUES ?s1 { <http://dbpedia.org/sparql> }
-	#VALUES ?s1 { <http://fragments.dbpedia.org/2016-04/en> }
+	VALUES ?s1 { <https://qlever.dev/api/dbpedia> }             # SPARQL endpoint
+	#VALUES ?s1 { <http://fragments.dbpedia.org/2016-04/en> }   # TPF server
 
 	SERVICE ?s1 {
 		<http://dbpedia.org/resource/Berlin> dbo:country ?c .
@@ -27,7 +27,7 @@ SELECT * WHERE {
 		FILTER ( CONTAINS(STR(?cc), "wikidata" ) )
 	}
 
-	VALUES ?s2 { <https://query.wikidata.org/sparql> }
+	VALUES ?s2 { <https://qlever.dev/api/wikidata> }
 
 	SERVICE ?s2 {
 		?cc rdfs:label ?o
