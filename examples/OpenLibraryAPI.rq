@@ -16,7 +16,7 @@ PREFIX ex:     <http://example.org/>
 SELECT ?authorName ?bookTitle ?publishYear WHERE {
   BIND(3 AS ?bookLimit)
 
-  SERVICE <http://dbpedia.org/sparql> {
+  SERVICE <https://qlever.dev/api/dbpedia> {
     ?author dbo:award dbr:Nobel_Prize_in_Literature ;
             rdfs:label ?authorName .
     FILTER( lang(?authorName) = "en" )

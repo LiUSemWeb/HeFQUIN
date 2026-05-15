@@ -12,6 +12,12 @@ ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;
                    fd:supportedProtocol  fd:SPARQLProtocol ;
                    fd:endpointAddress    "http://dbpedia.org/sparql"^^xsd:anyURI ] .
 
+ex:dbpediaSPARQL2 a fd:RDFBasedFederationMember ;
+    fd:serviceURI "https://qlever.dev/api/dbpedia"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "https://qlever.dev/api/dbpedia"^^xsd:anyURI ] .
+
 ex:dbpediaTPF a fd:RDFBasedFederationMember ;
     fd:serviceURI "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI ;
     fd:interface [ a                         fd:FragmentInterface ;
@@ -23,6 +29,12 @@ ex:wikidataSPARQL a fd:RDFBasedFederationMember ;
     fd:interface [ a                     fd:FixedEndpointInterface ;
                    fd:supportedProtocol  fd:SPARQLProtocol ;
                    fd:endpointAddress    "https://query.wikidata.org/sparql"^^xsd:anyURI ] .
+
+ex:wikidataSPARQL2 a fd:RDFBasedFederationMember ;
+    fd:serviceURI "https://qlever.dev/api/wikidata"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "https://qlever.dev/api/wikidata"^^xsd:anyURI ] .
 
 ex:dbpediaSPARQLWithVocabMappings a fd:RDFBasedFederationMember ;
     fd:serviceURI "http://example.org/DBpediaWrapper"^^xsd:anyURI ;

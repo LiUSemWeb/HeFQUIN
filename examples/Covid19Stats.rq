@@ -18,7 +18,8 @@ PREFIX ex:     <http://example.org/>
 # ignores the solution mapping with this ISO code.
 
 SELECT * WHERE {
-	SERVICE <https://query.wikidata.org/sparql> {
+	SERVICE <https://qlever.dev/api/wikidata>
+	{
 		?country wdt:P31 wd:Q6256 ;       # instance of country
 		         wdt:P30 wd:Q46 ;         # located in Europe
 		         wdt:P297 ?isoCode ;      # ISO country code
