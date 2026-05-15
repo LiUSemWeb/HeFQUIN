@@ -60,7 +60,7 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 		this.pattern = pattern;
 		this.fm = fm;
 
-		log.info( "Initialized ExecOpLookupJoinViaWrapperWithoutParamVars for endpoint {}", fm );
+		log.debug( "Initialized ExecOpLookupJoinViaWrapperWithoutParamVars for endpoint {}", fm );
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 	protected List<SolutionMapping> performRequest( final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		log.info( "Sending REST request to {}", fm.getURLTemplate() );
+		log.debug( "Sending REST request to {}", fm.getURLTemplate() );
 
 		final RESTRequest req = new RESTRequestImpl( fm.getURLTemplate() );
 
@@ -142,7 +142,7 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 		requestExecTime = time2 - time1;
 		responseProcTime = time3 - time2;
 		numOfSolMapsFromRequest = result.size();
-		log.info( "Lookup join received {} solution mappings from {}", result.size(), fm );
+		log.debug( "Lookup join received {} solution mappings from {}", result.size(), fm );
 		return result;
 	}
 

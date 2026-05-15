@@ -37,7 +37,7 @@ public class ExecOpHashJoin2 extends BaseForExecOpHashJoin
 
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 
-		log.info( "Initialized ExecOpHashJoin2 with useOuterJoinSemantics: {}.", useOuterJoinSemantics );
+		log.debug( "Initialized ExecOpHashJoin2 with useOuterJoinSemantics: {}.", useOuterJoinSemantics );
 	}
 
 	@Override
@@ -124,10 +124,10 @@ public class ExecOpHashJoin2 extends BaseForExecOpHashJoin
 		}
 
 		if ( useOuterJoinSemantics && ! hasJoinPartner ) {
-			log.info( "No join partner found. Applying outer join semantics." );
+			log.debug( "No join partner found. Applying outer join semantics." );
 			output.add(inputSolMap);
 		}
-		log.info( "Produced {} joined solution mappings.", output.size() - sizeBefore );
+		log.debug( "Produced {} joined solution mappings.", output.size() - sizeBefore );
 	}
 
 }

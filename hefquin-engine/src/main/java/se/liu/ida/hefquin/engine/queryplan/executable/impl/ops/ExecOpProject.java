@@ -39,7 +39,7 @@ public class ExecOpProject extends UnaryExecutableOpBaseWithoutBlocking
 
 		this.variables = variables;
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpProject with {} projection variables: {}.",
 			variables.size(),
 			variables );

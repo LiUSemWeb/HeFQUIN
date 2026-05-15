@@ -90,7 +90,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER for endpoint {} (patternType={}, batchSize={}, outerJoin={})",
 			fm,
 			pattern.getClass().getSimpleName(),
@@ -100,7 +100,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
-		log.info(
+		log.debug(
 			"Creating {}-based SPARQL bind-join request for {} bindings on endpoint {}",
 			useFilterBasedApproach ? "FILTER" : "VALUES",
 			solMaps.size(),
@@ -118,7 +118,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 	                                                final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		log.info(
+		log.debug(
 			"Executing {}-based bind-join request (trialPhase={}, bindings={})",
 			useFilterBasedApproach ? "FILTER" : "VALUES",
 			trialPhase,
@@ -136,7 +136,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 				throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
 			}
 
-			log.info(
+			log.debug(
 				"VALUES-based bind-join request failed for endpoint {}. Falling back to FILTER-based approach.",
 				fm,
 				e );
@@ -144,7 +144,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 			trialPhase = false;
 			useFilterBasedApproach = true;
 
-			log.info( "Switched bind-join strategy to FILTER-based requests for endpoint {}", fm );
+			log.debug( "Switched bind-join strategy to FILTER-based requests for endpoint {}", fm );
 
 			statsOfLastReqOp = reqOp.getStats();
 			if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
@@ -160,7 +160,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 
 		statsOfLastReqOp = reqOp.getStats();
 		if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
-		log.info(
+		log.debug(
 			"Successfully executed {}-based bind-join request for endpoint {}",
 			useFilterBasedApproach ? "FILTER" : "VALUES",
 			fm );

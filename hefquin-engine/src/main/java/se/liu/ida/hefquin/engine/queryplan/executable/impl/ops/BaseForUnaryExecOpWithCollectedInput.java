@@ -56,11 +56,6 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 
 		this.minimumCollectionSize = minimumCollectionSize;
 		collectedInputSolMaps = new ArrayList<>(minimumCollectionSize);
-
-		log.info(
-			"Initialized unary batching operator: minimumCollectionSize={}, mayReduce={}.",
-			minimumCollectionSize,
-			mayReduce );
 	}
 
 	@Override

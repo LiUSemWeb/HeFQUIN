@@ -32,14 +32,14 @@ public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
 	                            final QueryPlanningInfo qpInfo ) {
 		super(req, fm, mayReduce, collectExceptions, qpInfo);
 
-		log.info( "Initialized ExecOpRequestSPARQL for {}", fm );
+		log.debug( "Initialized ExecOpRequestSPARQL for {}", fm );
 	}
 
 	@Override
 	protected final void _execute( final IntermediateResultElementSink sink, final ExecutionContext execCxt )
 		throws ExecOpExecutionException
 	{
-		log.info( "Starting SPARQL request execution for {}", fm );
+		log.debug( "Starting SPARQL request execution for {}", fm );
 
 		final SolMapsResponse response;
 		try {
@@ -58,7 +58,7 @@ public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
 
 		process(response, sink);
 
-		log.info(
+		log.debug(
 			"Completed SPARQL request execution for {}: solMaps={}, outputMappings={}",
 			fm,
 			solMapsRetrieved,

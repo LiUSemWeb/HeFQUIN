@@ -31,7 +31,7 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 		assert vm != null;
 		this.vm = vm;
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpGlobalToLocal with VocabularyMapping {} (class={}).",
 			vm,
 			vm.getClass().getSimpleName() );
@@ -41,6 +41,7 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
+		log.info( "Processing solution mapping in ExecOpGlobalToLocal." );
 		final Set<SolutionMapping> output = vm.translateSolutionMappingFromGlobal(inputSolMap);
 		numberOfOutputMappingsProduced += output.size();
 		sink.send(output);

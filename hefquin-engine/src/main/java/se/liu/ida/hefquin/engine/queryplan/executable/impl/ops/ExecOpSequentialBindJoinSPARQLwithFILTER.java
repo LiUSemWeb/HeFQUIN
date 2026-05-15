@@ -83,7 +83,7 @@ public class ExecOpSequentialBindJoinSPARQLwithFILTER
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpSequentialBindJoinSPARQLwithFILTER for endpoint {} (patternType={}, batchSize={}, outerJoin={})",
 			fm,
 			pattern.getClass().getSimpleName(),
@@ -103,14 +103,14 @@ public class ExecOpSequentialBindJoinSPARQLwithFILTER
 	                                                         final Element pattern,
 	                                                         final SPARQLEndpoint fm,
 	                                                         final boolean mayReduce ) {
-		log.info( "Creating SPARQL request with {} bindings for endpoint {}", solMaps.size(), fm );
+		log.debug( "Creating SPARQL request with {} bindings for endpoint {}", solMaps.size(), fm );
 		final SPARQLRequest request = createRequest(solMaps, pattern);
 		return new ExecOpRequestSPARQL<>(request, fm, mayReduce, false, null);
 	}
 
 	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
 	                                           final Element pattern ) {
-		log.info( "Building FILTER expression for {} solution mappings", solMaps.size() );
+		log.debug( "Building FILTER expression for {} solution mappings", solMaps.size() );
 		final Expr expr = createFilterExpression(solMaps);
 
 		final ElementGroup group = new ElementGroup();
@@ -118,7 +118,7 @@ public class ExecOpSequentialBindJoinSPARQLwithFILTER
 		group.addElement( new ElementFilter(expr) );
 
 		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
-		log.info( "Constructed SPARQL FILTER request for {} bindings", solMaps.size() );
+		log.debug( "Constructed SPARQL FILTER request for {} bindings", solMaps.size() );
 		return new SPARQLRequestImpl(patternForReq);
 	}
 

@@ -41,7 +41,7 @@ public class ExecOpIndexNestedLoopsJoinTPF
 	                                      final QueryPlanningInfo qpInfo ) {
 		super(query, fm, useOuterJoinSemantics, mayReduce, minimumInputBlockSize, collectExceptions, qpInfo);
 
-		log.info("Initialized ExecOpIndexNestedLoopsJoinTPF for server {}", fm);
+		log.debug("Initialized ExecOpIndexNestedLoopsJoinTPF for server {}", fm);
 	}
 
 	public ExecOpIndexNestedLoopsJoinTPF( final TriplePattern query,
@@ -52,7 +52,7 @@ public class ExecOpIndexNestedLoopsJoinTPF
 	                                      final QueryPlanningInfo qpInfo ) {
 		super(query, fm, useOuterJoinSemantics, mayReduce, DEFAULT_INPUT_BLOCK_SIZE, collectExceptions, qpInfo);
 
-		log.info("Initialized ExecOpIndexNestedLoopsJoinTPF for server {}", fm);
+		log.debug("Initialized ExecOpIndexNestedLoopsJoinTPF for server {}", fm);
 	}
 
 	@Override

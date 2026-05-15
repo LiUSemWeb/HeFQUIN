@@ -237,7 +237,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		// in which case we can find the join partners for the given input
 		// solution mapping within the full result that we had to retrieve.
 		if ( fullResult != null ) {
-			log.info( "Using FULL RETRIEVAL join mode for endpoint {}", fm );
+			log.debug( "Using FULL RETRIEVAL join mode for endpoint {}", fm );
 			joinInFullRetrievalMode(inputSolMap, sink);
 			return;
 		}
@@ -338,7 +338,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		// If we have accumulated enough solution mappings for the next
 		// bind-join request, then let's perform this request.
 		if ( currentSolMapsForRequest.size() == requestBlockSize ) {
-			log.info(
+			log.debug(
 				"Triggering bind-join request for endpoint {} with batch size {}",
 				fm,
 				currentSolMapsForRequest.size() );
@@ -395,7 +395,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 
 		numOfSolMapsRetrievedPerReqOp.add( (Long) statsOfLastReqOp.getEntry("numberOfOutputMappingsProduced") );
 
-		log.info( "Completed bind-join request for endpoint {} (results from request-op={})", fm, reqOp.getStats() );
+		log.debug( "Completed bind-join request for endpoint {} (results from request-op={})", fm, reqOp.getStats() );
 	}
 
 	protected boolean alreadyCovered( final Binding inputSolMapRestricted ) {
@@ -452,7 +452,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	protected boolean reduceRequestBlockSize() {
 		final int newRequestBlockSize = requestBlockSize / 2;
 
-		log.info(
+		log.debug(
 			"Reducing request block size for endpoint {}: new size={}, minimum={}",
 			fm,
 			newRequestBlockSize,
@@ -601,7 +601,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	protected void switchToFullRetrievalMode( final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		log.info(
+		log.debug(
 			"Switching to FULL RETRIEVAL mode for endpoint {} (joinVars={}, batchSize={})",
 			fm,
 			varsInQuery,

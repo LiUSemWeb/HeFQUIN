@@ -21,7 +21,7 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	                          final QueryPlanningInfo qpInfo ) {
 		super(mayReduce, collectExceptions, qpInfo);
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpBinaryUnion (mayReduce={}, collectExceptions={}).",
 			mayReduce,
 			collectExceptions );

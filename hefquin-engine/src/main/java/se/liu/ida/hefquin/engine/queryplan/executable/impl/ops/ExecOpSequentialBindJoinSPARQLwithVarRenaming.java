@@ -100,7 +100,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 
 		renamedVar = getVarForRenaming(query, inputVars);
-		log.info(
+		log.debug(
 			"Initialized ExecOpSequentialBindJoinSPARQLwithVarRenaming for endpoint {} (renamedVar={}, batchSize={}, outerJoin={})",
 			fm,
 			renamedVar,
@@ -110,7 +110,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 		if( renamedVar == null ){
 			// If there are no non-joining vars, we need to fall back to a non-renaming
 			// version of the bind join strategy.
-			log.info( "No suitable non-join variable found for renaming in query {}", query );
+			log.debug( "No suitable non-join variable found for renaming in query {}", query );
 			throw new IllegalArgumentException("No suitable variable found for renaming");
 		}
 		renamedVarPrefix = renamedVar.getVarName() + "_";
@@ -142,12 +142,12 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
-		log.info(
+		log.debug(
 			"Creating UNION-based SPARQL bind-join request with {} bindings for endpoint {}",
 			solMaps.size(),
 			fm );
 		final Element elmt = createUnion(solMaps);
-		log.info(
+		log.debug(
 			"Created UNION pattern with {} branches using renamed variable prefix '{}'",
 			solMaps.size(),
 			renamedVarPrefix );
@@ -162,7 +162,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 		solMapsList.clear();
 		solMaps.forEach(solMapsList::add);
 
-		log.info( "Building UNION pattern for {} input solution mappings", solMapsList.size() );
+		log.debug( "Building UNION pattern for {} input solution mappings", solMapsList.size() );
 
 		// Union element
 		final ElementUnion union = new ElementUnion();
@@ -190,19 +190,19 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 
 			i++;
 
-			log.info(
+			log.debug(
 				"Renaming variable {} to {} for UNION branch {}",
 				renamedVar,
 				v,
 				i );
 		}
-		log.info( "Finished UNION construction with {} UNION branches", i );
+		log.debug( "Finished UNION construction with {} UNION branches", i );
 		return union;
 	}
 
 	@Override
 	protected MyIntermediateResultElementSink createMySink() {
-		log.info(
+		log.debug(
 			"Creating {} sink for var-renaming bind join",
 			useOuterJoinSemantics ? "outer-join" : "inner-join" );
 		if (useOuterJoinSemantics) {
@@ -230,7 +230,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 			// Resolve renamed var and merge with smFromRequest
 			final Binding renamedAndMerged = resolveRenamedVarAndMerge( smFromRequest.asJenaBinding() );
 
-			log.info( "Produced merged solution mapping from renamed binding" );
+			log.debug( "Produced merged solution mapping from renamed binding" );
 
 			// Merge with inputSolutionMappings
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
@@ -259,7 +259,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 			// Resolve renamed var and merge with smFromRequest
 			final Binding renamedAndMerged = resolveRenamedVarAndMerge( smFromRequest.asJenaBinding() );
 
-			log.info( "Produced outer-join-compatible merged solution mapping" );
+			log.debug( "Produced outer-join-compatible merged solution mapping" );
 
 			// Merge with inputSolutionMappings
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
@@ -286,7 +286,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 	public static Element renameVar( final SPARQLGraphPattern pattern,
                                      final Var oldVar,
                                      final Var newVar ) {
-		log.info( "Renaming variable {} to {} in SPARQL graph pattern", oldVar, newVar );
+		log.debug( "Renaming variable {} to {} in SPARQL graph pattern", oldVar, newVar );
 		// Element transform
 		final Element elt = QueryPatternUtils.convertToJenaElement(pattern);
 		final Map<Var, Node> eltMap = Collections.singletonMap(oldVar, newVar);
@@ -311,7 +311,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 	public static Binding renameVar( final Binding binding,
 	                                 final Var oldVar,
 	                                 final Var newVar ) {
-		log.info( "Renaming variable {} to {} in binding", oldVar, newVar );
+		log.debug( "Renaming variable {} to {} in binding", oldVar, newVar );
 		final BindingBuilder builder = BindingFactory.builder();
 		binding.forEach( (v, n) -> builder.add( v.equals(oldVar) ? newVar : v, n ) );
 		return builder.build();
@@ -339,7 +339,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 
 		// Fail if no variable was found
 		if ( matchedVar == null ) {
-			log.info(
+			log.debug(
 				"No renamed variable with prefix '{}' found in binding {}",
 				renamedVarPrefix,
 				sm );
@@ -348,13 +348,13 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 			                                                  sm) );
 		}
 
-		log.info( "Resolved renamed variable {} in binding", matchedVar );
+		log.debug( "Resolved renamed variable {} in binding", matchedVar );
 
 		// Parse index, rename, and merge
 		final String idxPart = matchedVar.getVarName().substring( renamedVarPrefix.length() );
 		final int i = Integer.parseInt(idxPart);
 		final Binding smRenamed = renameVar(sm, matchedVar, renamedVar);
-		log.info(
+		log.debug(
 			"Mapped renamed variable {} to original solution mapping index {}",
 			matchedVar,
 			i );

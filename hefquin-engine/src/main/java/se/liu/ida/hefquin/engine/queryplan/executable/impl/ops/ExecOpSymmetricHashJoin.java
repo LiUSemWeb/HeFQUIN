@@ -65,14 +65,14 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		// determine the certain join variables
 		final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);
 
-		log.info( "Initializing symmetric hash join operator with join variables {}.", certainJoinVars );
+		log.debug( "Initializing symmetric hash join operator with join variables {}.", certainJoinVars );
 
 		// set up the core part of the two indexes first; it is built on the certain join variables
 		SolutionMappingsIndex solMHashTableL;
 		SolutionMappingsIndex solMHashTableR;
 		if ( certainJoinVars.size() == 1 ) {
 			final Var joinVar = certainJoinVars.iterator().next();
-			log.info( "Using one-variable hash table for join variable {}.", joinVar );
+			log.debug( "Using one-variable hash table for join variable {}.", joinVar );
 			solMHashTableL = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
 			solMHashTableR = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
 		}
@@ -81,13 +81,13 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 			final Var joinVar1 = liVar.next();
 			final Var joinVar2 = liVar.next();
 
-			log.info( "Using two-variable hash table for join variables {}, {}.", joinVar1, joinVar2 );
+			log.debug( "Using two-variable hash table for join variables {}, {}.", joinVar1, joinVar2 );
 
 			solMHashTableL = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
 			solMHashTableR = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
 		}
 		else {
-			log.info( "Using generic hash table for join variables {}.", certainJoinVars );
+			log.debug( "Using generic hash table for join variables {}.", certainJoinVars );
 			solMHashTableL = new SolutionMappingsHashTable(certainJoinVars);
 			solMHashTableR = new SolutionMappingsHashTable(certainJoinVars);
 		}
@@ -96,7 +96,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		// the join and, if so, set up the indexes to use post-matching.
 		final Set<Var> potentialJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables(inputVars1, inputVars2);
 		if ( ! potentialJoinVars.equals(certainJoinVars) ) {
-			log.info( "Post-matching enabled for potential join variables {}.", potentialJoinVars );
+			log.debug( "Post-matching enabled for potential join variables {}.", potentialJoinVars );
 			solMHashTableL = new SolutionMappingsIndexWithPostMatching(solMHashTableL);
 			solMHashTableR = new SolutionMappingsIndexWithPostMatching(solMHashTableR);
 		}

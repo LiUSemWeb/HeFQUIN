@@ -85,7 +85,7 @@ public class ExecOpSequentialBindJoinBRTPF
 			final QueryPlanningInfo qpInfo ) {
 		super( tp, tp.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo );
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpSequentialBindJoinBRTPF for pattern {} on server {} (batchSize={}, outerJoin={})",
 			tp,
 			fm,
@@ -98,7 +98,7 @@ public class ExecOpSequentialBindJoinBRTPF
 		// If there is only a single solution mapping, we
 		// do a TPF request instead of a brTPF request.
 		if ( solMaps.size() == 1 ) {
-			log.info( "Using TPF request (single binding) for server {} (pattern={})", fm, query );
+			log.debug( "Using TPF request (single binding) for server {} (pattern={})", fm, query );
 			final Binding sm = solMaps.iterator().next();
 			final TriplePattern restrictedTP;
 			try {
@@ -115,14 +115,14 @@ public class ExecOpSequentialBindJoinBRTPF
 			return new ExecOpRequestTPF<>(req, fm, this.mayReduce, false, null );
 		}
 
-		log.info( "Using BRTPF request with {} bindings for server {}", solMaps.size(), fm );
+		log.debug( "Using BRTPF request with {} bindings for server {}", solMaps.size(), fm );
 		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl(query, solMaps);
 		return new ExecOpRequestBRTPF(req, fm, this.mayReduce, false, null );
 	}
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
-		log.info( "Using full TPF request (no bindings) for pattern {} on server {}", query, fm );
+		log.debug( "Using full TPF request (no bindings) for pattern {} on server {}", query, fm );
 		final TriplePatternRequest req = new TriplePatternRequestImpl(query);
 		return new ExecOpRequestTPF<>(req, fm, this.mayReduce, false, null );
 	}

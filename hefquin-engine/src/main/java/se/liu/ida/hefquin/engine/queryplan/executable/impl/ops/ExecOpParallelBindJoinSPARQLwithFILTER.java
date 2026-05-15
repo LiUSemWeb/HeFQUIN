@@ -68,7 +68,7 @@ public class ExecOpParallelBindJoinSPARQLwithFILTER
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpParallelBindJoinSPARQLwithFILTER for endpoint {} (patternType={}, batchSize={}, outerJoin={})",
 			fm,
 			pattern.getClass().getSimpleName(),
@@ -78,7 +78,7 @@ public class ExecOpParallelBindJoinSPARQLwithFILTER
 
 	@Override
 	protected SPARQLRequest createRequest( final Set<Binding> batch ) {
-		log.info(
+		log.debug(
 			"Creating parallel FILTER-based SPARQL bind-join request with {} bindings for endpoint {}",
 			batch.size(),
 			fm );

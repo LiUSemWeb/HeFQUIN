@@ -35,13 +35,6 @@ public abstract class BaseForExecOpParallelBindJoinSPARQL
 	                                            final boolean collectExceptions,
 	                                            final QueryPlanningInfo qpInfo ) {
 		super(p, p.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo);
-
-		log.info(
-			"Initialized parallel SPARQL bind-join base for endpoint {} (outerJoin={}, mayReduce={}, batchSize={})",
-			fm,
-			useOuterJoinSemantics,
-			mayReduce,
-			batchSize );
 	}
 
 	@Override
@@ -52,7 +45,7 @@ public abstract class BaseForExecOpParallelBindJoinSPARQL
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
-		log.info( "Creating FULL RETRIEVAL SPARQL request for endpoint {}", fm );
+		log.debug( "Creating FULL RETRIEVAL SPARQL request for endpoint {}", fm );
 
 		final SPARQLRequest req = new SPARQLRequestImpl(query);
 		return new ExecOpRequestSPARQL<>(req, fm, this.mayReduce, false, null);

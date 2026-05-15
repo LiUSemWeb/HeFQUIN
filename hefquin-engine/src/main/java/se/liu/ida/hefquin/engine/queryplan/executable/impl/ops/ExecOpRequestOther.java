@@ -37,7 +37,7 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 
 		assert fm.getNumberOfParameters() != 0;
 
-		log.info( "Initialized ExecOpRequestOther for {}", fm );
+		log.debug( "Initialized ExecOpRequestOther for {}", fm );
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 	                               final ExecutionContext execCxt )
 		throws ExecOpExecutionException
 	{
-		log.info( "Issuing REST request to endpoint {}", fm.getURLTemplate() );
+		log.debug( "Issuing REST request to endpoint {}", fm.getURLTemplate() );
 
 		final StringResponse response;
 		try {
@@ -66,7 +66,7 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 			throw new ExecOpExecutionException( "Accessing the response data caused an exception, which indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
 		}
 
-		log.info( "Received REST response from {}", fm.getURLTemplate() );
+		log.debug( "Received REST response from {}", fm.getURLTemplate() );
 
 		process(data, sink);
 	}
@@ -88,7 +88,7 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 
 		final int cnt = sink.send(solmaps);
 		numberOfOutputMappingsProduced += cnt;
-		log.info( "Processed REST response: produced {} solution mappings", numberOfOutputMappingsProduced );
+		log.debug( "Processed REST response: produced {} solution mappings", numberOfOutputMappingsProduced );
 	}
 
 	@Override

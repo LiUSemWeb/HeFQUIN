@@ -78,7 +78,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUES
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpSequentialBindJoinSPARQLwithVALUES for endpoint {} (patternType={}, batchSize={}, outerJoin={})",
 			fm,
 			pattern.getClass().getSimpleName(),
@@ -88,7 +88,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUES
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
-		log.info( "Creating SPARQL request with {} bindings for endpoint {}", solMaps.size(), fm );
+		log.debug( "Creating SPARQL request with {} bindings for endpoint {}", solMaps.size(), fm );
 		return createExecutableReqOp(solMaps, pattern, fm, this.mayReduce);
 	}
 
@@ -103,7 +103,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUES
 	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
 	                                           final Element pattern ) {
 		// Create the VALUES clause.
-		log.info( "Creating VALUES clause for {} bindings", solMaps.size() );
+		log.debug( "Creating VALUES clause for {} bindings", solMaps.size() );
 		final Element valuesClause = createValuesClause(solMaps);
 
 		// Combine the VALUES clause with the graph pattern of this operator.
@@ -126,7 +126,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUES
 			}
 		}
 
-		log.info("Constructed VALUES clause with {} join variables and {} bindings", joinVars.size(), solMaps.size());
+		log.debug("Constructed VALUES clause with {} join variables and {} bindings", joinVars.size(), solMaps.size());
 
 		// Create the VALUES clause.
 		return new ElementData( new ArrayList<>(joinVars), new ArrayList<>(solMaps) );

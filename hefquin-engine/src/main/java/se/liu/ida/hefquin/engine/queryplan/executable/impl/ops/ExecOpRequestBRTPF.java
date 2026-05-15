@@ -25,7 +25,7 @@ public class ExecOpRequestBRTPF extends BaseForExecOpRequestWithTPFPaging<Bindin
 	                           final QueryPlanningInfo qpInfo ) {
 		super(req, fm, mayReduce, collectExceptions, qpInfo);
 
-		log.info( "Initialized ExecOpRequestBRTPF for server {}", fm );
+		log.debug( "Initialized ExecOpRequestBRTPF for server {}", fm );
 	}
 
 	@Override

@@ -48,7 +48,7 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 	protected final void _execute( final IntermediateResultElementSink sink,
 	                               final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
-		log.info( "Starting paging request execution for {}", fm );
+		log.debug( "Starting paging request execution for {}", fm );
 
 		TPFResponse currentPage = null;
 		while ( currentPage == null || ! isLastPage(currentPage) ) {
@@ -91,7 +91,7 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 			consumeMatchingTriples( triples, sink );
 		}
 
-		log.info(
+		log.debug(
 			"Completed request execution for {}: pages={}, triples={}, outputMappings={}",
 			fm,
 			numberOfPageRequestsIssued,

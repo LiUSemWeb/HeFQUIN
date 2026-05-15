@@ -67,7 +67,7 @@ public class ExecOpParallelBindJoinSPARQLwithUNION
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpParallelBindJoinSPARQLwithUNION for endpoint {} (patternType={}, batchSize={}, outerJoin={})",
 			fm,
 			pattern.getClass().getSimpleName(),
@@ -77,7 +77,7 @@ public class ExecOpParallelBindJoinSPARQLwithUNION
 
 	@Override
 	protected SPARQLRequest createRequest( final Set<Binding> batch ) {
-		log.info(
+		log.debug(
 			"Creating parallel UNION-based SPARQL bind-join request with {} bindings for endpoint {}",
 			batch.size(),
 			fm );
