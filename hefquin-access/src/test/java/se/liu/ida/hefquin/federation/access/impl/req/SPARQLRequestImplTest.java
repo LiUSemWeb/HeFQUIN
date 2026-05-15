@@ -23,46 +23,42 @@ public class SPARQLRequestImplTest extends FederationTestBase
 {
 	@Test
 	public void testDistinctRequestInitialization() throws FederationAccessException {
-		if ( ! skipLiveWebTests ) {
-			// setting up
-			final String queryString = "SELECT ?s WHERE { ?s <http://xmlns.com/foaf/0.1/name> \"Berlin\"@en . ?s <http://xmlns.com/foaf/0.1/name> ?o2 .}";
-			final SPARQLQuery baseQuery = new SPARQLQueryImpl( QueryFactory.create(queryString) );
+		// setting up
+		final String queryString = "SELECT ?s WHERE { ?s <http://xmlns.com/foaf/0.1/name> \"Berlin\"@en . ?s <http://xmlns.com/foaf/0.1/name> ?o2 .}";
+		final SPARQLQuery baseQuery = new SPARQLQueryImpl( QueryFactory.create(queryString) );
 
-			final SPARQLRequest req1 = new SPARQLRequestImpl(baseQuery);
+		final SPARQLRequest req1 = new SPARQLRequestImpl(baseQuery);
 
-			final Element el = QueryFactory.create(queryString).getQueryPattern();
-			final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
-			final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), true);
+		final Element el = QueryFactory.create(queryString).getQueryPattern();
+		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
+		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), true);
 
-			// checking
-			// the base query does not contain DISTINCT
-			assertFalse( baseQuery.asJenaQuery().isDistinct() );
+		// checking
+		// the base query does not contain DISTINCT
+		assertFalse( baseQuery.asJenaQuery().isDistinct() );
 
-			// req1 inherits DISTINCT=false, req2 explicitly enforces DISTINCT
-			assertFalse( req1.getDistinctRequired() );
-			assertTrue( req2.getDistinctRequired() );
-		}
+		// req1 inherits DISTINCT=false, req2 explicitly enforces DISTINCT
+		assertFalse( req1.getDistinctRequired() );
+		assertTrue( req2.getDistinctRequired() );
 	}
 
 	@Test
 	public void testProjectionVariablesInitialization() throws FederationAccessException {
-		if ( ! skipLiveWebTests ) {
-			// setting up
-			final String queryString = "SELECT ?s ?o2 WHERE { ?s <http://xmlns.com/foaf/0.1/name> \"Berlin\"@en . " +
-			                           "?s <http://xmlns.com/foaf/0.1/name> ?o2 . }";
+		// setting up
+		final String queryString = "SELECT ?s ?o2 WHERE { ?s <http://xmlns.com/foaf/0.1/name> \"Berlin\"@en . " +
+									"?s <http://xmlns.com/foaf/0.1/name> ?o2 . }";
 
-			final SPARQLQuery baseQuery = new SPARQLQueryImpl( QueryFactory.create(queryString) );
+		final SPARQLQuery baseQuery = new SPARQLQueryImpl( QueryFactory.create(queryString) );
 
-			final SPARQLRequest req1 = new SPARQLRequestImpl(baseQuery);
+		final SPARQLRequest req1 = new SPARQLRequestImpl(baseQuery);
 
-			final Element el = QueryFactory.create(queryString).getQueryPattern();
-			final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
-			final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), false);
+		final Element el = QueryFactory.create(queryString).getQueryPattern();
+		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
+		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), false);
 
-			// checking
-			// ensure projection is applied
-			assertEquals( Set.of(Var.alloc("s"), Var.alloc("o2")), req1.getProjectionVars() );
-			assertEquals( Set.of(Var.alloc("s")), req2.getProjectionVars() );
-		}
+		// checking
+		// ensure projection is applied
+		assertEquals( Set.of(Var.alloc("s"), Var.alloc("o2")), req1.getProjectionVars() );
+		assertEquals( Set.of(Var.alloc("s")), req2.getProjectionVars() );
 	}
 }
