@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
@@ -26,6 +29,7 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
                                   PageReqType extends DataRetrievalRequest>
        extends BaseForExecOpRequest<ReqType,MemberType>
 {
+	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpRequestWithTPFPaging.class );
 	private int numberOfPageRequestsIssued = 0;
 	private long totalNumberOfMatchingTriplesRetrieved = 0L;
 	private int minNumberOfMatchingTriplesPerPage = Integer.MAX_VALUE;
@@ -44,6 +48,8 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 	protected final void _execute( final IntermediateResultElementSink sink,
 	                               final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
+		log.info( "Starting paging request execution for {}", fm );
+
 		TPFResponse currentPage = null;
 		while ( currentPage == null || ! isLastPage(currentPage) ) {
 			// create the request for the next page (which is the first page if currentPage is null)
@@ -84,6 +90,13 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 			}
 			consumeMatchingTriples( triples, sink );
 		}
+
+		log.info(
+			"Completed request execution for {}: pages={}, triples={}, outputMappings={}",
+			fm,
+			numberOfPageRequestsIssued,
+			totalNumberOfMatchingTriplesRetrieved,
+			numberOfOutputMappingsProduced );
 	}
 
 	protected PageReqType createPageRequest( final TPFResponse previousPage ) {

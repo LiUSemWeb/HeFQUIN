@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -17,6 +20,7 @@ public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
                                  MemberType extends FederationMember>
                 extends BaseForExecOpRequest<ReqType,MemberType>
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpRequestSPARQL.class );
 	private long timeAfterResponse = 0L;
 	private long solMapsRetrieved = 0L;
 	private long numberOfOutputMappingsProduced = 0L;
@@ -27,12 +31,16 @@ public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
 	                            final boolean collectExceptions,
 	                            final QueryPlanningInfo qpInfo ) {
 		super(req, fm, mayReduce, collectExceptions, qpInfo);
+
+		log.info( "Initialized ExecOpRequestSPARQL for {}", fm );
 	}
 
 	@Override
 	protected final void _execute( final IntermediateResultElementSink sink, final ExecutionContext execCxt )
 		throws ExecOpExecutionException
 	{
+		log.info( "Starting SPARQL request execution for {}", fm );
+
 		final SolMapsResponse response;
 		try {
 			response = FederationAccessUtils.performRequest( execCxt.getFederationAccessMgr(), req, fm );
@@ -49,6 +57,12 @@ public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
 		}
 
 		process(response, sink);
+
+		log.info(
+			"Completed SPARQL request execution for {}: solMaps={}, outputMappings={}",
+			fm,
+			solMapsRetrieved,
+			numberOfOutputMappingsProduced );
 	}
 
 	protected void process( final SolMapsResponse response, final IntermediateResultElementSink sink )

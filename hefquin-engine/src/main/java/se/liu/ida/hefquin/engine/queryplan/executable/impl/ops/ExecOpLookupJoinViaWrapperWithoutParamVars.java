@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -23,6 +26,8 @@ import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint.DataConversionE
 public class ExecOpLookupJoinViaWrapperWithoutParamVars
        extends UnaryExecutableOpBase
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpLookupJoinViaWrapperWithoutParamVars.class );
+
 	protected final SPARQLGraphPattern pattern;
 	protected final WrappedRESTEndpoint fm;
 
@@ -54,6 +59,8 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 
 		this.pattern = pattern;
 		this.fm = fm;
+
+		log.info( "Initialized ExecOpLookupJoinViaWrapperWithoutParamVars for endpoint {}", fm );
 	}
 
 	@Override
@@ -61,6 +68,7 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt )
 			throws ExecOpExecutionException {
+		log.info( "Executing lookup join (without param vars) against {}", fm );
 		if ( solmapsFromRequest == null ) {
 			solmapsFromRequest = performRequest(execCxt);
 		}
@@ -84,6 +92,8 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 	protected List<SolutionMapping> performRequest( final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
+		log.info( "Sending REST request to {}", fm.getURLTemplate() );
+
 		final RESTRequest req = new RESTRequestImpl( fm.getURLTemplate() );
 
 		final long time1 = System.currentTimeMillis();
@@ -132,6 +142,7 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 		requestExecTime = time2 - time1;
 		responseProcTime = time3 - time2;
 		numOfSolMapsFromRequest = result.size();
+		log.info( "Lookup join received {} solution mappings from {}", result.size(), fm );
 		return result;
 	}
 

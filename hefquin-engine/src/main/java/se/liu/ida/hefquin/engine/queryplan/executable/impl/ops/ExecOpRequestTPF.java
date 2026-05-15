@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.data.utils.TriplesToSolMapsConverter;
@@ -18,12 +21,16 @@ import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 public class ExecOpRequestTPF<MemberType extends FederationMember>
        extends BaseForExecOpRequestWithTPFPaging<TriplePatternRequest,MemberType,TPFRequest>
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpRequestTPF.class );
+
 	public ExecOpRequestTPF( final TriplePatternRequest req,
 	                         final MemberType fm,
 	                         final boolean mayReduce,
 	                         final boolean collectExceptions,
 	                         final QueryPlanningInfo qpInfo ) {
 		super(req, fm, mayReduce, collectExceptions, qpInfo);
+
+		log.info( "Initialized ExecOpRequestBRTPF for server {}", fm );
 	}
 
 	@Override
