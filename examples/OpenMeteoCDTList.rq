@@ -18,16 +18,15 @@ PREFIX ex:     <http://example.org/>
 # forecasts from the Open-Meteo API does indeed contain arrays.
 
 SELECT * WHERE {
-	SERVICE <http://dbpedia.org/sparql> {
+	SERVICE <https://qlever.dev/api/dbpedia>
+	{
 		<http://dbpedia.org/resource/Berlin> geo:lat ?lat ;
 		                                     geo:long ?long .
 	}
 
-	BIND ( "temperature_2m" AS ?req)
-
 	SERVICE <http://example.org/OpenMeteoWrapper> PARAMS(?lat AS "latitude",
-	                                                     ?long AS "longitude",
-	                                                     ?req AS "hourly") {
+	                                                     ?long AS "longitude")
+	{
 		?x ex:hourly_temperature ?list .
 	}
 

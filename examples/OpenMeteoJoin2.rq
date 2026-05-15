@@ -9,19 +9,24 @@ PREFIX ex:     <http://example.org/>
 
 # This query accesses the Web API of the Open-Meteo weather service by using
 # requests that are formed based on data obtained from a SPARQL endpoint.
-# More specifically, the query obtains the geographic coordinates of Berlin
-# from the SPARQL endpoint of the DBpedia Knowledge Graph and, then, uses
-# these coordinates to request the current temperature and wind speed in
-# Berlin from the Web API.
+# More specifically, the query obtains the geographic coordinates of cities
+# in Croatia from the SPARQL endpoint of the DBpedia Knowledge Graph and,
+# then, uses these coordinates to request the current temperature and wind
+# speed in these cities from the Web API.
 
-SELECT * WHERE {
-	SERVICE <https://qlever.dev/api/dbpedia> {
-		<http://dbpedia.org/resource/Berlin> geo:lat ?lat ;
-		                                     geo:long ?long .
+SELECT * WHERE
+{
+	SERVICE <https://qlever.dev/api/dbpedia>
+	{
+		?city rdf:type dbo:City ;
+		      geo:lat ?lat ;
+		      geo:long ?long ;
+		      dbo:country <http://dbpedia.org/resource/Croatia>
 	}
 
 	SERVICE <http://example.org/OpenMeteoWrapper> PARAMS(?lat AS "latitude",
-	                                                     ?long AS "longitude") {
+	                                                     ?long AS "longitude")
+	{
 		?x ex:temperature ?temp .
 		?x ex:windSpeed ?wind .
 	}

@@ -64,21 +64,11 @@ ex:openMeteo a fd:WrappedFederationMember ;
 _:openMeteoRestEndpoint a fd:TemplateBasedInterface ;
       fd:supportedProtocol fd:GenericWebAPIProtocol ;
       fd:uriTemplate [
-            hydra:template "https://api.open-meteo.com/v1/forecast{?latitude,longitude,current,hourly}" ;
+            hydra:template "https://api.open-meteo.com/v1/forecast?current=temperature_2m,wind_speed_10m&hourly=temperature_2m,wind_speed_10m{&latitude,longitude}" ;
             hydra:mapping [ hydra:variable "latitude" ;
-                            hydra:required true ;
-                            fd:paramType xsd:float
-                          ] ,
+                            hydra:required true ] ,
                           [ hydra:variable "longitude" ;
-                            hydra:required true ;
-                            fd:paramType xsd:float
-                          ] ,
-                          [ hydra:variable "current" ;
-                            fd:paramType xsd:string
-                          ] ,
-                          [ hydra:variable "hourly" ;
-                            fd:paramType xsd:string
-                          ]
+                            hydra:required true ]
           ] .
 
 ex:openMeteo2 a fd:WrappedFederationMember ;
@@ -128,7 +118,7 @@ _:openMeteoTM4
                           rml:referenceFormulation rml:JSONPath ;
                           rml:iterator "$" ] ;
       rml:subjectMap [ rml:termType rml:BlankNode ;
-                       rml:reference "hourly_units.time" ];
+                       rml:reference "current.time" ];
       rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:hourly_temperature ] ;
                                rml:objectMap [ rml:reference "hourly.temperature_2m" ; rml:datatype cdt:List ] ] .
 
