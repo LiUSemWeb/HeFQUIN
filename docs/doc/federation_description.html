@@ -33,32 +33,43 @@
 
         <h2 id="basic-concepts">1. Basic Concepts</h2>
         <ul>
-            <li><code>fd:FederationMember</code> - Represents a federation member (data source) that can be queried.</li>
-            <li><code>fd:serviceURI</code> -       A property to specify the URI via which a federation member is identified in SERVICE clauses.</li>
-            <li><code>fd:Interface</code> -        Represents the access mechanism used to query a federation member.</li>
-            <li><code>fd:interface</code> -        A property linking a federation member to its interface.</li>
+            <li><code>fd:RDFBasedFederationMember</code> - Represents a federation member (data source) whose interface provides access to RDF data.</li>
+            <li><code>fd:WrappedFederationMember</code> - Represents a federation member (data source) that provides access to non-RDF data.</li>
+            <li><code>fd:Wrapper</code> - Represents the wrapper of a wrapped federation member, defining an RDF view of the data.</li>
+            <li><code>fd:Interface</code> - Represents the access mechanism used to query a federation member.</li>
+            <li><code>fd:DataRetrievalProtocol</code> - Represents the protocol to be used when interacting with the interface of a federation member.</li>
         </ul>
 
         <h2 id="interface-types">2. Interface Types</h2>
-        <p>Use one of the concrete subclasses of <code>fd:Interface</code> to describe how to query the federation
-            member:</p>
+        <p>Use one of the concrete subclasses of <code>fd:Interface</code>:</p>
         <ul>
-            <li><code>fd:SPARQLEndpointInterface</code> -  For federation members accessible via the SPARQL protocol</li>
-            <li><code>fd:TPFInterface</code> -             For federation members accessible via Triple Pattern Fragments (TPF)</li>
-            <li><code>fd:brTPFInterface</code> -           For federation members accessible via Bindings-Restricted TPF (brTPF)</li>
-            <li><code>fd:RESTInterface</code> -            For federation members that are based on a REST endpoint</li>
-            <li><code>fd:GraphQLEndpointInterface</code> - For federation members that are based on a GraphQL API</li>
-            <li><code>fd:BoltInterface</code> -            For federation members accessible via the Bolt protocol (e.g., for Neo4j)</li>
+            <li><code>fd:FixedEndpointInterface</code> -   For interfaces that can be accessed via a single, fixed endpoint address.</li>
+            <li><code>fd:TemplateBasedInterface</code> -   For interfaces that can be accessed via request URIs that can be created based on a URI template.</li>
+            <li><code>fd:FragmentInterface</code> -        For interfaces that can be accessed via URIs that denote fragments (i.e., specific subsets) of the dataset of the federation member.</li>
         </ul>
 
-        <h2 id="key-properties">3. Key Properties</h2>
+        <h2 id="retrieval-protocols">3. Retrieval Protocols</h2>
+        <p>The <code>fd:DataRetrievalProtocol</code> can be one of the following:</p>
         <ul>
-            <li><code>fd:serviceURI</code> -             An <code>xsd:anyURI</code> literal with a URI to be used to refer to the corresponding federation member in <code>SERVICE</code> clauses</li>
-            <li><code>fd:endpointAddress</code> -        An <code>xsd:anyURI</code> literal with the URI via which a federation member with a single HTTP endpoint can be accessed (e.g., SPARQL, REST, and GraphQL endpoints)</li>
-            <li><code>fd:exampleFragmentAddress</code> - An <code>xsd:anyURI</code> literal with an example URL of a fragment that can be used to access a specific subset of the dataset of a federation member (e.g., for TPF and brTPF interfaces)</li>
+            <li><code>fd:SPARQLProtocol</code> -   The protocol to be used for SPARQL endpoints.</li>
+            <li><code>fd:TPFProtocol</code> -      The protocol to be used when interacting with a TPF server.</li>
+            <li><code>fd:brTPFProtocol</code> -    The protocol to be used when interacting with a brTPF server.</li>
+            <li><code>fd:GenericWebAPIProtocol</code> - The protocol to be used when interacting with a generic Web
+            <li><code>fd:BoltProtocol</code> -     The protocol to be used when interacting with a Neo4j server.</li>
+            <li><code>fd:GraphQLProtocol</code> -  The protocol to be used when interacting with a GraphQL server.</li> API.</li>
+        </ul>
+
+        <h2 id="key-properties">4. Key Properties</h2>
+        <ul>
+            <li><code>fd:serviceURI</code> -             An <code>xsd:anyURI</code> literal with a URI to be used to refer to the corresponding federation member in <code>SERVICE</code> clauses.</li>
+            <li><code>fd:interface</code> -              Links a federation member to its interface.</li>
+            <li><code>fd:wrapper</code> -                Links a wrapped federation member to its wrapper.</li>
+            <li><code>fd:supportedProtocol</code> -      Links an interface to the <code>fd:DataRetrievalProtocol</code> that it supports.</li>
+            <li><code>fd:endpointAddress</code> -        An <code>xsd:anyURI</code> literal with the URI of an <code>fd:FixedEndpointInterface</code>.</li>
+            <li><code>fd:uriTemplate</code> -            Links an <code>fd:TemplateBasedInterface</code> to a definition of its URI template.</li>
+
+            <li><code>fd:exampleFragmentAddress</code> - An <code>xsd:anyURI</code> literal with an example URL of an <code>fd:FragmentInterface</code>.</li>
             <li><code>fd:vocabularyMappingsFile</code> - Link to an RDF file aligning different vocabularies</li>
-            <li><code>fd:mappingConfiguration</code> -   Resource pointing to a mapping configuration for translating non-RDF data models (e.g., GraphQL, LPG) into RDF</li>
-            <li><code>fd:wrapper</code> -                Link to an <code>fd:Wrapper</code> that has RML triples maps listed via a <code>fd:rmlTriplesMaps</code> property</li>
         </ul>
 
         <h2>4. Example Descriptions</h2>
@@ -68,10 +79,11 @@
 PREFIX fd:   &lt;http://w3id.org/hefquin/feddesc#&gt;
 PREFIX ex:   &lt;http://example.org/&gt;
 
-ex:dbpediaSPARQL
+ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;
     fd:serviceURI "http://dbpedia.org/sparql"^^xsd:anyURI ;
     fd:interface [
-        a fd:SPARQLEndpointInterface ;
+        a fd:FixedEndpointInterface ;
+        fd:supportedProtocol fd:SPARQLProtocol ;
         fd:endpointAddress "http://dbpedia.org/sparql"^^xsd:anyURI
     ] .
 </code></pre>
@@ -81,10 +93,11 @@ ex:dbpediaSPARQL
 PREFIX fd:   &lt;http://w3id.org/hefquin/feddesc#&gt;
 PREFIX ex:   &lt;http://example.org/&gt;
 
-ex:dbpediaTPF
+ex:dbpediaTPF a fd:RDFBasedFederationMember ;
     fd:serviceURI "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI ;
     fd:interface [
-        a fd:TPFInterface ;
+        a fd:FragmentInterface ;
+        fd:supportedProtocol fd:TPFProtocol ;
         fd:exampleFragmentAddress "http://fragments.dbpedia.org/2016-04/en"^^xsd:anyURI
     ] .
 </code></pre>
@@ -96,13 +109,14 @@ PREFIX rml:    &lt;http://w3id.org/rml/&gt;
 PREFIX hydra:  &lt;http://www.w3.org/ns/hydra/core#&gt;
 PREFIX ex:     &lt;http://example.org/&gt;
 
-ex:openMeteo
+ex:openMeteo a fd:WrappedFederationMember ;
     fd:serviceURI "http://example.org/OpenMeteoWrapper"^^xsd:anyURI ;
     fd:interface _:openMeteoRestEndpoint ;
     fd:wrapper _:openMeteoWrapper .
 
-_:openMeteoRestEndpoint a fd:RESTInterface ;
-      fd:iriTemplate [
+_:openMeteoRestEndpoint a fd:TemplateBasedInterface ;
+      fd:supportedProtocol fd:GenericWebAPIProtocol ;
+      fd:uriTemplate [
             hydra:template "https://api.open-meteo.com/v1/forecast{?latitude,longitude,current,hourly}" ;
             hydra:mapping [ hydra:variable "latitude" ;
                             hydra:required true ;
@@ -143,6 +157,7 @@ _:openMeteoTM2
                                rml:objectMap [ rml:reference "wind_speed_10m" ; rml:datatype xsd:double ] ] .
 </code></pre>
 
+<!--
         <h3 id="Neo4j-example">Neo4j</h3>
         <pre><code class="language-turtle">PREFIX xsd:      &lt;http://www.w3.org/2001/XMLSchema#&gt;
 PREFIX fd:       &lt;http://w3id.org/hefquin/feddesc#&gt;
@@ -161,6 +176,8 @@ ex:neo4jTest
         ]
     ] .
 </code></pre>
+-->
+
     </main>
 
     <div id="footer"></div>
