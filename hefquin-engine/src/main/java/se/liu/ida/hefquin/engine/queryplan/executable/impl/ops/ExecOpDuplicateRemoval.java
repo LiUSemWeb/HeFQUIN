@@ -3,6 +3,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -16,6 +19,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpDuplicateRemoval.class );
 	private long numberOfOutputMappingsProduced = 0L;
 	private long numberOfDuplicates = 0L;
 
@@ -25,6 +29,8 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	                     final boolean collectExceptions,
 	                     final QueryPlanningInfo qpInfo ) {
 		super(true, collectExceptions, qpInfo);
+
+		log.info( "Initialized ExecOpDuplicateRemoval (collectExceptions={}).", collectExceptions );
 	}
 
 	@Override
@@ -41,6 +47,12 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
+		log.info(
+			"Distinct operator finishing. Produced={}, duplicates={}, uniqueSize={}.",
+			numberOfOutputMappingsProduced,
+			numberOfDuplicates,
+			distinctSolMaps.size() );
+
 		distinctSolMaps.clear();
 	}
 

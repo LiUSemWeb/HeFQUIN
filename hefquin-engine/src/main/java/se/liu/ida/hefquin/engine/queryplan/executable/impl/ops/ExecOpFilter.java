@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
@@ -16,6 +18,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpFilter.class );
+
 	private long numberOfOutputMappingsProduced = 0L;
 
 	protected final ExprList filterExpressions;
@@ -30,6 +34,12 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 		assert ! filterExpressions.isEmpty();
 
 		this.filterExpressions = filterExpressions;
+
+		log.info(
+			"Initialized ExecOpFilter with {} expressions, mayReduce={}, collectExceptions={}.",
+			filterExpressions.size(),
+			mayReduce,
+			collectExceptions );
 	}
 
 	public ExecOpFilter( final Expr filterExpression,
@@ -41,6 +51,11 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 		assert filterExpression != null;
 
 		this.filterExpressions = new ExprList(filterExpression);
+
+		log.info(
+			"Initialized ExecOpFilter with one expression, mayReduce={}, collectExceptions={}.",
+			mayReduce,
+			collectExceptions );
 	}
 
 	@Override
@@ -74,6 +89,8 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 			}
 		}
 
+		log.info( "Processing batch of {} solution mappings.", cnt );
+
 		// Continue consuming the rest of the batch (if any). If we find
 		// further solution mappings that can be passed on as output, we
 		// collect them in an output list, with the earlier-found first
@@ -106,12 +123,18 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 			sink.send(firstOutput);
 			numberOfOutputMappingsProduced++;
 		}
+
+		log.info(
+			"Batch processed: {} input, {} output mappings.",
+			cnt,
+			(allOutput != null ? allOutput.size() : (firstOutput != null ? 1 : 0)) );
 	}
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
 		// nothing to be done here
+		log.info( "ExecOpFilter concluded execution." );
 	}
 
 	@Override

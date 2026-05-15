@@ -19,6 +19,8 @@ import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.util.ExprUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
@@ -35,6 +37,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpUnfold.class );
+
 	protected final Expr expr;
 	protected final Var var1;
 	protected final Var var2;
@@ -58,6 +62,10 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 		this.expr = expr;
 		this.var1 = var1;
 		this.var2 = var2;
+
+		log.info(
+			"Initialized ExecOpUnfold (var1={}, var2={}, collectExceptions={})",
+			var1, var2, collectExceptions );
 	}
 
 	@Override
@@ -73,6 +81,7 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 			// If the expression failed to evaluate for a given
 			// solution mapping, then the expected result is that
 			// this solution mapping is returned as is.
+			log.info( "Expression evaluation failed for inputSolMap={}: {}", inputSolMap, ex.getMessage() );
 			sink.send(inputSolMap);
 			numberOfOutputMappingsProduced++;
 			numberOfExprEvalErrors++;
@@ -86,6 +95,7 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 
 			if ( CompositeDatatypeList.uri.equals(dtURI)
 			     && lit.isWellFormed() ) {
+				log.info( "Unfolding CDT list" );
 				numberOfUnfoldedCDTs++;
 				unfoldList(lit, inputSolMap, sink);
 				return;
@@ -93,6 +103,7 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 
 			if ( CompositeDatatypeMap.uri.equals(dtURI)
 			     && lit.isWellFormed() ) {
+				log.info( "Unfolding CDT map" );
 				numberOfUnfoldedCDTs++;
 				unfoldMap(lit, inputSolMap, sink);
 				return;

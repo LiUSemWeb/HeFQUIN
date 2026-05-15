@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
@@ -22,6 +24,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public class ExecOpProject extends UnaryExecutableOpBaseWithoutBlocking
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpProject.class );
 	private long numberOfOutputMappingsProduced = 0L;
 
 	protected final Set<Var> variables;
@@ -35,6 +38,11 @@ public class ExecOpProject extends UnaryExecutableOpBaseWithoutBlocking
 		assert variables != null;
 
 		this.variables = variables;
+
+		log.info(
+			"Initialized ExecOpProject with {} projection variables: {}.",
+			variables.size(),
+			variables );
 	}
 
 	@Override
