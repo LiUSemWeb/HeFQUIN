@@ -1,7 +1,10 @@
 package se.liu.ida.hefquin.base.query.impl;
 
+import java.util.Set;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -17,22 +20,37 @@ public class SPARQLQueryImpl implements SPARQLQuery
 		this.jenaQuery = jenaQuery;
 	}
 
-	public SPARQLQueryImpl( final SPARQLGraphPattern p ) {
-		this( QueryPatternUtils.convertToJenaElement(p) );
+	public SPARQLQueryImpl( final SPARQLGraphPattern p,
+	                        final Set<Var> projectionVars,
+	                        final boolean distinctRequired ) {
+		this( QueryPatternUtils.convertToJenaElement(p), projectionVars, distinctRequired );
 	}
 
-	protected SPARQLQueryImpl( final Element jenaElement ) {
+	protected SPARQLQueryImpl( final Element jenaElement,
+	                           final Set<Var> projectionVars,
+	                           final boolean distinctRequired ) {
 		assert jenaElement != null;
-		
+
 		jenaQuery = QueryFactory.create();
 		jenaQuery.setQuerySelectType();
-		jenaQuery.setQueryResultStar(true);
+		if ( projectionVars != null ) {
+			jenaQuery.setQueryResultStar( false );
+			jenaQuery.getProject().clear();
+			projectionVars.forEach(jenaQuery::addResultVar);
+		}
+		else
+			jenaQuery.setQueryResultStar( true );
+
+
+		jenaQuery.setDistinct( distinctRequired );
 		jenaQuery.setQueryPattern( jenaElement );
 	}
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof SPARQLQuery && ((SPARQLQuery) o).asJenaQuery().equals(jenaQuery);
+		if ( o == this ) return true;
+
+		return o instanceof SPARQLQuery oo && oo.asJenaQuery().equals(jenaQuery);
 	}
 
 	@Override

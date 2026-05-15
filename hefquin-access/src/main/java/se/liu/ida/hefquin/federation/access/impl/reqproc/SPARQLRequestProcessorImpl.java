@@ -141,7 +141,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 		public void accept( final QuerySolution s ) {
 			solMaps.add( SolutionMappingUtils.createSolutionMapping(s) );
 		}
-		
+
 	} // end of MySolutionConsumer
 
 }
