@@ -18,7 +18,7 @@ SELECT * WHERE {
 		FILTER ( CONTAINS(STR(?cc), "wikidata" ) )
 	}
 
-	SERVICE <https://query.wikidata.org/sparql> {
+	SERVICE <https://qlever.dev/api/wikidata> {
 		?cc rdfs:label ?o
 	}
 }

@@ -11,14 +11,14 @@ PREFIX dbo:    <http://dbpedia.org/ontology/>
 # algorithm, HeFQUIN pushes the FILTER into the request to the DBpedia endpoint.
 
 SELECT * WHERE {
-	SERVICE <http://dbpedia.org/sparql> {
+	SERVICE <https://qlever.dev/api/dbpedia> {
 		<http://dbpedia.org/resource/Berlin> dbo:country ?c .
 		?c owl:sameAs ?cc
 	}
 
 	FILTER ( CONTAINS(STR(?cc), "wikidata" ) )
 
-	SERVICE <https://query.wikidata.org/sparql> {
+	SERVICE <https://qlever.dev/api/wikidata> {
 		?cc rdfs:label ?o
 	}
 }
