@@ -25,6 +25,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fix in RML-to-algebra translation algorithm ([#610](https://github.com/LiUSemWeb/HeFQUIN/pull/610)).
 - Fix in code that expands URI templates ([#611](https://github.com/LiUSemWeb/HeFQUIN/pull/611)).
 - Removes unused provenance-related methods from DataRetrievalResponse ([#582](https://github.com/LiUSemWeb/HeFQUIN/pull/582)).
+- Changes some of the example queries to use the QLever SPARQL endpoints for DBpedia and Wikidata ([#620](https://github.com/LiUSemWeb/HeFQUIN/pull/620)).
 
 
 ## [0.0.10] - 2026-03-25
