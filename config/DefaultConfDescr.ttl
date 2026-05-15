@@ -82,22 +82,22 @@ _:bListOfPhysicalOpFactories
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF$Factory" ;
           ec:constructorArguments (30) ] # batch size
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
-          ec:constructorArguments ("VARIABLE_RENAMING"
-                                   false  # false = sequential version
-                                   30) ]  # batch size
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
-          ec:constructorArguments ("VALUES_OR_FILTER"
-                                   false  # false = sequential version
-                                   30) ]  # batch size
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
+        #  ec:constructorArguments ("VARIABLE_RENAMING"
+        #                           false  # false = sequential version (no parallel version for VARIABLE_RENAMING)
+        #                           30) ]  # batch size
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
+        #  ec:constructorArguments ("VALUES_OR_FILTER"
+        #                           false  # false = sequential version (no parallel version for VALUES_OR_FILTER)
+        #                           30) ]  # batch size
         #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
         #  ec:constructorArguments ("VALUES_BASED"
         #                           false  # false = sequential version
         #                           30) ]  # batch size
-        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
-        #  ec:constructorArguments ("VALUES_BASED"
-        #                           true   # true = parallel version
-        #                           30) ]  # batch size
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
+          ec:constructorArguments ("VALUES_BASED"
+                                   true  # true = parallel version
+                                   30) ]  # batch size
         #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinSPARQL$Factory" ;
         #  ec:constructorArguments ("FILTER_BASED"
         #                           false  # false = sequential version
