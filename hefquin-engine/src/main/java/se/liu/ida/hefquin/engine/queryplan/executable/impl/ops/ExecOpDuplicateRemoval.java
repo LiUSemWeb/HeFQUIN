@@ -30,13 +30,14 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	                     final QueryPlanningInfo qpInfo ) {
 		super(true, collectExceptions, qpInfo);
 
-		log.info( "Initialized ExecOpDuplicateRemoval (collectExceptions={}).", collectExceptions );
+		log.debug( "Initialized ExecOpDuplicateRemoval (collectExceptions={}).", collectExceptions );
 	}
 
 	@Override
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
+		log.info( "Processing solution mapping in ExecOpDuplicateRemoval." );
 		if ( distinctSolMaps.add(inputSolMap) ) {
 			sink.send(inputSolMap);
 			numberOfOutputMappingsProduced++;

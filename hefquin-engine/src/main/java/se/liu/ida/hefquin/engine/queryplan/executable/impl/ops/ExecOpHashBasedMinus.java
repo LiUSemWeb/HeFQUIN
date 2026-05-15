@@ -26,7 +26,7 @@ public class ExecOpHashBasedMinus extends ExecOpHashJoin2
 	                             final QueryPlanningInfo qpInfo ) {
 		super(true, mayReduce, inputVars1, inputVars2, collectExceptions, qpInfo);
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpHashBasedMinus with mayReduce={}, inputVarsLeft={}, inputVarsRight={}",
 			mayReduce,
 			inputVars1,

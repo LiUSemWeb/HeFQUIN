@@ -35,7 +35,7 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 
 		this.filterExpressions = filterExpressions;
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpFilter with {} expressions, mayReduce={}, collectExceptions={}.",
 			filterExpressions.size(),
 			mayReduce,
@@ -52,7 +52,7 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 
 		this.filterExpressions = new ExprList(filterExpression);
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpFilter with one expression, mayReduce={}, collectExceptions={}.",
 			mayReduce,
 			collectExceptions );
@@ -89,7 +89,7 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 			}
 		}
 
-		log.info( "Processing batch of {} solution mappings.", cnt );
+		log.info( "Processing batch of {} solution mappings in ExecOpFilter.", cnt );
 
 		// Continue consuming the rest of the batch (if any). If we find
 		// further solution mappings that can be passed on as output, we

@@ -96,13 +96,13 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 			}
 		}
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpParallelMultiwayLeftJoin with {} optional parts and {} join vars: {}.",
 			optionalParts.size(),
 			joinVars.size(),
 			joinVars );
 
-		log.info(
+		log.debug(
 			"Selected index implementation {} for {} join variables.",
 			indexes.get(0).getClass().getSimpleName(),
 			joinVars.size() );
@@ -154,7 +154,7 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 
 	protected void parallelPhase( final List<SolutionMapping> inputForParallelProcess,
 	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		log.info( "Starting parallel phase with {} workers.", optionalParts.size() );
+		log.debug( "Starting parallel phase with {} workers.", optionalParts.size() );
 		// begin the parallel phase by starting the workers for the optional parts
 		final CompletableFuture<?>[] futures = new CompletableFuture<?>[ optionalParts.size() ];
 		for ( int i = 0; i < optionalParts.size(); i++ ) {
@@ -179,17 +179,17 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 				throw new ExecOpExecutionException("The execution of the futures that run the executable operators caused an exception.", e, this);
 			}
 		}
-		log.info( "Parallel phase completed." );
+		log.debug( "Parallel phase completed." );
 	}
 
 	protected void mergePhase( final Iterable<SolutionMapping> inputSolMaps,
 	                           final IntermediateResultElementSink sink ) {
-		log.info( "Starting merge phase." );
+		log.debug( "Starting merge phase." );
 		for( final SolutionMapping inputSolMap : inputSolMaps ) {
 			final Set<SolutionMapping> outputSolMaps = merge(inputSolMap);
 			sink.send(outputSolMaps);
 		}
-		log.info( "Merge phase completed." );
+		log.debug( "Merge phase completed." );
 	}
 
 	protected Set<SolutionMapping> merge( final SolutionMapping inputSol ) {
@@ -265,7 +265,7 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 
 		@Override
 		public void run() {
-			log.info(
+			log.debug(
 				"Worker started processing {} input solution mappings.",
 				input.size() );
 			try {
@@ -273,10 +273,10 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 				execOp.concludeExecution(mySink, execCxt);
 			}
 			catch ( final ExecOpExecutionException e ) {
-				log.info( "Worker execution failed." );
+				log.debug( "Worker execution failed." );
 				throw new RuntimeException("Executing an add operator used by this parallel multi left join caused an exception.", e);
 			}
-			log.info( "Worker completed successfully." );
+			log.debug( "Worker completed successfully." );
 		}
 	}
 

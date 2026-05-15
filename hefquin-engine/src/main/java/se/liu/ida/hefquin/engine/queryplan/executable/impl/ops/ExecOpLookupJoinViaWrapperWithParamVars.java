@@ -114,7 +114,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			this.paramVars.put(paramDecl, paramVar);
 		}
 
-		log.info( "Initialized ExecOpLookupJoinViaWrapperWithParamVars for endpoint {}", fm );
+		log.debug( "Initialized ExecOpLookupJoinViaWrapperWithParamVars for endpoint {}", fm );
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			if ( cachedResult != null ) {
 				// ... we can join the current solution mapping with the
 				// result that has been cached earlier.
-				log.info( "Cache hit for param values {} (endpoint={})", paramValues, fm );
+				log.debug( "Cache hit for param values {} (endpoint={})", paramValues, fm );
 				join(cachedResult, sm, sink);
 			}
 			else {
@@ -148,7 +148,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 				// for an earlier batch, then remember them, together with
 				// the current solution mapping, for further processing
 				// after this for loop.
-				log.info( "Cache miss for param values {}, issuing request to {}", paramValues, fm );
+				log.debug( "Cache miss for param values {}, issuing request to {}", paramValues, fm );
 				List<SolutionMapping> solmaps = paramsForRequests.get(paramValues);
 				if ( solmaps == null ) {
 					solmaps = new ArrayList<>();
@@ -176,12 +176,12 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 				f = execCxt.getFederationAccessMgr().issueRequest(req, fm);
 			}
 			catch ( final FederationAccessException e ) {
-				log.info( "Request issuance failed for endpoint {} (paramValues={})", fm, entry.getKey() );
+				log.debug( "Request issuance failed for endpoint {} (paramValues={})", fm, entry.getKey() );
 				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
 			}
 
 			numberOfRequestsIssued++;
-			log.info( "Issued request #{} to {}", numberOfRequestsIssued, fm );
+			log.debug( "Issued request #{} to {}", numberOfRequestsIssued, fm );
 
 			// attach the processing of the response obtained for the request
 			final MyResponseProcessor respProc = new MyResponseProcessor(
@@ -191,7 +191,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 
 		// Wait for all the futures to be completed.
-		log.info( "Waiting for {} async requests to complete for {}", futures.length, fm );
+		log.debug( "Waiting for {} async requests to complete for {}", futures.length, fm );
 		try {
 			CompletableFuture.allOf(futures).get();
 		}
@@ -331,7 +331,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			}
 			catch ( final DataConversionException e ) {
 				numberOfDataConversionExceptions.incrementAndGet();
-				log.info( "Data conversion failed for endpoint {} (paramValues={})", fm, paramValues );
+				log.debug( "Data conversion failed for endpoint {} (paramValues={})", fm, paramValues );
 				final ExecOpExecutionException ex = new ExecOpExecutionException( "Converting the reponse of a REST request into RDF failed (message: " + e.getMessage() + ").", e, op );
 				recordExceptionCaughtDuringExecution( ex );
 				return;

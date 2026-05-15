@@ -35,7 +35,7 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 	                                   final QueryPlanningInfo qpInfo ) {
 		super(mayReduce, collectExceptions, qpInfo);
 
-		log.info( "Initialized ExecOpNaiveNestedLoopsJoin." );
+		log.debug( "Initialized ExecOpNaiveNestedLoopsJoin." );
 	}
 
 	@Override

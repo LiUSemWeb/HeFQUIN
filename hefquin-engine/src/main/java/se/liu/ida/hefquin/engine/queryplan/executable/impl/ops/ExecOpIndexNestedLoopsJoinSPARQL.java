@@ -33,7 +33,7 @@ public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLo
 	                                         final QueryPlanningInfo qpInfo ) {
 		super(query, fm, mayReduce, minimumInputBlockSize, collectExceptions, qpInfo);
 
-		log.info( "Initialized ExecOpIndexNestedLoopsJoinSPARQL for endpoint {}.", fm );
+		log.debug( "Initialized ExecOpIndexNestedLoopsJoinSPARQL for endpoint {}.", fm );
 
 		// TODO extend this implementation to support outer join semantics similar
 		// to how it is implemented in ExecOpGenericIndexNestedLoopsJoinWithRequestOps

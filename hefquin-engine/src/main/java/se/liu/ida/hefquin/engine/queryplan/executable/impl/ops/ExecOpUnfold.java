@@ -63,7 +63,7 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 		this.var1 = var1;
 		this.var2 = var2;
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpUnfold (var1={}, var2={}, collectExceptions={})",
 			var1, var2, collectExceptions );
 	}
@@ -81,7 +81,7 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 			// If the expression failed to evaluate for a given
 			// solution mapping, then the expected result is that
 			// this solution mapping is returned as is.
-			log.info( "Expression evaluation failed for inputSolMap={}: {}", inputSolMap, ex.getMessage() );
+			log.debug( "Expression evaluation failed for inputSolMap={}: {}", inputSolMap, ex.getMessage() );
 			sink.send(inputSolMap);
 			numberOfOutputMappingsProduced++;
 			numberOfExprEvalErrors++;
@@ -95,7 +95,7 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 
 			if ( CompositeDatatypeList.uri.equals(dtURI)
 			     && lit.isWellFormed() ) {
-				log.info( "Unfolding CDT list" );
+				log.debug( "Unfolding CDT list" );
 				numberOfUnfoldedCDTs++;
 				unfoldList(lit, inputSolMap, sink);
 				return;
@@ -103,7 +103,7 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 
 			if ( CompositeDatatypeMap.uri.equals(dtURI)
 			     && lit.isWellFormed() ) {
-				log.info( "Unfolding CDT map" );
+				log.debug( "Unfolding CDT map" );
 				numberOfUnfoldedCDTs++;
 				unfoldMap(lit, inputSolMap, sink);
 				return;

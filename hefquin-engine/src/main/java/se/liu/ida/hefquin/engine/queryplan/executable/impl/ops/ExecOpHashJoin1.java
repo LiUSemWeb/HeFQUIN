@@ -32,7 +32,7 @@ public class ExecOpHashJoin1 extends BaseForExecOpHashJoin
 	                        final QueryPlanningInfo qpInfo ) {
 		super(mayReduce, inputVars1, inputVars2, collectExceptions, qpInfo);
 
-		log.info( "Initialized ExecOpHashJoin1." );
+		log.debug( "Initialized ExecOpHashJoin1." );
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class ExecOpHashJoin1 extends BaseForExecOpHashJoin
 		for ( final SolutionMapping smL : matchSolMapL ){
 			output.add( SolutionMappingUtils.merge(smL,inputSolMap) );
 		}
-		log.info( "Produced {} joined solution mappings.", output.size() - sizeBefore );
+		log.debug( "Produced {} joined solution mappings.", output.size() - sizeBefore );
 	}
 
 }

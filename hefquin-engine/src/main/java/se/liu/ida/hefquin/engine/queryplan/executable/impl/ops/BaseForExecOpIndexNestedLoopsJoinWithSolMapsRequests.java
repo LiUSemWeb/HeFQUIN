@@ -35,7 +35,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<Query
 	                                                       final IntermediateResultElementSink sink,
 	                                                       final ExecutableOperator op )
 	{
-		log.info( "Creating response processor for solution mapping." );
+		log.debug( "Creating response processor for solution mapping." );
 		return new MyResponseProcessor( sm, sink, op ) {
 			@Override
 			protected Iterable<SolutionMapping> extractSolMaps( final SolMapsResponse response )
@@ -46,7 +46,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<Query
 
 			@Override
 			protected void processExtractedSolMaps( final Iterable<SolutionMapping> solmaps ) {
-				log.info( "Merging solution mappings with input mapping." );
+				log.debug( "Merging solution mappings with input mapping." );
 				for ( final SolutionMapping fetchedSM : solmaps ) {
 					final SolutionMapping out = SolutionMappingUtils.merge( sm, fetchedSM );
 					sink.send( out );
