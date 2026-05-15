@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
@@ -80,6 +82,8 @@ public abstract class BaseForExecOpSequentialBindJoin<
                                        MemberType extends FederationMember>
            extends UnaryExecutableOpBase
 {
+	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpSequentialBindJoin.class );
+
 	public final static int DEFAULT_BATCH_SIZE = 30;
 
 	protected final QueryType query;
@@ -233,6 +237,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		// in which case we can find the join partners for the given input
 		// solution mapping within the full result that we had to retrieve.
 		if ( fullResult != null ) {
+			log.info( "Using FULL RETRIEVAL join mode for endpoint {}", fm );
 			joinInFullRetrievalMode(inputSolMap, sink);
 			return;
 		}
@@ -333,6 +338,10 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		// If we have accumulated enough solution mappings for the next
 		// bind-join request, then let's perform this request.
 		if ( currentSolMapsForRequest.size() == requestBlockSize ) {
+			log.info(
+				"Triggering bind-join request for endpoint {} with batch size {}",
+				fm,
+				currentSolMapsForRequest.size() );
 			performRequestAndHandleResponse(sink, execCxt);
 
 			// After performing the request (and handling its response), we can
@@ -385,6 +394,8 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
 
 		numOfSolMapsRetrievedPerReqOp.add( (Long) statsOfLastReqOp.getEntry("numberOfOutputMappingsProduced") );
+
+		log.info( "Completed bind-join request for endpoint {} (results from request-op={})", fm, reqOp.getStats() );
 	}
 
 	protected boolean alreadyCovered( final Binding inputSolMapRestricted ) {
@@ -440,6 +451,13 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	 */
 	protected boolean reduceRequestBlockSize() {
 		final int newRequestBlockSize = requestBlockSize / 2;
+
+		log.info(
+			"Reducing request block size for endpoint {}: new size={}, minimum={}",
+			fm,
+			newRequestBlockSize,
+			minimumRequestBlockSize );
+
 		if ( newRequestBlockSize < minimumRequestBlockSize ) {
 			return false;
 		}
@@ -583,6 +601,12 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	protected void switchToFullRetrievalMode( final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
+		log.info(
+			"Switching to FULL RETRIEVAL mode for endpoint {} (joinVars={}, batchSize={})",
+			fm,
+			varsInQuery,
+			requestBlockSize );
+
 		final NullaryExecutableOp reqOp = createExecutableReqOpForAll();
 		numberOfRequestOpsUsed++;
 

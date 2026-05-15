@@ -14,6 +14,8 @@ import java.util.function.Consumer;
 
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
@@ -101,6 +103,8 @@ public abstract class BaseForExecOpParallelBindJoin<
                                        RespType extends DataRetrievalResponse<?>>
            extends BaseForUnaryExecOpWithCollectedInput
 {
+	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpParallelBindJoin.class );
+
 	public final static int DEFAULT_BATCH_SIZE = 30;
 
 	protected final QueryType query;
@@ -232,6 +236,14 @@ public abstract class BaseForExecOpParallelBindJoin<
 		this.batchSize = batchSize;
 
 		this.allJoinVarsAreCertain = BaseForExecOpSequentialBindJoin.areAllJoinVarsAreCertain(varsInQuery, inputVars);
+
+		log.info(
+			"Initialized ParallelBindJoin operator for endpoint {} with batchSize={}, outerJoinSemantics={}, joinVars={}, allJoinVarsCertain={}",
+			fm,
+			batchSize,
+			useOuterJoinSemantics,
+			varsInQuery,
+			allJoinVarsAreCertain );
 	}
 
 	@Override
@@ -502,6 +514,8 @@ public abstract class BaseForExecOpParallelBindJoin<
 				recordException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e );
 				return;
 			}
+
+			log.info("Received response from endpoint {}, processing {} join results", fm, solmaps);
 
 			final long outputCount;
 			if ( useOuterJoinSemantics )

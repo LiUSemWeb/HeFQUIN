@@ -4,6 +4,8 @@ import java.util.Set;
 
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.syntax.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -30,6 +32,7 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 		extends BaseForExecOpSequentialBindJoinSPARQL
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER.class );
 	protected final Element pattern;
 
 	/**
@@ -86,10 +89,23 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 		super(query, fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
+
+		log.info(
+			"Initialized ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER for endpoint {} (patternType={}, batchSize={}, outerJoin={})",
+			fm,
+			pattern.getClass().getSimpleName(),
+			batchSize,
+			useOuterJoinSemantics );
 	}
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
+		log.info(
+			"Creating {}-based SPARQL bind-join request for {} bindings on endpoint {}",
+			useFilterBasedApproach ? "FILTER" : "VALUES",
+			solMaps.size(),
+			fm );
+
 		if ( useFilterBasedApproach ) {
 			return ExecOpSequentialBindJoinSPARQLwithFILTER.createExecutableReqOp(solMaps, pattern, fm, this.mayReduce);
 		}
@@ -102,6 +118,11 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 	                                                final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
+		log.info(
+			"Executing {}-based bind-join request (trialPhase={}, bindings={})",
+			useFilterBasedApproach ? "FILTER" : "VALUES",
+			trialPhase,
+			currentSolMapsForRequest.size() );
 		final NullaryExecutableOp reqOp = createExecutableReqOp(currentSolMapsForRequest);
 		final MyIntermediateResultElementSink mySink = createMySink();
 
@@ -115,8 +136,15 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 				throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
 			}
 
+			log.info(
+				"VALUES-based bind-join request failed for endpoint {}. Falling back to FILTER-based approach.",
+				fm,
+				e );
+
 			trialPhase = false;
 			useFilterBasedApproach = true;
+
+			log.info( "Switched bind-join strategy to FILTER-based requests for endpoint {}", fm );
 
 			statsOfLastReqOp = reqOp.getStats();
 			if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
@@ -132,6 +160,10 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 
 		statsOfLastReqOp = reqOp.getStats();
 		if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
+		log.info(
+			"Successfully executed {}-based bind-join request for endpoint {}",
+			useFilterBasedApproach ? "FILTER" : "VALUES",
+			fm );
 	}
 
 	@Override

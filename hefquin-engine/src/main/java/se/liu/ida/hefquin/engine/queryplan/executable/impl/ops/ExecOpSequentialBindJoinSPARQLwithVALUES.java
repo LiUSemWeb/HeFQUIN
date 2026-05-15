@@ -10,6 +10,8 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementData;
 import org.apache.jena.sparql.syntax.ElementGroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -33,6 +35,7 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 public class ExecOpSequentialBindJoinSPARQLwithVALUES
 		extends BaseForExecOpSequentialBindJoinSPARQL
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpSequentialBindJoinSPARQLwithVALUES.class );
 	protected final Element pattern;
 
 	/**
@@ -74,10 +77,18 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUES
 		super(query, fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
+
+		log.info(
+			"Initialized ExecOpSequentialBindJoinSPARQLwithVALUES for endpoint {} (patternType={}, batchSize={}, outerJoin={})",
+			fm,
+			pattern.getClass().getSimpleName(),
+			batchSize,
+			useOuterJoinSemantics );
 	}
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
+		log.info( "Creating SPARQL request with {} bindings for endpoint {}", solMaps.size(), fm );
 		return createExecutableReqOp(solMaps, pattern, fm, this.mayReduce);
 	}
 
@@ -92,6 +103,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUES
 	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
 	                                           final Element pattern ) {
 		// Create the VALUES clause.
+		log.info( "Creating VALUES clause for {} bindings", solMaps.size() );
 		final Element valuesClause = createValuesClause(solMaps);
 
 		// Combine the VALUES clause with the graph pattern of this operator.
@@ -113,6 +125,8 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUES
 				joinVars.add( it.next() );
 			}
 		}
+
+		log.info("Constructed VALUES clause with {} join variables and {} bindings", joinVars.size(), solMaps.size());
 
 		// Create the VALUES clause.
 		return new ElementData( new ArrayList<>(joinVars), new ArrayList<>(solMaps) );

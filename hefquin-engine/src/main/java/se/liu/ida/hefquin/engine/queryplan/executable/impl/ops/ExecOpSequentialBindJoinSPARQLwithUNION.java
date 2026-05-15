@@ -14,6 +14,8 @@ import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementUnion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -36,6 +38,7 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 public class ExecOpSequentialBindJoinSPARQLwithUNION
 		extends BaseForExecOpSequentialBindJoinSPARQL
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpSequentialBindJoinSPARQLwithUNION.class );
 	protected final Element pattern;
 
 	/**
@@ -77,10 +80,18 @@ public class ExecOpSequentialBindJoinSPARQLwithUNION
 		super(query, fm, inputVars, useOuterJoinSemantics, mayReduce, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
+
+		log.info(
+			"Initialized ExecOpSequentialBindJoinSPARQLwithUNION for endpoint {} (patternType={}, batchSize={}, outerJoin={})",
+			fm,
+			pattern.getClass().getSimpleName(),
+			batchSize,
+			useOuterJoinSemantics );
 	}
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
+		log.info( "Creating SPARQL request with {} bindings for endpoint {}", solMaps.size(), fm );
 		final SPARQLRequest request = createRequest(solMaps, pattern, varsInQuery);
 		return new ExecOpRequestSPARQL<>(request, fm, this.mayReduce, false, null);
 	}
@@ -88,7 +99,9 @@ public class ExecOpSequentialBindJoinSPARQLwithUNION
 	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
 	                                           final Element pattern,
 	                                           final Set<Var> varsInQuery ) {
+		log.info( "Building SPARQL UNION request for {} solution mappings", solMaps.size() );
 		final Element elmt = createUnion(solMaps, pattern, varsInQuery);
+		log.info( "Constructed SPARQL UNION request for {} bindings", solMaps.size() );
 		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(elmt) );
 	}
 
