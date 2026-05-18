@@ -1,10 +1,12 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
@@ -26,6 +28,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
@@ -541,6 +544,46 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpGPAdd resultGPAddOp = (LogicalOpGPAdd) result.getRootOperator();
 		assertTrue( resultGPAddOp.getFederationMember() == fm );
 		assertTrue( resultGPAddOp.getTP() == tp2 );
+	}
+
+	@Test
+	public void mergeProject() {
+		// two request operators under a JOIN, wrapped by a PROJECT operator
+		// and targeting the same federation member, should be merged into a
+		// single request operator with the projection pushed into the request
+
+		// setup
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final Var v3 = Var.alloc("z");
+
+		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v3);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, Set.of(v1,v3), false) );
+
+		final TriplePattern tp2 = new TriplePatternImpl(v2, v2, v3);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2, Set.of(v2), true) );
+
+		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+			false,
+			new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+			new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+			null );
+
+		// Project keeps y
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v3), false);
+		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, joinSubPlan);
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(projectPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
+
+		final SPARQLRequest resultReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) result.getRootOperator()).getRequest();
+		assertEquals( Set.of(v3), resultReq.getProjectionVars());
+		assertFalse( resultReq.getDistinctRequired() );
 	}
 
 	@Test
