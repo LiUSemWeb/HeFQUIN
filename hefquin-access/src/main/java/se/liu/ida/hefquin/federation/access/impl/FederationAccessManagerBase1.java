@@ -16,9 +16,12 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.SPARQLQueryImpl;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.CardinalityEstimationUnavailableError;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.FederationAccessStats;
@@ -54,8 +57,34 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected AtomicLong issuedCardRequestsTPF    = new AtomicLong( 0L );
 	protected AtomicLong issuedCardRequestsBRTPF  = new AtomicLong( 0L );
 
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+	public < ReqType extends DataRetrievalRequest,
+	         RespType extends DataRetrievalResponse<?>,
+	         MemberType extends FederationMember >
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+			final ReqType req,
+	        final MemberType fm )
+					throws FederationAccessException
+	{
+		final CompletableFuture<CardinalityResponse> response;
+		if (    req instanceof TPFRequest tpfReq
+		     && fm instanceof TPFServer tpfServer )
+			response = _issueCardinalityRequest(tpfReq, tpfServer);
+		else if (    req instanceof TPFRequest tpfReq
+		          && fm instanceof BRTPFServer brtpfServer )
+			response = _issueCardinalityRequest(tpfReq, brtpfServer);
+		else if (    req instanceof BRTPFRequest brtpfReq
+		          && fm instanceof BRTPFServer brtpfServer )
+			response = _issueCardinalityRequest(brtpfReq, brtpfServer);
+		else if (    req instanceof SPARQLRequest sparqlReq
+		          && fm instanceof SPARQLEndpoint sparqlEndpoint )
+			response = _issueCardinalityRequest(sparqlReq, sparqlEndpoint);
+		else
+			throw new IllegalStateException( "Unsupported request/federation member combination: " +
+			                                 req.getClass().getName() + "/" + fm.getClass().getName() );
+		return response;
+	}
+
+	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final SPARQLRequest req,
 			final SPARQLEndpoint fm )
 					throws FederationAccessException
@@ -89,8 +118,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		return ftr.thenApply( getFctToObtainCardinalityResponseFromSolMapsResponse() );
 	}
 
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final TPFRequest req,
 			final TPFServer fm )
 					throws FederationAccessException
@@ -99,8 +127,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
 
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final TPFRequest req,
 			final BRTPFServer fm )
 					throws FederationAccessException
@@ -109,8 +136,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
 
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final BRTPFRequest req,
 			final BRTPFServer fm )
 					throws FederationAccessException
