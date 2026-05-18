@@ -41,6 +41,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 
 /**
  * Pushes project operators as much as possible towards the leaf nodes
@@ -265,11 +267,27 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	} // end of Worker
 
 	/**
-	 * Pushing a project operator into request operator is not possible yet TODO #570
-	*/
+	 * Pushes a project operator into a request operator by creating a new
+	 * request with the projection variables from the project operator.
+	 *
+	 * The resulting request preserves the duplicate-elimination requirement
+	 * of the original request while replacing any existing request-level
+	 * projection with the variables required by the project operator.
+	 *
+	 * A new request operator containing the rewritten request is then returned
+	 * as a plan with a nullary root.
+	 */
 	protected LogicalPlan createPlanForRequestUnderProject( final LogicalOpProject projectOp,
 	                                                        final LogicalOpRequest<?,?> reqOp,
 	                                                        final LogicalPlan inputPlan ) {
+		if ( reqOp.getRequest() instanceof SPARQLRequest oldReq ) {
+			final Set<Var> newProj = new HashSet<>( projectOp.getVariables() );
+
+			final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getDistinctRequired() );
+
+			final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( reqOp.getFederationMember(), projectOp.mayReduce(), newReq );
+			return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
+		}
 		return inputPlan;
 	}
 
