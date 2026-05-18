@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
@@ -31,6 +34,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class UnaryExecutableOpBase extends BaseForExecOps implements UnaryExecutableOp
 {
+	private static final Logger log = LoggerFactory.getLogger( UnaryExecutableOpBaseWithoutBlocking.class );
 	private boolean executionConcluded = false;
 	private long numberOfInputMappingsProcessed = 0L;
 
@@ -46,6 +50,8 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	                           final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
+		log.info( "Processing solution mapping in {}.", getClass().getSimpleName() );
+
 		if ( collectExceptions ) {
 			try {
 				_process(inputSolMap, sink, execCxt);
@@ -59,6 +65,7 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 		}
 
 		numberOfInputMappingsProcessed++;
+		log.info( "Finished processing solution mapping in {}.", getClass().getSimpleName() );
 	}
 
 	@Override
@@ -67,6 +74,8 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	                           final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
+		log.info( "Processing batch of {} solution mappings in {}.", inputSolMaps.size(), getClass().getSimpleName() );
+
 		if ( collectExceptions ) {
 			try {
 				_process(inputSolMaps, sink, execCxt);
@@ -80,11 +89,14 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 		}
 
 		numberOfInputMappingsProcessed += inputSolMaps.size();
+		log.info( "Finished processing batch in {}.", getClass().getSimpleName() );
 	}
 
 	@Override
 	public final void concludeExecution( final IntermediateResultElementSink sink,
 	                                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		log.info( "Concluding execution for {}.", getClass().getSimpleName() );
+
 		if ( collectExceptions ) {
 			try {
 				_concludeExecution(sink, execCxt);
@@ -98,6 +110,8 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 		}
 
 		executionConcluded = true;
+
+		log.info( "Execution concluded for {}.", getClass().getSimpleName() );
 	}
 
 	/**

@@ -68,7 +68,6 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt )
 			throws ExecOpExecutionException {
-		log.info( "Executing lookup join (without param vars) against {}", fm );
 		if ( solmapsFromRequest == null ) {
 			solmapsFromRequest = performRequest(execCxt);
 		}

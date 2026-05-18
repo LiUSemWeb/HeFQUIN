@@ -67,12 +67,12 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 		// Add the given solution mapping to the current collection.
 		collectedInputSolMaps.add(inputSolMap);
 
-		log.info( "Processing collected batch of {} solution mappings.", collectedInputSolMaps.size() );
-
 		// If enough solution mappings have been collected, process them now
 		// and, afterwards, remove them from the collection.
 		if ( collectedInputSolMaps.size() == minimumCollectionSize ) {
+			log.info( "Processing collected batch of {} solution mappings in {}.", collectedInputSolMaps.size(), getClass().getSimpleName() );
 			_processCollectedInput(collectedInputSolMaps, sink, execCxt);
+			log.info( "Finished batch processing in {}.", getClass().getSimpleName() );
 			collectedInputSolMaps.clear();
 			numberOfCollectionsProcessed++;
 		}
@@ -91,8 +91,9 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 		// next collection to be processed.
 		if (    inputSolMaps.size() >= minimumCollectionSize
 		     && collectedInputSolMaps.isEmpty()  ) {
-			log.info( "Passing through batch of {} mappings directly.", inputSolMaps.size() );
+			log.info( "Passing through batch of {} mappings directly in {}.", inputSolMaps.size(), getClass().getSimpleName() );
 			_processCollectedInput(inputSolMaps, sink, execCxt);
+			log.info( "Finished batch processing in {}.", getClass().getSimpleName() );
 			numberOfCollectionsProcessed++;
 			return;
 		}
@@ -103,7 +104,9 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 		// If enough solution mappings have been collected, process them now
 		// and, afterwards, remove them from the collection.
 		if ( collectedInputSolMaps.size() >= minimumCollectionSize ) {
+			log.info( "Processing collected batch of {} solution mappings in {}.", collectedInputSolMaps.size(), getClass().getSimpleName() );
 			_processCollectedInput(collectedInputSolMaps, sink, execCxt);
+			log.info( "Finished batch processing in {}.", getClass().getSimpleName() );
 			collectedInputSolMaps.clear();
 			numberOfCollectionsProcessed++;
 		}
@@ -114,7 +117,7 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 	                                         final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		log.info( "Concluding execution with remaining batch size {}.", collectedInputSolMaps.size() );
+		log.info( "Concluding execution with remaining batch size {} in {}.", collectedInputSolMaps.size(), getClass().getSimpleName() );
 		_concludeExecution(collectedInputSolMaps, sink, execCxt);
 
 		if ( ! collectedInputSolMaps.isEmpty() ) {

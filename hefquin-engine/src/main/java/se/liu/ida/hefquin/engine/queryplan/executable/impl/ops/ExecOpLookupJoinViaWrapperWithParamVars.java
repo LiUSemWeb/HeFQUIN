@@ -119,11 +119,10 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 	@Override
 	protected void _processCollectedInput( final List<SolutionMapping> input,
-	                              final IntermediateResultElementSink sink,
-	                              final ExecutionContext execCxt )
+	                                       final IntermediateResultElementSink sink,
+	                                       final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		log.info( "Executing lookup join batch (with param vars) against {}", fm );
 		final Map<Map<String,Node>, List<SolutionMapping>> paramsForRequests = new HashMap<>();
 		for ( final SolutionMapping sm : input ) {
 			final Map<String,Node> paramValues = extractParamValues(sm);
@@ -201,7 +200,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		catch ( final ExecutionException e ) {
 			throw new ExecOpExecutionException("The execution of the futures that perform the requests and process the responses caused an exception.", e, this);
 		}
-		log.info( "Completed lookup join batch for {} (requests={})", fm, numberOfRequestsIssued );
+		log.debug( "Completed lookup join batch for {} (requests={})", fm, numberOfRequestsIssued );
 	}
 
 	@Override
