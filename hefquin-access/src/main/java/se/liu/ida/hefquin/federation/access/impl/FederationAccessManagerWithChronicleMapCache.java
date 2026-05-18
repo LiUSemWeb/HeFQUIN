@@ -13,8 +13,10 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyFactory;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyLRU;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
@@ -26,9 +28,6 @@ import se.liu.ida.hefquin.federation.access.impl.cache.CardinalityCacheEntryFact
 import se.liu.ida.hefquin.federation.access.impl.cache.CardinalityCacheKey;
 import se.liu.ida.hefquin.federation.access.impl.cache.ChronicleMapCardinalityCache;
 import se.liu.ida.hefquin.federation.access.impl.response.CachedCardinalityResponseImpl;
-import se.liu.ida.hefquin.federation.members.BRTPFServer;
-import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
  * A FederationAccessManager implementation that incorporates persistent disk
@@ -57,7 +56,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		this( fedAccMan,
 		      cacheCapacity,
 		      new MyDefaultCachePolicies(),
-		      new MyDefaultCardinalityCachePolicies( timeToLive ) );
+		      new MyDefaultCardinalityCachePolicies(timeToLive) );
 	}
 
 	/**
@@ -65,114 +64,44 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 */
 	public FederationAccessManagerWithChronicleMapCache( final ExecutorService execService ) throws IOException
 	{
-		this( new AsyncFederationAccessManagerImpl( execService ),
+		this( new AsyncFederationAccessManagerImpl(execService),
 		      defaultCacheCapacity,
 		      new MyDefaultCachePolicies(),
 		      new MyDefaultCardinalityCachePolicies() );
 	}
-	
+
 	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final SPARQLRequest req,
-	                                                                       final SPARQLEndpoint fm )
-			throws FederationAccessException
+	public < ReqType extends DataRetrievalRequest,
+	         RespType extends DataRetrievalResponse<?>,
+	         MemberType extends FederationMember >
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+			final ReqType req,
+			final MemberType fm )
+					throws FederationAccessException
 	{
-		final CardinalityCacheKey key = new CardinalityCacheKey( req, fm );
+		final CardinalityCacheKey key = new CardinalityCacheKey(req, fm);
 		final Date requestStartTime = new Date();
-		final CardinalityCacheEntry cachedEntry = cardinalityCache.get( key );
+		final CardinalityCacheEntry cachedEntry = cardinalityCache.get(key);
 		final Date requestEndTime = new Date();
+
 		if ( cachedEntry != null ) {
-			cacheHitsSPARQLCardinality++;
+			// update the statistics
+			if ( req instanceof TPFRequest )
+				cacheHitsTPFCardinality++;
+			else if ( req instanceof BRTPFRequest )
+				cacheHitsBRTPFCardinality++;
+			else if ( req instanceof SPARQLRequest )
+				cacheHitsSPARQLCardinality++;
+			else
+				cacheHitsOther++;
+
 			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
 			                                                                  requestStartTime,
 			                                                                  requestEndTime );
-			return CompletableFuture.completedFuture( cr );
+			return CompletableFuture.completedFuture(cr);
 		}
 
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
-		newResponse.thenAccept( value -> {
-			try {
-				cardinalityCache.put( key, value.getCardinality() );
-			} catch ( UnsupportedOperationDueToRetrievalError e ) {
-				// intentionally ignored
-			}
-		} );
-		return newResponse;
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final TPFRequest req,
-	                                                                       final TPFServer fm )
-			throws FederationAccessException
-	{
-		final CardinalityCacheKey key = new CardinalityCacheKey( req, fm );
-		final Date requestStartTime = new Date();
-		final CardinalityCacheEntry cachedEntry = cardinalityCache.get( key );
-		final Date requestEndTime = new Date();
-		if ( cachedEntry != null ) {
-			cacheHitsTPFCardinality++;
-			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
-			                                                                  requestStartTime,
-			                                                                  requestEndTime );
-			return CompletableFuture.completedFuture( cr );
-		}
-
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
-		newResponse.thenAccept( value -> {
-			try {
-				cardinalityCache.put( key, value.getCardinality() );
-			} catch ( UnsupportedOperationDueToRetrievalError e ) {
-				// intentionally ignored
-			}
-		} );
-		return newResponse;
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final TPFRequest req,
-	                                                                       final BRTPFServer fm )
-			throws FederationAccessException
-	{
-		final CardinalityCacheKey key = new CardinalityCacheKey( req, fm );
-		final Date requestStartTime = new Date();
-		final CardinalityCacheEntry cachedEntry = cardinalityCache.get( key );
-		final Date requestEndTime = new Date();
-		if ( cachedEntry != null ) {
-			cacheHitsTPFCardinality++;
-			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
-			                                                                  requestStartTime,
-			                                                                  requestEndTime );
-			return CompletableFuture.completedFuture( cr );
-		}
-
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
-		newResponse.thenAccept( value -> {
-			try {
-				cardinalityCache.put( key, value.getCardinality() );
-			} catch ( UnsupportedOperationDueToRetrievalError e ) {
-				// intentionally ignored
-			}
-		} );
-		return newResponse;
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final BRTPFRequest req,
-	                                                                       final BRTPFServer fm )
-			throws FederationAccessException
-	{
-		final CardinalityCacheKey key = new CardinalityCacheKey( req, fm );
-		final Date requestStartTime = new Date();
-		final CardinalityCacheEntry cachedEntry = cardinalityCache.get( key );
-		final Date requestEndTime = new Date();
-		if ( cachedEntry != null ) {
-			cacheHitsTPFCardinality++;
-			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
-			                                                                  requestStartTime,
-			                                                                  requestEndTime );
-			return CompletableFuture.completedFuture( cr );
-		}
-
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
+		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
 		newResponse.thenAccept( value -> {
 			try {
 				cardinalityCache.put( key, value.getCardinality() );
