@@ -173,7 +173,11 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				return new CardinalityResponseImplWithoutCardinality(e, smResp);
 			}
 
-			return new CardinalityResponseImpl(smResp, cardinality);
+			return new CardinalityResponseImpl( cardinality,
+			                                    smResp.getRequestStartTime(),
+			                                    smResp.getRetrievalEndTime(),
+			                                    smResp.getErrorStatusCode(),
+			                                    smResp.getErrorDescription() );
 		}
 
 		protected Integer extractCardinality( final SolMapsResponse smResp ) throws UnsupportedOperationDueToRetrievalError {
@@ -203,8 +207,11 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 
 			final Integer cardinality = tpfResp.getCardinalityEstimate();
 			if ( cardinality != null ) {
-				final int c = cardinality;
-				return new CardinalityResponseImpl(tpfResp, c);
+				return new CardinalityResponseImpl( cardinality,
+				                                    tpfResp.getRequestStartTime(),
+				                                    tpfResp.getRetrievalEndTime(),
+				                                    tpfResp.getErrorStatusCode(),
+				                                    tpfResp.getErrorDescription() );
 			}
 			else {
 				final CardinalityEstimationUnavailableError e = new CardinalityEstimationUnavailableError(
