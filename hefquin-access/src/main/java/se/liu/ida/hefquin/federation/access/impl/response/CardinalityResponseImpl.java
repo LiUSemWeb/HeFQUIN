@@ -1,115 +1,71 @@
 package se.liu.ida.hefquin.federation.access.impl.response;
 
-import java.time.Duration;
 import java.util.Date;
 
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
-import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
-public class CardinalityResponseImpl implements CardinalityResponse
+public class CardinalityResponseImpl extends DataRetrievalResponseBase<Integer> implements CardinalityResponse
 {
-	protected final DataRetrievalResponse<?> wrappedResponse;
-	protected final int cardinality;
-
 	/**
-	 * Constructs a cardinality response that wraps the given data
-	 * retrieval response and associates it with a cardinality value.
+	 * Constructs a response with the given cardinality and request start
+	 * time. The retrieval end time is automatically set to the current
+	 * time at the moment of construction. This constructor assumes no
+	 * error occurred.
 	 *
-	 * @param wrappedResponse the wrapped data retrieval response (must not be null)
-	 * @param cardinality     the cardinality of the request
+	 * @param cardinality      the data contained in this response (must not be {@code null})
+	 * @param requestStartTime the time at which the request was initiated (must not be {@code null})
 	 */
-	public CardinalityResponseImpl( final DataRetrievalResponse<?> wrappedResponse,
-	                                final int cardinality ) {
-		assert wrappedResponse != null;
-
-		this.wrappedResponse = wrappedResponse;
-		this.cardinality = cardinality;
+	public CardinalityResponseImpl( final int cardinality,
+	                                final Date requestStartTime ) {
+		super(cardinality, requestStartTime);
 	}
 
 	/**
-	 * Returns the original data retrieval response that this object wraps.
+	 * Constructs a response with the given cardinality, request start time,
+	 * and request end time. This constructor assumes no error occurred.
 	 *
-	 * @return the wrapped {@link DataRetrievalResponse} instance
+	 * @param cardinality      the data contained in this response (must not be {@code null})
+	 * @param requestStartTime the time at which the request was initiated (must not be {@code null})
+	 * @param retrievalEndTime the time at which the retrieval of this response was completed (must not be {@code null})
 	 */
-	public DataRetrievalResponse<?> getWrappedResponse() {
-		return wrappedResponse;
+	public CardinalityResponseImpl( final int cardinality,
+	                                final Date requestStartTime,
+	                                final Date retrievalEndTime ) {
+		super(cardinality, requestStartTime, retrievalEndTime);
 	}
 
 	/**
-	 * Returns the timestamp indicating when the original request was initiated.
+	 * Constructs a response with the given cardinality, request start time,
+	 * and error details. The retrieval end time is automatically set to the
+	 * current time at the moment of construction.
 	 *
-	 * @return the request start time
+	 * @param cardinality      the data contained in this response (must not be {@code null})
+	 * @param requestStartTime the time at which the request was initiated (must not be {@code null})
+	 * @param errorStatusCode  the HTTP status code representing an error, or {@code null} if no error occurred
+	 * @param errorDescription a short description of the error, or {@code null} if no error occurred
 	 */
-	@Override
-	public Date getRequestStartTime() {
-		return wrappedResponse.getRequestStartTime();
+	public CardinalityResponseImpl( final int cardinality,
+	                                final Date requestStartTime,
+	                                final Integer errorStatusCode,
+	                                final String errorDescription ) {
+		super(cardinality, requestStartTime, errorStatusCode, errorDescription);
 	}
 
 	/**
-	 * Returns the timestamp indicating when the retrieval of the wrapped response completed.
+	 * Constructs a response with the given cardinality, request start time,
+	 * retrieval end time, and error details.
 	 *
-	 * @return the retrieval end time
+	 * @param cardinality      the data contained in this response (must not be {@code null})
+	 * @param requestStartTime the time at which the request was initiated (must not be {@code null})
+	 * @param retrievalEndTime the time at which the retrieval of this response was completed (must not be {@code null})
+	 * @param errorStatusCode  the HTTP status code representing an error, or {@code null} if no error occurred
+	 * @param errorDescription a short description of the error, or {@code null} if no error occurred
 	 */
-	@Override
-	public Date getRetrievalEndTime() {
-		return wrappedResponse.getRetrievalEndTime();
-	}
-
-	/**
-	 * Returns the duration between the request start and the retrieval end time, as reported by the wrapped response.
-	 *
-	 * @return the total duration of the request
-	 */
-	@Override
-	public Duration getRequestDuration() {
-		return wrappedResponse.getRequestDuration();
-	}
-
-	/**
-	 * Indicates whether an error occurred during data retrieval, based on the wrapped response.
-	 *
-	 * @return {@code true} if an error occurred. otherwise {@code false}
-	 */
-	@Override
-	public boolean isError() {
-		return wrappedResponse.getErrorStatusCode() != null;
-	}
-
-	/**
-	 * Returns the error status code from the wrapped response, if any.
-	 *
-	 * @return the HTTP status code representing the error, or {@code null} if no error occurred
-	 */
-	@Override
-	public Integer getErrorStatusCode() {
-		return wrappedResponse.getErrorStatusCode();
-	}
-
-	/**
-	 * Returns a short description of the error from the wrapped response, if available.
-	 *
-	 * @return the error description, or {@code null} if no error occurred
-	 */
-	@Override
-	public String getErrorDescription() {
-		return wrappedResponse.getErrorDescription();
-	}
-
-	/**
-	 * Returns the cardinality value as the response data. If the wrapped response indicates an error, this method
-	 * throws an exception instead of returning a value.
-	 *
-	 * @return the cardinality value
-	 * @throws UnsupportedOperationDueToRetrievalError if the wrapped response indicates an error
-	 */
-	@Override
-	public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
-		if ( wrappedResponse.isError() ) {
-			throw new UnsupportedOperationDueToRetrievalError(
-					getErrorStatusCode(),
-					getErrorDescription() );
-		}
-		return cardinality;
+	public CardinalityResponseImpl( final int cardinality,
+	                                final Date requestStartTime,
+	                                final Date retrievalEndTime,
+	                                final Integer errorStatusCode,
+	                                final String errorDescription ) {
+		super(cardinality, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription);
 	}
 }

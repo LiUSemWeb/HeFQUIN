@@ -131,67 +131,27 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	}
 
 	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final SPARQLRequest req, final SPARQLEndpoint fm)
-			throws FederationAccessException 
+	public < ReqType extends DataRetrievalRequest,
+	         RespType extends DataRetrievalResponse<?>,
+	         MemberType extends FederationMember >
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+			final ReqType req,
+			final MemberType fm )
+					throws FederationAccessException
 	{
 		final Key key = new Key(req, fm);
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
-			cacheHitsSPARQLCardinality++;
-			@SuppressWarnings("unchecked")
-			final CompletableFuture<CardinalityResponse> cachedResponse2 = (CompletableFuture<CardinalityResponse>) cachedResponse;
-			return cachedResponse2;
-		}
+			// update the statistics
+			if ( req instanceof TPFRequest )
+				cacheHitsTPFCardinality++;
+			else if ( req instanceof BRTPFRequest )
+				cacheHitsBRTPFCardinality++;
+			else if ( req instanceof SPARQLRequest )
+				cacheHitsSPARQLCardinality++;
+			else
+				cacheHitsOther++;
 
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
-		cache.put(key, newResponse);
-		return newResponse;
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final TPFRequest req, final TPFServer fm)
-			throws FederationAccessException 
-	{
-		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
-		if ( cachedResponse != null ) {
-			cacheHitsTPFCardinality++;
-			@SuppressWarnings("unchecked")
-			final CompletableFuture<CardinalityResponse> cachedResponse2 = (CompletableFuture<CardinalityResponse>) cachedResponse;
-			return cachedResponse2;
-		}
-
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
-		cache.put(key, newResponse);
-		return newResponse;
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final TPFRequest req, final BRTPFServer fm)
-			throws FederationAccessException 
-	{
-		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
-		if ( cachedResponse != null ) {
-			cacheHitsTPFCardinality++;
-			@SuppressWarnings("unchecked")
-			final CompletableFuture<CardinalityResponse> cachedResponse2 = (CompletableFuture<CardinalityResponse>) cachedResponse;
-			return cachedResponse2;
-		}
-
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
-		cache.put(key, newResponse);
-		return newResponse;
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final BRTPFRequest req, final BRTPFServer fm)
-			throws FederationAccessException 
-	{
-		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
-		if ( cachedResponse != null ) {
-			cacheHitsBRTPFCardinality++;
 			@SuppressWarnings("unchecked")
 			final CompletableFuture<CardinalityResponse> cachedResponse2 = (CompletableFuture<CardinalityResponse>) cachedResponse;
 			return cachedResponse2;
