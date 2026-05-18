@@ -37,7 +37,6 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
-		log.info( "Processing solution mapping in ExecOpDuplicateRemoval." );
 		if ( distinctSolMaps.add(inputSolMap) ) {
 			sink.send(inputSolMap);
 			numberOfOutputMappingsProduced++;
@@ -48,12 +47,6 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
-		log.info(
-			"Distinct operator finishing. Produced={}, duplicates={}, uniqueSize={}.",
-			numberOfOutputMappingsProduced,
-			numberOfDuplicates,
-			distinctSolMaps.size() );
-
 		distinctSolMaps.clear();
 	}
 

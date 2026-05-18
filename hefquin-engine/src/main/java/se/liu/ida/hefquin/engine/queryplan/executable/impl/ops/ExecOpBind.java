@@ -71,9 +71,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt )
 			 throws ExecOpExecutionException {
-		log.info( "Processing solution mapping in ExecOpBind." );
 		sink.send( worker.extend(inputSolMap) );
-		log.info( "Produced extended solution mapping." );
 		numberOfOutputMappingsProduced++;
 	}
 
@@ -84,7 +82,6 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	                         final ExecutionContext execCxt )
 		 throws ExecOpExecutionException
 	{
-		log.info( "Processing batch of solution mappings with max batch size {}.", maxBatchSize );
 		final List<SolutionMapping> output = new ArrayList<>();
 
 		// Produce the output solution mappings
@@ -98,7 +95,6 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 		}
 
 		numberOfOutputMappingsProduced += output.size();
-		log.info( "Produced {} output solution mappings in batch.", output.size() );
 		sink.send(output);
 	}
 
@@ -106,7 +102,6 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
 		// nothing to be done here
-		log.info( "ExecOpBind execution concluded. Produced {} output mappings.", numberOfOutputMappingsProduced );
 	}
 
 	@Override
@@ -144,7 +139,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 			final Binding sm = solmap.asJenaBinding();
 
 			if ( sm.contains(var) ) {
-				log.info( "Cannot bind variable {} because it is already bound.", var );
+				log.debug( "Cannot bind variable {} because it is already bound.", var );
 				throwExecOpExecutionException( "Variable '" + var.getVarName() + "' already bound in the given solution mapping." );
 			}
 

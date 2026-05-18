@@ -54,14 +54,12 @@ public class ExecOpHashJoin2 extends BaseForExecOpHashJoin
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Adding solution mapping to hash join index." );
 		index.add(inputSolMap);
 	}
 
 	@Override
 	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
 	                                 final ExecutionContext execCxt ) {
-		log.info( "Completed build phase for hash join index." );
 		this.child2InputComplete = true;
 	}
 
@@ -72,8 +70,6 @@ public class ExecOpHashJoin2 extends BaseForExecOpHashJoin
 		if ( child2InputComplete == false ) {
 			throw new IllegalStateException();
 		}
-
-		log.info( "Processing probe-side solution mapping." );
 
 		final List<SolutionMapping> output = new ArrayList<>();
 		produceOutput(inputSolMap, output);
@@ -89,8 +85,6 @@ public class ExecOpHashJoin2 extends BaseForExecOpHashJoin
 			throw new IllegalStateException();
 		}
 
-		log.info( "Processing batch of {} probe-side solution mappings.", inputSolMaps.size() );
-
 		final List<SolutionMapping> output = new ArrayList<>();
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
 			produceOutput(inputSolMap, output);
@@ -102,13 +96,11 @@ public class ExecOpHashJoin2 extends BaseForExecOpHashJoin
 	@Override
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
 	                                 final ExecutionContext execCxt ) {
-		log.info( "Hash join execution completed. Clearing index." );
 		child1InputComplete = true;
 
 		// clear the index to enable the GC to release memory early,
 		// but make sure we keep the final stats of the index
 		statsOfIndex = index.getStats();
-		log.info( "Final index statistics: {}.", statsOfIndex );
 		index.clear();
 	}
 

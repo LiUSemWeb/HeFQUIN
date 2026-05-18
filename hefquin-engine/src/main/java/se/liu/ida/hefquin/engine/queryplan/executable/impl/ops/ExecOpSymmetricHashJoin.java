@@ -119,14 +119,11 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing solution mapping from child 1." );
-
 		buffer.clear();
 
 		_processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
 
 		numberOfOutputMappingsProduced += buffer.size();
-		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -136,8 +133,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing batch of {} solution mappings from child 1.", inputSolMaps.size() );
-
 		buffer.clear();
 
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
@@ -145,7 +140,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		}
 
 		numberOfOutputMappingsProduced += buffer.size();
-		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -166,14 +160,11 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing solution mapping from child 2." );
-
 		buffer.clear();
 
 		_processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
 
 		numberOfOutputMappingsProduced += buffer.size();
-		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -183,8 +174,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing batch of {} solution mappings from child 2.", inputSolMaps.size() );
-
 		buffer.clear();
 
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
@@ -192,7 +181,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		}
 
 		numberOfOutputMappingsProduced += buffer.size();
-		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -201,7 +189,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
 	                                 final ExecutionContext execCxt ) {
-		log.info( "Completed input processing for child 2." );
 		child2InputComplete = true;
 
 		if ( child1InputComplete ) {

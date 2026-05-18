@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -29,6 +32,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class BinaryExecutableOpBase extends BaseForExecOps implements BinaryExecutableOp
 {
+	private static final Logger log = LoggerFactory.getLogger( BinaryExecutableOpBase.class );
+
 	private boolean leftInputConsumed           = false;
 	private boolean rightInputConsumed          = false;
 
@@ -56,6 +61,8 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
+		log.info( "Processing input solution mapping from child1 in {}.", getClass().getSimpleName() );
+
 		timeAtCurrentLeftProcStart = System.currentTimeMillis();
 
 		if ( collectExceptions ) {
@@ -85,6 +92,8 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
+		log.info( "Processing batch of {} solution mappings from child1 in {}.", inputSolMaps.size(), getClass().getSimpleName() );
+
 		if ( collectExceptions ) {
 			try {
 				_processInputFromChild1(inputSolMaps, sink, execCxt);
@@ -103,6 +112,7 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	@Override
 	public final void wrapUpForChild1( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		log.info( "Finished processing child1 input in {}.", getClass().getSimpleName() );
 		leftInputConsumed = true;
 		_wrapUpForChild1(sink, execCxt);
 	}
@@ -113,6 +123,8 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
+		log.info( "Processing input solution mapping from child2 in {}.", getClass().getSimpleName() );
+
 		timeAtCurrentRightProcStart = System.currentTimeMillis();
 
 		if ( collectExceptions ) {
@@ -142,6 +154,8 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
+		log.info( "Processing batch of {} solution mappings from child2 in {}.", inputSolMaps.size(), getClass().getSimpleName() );
+
 		if ( collectExceptions ) {
 			try {
 				_processInputFromChild2(inputSolMaps, sink, execCxt);
@@ -160,6 +174,7 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	@Override
 	public final void wrapUpForChild2( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		log.info( "Finished processing child2 input in {}.", getClass().getSimpleName() );
 		rightInputConsumed = true;
 		_wrapUpForChild2(sink, execCxt);
 	}
