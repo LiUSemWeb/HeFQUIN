@@ -1,6 +1,4 @@
 # HeFQUIN
-$${\color{red}\text{We are planning to create the next release on May 18 or 19, 2026.}}$$
----
 HeFQUIN is a **query federation engine for heterogeneous federations of graph data sources (e.g, federated knowledge graphs)** that is currently under development by [the Semantic Web research group at Linköping University](https://www.ida.liu.se/research/semanticweb/).
 
 For detailed information about HeFQUIN, refer to the **Website at [https://liusemweb.github.io/HeFQUIN/](https://liusemweb.github.io/HeFQUIN/)**, where you can find
