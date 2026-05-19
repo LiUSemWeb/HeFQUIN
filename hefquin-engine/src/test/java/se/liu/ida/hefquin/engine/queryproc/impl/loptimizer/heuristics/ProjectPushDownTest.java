@@ -70,7 +70,7 @@ public class ProjectPushDownTest extends EngineTestBase
 			new SPARQLRequestImpl(tp1) );
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
-		// Project keeps z
+		// Project keeps y
 		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, reqPlan);
 
@@ -600,10 +600,10 @@ public class ProjectPushDownTest extends EngineTestBase
 		assertTrue( result.getRootOperator() instanceof LogicalOpBind );
 
 		final LogicalPlan subResult = result.getSubPlan(0);
-		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest );
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpProject );
 
-		final SPARQLRequest subResultReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) subResult.getRootOperator()).getRequest();
-		assertEquals( Set.of(v1), subResultReq.getProjectionVars() );
+		final LogicalOpProject resultProj1 = (LogicalOpProject) subResult.getRootOperator();
+		assertEquals( Set.of(v1), resultProj1.getVariables() );
 	}
 
 	@Test
