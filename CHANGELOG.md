@@ -7,6 +7,13 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
+- nothing yet
+### Changed
+- nothing yet
+
+
+## [0.0.11] - 2026-05-19
+### Added
 - Adding a limit on the number of parallel requests that are executed against any particular endpoint/server at any point in time ([#556](https://github.com/LiUSemWeb/HeFQUIN/pull/556)).
 - Support for MINUS directly within the HeFQUIN engine ([#586](https://github.com/LiUSemWeb/HeFQUIN/pull/586), [#587](https://github.com/LiUSemWeb/HeFQUIN/pull/587), [#592](https://github.com/LiUSemWeb/HeFQUIN/pull/592)).
 - Support for DISTINCT directly within the HeFQUIN engine ([#547](https://github.com/LiUSemWeb/HeFQUIN/pull/547), [#550](https://github.com/LiUSemWeb/HeFQUIN/pull/550), [#555](https://github.com/LiUSemWeb/HeFQUIN/pull/555), [#558](https://github.com/LiUSemWeb/HeFQUIN/pull/558)).
@@ -29,6 +36,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Removes deprecated federation access manager ([#626](https://github.com/LiUSemWeb/HeFQUIN/pull/627)).
 - Changes some of the example queries to use the QLever SPARQL endpoints for DBpedia and Wikidata ([#620](https://github.com/LiUSemWeb/HeFQUIN/pull/620), [#621](https://github.com/LiUSemWeb/HeFQUIN/pull/621), [#622](https://github.com/LiUSemWeb/HeFQUIN/pull/622)).
 - Logging for executable operators ([#608](https://github.com/LiUSemWeb/HeFQUIN/pull/608), [#609](https://github.com/LiUSemWeb/HeFQUIN/pull/609), [#614](https://github.com/LiUSemWeb/HeFQUIN/pull/614), [#617](https://github.com/LiUSemWeb/HeFQUIN/pull/617), [#618](https://github.com/LiUSemWeb/HeFQUIN/pull/618), [#619](https://github.com/LiUSemWeb/HeFQUIN/pull/619), [#624](https://github.com/LiUSemWeb/HeFQUIN/pull/624), [#625](https://github.com/LiUSemWeb/HeFQUIN/pull/625)).
+### Planned for Next Release
+- CLI program to issue queries to the HeFQUIN service ([#606](https://github.com/LiUSemWeb/HeFQUIN/issues/606)).
+- Persistent cache for requests ([#546](https://github.com/LiUSemWeb/HeFQUIN/issues/546), [#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590), [#599](https://github.com/LiUSemWeb/HeFQUIN/issues/599)).
+- Pushing projection variables and distinct into requests to SPARQL endpoints ([#570](https://github.com/LiUSemWeb/HeFQUIN/issues/570)).
+- SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
+
 
 
 ## [0.0.10] - 2026-03-25
