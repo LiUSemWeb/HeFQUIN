@@ -750,17 +750,16 @@ public class ProjectPushDownTest extends EngineTestBase
 		assertTrue( result.getRootOperator() instanceof LogicalOpUnfold );
 
 		final LogicalPlan subResult = result.getSubPlan(0);
-		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest );
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpProject );
 
-		final SPARQLRequest subResultReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) subResult.getRootOperator()).getRequest();
-		assertEquals( Set.of(v1), subResultReq.getProjectionVars() );
+		final LogicalOpProject resultProj1 = (LogicalOpProject) subResult.getRootOperator();
+		assertEquals( Set.of(v1), resultProj1.getVariables() );
 	}
 
 	@Test
 	public void pushProjectUnderL2g() {
 		// A project on top of an l2g operator with a TPF request underneath
-		// The project and l2g operator are expected to swap places and the
-		// project is subsequently pushed into the request.
+		// The project and l2g operator are expected to swap places.
 
 		// set up
 		// - request operator
@@ -785,7 +784,10 @@ public class ProjectPushDownTest extends EngineTestBase
 		assertTrue( result.getRootOperator() instanceof LogicalOpLocalToGlobal );
 
 		final LogicalPlan subResult = result.getSubPlan(0);
-		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest );
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpProject );
+
+		final LogicalPlan subsubResult = subResult.getSubPlan(0);
+		assertTrue( subsubResult.getRootOperator() instanceof LogicalOpRequest );
 	}
 
 	@Test
@@ -865,10 +867,13 @@ public class ProjectPushDownTest extends EngineTestBase
 		assertTrue( subResult.getRootOperator() instanceof LogicalOpGPAdd );
 
 		final LogicalPlan subsubResult = subResult.getSubPlan(0);
-		assertTrue( subsubResult.getRootOperator() instanceof LogicalOpRequest );
+		assertTrue( subsubResult.getRootOperator() instanceof LogicalOpProject );
 
-		final SPARQLRequest subsubResultReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) subsubResult.getRootOperator()).getRequest();
-		assertEquals( Set.of(v1,v2), subsubResultReq.getProjectionVars() );
+		final LogicalOpProject resultProj2 = (LogicalOpProject) subsubResult.getRootOperator();
+		assertEquals( Set.of(v1,v2), resultProj2.getVariables() );
+
+		final LogicalPlan subsubsubResult = subsubResult.getSubPlan(0);
+		assertTrue( subsubsubResult.getRootOperator() instanceof LogicalOpRequest );
 	}
 
 	@Test
@@ -899,10 +904,13 @@ public class ProjectPushDownTest extends EngineTestBase
 		assertTrue( result.getRootOperator() instanceof LogicalOpGPAdd );
 
 		final LogicalPlan subResult = result.getSubPlan(0);
-		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest );
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpProject );
 
-		final SPARQLRequest subResultReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) subResult.getRootOperator()).getRequest();
-		assertEquals( Set.of(v1), subResultReq.getProjectionVars() );
+		final LogicalOpProject resultProj1 = (LogicalOpProject) subResult.getRootOperator();
+		assertEquals( Set.of(v1), resultProj1.getVariables() );
+
+		final LogicalPlan subsubResult = subResult.getSubPlan(0);
+		assertTrue( subsubResult.getRootOperator() instanceof LogicalOpRequest );
 	}
 
 	@Test
