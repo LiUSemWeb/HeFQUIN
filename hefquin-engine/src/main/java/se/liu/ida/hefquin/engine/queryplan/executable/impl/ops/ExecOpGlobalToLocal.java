@@ -41,7 +41,6 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
-		log.info( "Processing solution mapping in ExecOpGlobalToLocal." );
 		final Set<SolutionMapping> output = vm.translateSolutionMappingFromGlobal(inputSolMap);
 		numberOfOutputMappingsProduced += output.size();
 		sink.send(output);
@@ -52,7 +51,6 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 	                         final int maxBatchSize,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
-		log.info( "Processing batch of up to {} solution mappings (GlobalToLocal).", maxBatchSize );
 		final List<SolutionMapping> output = new ArrayList<>();
 
 		// Produce the output solution mappings
@@ -66,18 +64,12 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 
 		numberOfOutputMappingsProduced += output.size();
 		sink.send(output);
-
-		log.info(
-			"Batch translated: {} output mappings produced from {} input mappings.",
-			output.size(),
-			cnt );
 	}
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
 		// nothing to be done here
-		log.info( "ExecOpGlobalToLocal concluded execution." );
 	}
 
 	@Override

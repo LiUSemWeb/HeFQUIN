@@ -119,14 +119,11 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing solution mapping from child 1." );
-
 		buffer.clear();
 
 		_processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
 
 		numberOfOutputMappingsProduced += buffer.size();
-		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -136,8 +133,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing batch of {} solution mappings from child 1.", inputSolMaps.size() );
-
 		buffer.clear();
 
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
@@ -145,7 +140,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		}
 
 		numberOfOutputMappingsProduced += buffer.size();
-		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -154,7 +148,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
 									 final ExecutionContext execCxt ) {
-		log.info( "Completed input processing for child 1." );
 		child1InputComplete = true;
 
 		if ( child2InputComplete ) {
@@ -166,14 +159,11 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing solution mapping from child 2." );
-
 		buffer.clear();
 
 		_processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
 
 		numberOfOutputMappingsProduced += buffer.size();
-		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -183,8 +173,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing batch of {} solution mappings from child 2.", inputSolMaps.size() );
-
 		buffer.clear();
 
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
@@ -192,7 +180,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		}
 
 		numberOfOutputMappingsProduced += buffer.size();
-		log.info( "Produced {} joined solution mappings.", buffer.size() );
 		sink.send(buffer);
 
 		buffer.clear();
@@ -201,7 +188,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
 	                                 final ExecutionContext execCxt ) {
-		log.info( "Completed input processing for child 2." );
 		child2InputComplete = true;
 
 		if ( child1InputComplete ) {
@@ -212,12 +198,12 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void wrapUp() {
 		// clear both indexes to enable the GC to release memory early,
 		// but make sure we keep the final stats of the indexes
-		log.info( "Symmetric hash join execution completed. Clearing indexes." );
+		log.debug( "Symmetric hash join execution completed. Clearing indexes." );
 
 		statsOfIndexForChild1 = indexForChild1.getStats();
 		statsOfIndexForChild2 = indexForChild2.getStats();
-		log.info( "Final index statistics for child 1: {}.", statsOfIndexForChild1 );
-		log.info( "Final index statistics for child 2: {}.", statsOfIndexForChild2 );
+		log.debug( "Final index statistics for child 1: {}.", statsOfIndexForChild1 );
+		log.debug( "Final index statistics for child 2: {}.", statsOfIndexForChild2 );
 
 		indexForChild1.clear();
 		indexForChild2.clear();

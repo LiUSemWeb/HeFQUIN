@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
@@ -28,6 +31,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class NaryExecutableOpBase extends BaseForExecOps implements NaryExecutableOp
 {
+	private static final Logger log = LoggerFactory.getLogger( ExecOpMultiwayUnion.class );
+
 	protected final int numberOfChildren;
 
 	private boolean[] xthInputConsumed;
@@ -65,6 +70,8 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 		assert x >= 0;
 		assert x < numberOfChildren;
 
+		log.info( "Processing solution mapping from child{} in {}.", x, getClass().getSimpleName() );
+
 		timeAtCurrentProcStartXthInput[x] = System.currentTimeMillis();
 
 		if ( collectExceptions ) {
@@ -86,6 +93,8 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 		if ( processingTime > maxProcessingTimeXthInput[x] ) { maxProcessingTimeXthInput[x] = processingTime; }
 
 		numberOfMappingsFromXthInputProcessed[x]++;
+
+		log.info( "Finished processing solution mapping from child{} in {}.", x, getClass().getSimpleName() );
 	}
 
 	@Override
@@ -97,6 +106,8 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	{
 		assert x >= 0;
 		assert x < numberOfChildren;
+
+		log.info( "Processing batch of {} solution mappings from child{} in {}.", inputSolMaps.size(), x, getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
 			try {
@@ -111,6 +122,8 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 		}
 
 		numberOfMappingsFromXthInputProcessed[x] += inputSolMaps.size();
+
+		log.info( "Finished processing batch from child{} in {}.", x, getClass().getSimpleName() );
 	}
 
 	@Override
@@ -122,8 +135,10 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 		assert x >= 0;
 		assert x < numberOfChildren;
 
+		log.info( "Wrapping up processing of child{} input in {}.", x, getClass().getSimpleName() );
 		xthInputConsumed[x] = true;
 		_wrapUpForXthChild(x, sink, execCxt);
+		log.info( "Finished processing child{} input in {}.", x, getClass().getSimpleName() );
 	}
 
 	@Override

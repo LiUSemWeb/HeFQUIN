@@ -41,7 +41,6 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing input solution mapping from child1." );
 		numberOfOutputMappingsProduced++;
 		sink.send(inputSolMap);
 	}
@@ -50,7 +49,6 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing batch of {} solution mappings from child1.", inputSolMaps.size() );
 		numberOfOutputMappingsProduced += inputSolMaps.size();
 		sink.send(inputSolMaps);
 	}
@@ -59,14 +57,12 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
 	                                 final ExecutionContext execCxt ) {
 		// nothing to be done here
-		log.info( "Finished processing child1 input." );
 	}
 
 	@Override
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing input solution mapping from child2." );
 		numberOfOutputMappingsProduced++;
 		sink.send(inputSolMap);
 	}
@@ -75,7 +71,6 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
-		log.info( "Processing batch of {} solution mappings from child2.", inputSolMaps.size() );
 		numberOfOutputMappingsProduced += inputSolMaps.size();
 		sink.send(inputSolMaps);
 	}
@@ -84,7 +79,6 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
 	                                 final ExecutionContext execCxt ) {
 		// nothing to be done here
-		log.info( "Finished ExecOpBinaryUnion. Produced {} output mappings.", numberOfOutputMappingsProduced );
 	}
 
 	@Override

@@ -89,7 +89,6 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 			}
 		}
 
-		log.info( "Processing batch of {} solution mappings in ExecOpFilter.", cnt );
 
 		// Continue consuming the rest of the batch (if any). If we find
 		// further solution mappings that can be passed on as output, we
@@ -123,18 +122,12 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 			sink.send(firstOutput);
 			numberOfOutputMappingsProduced++;
 		}
-
-		log.info(
-			"Batch processed: {} input, {} output mappings.",
-			cnt,
-			(allOutput != null ? allOutput.size() : (firstOutput != null ? 1 : 0)) );
 	}
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
 		// nothing to be done here
-		log.info( "ExecOpFilter concluded execution." );
 	}
 
 	@Override

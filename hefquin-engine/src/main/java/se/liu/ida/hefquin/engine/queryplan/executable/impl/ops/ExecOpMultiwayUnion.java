@@ -22,7 +22,7 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 	                            final QueryPlanningInfo qpInfo ) {
 		super(numberOfChildren, mayReduce, collectExceptions, qpInfo);
 
-		log.info(
+		log.debug(
 			"Initialized ExecOpMultiwayUnion with {} children (mayReduce={}, collectExceptions={}).",
 			numberOfChildren,
 			mayReduce,
@@ -34,7 +34,6 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 	                                          final SolutionMapping inputSolMap,
 	                                          final IntermediateResultElementSink sink,
 	                                          final ExecutionContext execCxt) {
-		log.info( "Processing input solution mapping from child{}.", x );
 		numberOfOutputMappingsProduced++;
 		sink.send(inputSolMap);
 	}
@@ -44,7 +43,6 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 	                                          final List<SolutionMapping> inputSolMaps,
 	                                          final IntermediateResultElementSink sink,
 	                                          final ExecutionContext execCxt) {
-		log.info( "Processing batch of {} solution mappings from child{}.", inputSolMaps.size(), x );
 		numberOfOutputMappingsProduced += inputSolMaps.size();
 		sink.send(inputSolMaps);
 	}
@@ -54,7 +52,6 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 	                                   final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) {
 		// nothing to be done here
-		log.info( "Finished processing child{} input.", x );
 	}
 
 

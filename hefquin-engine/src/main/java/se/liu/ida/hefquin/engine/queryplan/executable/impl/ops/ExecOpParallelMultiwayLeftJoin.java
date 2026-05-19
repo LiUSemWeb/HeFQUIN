@@ -110,13 +110,9 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 
 	@Override
 	protected void _processCollectedInput( final List<SolutionMapping> input,
-	                              final IntermediateResultElementSink sink,
-	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		log.info( "Processing batch of {} input solution mappings.", input.size() );
-
+	                                       final IntermediateResultElementSink sink,
+	                                       final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		final List<SolutionMapping> inputForParallelProcess = determineInputForParallelProcess(input);
-
-		log.info( "Reduced batch to {} unique join-key bindings for parallel phase.", inputForParallelProcess.size() );
 
 		if ( inputForParallelProcess.size() > 0 ) {
 			parallelPhase(inputForParallelProcess, execCxt);
