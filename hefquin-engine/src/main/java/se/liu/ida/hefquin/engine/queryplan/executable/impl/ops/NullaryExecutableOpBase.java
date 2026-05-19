@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -23,6 +26,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class NullaryExecutableOpBase extends BaseForExecOps implements NullaryExecutableOp
 {
+	private static final Logger log = LoggerFactory.getLogger( NullaryExecutableOpBase.class );
+
 	private int numberOfInvocations = 0;
 	protected long timeAtExecStart  = 0L;
 	protected long timeAtExecEnd    = 0L;
@@ -37,6 +42,7 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 	public final void execute( final IntermediateResultElementSink sink,
 	                           final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
+		log.info( "Executing {}.", getClass().getSimpleName() );
 		numberOfInvocations++;
 		timeAtExecStart = System.currentTimeMillis();
 
@@ -53,6 +59,8 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 		}
 
 		timeAtExecEnd = System.currentTimeMillis();
+
+		log.info( "Finished executing {}.", getClass().getSimpleName() );
 	}
 
 	/**

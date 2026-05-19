@@ -61,7 +61,7 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
-		log.info( "Processing input solution mapping from child1 in {}.", getClass().getSimpleName() );
+		log.info( "Processing solution mapping from child1 in {}.", getClass().getSimpleName() );
 
 		timeAtCurrentLeftProcStart = System.currentTimeMillis();
 
@@ -84,6 +84,8 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 		if ( processingTime > maxLeftProcessingTime ) { maxLeftProcessingTime = processingTime; }
 
 		numberOfLeftInputMappingsProcessed++;
+
+		log.info( "Finished processing solution mapping from child1 in {}.", getClass().getSimpleName() );
 	}
 
 	@Override
@@ -107,14 +109,17 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 		}
 
 		numberOfLeftInputMappingsProcessed += inputSolMaps.size();
+
+		log.info( "Finished processing batch from child1 in {}.", getClass().getSimpleName() );
 	}
 
 	@Override
 	public final void wrapUpForChild1( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		log.info( "Finished processing child1 input in {}.", getClass().getSimpleName() );
+		log.info( "Wrapping up processing of child1 input in {}.", getClass().getSimpleName() );
 		leftInputConsumed = true;
 		_wrapUpForChild1(sink, execCxt);
+		log.info( "Finished processing child1 input in {}.", getClass().getSimpleName() );
 	}
 
 	@Override
@@ -123,7 +128,7 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
-		log.info( "Processing input solution mapping from child2 in {}.", getClass().getSimpleName() );
+		log.info( "Processing solution mapping from child2 in {}.", getClass().getSimpleName() );
 
 		timeAtCurrentRightProcStart = System.currentTimeMillis();
 
@@ -146,6 +151,8 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 		if ( processingTime > maxRightProcessingTime ) { maxRightProcessingTime = processingTime; }
 
 		numberOfRightInputMappingsProcessed++;
+
+		log.info( "Finished processing solution mapping from child2 in {}.", getClass().getSimpleName() );
 	}
 
 	@Override
@@ -169,14 +176,17 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 		}
 
 		numberOfRightInputMappingsProcessed += inputSolMaps.size();
+
+		log.info( "Finished processing batch from child2 in {}.", getClass().getSimpleName() );
 	}
 
 	@Override
 	public final void wrapUpForChild2( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		log.info( "Finished processing child2 input in {}.", getClass().getSimpleName() );
+		log.info( "Wrapping up processing of child2 input in {}.", getClass().getSimpleName() );
 		rightInputConsumed = true;
 		_wrapUpForChild2(sink, execCxt);
+		log.info( "Finished processing child2 input in {}.", getClass().getSimpleName() );
 	}
 
 

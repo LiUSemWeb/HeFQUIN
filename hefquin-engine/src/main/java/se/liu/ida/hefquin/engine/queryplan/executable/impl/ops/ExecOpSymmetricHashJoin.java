@@ -148,7 +148,6 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
 									 final ExecutionContext execCxt ) {
-		log.info( "Completed input processing for child 1." );
 		child1InputComplete = true;
 
 		if ( child2InputComplete ) {
@@ -199,12 +198,12 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected void wrapUp() {
 		// clear both indexes to enable the GC to release memory early,
 		// but make sure we keep the final stats of the indexes
-		log.info( "Symmetric hash join execution completed. Clearing indexes." );
+		log.debug( "Symmetric hash join execution completed. Clearing indexes." );
 
 		statsOfIndexForChild1 = indexForChild1.getStats();
 		statsOfIndexForChild2 = indexForChild2.getStats();
-		log.info( "Final index statistics for child 1: {}.", statsOfIndexForChild1 );
-		log.info( "Final index statistics for child 2: {}.", statsOfIndexForChild2 );
+		log.debug( "Final index statistics for child 1: {}.", statsOfIndexForChild1 );
+		log.debug( "Final index statistics for child 2: {}.", statsOfIndexForChild2 );
 
 		indexForChild1.clear();
 		indexForChild2.clear();
