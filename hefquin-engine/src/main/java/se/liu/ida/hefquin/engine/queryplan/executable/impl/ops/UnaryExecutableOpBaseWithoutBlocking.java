@@ -3,9 +3,6 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -34,7 +31,6 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutableOpBase
 {
-	private static final Logger log = LoggerFactory.getLogger( UnaryExecutableOpBaseWithoutBlocking.class );
 	public static final int MAX_BATCH_SIZE = 100;
 
 	public UnaryExecutableOpBaseWithoutBlocking( final boolean mayReduce,
@@ -57,18 +53,14 @@ public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutab
 			// of this class would otherwise create a list for collecting
 			// the output (but does not do so in its single-input version
 			// of the _process method).
-			log.info( "Processing solution mapping in {}.", getClass().getSimpleName() );
 			final SolutionMapping inputSolMap = inputSolMaps.get(0);
 			_process(inputSolMap, sink, execCxt);
-			log.info( "Finished processing solution mapping in {}.", getClass().getSimpleName() );
 		}
 		else if ( inputSize > 1 ) {
-			log.info( "Processing batch of solution mappings with max batch size {} in {}.", MAX_BATCH_SIZE, getClass().getSimpleName() );
 			final Iterator<SolutionMapping> it = inputSolMaps.iterator();
 			while ( it.hasNext() ) {
 				_process(it, MAX_BATCH_SIZE, sink, execCxt);
 			}
-			log.info( "Finished processing batch in {}.", getClass().getSimpleName() );
 		}
 		// no else case here - nothing to do if inputSolMaps is empty
 	}
@@ -93,7 +85,6 @@ public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutab
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt )
 			throws ExecOpExecutionException {
-		log.info( "Processing batch of solution mappings in {}.", getClass().getSimpleName() );
 		int cnt = 0;
 		while ( cnt < maxBatchSize && inputSolMaps.hasNext() ) {
 			final SolutionMapping inputSolMap = inputSolMaps.next();
