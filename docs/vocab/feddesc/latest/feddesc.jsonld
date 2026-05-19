@@ -1,92 +1,49 @@
 [
   {
-    "@id": "http://w3id.org/hefquin/feddesc#vocabularyMappingsFile",
+    "@id": "http://w3id.org/hefquin/feddesc#TPFProtocol",
     "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+      "http://w3id.org/hefquin/feddesc#DataRetrievalProtocol"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Path to a file with RDF mappings to align different vocabularies."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#FederationMember"
+        "@value": "The protocol to be used when interacting with a TPF server."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "vocabulary mappings file"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#string"
+        "@value": "TPF protocol"
       }
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/feddesc#endpointAddress",
+    "@id": "http://w3id.org/hefquin/feddesc#FixedEndpointInterface",
     "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+      "http://www.w3.org/2002/07/owl#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "The network address (URI) of the endpoint of the federation member."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#EndpointInterface"
+        "@value": "An interface that can be accessed via a single, fixed endpoint address. Every such interface must have an fd:endpointAddress property and an fd:supportedProtocol property. The value for the fd:supportedProtocol property is expected to be one of the following: fd:SPARQLProtocol, fd:BoltProtocol, fd:GraphQLProtocol, or fd:GenericWebAPIProtocol."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "endpoint address"
+        "@value": "Fixed Endpoint Interface"
       }
     ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
       {
-        "@id": "http://www.w3.org/2001/XMLSchema#anyURI"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#exampleFragmentAddress",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "An example URL of a fragment for pattern fragment interfaces."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#FragmentInterface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "example fragment address"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#anyURI"
+        "@id": "http://w3id.org/hefquin/feddesc#Interface"
       }
     ]
   },
   {
     "@id": "http://w3id.org/hefquin/feddesc#serviceURI",
     "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+      "http://www.w3.org/2002/07/owl#DatatypeProperty"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
@@ -112,389 +69,6 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/feddesc#WrappedFederationMember",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "An federation member that is accessed via a wrapper."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Wrapped Federation Member"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#FederationMember"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#interface",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "The interface description for accessing the federation member."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#FederationMember"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "interface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#Interface"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#wrapper",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "The wrapper of a wrapped federation member."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#WrappedFederationMember"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "wrapper"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#Wrapper"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#RESTInterface",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "An interface to access a federation member that provides a REST API."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "REST Endpoint Interface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#EndpointInterface"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#TPFInterface",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "An interface to access a federation member via Triple Pattern Fragments."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "TPF Interface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#FragmentInterface"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#rmlTriplesMaps",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "List of RML triples maps that define the mapping for a wrapper. The elements of such a list are expected to be of type rml:TriplesMap. ATTENTION: for the time being, these triples maps must all be normalized as per the definition in Section 5 of the paper titled 'An Algebraic Foundation for Knowledge Graph Construction'."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#Wrapper"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "RML triples maps"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#FederationMember",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "An entity that is part of the federation and provides data via a specific interface."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Federation Member"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#brTPFInterface",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "An interface to access a federation member via Bindings-Restricted Triple Pattern Fragments."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "brTPF Interface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#FragmentInterface"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#SPARQLEndpointInterface",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "An interface to access a federation member via the SPARQL protocol."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "SPARQL Endpoint Interface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#EndpointInterface"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#paramType",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "The type of values to be used for a variable part of an IRI template, which is expected to be specified as a datatype IRI (e.g., xsd:string, xsd:float)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://www.w3.org/ns/hydra/core#IriTemplateMapping"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "type of template parameter"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#Wrapper",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "A wrapper provides access to federation members that do not support RDF and SPARQL natively."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Wrapper"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#GraphQLEndpointInterface",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "An interface to access a federation member via a GraphQL API."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "GraphQL Endpoint Interface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#EndpointInterface"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#mappingConfiguration",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, LPG)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#FederationMember"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "mapping configuration"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#BoltInterface",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "An interface to access a federation member using the Bolt protocol (e.g., for Neo4j)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Bolt Interface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#EndpointInterface"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#FragmentInterface",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "A fragment interface is an interface to request a fragment (i.e., a specific subset) of the dataset of a federation member. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Fragment Interface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#Interface"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/feddesc#MultipleEndpointsInterface",
-    "@type": [
-      "http://www.w3.org/2002/07/owl#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "An interface that can be accessed via multiple HTTP endpoints. This class is a superclass of any kind of such interface and should not be used directly within federation descriptions. Concrete types of such interfaces, to be used in federation descriptions, are captured by the subclasses of this class."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Multiple-Endpoints Interface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#Interface"
-      }
-    ]
-  },
-  {
     "@id": "http://w3id.org/hefquin/feddesc",
     "@type": [
       "http://www.w3.org/2002/07/owl#Ontology"
@@ -512,7 +86,7 @@
     ],
     "http://purl.org/dc/elements/1.1/date": [
       {
-        "@value": "2026-03-06"
+        "@value": "2026-04-30"
       }
     ],
     "http://purl.org/dc/elements/1.1/description": [
@@ -551,25 +125,219 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/feddesc#EndpointInterface",
+    "@id": "http://w3id.org/hefquin/feddesc#uriTemplate",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#ObjectProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The template for creating URIs that can be used for issuing requests to the interface. The template is captured as a hydra:IriTemplate, which must have a hydra:template property and, if the template contains variable parts, there must also be a hydra:mapping property for each of these variable parts."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#TemplateBasedInterface"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "URI template"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/ns/hydra/core#IriTemplate"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#GraphQLProtocol",
+    "@type": [
+      "http://w3id.org/hefquin/feddesc#DataRetrievalProtocol"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The protocol to be used when interacting with a GraphQL server."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "GraphQL protocol"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#supportedProtocol",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#ObjectProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The data retrieval protocol supported by the interface."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#Interface"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "supported protocol"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#DataRetrievalProtocol"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#FragmentInterface",
     "@type": [
       "http://www.w3.org/2002/07/owl#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "An endpoint interface is an interface that can be accessed via a single HTTP endpoint. This class is a superclass of any kind of endpoint interface and should not be used directly within federation descriptions. Concrete types of endpoint interfaces, to be used in federation descriptions, are captured by the subclasses of this class."
+        "@value": "An interface that can be accessed via URIs that denote fragments (i.e., specific subsets) of the dataset of the corresponding federation member, where the way in which these URIs are formed is communicated in responses to requests to such an interface. Every such interface must have an fd:exampleFragmentAddress property and an fd:supportedProtocol property. The value for the fd:supportedProtocol property is expected to be either fd:TPFProtocol or fd:brTPFProtocol."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Endpoint Interface"
+        "@value": "Fragment Interface"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
       {
         "@id": "http://w3id.org/hefquin/feddesc#Interface"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#paramType",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#ObjectProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The type of values to be used for a variable part of a URI template. This type is expected to be specified as a datatype URI (e.g., xsd:string, xsd:float). This property is optional; i.e., not every IriTemplateMapping needs to have it. If a IriTemplateMapping has this property, the datatype specified via this property is enforced when creating request URIs from the corresponding IriTemplate; i.e., the IriTemplate will be instantiated only for parameter values that have the specified datatype."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://www.w3.org/ns/hydra/core#IriTemplateMapping"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "type of template parameter"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#Resource"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#Wrapper",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "A wrapper provides a mapping for data of federation members that do not support RDF and SPARQL natively. For the time being, every such wrapper must have either an fd:rmlTriplesMaps property or an fd:mappingConfiguration property. In particular, for wrappers associated with a federation member whose interface has fd:GenericWebAPIProtocol as the fd:supportedProtocol, the wrapper must have an fd:rmlTriplesMaps property; and for wrappers associated with a federation member whose interface has fd:BoltProtocol or fd:GraphQLProtocol as the fd:supportedProtocol, the wrapper must have an fd:mappingConfiguration property."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Wrapper"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#mappingConfiguration",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#ObjectProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, PG)."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#Wrapper"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "mapping configuration"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#Resource"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#DataRetrievalProtocol",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Instances of this class represent the different protocols to be used when interacting with the interface of a federation member."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Data Retrieval Protocol"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#endpointAddress",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#DatatypeProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The network address (URI) of the endpoint of the federation member."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#FixedEndpointInterface"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "endpoint address"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#anyURI"
       }
     ]
   },
@@ -592,30 +360,301 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/feddesc#iriTemplate",
+    "@id": "http://w3id.org/hefquin/feddesc#SPARQLProtocol",
     "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+      "http://w3id.org/hefquin/feddesc#DataRetrievalProtocol"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "The template for creating IRIs of endpoints of the federation member."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/feddesc#RESTInterface"
+        "@value": "The protocol to be used for SPARQL endpoints."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "iri template"
+        "@value": "SPARQL protocol"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#BoltProtocol",
+    "@type": [
+      "http://w3id.org/hefquin/feddesc#DataRetrievalProtocol"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The protocol to be used when interacting with a Neo4j server."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Bolt protocol"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#WrappedFederationMember",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "A federation member that provides access to non-RDF data, for which it is associated with a wrapper that defines and RDF view of the data of that federation member. In addition to the properties that are expected for any kind of federation member (i.e., fd:serviceURI and fd:interface), such a wrapped federation member must have an fd:wrapper property."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Wrapped Federation Member"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#FederationMember"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#exampleFragmentAddress",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#DatatypeProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "An example URI of a fragment for the fragment interface."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#FragmentInterface"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "example fragment address"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#range": [
       {
-        "@id": "http://www.w3.org/ns/hydra/core#IriTemplate"
+        "@id": "http://www.w3.org/2001/XMLSchema#anyURI"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#vocabularyMappingsFile",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#DatatypeProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Path to a file with RDF mappings to align different vocabularies."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#RDFBasedFederationMember"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "vocabulary mappings file"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#wrapper",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#ObjectProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The wrapper of a wrapped federation member."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#WrappedFederationMember"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "wrapper"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#Wrapper"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#brTPFProtocol",
+    "@type": [
+      "http://w3id.org/hefquin/feddesc#DataRetrievalProtocol"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The protocol to be used when interacting with a brTPF server."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "brTPF protocol"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#interface",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#ObjectProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The interface for accessing the federation member."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#FederationMember"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "interface"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#Interface"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#FederationMember",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "An entity that is part of the federation and provides access to data via a specific interface. Every federation member must have an fd:serviceURI property and an fd:interface property. This class is a superclass of any kind of federation member and should not be used directly within federation descriptions. Concrete types of federation members, to be used in federation descriptions, are captured by the subclasses of this class."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Federation Member"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#RDFBasedFederationMember",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "A federation member whose interface exposes RDF data. Every such federation member must have the two properties that are expected for any kind of federation member (i.e., fd:serviceURI and fd:interface), where the fd:interface may be either an fd:FixedEndpointInterface with the fd:supportedProtocol being fd:SPARQLProtocol or an fd:FragmentInterface. Additionally, an RDF-based federation member may have an fd:vocabularyMappingsFile property."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "RDF-based Federation Member"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#FederationMember"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#TemplateBasedInterface",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "An interface that can be accessed via request URIs that can be created based on a URI template. Every such interface must have an fd:uriTemplate property and an fd:supportedProtocol property. For the time being, the value for the fd:supportedProtocol property is expected to be fd:GenericWebAPIProtocol."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Template-based Interface"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#Interface"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#rmlTriplesMaps",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#ObjectProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "List of RML triples maps that define the mapping for a wrapper. The elements of such a list are expected to be of type rml:TriplesMap. ATTENTION: for the time being, these triples maps must all be normalized as per the definition in Section 5 of the paper titled 'An Algebraic Foundation for Knowledge Graph Construction'."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/feddesc#Wrapper"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "RML triples maps"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/feddesc#GenericWebAPIProtocol",
+    "@type": [
+      "http://w3id.org/hefquin/feddesc#DataRetrievalProtocol"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The protocol to be used when interacting with a generic Web API."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Generic Web API protocol"
       }
     ]
   }
