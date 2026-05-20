@@ -394,9 +394,14 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 					&& reqOp.getFederationMember() instanceof SPARQLEndpoint
 					&& reqOp.getRequest() instanceof SPARQLRequest req )
 			{
-				final Set<Var> newProj = op.getVariables();
-				if ( req.getProjectionVars() != null )
+				final Set<Var> newProj;
+				if ( req.getProjectionVars() != null ) {
+					newProj = new HashSet<>( op.getVariables() );
 					newProj.retainAll( req.getProjectionVars() );
+				}
+				else {
+					newProj = op.getVariables();
+				}
 
 				final SPARQLRequest newReq = new SPARQLRequestImpl( req.getQueryPattern(), newProj, req.getDistinctRequired() );
 
