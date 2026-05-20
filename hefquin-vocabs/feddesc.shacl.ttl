@@ -14,7 +14,7 @@ fd:FederationMemberShape
         [ sh:class fd:WrappedFederationMember ;
           sh:node  fd:WrappedFederationMemberShape ]
     ) ;
-    sh:message "Interface must be one of the supported types" ;
+    sh:message "Federation member must be one of the supported types" ;
     sh:targetClass fd:FederationMember ;
     sh:property [
         sh:path fd:serviceURI ;
@@ -33,20 +33,29 @@ fd:FederationMemberShape
 
 fd:RDFBasedFederationMemberShape
     a sh:NodeShape ;
+    sh:not [
+        sh:class fd:WrappedFederationMember ;
+    ] ;
+    sh:message "RDF-based federation member cannot also be an fd:WrappedFederationMember." ;
     sh:property [
         sh:path fd:vocabularyMappingsFile ;
         sh:maxCount 1 ;
         sh:datatype xsd:string ;
-        sh:message "A federation member can have at most one fd:vocabularyMappingsFile." ;
+        sh:message "RDF-based federation member can have at most one fd:vocabularyMappingsFile." ;
     ] .
 
 fd:WrappedFederationMemberShape
     a sh:NodeShape ;
+    sh:not [
+        sh:class fd:RDFBasedFederationMember ;
+    ] ;
+    sh:message "Wrapped federation member cannot also be an fd:RDFBasedFederationMember." ;
     sh:property [
         sh:path fd:wrapper ;
+        sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:node fd:WrapperShape ;
-        sh:message "A federation member can have at most one fd:wrapper." ;
+        sh:message "Wrapped federation member must have exactly one fd:wrapper." ;
     ] ;
     sh:or (
         [
@@ -63,7 +72,7 @@ fd:WrappedFederationMemberShape
                 sh:path fd:wrapper ;
                 sh:node fd:RMLWrapperShape
             ] ;
-            sh:message "Wrapped federation members using fd:GenericWebAPIProtocol must have a wrapper with fd:rmlTriplesMaps."
+            sh:message "Wrapped federation member using fd:GenericWebAPIProtocol must have a wrapper with fd:rmlTriplesMaps."
         ]
         [
             sh:property [
@@ -82,10 +91,9 @@ fd:WrappedFederationMemberShape
                 sh:path fd:wrapper ;
                 sh:node fd:MappingConfigWrapperShape
             ] ;
-            sh:message "Wrapped federation members using fd:BoltProtocol or fd:GraphQLProtocol must have a wrapper with fd:mappingConfiguration." ;
+            sh:message "Wrapped federation member using fd:BoltProtocol or fd:GraphQLProtocol must have a wrapper with fd:mappingConfiguration." ;
         ]
-    ) ;
-    sh:message "Wrapper requirements depend on the supported protocol of the interface." .
+    ) .
 
 # Shape for interfaces
 fd:InterfaceShape
@@ -113,15 +121,20 @@ fd:FixedEndpointInterfaceShape
     ] ;
     sh:property [
         sh:path fd:supportedProtocol ;
-        sh:or (
-            [ sh:hasValue fd:SPARQLProtocol ]
-            [ sh:hasValue fd:BoltProtocol ]
-            [ sh:hasValue fd:GraphQLProtocol ]
-            [ sh:hasValue fd:GenericWebAPIProtocol ]
-        ) ;
+
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:message "Fixed endpoint interface must have exactly one fd:supportedProtocol." ;
+    ] ;
+    sh:property [
+        sh:path fd:supportedProtocol
+        sh:in (
+            fd:SPARQLProtocol
+            fd:BoltProtocol
+            fd:GraphQLProtocol
+            fd:GenericWebAPIProtocol
+        ) ;
+        sh:message "Supported protocol must be one of fd:SPARQLProtocol, fd:BoltProtocol, fd:GraphQLProtocol, or fd:GenericWebAPIProtocol." ;
     ] .
 
 # Shape for Fragment interfaces
@@ -151,12 +164,6 @@ fd:TemplateBasedInterfaceShape
     a sh:NodeShape ;
     sh:targetClass fd:TemplateBasedInterface ;
     sh:property [
-        sh:path fd:vocabularyMappingsFile ;
-        sh:maxCount 0 ;
-        sh:datatype xsd:string ;
-        sh:message "Template-based interface cannot have a vocabulary mapping." ;
-    ] ;
-    sh:property [
         sh:path fd:uriTemplate ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
@@ -183,12 +190,12 @@ fd:UriTemplateShape
     ] ;
     sh:property [
         sh:path hydra:mapping ;
-        sh:node fd:MappingShape ;
+        sh:node fd:HydraMappingShape ;
         sh:message "URI template mappings must conform to mapping shape." ;
     ] .
 
 # Shape for Hydra Mapping
-fd:MappingShape
+fd:HydraMappingShape
     a sh:NodeShape ;
     sh:property [
         sh:path hydra:variable ;
@@ -206,8 +213,8 @@ fd:MappingShape
         sh:path fd:paramType ;
         sh:maxCount 1 ;
         sh:nodeKind sh:IRI ;
-        sh:in ( xsd:string xsd:integer xsd:float xsd:double ) ;
-        sh:message "Parameter type must be either xsd:string, xsd:integer, xsd:float or xsd:double." ;
+        sh:in ( xsd:string xsd:integer xsd:decimal xsd:float xsd:double ) ;
+        sh:message "Parameter type must be one of xsd:string, xsd:integer, xsd:decimal, xsd:float, or xsd:double." ;
     ] .
 
 # Shape for wrappers
@@ -246,6 +253,7 @@ fd:RmlTriplesMapShape
     sh:property [
         sh:path rml:logicalSource ;
         sh:minCount 1 ;
+        sh:maxCount 1 ;
         sh:nodeKind sh:BlankNodeOrIRI ;
         sh:message "TriplesMap must have a logicalSource." ;
     ] ;
