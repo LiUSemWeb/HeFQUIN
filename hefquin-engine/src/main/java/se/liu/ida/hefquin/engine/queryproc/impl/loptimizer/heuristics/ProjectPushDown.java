@@ -288,9 +288,14 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	                                                        final LogicalPlan inputPlan ) {
 		if (    reqOp.getFederationMember() instanceof SPARQLEndpoint
 			 && reqOp.getRequest() instanceof SPARQLRequest oldReq ) {
-			final Set<Var> newProj = projectOp.getVariables();
-			if ( oldReq.getProjectionVars() != null )
-				newProj.retainAll( oldReq.getProjectionVars() );
+				final Set<Var> newProj;
+				if ( oldReq.getProjectionVars() != null ) {
+					newProj = new HashSet<>( projectOp.getVariables() );
+					newProj.retainAll( oldReq.getProjectionVars() );
+				}
+				else {
+					newProj = projectOp.getVariables();
+				}
 
 			final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getDistinctRequired() );
 
