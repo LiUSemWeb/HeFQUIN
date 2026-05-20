@@ -1,4 +1,4 @@
-FROM maven:latest AS build
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 ARG TAG
 
 # Check commit (invalidates cache to ensure that the newest version of the repo is used)
