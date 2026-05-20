@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -11,11 +14,15 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 public abstract class PhysicalOptimizerBase implements PhysicalOptimizer
 {
+	private static final Logger log = LoggerFactory.getLogger( PhysicalOptimizerBase.class );
+
 	@Override
 	public final Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan lp,
 	                                                                     final QueryProcContext ctxt )
 			throws PhysicalOptimizationException {
 		final boolean keepMultiwayJoins = keepMultiwayJoinsInInitialPhysicalPlan();
+
+		log.debug( "Converting logical plan to physical plan (keepMultiwayJoins={})", keepMultiwayJoins );
 
 		final LogicalToPhysicalPlanConverter lp2pp = ctxt.getLogicalToPhysicalPlanConverter();
 		final PhysicalPlan initialPhysicalPlan = lp2pp.convert(lp, keepMultiwayJoins, ctxt);
