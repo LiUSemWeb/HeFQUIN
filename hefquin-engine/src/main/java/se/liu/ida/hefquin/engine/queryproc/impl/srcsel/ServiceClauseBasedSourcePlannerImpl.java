@@ -10,6 +10,8 @@ import org.apache.jena.sparql.algebra.op.*;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
@@ -48,18 +50,24 @@ import se.liu.ida.hefquin.jenaext.sparql.algebra.op.OpServiceWithParams;
  */
 public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 {
+	private static final Logger log = LoggerFactory.getLogger( ServiceClauseBasedSourcePlannerImpl.class );
+
 	@Override
 	protected Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Op jenaOp,
 	                                                                         final QueryProcContext ctxt )
 			throws SourcePlanningException
 	{
+		log.debug( "Starting source assignment with root operator = {}", jenaOp );
 		final LogicalPlan sa = createPlan(jenaOp, false, ctxt);
+		log.debug( "Finished source assignment. Plan root = {}", sa.getRootOperator() );
+
 		final SourcePlanningStats myStats = new SourcePlanningStatsImpl();
 
 		return new Pair<>(sa, myStats);
 	}
 
 	protected LogicalPlan createPlan( final Op jenaOp, final boolean mayReduce, final QueryProcContext ctxt ) {
+		log.debug( "Creating plan: {} (mayReduce={})", jenaOp.getClass().getSimpleName(), mayReduce );
 		if ( jenaOp instanceof OpSequence opSeq ) {
 			return createPlanForSequence(opSeq, mayReduce, ctxt);
 		}
@@ -124,6 +132,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForJoin( final List<Op> ops,
 	                                         final boolean mayReduce,
 	                                         final QueryProcContext ctxt ) {
+		log.debug( "Planning JOIN with {} operands", ops.size() );
 		// Convert the list of Op objects into a multiway join,
 		// but ignore OpServiceWithParams objects in this step,
 		// as well as OpExtend objects that have an OpTable with
@@ -206,6 +215,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForFilter( final OpFilter jenaOp,
 	                                           final boolean mayReduce,
 	                                           final QueryProcContext ctxt ) {
+		log.debug( "Applying FILTER expressions: {}", jenaOp.getExprs() );
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), mayReduce, ctxt );
 		final LogicalOpFilter rootOp = new LogicalOpFilter( jenaOp.getExprs(), mayReduce );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
@@ -214,6 +224,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForBind( final OpExtend jenaOp,
 	                                         final boolean mayReduce,
 	                                         final QueryProcContext ctxt ) {
+		log.debug( "Applying BIND {}", jenaOp.getVarExprList() );
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), mayReduce, ctxt );
 		final LogicalOpBind rootOp = new LogicalOpBind( jenaOp.getVarExprList(),  mayReduce );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
@@ -252,6 +263,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForServicePattern( final OpService jenaOp,
 	                                                   final boolean mayReduce,
 	                                                   final QueryProcContext ctxt ) {
+		log.debug( "SERVICE clause: {}", jenaOp.getService() );
 		if ( jenaOp.getService().isVariable() )
 			throw new IllegalArgumentException( "unsupported SERVICE clause" );
 
@@ -261,6 +273,13 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			throw new IllegalArgumentException( "Unsupported SERVICE clause: group graph patterns that begin with a SERVICE clause with PARAMS are not supported yet." );
 
 		final FederationMember fm = ctxt.getFederationCatalog().getFederationMemberByURI( jenaOp.getService().getURI() );
+
+		log.debug( "Resolved SERVICE endpoint {} -> {}", jenaOp.getService().getURI(), fm.getClass().getSimpleName() );
+		log.debug(
+			"Creating {} request for SERVICE {}",
+			( fm instanceof WrappedRESTEndpoint ? "REST" : "SPARQL" ),
+			fm );
+		log.debug( "SERVICE sub-operation: {}", jenaOp.getSubOp() );
 
 		if ( fm instanceof WrappedRESTEndpoint ep ) {
 			if ( ep.getNumberOfParameters() != 0 )
@@ -306,6 +325,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 	protected LogicalPlan createPlanForDistinct( final OpDistinct jenaOp,
 	                                             final QueryProcContext ctxt ) {
+		log.debug( "Applying DISTINCT" );
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), true, ctxt );
 		final LogicalOpDedup rootOp = LogicalOpDedup.getInstance();
 		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
@@ -314,12 +334,17 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForProject( final OpProject jenaOp,
 	                                            final boolean mayReduce,
 	                                            final QueryProcContext ctxt ) {
+		log.debug( "Applying PROJECT over vars {}", jenaOp.getVars() );
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), mayReduce, ctxt );
 		final LogicalOpProject rootOp = new LogicalOpProject( jenaOp.getVars(), mayReduce );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
 	}
 
 	protected LogicalPlan createPlan( final Op jenaOp, final boolean mayReduce, final FederationMember fm ) {
+		log.debug(
+			"Creating plan for federation member {} using op {}",
+			fm.getClass().getSimpleName(),
+			jenaOp.getClass().getSimpleName() );
 		// If the federation member has a SPARQL endpoint interface, then
 		// we can simply wrap the whole query pattern in a single request.
 		if ( fm instanceof SPARQLEndpoint ) {
@@ -373,6 +398,10 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	}
 
 	protected LogicalPlan createPlanForJoin( final OpJoin jenaOp, final boolean mayReduce, final FederationMember fm ) {
+		log.debug(
+			"Planning JOIN: left={}, right={}",
+			jenaOp.getLeft().getClass().getSimpleName(),
+			jenaOp.getRight().getClass().getSimpleName() );
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), mayReduce, fm );
 		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), mayReduce, fm );
 		return mergeIntoMultiwayJoin(mayReduce,leftSubPlan,rightSubPlan);
@@ -401,6 +430,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	}
 
 	protected LogicalPlan createPlanForFilter( final OpFilter jenaOp, final boolean mayReduce, final FederationMember fm ) {
+		log.debug( "Applying FILTER expressions: {}", jenaOp.getExprs() );
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), mayReduce, fm );
 		final LogicalOpFilter rootOp = new LogicalOpFilter( jenaOp.getExprs(), mayReduce );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
@@ -418,12 +448,15 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	                                                  final boolean mayReduce,
 	                                                  final FederationMember fm ) {
 		final TriplePattern tp = new TriplePatternImpl( pattern.getTriple() );
+		log.debug( "Creating triple-pattern request for {} at federation member {}", tp, fm );
 		final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 		final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, mayReduce, req);
 		return new LogicalPlanWithNullaryRootImpl(op, null);
 	}
 
 	protected LogicalPlan createPlanForBGP( final BGP bgp, final boolean mayReduce, final FederationMember fm ) {
+		log.debug( "Planning BGP with {} triple patterns", bgp.getTriplePatterns().size() );
+		log.debug( "Federation member {} supports BGP = {}", fm, fm.supportsMoreThanTriplePatterns() );
 		// If the federation member has an interface that supports only
 		// triple pattern requests, ...
 		if ( ! fm.supportsMoreThanTriplePatterns() ) {
@@ -432,6 +465,8 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			if ( bgp.getTriplePatterns().size() == 0 ) {
 				throw new IllegalArgumentException( "the given BGP is empty" );
 			}
+
+			log.debug( "Decomposing BGP into {} triple-pattern requests", bgp.getTriplePatterns().size() );
 
 			final List<LogicalPlan> subPlans = new ArrayList<>();
 			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
@@ -447,6 +482,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		// Otherwise, if the federation member supports BGP requests, ...
 		if ( fm.isSupportedPattern(bgp) ) {
 			// ... then we can simply create a BGP request operator.
+			log.debug( "Creating BGP request with pattern {} for federation member {}", bgp, fm );
 			final BGPRequest req = new BGPRequestImpl(bgp);
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, mayReduce, req);
 			return new LogicalPlanWithNullaryRootImpl(op, null);
@@ -481,10 +517,13 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			return subPlans.get(0);
 		}
 
+		log.debug( "Merging {} subplans into multiway join", subPlans.size() );
+
 		final List<LogicalPlan> subPlansFlattened = new ArrayList<>();
 
 		for ( final LogicalPlan subPlan : subPlans ) {
 			if ( subPlan.getRootOperator() instanceof LogicalOpMultiwayJoin ) {
+				log.debug( "Flattening nested multiway join with {} children", subPlan.numberOfSubPlans() );
 				for ( int j = 0; j < subPlan.numberOfSubPlans(); ++j ) {
 					subPlansFlattened.add( subPlan.getSubPlan(j) );
 				}
@@ -527,6 +566,8 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		if ( subPlans.length == 1 ) {
 			return subPlans[0];
 		}
+
+		log.debug( "Merging {} subplans into multiway union", subPlans.length );
 
 		final List<LogicalPlan> subPlansFlattened = new ArrayList<>();
 
