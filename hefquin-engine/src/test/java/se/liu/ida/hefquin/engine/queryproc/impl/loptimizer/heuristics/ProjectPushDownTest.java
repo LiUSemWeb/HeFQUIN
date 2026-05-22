@@ -44,6 +44,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
@@ -51,6 +52,39 @@ import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
 public class ProjectPushDownTest extends EngineTestBase
 {
+	@Test
+	public void pushProjectIntoRequest() {
+		// A project on top of a request to a SPARQL endpoint;
+		// the project operator is merged into the request,
+		// overwriting the projection variables of the request.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+
+		// Left request produces x
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
+			new SPARQLEndpointForTest("http://exA.org"),
+			false,
+			new SPARQLRequestImpl(tp1) );
+		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
+
+		// Project keeps y
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
+		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, reqPlan);
+
+		// test
+		final LogicalPlan result = new ProjectPushDown().apply(projectPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
+
+		final SPARQLRequest resultReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) result.getRootOperator()).getRequest();
+		assertEquals( Set.of(v2), resultReq.getProjectionVars() );
+		assertFalse( resultReq.getDistinctRequired() );
+	}
+
 	@Test
 	public void pushProjectIntoFixedSolMapEqual() {
 		// A project on top of a fixed solution mapping operator;
@@ -219,17 +253,17 @@ public class ProjectPushDownTest extends EngineTestBase
 
 		// Left branch
 		final LogicalPlan left = joinResult.getSubPlan(0);
-		assertTrue( left.getRootOperator() instanceof LogicalOpProject );
+		assertTrue( left.getRootOperator() instanceof LogicalOpRequest );
 
-		final LogicalOpProject leftProj = (LogicalOpProject) left.getRootOperator();
-		assertEquals( Set.of(v1,v2), leftProj.getVariables() );
+		final SPARQLRequest leftReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) left.getRootOperator()).getRequest();
+		assertEquals( Set.of(v1,v2), leftReq.getProjectionVars() );
 
 		// Right branch
 		final LogicalPlan right = joinResult.getSubPlan(1);
-		assertTrue( right.getRootOperator() instanceof LogicalOpProject );
+		assertTrue( right.getRootOperator() instanceof LogicalOpRequest );
 
-		final LogicalOpProject rightProj = (LogicalOpProject) right.getRootOperator();
-		assertEquals( Set.of(v1), rightProj.getVariables() );
+		final SPARQLRequest rightReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) right.getRootOperator()).getRequest();
+		assertEquals( Set.of(v1), rightReq.getProjectionVars() );
 	}
 
 	@Test
@@ -281,17 +315,17 @@ public class ProjectPushDownTest extends EngineTestBase
 
 		// Left branch
 		final LogicalPlan left = joinResult.getSubPlan(0);
-		assertTrue( left.getRootOperator() instanceof LogicalOpProject );
+		assertTrue( left.getRootOperator() instanceof LogicalOpRequest );
 
-		final LogicalOpProject leftProj = (LogicalOpProject) left.getRootOperator();
-		assertEquals( Set.of(v2,v4), leftProj.getVariables() );
+		final SPARQLRequest leftReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) left.getRootOperator()).getRequest();
+		assertEquals( Set.of(v2,v4), leftReq.getProjectionVars() );
 
 		// Right branch
 		final LogicalPlan right = joinResult.getSubPlan(1);
-		assertTrue( right.getRootOperator() instanceof LogicalOpProject );
+		assertTrue( right.getRootOperator() instanceof LogicalOpRequest );
 
-		final LogicalOpProject rightProj = (LogicalOpProject) right.getRootOperator();
-		assertEquals( Set.of(v2,v4), rightProj.getVariables() );
+		final SPARQLRequest rightReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) right.getRootOperator()).getRequest();
+		assertEquals( Set.of(v2,v4), rightReq.getProjectionVars() );
 	}
 
 	@Test
@@ -383,17 +417,17 @@ public class ProjectPushDownTest extends EngineTestBase
 
 		// Left branch
 		final LogicalPlan left = result.getSubPlan(0);
-		assertTrue( left.getRootOperator() instanceof LogicalOpProject );
+		assertTrue( left.getRootOperator() instanceof LogicalOpRequest );
 
-		final LogicalOpProject leftProj = (LogicalOpProject) left.getRootOperator();
-		assertEquals( Set.of(v2), leftProj.getVariables() );
+		final SPARQLRequest leftReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) left.getRootOperator()).getRequest();
+		assertEquals( Set.of(v2), leftReq.getProjectionVars() );
 
 		// Right branch
 		final LogicalPlan right = result.getSubPlan(1);
-		assertTrue( right.getRootOperator() instanceof LogicalOpProject );
+		assertTrue( right.getRootOperator() instanceof LogicalOpRequest );
 
-		final LogicalOpProject rightProj = (LogicalOpProject) right.getRootOperator();
-		assertEquals( Set.of(v2), rightProj.getVariables() );
+		final SPARQLRequest rightReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) right.getRootOperator()).getRequest();
+		assertEquals( Set.of(v2), rightReq.getProjectionVars() );
 	}
 
 	@Test

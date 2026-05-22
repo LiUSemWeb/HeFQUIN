@@ -2,10 +2,13 @@ package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
@@ -29,6 +32,7 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.BGPRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
  * Merges subplans that consists of multiple requests to the same federation
@@ -264,8 +268,8 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 					returnPlan = newSubPlans.get(0);
 				else
 					returnPlan = LogicalPlanUtils.createPlanWithSubPlans( op,
-																	null,
-																	newSubPlans );
+					                                                      null,
+					                                                      newSubPlans );
 			}
 		}
 
@@ -384,7 +388,27 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpProject op ) {
-			// nothing to do here
+			// A project can be merged into a request operator if that request
+			// is for a SPARQL endpoint.
+			final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
+			if (    childOp instanceof LogicalOpRequest reqOp
+					&& reqOp.getFederationMember() instanceof SPARQLEndpoint
+					&& reqOp.getRequest() instanceof SPARQLRequest req )
+			{
+				final Set<Var> newProj;
+				if ( req.getProjectionVars() != null ) {
+					newProj = new HashSet<>( op.getVariables() );
+					newProj.retainAll( req.getProjectionVars() );
+				}
+				else {
+					newProj = op.getVariables();
+				}
+
+				final SPARQLRequest newReq = new SPARQLRequestImpl( req.getQueryPattern(), newProj, req.getDistinctRequired() );
+
+				final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( reqOp.getFederationMember(), op.mayReduce(), newReq );
+				returnPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
+			}
 		}
 
 		@Override

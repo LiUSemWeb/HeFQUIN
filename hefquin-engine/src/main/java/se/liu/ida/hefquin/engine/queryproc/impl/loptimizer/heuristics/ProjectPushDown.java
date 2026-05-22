@@ -41,6 +41,9 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
  * Pushes project operators as much as possible towards the leaf nodes
@@ -265,11 +268,40 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	} // end of Worker
 
 	/**
-	 * Pushing a project operator into request operator is not possible yet TODO #570
-	*/
+	 * Pushes a project operator into a request operator if the request is
+	 * for a SPARQL endpoint.
+	 *
+	 * A new request is created whose projection variables correspond to the
+	 * variables required by the project operator. If the request already
+	 * contains request-level projection variables, then the new request uses
+	 * the intersection of the existing projection variables and the variables
+	 * required by the project operator.
+	 *
+	 * The resulting request preserves the duplicate-elimination requirement
+	 * of the original request.
+	 *
+	 * A new request operator containing the rewritten request is then returned
+	 * as a plan with a nullary root.
+	 */
 	protected LogicalPlan createPlanForRequestUnderProject( final LogicalOpProject projectOp,
 	                                                        final LogicalOpRequest<?,?> reqOp,
 	                                                        final LogicalPlan inputPlan ) {
+		if (    reqOp.getFederationMember() instanceof SPARQLEndpoint
+			 && reqOp.getRequest() instanceof SPARQLRequest oldReq ) {
+				final Set<Var> newProj;
+				if ( oldReq.getProjectionVars() != null ) {
+					newProj = new HashSet<>( projectOp.getVariables() );
+					newProj.retainAll( oldReq.getProjectionVars() );
+				}
+				else {
+					newProj = projectOp.getVariables();
+				}
+
+			final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getDistinctRequired() );
+
+			final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( reqOp.getFederationMember(), projectOp.mayReduce(), newReq );
+			return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
+		}
 		return inputPlan;
 	}
 
