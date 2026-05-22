@@ -404,7 +404,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 					newProj = op.getVariables();
 				}
 
-				final boolean mayReduce = reqOp.mayReduce() || op.mayReduce();
+				final boolean mayReduce = reqOp.mayReduce() && op.mayReduce();
 
 				final SPARQLRequest newReq = new SPARQLRequestImpl( req.getQueryPattern(), newProj, req.getDistinctRequired() || mayReduce );
 
