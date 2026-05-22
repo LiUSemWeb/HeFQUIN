@@ -601,10 +601,10 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v3);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, Set.of(v1,v3), false) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, true, new SPARQLRequestImpl(tp1, Set.of(v1,v3), true) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2, v2, v3);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2, Set.of(v2), false) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, true, new SPARQLRequestImpl(tp2, Set.of(v2), true) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
 			true,
@@ -613,7 +613,7 @@ public class MergeRequestsTest extends EngineTestBase
 			null );
 
 		// Project keeps y
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v3), false);
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v3), true);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, joinSubPlan);
 
 		// test

@@ -100,11 +100,11 @@ public class ProjectPushDownTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
 			true,
-			new SPARQLRequestImpl(tp1) );
+			new SPARQLRequestImpl(tp1, null, true) );
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
 		// Project keeps y
-		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), true);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, reqPlan);
 
 		// test
