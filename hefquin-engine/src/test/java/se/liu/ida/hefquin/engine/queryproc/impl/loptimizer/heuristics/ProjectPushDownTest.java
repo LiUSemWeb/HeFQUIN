@@ -86,6 +86,38 @@ public class ProjectPushDownTest extends EngineTestBase
 	}
 
 	@Test
+	public void pushDistinctIntoRequest() {
+		// A project on top of a request to a SPARQL endpoint;
+		// the request operator has the mayReduce flag set and
+		// so the request is expected to be DISTINCT.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+
+		// Left request produces x
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
+			new SPARQLEndpointForTest("http://exA.org"),
+			true,
+			new SPARQLRequestImpl(tp1) );
+		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
+
+		// Project keeps y
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
+		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, reqPlan);
+
+		// test
+		final LogicalPlan result = new ProjectPushDown().apply(projectPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
+
+		final SPARQLRequest resultReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) result.getRootOperator()).getRequest();
+		assertTrue( resultReq.getDistinctRequired() );
+	}
+
+	@Test
 	public void pushProjectIntoFixedSolMapEqual() {
 		// A project on top of a fixed solution mapping operator;
 		// set of project variables equal to the set of variables
