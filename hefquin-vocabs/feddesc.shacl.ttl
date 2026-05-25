@@ -9,10 +9,8 @@ PREFIX rml:    <http://w3id.org/rml/>
 fd:FederationMemberShape
     a sh:NodeShape ;
     sh:or (
-        [ sh:class fd:RDFBasedFederationMember ;
-          sh:node  fd:RDFBasedFederationMemberShape ]
-        [ sh:class fd:WrappedFederationMember ;
-          sh:node  fd:WrappedFederationMemberShape ]
+        [ sh:class fd:RDFBasedFederationMember ]
+        [ sh:class fd:WrappedFederationMember ]
     ) ;
     sh:message "Federation member must be one of the supported types" ;
     sh:targetClass fd:FederationMember ;
@@ -33,6 +31,8 @@ fd:FederationMemberShape
 
 fd:RDFBasedFederationMemberShape
     a sh:NodeShape ;
+    sh:node fd:FederationMemberShape ;
+    sh:targetClass fd:RDFBasedFederationMember;
     sh:not [
         sh:class fd:WrappedFederationMember ;
     ] ;
@@ -46,6 +46,8 @@ fd:RDFBasedFederationMemberShape
 
 fd:WrappedFederationMemberShape
     a sh:NodeShape ;
+    sh:node fd:FederationMemberShape ;
+    sh:targetClass fd:WrappedFederationMember;
     sh:not [
         sh:class fd:RDFBasedFederationMember ;
     ] ;
@@ -56,6 +58,12 @@ fd:WrappedFederationMemberShape
         sh:maxCount 1 ;
         sh:node fd:WrapperShape ;
         sh:message "Wrapped federation member must have exactly one fd:wrapper." ;
+    ] ;
+        sh:property [
+        sh:path fd:vocabularyMappingsFile ;
+        sh:maxCount 0 ;
+        sh:datatype xsd:string ;
+        sh:message "Wrapped federation member cannot have a vocabulary mapping." ;
     ] ;
     sh:or (
         [
@@ -112,6 +120,13 @@ fd:InterfaceShape
 fd:FixedEndpointInterfaceShape
     a sh:NodeShape ;
     sh:targetClass fd:FixedEndpointInterface ;
+    sh:not [
+        sh:class fd:TemplateBasedInterface ;
+    ] ;
+    sh:not [
+        sh:class fd:FragmentInterface ;
+    ] ;
+    sh:message "Fixed endpoint interface cannot also be an fd:TemplateBasedInterface or an fd:FragmentInterface." ;
     sh:property [
         sh:path fd:endpointAddress ;
         sh:minCount 1 ;
@@ -127,7 +142,7 @@ fd:FixedEndpointInterfaceShape
         sh:message "Fixed endpoint interface must have exactly one fd:supportedProtocol." ;
     ] ;
     sh:property [
-        sh:path fd:supportedProtocol
+        sh:path fd:supportedProtocol ;
         sh:in (
             fd:SPARQLProtocol
             fd:BoltProtocol
@@ -141,6 +156,13 @@ fd:FixedEndpointInterfaceShape
 fd:FragmentInterfaceShape
     a sh:NodeShape ;
     sh:targetClass fd:FragmentInterface ;
+    sh:not [
+        sh:class fd:TemplateBasedInterface ;
+    ] ;
+    sh:not [
+        sh:class fd:FixedEndpointInterface ;
+    ] ;
+    sh:message "Fragment interface cannot also be an fd:TemplateBasedInterface or an fd:FixedEndpointInterface." ;
     sh:property [
         sh:path fd:exampleFragmentAddress ;
         sh:minCount 1 ;
@@ -156,13 +178,20 @@ fd:FragmentInterfaceShape
         ) ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:message "Fixed endpoint interface must have exactly one fd:supportedProtocol." ;
+        sh:message "Fragment interface must have exactly one fd:supportedProtocol." ;
     ] .
 
 # Shape for Template-based interfaces
 fd:TemplateBasedInterfaceShape
     a sh:NodeShape ;
     sh:targetClass fd:TemplateBasedInterface ;
+    sh:not [
+        sh:class fd:FragmentInterface ;
+    ] ;
+    sh:not [
+        sh:class fd:FixedEndpointInterface ;
+    ] ;
+    sh:message "Template-based interface cannot also be an fd:FragmentInterface or an fd:FixedEndpointInterface." ;
     sh:property [
         sh:path fd:uriTemplate ;
         sh:minCount 1 ;
