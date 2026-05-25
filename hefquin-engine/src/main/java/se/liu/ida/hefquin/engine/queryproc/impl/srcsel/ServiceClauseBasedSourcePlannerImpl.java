@@ -267,7 +267,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 				throw new IllegalArgumentException( "Invalid SERVICE clause: missing PARAMS for " + ep.toString() );
 
 			final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-			final SPARQLRequest req = new SPARQLRequestImpl(p);
+			final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(ep, mayReduce, req);
 			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
@@ -335,7 +335,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 				return createPlanForTriplePattern(opTP, mayReduce, fm);
 			}
 			else {
-				final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp) );
+				final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp), null, mayReduce );
 				final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, mayReduce, req );
 				return new LogicalPlanWithNullaryRootImpl(op, null);
 			}
