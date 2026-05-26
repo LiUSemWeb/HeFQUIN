@@ -24,6 +24,7 @@ import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.members.RDFBasedFederationMember;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINALITY;
@@ -222,7 +223,10 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 					minCardValue = cardValueOfResponse;
 					maxCardValue = cardValueOfResponse;
 
-					cardQuality = Quality.DIRECT_ESTIMATE;
+					if ( reqOp.getFederationMember() instanceof SPARQLEndpoint )
+						cardQuality = Quality.ACCURATE;
+					else
+						cardQuality = Quality.DIRECT_ESTIMATE;
 
 					minCardQuality = cardQuality;
 					maxCardQuality = cardQuality;
