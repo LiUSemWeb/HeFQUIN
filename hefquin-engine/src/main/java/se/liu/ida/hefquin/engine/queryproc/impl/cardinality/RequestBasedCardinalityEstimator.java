@@ -24,7 +24,6 @@ import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.members.RDFBasedFederationMember;
-import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINALITY;
@@ -46,7 +45,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		addCardinalitiesForRequests(plans);
 
 		// Now, use the worker to determine the cardinality estimates
-		// for the given plans recursively. 
+		// for the given plans recursively.
 		new CardinalityEstimationWorkerImpl().addCardinalities(plans);
 	}
 
@@ -58,7 +57,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		addCardinalitiesForRequests(plans);
 
 		// Now, use the worker to determine the cardinality estimates
-		// for the given plans recursively. 
+		// for the given plans recursively.
 		new CardinalityEstimationWorkerImpl().addCardinalities(plans);
 	}
 
@@ -157,7 +156,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 // TODO: We should try to be a bit smarter, using some heuristic that takes
 // the patterns of the given requests into account.
 // TODO: Also, in cases in which only some of the cardinality requests failed,
-// we should at least get the values for those that did not fail. 
+// we should at least get the values for those that did not fail.
 			final QueryPlanProperty est = QueryPlanProperty.cardinality(Integer.MAX_VALUE,
 			                                                            Quality.PURE_GUESS);
 			final QueryPlanProperty min = QueryPlanProperty.minCardinality(0,
@@ -223,10 +222,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 					minCardValue = cardValueOfResponse;
 					maxCardValue = cardValueOfResponse;
 
-					if ( reqOp.getFederationMember() instanceof SPARQLEndpoint )
-						cardQuality = Quality.ACCURATE;
-					else
-						cardQuality = Quality.DIRECT_ESTIMATE;
+					cardQuality = Quality.DIRECT_ESTIMATE;
 
 					minCardQuality = cardQuality;
 					maxCardQuality = cardQuality;
