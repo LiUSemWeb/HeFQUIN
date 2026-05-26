@@ -46,7 +46,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		addCardinalitiesForRequests(plans);
 
 		// Now, use the worker to determine the cardinality estimates
-		// for the given plans recursively.
+		// for the given plans recursively. 
 		new CardinalityEstimationWorkerImpl().addCardinalities(plans);
 	}
 
@@ -58,7 +58,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		addCardinalitiesForRequests(plans);
 
 		// Now, use the worker to determine the cardinality estimates
-		// for the given plans recursively.
+		// for the given plans recursively. 
 		new CardinalityEstimationWorkerImpl().addCardinalities(plans);
 	}
 
@@ -157,7 +157,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 // TODO: We should try to be a bit smarter, using some heuristic that takes
 // the patterns of the given requests into account.
 // TODO: Also, in cases in which only some of the cardinality requests failed,
-// we should at least get the values for those that did not fail.
+// we should at least get the values for those that did not fail. 
 			final QueryPlanProperty est = QueryPlanProperty.cardinality(Integer.MAX_VALUE,
 			                                                            Quality.PURE_GUESS);
 			final QueryPlanProperty min = QueryPlanProperty.minCardinality(0,
