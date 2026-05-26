@@ -57,9 +57,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	                                                                         final QueryProcContext ctxt )
 			throws SourcePlanningException
 	{
-		log.debug( "Starting source assignment with root operator = {}", jenaOp );
+		log.debug( "Starting source selection with root operator = {}", jenaOp );
 		final LogicalPlan sa = createPlan(jenaOp, false, ctxt);
-		log.debug( "Finished source assignment. Plan root = {}", sa.getRootOperator() );
+		log.debug( "Finished source selection. Plan root = {}", sa.getRootOperator() );
 
 		final SourcePlanningStats myStats = new SourcePlanningStatsImpl();
 
