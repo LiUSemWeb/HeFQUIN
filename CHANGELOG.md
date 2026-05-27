@@ -10,6 +10,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616)).
 ### Changed
 - Logging for query planner ([#636](https://github.com/LiUSemWeb/HeFQUIN/pull/636), [#637](https://github.com/LiUSemWeb/HeFQUIN/pull/637)).
+- Fixing example vocabulary mapping for Wikidata to make the example query work ([#640](https://github.com/LiUSemWeb/HeFQUIN/issues/640)).
 ### Planned for Next Release
 - Persistent cache for requests ([#546](https://github.com/LiUSemWeb/HeFQUIN/issues/546), [#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590), [#599](https://github.com/LiUSemWeb/HeFQUIN/issues/599)).
 - Pushing projection variables and distinct into requests to SPARQL endpoints ([#570](https://github.com/LiUSemWeb/HeFQUIN/issues/570)).
