@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
@@ -17,6 +20,8 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompilerBase
 {
+	private static final Logger log = LoggerFactory.getLogger( QueryPlanCompilerForIteratorBasedExecution.class );
+
 	public QueryPlanCompilerForIteratorBasedExecution( final QueryProcContext ctxt ) {
 		super(ctxt);
 	}
@@ -25,6 +30,7 @@ public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompile
 	public ExecutablePlan compile( final PhysicalPlan qep )
 			throws QueryCompilationException
 	{
+		log.debug("Compiling physical plan using iterator-based execution model.");
 		final ExecutionContext execCxt = createExecContext();
 		final ResultElementIterator it = compile( qep, execCxt );
 		return new IteratorBasedExecutablePlanImpl(it);
@@ -70,6 +76,10 @@ public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompile
 		}
 		else
 		{
+			log.debug(
+				"Unsupported operator arity: {} for operator {}",
+				qep.numberOfSubPlans(),
+				qep.getRootOperator().getClass().getSimpleName() );
 			throw new IllegalArgumentException();
 		}
 	}

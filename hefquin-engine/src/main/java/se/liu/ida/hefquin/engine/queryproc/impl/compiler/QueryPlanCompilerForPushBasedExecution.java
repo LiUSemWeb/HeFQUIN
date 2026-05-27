@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
@@ -29,12 +32,15 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBase
 {
+	private static final Logger log = LoggerFactory.getLogger( QueryPlanCompilerForPushBasedExecution.class );
+
 	public QueryPlanCompilerForPushBasedExecution( final QueryProcContext ctxt ) {
 		super(ctxt);
 	}
 
 	@Override
 	public ExecutablePlan compile( final PhysicalPlan qep ) {
+		log.debug("Compiling physical plan using push-based execution model.");
 		final ExecutionContext execCtxt = createExecContext();
 		final LinkedList<PushBasedPlanThread> threads = createThreads(qep, execCtxt);
 		return new PushBasedExecutablePlanImpl(threads, execCtxt);
@@ -52,6 +58,10 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 				threads2.add(t);
 			}
 		}
+		log.debug(
+			"Push-based construction produced {} thread nodes (incl. connectors) and {} executable worker threads.",
+			threads.size(),
+			threads2.size() );
 
 		return threads2;
 	}
@@ -82,6 +92,7 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 				threads.addFirst(t);
 			}
 			else {
+				log.debug( "Reusing existing push-based thread for shared subplan." );
 				// If we have indeed seen the given QEP before, then reuse
 				// the thread that we have already created for it, ...
 				final PushBasedPlanThread existingThread = convertedSubPlans.get(qep);
@@ -156,6 +167,7 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 			}
 			else
 			{
+				log.debug( "Unsupported physical operator encountered during push-based compilation: {}", pop.getClass().getName() );
 				throw new IllegalArgumentException();
 			}
 		}

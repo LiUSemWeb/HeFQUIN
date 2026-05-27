@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -25,6 +28,8 @@ import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
  */
 public class QueryPlannerImpl implements QueryPlanner
 {
+	private static final Logger log = LoggerFactory.getLogger( QueryPlannerImpl.class );
+
 	protected final SourcePlanner sourcePlanner;
 	protected final LogicalOptimizer loptimizer;
 	protected final PhysicalOptimizer poptimizer;
@@ -64,6 +69,8 @@ public class QueryPlannerImpl implements QueryPlanner
 	@Override
 	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query,
 	                                                          final QueryProcContext ctxt ) throws QueryPlanningException {
+		log.debug("Starting source selection phase.");
+
 		final long t1 = System.currentTimeMillis();
 		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query, ctxt);
 
@@ -71,29 +78,38 @@ public class QueryPlannerImpl implements QueryPlanner
 			srcasgPrinter.print( saAndStats.object1, LogicalPlanStage.SOURCE_ASSIGNMENT );
 		}
 		final long t2 = System.currentTimeMillis();
+		log.debug( "Source selection completed in {} ms.", (t2 - t1) );
+		log.debug( "Starting logical optimization phase." );
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
 			final boolean keepNaryOperators = poptimizer.assumesLogicalMultiwayJoins();
 			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators, ctxt);
+			log.debug( "Logical optimizer invoked with keepNaryOperators={}.", keepNaryOperators );
 		}
 		else {
 			lp = saAndStats.object1;
+			log.debug( "No logical optimizer configured; using source assignment directly." );
 		}
-		
+
 		if ( lplanPrinter != null ) {
 			lplanPrinter.print( lp, LogicalPlanStage.FINAL_LOGICAL_PLAN );
 		}
 
 		final long t3 = System.currentTimeMillis();
+		log.debug( "Logical optimization completed in {} ms.", (t3 - t2) );
+		log.debug( "Starting physical optimization phase." );
 
 		final Pair<PhysicalPlan, PhysicalOptimizationStats> planAndStats;
-		if ( lp instanceof LogicalPlanWithoutResult )
+		if ( lp instanceof LogicalPlanWithoutResult ) {
 			planAndStats = new Pair<>( PhysicalPlanWithoutResult.getInstance(),
 			                           null );  // no stats
+			log.debug( "Logical optimization returned a plan that produces the empty result; skipping physical optimization." );
+		}
 		else
 			planAndStats = poptimizer.optimize(lp, ctxt);
 
 		final long t4 = System.currentTimeMillis();
+		log.debug( "Physical optimization completed in {} ms.", (t4 - t3) );
 
 		if ( pplanPrinter != null ) {
 			pplanPrinter.print( planAndStats.object1 );
