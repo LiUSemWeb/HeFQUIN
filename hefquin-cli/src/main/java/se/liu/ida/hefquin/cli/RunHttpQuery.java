@@ -1,0 +1,253 @@
+package se.liu.ida.hefquin.cli;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+
+import org.apache.jena.atlas.io.IndentedWriter;
+import org.apache.jena.cmd.ArgDecl;
+import org.apache.jena.cmd.TerminationException;
+import org.apache.jena.query.ARQ;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryVisitor;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.Syntax;
+import org.apache.jena.shared.NotFoundException;
+import org.apache.jena.sparql.core.Prologue;
+import org.apache.jena.sparql.lang.SPARQLParser;
+import org.apache.jena.sparql.lang.SPARQLParserFactory;
+import org.apache.jena.sparql.lang.SPARQLParserRegistry;
+import org.apache.jena.sparql.serializer.QuerySerializerFactory;
+import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.sparql.serializer.SerializerRegistry;
+import org.apache.jena.sparql.util.QueryExecUtils;
+
+import arq.cmdline.CmdARQ;
+import arq.cmdline.ModResultsOut;
+import se.liu.ida.hefquin.cli.modules.ModQuery;
+import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
+import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
+
+/**
+ * A command-line tool that interacts with a HeFQUIN service to execute a SPARQL
+ * query over the federation for which the service is set up, and prints the query result
+ * returned by the service.
+ *
+ * The tool sends a SPARQL SELECT query to a given HTTP endpoint using a
+ * standard HTTP POST request with SPARQL Protocol encoding. It expects the
+ * endpoint to return results in SPARQL JSON Results format, which is then
+ * parsed into a Jena {@code ResultSet}.
+ *
+ * The resulting solution mappings are printed to standard output or written
+ * to a file in a user-selected results format.
+ */
+public class RunHttpQuery extends CmdARQ
+{
+	protected final ModResultsOut modResults = new ModResultsOut();
+	protected final ModQuery      modQuery =   new ModQuery();
+
+	protected final ArgDecl argServerAddress = new ArgDecl( ArgDecl.HasValue, "server" );
+	protected final ArgDecl argOutputToFile =  new ArgDecl( ArgDecl.HasValue, "outputToFile" );
+
+	public static void main( final String[] argv ) {
+		new RunHttpQuery( argv ).mainRun();
+	}
+
+	public RunHttpQuery( final String[] argv ) {
+		super( argv );
+
+		registerHeFQUINJenaIntegration();
+
+		addModule( modResults );
+
+		add( argServerAddress, "--server", "Address of HeFQUIN service" );
+		add( argOutputToFile, "--outputToFile", "Output file (optional, printing to stdout if omitted)" );
+
+		addModule( modQuery );
+	}
+
+	/**
+	 * Returns the usage summary string of the command, showing the required arguments.
+	 *
+	 * @return A string that describes the usage of the command.
+	 */
+	@Override
+	protected String getSummary() {
+		return getCommandName() + " " +
+		"--query=<query> " +
+		"--server=<server address> " +
+		"[--outputToFile=<file name>]";
+	}
+
+	/**
+	 * Returns the command name used to invoke the tool.
+	 *
+	 * @return The name of the command.
+	 */
+	@Override
+	protected String getCommandName() {
+		return "hefquin-client";
+	}
+
+	/**
+	 * Executes the HTTP SPARQL query command.
+	 * This method parses command-line arguments, prepares the output stream
+	 * (either standard output or a file if specified) and delegates query
+	 * execution to the HTTP request handler.
+	 *
+	 * It ensures that any file-based output streams are properly closed after
+	 * execution, even if an error occurs during query processing.
+	 */
+	@Override
+	protected void exec() {
+		if ( ! contains(argServerAddress) )
+			cmdError("Must give a server address to send query to", true );
+
+		PrintStream out = System.out;
+		PrintStream ownedStream = null;
+		if ( contains(argOutputToFile) ) {
+			try {
+				// Appends to file rather than overwriting
+				ownedStream = new PrintStream(
+					new FileOutputStream( getValue( argOutputToFile ), true ),
+					true );
+				out = ownedStream;
+			} catch ( final FileNotFoundException e ) {
+				cmdError( "Failed to create print stream for output destination: " + getValue( argOutputToFile ), false );
+			}
+		}
+
+		final String serverURI = getValue( argServerAddress );
+
+		final Query query = getQuery();
+
+		try {
+			exec( serverURI, query, out );
+		}
+		finally {
+			if (ownedStream != null)
+				ownedStream.close();
+		}
+	}
+
+	/**
+	 * Executes a SPARQL query against a remote SPARQL endpoint using HTTP.
+	 * The query is sent using the SPARQL Protocol over HTTP and the results
+	 * are expected to be returned in SPARQL JSON Results format.
+	 *
+	 * This method handles HTTP request creation, response validation, error
+	 * handling and conversion of the result set into a printable format.
+	 * Successful results are written to the provided output stream.
+	 */
+	protected void exec( final String serverURI,
+	                     final Query query,
+	                     final PrintStream out ) {
+		final HttpClient client = HttpClient.newBuilder()
+			.connectTimeout( Duration.ofMillis(5000) )
+			.build();
+
+		final HttpRequest request = HttpRequest.newBuilder()
+			.uri( URI.create(serverURI) )
+			.header( "Content-Type", "application/sparql-query" )
+			.header( "Accept", "application/sparql-results+json" )
+			.timeout( Duration.ofSeconds(60) )
+			.POST( HttpRequest.BodyPublishers.ofString(query.toString()) )
+			.build();
+
+		final HttpResponse<InputStream> response;
+		try {
+			response = client.send( request, HttpResponse.BodyHandlers.ofInputStream() );
+		}
+		catch ( final IOException e ) {
+			cmdError( "Request to address at <" + serverURI.toString() + "> failed: " + e.getMessage(), true );
+			return;
+		}
+		catch ( final InterruptedException e ) {
+			cmdError( "Request to address at <" + serverURI.toString() + "> failed: " + e.getMessage(), true );
+			return;
+		}
+
+		if ( response.statusCode() != 200 ) {
+			cmdError( "Request failed with HTTP status " + response.statusCode(), true );
+			return;
+		}
+
+		final ResultSet rs = ResultSetFactory.fromJSON( response.body() );
+
+		QueryExecUtils.outputResultSet( rs, query.getPrologue(), modResults.getResultsFormat(), out );
+	}
+
+	/**
+	 * Registers HeFQUIN-specific integrations with the Jena framework.
+	 * This method ensures that queries written in the HeFQUIN syntax are correctly parsed
+	 * into Jena's internal query representation and that query serialization
+	 * correctly falls back to standard SPARQL 1.2 behaviour when needed.
+	 */
+	protected void registerHeFQUINJenaIntegration() {
+		ARQ.init();
+		final SPARQLParserFactory pFact = new SPARQLParserFactory() {
+			@Override
+			public boolean accept( final Syntax syntax ) {
+				return SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN.equals(syntax);
+			}
+
+			@Override
+			public SPARQLParser create( final Syntax syntax ) {
+				return new ParserSPARQL12HeFQUIN();
+			}
+		};
+
+		SPARQLParserRegistry.addFactory( SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN,
+		                                 pFact );
+
+		final QuerySerializerFactory baseFactory =
+				SerializerRegistry.get()
+						.getQuerySerializerFactory(Syntax.syntaxSPARQL_12);
+
+		final QuerySerializerFactory customFactory = new QuerySerializerFactory() {
+			@Override
+			public boolean accept(Syntax syntax) {
+				return SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN.equals(syntax);
+			}
+
+			@Override
+			public QueryVisitor create(Syntax syntax, Prologue prologue, IndentedWriter writer) {
+				return baseFactory.create(Syntax.syntaxSPARQL_12, prologue, writer);
+			}
+
+			@Override
+			public QueryVisitor create(Syntax syntax, SerializationContext context, IndentedWriter writer) {
+				return baseFactory.create(Syntax.syntaxSPARQL_12, context, writer);
+			}
+		};
+
+		SerializerRegistry.get().addQuerySerializer(
+				SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN,
+				customFactory
+		);
+	}
+
+    /**
+     * Returns the SPARQL query to be executed.
+     *
+     * @return the {@code Query} object
+     * @throws TerminationException if the query file could not be found
+     */
+	protected Query getQuery() {
+		try {
+			return modQuery.getQuery();
+		} catch ( final NotFoundException ex ) {
+			System.err.println( "Failed to load query: " + ex.getMessage() );
+			throw new TerminationException( 1 );
+		}
+	}
+
+}
