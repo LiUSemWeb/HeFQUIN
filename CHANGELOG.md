@@ -7,11 +7,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- nothing yet
+- CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616)).
 ### Changed
 - Logging for query planner ([#636](https://github.com/LiUSemWeb/HeFQUIN/pull/636), [#637](https://github.com/LiUSemWeb/HeFQUIN/pull/637)).
 ### Planned for Next Release
-- CLI program to issue queries to the HeFQUIN service ([#606](https://github.com/LiUSemWeb/HeFQUIN/issues/606)).
 - Persistent cache for requests ([#546](https://github.com/LiUSemWeb/HeFQUIN/issues/546), [#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590), [#599](https://github.com/LiUSemWeb/HeFQUIN/issues/599)).
 - Pushing projection variables and distinct into requests to SPARQL endpoints ([#570](https://github.com/LiUSemWeb/HeFQUIN/issues/570)).
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
