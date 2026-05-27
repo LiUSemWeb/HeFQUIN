@@ -322,9 +322,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlan( final Op jenaOp, final boolean mayReduce, final FederationMember fm ) {
 		// If the federation member has a SPARQL endpoint interface, then
 		// we can simply wrap the whole query pattern in a single request.
-		if ( fm instanceof SPARQLEndpoint ) {
+		if ( fm instanceof SPARQLEndpoint ep ) {
 			final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp), null, mayReduce );
-			final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, mayReduce, req );
+			final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>(ep, mayReduce, req);
 			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
 
