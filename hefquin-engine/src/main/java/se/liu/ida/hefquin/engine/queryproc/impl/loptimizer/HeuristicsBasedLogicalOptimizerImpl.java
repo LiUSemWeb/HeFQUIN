@@ -69,14 +69,16 @@ public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 		log.debug( "Starting logical optimization with {} heuristics", heuristics.size() );
 		LogicalPlan resultPlan = inputPlan;
 		for ( final HeuristicForLogicalOptimization h : heuristics ) {
-			log.debug( "Applying heuristic: {}", h.getClass().getSimpleName() );
+			log.debug( "Applying heuristic {} to plan", h.getClass().getSimpleName() );
 			resultPlan = h.apply(resultPlan);
+			log.debug( "Finished applying heuristic {} to plan", h.getClass().getSimpleName() );
 
 			// If the plan has been rewritten into the plan that produces
 			// the empty result, then this plan can be returned immediately.
-			if ( resultPlan instanceof LogicalPlanWithoutResult )
+			if ( resultPlan instanceof LogicalPlanWithoutResult ) {
 				log.debug( "Optimization terminated early: heuristic {} produced empty-result plan", h.getClass().getSimpleName() );
 				return resultPlan;
+			}
 		}
 
 		log.debug( "Logical optimization finished" );
