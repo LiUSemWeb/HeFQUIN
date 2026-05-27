@@ -81,7 +81,7 @@ public class ExecOpParallelBindJoinSPARQLwithUNION
 			"Creating parallel UNION-based SPARQL bind-join request with {} bindings for endpoint {}",
 			batch.size(),
 			fm );
-		return ExecOpSequentialBindJoinSPARQLwithUNION.createRequest(batch, pattern, varsInQuery);
+		return ExecOpSequentialBindJoinSPARQLwithUNION.createRequest(batch, pattern, varsInQuery, this.mayReduce);
 	}
 
 }

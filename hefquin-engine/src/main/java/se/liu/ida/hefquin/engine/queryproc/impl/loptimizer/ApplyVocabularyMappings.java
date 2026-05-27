@@ -316,7 +316,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 
 		// For SPARQL endpoints, the whole graph pattern can be sent in a single request.
 		if ( fm instanceof SPARQLEndpoint ) {
-			final SPARQLRequest reqP = new SPARQLRequestImpl(pattern);
+			final SPARQLRequest reqP = new SPARQLRequestImpl( pattern, null, mayReduce );
 			final LogicalOpRequest<SPARQLRequest, SPARQLEndpoint> req = new LogicalOpRequest<>( (SPARQLEndpoint) fm, mayReduce, reqP );
 			return new LogicalPlanWithNullaryRootImpl(req, null);
 		}

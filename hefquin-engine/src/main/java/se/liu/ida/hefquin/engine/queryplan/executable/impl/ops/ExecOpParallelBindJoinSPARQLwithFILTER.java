@@ -82,7 +82,7 @@ public class ExecOpParallelBindJoinSPARQLwithFILTER
 			"Creating parallel FILTER-based SPARQL bind-join request with {} bindings for endpoint {}",
 			batch.size(),
 			fm );
-		return ExecOpSequentialBindJoinSPARQLwithFILTER.createRequest(batch, pattern);
+		return ExecOpSequentialBindJoinSPARQLwithFILTER.createRequest(batch, pattern, this.mayReduce);
 	}
 
 }

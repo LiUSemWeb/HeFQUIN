@@ -82,7 +82,7 @@ public class ExecOpParallelBindJoinSPARQLwithVALUES
 			"Creating parallel VALUES-based SPARQL bind-join request with {} bindings for endpoint {}",
 			batch.size(),
 			fm );
-		return ExecOpSequentialBindJoinSPARQLwithVALUES.createRequest(batch, pattern);
+		return ExecOpSequentialBindJoinSPARQLwithVALUES.createRequest(batch, pattern, this.mayReduce);
 	}
 
 }
