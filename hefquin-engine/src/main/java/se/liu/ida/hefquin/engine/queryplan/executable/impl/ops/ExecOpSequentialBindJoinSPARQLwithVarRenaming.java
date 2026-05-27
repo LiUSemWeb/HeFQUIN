@@ -152,7 +152,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVarRenaming
 			solMaps.size(),
 			renamedVarPrefix );
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(elmt);
-		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
+		final SPARQLRequest request = new SPARQLRequestImpl(pattern, null, this.mayReduce);
 		return new ExecOpRequestSPARQL<>(request, fm, this.mayReduce, false, null);
 	}
 

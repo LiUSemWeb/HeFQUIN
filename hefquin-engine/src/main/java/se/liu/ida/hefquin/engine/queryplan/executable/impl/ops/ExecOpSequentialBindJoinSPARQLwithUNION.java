@@ -92,17 +92,18 @@ public class ExecOpSequentialBindJoinSPARQLwithUNION
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
 		log.debug( "Creating SPARQL request with {} bindings for endpoint {}", solMaps.size(), fm );
-		final SPARQLRequest request = createRequest(solMaps, pattern, varsInQuery);
+		final SPARQLRequest request = createRequest(solMaps, pattern, varsInQuery, mayReduce);
 		return new ExecOpRequestSPARQL<>(request, fm, this.mayReduce, false, null);
 	}
 
 	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
 	                                           final Element pattern,
-	                                           final Set<Var> varsInQuery ) {
+	                                           final Set<Var> varsInQuery,
+	                                           final boolean mayReduce ) {
 		log.debug( "Building SPARQL UNION request for {} solution mappings", solMaps.size() );
 		final Element elmt = createUnion(solMaps, pattern, varsInQuery);
 		log.debug( "Constructed SPARQL UNION request for {} bindings", solMaps.size() );
-		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(elmt) );
+		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(elmt), null, mayReduce );
 	}
 
 	public static Element createUnion( final Iterable<Binding> solMaps,

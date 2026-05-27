@@ -254,11 +254,11 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return inputPlan;
 		}
 
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl(mergedPattern);
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
 
 		final boolean mayReduce = filterOp.mayReduce();
 
-		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>(fm, mayReduce, mergedReq);
+		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, mayReduce, mergedReq );
 		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 	}
 
@@ -503,7 +503,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		// Now we recurse, applying the filter-pushdown heuristic
 		// to the sub-plan under the gpAdd / gpOptAdd operator.
 		final LogicalPlan rewrittenSubPlanUnderAddOp = apply(newSubPlanUnderAddOp);
-		
+
 		final LogicalPlan newSubPlanUnderRootOp = new LogicalPlanWithUnaryRootImpl(
 				newChildOp,
 				null,

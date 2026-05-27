@@ -564,7 +564,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			req = new BGPRequestImpl(bgp);
 		}
 		else {
-			req = new SPARQLRequestImpl(p);
+			req = new SPARQLRequestImpl(p, null, mayReduce);
 		}
 
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, mayReduce, req);

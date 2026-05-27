@@ -34,7 +34,7 @@ public abstract class BaseForExecOpSequentialBindJoinSPARQL extends BaseForExecO
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
 		log.debug( "Creating non-batched SPARQL request operator for endpoint {}", fm );
-		final SPARQLRequest req = new SPARQLRequestImpl(query);
+		final SPARQLRequest req = new SPARQLRequestImpl(query, null, this.mayReduce);
 		return new ExecOpRequestSPARQL<>(req, fm, this.mayReduce, false, null);
 	}
 

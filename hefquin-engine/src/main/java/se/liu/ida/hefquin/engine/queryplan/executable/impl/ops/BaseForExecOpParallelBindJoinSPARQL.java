@@ -47,7 +47,7 @@ public abstract class BaseForExecOpParallelBindJoinSPARQL
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
 		log.debug( "Creating FULL RETRIEVAL SPARQL request for endpoint {}", fm );
 
-		final SPARQLRequest req = new SPARQLRequestImpl(query);
+		final SPARQLRequest req = new SPARQLRequestImpl(query, null, this.mayReduce);
 		return new ExecOpRequestSPARQL<>(req, fm, this.mayReduce, false, null);
 	}
 }

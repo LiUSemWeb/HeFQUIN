@@ -104,12 +104,13 @@ public class ExecOpSequentialBindJoinSPARQLwithFILTER
 	                                                         final SPARQLEndpoint fm,
 	                                                         final boolean mayReduce ) {
 		log.debug( "Creating SPARQL request with {} bindings for endpoint {}", solMaps.size(), fm );
-		final SPARQLRequest request = createRequest(solMaps, pattern);
+		final SPARQLRequest request = createRequest(solMaps, pattern, mayReduce);
 		return new ExecOpRequestSPARQL<>(request, fm, mayReduce, false, null);
 	}
 
 	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
-	                                           final Element pattern ) {
+	                                           final Element pattern,
+	                                           final boolean mayReduce ) {
 		log.debug( "Building FILTER expression for {} solution mappings", solMaps.size() );
 		final Expr expr = createFilterExpression(solMaps);
 
@@ -119,7 +120,7 @@ public class ExecOpSequentialBindJoinSPARQLwithFILTER
 
 		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
 		log.debug( "Constructed SPARQL FILTER request for {} bindings", solMaps.size() );
-		return new SPARQLRequestImpl(patternForReq);
+		return new SPARQLRequestImpl( patternForReq, null, mayReduce );
 	}
 
 	public static Expr createFilterExpression( final Iterable<Binding> solMaps ) {
