@@ -113,8 +113,10 @@ public class QueryProcessorImpl implements QueryProcessor
 
 			exceptionsCaughtDuringExecution = prg.getExceptionsCaughtDuringExecution();
 
-			if ( ! exceptionsCaughtDuringExecution.isEmpty() )
-				log.debug( "Execution completed with {} caught exception(s).", exceptionsCaughtDuringExecution.size() );
+			if ( log.isDebugEnabled() ) {
+				if ( ! exceptionsCaughtDuringExecution.isEmpty() )
+					log.debug( "Execution completed with {} caught exception(s).", exceptionsCaughtDuringExecution.size() );
+			}
 		}
 
 		final QueryProcessingStatsAndExceptions s = new QueryProcessingStatsAndExceptionsImpl( t4-t1, t2-t1, t3-t2, t4-t3, qepAndStats.object2, execStats, exceptionsCaughtDuringExecution );
