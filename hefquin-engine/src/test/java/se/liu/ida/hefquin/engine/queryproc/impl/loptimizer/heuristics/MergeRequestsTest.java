@@ -582,8 +582,48 @@ public class MergeRequestsTest extends EngineTestBase
 		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
 
 		final SPARQLRequest resultReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) result.getRootOperator()).getRequest();
-		assertEquals( Set.of(v3), resultReq.getProjectionVars());
+		assertEquals( Set.of(v3), resultReq.getProjectionVars() );
 		assertFalse( resultReq.getDistinctRequired() );
+	}
+
+	@Test
+	public void mergeProjectDistinct() {
+		// two request operators under a duplicate-reducing JOIN,
+		// wrapped by a PROJECT operator and targeting the same
+		// federation member, should be merged into a single request
+		// operator with the DISTINCT pushed down into the merged request
+
+		// setup
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final Var v3 = Var.alloc("z");
+
+		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v3);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, true, new SPARQLRequestImpl(tp1, Set.of(v1,v3), true) );
+
+		final TriplePattern tp2 = new TriplePatternImpl(v2, v2, v3);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, true, new SPARQLRequestImpl(tp2, Set.of(v2), true) );
+
+		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+			true,
+			new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+			new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+			null );
+
+		// Project keeps y
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v3), true);
+		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, joinSubPlan);
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(projectPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
+
+		final SPARQLRequest resultReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) result.getRootOperator()).getRequest();
+		assertTrue( resultReq.getDistinctRequired() );
 	}
 
 	@Test

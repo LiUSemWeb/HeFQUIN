@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.*;
 public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 {
 	private static final Logger log = LoggerFactory.getLogger( HeuristicsBasedLogicalOptimizerImpl.class );
+
 	protected final List<HeuristicForLogicalOptimization> heuristics;
 
 	public HeuristicsBasedLogicalOptimizerImpl( final List<HeuristicForLogicalOptimization> heuristics ) {
@@ -65,6 +66,7 @@ public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 	public LogicalPlan optimize( final LogicalPlan inputPlan,
 	                             final boolean keepNaryOperators,
 	                             final QueryProcContext ctxt ) throws LogicalOptimizationException {
+		log.debug( "Starting logical optimization with {} heuristics", heuristics.size() );
 		LogicalPlan resultPlan = inputPlan;
 		for ( final HeuristicForLogicalOptimization h : heuristics ) {
 			log.debug( "Applying heuristic {} to plan", h.getClass().getSimpleName() );
@@ -74,10 +76,12 @@ public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 			// If the plan has been rewritten into the plan that produces
 			// the empty result, then this plan can be returned immediately.
 			if ( resultPlan instanceof LogicalPlanWithoutResult ) {
-				log.debug( "Plan became empty after {}" + h.getClass().getSimpleName());
+				log.debug( "Optimization terminated early: heuristic {} produced empty-result plan", h.getClass().getSimpleName() );
 				return resultPlan;
 			}
 		}
+
+		log.debug( "Logical optimization finished" );
 
 		return resultPlan;
 	}
