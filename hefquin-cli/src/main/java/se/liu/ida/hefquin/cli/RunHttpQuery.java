@@ -37,16 +37,17 @@ import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
 
 /**
- * A command-line tool that executes SPARQL queries against a remote SPARQL
- * endpoint using HTTP and prints the resulting query result set.
+ * A command-line tool that interacts with a HeFQUIN service to execute a SPARQL
+ * query over the federation for which the service is set up, and prints the query result
+ * returned by the service.
  *
  * The tool sends a SPARQL SELECT query to a given HTTP endpoint using a
  * standard HTTP POST request with SPARQL Protocol encoding. It expects the
  * endpoint to return results in SPARQL JSON Results format, which is then
  * parsed into a Jena {@code ResultSet}.
  *
- * The resulting bindings are printed to standard output or optionally written
- * to a file in a user-specified results format.
+ * The resulting solution mappings are printed to standard output or written
+ * to a file in a user-selected results format.
  */
 public class RunHttpQuery extends CmdARQ
 {
@@ -67,7 +68,7 @@ public class RunHttpQuery extends CmdARQ
 
 		addModule( modResults );
 
-		add( argServerAddress, "--server", "SPARQL endpoint URI" );
+		add( argServerAddress, "--server", "Address of HeFQUIN service" );
 		add( argOutputToFile, "--outputToFile", "Output file (optional, printing to stdout if omitted)" );
 
 		addModule( modQuery );
@@ -82,8 +83,8 @@ public class RunHttpQuery extends CmdARQ
 	protected String getSummary() {
 		return getCommandName() + " " +
 		"--query=<query> " +
-		"--server=<server-address> " +
-		"[--outputToFile=<file-name>]";
+		"--server=<server address> " +
+		"[--outputToFile=<file name>]";
 	}
 
 	/**
@@ -93,7 +94,7 @@ public class RunHttpQuery extends CmdARQ
 	 */
 	@Override
 	protected String getCommandName() {
-		return "hefquin-httpquery";
+		return "hefquin-client";
 	}
 
 	/**
