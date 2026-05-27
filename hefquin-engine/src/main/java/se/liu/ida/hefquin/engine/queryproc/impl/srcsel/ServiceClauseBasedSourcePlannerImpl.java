@@ -267,7 +267,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 				throw new IllegalArgumentException( "Invalid SERVICE clause: missing PARAMS for " + ep.toString() );
 
 			final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-			final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
+			final SPARQLRequest req = new SPARQLRequestImpl( p, null, false );
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(ep, mayReduce, req);
 			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
@@ -323,22 +323,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		// If the federation member has a SPARQL endpoint interface, then
 		// we can simply wrap the whole query pattern in a single request.
 		if ( fm instanceof SPARQLEndpoint ) {
-			if ( jenaOp instanceof OpBGP opBGP ) {
-				// If possible, create an explicit BGP request operator
-				// rather than a general SPARQL pattern request operator
-				// because that causes fewer checks and casts further
-				// down in the query planning pipeline.
-				return createPlanForBGP(opBGP, mayReduce, fm);
-			}
-			else if ( jenaOp instanceof OpTriple opTP ) {
-				// Likewise for triple patterns
-				return createPlanForTriplePattern(opTP, mayReduce, fm);
-			}
-			else {
-				final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp), null, mayReduce );
-				final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, mayReduce, req );
-				return new LogicalPlanWithNullaryRootImpl(op, null);
-			}
+			final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp), null, mayReduce );
+			final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, mayReduce, req );
+			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
 
 		// For all federation members with other types of interfaces,
