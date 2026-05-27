@@ -59,7 +59,7 @@ fd:WrappedFederationMemberShape
         sh:node fd:WrapperShape ;
         sh:message "Wrapped federation member must have exactly one fd:wrapper." ;
     ] ;
-        sh:property [
+    sh:property [
         sh:path fd:vocabularyMappingsFile ;
         sh:maxCount 0 ;
         sh:datatype xsd:string ;
@@ -136,7 +136,6 @@ fd:FixedEndpointInterfaceShape
     ] ;
     sh:property [
         sh:path fd:supportedProtocol ;
-
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:message "Fixed endpoint interface must have exactly one fd:supportedProtocol." ;
