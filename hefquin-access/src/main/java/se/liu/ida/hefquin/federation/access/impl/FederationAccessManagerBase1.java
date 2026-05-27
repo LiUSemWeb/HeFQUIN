@@ -77,10 +77,6 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		countQuery.setQueryPattern( QueryPatternUtils.convertToJenaElement( pattern ) );
 
 		// initialize the SELECT clause of the query
-		// (it needs to be a COUNT(*) without DISTINCT,
-		// and we need a variable for it)
-
-		// initialize the SELECT clause of the query
 		// (it needs to be a COUNT(*) or COUNT(DISTINCT *) depending on
 		// whether the request requires duplicate elimination, and we need
 		// a variable for the result)
