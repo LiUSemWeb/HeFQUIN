@@ -47,7 +47,7 @@ ex:dbpediaSPARQLWithVocabMappings2 a fd:RDFBasedFederationMember ;
     fd:serviceURI "http://example.org/DBpediaWrapper2"^^xsd:anyURI ;
     fd:interface [ a                     fd:FixedEndpointInterface ;
                    fd:supportedProtocol  fd:SPARQLProtocol ;
-                   fd:endpointAddress    "http://dbpedia.org/sparql"^^xsd:anyURI ] ;
+                   fd:endpointAddress    "https://qlever.dev/api/dbpedia"^^xsd:anyURI ] ;
     fd:vocabularyMappingsFile "examples/ExampleVocabMappingDBpedia.ttl" .
 
 ex:wikidataSPARQLWithVocabMappings a fd:RDFBasedFederationMember ;
