@@ -69,7 +69,7 @@ public class QueryPlannerImpl implements QueryPlanner
 	@Override
 	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query,
 	                                                          final QueryProcContext ctxt ) throws QueryPlanningException {
-		log.debug("Starting source assignment phase.");
+		log.debug("Starting source selection phase.");
 
 		final long t1 = System.currentTimeMillis();
 		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query, ctxt);
@@ -78,7 +78,7 @@ public class QueryPlannerImpl implements QueryPlanner
 			srcasgPrinter.print( saAndStats.object1, LogicalPlanStage.SOURCE_ASSIGNMENT );
 		}
 		final long t2 = System.currentTimeMillis();
-		log.debug( "Source assignment completed in {} ms.", (t2 - t1) );
+		log.debug( "Source selection completed in {} ms.", (t2 - t1) );
 		log.debug( "Starting logical optimization phase." );
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
@@ -103,7 +103,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		if ( lp instanceof LogicalPlanWithoutResult ) {
 			planAndStats = new Pair<>( PhysicalPlanWithoutResult.getInstance(),
 			                           null );  // no stats
-			log.debug( "Logical optimization produced a plan without results; skipping physical optimization." );
+			log.debug( "Logical optimization returned a plan that produces the empty result; skipping physical optimization." );
 		}
 		else
 			planAndStats = poptimizer.optimize(lp, ctxt);
