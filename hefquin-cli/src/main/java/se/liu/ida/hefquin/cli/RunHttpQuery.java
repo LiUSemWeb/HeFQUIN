@@ -10,6 +10,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.output.NullPrintStream;
 import org.apache.jena.atlas.io.IndentedWriter;
@@ -60,6 +61,8 @@ public class RunHttpQuery extends CmdARQ
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl( ArgDecl.NoValue, "suppressResultPrintout" );
 	protected final ArgDecl argServerAddress = new ArgDecl( ArgDecl.HasValue, "server" );
 	protected final ArgDecl argOutputToFile =  new ArgDecl( ArgDecl.HasValue, "outputToFile" );
+
+	protected static final Pattern BASE_PATTERN = Pattern.compile( "\\bBASE\\b\\s*<[^>]+>", Pattern.CASE_INSENSITIVE );
 
 	public static void main( final String[] argv ) {
 		new RunHttpQuery( argv ).mainRun();
@@ -119,11 +122,6 @@ public class RunHttpQuery extends CmdARQ
 
 		PrintStream out = System.out;
 		PrintStream ownedStream = null;
-		if ( contains( argSuppressResultPrintout ) ) {
-			out = NullPrintStream.INSTANCE;
-		}
-
-		// File output takes precedence over result printout suppression
 		if ( contains(argOutputToFile) ) {
 			try {
 				// Appends to file rather than overwriting
@@ -134,6 +132,11 @@ public class RunHttpQuery extends CmdARQ
 			} catch ( final FileNotFoundException e ) {
 				cmdError( "Failed to create print stream for output destination: " + getValue( argOutputToFile ), false );
 			}
+		}
+
+		// Result printout suppression takes precedence over file output
+		if ( contains( argSuppressResultPrintout ) ) {
+			out = NullPrintStream.INSTANCE;
 		}
 
 		final String serverURI = getValue( argServerAddress );
@@ -271,15 +274,22 @@ public class RunHttpQuery extends CmdARQ
 	/**
 	 * Prepares a SPARQL query for HTTP transmission by ensuring that any base URI
 	 * defined in the query prologue is explicitly included in the serialized query.
+	 *
+	 * <p>If the query already contains an explicit {@code BASE <...>} declaration,
+	 * it is left unchanged. Otherwise, if a base URI is present in the query
+	 * prologue (e.g., provided via the {@code --base} argument), it is injected as
+	 * a leading {@code BASE} clause.</p>
 	 */
 	protected static String prepareQuery( final Query query ) {
-		final String base = query.getPrologue().getBaseURI();
-		String q = query.toString();
-		if ( base != null && ! q.toLowerCase().contains("base") ) {
-			q = "BASE <" + base + ">\n" + q;
-		}
+		final String serialized = query.toString();
 
-		return q;
+		if ( query.getPrologue().getBaseURI() == null )
+			return serialized;
+
+		if ( BASE_PATTERN.matcher(serialized).find() )
+			return serialized;
+
+		return "BASE <" + query.getPrologue().getBaseURI() + ">\n" + serialized;
 	}
 
 }
