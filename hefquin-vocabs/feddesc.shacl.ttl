@@ -35,8 +35,14 @@ fd:RDFBasedFederationMemberShape
     sh:targetClass fd:RDFBasedFederationMember;
     sh:not [
         sh:class fd:WrappedFederationMember ;
+        sh:message "RDF-based federation member cannot also be an fd:WrappedFederationMember." ;
     ] ;
-    sh:message "RDF-based federation member cannot also be an fd:WrappedFederationMember." ;
+    sh:property [
+        sh:path fd:wrapper ;
+        sh:maxCount 0 ;
+        sh:datatype xsd:string ;
+        sh:message "RDF-based federation member cannot have a wrapper." ;
+    ] ;
     sh:property [
         sh:path fd:vocabularyMappingsFile ;
         sh:maxCount 1 ;
@@ -50,8 +56,8 @@ fd:WrappedFederationMemberShape
     sh:targetClass fd:WrappedFederationMember;
     sh:not [
         sh:class fd:RDFBasedFederationMember ;
+        sh:message "Wrapped federation member cannot also be an fd:RDFBasedFederationMember." ;
     ] ;
-    sh:message "Wrapped federation member cannot also be an fd:RDFBasedFederationMember." ;
     sh:property [
         sh:path fd:wrapper ;
         sh:minCount 1 ;
@@ -171,13 +177,17 @@ fd:FragmentInterfaceShape
     ] ;
     sh:property [
         sh:path fd:supportedProtocol ;
-        sh:or (
-            [ sh:hasValue fd:TPFProtocol ]
-            [ sh:hasValue fd:brTPFProtocol ]
-        ) ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:message "Fragment interface must have exactly one fd:supportedProtocol." ;
+    ] ;
+    sh:property [
+        sh:path fd:supportedProtocol ;
+        sh:in (
+            fd:TPFProtocol
+            fd:brTPFProtocol
+        ) ;
+        sh:message "Supported protocol must be one of fd:TPFProtocol or fd:brTPFProtocol." ;
     ] .
 
 # Shape for Template-based interfaces
@@ -204,6 +214,11 @@ fd:TemplateBasedInterfaceShape
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:message "Template-based interface must have exactly one fd:supportedProtocol." ;
+    ] ;
+    sh:property [
+        sh:path fd:supportedProtocol ;
+        sh:in ( fd:GenericWebAPIProtocol ) ;
+        sh:message "Supported protocol must be fd:GenericWebAPIProtocol." ;
     ] .
 
 # Shape for URI Template
@@ -271,7 +286,14 @@ fd:RMLWrapperShape
         sh:path fd:rmlTriplesMaps ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:node fd:RmlTriplesMapShape ;
+        sh:node [
+            sh:property [
+                sh:path ( [ sh:zeroOrMorePath rdf:rest ] rdf:first ) ;
+                sh:node fd:RmlTriplesMapShape ;
+                sh:minCount 1 ;
+                sh:message "Every element in fd:rmlTriplesMaps must satisfy fd:RmlTriplesMapShape." ;
+            ]
+        ] ;
         sh:message "Wrapper must have exactly one fd:rmlTriplesMaps." ;
     ] .
 
