@@ -278,11 +278,11 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 				return entry;
 			} );
 
-			// Check capacity
+			// Enforce max capacity
 			if ( map.size() > capacity ) {
-				final Iterable<ChronicleMapCacheKey> evictionCandidates = replacementPolicy.getEvictionCandidates(1);
-				final ChronicleMapCacheKey evictionCandidate = evictionCandidates.iterator().next();
-				evict(evictionCandidate);
+				final Iterable<ChronicleMapCacheKey> evictionCandidates = replacementPolicy
+						.getEvictionCandidates( map.size() - capacity );
+				evictionCandidates.forEach(this::evict);
 			}
 		}
 	}
