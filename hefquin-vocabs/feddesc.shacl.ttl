@@ -8,10 +8,13 @@ PREFIX rml:    <http://w3id.org/rml/>
 # Main shape for FederationMember
 fd:FederationMemberShape
     a sh:NodeShape ;
-    sh:or (
-        [ sh:class fd:RDFBasedFederationMember ]
-        [ sh:class fd:WrappedFederationMember ]
-    ) ;
+    sh:node [
+        sh:xone (
+            [ sh:class fd:RDFBasedFederationMember ]
+            [ sh:class fd:WrappedFederationMember ]
+        ) ;
+        sh:message "Federation member must be typed as exactly one supported concrete member type: fd:RDFBasedFederationMember or fd:WrappedFederationMember." ;
+    ] ;
     sh:message "Federation member must be one of the supported types" ;
     sh:targetClass fd:FederationMember ;
     sh:property [
@@ -33,10 +36,6 @@ fd:RDFBasedFederationMemberShape
     a sh:NodeShape ;
     sh:node fd:FederationMemberShape ;
     sh:targetClass fd:RDFBasedFederationMember;
-    sh:not [
-        sh:class fd:WrappedFederationMember ;
-        sh:message "RDF-based federation member cannot also be an fd:WrappedFederationMember." ;
-    ] ;
     sh:property [
         sh:path fd:wrapper ;
         sh:maxCount 0 ;
@@ -54,10 +53,6 @@ fd:WrappedFederationMemberShape
     a sh:NodeShape ;
     sh:node fd:FederationMemberShape ;
     sh:targetClass fd:WrappedFederationMember;
-    sh:not [
-        sh:class fd:RDFBasedFederationMember ;
-        sh:message "Wrapped federation member cannot also be an fd:RDFBasedFederationMember." ;
-    ] ;
     sh:property [
         sh:path fd:wrapper ;
         sh:minCount 1 ;
@@ -112,26 +107,20 @@ fd:WrappedFederationMemberShape
 # Shape for interfaces
 fd:InterfaceShape
     a sh:NodeShape ;
-    sh:or (
-        [ sh:class fd:FixedEndpointInterface ;
-          sh:node  fd:FixedEndpointInterfaceShape ]
-        [ sh:class fd:TemplateBasedInterface ;
-          sh:node  fd:TemplateBasedInterfaceShape ]
-        [ sh:class fd:FragmentInterface ;
-          sh:node  fd:FragmentInterfaceShape ]
-    ) ;
-    sh:message "Interface must be one of the supported types" .
+    sh:node [
+        sh:xone (
+            [ sh:class fd:FixedEndpointInterface ]
+            [ sh:class fd:TemplateBasedInterface ]
+            [ sh:class fd:FragmentInterface ]
+        ) ;
+        sh:message "Interface must be typed as exactly one supported concrete member type: fd:FixedEndpointInterface, fd:TemplateBasedInterface, or fd:FragmentInterface." ;
+    ] .
 
 # Shape for Fixed Endpoint interfaces
 fd:FixedEndpointInterfaceShape
     a sh:NodeShape ;
+    sh:node fd:InterfaceShape ;
     sh:targetClass fd:FixedEndpointInterface ;
-    sh:not [
-        sh:class fd:TemplateBasedInterface ;
-    ] ;
-    sh:not [
-        sh:class fd:FragmentInterface ;
-    ] ;
     sh:message "Fixed endpoint interface cannot also be an fd:TemplateBasedInterface or an fd:FragmentInterface." ;
     sh:property [
         sh:path fd:endpointAddress ;
@@ -160,13 +149,8 @@ fd:FixedEndpointInterfaceShape
 # Shape for Fragment interfaces
 fd:FragmentInterfaceShape
     a sh:NodeShape ;
+    sh:node fd:InterfaceShape ;
     sh:targetClass fd:FragmentInterface ;
-    sh:not [
-        sh:class fd:TemplateBasedInterface ;
-    ] ;
-    sh:not [
-        sh:class fd:FixedEndpointInterface ;
-    ] ;
     sh:message "Fragment interface cannot also be an fd:TemplateBasedInterface or an fd:FixedEndpointInterface." ;
     sh:property [
         sh:path fd:exampleFragmentAddress ;
@@ -193,13 +177,8 @@ fd:FragmentInterfaceShape
 # Shape for Template-based interfaces
 fd:TemplateBasedInterfaceShape
     a sh:NodeShape ;
+    sh:node fd:InterfaceShape ;
     sh:targetClass fd:TemplateBasedInterface ;
-    sh:not [
-        sh:class fd:FragmentInterface ;
-    ] ;
-    sh:not [
-        sh:class fd:FixedEndpointInterface ;
-    ] ;
     sh:message "Template-based interface cannot also be an fd:FragmentInterface or an fd:FixedEndpointInterface." ;
     sh:property [
         sh:path fd:uriTemplate ;
