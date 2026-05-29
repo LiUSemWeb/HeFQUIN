@@ -263,7 +263,6 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 *                                   unsupported
 	 */
 	public < ReqType extends DataRetrievalRequest,
-	         RespType extends DataRetrievalResponse<?>,
 	         MemberType extends FederationMember >
 	CompletableFuture<CardinalityResponse> issueCardReq( final ReqType req,
 	                                                     final MemberType fm )
