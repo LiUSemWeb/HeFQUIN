@@ -120,9 +120,14 @@ public class RunHttpQuery extends CmdARQ
 		if ( ! contains(argServerAddress) )
 			cmdError("Must give a server address to send query to", true );
 
-		PrintStream out = System.out;
-		PrintStream ownedStream = null;
-		if ( contains(argOutputToFile) ) {
+		final PrintStream out;
+		final PrintStream ownedStream;
+		// Result printout suppression has highest precedence
+		if ( contains( argSuppressResultPrintout ) ) {
+			out = NullPrintStream.INSTANCE;
+			ownedStream = null;
+		}
+		else if ( contains(argOutputToFile) ) {
 			try {
 				// Appends to file rather than overwriting
 				ownedStream = new PrintStream(
@@ -131,12 +136,12 @@ public class RunHttpQuery extends CmdARQ
 				out = ownedStream;
 			} catch ( final FileNotFoundException e ) {
 				cmdError( "Failed to create print stream for output destination: " + getValue( argOutputToFile ), false );
+				return;
 			}
 		}
-
-		// Result printout suppression takes precedence over file output
-		if ( contains( argSuppressResultPrintout ) ) {
-			out = NullPrintStream.INSTANCE;
+		else {
+			out = System.out;
+			ownedStream = null;
 		}
 
 		final String serverURI = getValue( argServerAddress );
