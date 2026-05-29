@@ -15,7 +15,6 @@ fd:FederationMemberShape
         ) ;
         sh:message "Federation member must be typed as exactly one supported concrete member type: fd:RDFBasedFederationMember or fd:WrappedFederationMember." ;
     ] ;
-    sh:message "Federation member must be one of the supported types" ;
     sh:targetClass fd:FederationMember ;
     sh:property [
         sh:path fd:serviceURI ;
@@ -121,7 +120,6 @@ fd:FixedEndpointInterfaceShape
     a sh:NodeShape ;
     sh:node fd:InterfaceShape ;
     sh:targetClass fd:FixedEndpointInterface ;
-    sh:message "Fixed endpoint interface cannot also be an fd:TemplateBasedInterface or an fd:FragmentInterface." ;
     sh:property [
         sh:path fd:endpointAddress ;
         sh:minCount 1 ;
@@ -151,7 +149,6 @@ fd:FragmentInterfaceShape
     a sh:NodeShape ;
     sh:node fd:InterfaceShape ;
     sh:targetClass fd:FragmentInterface ;
-    sh:message "Fragment interface cannot also be an fd:TemplateBasedInterface or an fd:FixedEndpointInterface." ;
     sh:property [
         sh:path fd:exampleFragmentAddress ;
         sh:minCount 1 ;
@@ -179,7 +176,6 @@ fd:TemplateBasedInterfaceShape
     a sh:NodeShape ;
     sh:node fd:InterfaceShape ;
     sh:targetClass fd:TemplateBasedInterface ;
-    sh:message "Template-based interface cannot also be an fd:FragmentInterface or an fd:FixedEndpointInterface." ;
     sh:property [
         sh:path fd:uriTemplate ;
         sh:minCount 1 ;
