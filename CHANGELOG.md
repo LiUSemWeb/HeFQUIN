@@ -7,7 +7,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616)).
+- CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616), [#643](https://github.com/LiUSemWeb/HeFQUIN/issues/643)).
 ### Changed
 - Pushing projection variables and distinct into requests to SPARQL endpoints ([#600](https://github.com/LiUSemWeb/HeFQUIN/issues/600), [#629](https://github.com/LiUSemWeb/HeFQUIN/issues/629), [#638](https://github.com/LiUSemWeb/HeFQUIN/issues/638), [#639](https://github.com/LiUSemWeb/HeFQUIN/issues/639), [#642](https://github.com/LiUSemWeb/HeFQUIN/issues/642)).
 - Logging for query planner ([#636](https://github.com/LiUSemWeb/HeFQUIN/pull/636), [#637](https://github.com/LiUSemWeb/HeFQUIN/pull/637)).
