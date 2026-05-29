@@ -159,10 +159,10 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 		}
 
 		// Enforce max capacity
-		while ( map.size() > capacity ) {
-			final Iterable<ChronicleMapCacheKey> evictionCandidates = replacementPolicy.getEvictionCandidates(1);
-			final ChronicleMapCacheKey evictionCandidate = evictionCandidates.iterator().next();
-			evict(evictionCandidate);
+		if ( map.size() > capacity ) {
+			final Iterable<ChronicleMapCacheKey> evictionCandidates = replacementPolicy
+					.getEvictionCandidates( map.size() - capacity );
+			evictionCandidates.forEach(this::evict);
 		}
 
 		logger.info( toString() );
