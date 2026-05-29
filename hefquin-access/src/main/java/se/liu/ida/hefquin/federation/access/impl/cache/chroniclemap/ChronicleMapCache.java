@@ -243,7 +243,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 	 *
 	 * <p>
 	 * If the key already exists, the corresponding entry is replaced and the
-	 * replacement policy is notified accordingly. Otherwise, entry is added. If the
+	 * replacement policy is notified accordingly. Otherwise, the entry is added. If the
 	 * cache exceeds max capacity, an entry is evicted according to the replacement
 	 * policy.
 	 * </p>
