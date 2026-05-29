@@ -165,7 +165,12 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 			evictionCandidates.forEach(this::evict);
 		}
 
-		logger.info( toString() );
+		logger.info(
+			"ChronicleMap-based cache created: filename={}, capacity={}, size={}",
+			filename,
+			capacity,
+			map.size()
+		);
 	}
 
 	/**
