@@ -308,20 +308,22 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 	@Override
 	public CompletableFuture<? extends DataRetrievalResponse<?>> get( final ChronicleMapCacheKey key ) {
 		synchronized (map) {
-			final ChronicleMapCacheEntry e = inMemoryCache.get(key);
-			if ( e != null ) {
-				if( invalidPolicy.isStillValid(e) ) {
-					replacementPolicy.entryWasRequested(key, e);
-					return e.getObject();
-				}
-				else {
-					inMemoryCache.remove(key);
+			final ChronicleMapCacheEntry inMemoryEntry = inMemoryCache.get(key);
+			final ChronicleMapCacheEntry entry;
+
+			if ( inMemoryEntry != null ) {
+				entry = inMemoryEntry;
+			}
+			else {
+				entry = map.get(key);
+				if ( entry != null ) {
+					inMemoryCache.put(key, entry);
 				}
 			}
 
-			final ChronicleMapCacheEntry entry = map.get(key);
-			if ( entry == null )
+			if ( entry == null ) {
 				return null;
+			}
 
 			if ( ! invalidPolicy.isStillValid(entry) ) {
 				evict(key);
@@ -329,7 +331,6 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 			}
 
 			replacementPolicy.entryWasRequested(key, entry);
-			inMemoryCache.put(key, entry);
 			return entry.getObject();
 		}
 	}
