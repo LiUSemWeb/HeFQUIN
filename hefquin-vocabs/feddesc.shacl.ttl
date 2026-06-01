@@ -113,7 +113,8 @@ fd:InterfaceShape
             [ sh:class fd:FragmentInterface ]
         ) ;
         sh:message "Interface must be typed as exactly one supported concrete member type: fd:FixedEndpointInterface, fd:TemplateBasedInterface, or fd:FragmentInterface." ;
-    ] .
+    ] ;
+    sh:targetClass fd:interface .
 
 # Shape for Fixed Endpoint interfaces
 fd:FixedEndpointInterfaceShape
