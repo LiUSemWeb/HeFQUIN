@@ -500,16 +500,6 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		public ExecutorService getExecutorServiceForPlanTasks() {
 			throw new UnsupportedOperationException();
 		}
-
-		@Override
-		public boolean isExperimentRun() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean skipExecution() {
-			throw new UnsupportedOperationException();
-		}
 	}
 
 }

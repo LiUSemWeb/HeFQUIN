@@ -25,6 +25,8 @@ import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 
 /**
  * A command-line tool that executes SPARQL queries using the HeFQUIN federation
@@ -121,8 +123,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			.withSourceAssignmentPrinter( modPlanPrinting.getSourceAssignmentPrinter() )
 			.withLogicalPlanPrinter( modPlanPrinting.getLogicalPlanPrinter() )
 			.withPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
-			.withExecutablePlanPrinter( modPlanPrinting.getExecutablePlanPrinter() )
-			.setSkipExecution( contains(argSkipExecution) );
+			.withExecutablePlanPrinter( modPlanPrinting.getExecutablePlanPrinter() );
 
 		if( modEngineConfig.getConfDescr() != null ){
 			builder.withEngineConfiguration( modEngineConfig.getConfDescr() );
@@ -142,10 +143,14 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			out = System.out;
 		}
 
-		QueryProcessingStatsAndExceptions statsAndExceptions = null;
+		final QueryProcContextBuilder ctxBuilder = e.getQueryProcContextBuilder();
+		if ( contains(argSkipExecution) ) ctxBuilder.setSkipExecution();
 
+		final QueryProcContext2 ctx = ctxBuilder.build();
+
+		QueryProcessingStatsAndExceptions statsAndExceptions = null;
 		try {
-			statsAndExceptions = e.executeQueryAndPrintResult(query, resFmt, out);
+			statsAndExceptions = e.executeQueryAndPrintResult(query, resFmt, out, ctx);
 		}
 		catch ( final IllegalQueryException ex ) {
 			System.out.flush();

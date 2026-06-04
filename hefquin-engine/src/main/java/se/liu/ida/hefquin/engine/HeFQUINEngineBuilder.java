@@ -45,8 +45,6 @@ public class HeFQUINEngineBuilder
 {
 	private FederationCatalog fedCat = null;
 	private Model engineConf = null;
-	private boolean skipExecution = false;
-	private boolean isExperimentRun = false;
 	private ExecutorService execFed = null;
 	private ExecutorService execPlan = null;
 	private LogicalPlanPrinter srcasgPrinter = null;
@@ -181,28 +179,6 @@ public class HeFQUINEngineBuilder
 	}
 
 	/**
-	 * Sets whether the engine should skip execution after query planning.
-	 *
-	 * @param skip whether to skip query execution
-	 * @return this builder instance for method chaining
-	 */
-	public HeFQUINEngineBuilder setSkipExecution( final boolean skip ) {
-		this.skipExecution = skip;
-		return this;
-	}
-
-	/**
-	 * Sets whether the engine should treat the current run as part of an experiment.
-	 *
-	 * @param isExperimentRun whether this is an experimental run
-	 * @return this builder instance for method chaining
-	 */
-	public HeFQUINEngineBuilder setExperimentRun(final boolean isExperimentRun) {
-		this.isExperimentRun = isExperimentRun;
-		return this;
-	}
-
-	/**
 	 * Returns a {@link HeFQUINEngine} instance that is created using the
 	 * parameters configured via this builder.
 	 *
@@ -228,15 +204,13 @@ public class HeFQUINEngineBuilder
 
 		// create context
 		final Context ctx = new HeFQUINEngineConfigReader.Context() {
-			public ExecutorService getExecutorServiceForFederationAccess() { return execFed; }
-			public ExecutorService getExecutorServiceForPlanTasks() { return execPlan; }
-			public FederationCatalog getFederationCatalog() { return fedCat; }
-			public boolean isExperimentRun() { return isExperimentRun; }
-			public boolean skipExecution() { return skipExecution; }
-			public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
-			public LogicalPlanPrinter getLogicalPlanPrinter() { return lplanPrinter; }
-			public PhysicalPlanPrinter getPhysicalPlanPrinter() { return pplanPrinter; }
-			public ExecutablePlanPrinter getExecutablePlanPrinter() { return eplanPrinter; }
+			@Override public ExecutorService getExecutorServiceForFederationAccess() { return execFed; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execPlan; }
+			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
+			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
+			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return lplanPrinter; }
+			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return pplanPrinter; }
+			@Override public ExecutablePlanPrinter getExecutablePlanPrinter() { return eplanPrinter; }
 		};
 
 		// init engine

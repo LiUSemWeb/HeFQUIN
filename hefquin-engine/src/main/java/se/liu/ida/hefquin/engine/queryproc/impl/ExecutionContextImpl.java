@@ -15,16 +15,12 @@ public class ExecutionContextImpl implements ExecutionContext
 	protected final ExecutorService execServiceForPlanTasks;
 	protected final LogicalToPhysicalPlanConverter lp2pp;
 	protected  final LogicalToPhysicalOpConverter lop2pop;
-	protected final boolean isExperimentRun;
-	protected final boolean skipExecution;
 
 	public ExecutionContextImpl( final FederationAccessManager fedAccMgr,
 	                             final FederationCatalog fedCatalog,
 	                             final ExecutorService execServiceForPlanTasks,
 	                             final LogicalToPhysicalPlanConverter lp2pp,
-	                             final LogicalToPhysicalOpConverter lop2pop,
-	                             final boolean isExperimentRun,
-	                             final boolean skipExecution ) {
+	                             final LogicalToPhysicalOpConverter lop2pop ) {
 		assert fedAccMgr != null;
 		assert fedCatalog != null;
 		assert execServiceForPlanTasks != null;
@@ -36,8 +32,6 @@ public class ExecutionContextImpl implements ExecutionContext
 		this.execServiceForPlanTasks = execServiceForPlanTasks;
 		this.lp2pp = lp2pp;
 		this.lop2pop = lop2pop;
-		this.isExperimentRun = isExperimentRun;
-		this.skipExecution = skipExecution;
 	}
 
 	@Override
@@ -54,11 +48,5 @@ public class ExecutionContextImpl implements ExecutionContext
 
 	@Override
 	public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
-
-	@Override
-	public boolean isExperimentRun() { return isExperimentRun; }
-
-	@Override
-	public boolean skipExecution() { return skipExecution; }
 
 }

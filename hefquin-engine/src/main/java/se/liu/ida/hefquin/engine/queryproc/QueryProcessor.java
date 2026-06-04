@@ -6,7 +6,8 @@ import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 public interface QueryProcessor
 {
 	QueryProcessingStatsAndExceptions processQuery( Query query,
-	                                                QueryResultSink resultSink )
+	                                                QueryResultSink resultSink,
+	                                                QueryProcContext2 ctx )
 			throws QueryProcException;
 
 	QueryPlanner getPlanner();

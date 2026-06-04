@@ -295,12 +295,6 @@ public class HeFQUINEngineConfigReaderTest
 			public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 
 			@Override
-			public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public boolean skipExecution() { throw new UnsupportedOperationException(); }
-
-			@Override
 			public LogicalPlanPrinter getSourceAssignmentPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
@@ -353,16 +347,6 @@ public class HeFQUINEngineConfigReaderTest
 				public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() {
 					throw new UnsupportedOperationException();
 				}
-
-				@Override
-				public boolean isExperimentRun() {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public boolean skipExecution() {
-					throw new UnsupportedOperationException();
-				}
 			};
 
 			@Override
@@ -378,12 +362,6 @@ public class HeFQUINEngineConfigReaderTest
 
 			@Override
 			public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public boolean skipExecution() { throw new UnsupportedOperationException(); }
 
 			@Override
 			public LogicalPlanPrinter getSourceAssignmentPrinter() { throw new UnsupportedOperationException(); }

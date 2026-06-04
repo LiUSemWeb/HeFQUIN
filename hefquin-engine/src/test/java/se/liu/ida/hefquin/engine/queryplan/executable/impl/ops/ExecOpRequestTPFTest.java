@@ -86,8 +86,6 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
-			@Override public boolean isExperimentRun() { return false; }
-			@Override public boolean skipExecution() { return false; }
 		};
 
 		op.execute(sink, execCxt);
@@ -148,8 +146,6 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
-			@Override public boolean isExperimentRun() { return false; }
-			@Override public boolean skipExecution() { return false; }
 		};
 	}
 

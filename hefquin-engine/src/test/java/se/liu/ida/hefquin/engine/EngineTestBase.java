@@ -105,8 +105,6 @@ public abstract class EngineTestBase
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
-			@Override public boolean isExperimentRun() { return false; }
-			@Override public boolean skipExecution() { return false; }
 		};
 	}
 

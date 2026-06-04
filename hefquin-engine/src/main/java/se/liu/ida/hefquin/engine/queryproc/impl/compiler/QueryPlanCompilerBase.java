@@ -22,9 +22,7 @@ public abstract class QueryPlanCompilerBase implements QueryPlanCompiler
 			                                 ctxt.getFederationCatalog(),
 			                                 ctxt.getExecutorServiceForPlanTasks(),
 			                                 ctxt.getLogicalToPhysicalPlanConverter(),
-			                                 ctxt.getLogicalToPhysicalOpConverter(),
-			                                 ctxt.isExperimentRun(),
-			                                 ctxt.skipExecution() );
+			                                 ctxt.getLogicalToPhysicalOpConverter() );
 	}
 
 }

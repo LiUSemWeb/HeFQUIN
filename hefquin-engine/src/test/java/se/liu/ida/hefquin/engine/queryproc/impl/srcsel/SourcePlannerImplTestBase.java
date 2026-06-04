@@ -36,8 +36,6 @@ public abstract class SourcePlannerImplTestBase extends EngineTestBase
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
-			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
-			@Override public boolean skipExecution() { return false; }
 		};
 
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );

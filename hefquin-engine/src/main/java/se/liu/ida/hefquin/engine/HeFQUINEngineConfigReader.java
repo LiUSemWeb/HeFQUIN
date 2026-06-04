@@ -107,8 +107,6 @@ public class HeFQUINEngineConfigReader
 		ExecutorService getExecutorServiceForFederationAccess();
 		ExecutorService getExecutorServiceForPlanTasks();
 		FederationCatalog getFederationCatalog();
-		boolean isExperimentRun();
-		boolean skipExecution();
 
 		/** may be <code>null</code> if source assignment printing is not requested by the user */
 		LogicalPlanPrinter getSourceAssignmentPrinter();
@@ -499,12 +497,6 @@ public class HeFQUINEngineConfigReader
 		public FederationCatalog getFederationCatalog() { return ctx.getFederationCatalog(); }
 
 		@Override
-		public boolean isExperimentRun() { return ctx.isExperimentRun(); }
-
-		@Override
-		public boolean skipExecution() { return ctx.skipExecution(); }
-
-		@Override
 		public LogicalPlanPrinter getSourceAssignmentPrinter() { return ctx.getSourceAssignmentPrinter(); }
 
 		@Override
@@ -582,16 +574,6 @@ public class HeFQUINEngineConfigReader
 		}
 
 		@Override
-		public boolean isExperimentRun() {
-			return ctx.isExperimentRun();
-		}
-
-		@Override
-		public boolean skipExecution() {
-			return ctx.skipExecution();
-		}
-
-		@Override
 		public LogicalPlanPrinter getSourceAssignmentPrinter() { return ctx.getSourceAssignmentPrinter(); }
 
 		@Override
@@ -612,9 +594,7 @@ public class HeFQUINEngineConfigReader
 		                                 ctx.getFederationCatalog(),
 		                                 ctx.getExecutorServiceForPlanTasks(),
 		                                 lp2pp,
-		                                 lop2pop,
-		                                 ctx.isExperimentRun(),
-		                                 ctx.skipExecution() );
+		                                 lop2pop );
 	}
 
 }

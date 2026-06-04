@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
@@ -62,7 +63,8 @@ public class QueryProcessorImpl implements QueryProcessor
 
 	@Override
 	public QueryProcessingStatsAndExceptions processQuery( final Query query,
-	                                                       final QueryResultSink resultSink )
+	                                                       final QueryResultSink resultSink,
+	                                                       final QueryProcContext2 ctx )
 			throws QueryProcException
 	{
 		log.debug("Starting query processing.");
@@ -80,10 +82,10 @@ public class QueryProcessorImpl implements QueryProcessor
 		final ExecutionStats execStats;
 		final List<Exception> exceptionsCaughtDuringExecution;
 
-		if ( ctxt.skipExecution() || qep instanceof PhysicalPlanWithoutResult ) {
+		if ( ctx.skipExecution() || qep instanceof PhysicalPlanWithoutResult ) {
 			log.debug(
 				"Skipping execution (skipExecution={}, planWithoutResult={}).",
-				ctxt.skipExecution(),
+				ctx.skipExecution(),
 				qep instanceof PhysicalPlanWithoutResult );
 			t3 = System.currentTimeMillis();
 			t4 = System.currentTimeMillis();
@@ -123,7 +125,7 @@ public class QueryProcessorImpl implements QueryProcessor
 
 		log.debug( "Query processing finished. Total time: {} ms.", (t4 - t1) );
 
-		if ( ctxt.isExperimentRun() ) {
+		if ( ctx.isExperimentRun() ) {
 			StatsPrinter.print( s, System.out, true );
 		}
 
