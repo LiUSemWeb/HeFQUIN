@@ -38,6 +38,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRoo
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BGPRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -48,12 +49,20 @@ import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.members.RDFBasedFederationMember;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
-public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization {
-	/**
-	 * Rewrites an initial logical plan into a second plan which incorporates translations of local to global vocabulary and request-operator rewriting.
-	 * This method implements the rewriteLogPlan pseudocode of Helgesson's B.Sc thesis.
-	 */
+/**
+ * Rewrites an initial logical plan into a plan that incorporates translations
+ * of local to global vocabulary and request-operator rewriting. This method
+ * implements the rewriteLogPlan pseudocode of Helgesson's B.Sc thesis.
+ */
+public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization
+{
+
 	@Override
+	public LogicalPlan apply( final LogicalPlan inputPlan,
+	                          final QueryProcContext2 ctxt2 ) {
+		return apply(inputPlan);
+	}
+
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
 		final Worker worker = new Worker(inputPlan);

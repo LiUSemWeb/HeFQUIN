@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINALITY;
 
-import java.util.concurrent.ExecutorService;
-
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.Expr;
@@ -31,13 +29,11 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootI
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
-import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 {
@@ -69,7 +65,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan unionPlan = new LogicalPlanWithBinaryRootImpl( LogicalOpUnion.getInstance(), null, bindPlan, rightReqPlan);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(unionPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( unionPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
@@ -109,7 +106,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan unionPlan = new LogicalPlanWithBinaryRootImpl( LogicalOpUnion.getInstance(), null, bindPlan, rightReqPlan);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(unionPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( unionPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result.getRootOperator() instanceof LogicalOpUnion );
@@ -156,7 +154,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan multiwayUnionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), null, reqPlan1, reqPlan2, bindPlan);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(multiwayUnionPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( multiwayUnionPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result.getRootOperator() instanceof LogicalOpMultiwayUnion );
@@ -192,7 +191,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan unionPlan = new LogicalPlanWithBinaryRootImpl( LogicalOpUnion.getInstance(), null, reqPlan1, reqPlan2);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(unionPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( unionPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result instanceof LogicalPlanWithoutResult );
@@ -223,7 +223,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan parentUnionPlan = new LogicalPlanWithBinaryRootImpl( LogicalOpUnion.getInstance(), null, childUnionPlan, nonZeroReqPlan);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(parentUnionPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( parentUnionPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result.getRootOperator() instanceof LogicalOpUnion );
@@ -261,7 +262,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan parentUnionPlan = new LogicalPlanWithBinaryRootImpl( LogicalOpUnion.getInstance(), null, childUnionPlan, nonZeroReqPlan);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(parentUnionPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( parentUnionPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
@@ -294,7 +296,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 				null );
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(joinPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( joinPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result instanceof LogicalPlanWithoutResult );
@@ -320,7 +323,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan joinPlan = new LogicalPlanWithBinaryRootImpl( LogicalOpJoin.getInstance(), null, reqPlan1, reqPlan2);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(joinPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( joinPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result instanceof LogicalPlanWithoutResult );
@@ -347,7 +351,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan leftJoinPlan = new LogicalPlanWithBinaryRootImpl( LogicalOpLeftJoin.getInstance(), null, reqPlan1, reqPlan2);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(leftJoinPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( leftJoinPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
@@ -375,7 +380,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan leftJoinPlan = new LogicalPlanWithBinaryRootImpl( LogicalOpLeftJoin.getInstance(), null, reqPlan2, reqPlan1);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(leftJoinPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( leftJoinPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result instanceof LogicalPlanWithoutResult );
@@ -402,7 +408,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan bindPlan = new LogicalPlanWithUnaryRootImpl(bindOp, null, reqPlan);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(bindPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( bindPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result instanceof LogicalPlanWithoutResult );
@@ -433,7 +440,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		final LogicalPlan bindPlan = new LogicalPlanWithUnaryRootImpl(bindOp, null, reqPlan);
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(bindPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( bindPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result.getRootOperator() instanceof LogicalOpBind );
@@ -458,7 +466,8 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		addCardEstimate( 42, reqPlan.getQueryPlanningInfo() );
 
 		// Test
-		final LogicalPlan result = new RemoveSubPlansWithEmptyResults(new TestQueryProcContext()).apply(reqPlan);
+		final RemoveSubPlansWithEmptyResults r = new RemoveSubPlansWithEmptyResults();
+		final LogicalPlan result = r.apply( reqPlan, getQueryProcContextForTest() );
 
 		// Check
 		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
@@ -473,33 +482,9 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(cardinality, Quality.ACCURATE) );
 	}
 
-	protected class TestQueryProcContext implements QueryProcContext {
-		protected final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
-
-		@Override
-		public FederationAccessManager getFederationAccessMgr() {
-			return fedAccessMgr;
-		}
-
-		@Override
-		public FederationCatalog getFederationCatalog() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public ExecutorService getExecutorServiceForPlanTasks() {
-			throw new UnsupportedOperationException();
-		}
+	protected QueryProcContext2 getQueryProcContextForTest() {
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+		return new QueryProcContextBuilder(fedAccessMgr).build();
 	}
 
 }

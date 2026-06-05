@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -45,6 +46,11 @@ import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 public class FilterPushDown implements HeuristicForLogicalOptimization
 {
 	@Override
+	public LogicalPlan apply( final LogicalPlan inputPlan,
+	                          final QueryProcContext2 ctxt2 ) {
+		return apply(inputPlan);
+	}
+
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
 		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
 		if ( numberOfSubPlans == 0 ) {

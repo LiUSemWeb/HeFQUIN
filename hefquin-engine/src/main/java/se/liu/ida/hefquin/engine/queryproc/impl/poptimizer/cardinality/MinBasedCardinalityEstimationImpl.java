@@ -5,11 +5,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CardinalityEstimationUtils;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -22,18 +21,11 @@ import java.util.function.Supplier;
  * [1] Heling, Lars, and Maribel Acosta. "Federated SPARQL query processing over heterogeneous linked data fragments." Proceedings of the ACM Web Conference 2022.
  */
 
-public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl {
-
-    public MinBasedCardinalityEstimationImpl( final FederationAccessManager fedAccessMgr ) {
-        super( fedAccessMgr );
-    }
-
-    public MinBasedCardinalityEstimationImpl( final QueryProcContext ctxt ) {
-        super( ctxt );
-    }
-
+public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
+{
     @Override
-    public CompletableFuture<Integer> _initiateCardinalityEstimation( final PhysicalPlan plan ) {
+    public CompletableFuture<Integer> _initiateCardinalityEstimation( final PhysicalPlan plan,
+                                                                      final QueryProcContext2 ctx ) {
         final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
 
         Supplier<Integer> worker;
@@ -42,17 +34,17 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
         }
         else if (  rootOp instanceof LogicalOpJoin  ){
             // The join cardinality is the minimum cardinality of subPlans
-            worker = new WorkerForJoin( this, plan.getSubPlan(0), plan.getSubPlan(1) );
+            worker = new WorkerForJoin( this, plan.getSubPlan(0), plan.getSubPlan(1), ctx );
         }
         else if ( rootOp instanceof LogicalOpGPAdd gpAdd ) {
-            worker = new WorkerForJoin( this, plan.getSubPlan(0), PhysicalPlanFactory.extractRequestAsPlan(gpAdd));
+            worker = new WorkerForJoin( this, plan.getSubPlan(0), PhysicalPlanFactory.extractRequestAsPlan(gpAdd), ctx );
         }
         else if ( rootOp instanceof LogicalOpMultiwayUnion || rootOp instanceof LogicalOpUnion ) {
             // The estimated cardinality is the sum up cardinality of subPlans
-            worker = new WorkerForUnion( this, plan );
+            worker = new WorkerForUnion( this, plan, ctx );
         }
         else if ( rootOp instanceof LogicalOpLocalToGlobal || rootOp instanceof LogicalOpGlobalToLocal ) {
-            return _initiateCardinalityEstimation( plan.getSubPlan(0) );
+            return _initiateCardinalityEstimation( plan.getSubPlan(0), ctx );
         }
         else {
             throw new IllegalArgumentException("The type of the root operator of the given plan is currently not supported (" + rootOp.getClass().getName() + ").");
@@ -66,18 +58,23 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
         protected final CardinalityEstimation cardEstimate;
         protected final PhysicalPlan plan1;
         protected final PhysicalPlan plan2;
+        protected final QueryProcContext2 ctx;
 
-        public WorkerForJoin( final CardinalityEstimation cardEstimate, final PhysicalPlan plan1, final PhysicalPlan plan2 ) {
+        public WorkerForJoin( final CardinalityEstimation cardEstimate,
+                              final PhysicalPlan plan1,
+                              final PhysicalPlan plan2,
+                              final QueryProcContext2 ctx ) {
             this.cardEstimate = cardEstimate;
             this.plan1 = plan1;
             this.plan2 = plan2;
+            this.ctx = ctx;
         }
 
         @Override
         public Integer get() {
             Integer[] cardinalities = new Integer[0];
             try {
-                cardinalities = CardinalityEstimationUtils.getEstimates( cardEstimate, plan1, plan2);
+                cardinalities = CardinalityEstimationUtils.getEstimates( cardEstimate, ctx, plan1, plan2);
             } catch ( CardinalityEstimationException e ) {
                 e.printStackTrace();
             }
@@ -91,10 +88,14 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
     {
         protected final CardinalityEstimation cardEstimate;
         protected final PhysicalPlan plan;
+        protected final QueryProcContext2 ctx;
 
-        public WorkerForUnion( final CardinalityEstimation cardEstimate, final PhysicalPlan plan) {
+        public WorkerForUnion( final CardinalityEstimation cardEstimate,
+                               final PhysicalPlan plan,
+                               final QueryProcContext2 ctx ) {
             this.cardEstimate = cardEstimate;
             this.plan = plan;
+            this.ctx = ctx;
         }
 
         @Override
@@ -107,7 +108,7 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
 
             final Integer[] cardinalities;
             try {
-                cardinalities = CardinalityEstimationUtils.getEstimates( cardEstimate, subPlans );
+                cardinalities = CardinalityEstimationUtils.getEstimates( cardEstimate, ctx, subPlans );
             }
             catch ( final CardinalityEstimationException e ) {
                 throw new RuntimeException("Getting cardinality estimates caused an exception.", e);

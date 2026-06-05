@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningException;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
 
@@ -68,7 +69,8 @@ public class QueryPlannerImpl implements QueryPlanner
 
 	@Override
 	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query,
-	                                                          final QueryProcContext ctxt ) throws QueryPlanningException {
+	                                                          final QueryProcContext ctxt,
+	                                                          final QueryProcContext2 ctxt2 ) throws QueryPlanningException {
 		log.debug("Starting source selection phase.");
 
 		final long t1 = System.currentTimeMillis();
@@ -83,7 +85,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
 			final boolean keepNaryOperators = poptimizer.assumesLogicalMultiwayJoins();
-			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators, ctxt);
+			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators, ctxt2);
 			log.debug( "Logical optimizer invoked with keepNaryOperators={}.", keepNaryOperators );
 		}
 		else {

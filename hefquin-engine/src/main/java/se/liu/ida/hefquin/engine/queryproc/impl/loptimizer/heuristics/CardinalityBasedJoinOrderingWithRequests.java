@@ -4,7 +4,6 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 /**
  * This class is an implementation of {@link CardinalityBasedJoinOrderingBase}
@@ -38,15 +37,6 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 // TODO: The Javadoc comment is outdated. See the base class.
 public class CardinalityBasedJoinOrderingWithRequests extends CardinalityBasedJoinOrderingBase
 {
-	protected final QueryProcContext ctxt;
-
-	public CardinalityBasedJoinOrderingWithRequests( final QueryProcContext ctxt ) {
-		super(ctxt);
-
-		assert ctxt != null;
-		this.ctxt = ctxt;
-	}
-
 	@Override
 	protected int estimateJoinCardinality( final List<LogicalPlan> selectedPlans,
 	                                       final int joinCardOfSelectedPlans,

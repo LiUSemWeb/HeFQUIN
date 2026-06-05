@@ -6,5 +6,5 @@ public interface LogicalOptimizer
 {
 	LogicalPlan optimize( LogicalPlan inputPlan,
 	                      boolean keepNaryOperators,
-	                      QueryProcContext ctxt ) throws LogicalOptimizationException;
+	                      QueryProcContext2 ctxt ) throws LogicalOptimizationException;
 }

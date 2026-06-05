@@ -379,7 +379,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 
 		final LogicalOptimizer loptimizer = new LogicalOptimizer() {
 			@Override
-			public LogicalPlan optimize( final LogicalPlan p, final boolean keepNaryOperators, final QueryProcContext ctxt ) {
+			public LogicalPlan optimize( final LogicalPlan p, final boolean keepNaryOperators, final QueryProcContext2 ctxt ) {
 				return p;
 			}
 		};

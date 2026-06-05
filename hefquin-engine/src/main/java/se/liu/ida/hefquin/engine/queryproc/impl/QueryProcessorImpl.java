@@ -71,7 +71,7 @@ public class QueryProcessorImpl implements QueryProcessor
 
 		final long t1 = System.currentTimeMillis();
 		log.debug("Creating physical plan.");
-		final Pair<PhysicalPlan, QueryPlanningStats> qepAndStats = planner.createPlan(query, ctxt);
+		final Pair<PhysicalPlan, QueryPlanningStats> qepAndStats = planner.createPlan(query, ctxt, ctx);
 		final PhysicalPlan qep = qepAndStats.object1;
 
 		final long t2 = System.currentTimeMillis();

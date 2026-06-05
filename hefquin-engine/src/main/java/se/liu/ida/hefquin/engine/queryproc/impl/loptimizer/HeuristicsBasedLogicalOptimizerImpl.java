@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.*;
 
@@ -25,7 +25,7 @@ public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 		this.heuristics = heuristics;
 	}
 
-	public static List<HeuristicForLogicalOptimization> getDefaultHeuristics( final QueryProcContext ctxt ) {
+	public static List<HeuristicForLogicalOptimization> getDefaultHeuristics() {
 		final List<HeuristicForLogicalOptimization> heuristics = new ArrayList<>();
 
 		final HeuristicForLogicalOptimization mergeRequests = new MergeRequests();
@@ -48,7 +48,7 @@ public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 		//// currently since the rewriting rules need to be extended to consider
 		//// operators PhysicalOpLocalToGlobal and PhysicalOpGlobalToLocal.
 		heuristics.add( new ApplyVocabularyMappings() );
-		heuristics.add( new CardinalityBasedJoinOrderingWithRequests(ctxt) );
+		heuristics.add( new CardinalityBasedJoinOrderingWithRequests() );
 
 		heuristics.add( new RemoveUnnecessaryL2gAndG2l() );
 
@@ -65,12 +65,12 @@ public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 	@Override
 	public LogicalPlan optimize( final LogicalPlan inputPlan,
 	                             final boolean keepNaryOperators,
-	                             final QueryProcContext ctxt ) throws LogicalOptimizationException {
+	                             final QueryProcContext2 ctxt ) throws LogicalOptimizationException {
 		log.debug( "Starting logical optimization with {} heuristics", heuristics.size() );
 		LogicalPlan resultPlan = inputPlan;
 		for ( final HeuristicForLogicalOptimization h : heuristics ) {
 			log.debug( "Applying heuristic {} to plan", h.getClass().getSimpleName() );
-			resultPlan = h.apply(resultPlan);
+			resultPlan = h.apply(resultPlan, ctxt);
 			log.debug( "Finished applying heuristic {} to plan", h.getClass().getSimpleName() );
 
 			// If the plan has been rewritten into the plan that produces

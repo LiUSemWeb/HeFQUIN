@@ -20,6 +20,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
@@ -38,8 +40,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void oneRequestOp() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests();
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
 
 		final CompletableFuture<Integer> f = initEstimateForRequestPlan(42, cardEstimator);
 
@@ -49,8 +50,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void oneRequestOp_negativeCard() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests();
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
 
 		final CompletableFuture<Integer> f = initEstimateForRequestPlan(Integer.MAX_VALUE+1, cardEstimator);
 
@@ -60,16 +60,16 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void twoRequestOpsInParallel() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan1 = createRequestPlan(42);
 		final PhysicalPlan plan2 = createRequestPlan(13);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1);
-		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan2);
+		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1, ctx);
+		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan2, ctx);
 
 		final int result1 = f1.get().intValue();
 		final int result2 = f2.get().intValue();
@@ -83,18 +83,18 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void twoRequestOpsInSequence() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan1 = createRequestPlan(42);
 		final PhysicalPlan plan2 = createRequestPlan(13);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1);
+		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1, ctx);
 		final int result1 = f1.get().intValue();
 
-		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan2);
+		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan2, ctx);
 		final int result2 = f2.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -106,15 +106,15 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void sameRequestOpTwiceInParallel() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createRequestPlan(42);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan);
-		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan, ctx);
+		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 
 		final int result1 = f1.get().intValue();
 		final int result2 = f2.get().intValue();
@@ -128,17 +128,17 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void sameRequestOpTwiceInSequence() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createRequestPlan(42);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result1 = f1.get().intValue();
 
-		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result2 = f2.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -150,14 +150,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void joinOfTwoRequestOps() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createJoinPlan(42, 13);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -168,14 +168,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void joinOfTwoRequestOps_oneNegativeCard() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createJoinPlan(42, Integer.MAX_VALUE+1);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -186,14 +186,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void joinOfTwoRequestOps_twoNegativeCard() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createJoinPlan(Integer.MAX_VALUE+2, Integer.MAX_VALUE+1);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -204,14 +204,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void unionOfTwoRequestOps() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createUnionPlan(42, 13);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -222,14 +222,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void unionOfTwoRequestOps_oneNegativeCard() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createUnionPlan(42, Integer.MAX_VALUE+1);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -240,14 +240,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void unionOfTwoRequestOps_twoNegativeCard() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createUnionPlan(Integer.MAX_VALUE+1, Integer.MAX_VALUE+1);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -258,14 +258,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void unionOfTwoRequestOps_negativeTotalCard() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createUnionPlan(2, Integer.MAX_VALUE-1);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -276,14 +276,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void joinOfSameRequestOp() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createJoinPlan(42, 42);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -294,14 +294,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void oneTPAdd() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createGPAddPlan(42, 13);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -312,14 +312,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void oneTPAdd_oneNegativeCard() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createGPAddPlan(42, Integer.MAX_VALUE+1);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -330,15 +330,15 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void twoTPAdd() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
-		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
+		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan subplan = createGPAddPlan(42, 13);
 		final PhysicalPlan plan = createGPAddPlan(subplan, 22);
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		final int result = f.get().intValue();
 
 		final long endTime = new Date().getTime();
@@ -348,12 +348,25 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	}
 
 
+	// ------------ helper functionality -------------
+
 	protected CompletableFuture<Integer> initEstimateForRequestPlan(
 			final int card,
 			final CardinalityEstimation cardEstimator )
 	{
 		final PhysicalPlan plan = createRequestPlan(card);
-		return cardEstimator.initiateCardinalityEstimation(plan);
+
+		final FederationAccessManager fedAccMgr = new MyFederationAccessManagerForTests();
+		final QueryProcContextBuilder b = new QueryProcContextBuilder(fedAccMgr);
+		final QueryProcContext2 ctx = b.build();
+
+		return cardEstimator.initiateCardinalityEstimation(plan, ctx);
+	}
+
+	protected QueryProcContext2 createQueryProcContext( final long sleepMillis ) {
+		final FederationAccessManager fedAccMgr = new MyFederationAccessManagerForTests(sleepMillis);
+		final QueryProcContextBuilder b = new QueryProcContextBuilder(fedAccMgr);
+		return b.build();
 	}
 
 	protected PhysicalPlan createRequestPlan( final int card ) {

@@ -9,10 +9,9 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.cardinality.RequestBasedCardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -38,58 +37,58 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
     // The visibility of this constructor is at the package level (i.e.,
     // not public) such that it can be used in the unit tests, but not by
     // the configuration framework of HeFQUIN.
-    CardinalityEstimationImpl( final FederationAccessManager fedAccessMgr ) {
-        cardEstimator = new RequestBasedCardinalityEstimator(fedAccessMgr);
+    CardinalityEstimationImpl() {
+        cardEstimator = new RequestBasedCardinalityEstimator();
         vsCardEstimator = new VarSpecificCardinalityEstimationImpl(this);
     }
 
-    public CardinalityEstimationImpl( final QueryProcContext ctxt ) {
-        this( ctxt.getFederationAccessMgr() );
-    }
+	@Override
+	public final CompletableFuture<Integer> initiateCardinalityEstimation(
+			final PhysicalPlan plan,
+			final QueryProcContext2 ctx ) {
+		synchronized (cache) {
+			// If we already have a CompletableFuture for the
+			// given plan in the cache, return that one.
+			final CompletableFuture<Integer> cachedFuture = cache.get(plan);
+			if ( cachedFuture != null ) {
+				return cachedFuture;
+			}
 
-    @Override
-    public final CompletableFuture<Integer> initiateCardinalityEstimation( final PhysicalPlan plan ) {
-        synchronized (cache) {
-            // If we already have a CompletableFuture for the
-        	// given plan in the cache, return that one.
-            final CompletableFuture<Integer> cachedFuture = cache.get(plan);
-            if ( cachedFuture != null ) {
-                return cachedFuture;
-            }
+			cardEstimator.addCardinalitiesForRequests(ctx, plan);
 
-            cardEstimator.addCardinalitiesForRequests(plan);
+			// If we don't have a cache hit, create a CompletableFuture
+			// that will produce the cardinality estimate for the given
+			// plan, ...
+			final CompletableFuture<Integer> futRslt = _initiateCardinalityEstimation(plan, ctx);
 
-            // If we don't have a cache hit, create a CompletableFuture
-            // that will produce the cardinality estimate for the given
-            // plan, ...
-            final CompletableFuture<Integer> futRslt = _initiateCardinalityEstimation(plan);
+			// ... extend it into a CompletableFuture that will update the
+			// cache once the future result has been produced, ...
+			final CompletableFuture<Integer> future = futRslt.thenApply( c -> {
+				synchronized (cache) {
+					cache.put( plan, CompletableFuture.completedFuture(c) );
+				}
+				return c;
+			});
 
-            // ... extend it into a CompletableFuture that will update the
-            // cache once the future result has been produced, ...
-            final CompletableFuture<Integer> future = futRslt.thenApply( c -> {
-                synchronized (cache) {
-                    cache.put( plan, CompletableFuture.completedFuture(c) );
-                }
-                return c;
-            });
+			// ... add the extended CompletableFuture into the cache, and ...
+			cache.put(plan, future);
 
-            // ... add the extended CompletableFuture into the cache, and ...
-            cache.put(plan, future);
+			// ... return it.
+			return future;
+		}
+	}
 
-            // ... return it.
-            return future;
-        }
-    }
-
-    public CompletableFuture<Integer> _initiateCardinalityEstimation( final PhysicalPlan plan ) {
-        final Supplier<Integer> worker;
-        if ( plan instanceof PhysicalPlanWithNullaryRoot )
-            worker = new WorkerForRequestOps(plan);
+	public CompletableFuture<Integer> _initiateCardinalityEstimation(
+			final PhysicalPlan plan,
+			final QueryProcContext2 ctx ) {
+		final Supplier<Integer> worker;
+		if ( plan instanceof PhysicalPlanWithNullaryRoot )
+			worker = new WorkerForRequestOps(plan);
 		else
-			worker = new WorkerForSubquery(plan);
+			worker = new WorkerForSubquery(plan, ctx);
 
-        return CompletableFuture.supplyAsync(worker);
-    }
+		return CompletableFuture.supplyAsync(worker);
+	}
 
 	protected class WorkerForRequestOps implements Supplier<Integer>
 	{
@@ -111,9 +110,12 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 	protected class WorkerForSubquery implements Supplier<Integer>
 	{
 		protected final PhysicalPlan plan;
+		protected final QueryProcContext2 ctx;
 
-		public WorkerForSubquery( final PhysicalPlan plan) {
+		public WorkerForSubquery( final PhysicalPlan plan,
+		                          final QueryProcContext2 ctx ) {
 			this.plan = plan;
+			this.ctx = ctx;
 		}
 
 		@Override
@@ -131,7 +133,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 			for ( int i = 0; i < vars.size(); ++i ) {
 				final Var v = vars.get(i);
-				futures[i] = vsCardEstimator.initiateCardinalityEstimation(plan, v);
+				futures[i] = vsCardEstimator.initiateCardinalityEstimation(plan, v, ctx);
 			}
 
 			final Integer[] cardinalities;

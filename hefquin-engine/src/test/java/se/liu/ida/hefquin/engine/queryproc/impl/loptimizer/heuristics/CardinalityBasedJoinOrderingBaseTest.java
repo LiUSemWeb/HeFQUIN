@@ -30,6 +30,9 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRoot
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
@@ -47,7 +50,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 
 		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
-		final LogicalPlan resultPlan = h.apply(joinPlan);
+		final LogicalPlan resultPlan = h.apply( joinPlan, getQueryProcContextForTest() );
 
 		assertTrue( resultPlan.isSamePlan(joinPlan) );
 	}
@@ -64,7 +67,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 
 		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
-		final LogicalPlan resultPlan = h.apply(joinPlan);
+		final LogicalPlan resultPlan = h.apply( joinPlan, getQueryProcContextForTest() );
 
 		assertEquals( 2, resultPlan.numberOfSubPlans() );
 		assertTrue( resultPlan.getSubPlan(0) == joinPlan.getSubPlan(1) ); // not just equal but indeed the same
@@ -87,7 +90,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 
 		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
-		final LogicalPlan resultPlan = h.apply(filterPlan);
+		final LogicalPlan resultPlan = h.apply( filterPlan, getQueryProcContextForTest() );
 
 		assertEquals( 2, resultPlan.getSubPlan(0).numberOfSubPlans() );
 		assertTrue( resultPlan.getSubPlan(0).getSubPlan(0) == joinPlan.getSubPlan(1) ); // not just equal but indeed the same
@@ -110,7 +113,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 
 		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
-		final LogicalPlan resultPlan = h.apply(l2gPlan);
+		final LogicalPlan resultPlan = h.apply( l2gPlan, getQueryProcContextForTest() );
 
 		assertEquals( 2, resultPlan.getSubPlan(0).numberOfSubPlans() );
 		assertTrue( resultPlan.getSubPlan(0).getSubPlan(0) == joinPlan.getSubPlan(1) ); // not just equal but indeed the same
@@ -133,7 +136,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 
 		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
-		final LogicalPlan resultPlan = h.apply(joinPlan);
+		final LogicalPlan resultPlan = h.apply( joinPlan, getQueryProcContextForTest() );
 
 		assertTrue( resultPlan.isSamePlan(joinPlan) );
 	}
@@ -154,7 +157,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 
 		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
-		final LogicalPlan resultPlan = h.apply(joinPlan);
+		final LogicalPlan resultPlan = h.apply( joinPlan, getQueryProcContextForTest() );
 
 		assertEquals( 3, resultPlan.numberOfSubPlans() );
 		assertTrue( resultPlan.getSubPlan(0) == joinPlan.getSubPlan(1) ); // not just equal but indeed the same
@@ -178,7 +181,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 
 		final CardinalityBasedJoinOrderingBase h = new TestImpl(cards);
 
-		final LogicalPlan resultPlan = h.apply(joinPlan);
+		final LogicalPlan resultPlan = h.apply( joinPlan, getQueryProcContextForTest() );
 
 		assertEquals( 3, resultPlan.numberOfSubPlans() );
 		assertTrue( resultPlan.getSubPlan(0) == joinPlan.getSubPlan(1) ); // not just equal but indeed the same
@@ -234,7 +237,8 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 		}
 
 		@Override
-		public void addCardinalities( final LogicalPlan... plans ) {
+		public void addCardinalities( final QueryProcContext2 ctx,
+		                              final LogicalPlan... plans ) {
 			for ( int i = 0; i < plans.length; i++ ) {
 				final LogicalPlan plan = plans[i];
 				final Integer card = results.get(plan);
@@ -249,16 +253,22 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 
 				if ( plan.numberOfSubPlans() > 0 ) {
 					for ( int j = 0; j < plan.numberOfSubPlans(); j++ ) {
-						addCardinalities( plan.getSubPlan(j) );
+						addCardinalities( ctx, plan.getSubPlan(j) );
 					}
 				}
 			}
 		}
 
 		@Override
-		public void addCardinalities( final PhysicalPlan ... plans ) {
+		public void addCardinalities( final QueryProcContext2 ctx,
+		                              final PhysicalPlan ... plans ) {
 			throw new UnsupportedOperationException();
 		}
+	}
+
+	protected QueryProcContext2 getQueryProcContextForTest() {
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+		return new QueryProcContextBuilder(fedAccessMgr).build();
 	}
 
 }
