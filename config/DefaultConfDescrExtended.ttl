@@ -154,8 +154,7 @@ _:bCardBasedGreedyOptimizer
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.SimpleJoinOrderingQueryOptimizer" ;
     ec:constructorArguments (
         [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.JoinPlanOptimizer" ;
-          ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.CardinalityBasedGreedyJoinPlanOptimizerImpl" ;
-          ec:constructorArguments ( ec:value:QueryProcContext )
+          ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.CardinalityBasedGreedyJoinPlanOptimizerImpl"
         ]
     ) .
 

@@ -32,6 +32,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImp
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
@@ -92,6 +93,49 @@ public abstract class EngineTestBase
 				PhysicalOpNaiveNestedLoopsJoin.getFactory()
 			)
 		);
+	}
+
+	protected class QueryProcContextForTests implements QueryProcContext2 {
+		protected final FederationCatalog fedCatalog;
+		protected final FederationAccessManager fedAccMgr;
+
+		public QueryProcContextForTests( final FederationCatalog fedCatalog,
+		                                 final FederationAccessManager fedAccMgr ) {
+			this.fedCatalog = fedCatalog;
+			this.fedAccMgr = fedAccMgr;
+		}
+
+		public QueryProcContextForTests( final FederationCatalog fedCatalog ) {
+			this( fedCatalog, null );
+		}
+
+		public QueryProcContextForTests( final FederationAccessManager fedAccMgr ) {
+			this( null, fedAccMgr );
+		}
+
+		@Override
+		public FederationCatalog getFederationCatalog() {
+			if ( fedCatalog != null ) return fedCatalog;
+
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public FederationAccessManager getFederationAccessMgr() {
+			if ( fedAccMgr != null ) return fedAccMgr;
+
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isExperimentRun() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean skipExecution() {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	protected ExecutionContext getExecContextForTests( final ExecutorService execService ) {

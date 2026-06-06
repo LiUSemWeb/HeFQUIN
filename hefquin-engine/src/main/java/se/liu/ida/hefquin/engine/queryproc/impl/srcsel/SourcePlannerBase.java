@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
@@ -16,7 +16,7 @@ public abstract class SourcePlannerBase implements SourcePlanner
 {
 	@Override
 	public final Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Query query,
-	                                                                            final QueryProcContext ctxt )
+	                                                                            final QueryProcContext2 ctx )
 			throws SourcePlanningException
 	{
 		final Op jenaOp;
@@ -32,9 +32,9 @@ public abstract class SourcePlannerBase implements SourcePlanner
 			throw new UnsupportedOperationException( query.getClass().getName() );
 		}
 
-		return createSourceAssignment(jenaOp, ctxt);
+		return createSourceAssignment(jenaOp, ctx);
 	}
 
-	protected abstract Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( Op jenaOp, QueryProcContext ctxt )
+	protected abstract Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( Op jenaOp, QueryProcContext2 ctx )
 			throws SourcePlanningException;
 }

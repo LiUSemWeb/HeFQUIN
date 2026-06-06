@@ -21,7 +21,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
@@ -357,16 +356,14 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		final PhysicalPlan plan = createRequestPlan(card);
 
 		final FederationAccessManager fedAccMgr = new MyFederationAccessManagerForTests();
-		final QueryProcContextBuilder b = new QueryProcContextBuilder(fedAccMgr);
-		final QueryProcContext2 ctx = b.build();
+		final QueryProcContext2 ctx = new QueryProcContextForTests(fedAccMgr);
 
 		return cardEstimator.initiateCardinalityEstimation(plan, ctx);
 	}
 
 	protected QueryProcContext2 createQueryProcContext( final long sleepMillis ) {
 		final FederationAccessManager fedAccMgr = new MyFederationAccessManagerForTests(sleepMillis);
-		final QueryProcContextBuilder b = new QueryProcContextBuilder(fedAccMgr);
-		return b.build();
+		return new QueryProcContextForTests(fedAccMgr);
 	}
 
 	protected PhysicalPlan createRequestPlan( final int card ) {

@@ -370,6 +370,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		};
 
 		final QueryProcContext2 ctxt2 = new QueryProcContext2() {
+			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public boolean skipExecution() { return false; }

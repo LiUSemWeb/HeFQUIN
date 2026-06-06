@@ -1,9 +1,12 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public interface QueryProcContext2
 {
+	FederationCatalog getFederationCatalog();
+
 	FederationAccessManager getFederationAccessMgr();
 
 	/**

@@ -218,7 +218,7 @@ public class HeFQUINEngineBuilder
 		final FederationAccessManager fedAccessMgr = confReader.readFederationAccessManager(engineConf, ctx);
 		final QueryProcessor qProc = confReader.readQueryProcessor(engineConf, ctx, fedAccessMgr);
 
-		final HeFQUINEngine engine = new HeFQUINEngine(fedAccessMgr, qProc);
+		final HeFQUINEngine engine = new HeFQUINEngine(fedCat, fedAccessMgr, qProc);
 
 		// integrate the engine into the Jena/ARQ machinery
 		integrateEngineIntoJena(qProc);

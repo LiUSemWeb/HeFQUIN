@@ -18,6 +18,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessingStatsAndExceptionsImpl;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.FederationAccessStats;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINEngineConstants;
 
 /**
@@ -49,22 +50,26 @@ import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINEngineConstants;
  */
 public class HeFQUINEngine
 {
+	protected final FederationCatalog fedCatalog;
 	protected final FederationAccessManager fedAccessMgr;
 	protected final QueryProcessor qProc;
 
 	protected boolean wasShutDown = false;
 
-	protected HeFQUINEngine( final FederationAccessManager fedAccessMgr,
+	protected HeFQUINEngine( final FederationCatalog fedCatalog,
+	                         final FederationAccessManager fedAccessMgr,
 	                         final QueryProcessor qProc ) {
+		assert fedCatalog != null;
 		assert fedAccessMgr != null;
 		assert qProc != null;
 
+		this.fedCatalog = fedCatalog;
 		this.fedAccessMgr = fedAccessMgr;
 		this.qProc = qProc;
 	}
 
 	public QueryProcContextBuilder getQueryProcContextBuilder() {
-		return new QueryProcContextBuilder(fedAccessMgr);
+		return new QueryProcContextBuilder(fedCatalog, fedAccessMgr);
 	}
 
 	/**

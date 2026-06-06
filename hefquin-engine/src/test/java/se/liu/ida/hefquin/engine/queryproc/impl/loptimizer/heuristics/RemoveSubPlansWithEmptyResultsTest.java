@@ -30,7 +30,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRo
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
@@ -484,7 +483,7 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 
 	protected QueryProcContext2 getQueryProcContextForTest() {
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
-		return new QueryProcContextBuilder(fedAccessMgr).build();
+		return new QueryProcContextForTests(fedAccessMgr);
 	}
 
 }

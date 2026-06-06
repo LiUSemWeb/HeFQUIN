@@ -100,7 +100,7 @@ public class HeFQUINEngineConfigReader
 		final FederationAccessManager fedAccessMgr = readFederationAccessManager(confRsrc, ctx);
 		final QueryProcessor qproc = readQueryProcessor(confRsrc, ctx, fedAccessMgr);
 
-		return new HeFQUINEngine(fedAccessMgr, qproc);
+		return new HeFQUINEngine(ctx.getFederationCatalog(), fedAccessMgr, qproc);
 	}
 
 	public interface Context {
@@ -570,7 +570,7 @@ public class HeFQUINEngineConfigReader
 
 		@Override
 		public FederationCatalog getFederationCatalog() {
-			return qprocCtx.getFederationCatalog();
+			return ctx.getFederationCatalog();
 		}
 
 		@Override

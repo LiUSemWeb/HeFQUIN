@@ -31,7 +31,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.members.TPFServer;
@@ -268,7 +267,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 
 	protected QueryProcContext2 getQueryProcContextForTest() {
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
-		return new QueryProcContextBuilder(fedAccessMgr).build();
+		return new QueryProcContextForTests(fedAccessMgr);
 	}
 
 }

@@ -32,27 +32,24 @@ import java.util.*;
  */
 public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 {
-    protected final FederationAccessManager fedAccessMgr;
-
-    public CardinalityBasedGreedyJoinPlanOptimizerImpl( final QueryProcContext ctx ) {
-        fedAccessMgr = ctx.getFederationAccessMgr();
-    }
-
     @Override
     public EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans,
                                                                 final QueryProcContext ctxt,
                                                                 final QueryProcContext2 ctx ) {
-        return new GreedyConstructionAlgorithm(subplans, ctxt);
+        return new GreedyConstructionAlgorithm(subplans, ctxt, ctx);
     }
 
     protected class GreedyConstructionAlgorithm implements EnumerationAlgorithm {
         protected final List<PhysicalPlan> subplans;
         protected final LogicalToPhysicalOpConverter lop2pop;
+        protected final QueryProcContext2 ctx;
 
         public GreedyConstructionAlgorithm( final List<PhysicalPlan> subplans,
-                                            final QueryProcContext ctxt ) {
+                                            final QueryProcContext ctxt,
+                                            final QueryProcContext2 ctx ) {
             this.subplans = subplans;
             lop2pop = ctxt.getLogicalToPhysicalOpConverter();
+            this.ctx = ctx;
         }
 
         @Override
@@ -70,8 +67,11 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             // requests for the above list of request operators.
             final CardinalityResponse[] resps;
             try {
-                resps = FederationAccessUtils.performCardinalityRequests(fedAccessMgr, reqOpsOfAllSubPlans);
-            } catch (final FederationAccessException e) {
+                resps = FederationAccessUtils.performCardinalityRequests(
+                        ctx.getFederationAccessMgr(),
+                        reqOpsOfAllSubPlans );
+            }
+            catch ( final FederationAccessException e ) {
                 throw new PhysicalOptimizationException("Issuing a cardinality request caused an exception.", e);
             }
 

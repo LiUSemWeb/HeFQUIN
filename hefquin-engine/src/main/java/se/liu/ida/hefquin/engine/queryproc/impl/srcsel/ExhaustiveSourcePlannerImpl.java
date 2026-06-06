@@ -15,7 +15,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
@@ -34,39 +34,41 @@ import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlannerImpl
 {
 	@Override
-	protected LogicalPlan createPlan( final Op jenaOp, final boolean mayReduce, final QueryProcContext ctxt ) {
+	protected LogicalPlan createPlan( final Op jenaOp,
+	                                  final boolean mayReduce,
+	                                  final QueryProcContext2 ctx ) {
 		if ( jenaOp instanceof OpBGP bgp ) {
-			return createPlanForBGP(bgp, ctxt, mayReduce);
+			return createPlanForBGP(bgp, mayReduce, ctx);
 		}
 		else if ( jenaOp instanceof OpService ) {
 			throw new IllegalArgumentException( "queries with SERVICE patterns are not supported by this source planner (" + getClass().getName() + ")" );
 		}
 
-		return super.createPlan(jenaOp, mayReduce, ctxt);
+		return super.createPlan(jenaOp, mayReduce, ctx);
 	}
 
 	protected LogicalPlan createPlanForBGP( final OpBGP bgpOp,
-	                                        final QueryProcContext ctxt,
-	                                        final boolean mayReduce ) {
+	                                        final boolean mayReduce,
+	                                        final QueryProcContext2 ctx ) {
 		final BasicPattern bgp = bgpOp.getPattern();
 		assert ! bgp.isEmpty();
 
 		if ( bgp.size() == 1 ) {
-			return createSubPlanForTP( bgp.get(0), ctxt, mayReduce );
+			return createSubPlanForTP( bgp.get(0), mayReduce, ctx );
 		}
 
 		final List<LogicalPlan> subPlans = new ArrayList<>();
 		for ( final Triple tp : bgp.getList() ) {
-			subPlans.add( createSubPlanForTP(tp, ctxt, mayReduce) );
+			subPlans.add( createSubPlanForTP(tp, mayReduce, ctx) );
 		}
 
 		return LogicalPlanUtils.createPlanWithMultiwayJoin(mayReduce, subPlans, null);
 	}
 
 	protected LogicalPlan createSubPlanForTP( final Triple tp,
-	                                          final QueryProcContext ctxt,
-	                                          final boolean mayReduce ) {
-		final Set<FederationMember> allFMs = ctxt.getFederationCatalog().getAllFederationMembers();
+	                                          final boolean mayReduce,
+	                                          final QueryProcContext2 ctx ) {
+		final Set<FederationMember> allFMs = ctx.getFederationCatalog().getAllFederationMembers();
 		assert ! allFMs.isEmpty();
 
 		if ( allFMs.size() == 1 ) {

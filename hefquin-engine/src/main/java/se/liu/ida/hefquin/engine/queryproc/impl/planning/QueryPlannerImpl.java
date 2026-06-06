@@ -74,7 +74,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		log.debug("Starting source selection phase.");
 
 		final long t1 = System.currentTimeMillis();
-		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query, ctxt);
+		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query, ctx);
 
 		if ( srcasgPrinter != null ) {
 			srcasgPrinter.print( saAndStats.object1, LogicalPlanStage.SOURCE_ASSIGNMENT );
