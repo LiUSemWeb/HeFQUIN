@@ -22,7 +22,6 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public class HeFQUINEngineConfigReaderTest
 {
@@ -292,9 +291,6 @@ public class HeFQUINEngineConfigReaderTest
 			public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
 
 			@Override
-			public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
-
-			@Override
 			public LogicalPlanPrinter getSourceAssignmentPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
@@ -354,9 +350,6 @@ public class HeFQUINEngineConfigReaderTest
 
 			@Override
 			public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 
 			@Override
 			public LogicalPlanPrinter getSourceAssignmentPrinter() { throw new UnsupportedOperationException(); }

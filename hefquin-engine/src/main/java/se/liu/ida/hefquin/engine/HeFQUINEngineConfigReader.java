@@ -35,7 +35,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.jenaext.ModelUtils;
 import se.liu.ida.hefquin.vocabulary.ECVocab;
 
@@ -48,7 +47,6 @@ public class HeFQUINEngineConfigReader
 	public interface Context {
 		ExecutorService getExecutorServiceForFederationAccess();
 		ExecutorService getExecutorServiceForPlanTasks();
-		FederationCatalog getFederationCatalog();
 
 		/** may be <code>null</code> if source assignment printing is not requested by the user */
 		LogicalPlanPrinter getSourceAssignmentPrinter();
@@ -452,9 +450,6 @@ public class HeFQUINEngineConfigReader
 		public ExecutorService getExecutorServiceForPlanTasks() { return ctx.getExecutorServiceForPlanTasks(); }
 
 		@Override
-		public FederationCatalog getFederationCatalog() { return ctx.getFederationCatalog(); }
-
-		@Override
 		public LogicalPlanPrinter getSourceAssignmentPrinter() { return ctx.getSourceAssignmentPrinter(); }
 
 		@Override
@@ -524,11 +519,6 @@ public class HeFQUINEngineConfigReader
 		@Override
 		public ExecutorService getExecutorServiceForPlanTasks() {
 			return qprocCtx.getExecutorServiceForPlanTasks();
-		}
-
-		@Override
-		public FederationCatalog getFederationCatalog() {
-			return ctx.getFederationCatalog();
 		}
 
 		@Override

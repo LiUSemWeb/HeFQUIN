@@ -206,7 +206,6 @@ public class HeFQUINEngineBuilder
 		final Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override public ExecutorService getExecutorServiceForFederationAccess() { return execFed; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execPlan; }
-			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
 			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return lplanPrinter; }
 			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return pplanPrinter; }
