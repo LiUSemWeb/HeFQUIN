@@ -125,6 +125,11 @@ _:bCostModel rdf:type ec:CostModel ;
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl" ;
     ec:constructorArguments (
           [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation" ;
-            ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl"
+            ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl" ;
+            ec:constructorArguments (
+                  [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.cardinality.RequestBasedCardinalityEstimator" ;
+                    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.cardinality.RequestBasedCardinalityEstimator"
+                  ]
+            )
           ]
     ) .

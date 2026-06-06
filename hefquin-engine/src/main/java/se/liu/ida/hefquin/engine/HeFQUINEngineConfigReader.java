@@ -16,6 +16,8 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
@@ -44,6 +46,8 @@ import se.liu.ida.hefquin.vocabulary.ECVocab;
  */
 public class HeFQUINEngineConfigReader
 {
+	private static final Logger log = LoggerFactory.getLogger( HeFQUINEngineConfigReader.class );
+
 	public interface Context {
 		ExecutorService getExecutorServiceForFederationAccess();
 		ExecutorService getExecutorServiceForPlanTasks();
@@ -267,6 +271,9 @@ public class HeFQUINEngineConfigReader
 	protected Object instantiate( final Resource r, final ExtendedContext ctx ) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		// Obtain the Java class to be instantiated.
 		final String className = ModelUtils.getSingleMandatoryProperty_XSDString( r, ECVocab.javaClassName );
+
+		log.debug( "Starting to instantiate an object of class '{}'.", className );
+
 		final Class<?> c = Class.forName(className);
 
 		// Obtain the list of constructor arguments (if any).
@@ -275,6 +282,7 @@ public class HeFQUINEngineConfigReader
 		// If there is no list of constructor arguments, create an instance
 		// of the class by using the constructor without arguments.
 		if ( list == null ) {
+			log.debug( "Instantiating an object without constructor arguments; class: '{}'.", className );
 			final Constructor<?> ctor = c.getConstructor();
 			return ctor.newInstance();
 		}

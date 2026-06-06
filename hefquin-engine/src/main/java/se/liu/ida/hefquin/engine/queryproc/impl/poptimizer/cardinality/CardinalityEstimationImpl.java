@@ -34,12 +34,17 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 	protected final RequestBasedCardinalityEstimator cardEstimator;
     protected final VarSpecificCardinalityEstimation vsCardEstimator;
 
+    public CardinalityEstimationImpl( final RequestBasedCardinalityEstimator e ) {
+        assert e != null;
+        cardEstimator = e;
+        vsCardEstimator = new VarSpecificCardinalityEstimationImpl(this);
+    }
+
     // The visibility of this constructor is at the package level (i.e.,
     // not public) such that it can be used in the unit tests, but not by
     // the configuration framework of HeFQUIN.
     CardinalityEstimationImpl() {
-        cardEstimator = new RequestBasedCardinalityEstimator();
-        vsCardEstimator = new VarSpecificCardinalityEstimationImpl(this);
+        this( new RequestBasedCardinalityEstimator() );
     }
 
 	@Override
