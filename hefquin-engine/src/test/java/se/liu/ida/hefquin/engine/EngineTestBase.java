@@ -144,7 +144,6 @@ public abstract class EngineTestBase
 		final LogicalToPhysicalOpConverter lop2pop = getLOP2POPForTests();
 
 		return new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }

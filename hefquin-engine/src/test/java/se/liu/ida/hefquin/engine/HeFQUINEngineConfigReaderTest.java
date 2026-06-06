@@ -329,11 +329,6 @@ public class HeFQUINEngineConfigReaderTest
 				}
 
 				@Override
-				public FederationCatalog getFederationCatalog() {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
 				public ExecutorService getExecutorServiceForPlanTasks() {
 					throw new UnsupportedOperationException();
 				}

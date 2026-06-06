@@ -362,7 +362,6 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final LogicalToPhysicalOpConverter lop2pop = getLOP2POPForTests();
 
 		final QueryProcContext ctxt = new QueryProcContext() {
-			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }

@@ -19,7 +19,6 @@ public abstract class QueryPlanCompilerBase implements QueryPlanCompiler
 			return eCtxt;
 		else
 			return new ExecutionContextImpl( ctxt.getFederationAccessMgr(),
-			                                 ctxt.getFederationCatalog(),
 			                                 ctxt.getExecutorServiceForPlanTasks(),
 			                                 ctxt.getLogicalToPhysicalPlanConverter(),
 			                                 ctxt.getLogicalToPhysicalOpConverter() );

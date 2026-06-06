@@ -34,7 +34,6 @@ import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl;
 import se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithCache;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public class ExecOpRequestTPFTest extends ExecOpTestBase
 {
@@ -81,7 +80,6 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 		final FederationAccessManager internalFedAccMgr = new AsyncFederationAccessManagerImpl(execServiceForFedAccess);
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerWithCache(internalFedAccMgr, 100);
 		final ExecutionContext execCxt = new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
@@ -141,7 +139,6 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(null, l);
 		return new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }

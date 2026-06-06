@@ -13,14 +13,12 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.access.*;
-import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public class TestUtils extends EngineTestBase
 {
 	public static ExecutionContext createExecContextForTests() {
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest ();
 		return new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }

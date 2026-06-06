@@ -591,7 +591,6 @@ public class HeFQUINEngineConfigReader
 	                                                   final LogicalToPhysicalPlanConverter lp2pp,
 	                                                   final LogicalToPhysicalOpConverter lop2pop ) {
 		return new ExecutionContextImpl( fedAccessMgr,
-		                                 ctx.getFederationCatalog(),
 		                                 ctx.getExecutorServiceForPlanTasks(),
 		                                 lp2pp,
 		                                 lop2pop );
