@@ -70,7 +70,7 @@ public class QueryPlannerImpl implements QueryPlanner
 	@Override
 	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query,
 	                                                          final QueryProcContext ctxt,
-	                                                          final QueryProcContext2 ctxt2 ) throws QueryPlanningException {
+	                                                          final QueryProcContext2 ctx ) throws QueryPlanningException {
 		log.debug("Starting source selection phase.");
 
 		final long t1 = System.currentTimeMillis();
@@ -85,7 +85,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
 			final boolean keepNaryOperators = poptimizer.assumesLogicalMultiwayJoins();
-			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators, ctxt2);
+			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators, ctx);
 			log.debug( "Logical optimizer invoked with keepNaryOperators={}.", keepNaryOperators );
 		}
 		else {
@@ -108,7 +108,7 @@ public class QueryPlannerImpl implements QueryPlanner
 			log.debug( "Logical optimization returned a plan that produces the empty result; skipping physical optimization." );
 		}
 		else
-			planAndStats = poptimizer.optimize(lp, ctxt);
+			planAndStats = poptimizer.optimize(lp, ctxt, ctx);
 
 		final long t4 = System.currentTimeMillis();
 		log.debug( "Physical optimization completed in {} ms.", (t4 - t3) );

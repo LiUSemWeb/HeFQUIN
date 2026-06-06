@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
@@ -46,7 +47,8 @@ public class CostModelImpl implements CostModel
 
 
 	@Override
-    public CompletableFuture<Double> initiateCostEstimation( final PhysicalPlan plan )
+    public CompletableFuture<Double> initiateCostEstimation( final PhysicalPlan plan,
+                                                             final QueryProcContext2 ctx )
     {
         synchronized (cache) {
             // If we already have a CompletableFuture for the
@@ -58,7 +60,7 @@ public class CostModelImpl implements CostModel
 
             // If we don't have a cache hit, create a CompletableFuture
             // that will produce the cost estimate for the given plan, ...
-            final CompletableFuture<Double> futRslt = _initiateCostEstimation(plan);
+            final CompletableFuture<Double> futRslt = _initiateCostEstimation(plan, ctx);
 
             // ... extend it into a CompletableFuture that will update the
             // cache once the future result has been produced, ...
@@ -77,7 +79,8 @@ public class CostModelImpl implements CostModel
         }
     }
 
-    protected CompletableFuture<Double> _initiateCostEstimation( final PhysicalPlan plan )
+    protected CompletableFuture<Double> _initiateCostEstimation( final PhysicalPlan plan,
+                                                                 final QueryProcContext2 ctx )
     {
         CompletableFuture<Double> f = CompletableFuture.completedFuture( Double.valueOf(0) );
         for ( int i = 0; i < dimensions.length; ++i ) {
@@ -85,7 +88,7 @@ public class CostModelImpl implements CostModel
 
             final CostFunctionForPlan costFct = dimensions[i].costFct;
             final double weight = dimensions[i].weight;
-            f = f.thenCombine( costFct.initiateCostEstimation( visitedPlans, plan),
+            f = f.thenCombine( costFct.initiateCostEstimation(visitedPlans, plan, ctx),
                     (aggregate,costValue) -> aggregate + weight * (costValue < 0 ? Integer.MAX_VALUE: costValue) );
         }
         return f;

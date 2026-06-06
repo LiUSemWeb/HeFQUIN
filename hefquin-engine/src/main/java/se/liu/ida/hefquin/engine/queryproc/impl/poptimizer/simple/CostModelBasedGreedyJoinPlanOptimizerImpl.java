@@ -21,6 +21,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CostEstimationUtils;
 
@@ -35,20 +36,24 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 
 	@Override
 	public EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans,
-	                                                            final QueryProcContext ctxt ) {
-		return new GreedyEnumerationAlgorithm(subplans, ctxt);
+	                                                            final QueryProcContext ctxt,
+	                                                            final QueryProcContext2 ctx ) {
+		return new GreedyEnumerationAlgorithm(subplans, ctxt, ctx);
 	}
 
 
 	protected class GreedyEnumerationAlgorithm implements EnumerationAlgorithm
 	{
 		protected final List<PhysicalPlan> subplans;
-		final LogicalToPhysicalOpConverter lop2pop;
+		protected final LogicalToPhysicalOpConverter lop2pop;
+		protected final QueryProcContext2 ctx;
 
 		public GreedyEnumerationAlgorithm( final List<PhysicalPlan> subplans,
-		                                   final QueryProcContext ctxt ) {
+		                                   final QueryProcContext ctxt,
+		                                   final QueryProcContext2 ctx ) {
 			this.subplans = subplans;
 			lop2pop = ctxt.getLogicalToPhysicalOpConverter();
+			this.ctx = ctx;
 		}
 
 		@Override
@@ -68,7 +73,7 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 		 * and returns the one with the lowest estimated cost.
 		 */
 		protected PhysicalPlan chooseFirstSubplan() throws PhysicalOptimizationException {
-			final Double[] costs = CostEstimationUtils.getEstimates(costModel, subplans);
+			final Double[] costs = CostEstimationUtils.getEstimates(costModel, ctx, subplans);
 
 			int indexOfBestPlan = 0;
 
@@ -105,7 +110,7 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 					continue;
 				}
 
-				final Double[] costs = CostEstimationUtils.getEstimates(costModel, candidatePlansForSubPlan);
+				final Double[] costs = CostEstimationUtils.getEstimates(costModel, ctx, candidatePlansForSubPlan);
 
 				for ( int i = 0; i < costs.length; i++ ){
 					if ( costOfBestCandidate > costs[i] ) {

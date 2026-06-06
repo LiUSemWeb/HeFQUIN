@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
@@ -22,7 +23,8 @@ public class CFRNumberOfRequests extends CFRBase
 	}
 
 	@Override
-	public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan ) {
+	public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan,
+	                                                          final QueryProcContext2 ctx ) {
 		final PhysicalOperator rootOp = plan.getRootOperator();
 
 		final double pageSize = defaultPageSize;
@@ -34,13 +36,13 @@ public class CFRNumberOfRequests extends CFRBase
 			if ( lop instanceof LogicalOpGPAdd gpAdd ) {
 				FederationMember fm = gpAdd.getFederationMember();
 				if ( fm instanceof SPARQLEndpoint ) {
-					return initiateCardinalityEstimation( plan.getSubPlan(0) );
+					return initiateCardinalityEstimation( plan.getSubPlan(0), ctx );
 				}
 				else if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
 //				The actual number of requests depends on the page size of response.
 //				This implementation is under an assumption that the number of pages is evenly distributed among bind-join requests.
-					numReq = initiateCardinalityEstimation(plan);
-					return numReq.thenCombine(initiateCardinalityEstimation(plan.getSubPlan(0)),
+					numReq = initiateCardinalityEstimation(plan, ctx);
+					return numReq.thenCombine(initiateCardinalityEstimation(plan.getSubPlan(0), ctx),
 							(responseSize, card) -> {
 								final double pageNum = Math.ceil( responseSize/pageSize );
 								final int avgPageNum = (int) Math.ceil( pageNum / card );
@@ -56,9 +58,9 @@ public class CFRNumberOfRequests extends CFRBase
 		else if ( rootOp instanceof PhysicalOpBindJoinBRTPF ){
 //			The actual number of requests depends on the block size used for the bind-join requests, and page size of response.
 //		    This implementation is under an assumption that the number of pages is evenly distributed among bind-join requests.
-			numReq = initiateCardinalityEstimation(plan);
+			numReq = initiateCardinalityEstimation(plan, ctx);
 			return numReq.thenCombine(
-					initiateCardinalityEstimation(plan.getSubPlan(0)),
+					initiateCardinalityEstimation( plan.getSubPlan(0), ctx ),
 					(responseSize, card) -> {
 						final double pageNum = Math.ceil( responseSize/pageSize );
 						final int opeNum = (int) Math.ceil( card/blockSize );
@@ -68,7 +70,7 @@ public class CFRNumberOfRequests extends CFRBase
 		}
 		else if ( rootOp instanceof PhysicalOpBindJoinSPARQL ) {
 //			The actual number of requests depends on the block size used for the bind-join requests.
-			numReq = initiateCardinalityEstimation( plan.getSubPlan(0) );
+			numReq = initiateCardinalityEstimation( plan.getSubPlan(0), ctx );
 			return numReq.thenApply( card -> (int) Math.ceil(card/blockSize) );
 		}
 		else if ( rootOp instanceof PhysicalOpRequest ) {
@@ -78,7 +80,7 @@ public class CFRNumberOfRequests extends CFRBase
 			}
 			else if ( (fm instanceof TPFServer) || (fm instanceof BRTPFServer) ){
 //				The actual number of requests depends on the page size used for the requests.
-				numReq = initiateCardinalityEstimation(plan);
+				numReq = initiateCardinalityEstimation(plan, ctx);
 				return numReq.thenApply( card -> (int) Math.ceil(card/pageSize) );
 			}
 			else

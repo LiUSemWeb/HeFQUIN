@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 
 public class PhysicalOptimizerWithoutOptimization extends PhysicalOptimizerBase
 {
@@ -26,7 +27,8 @@ public class PhysicalOptimizerWithoutOptimization extends PhysicalOptimizerBase
 	@Override
 	public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize(
 			final PhysicalPlan initialPlan,
-			final QueryProcContext ctxt )
+			final QueryProcContext ctxt,
+			final QueryProcContext2 ctx )
 					throws PhysicalOptimizationException
 	{
 		log.debug( "Skipping physical optimization (identity optimizer)." );

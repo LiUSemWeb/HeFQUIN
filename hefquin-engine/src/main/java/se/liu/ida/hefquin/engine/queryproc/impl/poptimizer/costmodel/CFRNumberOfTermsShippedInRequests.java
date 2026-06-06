@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -22,7 +23,8 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 	}
 
 	@Override
-	public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan ) {
+	public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan,
+	                                                          final QueryProcContext2 ctx ) {
 		final PhysicalOperator pop = plan.getRootOperator();
 		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) pop).getLogicalOperator();
 
@@ -37,7 +39,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 			final PhysicalPlan req = PhysicalPlanFactory.extractRequestAsPlan(gpAdd);
 			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan, req).size();
 
-			futureIntResSize = initiateCardinalityEstimation(subplan);
+			futureIntResSize = initiateCardinalityEstimation(subplan, ctx);
 		}
 		else if ( lop instanceof LogicalOpRequest reqOp ) {
 			final DataRetrievalRequest req = reqOp.getRequest();

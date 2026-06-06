@@ -13,6 +13,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CFRNumberOfRequests;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.*;
@@ -39,7 +40,8 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
 
     @Override
     public EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans,
-                                                                final QueryProcContext ctxt ) {
+                                                                final QueryProcContext ctxt,
+                                                                final QueryProcContext2 ctx ) {
         return new GreedyConstructionAlgorithm(subplans, ctxt);
     }
 

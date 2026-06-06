@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 
 public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer
 {
@@ -18,7 +19,8 @@ public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer
 	
 	@Override
 	public PhysicalPlan determineJoinPlan( final List<PhysicalPlan> subplans,
-	                                       final QueryProcContext ctxt )
+	                                       final QueryProcContext ctxt,
+	                                       final QueryProcContext2 ctx )
 			throws PhysicalOptimizationException
 	{
 		final LogicalToPhysicalOpConverter lop2pop = ctxt.getLogicalToPhysicalOpConverter();

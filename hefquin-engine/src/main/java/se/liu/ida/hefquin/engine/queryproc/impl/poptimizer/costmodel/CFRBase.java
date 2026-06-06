@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
@@ -21,9 +22,11 @@ public abstract class CFRBase implements CostFunctionForRootOp
 		this.cardEstimate = cardEstimate;
 	}
 
-	protected CompletableFuture<Integer> initiateCardinalityEstimation( final PhysicalPlan plan ) {
-    	return cardEstimate.initiateCardinalityEstimation(plan);
-    }
+	protected CompletableFuture<Integer> initiateCardinalityEstimation(
+			final PhysicalPlan plan,
+			final QueryProcContext2 ctx ) {
+		return cardEstimate.initiateCardinalityEstimation(plan, ctx);
+	}
 
 	protected IllegalArgumentException createIllegalArgumentException( final PhysicalOperator rootOp ) {
 		return new IllegalArgumentException("Physical root operator of unsupported type (" + rootOp.getClass().getName() + ").");

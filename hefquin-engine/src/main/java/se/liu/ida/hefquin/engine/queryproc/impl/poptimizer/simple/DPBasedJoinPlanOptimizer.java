@@ -13,6 +13,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCostUtils;
@@ -29,8 +30,9 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 	@Override
 	protected EnumerationAlgorithm initializeEnumerationAlgorithm(
 			final List<PhysicalPlan> subplans,
-			final QueryProcContext ctxt ) {
-		return new DynamicProgrammingOptimizerImpl(subplans, ctxt);
+			final QueryProcContext ctxt,
+			final QueryProcContext2 ctx ) {
+		return new DynamicProgrammingOptimizerImpl(subplans, ctxt, ctx);
 	}
 
 
@@ -38,11 +40,14 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 	{
 		protected final List<PhysicalPlan> subplans;
 		protected final LogicalToPhysicalOpConverter lop2pop;
+		protected final QueryProcContext2 ctx;
 
 		public DynamicProgrammingOptimizerImpl( final List<PhysicalPlan> subplans,
-		                                        final QueryProcContext ctxt ) {
+		                                        final QueryProcContext ctxt,
+		                                        final QueryProcContext2 ctx ) {
 			this.subplans = subplans;
 			lop2pop = ctxt.getLogicalToPhysicalOpConverter();
+			this.ctx = ctx;
 		}
 
 		@Override
@@ -62,9 +67,10 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 				final boolean atLeastOneFound = determineOptimalCandidatesAtStageN( subsets,
 				                                                                    optmPlansPerStage,
 				                                                                    true, // ignoreCartesianProductJoins
-				                                                                    lop2pop );
+				                                                                    lop2pop,
+				                                                                    ctx );
 				if ( ! atLeastOneFound ) {
-					determineOptimalCandidatesAtStageN( subsets, optmPlansPerStage, false, lop2pop );
+					determineOptimalCandidatesAtStageN(subsets, optmPlansPerStage, false, lop2pop, ctx);
 				}
 			}
 
@@ -144,7 +150,8 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 	protected boolean determineOptimalCandidatesAtStageN( final List<List<PhysicalPlan>> subsets,
 	                                                      final OptimalPlansPerStage optPlansPerStage,
 	                                                      final boolean ignoreCartesianProductJoins,
-	                                                      final LogicalToPhysicalOpConverter lop2pop )
+	                                                      final LogicalToPhysicalOpConverter lop2pop,
+	                                                      final QueryProcContext2 ctx )
 			throws PhysicalOptimizationException
 	{
 		boolean atLeastOnePlanFound = false;
@@ -202,7 +209,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 
 				// Prune: we only need to keep the best plan for the current subset of subplans
 				// TODO: Move the cost annotation out of this for-loop. For all plans of the same size, invoke the cost function once.
-				final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(costModel, candidatePlans);
+				final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(costModel, candidatePlans, ctx);
 				final PhysicalPlanWithCost planWithLowestCost = PhysicalPlanWithCostUtils.findPlanWithLowestCost(candidatesWithCost);
 				optPlansPerStage.add( plans, planWithLowestCost.getPlan() );
 			}

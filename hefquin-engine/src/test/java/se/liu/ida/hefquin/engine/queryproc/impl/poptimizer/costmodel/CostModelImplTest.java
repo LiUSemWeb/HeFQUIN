@@ -15,9 +15,12 @@ import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 
@@ -40,10 +43,12 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan = createSimplePlan();
 		final CostModel costModel = createCostModel(1, 20, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
 
+		final QueryProcContext2 ctx = getQueryProcContextForTest();
+
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan);
-		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan);
+		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan, ctx);
+		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan, ctx);
 
 		final Double result1 = f1.get();
 		final Double result2 = f2.get();
@@ -62,10 +67,12 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan = createSimplePlan();
 		final CostModel costModel = createCostModel(1, Integer.MAX_VALUE+2, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
 
+		final QueryProcContext2 ctx = getQueryProcContextForTest();
+
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan);
-		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan);
+		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan, ctx);
+		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan, ctx);
 
 		final Double result1 = f1.get();
 		final Double result2 = f2.get();
@@ -84,10 +91,12 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan = createSimplePlan();
 		final CostModel costModel = createCostModel(1, Integer.MAX_VALUE-1, SLEEP_MILLIES, 1, Integer.MAX_VALUE-1, SLEEP_MILLIES);
 
+		final QueryProcContext2 ctx = getQueryProcContextForTest();
+
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan);
-		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan);
+		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan, ctx);
+		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan, ctx);
 
 		final Double result1 = f1.get();
 		final Double result2 = f2.get();
@@ -106,12 +115,14 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan = createSimplePlan();
 		final CostModel costModel = createCostModel(1, 20, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
 
+		final QueryProcContext2 ctx = getQueryProcContextForTest();
+
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan);
+		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan, ctx);
 		final Double result1 = f1.get();
 
-		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan);
+		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan, ctx);
 		final Double result2 = f2.get();
 
 		final long endTime = new Date().getTime();
@@ -131,12 +142,14 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan4 = createSimplePlan();
 		final CostModel costModel = createCostModel(1, 20, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
 
+		final QueryProcContext2 ctx = getQueryProcContextForTest();
+
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan1);
-		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan2);
-		final CompletableFuture<Double> f3 = costModel.initiateCostEstimation(plan3);
-		final CompletableFuture<Double> f4 = costModel.initiateCostEstimation(plan4);
+		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan1, ctx);
+		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan2, ctx);
+		final CompletableFuture<Double> f3 = costModel.initiateCostEstimation(plan3, ctx);
+		final CompletableFuture<Double> f4 = costModel.initiateCostEstimation(plan4, ctx);
 
 		final Double result1 = f1.get();
 		final Double result2 = f2.get();
@@ -160,12 +173,14 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan2 = createSimplePlan();
 		final CostModel costModel = createCostModel(1, 20, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
 
+		final QueryProcContext2 ctx = getQueryProcContextForTest();
+
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan1);
+		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan1, ctx);
 		final Double result1 = f1.get();
 
-		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan2);
+		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan2, ctx);
 		final Double result2 = f2.get();
 
 		final long endTime = new Date().getTime();
@@ -176,6 +191,7 @@ public class CostModelImplTest extends EngineTestBase
 	}
 
 
+	// ---------------- helper functionality ---------------
 
 	protected PhysicalPlan createSimplePlan() {
 		final TriplePattern tp = new TriplePatternImpl(
@@ -213,7 +229,10 @@ public class CostModelImplTest extends EngineTestBase
 		}
 
 		@Override
-		public CompletableFuture<Integer> initiateCostEstimation( final Set<PhysicalPlan> visitedPlan, final PhysicalPlan plan ) {
+		public CompletableFuture<Integer> initiateCostEstimation(
+				final Set<PhysicalPlan> visitedPlan,
+				final PhysicalPlan plan,
+				final QueryProcContext2 ctx ) {
 			return CompletableFuture.supplyAsync( () -> {
 				if ( sleepMillis > 0L ) {
 					try {
@@ -226,6 +245,11 @@ public class CostModelImplTest extends EngineTestBase
 				return cost;
 			});
 		}
+	}
+
+	protected QueryProcContext2 getQueryProcContextForTest() {
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+		return new QueryProcContextBuilder(fedAccessMgr).build();
 	}
 
 }

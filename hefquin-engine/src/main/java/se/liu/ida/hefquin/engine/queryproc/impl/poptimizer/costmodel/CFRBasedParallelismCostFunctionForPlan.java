@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,7 +29,11 @@ public class CFRBasedParallelismCostFunctionForPlan extends CFRBasedCostFunction
 	}
 
 	@Override
-	public CompletableFuture<Integer> aggregateValueForAllSubPlans( final Set<PhysicalPlan> visitedPlans, final CompletableFuture<Integer> futureForRoot, final PhysicalPlan plan ) {
+	public CompletableFuture<Integer> aggregateValueForAllSubPlans(
+			final Set<PhysicalPlan> visitedPlans,
+			final CompletableFuture<Integer> futureForRoot,
+			final PhysicalPlan plan,
+			final QueryProcContext2 ctx ) {
 		final PhysicalOperator pop = plan.getRootOperator();
 		if ( pop instanceof PhysicalOpBinaryUnion || pop instanceof PhysicalOpMultiwayUnion || pop instanceof PhysicalOpSymmetricHashJoin ){
 			CompletableFuture<Integer> cardForSubPlan = CompletableFuture.completedFuture( 0 );
@@ -37,12 +42,12 @@ public class CFRBasedParallelismCostFunctionForPlan extends CFRBasedCostFunction
 				final PhysicalPlan subPlan = plan.getSubPlan(i);
 
 				// To get a fair maximum value, the visited subPlans should not be skipped.
-				cardForSubPlan = cardForSubPlan.thenCombine( initiateCostEstimation( new HashSet<>(), subPlan), (m, v) -> Math.max(m, v));
+				cardForSubPlan = cardForSubPlan.thenCombine( initiateCostEstimation(new HashSet<>(), subPlan, ctx), (m, v) -> Math.max(m, v));
 			}
 			return f.thenCombine(cardForSubPlan, ( total, valueForSubPlan) -> (total + valueForSubPlan) < 0 ? Integer.MAX_VALUE : (total + valueForSubPlan) );
 		}
 		else
-			return super.aggregateValueForAllSubPlans(new HashSet<>(), futureForRoot, plan);
+			return super.aggregateValueForAllSubPlans(new HashSet<>(), futureForRoot, plan, ctx);
 	}
 
 }
