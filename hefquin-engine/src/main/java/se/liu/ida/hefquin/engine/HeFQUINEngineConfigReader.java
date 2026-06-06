@@ -15,7 +15,6 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
@@ -46,63 +45,6 @@ import se.liu.ida.hefquin.vocabulary.ECVocab;
  */
 public class HeFQUINEngineConfigReader
 {
-	/**
-	 * Creates a {@link HeFQUINEngine} that is configured based on
-	 * the description in the given RDF file. Assumes that the file
-	 * describes only one such configuration.
-	 */
-	public HeFQUINEngine readFromFile( final String filename, final Context ctx ) {
-		final Model m = RDFDataMgr.loadModel(filename);
-		return read(m, ctx);
-	}
-
-	/**
-	 * Creates a {@link HeFQUINEngine} that is configured based on the
-	 * configuration identified by the given URI in the given RDF file.
-	 */
-	public HeFQUINEngine readFromFile( final String filename, final String uriOfConfRsrc, final Context ctx ) {
-		final Model m = RDFDataMgr.loadModel(filename);
-		final Resource confRsrc = m.createResource(uriOfConfRsrc);
-
-		if ( ! m.contains(confRsrc, null) )
-			throw new IllegalArgumentException("There is no description of the given URI (" + uriOfConfRsrc + ") in " + filename);
-
-		return read(confRsrc, ctx);
-	}
-
-	/**
-	 * Creates a {@link HeFQUINEngine} that is configured based on
-	 * the description in the given RDF model. Assumes that the
-	 * model describes only one such configuration.
-	 */
-	public HeFQUINEngine read( final Model m, final Context ctx ) {
-		final Resource confRsrc = obtainConfigurationResource(m);
-		return read(confRsrc, ctx);
-	}
-
-	public Resource obtainConfigurationResource( final Model m ) {
-		final ResIterator itConfigs = m.listResourcesWithProperty(RDF.type, ECVocab.HeFQUINEngineConfiguration);
-
-		if ( ! itConfigs.hasNext() ) {
-			throw new IllegalArgumentException("The given RDF description does not contain a HeFQUINEngineConfiguration.");
-		}
-
-		final Resource r = itConfigs.next();
-
-		if ( itConfigs.hasNext() ) {
-			throw new IllegalArgumentException("The given RDF description contains more than one HeFQUINEngineConfiguration.");
-		}
-
-		return r;
-	}
-
-	public HeFQUINEngine read( final Resource confRsrc, final Context ctx ) {
-		final FederationAccessManager fedAccessMgr = readFederationAccessManager(confRsrc, ctx);
-		final QueryProcessor qproc = readQueryProcessor(confRsrc, ctx, fedAccessMgr);
-
-		return new HeFQUINEngine(ctx.getFederationCatalog(), fedAccessMgr, qproc);
-	}
-
 	public interface Context {
 		ExecutorService getExecutorServiceForFederationAccess();
 		ExecutorService getExecutorServiceForPlanTasks();
@@ -128,6 +70,22 @@ public class HeFQUINEngineConfigReader
 	                                                            final Context ctx ) {
 		final Resource confRsrc = obtainConfigurationResource(m);
 		return readFederationAccessManager(confRsrc, ctx);
+	}
+
+	public Resource obtainConfigurationResource( final Model m ) {
+		final ResIterator itConfigs = m.listResourcesWithProperty(RDF.type, ECVocab.HeFQUINEngineConfiguration);
+
+		if ( ! itConfigs.hasNext() ) {
+			throw new IllegalArgumentException("The given RDF description does not contain a HeFQUINEngineConfiguration.");
+		}
+
+		final Resource r = itConfigs.next();
+
+		if ( itConfigs.hasNext() ) {
+			throw new IllegalArgumentException("The given RDF description contains more than one HeFQUINEngineConfiguration.");
+		}
+
+		return r;
 	}
 
 	public FederationAccessManager readFederationAccessManager( final Resource confRsrc,
