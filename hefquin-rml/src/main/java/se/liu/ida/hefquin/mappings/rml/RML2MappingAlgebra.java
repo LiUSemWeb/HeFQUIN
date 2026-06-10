@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.mappings.rml;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 
 import se.liu.ida.hefquin.jenaext.ModelUtils;
@@ -37,9 +39,10 @@ import se.liu.ida.hefquin.mappings.rml.vocabulary.RMLVocab;
 import se.liu.ida.hefquin.mappings.sources.SourceReference;
 import se.liu.ida.hefquin.mappings.sources.json.JsonPathQuery;
 import se.liu.ida.hefquin.mappings.sources.json.MappingOpExtractJSON;
+import se.liu.ida.hefquin.vocabulary.FDVocab;
 
 /**
- * This class can be used to translated RML mappings into the mapping algebra.
+ * This class can be used to translate RML mappings into the mapping algebra.
  * <p>
  * The translation is implemented using the algorithms introduced in the
  * following research paper.
@@ -229,7 +232,7 @@ public class RML2MappingAlgebra
 	 * Checks that the logical source of the given triples map has
 	 * rml:JSONPath as its reference formulation and obtains the
 	 * root iterator query of the logical source.
-	 * 
+	 *
 	 * @param tm - assumed to represent an RML triples map
 	 * @return JSONPath query created from the rml:iterator of the logical source
 	 * @throws RMLParserException
@@ -299,7 +302,15 @@ public class RML2MappingAlgebra
 			throw new RMLParserException("There is a triples map (" + tm.toString() + ") whose logical source does not have an rm:source.", e);
 		}
 
-		return new MySourceReference(src);
+		if ( src.hasProperty( RDF.type, FDVocab.TemplateBasedInterface ) || src.hasProperty( RDF.type, FDVocab.FixedEndpointInterface ) )
+			return new MySourceReference(src);
+		else if ( src.hasProperty( RDF.type, RMLVocab.RelativePathSource ) || src.hasProperty( RDF.type, RMLVocab.FilePath ) )
+			return new FileSourceReference(src);
+		else {
+			throw new RMLParserException(
+				"Unsupported rml:source type: " + src
+			);
+		}
 	}
 
 	/**
@@ -643,4 +654,23 @@ public class RML2MappingAlgebra
 		}
 	}
 
+	public static class FileSourceReference implements SourceReference {
+		public final File file;
+		public FileSourceReference( final File file ) { this.file = file; }
+		public FileSourceReference( final Resource r ) {
+			final String path = r.getProperty( RMLVocab.path ).getString();
+
+			this.file = new File( path );
+		}
+
+		@Override
+		public boolean equals( final Object other ) {
+			if ( other == this ) return true;
+
+			return (    other instanceof FileSourceReference sr
+			         && sr.file.equals(file) );
+		}
+
+		public File getFile() { return this.file; }
+	}
 }

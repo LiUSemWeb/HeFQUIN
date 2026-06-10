@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.cli;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +34,7 @@ import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpressionUtils;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpProject;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
 import se.liu.ida.hefquin.mappings.rml.RML2MappingAlgebra;
+import se.liu.ida.hefquin.mappings.rml.RML2MappingAlgebra.FileSourceReference;
 import se.liu.ida.hefquin.mappings.rml.RMLParserException;
 import se.liu.ida.hefquin.mappings.rml.vocabulary.RMLVocab;
 import se.liu.ida.hefquin.mappings.sources.DataObject;
@@ -181,28 +182,40 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 				MappingOpUnion.getInstance(),
 				exprs );
 
-		// NOTE: currently using a fixed JSON source for evaluation.
-		final String jsonString;
-		try {
-			jsonString = Files.readString(Path.of("examples/ExampleJSONSource.json"));
-		}
-		catch ( final Exception e ) {
-			cmdError( "Failed to read sources.json: " + e.getMessage(), true );
-			return; // Primarily used to avoid "variable not initialized" compiler error
-		}
-
-		final JsonObject jsonObject;
-		try {
-			jsonObject = new JsonObject(jsonString);
-		}
-		catch ( final JsonPathException e ) {
-			cmdError( "Invalid JSON input: failed to parse JSON string.", true );
-			return;
-		}
-
 		final Map<SourceReference,DataObject> map = new HashMap<>();
 		for ( final SourceReference sr : MappingExpressionUtils.extractAllSrcRefs(expr) ) {
-			map.put( sr, jsonObject );
+			if ( sr instanceof FileSourceReference fsr ) {
+				final File file = fsr.getFile();
+
+				final String jsonString;
+				try {
+					jsonString = Files.readString(file.toPath());
+				}
+				catch ( final Exception e ) {
+					cmdError( "Failed to read " + file.getPath() + ":" + e.getMessage(), true );
+					return; // Primarily used to avoid "variable not initialized" compiler error
+				}
+
+				final JsonObject jsonObject;
+				try {
+					jsonObject = new JsonObject(jsonString);
+				}
+				catch ( final JsonPathException e ) {
+					cmdError( "Invalid JSON input: failed to parse JSON string.", true );
+					return;
+				}
+
+				map.put( sr, jsonObject );
+			}
+			else {
+				cmdError(
+					"MaterializeRDFViewFromRML only supports file-based logical sources. "
+					+ "Found source reference of type "
+					+ sr.getClass().getSimpleName(),
+					true
+				);
+				return;
+			}
 		}
 
 		// Measure only the core RML evaluation + materialization phase
