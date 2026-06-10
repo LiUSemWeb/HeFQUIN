@@ -32,7 +32,6 @@ import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
@@ -389,13 +388,6 @@ public class QueryProcessorImplTest extends EngineTestBase
 			}
 		};
 
-		final QueryProcContext ctxt = new QueryProcContext() {
-			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
-			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
-			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
-		};
-
 		final PhysicalOptimizer poptimizer = new PhysicalOptimizerWithoutOptimization();
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, null, null, null,  null);
 		final QueryPlanCompiler planCompiler = new
@@ -403,7 +395,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				//PullBasedQueryPlanCompilerImpl(ctx);
 				QueryPlanCompilerForPushBasedExecution(ctx);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
-		final QueryProcessor qProc = new QueryProcessorImpl(planner, lp2pp, lop2pop, planCompiler, execEngine, ctxt);
+		final QueryProcessor qProc = new QueryProcessorImpl(planner, lp2pp, lop2pop, planCompiler, execEngine);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
 

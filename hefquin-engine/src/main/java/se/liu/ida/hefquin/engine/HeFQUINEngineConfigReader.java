@@ -136,7 +136,7 @@ public class HeFQUINEngineConfigReader
 		final QueryPlanCompiler compiler = readQueryPlanCompiler(rsrc, ctxx);
 		final ExecutionEngine exec = readExecutionEngine(rsrc, ctxx);
 
-		return new QueryProcessorImpl( planner, lp2pp, lop2pop, compiler, exec, ctxx.getQueryProcContext() );
+		return new QueryProcessorImpl(planner, lp2pp, lop2pop, compiler, exec);
 	}
 
 	public CostModel readCostModel( final Resource qprocRsrc, final ExtendedContext ctx ) {

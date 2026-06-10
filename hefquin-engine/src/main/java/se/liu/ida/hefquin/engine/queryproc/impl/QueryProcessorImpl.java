@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
@@ -42,27 +40,23 @@ public class QueryProcessorImpl implements QueryProcessor
 	protected final LogicalToPhysicalOpConverter lop2pop;
 	protected final QueryPlanCompiler planCompiler;
 	protected final ExecutionEngine execEngine;
-	protected final QueryProcContext ctxt;
 
 	public QueryProcessorImpl( final QueryPlanner planner,
 	                           final LogicalToPhysicalPlanConverter lp2pp,
 	                           final LogicalToPhysicalOpConverter lop2pop,
 	                           final QueryPlanCompiler planCompiler,
-	                           final ExecutionEngine execEngine,
-	                           final QueryProcContext ctxt ) {
+	                           final ExecutionEngine execEngine ) {
 		assert planner != null;
 		assert lp2pp != null;
 		assert lop2pop != null;
 		assert planCompiler != null;
 		assert execEngine != null;
-		assert ctxt != null;
 
 		this.planner = planner;
 		this.lp2pp = lp2pp;
 		this.lop2pop = lop2pop;
 		this.planCompiler = planCompiler;
 		this.execEngine = execEngine;
-		this.ctxt = ctxt;
 	}
 
 	@Override
@@ -156,20 +150,7 @@ public class QueryProcessorImpl implements QueryProcessor
 
 	@Override
 	public void shutdown() {
-		final ExecutorService threadPool = ctxt.getExecutorServiceForPlanTasks();
-		log.debug( "Shutting down query processor thread pool." );
-		threadPool.shutdown();
-		try {
-			if ( ! threadPool.awaitTermination(500L, TimeUnit.MILLISECONDS) ) {
-				log.debug( "Thread pool did not terminate gracefully; forcing shutdown." );
-				threadPool.shutdownNow();
-			}
-			else log.debug( "Thread pool terminated gracefully." );
-		} catch ( InterruptedException ex ) {
-			log.debug( "Interrupted while waiting for thread pool termination.", ex );
-			Thread.currentThread().interrupt();
-			threadPool.shutdownNow();
-		}
+		// nothing to do
 	}
 
 	protected class MyQueryProcContextExt implements QueryProcContextExt

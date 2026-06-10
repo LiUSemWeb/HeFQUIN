@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -12,6 +13,8 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.apache.jena.sparql.util.QueryExecUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
@@ -51,6 +54,8 @@ import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINEngineConstants;
  */
 public class HeFQUINEngine
 {
+	private static final Logger log = LoggerFactory.getLogger( HeFQUINEngine.class );
+
 	protected final FederationCatalog fedCatalog;
 	protected final FederationAccessManager fedAccessMgr;
 	protected final QueryProcessor qProc;
@@ -213,6 +218,21 @@ public class HeFQUINEngine
 		wasShutDown = true;
 		fedAccessMgr.shutdown();
 		qProc.shutdown();
+
+		log.debug( "Shutting down query processor thread pool." );
+		execServiceForPlanTasks.shutdown();
+		try {
+			if ( ! execServiceForPlanTasks.awaitTermination(500L, TimeUnit.MILLISECONDS) ) {
+				log.debug( "Thread pool did not terminate gracefully; forcing shutdown." );
+				execServiceForPlanTasks.shutdownNow();
+			}
+			else log.debug( "Thread pool terminated gracefully." );
+		}
+		catch ( final InterruptedException ex ) {
+			log.debug( "Interrupted while waiting for thread pool termination.", ex );
+			Thread.currentThread().interrupt();
+			execServiceForPlanTasks.shutdownNow();
+		}
 	}
 
 
