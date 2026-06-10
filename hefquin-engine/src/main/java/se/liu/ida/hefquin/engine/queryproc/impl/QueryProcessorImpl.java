@@ -111,7 +111,7 @@ public class QueryProcessorImpl implements QueryProcessor
 		else {
 			log.debug("Compiling executable plan.");
 
-			final ExecutablePlan prg = planCompiler.compile(qepAndStats.object1);
+			final ExecutablePlan prg = planCompiler.compile(qepAndStats.object1, ctx);
 
 			if ( planner.getExecutablePlanPrinter() != null ) {
 				log.debug( "Printing executable plan." );

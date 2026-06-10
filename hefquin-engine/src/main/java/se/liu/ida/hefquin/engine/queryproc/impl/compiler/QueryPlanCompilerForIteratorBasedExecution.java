@@ -15,27 +15,25 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultEleme
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryCompilationException;
+import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
-public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompilerBase
+public class QueryPlanCompilerForIteratorBasedExecution implements QueryPlanCompiler
 {
 	private static final Logger log = LoggerFactory.getLogger( QueryPlanCompilerForIteratorBasedExecution.class );
 
-	public QueryPlanCompilerForIteratorBasedExecution( final QueryProcContextExt ctx ) {
-		super(ctx);
-	}
-
 	@Override
-	public ExecutablePlan compile( final PhysicalPlan qep )
+	public ExecutablePlan compile( final PhysicalPlan qep,
+	                               final QueryProcContextExt ctx )
 			throws QueryCompilationException
 	{
 		log.debug("Compiling physical plan using iterator-based execution model.");
-		final ResultElementIterator it = compile(qep, ctx);
+		final ResultElementIterator it = _compile(qep, ctx);
 		return new IteratorBasedExecutablePlanImpl(it);
 	}
 
-	protected ResultElementIterator compile( final PhysicalPlan qep,
-	                                         final QueryProcContextExt ctx )
+	protected ResultElementIterator _compile( final PhysicalPlan qep,
+	                                          final QueryProcContextExt ctx )
 	{
 		final QueryPlanningInfo qpInfo;
 		if ( qep.hasQueryPlanningInfo() )
@@ -54,7 +52,7 @@ public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompile
 
 			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( true, qpInfo, subPlan.getExpectedVariables() );
 
-			final ResultElementIterator elmtIterSubPlan = compile(subPlan, ctx);
+			final ResultElementIterator elmtIterSubPlan = _compile(subPlan, ctx);
 			return new ResultElementIterWithUnaryExecOp(execOp, elmtIterSubPlan, ctx);
 		}
 		else if ( qep.numberOfSubPlans() == 2 )
@@ -68,8 +66,8 @@ public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompile
 					subPlan1.getExpectedVariables(),
 					subPlan2.getExpectedVariables() );
 
-			final ResultElementIterator elmtIterSubPlan1 = compile(subPlan1, ctx);
-			final ResultElementIterator elmtIterSubPlan2 = compile(subPlan2, ctx);
+			final ResultElementIterator elmtIterSubPlan1 = _compile(subPlan1, ctx);
+			final ResultElementIterator elmtIterSubPlan2 = _compile(subPlan2, ctx);
 			return new ResultElementIterWithBinaryExecOp(execOp, elmtIterSubPlan1, elmtIterSubPlan2, ctx);
 		}
 		else

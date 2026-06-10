@@ -115,7 +115,7 @@ _:bListOfPhysicalOpFactories
 
 _:bPlanCompiler rdf:type ec:PlanCompiler ;
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerForPushBasedExecution" ;
-    ec:constructorArguments ( [rdf:value ec:value:QueryProcContext] ) .
+    ec:constructorArguments ( ) .
 
 _:bExecutionEngine rdf:type ec:ExecutionEngine ;
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl" ;

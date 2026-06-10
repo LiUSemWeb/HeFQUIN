@@ -27,18 +27,16 @@ import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
-public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBase
+public class QueryPlanCompilerForPushBasedExecution implements QueryPlanCompiler
 {
 	private static final Logger log = LoggerFactory.getLogger( QueryPlanCompilerForPushBasedExecution.class );
 
-	public QueryPlanCompilerForPushBasedExecution( final QueryProcContextExt ctx ) {
-		super(ctx);
-	}
-
 	@Override
-	public ExecutablePlan compile( final PhysicalPlan qep ) {
+	public ExecutablePlan compile( final PhysicalPlan qep,
+	                               final QueryProcContextExt ctx ) {
 		log.debug("Compiling physical plan using push-based execution model.");
 		final LinkedList<PushBasedPlanThread> threads = createThreads(qep, ctx);
 		return new PushBasedExecutablePlanImpl(threads, ctx);

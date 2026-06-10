@@ -5,5 +5,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 public interface QueryPlanCompiler
 {
-	ExecutablePlan compile( PhysicalPlan qep ) throws QueryCompilationException;
+	ExecutablePlan compile( PhysicalPlan qep, QueryProcContextExt ctx )
+			throws QueryCompilationException;
 }

@@ -391,9 +391,9 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final PhysicalOptimizer poptimizer = new PhysicalOptimizerWithoutOptimization();
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, null, null, null,  null);
 		final QueryPlanCompiler planCompiler = new
-				//IteratorBasedQueryPlanCompilerImpl(ctx);
-				//PullBasedQueryPlanCompilerImpl(ctx);
-				QueryPlanCompilerForPushBasedExecution(ctx);
+				//IteratorBasedQueryPlanCompilerImpl();
+				//PullBasedQueryPlanCompilerImpl();
+				QueryPlanCompilerForPushBasedExecution();
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
 		final QueryProcessor qProc = new QueryProcessorImpl(planner, lp2pp, lop2pop, planCompiler, execEngine);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
