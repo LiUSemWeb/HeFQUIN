@@ -318,7 +318,6 @@ public class HeFQUINEngineConfigReader
 			final RDFNode argValueTerm;
 			if (    argDescr.isLiteral()
 			     || argDescr.equals(ECVocab.ExecServiceForFedAccess)
-			     || argDescr.equals(ECVocab.QueryProcContext)
 			     || argDescr.equals(ECVocab.CostModel_INSTANCE) ) {
 				argValueTerm = argDescr;
 			}
@@ -397,10 +396,6 @@ public class HeFQUINEngineConfigReader
 				if ( argValueTerm.equals(ECVocab.ExecServiceForFedAccess) ) {
 					argType = ExecutorService.class;
 					argValue = ctx.getExecutorServiceForFederationAccess();
-				}
-				else if ( argValueTerm.equals(ECVocab.QueryProcContext) ) {
-					argType = QueryProcContext.class;
-					argValue = ctx.getQueryProcContext();
 				}
 				else if ( argValueTerm.equals(ECVocab.CostModel_INSTANCE) ) {
 					argType = CostModel.class;

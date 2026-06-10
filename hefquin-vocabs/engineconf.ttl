@@ -8,7 +8,7 @@
 <http://w3id.org/hefquin/engineconf>
     rdf:type owl:Ontology ;
     dc:creator       "Olaf Hartig" ;
-    dc:date          "2023-11-29" ;
+    dc:date          "2026-06-10" ;
     dc:format        "RDF" ;
     dc:identifier    <http://w3id.org/hefquin/engineconf> ;
     dc:title         "Vocabulary for describing configurations of the HeFQUIN engine"@en ;
@@ -196,7 +196,5 @@ ec:elements         rdf:type rdf:Property ;
 ## ==== INSTANCES ====
 
 ec:value:ExecServiceForFedAccess rdf:type ec:DesignatedArgumentValue .
-
-ec:value:QueryProcContext rdf:type ec:DesignatedArgumentValue .
 
 ec:value:CostModel rdf:type ec:DesignatedArgumentValue .
