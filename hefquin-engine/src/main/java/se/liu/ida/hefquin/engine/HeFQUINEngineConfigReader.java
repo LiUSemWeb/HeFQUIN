@@ -122,6 +122,12 @@ public class HeFQUINEngineConfigReader
 		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( confRsrc, ECVocab.queryProcessor );
 
 		final ExtendedContext ctxx = new ExtendedContextImpl2(ctx, fedAccessMgr);
+
+		final LogicalToPhysicalPlanConverter lp2pp = readLogicalToPhysicalPlanConverter(rsrc, ctxx);
+		final LogicalToPhysicalOpConverter lop2pop = readLogicalToPhysicalOpConverter(rsrc, ctxx);
+		ctxx.complete(lp2pp);
+		ctxx.complete(lop2pop);
+
 		final QueryPlanner planner = readQueryPlanner(rsrc, ctxx);
 
 		final CostModel cm = readCostModel(rsrc, ctxx);
@@ -153,9 +159,6 @@ public class HeFQUINEngineConfigReader
 	public QueryPlanner readQueryPlanner( final Resource queryProcRsrc,
 	                                      final ExtendedContext ctx ) {
 		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( queryProcRsrc, ECVocab.queryPlanner );
-
-		ctx.complete( readLogicalToPhysicalPlanConverter(rsrc, ctx) );
-		ctx.complete( readLogicalToPhysicalOpConverter(rsrc, ctx) );
 
 		final SourcePlanner spl = readSourcePlanner(rsrc, ctx);
 		final LogicalOptimizer lopt = readLogicalOptimizer(rsrc, ctx);
