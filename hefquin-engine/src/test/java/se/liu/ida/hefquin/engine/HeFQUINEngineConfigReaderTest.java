@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -224,7 +225,7 @@ public class HeFQUINEngineConfigReaderTest
 			  + System.lineSeparator()
 			  + "ex:a  ec:javaClassName 'se.liu.ida.hefquin.engine.HeFQUINEngineConfigReaderTest_DummyClass2' ;" + System.lineSeparator()
 			  + "      ec:constructorArguments (" + System.lineSeparator()
-			  + "           [ rdf:value ec:value:QueryProcContext ]" + System.lineSeparator()
+			  + "           [ rdf:value ec:value:ExecServiceForFedAccess ]" + System.lineSeparator()
 			  + "      ) ."
 		);
 
@@ -237,7 +238,7 @@ public class HeFQUINEngineConfigReaderTest
 
 		final HeFQUINEngineConfigReaderTest_DummyClass2 d = (HeFQUINEngineConfigReaderTest_DummyClass2) o;
 		assertEquals( 4321, d.i );
-		assertEquals( ctx.getQueryProcContext(), d.ctx );
+		assertEquals( ctx.getExecutorServiceForFederationAccess(), d.execService );
 	}
 
 	@Test
@@ -251,7 +252,7 @@ public class HeFQUINEngineConfigReaderTest
 			  + "ex:a  ec:javaClassName 'se.liu.ida.hefquin.engine.HeFQUINEngineConfigReaderTest_DummyClass2' ;" + System.lineSeparator()
 			  + "      ec:constructorArguments (" + System.lineSeparator()
 			  //            the constructor argument is given directly
-			  + "           ec:value:QueryProcContext" + System.lineSeparator()
+			  + "           ec:value:ExecServiceForFedAccess" + System.lineSeparator()
 			  + "      ) ."
 		);
 
@@ -264,7 +265,7 @@ public class HeFQUINEngineConfigReaderTest
 
 		final HeFQUINEngineConfigReaderTest_DummyClass2 d = (HeFQUINEngineConfigReaderTest_DummyClass2) o;
 		assertEquals( 4321, d.i );
-		assertEquals( ctx.getQueryProcContext(), d.ctx );
+		assertEquals( ctx.getExecutorServiceForFederationAccess(), d.execService );
 	}
 
 
@@ -318,6 +319,8 @@ public class HeFQUINEngineConfigReaderTest
 
 	protected HeFQUINEngineConfigReader.ExtendedContext createNonEmptyContext() {
 		return new HeFQUINEngineConfigReader.ExtendedContext() {
+			final protected ExecutorService execService1 = Executors.newSingleThreadExecutor();
+
 			protected final QueryProcContext myQPC = new QueryProcContext() {
 				@Override
 				public FederationAccessManager getFederationAccessMgr() {
@@ -346,7 +349,7 @@ public class HeFQUINEngineConfigReaderTest
 			}
 
 			@Override
-			public ExecutorService getExecutorServiceForFederationAccess() { throw new UnsupportedOperationException(); }
+			public ExecutorService getExecutorServiceForFederationAccess() { return execService1; }
 
 			@Override
 			public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
