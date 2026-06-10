@@ -19,8 +19,7 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningException;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
 
@@ -69,8 +68,7 @@ public class QueryPlannerImpl implements QueryPlanner
 
 	@Override
 	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query,
-	                                                          final QueryProcContext ctxt,
-	                                                          final QueryProcContext2 ctx ) throws QueryPlanningException {
+	                                                          final QueryProcContextExt ctx ) throws QueryPlanningException {
 		log.debug("Starting source selection phase.");
 
 		final long t1 = System.currentTimeMillis();
@@ -108,7 +106,7 @@ public class QueryPlannerImpl implements QueryPlanner
 			log.debug( "Logical optimization returned a plan that produces the empty result; skipping physical optimization." );
 		}
 		else
-			planAndStats = poptimizer.optimize(lp, ctxt, ctx);
+			planAndStats = poptimizer.optimize(lp, ctx);
 
 		final long t4 = System.currentTimeMillis();
 		log.debug( "Physical optimization completed in {} ms.", (t4 - t3) );

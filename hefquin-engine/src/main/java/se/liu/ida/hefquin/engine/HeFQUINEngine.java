@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine;
 
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -53,23 +54,27 @@ public class HeFQUINEngine
 	protected final FederationCatalog fedCatalog;
 	protected final FederationAccessManager fedAccessMgr;
 	protected final QueryProcessor qProc;
+	protected final ExecutorService execServiceForPlanTasks;
 
 	protected boolean wasShutDown = false;
 
 	protected HeFQUINEngine( final FederationCatalog fedCatalog,
 	                         final FederationAccessManager fedAccessMgr,
-	                         final QueryProcessor qProc ) {
+	                         final QueryProcessor qProc,
+	                         final ExecutorService execServiceForPlanTasks ) {
 		assert fedCatalog != null;
 		assert fedAccessMgr != null;
 		assert qProc != null;
+		assert execServiceForPlanTasks != null;
 
 		this.fedCatalog = fedCatalog;
 		this.fedAccessMgr = fedAccessMgr;
 		this.qProc = qProc;
+		this.execServiceForPlanTasks = execServiceForPlanTasks;
 	}
 
 	public QueryProcContextBuilder getQueryProcContextBuilder() {
-		return new QueryProcContextBuilder(fedCatalog, fedAccessMgr);
+		return new QueryProcContextBuilder(fedCatalog, fedAccessMgr, execServiceForPlanTasks);
 	}
 
 	/**

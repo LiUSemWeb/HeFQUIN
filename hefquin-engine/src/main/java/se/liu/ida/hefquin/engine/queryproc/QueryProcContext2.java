@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
+import java.util.concurrent.ExecutorService;
+
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
@@ -8,6 +10,8 @@ public interface QueryProcContext2
 	FederationCatalog getFederationCatalog();
 
 	FederationAccessManager getFederationAccessMgr();
+
+	ExecutorService getExecutorServiceForPlanTasks();
 
 	/**
 	 * Returns <code>true</code> if the query execution process is done as part

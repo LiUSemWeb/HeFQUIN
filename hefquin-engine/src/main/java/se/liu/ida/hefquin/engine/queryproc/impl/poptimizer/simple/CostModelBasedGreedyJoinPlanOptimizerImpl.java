@@ -20,8 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CostEstimationUtils;
 
@@ -36,23 +35,19 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 
 	@Override
 	public EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans,
-	                                                            final QueryProcContext ctxt,
-	                                                            final QueryProcContext2 ctx ) {
-		return new GreedyEnumerationAlgorithm(subplans, ctxt, ctx);
+	                                                            final QueryProcContextExt ctx ) {
+		return new GreedyEnumerationAlgorithm(subplans, ctx);
 	}
 
 
 	protected class GreedyEnumerationAlgorithm implements EnumerationAlgorithm
 	{
 		protected final List<PhysicalPlan> subplans;
-		protected final LogicalToPhysicalOpConverter lop2pop;
-		protected final QueryProcContext2 ctx;
+		protected final QueryProcContextExt ctx;
 
 		public GreedyEnumerationAlgorithm( final List<PhysicalPlan> subplans,
-		                                   final QueryProcContext ctxt,
-		                                   final QueryProcContext2 ctx ) {
+		                                   final QueryProcContextExt ctx ) {
 			this.subplans = subplans;
-			lop2pop = ctxt.getLogicalToPhysicalOpConverter();
 			this.ctx = ctx;
 		}
 
@@ -146,7 +141,10 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 				final PhysicalPlan subplan = subplans.get(i);
 				final Set<Var> joinVars = PhysicalPlanUtils.intersectionOfAllVariables(currentPlan, subplan);
 				if ( ! joinVars.isEmpty() ) {
-					nextPossiblePlans.put( i, createAllJoinPlans(currentPlan, subplan, lop2pop) );
+					nextPossiblePlans.put( i,
+					                       createAllJoinPlans(currentPlan,
+					                                          subplan,
+					                                          ctx.getLogicalToPhysicalOpConverter()) );
 				}
 			}
 
@@ -161,7 +159,10 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 			// which will all be cartesian products.
 			for ( int i = 0; i < subplans.size(); i++ ) {
 				final PhysicalPlan subplan = subplans.get(i);
-				nextPossiblePlans.put( i, createAllJoinPlans(currentPlan, subplan, lop2pop) );
+				nextPossiblePlans.put( i,
+				                       createAllJoinPlans(currentPlan,
+				                                          subplan,
+				                                          ctx.getLogicalToPhysicalOpConverter()) );
 			}
 
 			return nextPossiblePlans;

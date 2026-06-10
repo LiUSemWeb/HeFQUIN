@@ -128,6 +128,11 @@ public abstract class EngineTestBase
 		}
 
 		@Override
+		public ExecutorService getExecutorServiceForPlanTasks() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public boolean isExperimentRun() {
 			throw new UnsupportedOperationException();
 		}

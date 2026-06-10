@@ -14,6 +14,8 @@ import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithoutResult;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
@@ -21,9 +23,12 @@ import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 /**
  * Simple implementation of {@link QueryProcessor}.
@@ -33,20 +38,28 @@ public class QueryProcessorImpl implements QueryProcessor
 	private static final Logger log = LoggerFactory.getLogger( QueryProcessorImpl.class );
 
 	protected final QueryPlanner planner;
+	protected final LogicalToPhysicalPlanConverter lp2pp;
+	protected final LogicalToPhysicalOpConverter lop2pop;
 	protected final QueryPlanCompiler planCompiler;
 	protected final ExecutionEngine execEngine;
 	protected final QueryProcContext ctxt;
 
 	public QueryProcessorImpl( final QueryPlanner planner,
+	                           final LogicalToPhysicalPlanConverter lp2pp,
+	                           final LogicalToPhysicalOpConverter lop2pop,
 	                           final QueryPlanCompiler planCompiler,
 	                           final ExecutionEngine execEngine,
 	                           final QueryProcContext ctxt ) {
 		assert planner != null;
+		assert lp2pp != null;
+		assert lop2pop != null;
 		assert planCompiler != null;
 		assert execEngine != null;
 		assert ctxt != null;
 
 		this.planner = planner;
+		this.lp2pp = lp2pp;
+		this.lop2pop = lop2pop;
 		this.planCompiler = planCompiler;
 		this.execEngine = execEngine;
 		this.ctxt = ctxt;
@@ -67,11 +80,20 @@ public class QueryProcessorImpl implements QueryProcessor
 	                                                       final QueryProcContext2 ctx )
 			throws QueryProcException
 	{
+		final QueryProcContextExt ctxx = new MyQueryProcContextExt(ctx);
+		return processQuery(query, resultSink, ctxx);
+	}
+
+	protected QueryProcessingStatsAndExceptions processQuery( final Query query,
+	                                                          final QueryResultSink resultSink,
+	                                                          final QueryProcContextExt ctx )
+			throws QueryProcException
+	{
 		log.debug("Starting query processing.");
 
 		final long t1 = System.currentTimeMillis();
 		log.debug("Creating physical plan.");
-		final Pair<PhysicalPlan, QueryPlanningStats> qepAndStats = planner.createPlan(query, ctxt, ctx);
+		final Pair<PhysicalPlan, QueryPlanningStats> qepAndStats = planner.createPlan(query, ctx);
 		final PhysicalPlan qep = qepAndStats.object1;
 
 		final long t2 = System.currentTimeMillis();
@@ -147,6 +169,50 @@ public class QueryProcessorImpl implements QueryProcessor
 			log.debug( "Interrupted while waiting for thread pool termination.", ex );
 			Thread.currentThread().interrupt();
 			threadPool.shutdownNow();
+		}
+	}
+
+	protected class MyQueryProcContextExt implements QueryProcContextExt
+	{
+		protected final QueryProcContext2 wrapped;
+
+		public MyQueryProcContextExt( final QueryProcContext2 wrapped ) {
+			this.wrapped = wrapped;
+		}
+
+		@Override
+		public FederationCatalog getFederationCatalog() {
+			return wrapped.getFederationCatalog();
+		}
+
+		@Override
+		public FederationAccessManager getFederationAccessMgr() {
+			return wrapped.getFederationAccessMgr();
+		}
+
+		@Override
+		public ExecutorService getExecutorServiceForPlanTasks() {
+			return wrapped.getExecutorServiceForPlanTasks();
+		}
+
+		@Override
+		public boolean isExperimentRun() {
+			return wrapped.isExperimentRun();
+		}
+
+		@Override
+		public boolean skipExecution() {
+			return wrapped.skipExecution();
+		}
+
+		@Override
+		public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() {
+			return lp2pp;
+		}
+
+		@Override
+		public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() {
+			return lop2pop;
 		}
 	}
 

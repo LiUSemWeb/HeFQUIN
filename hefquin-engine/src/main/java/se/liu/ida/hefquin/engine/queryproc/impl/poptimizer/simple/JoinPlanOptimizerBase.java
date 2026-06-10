@@ -4,8 +4,7 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * An abstract base class for implementations of {@link JoinPlanOptimizer}.
@@ -14,8 +13,7 @@ public abstract class JoinPlanOptimizerBase implements JoinPlanOptimizer
 {
 	@Override
 	public final PhysicalPlan determineJoinPlan( final List<PhysicalPlan> subplans,
-	                                             final QueryProcContext ctxt,
-	                                             final QueryProcContext2 ctx )
+	                                             final QueryProcContextExt ctx )
 			throws PhysicalOptimizationException
 	{
 		// no need to use the enumeration algorithm if there is only one subplan
@@ -23,14 +21,13 @@ public abstract class JoinPlanOptimizerBase implements JoinPlanOptimizer
 			return subplans.get(0);
 		}
 
-		final EnumerationAlgorithm algo = initializeEnumerationAlgorithm(subplans, ctxt, ctx);
+		final EnumerationAlgorithm algo = initializeEnumerationAlgorithm(subplans, ctx);
 		return algo.getResultingPlan();
 	}
 
 	protected abstract EnumerationAlgorithm initializeEnumerationAlgorithm(
 			List<PhysicalPlan> subplans,
-			QueryProcContext ctxt,
-			QueryProcContext2 ctx );
+			QueryProcContextExt ctx );
 
 	protected interface EnumerationAlgorithm
 	{

@@ -371,6 +371,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final QueryProcContext2 ctxt2 = new QueryProcContext2() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public boolean skipExecution() { return false; }
 		};
@@ -391,7 +392,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				//PullBasedQueryPlanCompilerImpl(ctxt);
 				QueryPlanCompilerForPushBasedExecution(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
-		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine, ctxt);
+		final QueryProcessor qProc = new QueryProcessorImpl(planner, lp2pp, lop2pop, planCompiler, execEngine, ctxt);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
 
