@@ -32,7 +32,6 @@ import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
-import se.liu.ida.hefquin.engine.queryproc.impl.ExecutionContextImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
@@ -125,8 +124,6 @@ public class HeFQUINEngineConfigReader
 
 		final LogicalToPhysicalPlanConverter lp2pp = readLogicalToPhysicalPlanConverter(rsrc, ctxx);
 		final LogicalToPhysicalOpConverter lop2pop = readLogicalToPhysicalOpConverter(rsrc, ctxx);
-		ctxx.complete(lp2pp);
-		ctxx.complete(lop2pop);
 
 		final QueryPlanner planner = readQueryPlanner(rsrc, ctxx);
 
@@ -423,8 +420,6 @@ public class HeFQUINEngineConfigReader
 
 	protected interface ExtendedContext extends Context {
 		void complete( CostModel cm );
-		void complete( LogicalToPhysicalPlanConverter c );
-		void complete( LogicalToPhysicalOpConverter c );
 		CostModel getCostModel();
 	}
 
@@ -435,12 +430,6 @@ public class HeFQUINEngineConfigReader
 
 		@Override
 		public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
-
-		@Override
-		public void complete( final LogicalToPhysicalPlanConverter c ) { throw new UnsupportedOperationException(); }
-
-		@Override
-		public void complete( final LogicalToPhysicalOpConverter c ) { throw new UnsupportedOperationException(); }
 
 		@Override
 		public CostModel getCostModel() { throw new UnsupportedOperationException(); }
@@ -469,8 +458,6 @@ public class HeFQUINEngineConfigReader
 		protected final FederationAccessManager fedAccessMgr;
 
 		protected CostModel costModel = null;
-		protected LogicalToPhysicalPlanConverter lp2pp = null;
-		protected LogicalToPhysicalOpConverter lop2pop = null;
 
 		protected QueryProcContext qprocCtx = null;
 
@@ -483,12 +470,6 @@ public class HeFQUINEngineConfigReader
 		public void complete( final CostModel cm ) {
 			costModel = cm;
 		}
-
-		@Override
-		public void complete( final LogicalToPhysicalPlanConverter c ) { lp2pp = c; }
-
-		@Override
-		public void complete( final LogicalToPhysicalOpConverter c ) { lop2pop = c; }
 
 		@Override
 		public CostModel getCostModel() {
@@ -519,16 +500,6 @@ public class HeFQUINEngineConfigReader
 
 		@Override
 		public ExecutablePlanPrinter getExecutablePlanPrinter() { return ctx.getExecutablePlanPrinter(); }
-	}
-
-	protected QueryProcContext createQueryProcContext( final Context ctx,
-	                                                   final FederationAccessManager fedAccessMgr,
-	                                                   final LogicalToPhysicalPlanConverter lp2pp,
-	                                                   final LogicalToPhysicalOpConverter lop2pop ) {
-		return new ExecutionContextImpl( fedAccessMgr,
-		                                 ctx.getExecutorServiceForPlanTasks(),
-		                                 lp2pp,
-		                                 lop2pop );
 	}
 
 }

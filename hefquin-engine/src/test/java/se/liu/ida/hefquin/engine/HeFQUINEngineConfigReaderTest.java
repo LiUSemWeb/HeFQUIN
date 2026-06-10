@@ -17,8 +17,6 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
@@ -303,12 +301,6 @@ public class HeFQUINEngineConfigReaderTest
 
 			@Override
 			public CostModel getCostModel() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete( final LogicalToPhysicalPlanConverter c ) { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete( final LogicalToPhysicalOpConverter c ) { throw new UnsupportedOperationException(); }
 		};
 	}
 
@@ -339,12 +331,6 @@ public class HeFQUINEngineConfigReaderTest
 
 			@Override
 			public CostModel getCostModel() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete(LogicalToPhysicalPlanConverter c) { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete(LogicalToPhysicalOpConverter c) { throw new UnsupportedOperationException(); }
 		};
 	}
 
