@@ -29,7 +29,6 @@ import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
@@ -459,9 +458,8 @@ public class HeFQUINEngineConfigReader
 
 		protected CostModel costModel = null;
 
-		protected QueryProcContext qprocCtx = null;
-
-		public ExtendedContextImpl2( final Context ctx, final FederationAccessManager fedAccessMgr ) {
+		public ExtendedContextImpl2( final Context ctx,
+		                             final FederationAccessManager fedAccessMgr ) {
 			this.ctx = ctx;
 			this.fedAccessMgr = fedAccessMgr;
 		}
@@ -486,7 +484,7 @@ public class HeFQUINEngineConfigReader
 
 		@Override
 		public ExecutorService getExecutorServiceForPlanTasks() {
-			return qprocCtx.getExecutorServiceForPlanTasks();
+			return ctx.getExecutorServiceForPlanTasks();
 		}
 
 		@Override
