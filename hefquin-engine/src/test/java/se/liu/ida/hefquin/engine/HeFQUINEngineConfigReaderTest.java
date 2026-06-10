@@ -20,9 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 
 public class HeFQUINEngineConfigReaderTest
 {
@@ -286,9 +284,6 @@ public class HeFQUINEngineConfigReaderTest
 			public ExecutorService getExecutorServiceForFederationAccess() { throw new UnsupportedOperationException(); }
 
 			@Override
-			public QueryProcContext getQueryProcContext() { throw new UnsupportedOperationException(); }
-
-			@Override
 			public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
 
 			@Override
@@ -320,33 +315,6 @@ public class HeFQUINEngineConfigReaderTest
 	protected HeFQUINEngineConfigReader.ExtendedContext createNonEmptyContext() {
 		return new HeFQUINEngineConfigReader.ExtendedContext() {
 			final protected ExecutorService execService1 = Executors.newSingleThreadExecutor();
-
-			protected final QueryProcContext myQPC = new QueryProcContext() {
-				@Override
-				public FederationAccessManager getFederationAccessMgr() {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public ExecutorService getExecutorServiceForPlanTasks() {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() {
-					throw new UnsupportedOperationException();
-				}
-			};
-
-			@Override
-			public QueryProcContext getQueryProcContext() {
-				return myQPC;
-			}
 
 			@Override
 			public ExecutorService getExecutorServiceForFederationAccess() { return execService1; }

@@ -425,7 +425,6 @@ public class HeFQUINEngineConfigReader
 		void complete( CostModel cm );
 		void complete( LogicalToPhysicalPlanConverter c );
 		void complete( LogicalToPhysicalOpConverter c );
-		QueryProcContext getQueryProcContext();
 		CostModel getCostModel();
 	}
 
@@ -442,9 +441,6 @@ public class HeFQUINEngineConfigReader
 
 		@Override
 		public void complete( final LogicalToPhysicalOpConverter c ) { throw new UnsupportedOperationException(); }
-
-		@Override
-		public QueryProcContext getQueryProcContext() { throw new UnsupportedOperationException(); }
 
 		@Override
 		public CostModel getCostModel() { throw new UnsupportedOperationException(); }
@@ -493,21 +489,6 @@ public class HeFQUINEngineConfigReader
 
 		@Override
 		public void complete( final LogicalToPhysicalOpConverter c ) { lop2pop = c; }
-
-		@Override
-		public QueryProcContext getQueryProcContext() {
-			if ( qprocCtx != null )
-				return qprocCtx;
-
-			if ( lp2pp == null )
-				throw new UnsupportedOperationException("LogicalToPhysicalPlanConverter not set yet.");
-
-			if ( lop2pop == null )
-				throw new UnsupportedOperationException("LogicalToPhysicalOpConverter not set yet.");
-
-			qprocCtx = createQueryProcContext(ctx, fedAccessMgr, lp2pp, lop2pop);
-			return qprocCtx;
-		}
 
 		@Override
 		public CostModel getCostModel() {
