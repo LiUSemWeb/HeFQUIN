@@ -14,14 +14,14 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOps;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class ResultElementIterWithNullaryExecOpTest
 {
 	@Test
 	public void getOpTest() {
 		final NullaryExecutableOpForTest op = new NullaryExecutableOpForTest();
-		final ResultElementIterWithNullaryExecOp it = new ResultElementIterWithNullaryExecOp( op, TestUtils.createExecContextForTests() );
+		final ResultElementIterWithNullaryExecOp it = new ResultElementIterWithNullaryExecOp( op, TestUtils.createQueryProcContextForTests() );
 
 		assertEquals( op, it.getOp() );
 	}
@@ -68,7 +68,7 @@ public class ResultElementIterWithNullaryExecOpTest
 	protected static ResultElementIterator createIteratorForTests( SolutionMapping... elements ) {
 		return new ResultElementIterWithNullaryExecOp(
 						new NullaryExecutableOpForTest(elements),
-						TestUtils.createExecContextForTests() );
+						TestUtils.createQueryProcContextForTests() );
 	}
 
 	protected static class NullaryExecutableOpForTest extends BaseForExecOps implements NullaryExecutableOp
@@ -87,7 +87,7 @@ public class ResultElementIterWithNullaryExecOpTest
 
 		@Override
 		public void execute( final IntermediateResultElementSink sink,
-		                     final ExecutionContext execCxt )
+		                     final QueryProcContextExt ctx )
 		{
 			if ( list != null ) {
 				sink.send(list);

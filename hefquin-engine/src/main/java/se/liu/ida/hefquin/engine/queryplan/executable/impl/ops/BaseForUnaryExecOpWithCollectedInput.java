@@ -12,7 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * Base class for all implementations of {@link UnaryExecutableOp} that
@@ -61,7 +61,7 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 	@Override
 	protected final void _process( final SolutionMapping inputSolMap,
 	                               final IntermediateResultElementSink sink,
-	                               final ExecutionContext execCxt )
+	                               final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
 		// Add the given solution mapping to the current collection.
@@ -71,7 +71,7 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 		// and, afterwards, remove them from the collection.
 		if ( collectedInputSolMaps.size() == minimumCollectionSize ) {
 			log.debug( "Processing collected batch of {} solution mappings in {}.", collectedInputSolMaps.size(), getClass().getSimpleName() );
-			_processCollectedInput(collectedInputSolMaps, sink, execCxt);
+			_processCollectedInput(collectedInputSolMaps, sink, ctx);
 			log.debug( "Finished batch processing in {}.", getClass().getSimpleName() );
 			collectedInputSolMaps.clear();
 			numberOfCollectionsProcessed++;
@@ -81,7 +81,7 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 	@Override
 	protected final void _process( final List<SolutionMapping> inputSolMaps,
 	                               final IntermediateResultElementSink sink,
-	                               final ExecutionContext execCxt )
+	                               final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
 		// If the number of the given solution mappings exceeds the minimum
@@ -92,7 +92,7 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 		if (    inputSolMaps.size() >= minimumCollectionSize
 		     && collectedInputSolMaps.isEmpty()  ) {
 			log.debug( "Passing through batch of {} mappings directly in {}.", inputSolMaps.size(), getClass().getSimpleName() );
-			_processCollectedInput(inputSolMaps, sink, execCxt);
+			_processCollectedInput(inputSolMaps, sink, ctx);
 			log.debug( "Finished batch processing in {}.", getClass().getSimpleName() );
 			numberOfCollectionsProcessed++;
 			return;
@@ -105,7 +105,7 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 		// and, afterwards, remove them from the collection.
 		if ( collectedInputSolMaps.size() >= minimumCollectionSize ) {
 			log.debug( "Processing collected batch of {} solution mappings in {}.", collectedInputSolMaps.size(), getClass().getSimpleName() );
-			_processCollectedInput(collectedInputSolMaps, sink, execCxt);
+			_processCollectedInput(collectedInputSolMaps, sink, ctx);
 			log.debug( "Finished batch processing in {}.", getClass().getSimpleName() );
 			collectedInputSolMaps.clear();
 			numberOfCollectionsProcessed++;
@@ -114,11 +114,11 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 
 	@Override
 	protected final void _concludeExecution( final IntermediateResultElementSink sink,
-	                                         final ExecutionContext execCxt )
+	                                         final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		log.debug( "Concluding execution with remaining batch size {} in {}.", collectedInputSolMaps.size(), getClass().getSimpleName() );
-		_concludeExecution(collectedInputSolMaps, sink, execCxt);
+		_concludeExecution(collectedInputSolMaps, sink, ctx);
 
 		if ( ! collectedInputSolMaps.isEmpty() ) {
 			collectedInputSolMaps.clear();
@@ -136,7 +136,7 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 	 */
 	protected abstract void _processCollectedInput( List<SolutionMapping> currentBatch,
 	                                                IntermediateResultElementSink sink,
-	                                                ExecutionContext execCxt )
+	                                                QueryProcContextExt ctx )
 			throws ExecOpExecutionException;
 
 	/**
@@ -152,7 +152,7 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 	 */
 	protected abstract void _concludeExecution( List<SolutionMapping> currentBatch,
 	                                            IntermediateResultElementSink sink,
-	                                            ExecutionContext execCxt )
+	                                            QueryProcContextExt ctx )
 			throws ExecOpExecutionException;
 
 	@Override

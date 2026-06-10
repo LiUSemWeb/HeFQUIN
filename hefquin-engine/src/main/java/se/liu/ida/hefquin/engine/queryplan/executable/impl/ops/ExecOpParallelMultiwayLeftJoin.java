@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * TODO: Provide a description of the algorithm implemented by this class.
@@ -111,11 +111,11 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 	@Override
 	protected void _processCollectedInput( final List<SolutionMapping> input,
 	                                       final IntermediateResultElementSink sink,
-	                                       final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	                                       final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		final List<SolutionMapping> inputForParallelProcess = determineInputForParallelProcess(input);
 
 		if ( inputForParallelProcess.size() > 0 ) {
-			parallelPhase(inputForParallelProcess, execCxt);
+			parallelPhase(inputForParallelProcess, ctx);
 		}
 
 		mergePhase(input, sink);
@@ -149,18 +149,18 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 	}
 
 	protected void parallelPhase( final List<SolutionMapping> inputForParallelProcess,
-	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	                              final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		log.debug( "Starting parallel phase with {} workers.", optionalParts.size() );
 		// begin the parallel phase by starting the workers for the optional parts
 		final CompletableFuture<?>[] futures = new CompletableFuture<?>[ optionalParts.size() ];
 		for ( int i = 0; i < optionalParts.size(); i++ ) {
 			final Worker w = new Worker( optionalParts.get(i),
 			                             indexes.get(i),
-										 inputForParallelProcess,
+			                             inputForParallelProcess,
 			                             inputVarsFromNonOptionalPart,
-			                             execCxt,
+			                             ctx,
 			                             mayReduce );
-			futures[i] = CompletableFuture.runAsync( w, execCxt.getExecutorServiceForPlanTasks() );
+			futures[i] = CompletableFuture.runAsync( w, ctx.getExecutorServiceForPlanTasks() );
 		}
 
 		// wait until the parallel phase is completed
@@ -216,11 +216,11 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 	@Override
 	protected void _concludeExecution( final List<SolutionMapping> batch,
 	                                   final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt )
+	                                   final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		if ( batch != null && ! batch.isEmpty() ) {
-			_processCollectedInput(batch, sink, execCxt);
+			_processCollectedInput(batch, sink, ctx);
 		}
 	}
 
@@ -229,18 +229,18 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 		protected final UnaryExecutableOp execOp;
 		protected final IntermediateResultElementSink mySink;
 		protected final List<SolutionMapping> input;
-		protected final ExecutionContext execCxt;
+		protected final QueryProcContextExt ctx ;
 
 		public Worker( final LogicalOpRequest<?,?> req,
 		               final SolutionMappingsIndex index,
 		               final List<SolutionMapping> input,
 		               final ExpectedVariables inputVarsFromNonOptionalPart,
-		               final ExecutionContext execCxt,
+		               final QueryProcContextExt ctx,
 		               final boolean mayReduce ) {
 			this.input = input;
-			this.execCxt = execCxt;
+			this.ctx = ctx;
 
-			final LogicalToPhysicalOpConverter lop2pop = execCxt.getLogicalToPhysicalOpConverter();
+			final LogicalToPhysicalOpConverter lop2pop = ctx.getLogicalToPhysicalOpConverter();
 
 			// TODO: The creation of the executable operator (i.e., the
 			// following three lines) should be moved into the constructor
@@ -265,8 +265,8 @@ public class ExecOpParallelMultiwayLeftJoin extends BaseForUnaryExecOpWithCollec
 				"Worker started processing {} input solution mappings.",
 				input.size() );
 			try {
-				execOp.process(input, mySink, execCxt);
-				execOp.concludeExecution(mySink, execCxt);
+				execOp.process(input, mySink, ctx);
+				execOp.concludeExecution(mySink, ctx);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				log.debug( "Worker execution failed." );

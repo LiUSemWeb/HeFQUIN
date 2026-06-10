@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.utils.Stats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,20 +48,20 @@ public class ExecOpHashJoin1 extends BaseForExecOpHashJoin
 	@Override
 	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		index.add(inputSolMap);
 	}
 
 	@Override
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
-	                                 final ExecutionContext execCxt ) {
+	                                 final QueryProcContextExt ctx ) {
 		this.child1InputComplete = true;
 	}
 
 	@Override
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		if ( child1InputComplete == false ) {
 			throw new IllegalStateException();
 		}
@@ -75,7 +75,7 @@ public class ExecOpHashJoin1 extends BaseForExecOpHashJoin
 	@Override
 	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		if ( child1InputComplete == false ) {
 			throw new IllegalStateException();
 		}
@@ -90,7 +90,7 @@ public class ExecOpHashJoin1 extends BaseForExecOpHashJoin
 
 	@Override
 	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
-	                                 final ExecutionContext execCxt ) {
+	                                 final QueryProcContextExt ctx ) {
 		child2InputComplete = true;
 
 		// clear the index to enable the GC to release memory early,

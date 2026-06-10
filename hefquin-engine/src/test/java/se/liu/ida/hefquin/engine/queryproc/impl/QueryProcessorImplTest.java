@@ -34,6 +34,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
@@ -361,19 +362,22 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final LogicalToPhysicalPlanConverter lp2pp = new LogicalToPhysicalPlanConverterImpl(false, false);
 		final LogicalToPhysicalOpConverter lop2pop = getLOP2POPForTests();
 
-		final QueryProcContext ctxt = new QueryProcContext() {
-			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
-			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
-			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
-		};
-
-		final QueryProcContext2 ctxt2 = new QueryProcContext2() {
+		final QueryProcContextExt ctx = new QueryProcContextExt() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public boolean skipExecution() { return false; }
+
+			@Override
+			public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() {
+				throw new UnsupportedOperationException();
+			}
 		};
 
 		final SourcePlanner sourcePlanner = new ServiceClauseBasedSourcePlannerImpl();
@@ -385,18 +389,25 @@ public class QueryProcessorImplTest extends EngineTestBase
 			}
 		};
 
+		final QueryProcContext ctxt = new QueryProcContext() {
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
+			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
+		};
+
 		final PhysicalOptimizer poptimizer = new PhysicalOptimizerWithoutOptimization();
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, null, null, null,  null);
 		final QueryPlanCompiler planCompiler = new
-				//IteratorBasedQueryPlanCompilerImpl(ctxt);
-				//PullBasedQueryPlanCompilerImpl(ctxt);
-				QueryPlanCompilerForPushBasedExecution(ctxt);
+				//IteratorBasedQueryPlanCompilerImpl(ctx);
+				//PullBasedQueryPlanCompilerImpl(ctx);
+				QueryPlanCompilerForPushBasedExecution(ctx);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
 		final QueryProcessor qProc = new QueryProcessorImpl(planner, lp2pp, lop2pop, planCompiler, execEngine, ctxt);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
 
-		qProc.processQuery(query, resultSink, ctxt2);
+		qProc.processQuery(query, resultSink, ctx);
 
 		execServiceForPlanTasks.shutdownNow();
 		try {

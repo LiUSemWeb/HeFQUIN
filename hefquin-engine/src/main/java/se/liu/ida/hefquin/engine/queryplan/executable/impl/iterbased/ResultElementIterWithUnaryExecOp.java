@@ -4,8 +4,8 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 {
@@ -13,9 +13,9 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 
 	public ResultElementIterWithUnaryExecOp( final UnaryExecutableOp op,
 	                                         final ResultElementIterator inputIter,
-	                                         final ExecutionContext execCxt )
+	                                         final QueryProcContextExt ctx )
 	{
-		super(execCxt);
+		super(ctx);
 
 		assert op != null;
 		assert inputIter != null;
@@ -66,9 +66,9 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 		@Override
 		protected void _run() throws ExecutionException {
 			while ( inputIter.hasNext() ) {
-				op.process( inputIter.next(), sink, execCxt );
+				op.process( inputIter.next(), sink, ctx );
 			}
-			op.concludeExecution(sink, execCxt);
+			op.concludeExecution(sink, ctx);
 		}
 
 	} // end of class OpRunnerThread

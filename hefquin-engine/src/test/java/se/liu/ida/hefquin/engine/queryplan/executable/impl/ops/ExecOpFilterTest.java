@@ -22,7 +22,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.TestUtils;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 
 public class ExecOpFilterTest
@@ -42,7 +42,7 @@ public class ExecOpFilterTest
 		final SolutionMapping sol12 = SolutionMappingUtils.createSolutionMapping(x, value12);
 
 		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10, false, false, null);
-		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+		final QueryProcContextExt ctx = TestUtils.createQueryProcContextForTests();
 		filterLessThan10.process(sol8, sink, ctx);
 		filterLessThan10.process(sol12, sink, ctx);  // 12 is processed before 9. This should not pass the filter. 9 should be after 8.
 		filterLessThan10.process(sol9, sink, ctx);
@@ -66,7 +66,7 @@ public class ExecOpFilterTest
 		final SolutionMapping sol9 = SolutionMappingUtils.createSolutionMapping(y, value9);
 
 		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10, false, false, null);
-		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+		final QueryProcContextExt ctx = TestUtils.createQueryProcContextForTests();
 		filterLessThan10.process(sol8, sink, ctx);
 		filterLessThan10.process(sol9, sink, ctx);
 
@@ -94,7 +94,7 @@ public class ExecOpFilterTest
 		final SolutionMapping solNYD = SolutionMappingUtils.createSolutionMapping(x, dateNewYearsDay);
 
 		final ExecOpFilter filterAfter2019 = new ExecOpFilter(after2019, false, false, null);
-		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+		final QueryProcContextExt ctx = TestUtils.createQueryProcContextForTests();
 		filterAfter2019.process(sol2020, sink, ctx);
 		filterAfter2019.process(sol2019, sink, ctx);
 		filterAfter2019.process(sol2021, sink, ctx);
@@ -127,7 +127,7 @@ public class ExecOpFilterTest
 		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+		final QueryProcContextExt ctx = TestUtils.createQueryProcContextForTests();
 
 		filterOp.process(sm1, sink, ctx);
 		filterOp.process(sm2, sink, ctx);
@@ -171,7 +171,7 @@ public class ExecOpFilterTest
 		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+		final QueryProcContextExt ctx = TestUtils.createQueryProcContextForTests();
 
 		filterOp.process(input1, sink, ctx);
 		filterOp.process(input2, sink, ctx);
@@ -212,7 +212,7 @@ public class ExecOpFilterTest
 		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+		final QueryProcContextExt ctx = TestUtils.createQueryProcContextForTests();
 
 		filterOp.process(input, sink, ctx);
 

@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
@@ -36,14 +36,15 @@ public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
 	}
 
 	@Override
-	protected final void _execute( final IntermediateResultElementSink sink, final ExecutionContext execCxt )
+	protected final void _execute( final IntermediateResultElementSink sink,
+	                               final QueryProcContextExt ctx )
 		throws ExecOpExecutionException
 	{
 		log.debug( "Starting SPARQL request execution for {}", fm );
 
 		final SolMapsResponse response;
 		try {
-			response = FederationAccessUtils.performRequest( execCxt.getFederationAccessMgr(), req, fm );
+			response = FederationAccessUtils.performRequest( ctx.getFederationAccessMgr(), req, fm );
 		}
 		catch ( final FederationAccessException e ) {
 			throw new ExecOpExecutionException( "Performing the request caused an exception.", e, this );

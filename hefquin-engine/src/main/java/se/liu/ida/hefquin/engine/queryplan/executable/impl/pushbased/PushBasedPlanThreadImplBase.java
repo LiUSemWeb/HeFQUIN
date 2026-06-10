@@ -11,16 +11,16 @@ import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * Contains the core part of implementing {@link PushBasedPlanThread}.
  */
-public abstract class PushBasedPlanThreadImplBase implements PushBasedPlanThread,
-                                                         IntermediateResultElementSink
+public abstract class PushBasedPlanThreadImplBase
+                implements PushBasedPlanThread, IntermediateResultElementSink
 {
 	// initialized via the constructor
-	protected final ExecutionContext execCxt;
+	protected final QueryProcContextExt ctx;
 
 	// initialized if needed (i.e., if addConnectorForAdditionalConsumer is called)
 	protected List<ConnectorForAdditionalConsumer> extraConnectors = null;
@@ -73,9 +73,9 @@ public abstract class PushBasedPlanThreadImplBase implements PushBasedPlanThread
 	private Exception causeOfFailure = null;
 
 
-	protected PushBasedPlanThreadImplBase( final ExecutionContext execCxt ) {
-		assert execCxt != null;
-		this.execCxt = execCxt;
+	protected PushBasedPlanThreadImplBase( final QueryProcContextExt ctx ) {
+		assert ctx != null;
+		this.ctx = ctx;
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public abstract class PushBasedPlanThreadImplBase implements PushBasedPlanThread
 			extraConnectors = new ArrayList<>();
 		}
 
-		final ConnectorForAdditionalConsumer c = new ConnectorForAdditionalConsumer(execCxt);
+		final ConnectorForAdditionalConsumer c = new ConnectorForAdditionalConsumer(ctx);
 		extraConnectors.add(c);
 		return c;
 	}

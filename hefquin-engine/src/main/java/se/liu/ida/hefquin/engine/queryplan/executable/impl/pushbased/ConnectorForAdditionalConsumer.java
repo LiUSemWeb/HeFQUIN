@@ -2,12 +2,12 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class ConnectorForAdditionalConsumer extends PushBasedPlanThreadImplBase
 {
-	protected ConnectorForAdditionalConsumer( final ExecutionContext execCxt ) {
-		super(execCxt);
+	protected ConnectorForAdditionalConsumer( final QueryProcContextExt ctx ) {
+		super(ctx);
 	}
 
 	@Override

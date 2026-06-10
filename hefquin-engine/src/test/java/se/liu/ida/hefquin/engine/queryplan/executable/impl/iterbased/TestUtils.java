@@ -11,18 +11,22 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.access.*;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public class TestUtils extends EngineTestBase
 {
-	public static ExecutionContext createExecContextForTests() {
-		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest ();
-		return new ExecutionContext() {
+	public static QueryProcContextExt createQueryProcContextForTests() {
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+		return new QueryProcContextExt() {
+			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
+			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
+			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
 		};
 	}
 

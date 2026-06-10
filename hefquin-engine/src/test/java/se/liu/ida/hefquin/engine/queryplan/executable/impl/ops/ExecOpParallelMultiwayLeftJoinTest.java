@@ -34,8 +34,8 @@ import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
@@ -1442,7 +1442,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 			final TriplePattern tp2 ) throws ExecutionException
 	{
 		final ExecutorService execService = getExecutorServiceForTest();
-		final ExecutionContext execCxt = getExecContextForTests(execService);
+		final QueryProcContextExt ctx = getExtendedQueryProcContextForTests(execService);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
@@ -1451,9 +1451,9 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 
 		final UnaryExecutableOp op = createExecOpForTest(expectedInputVariables, tp1, fm1, tp2, fm2);
 		for ( final SolutionMapping sm : input ) {
-			op.process(sm, sink, execCxt);
+			op.process(sm, sink, ctx);
 		}
-		op.concludeExecution(sink, execCxt);
+		op.concludeExecution(sink, ctx);
 
 		return sink.getCollectedSolutionMappings().iterator();
 	}

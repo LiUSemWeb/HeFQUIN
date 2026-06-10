@@ -22,7 +22,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 
 /**
@@ -181,14 +181,14 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	 *          immediately throw every {@link ExecOpExecutionException}
 	 */
 	public BaseForExecOpSequentialBindJoin( final QueryType query,
-	                                            final Set<Var> varsInQuery,
-	                                            final MemberType fm,
-	                                            final ExpectedVariables inputVars,
-	                                            final boolean useOuterJoinSemantics,
-												final boolean mayReduce,
-	                                            final int batchSize,
-	                                            final boolean collectExceptions,
-	                                            final QueryPlanningInfo qpInfo ) {
+	                                        final Set<Var> varsInQuery,
+	                                        final MemberType fm,
+	                                        final ExpectedVariables inputVars,
+	                                        final boolean useOuterJoinSemantics,
+	                                        final boolean mayReduce,
+	                                        final int batchSize,
+	                                        final boolean collectExceptions,
+	                                        final QueryPlanningInfo qpInfo ) {
 		super(mayReduce, collectExceptions, qpInfo);
 
 		assert query != null;
@@ -230,7 +230,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	@Override
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	                         final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
 		// First, check whether we had to switch into full-retrieval mode,
@@ -256,7 +256,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		// query/pattern of this bind-join operator. In this case, we need
 		// to switch into full-retrieval mode.
 		if ( restrictedInputSolMap.isEmpty() ) {
-			switchToFullRetrievalMode(execCxt);
+			switchToFullRetrievalMode(ctx);
 
 			joinInFullRetrievalMode(inputSolMap, sink);
 			joinInFullRetrievalMode(currentBatch, sink);
@@ -287,7 +287,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		// the input solution mapping. Therefore, the following function
 		// makes sure that we will consider the input solution mapping in
 		// the next bind-join request that we will do.
-		_processJoinableInput(inputSolMap, restrictedInputSolMap, sink, execCxt);
+		_processJoinableInput(inputSolMap, restrictedInputSolMap, sink, ctx);
 	}
 
 	/**
@@ -306,7 +306,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	protected void _processJoinableInput( final SolutionMapping inputSolMap,
 	                                      final Binding inputSolMapRestricted,
 	                                      final IntermediateResultElementSink sink,
-	                                      final ExecutionContext execCxt )
+	                                      final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
 		// Add the given solution mapping to the batch of solution mappings
@@ -342,7 +342,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 				"Triggering bind-join request for endpoint {} with batch size {}",
 				fm,
 				currentSolMapsForRequest.size() );
-			performRequestAndHandleResponse(sink, execCxt);
+			performRequestAndHandleResponse(sink, ctx);
 
 			// After performing the request (and handling its response), we can
 			// forget about the solution mappings considered for the request.
@@ -352,7 +352,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	}
 
 	protected void performRequestAndHandleResponse( final IntermediateResultElementSink sink,
-	                                                final ExecutionContext execCxt )
+	                                                final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableReqOp(currentSolMapsForRequest);
@@ -367,7 +367,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		numberOfRequestOpsUsed++;
 
 		try {
-			reqOp.execute(mySink, execCxt);
+			reqOp.execute(mySink, ctx);
 		}
 		catch ( final ExecOpExecutionException e ) {
 // TODO: How to (re)implement this part now?
@@ -434,11 +434,11 @@ public abstract class BaseForExecOpSequentialBindJoin<
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt )
+	                                   final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		if ( fullResult == null && ! currentSolMapsForRequest.isEmpty() ) {
-			performRequestAndHandleResponse(sink, execCxt);
+			performRequestAndHandleResponse(sink, ctx);
 		}
 	}
 
@@ -598,7 +598,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	 * of this operator (see {@link #createExecutableReqOpForAll}) and puts
 	 * the retrieved solution mappings into {@link #fullResult}.
 	 */
-	protected void switchToFullRetrievalMode( final ExecutionContext execCxt )
+	protected void switchToFullRetrievalMode( final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		log.debug(
@@ -612,7 +612,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 
 		final CollectingIntermediateResultElementSink mySink = new CollectingIntermediateResultElementSink();
 		try {
-			reqOp.execute(mySink, execCxt);
+			reqOp.execute(mySink, ctx);
 		}
 		catch ( final ExecOpExecutionException e ) {
 			throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);

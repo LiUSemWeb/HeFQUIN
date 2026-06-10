@@ -12,7 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * Top-level base class for all implementations of {@link NaryExecutableOp}.
@@ -64,7 +64,7 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	public final void processInputFromXthChild( final int x,
 	                                            final SolutionMapping inputSolMap,
 	                                            final IntermediateResultElementSink sink,
-	                                            final ExecutionContext execCxt )
+	                                            final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		assert x >= 0;
@@ -76,14 +76,14 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 
 		if ( collectExceptions ) {
 			try {
-				_processInputFromXthChild(x, inputSolMap, sink, execCxt);
+				_processInputFromXthChild(x, inputSolMap, sink, ctx);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_processInputFromXthChild(x, inputSolMap, sink, execCxt);
+			_processInputFromXthChild(x, inputSolMap, sink, ctx);
 		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentProcStartXthInput[x];
@@ -101,7 +101,7 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	public final void processInputFromXthChild( final int x,
 	                                            final List<SolutionMapping> inputSolMaps,
 	                                            final IntermediateResultElementSink sink,
-	                                            final ExecutionContext execCxt )
+	                                            final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		assert x >= 0;
@@ -111,14 +111,14 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 
 		if ( collectExceptions ) {
 			try {
-				_processInputFromXthChild(x, inputSolMaps, sink, execCxt);
+				_processInputFromXthChild(x, inputSolMaps, sink, ctx);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_processInputFromXthChild(x, inputSolMaps, sink, execCxt);
+			_processInputFromXthChild(x, inputSolMaps, sink, ctx);
 		}
 
 		numberOfMappingsFromXthInputProcessed[x] += inputSolMaps.size();
@@ -129,7 +129,7 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	@Override
 	public final void wrapUpForXthChild( final int x,
 	                                     final IntermediateResultElementSink sink,
-	                                     final ExecutionContext execCxt )
+	                                     final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		assert x >= 0;
@@ -137,7 +137,7 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 
 		log.info( "Wrapping up processing of child{} input in {}.", x, getClass().getSimpleName() );
 		xthInputConsumed[x] = true;
-		_wrapUpForXthChild(x, sink, execCxt);
+		_wrapUpForXthChild(x, sink, ctx);
 		log.info( "Finished processing child{} input in {}.", x, getClass().getSimpleName() );
 	}
 
@@ -166,7 +166,7 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 			int x,
 			SolutionMapping inputSolMap,
 			IntermediateResultElementSink sink,
-			ExecutionContext execCxt ) throws ExecOpExecutionException;
+			QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	/**
 	 * Processes the input solution mappings of the given list by calling
@@ -183,9 +183,9 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 			final int x,
 			final List<SolutionMapping> inputSolMaps,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException {
+			final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
-			_processInputFromXthChild(x, sm, sink, execCxt );
+			_processInputFromXthChild(x, sm, sink, ctx);
 		}
 	}
 
@@ -200,7 +200,7 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	protected abstract void _wrapUpForXthChild(
 			int x,
 			IntermediateResultElementSink sink,
-			ExecutionContext execCxt ) throws ExecOpExecutionException;
+			QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	@Override
 	public final ExecutableOperatorStats getStats() {

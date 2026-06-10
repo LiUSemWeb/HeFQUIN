@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
 
 public class PushBasedExecutablePlanImpl implements ExecutablePlan
@@ -25,7 +25,8 @@ public class PushBasedExecutablePlanImpl implements ExecutablePlan
 	protected final LinkedList<PushBasedPlanThread> tasks;
 	protected ExecutorService threadPool;
 
-	public PushBasedExecutablePlanImpl( final LinkedList<PushBasedPlanThread> tasks, final ExecutionContext ctx ) {
+	public PushBasedExecutablePlanImpl( final LinkedList<PushBasedPlanThread> tasks,
+	                                    final QueryProcContextExt ctx ) {
 		assert ! tasks.isEmpty();
 		this.tasks = tasks;
 

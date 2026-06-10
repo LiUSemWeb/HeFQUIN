@@ -12,7 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * Top-level base class for all implementations of {@link UnaryExecutableOp}.
@@ -47,21 +47,21 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	@Override
 	public final void process( final SolutionMapping inputSolMap,
 	                           final IntermediateResultElementSink sink,
-	                           final ExecutionContext execCxt )
+	                           final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		log.info( "Processing solution mapping in {}.", getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
 			try {
-				_process(inputSolMap, sink, execCxt);
+				_process(inputSolMap, sink, ctx);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_process(inputSolMap, sink, execCxt);
+			_process(inputSolMap, sink, ctx);
 		}
 
 		numberOfInputMappingsProcessed++;
@@ -71,21 +71,21 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	@Override
 	public final void process( final List<SolutionMapping> inputSolMaps,
 	                           final IntermediateResultElementSink sink,
-	                           final ExecutionContext execCxt )
+	                           final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		log.info( "Processing batch of {} solution mappings in {}.", inputSolMaps.size(), getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
 			try {
-				_process(inputSolMaps, sink, execCxt);
+				_process(inputSolMaps, sink, ctx);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_process(inputSolMaps, sink, execCxt);
+			_process(inputSolMaps, sink, ctx);
 		}
 
 		numberOfInputMappingsProcessed += inputSolMaps.size();
@@ -94,19 +94,19 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 
 	@Override
 	public final void concludeExecution( final IntermediateResultElementSink sink,
-	                                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	                                     final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		log.info( "Concluding execution for {}.", getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
 			try {
-				_concludeExecution(sink, execCxt);
+				_concludeExecution(sink, ctx);
 			}
 			catch ( ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_concludeExecution(sink, execCxt);
+			_concludeExecution(sink, ctx);
 		}
 
 		executionConcluded = true;
@@ -122,9 +122,9 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	 * If an exception occurs while processing the solution mapping, then
 	 * this exception needs to be thrown.
 	 */
-	protected abstract void _process( final SolutionMapping inputSolMap,
-	                                  final IntermediateResultElementSink sink,
-	                                  final ExecutionContext execCxt ) throws ExecOpExecutionException;
+	protected abstract void _process( SolutionMapping inputSolMap,
+	                                  IntermediateResultElementSink sink,
+	                                  QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	/**
 	 * Processes the input solution mappings of the given list by calling
@@ -139,10 +139,10 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	 */
 	protected void _process( final List<SolutionMapping> inputSolMaps,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	                         final QueryProcContextExt ctx )
 			throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
-			_process(sm, sink, execCxt );
+			_process(sm, sink, ctx);
 		}
 	}
 
@@ -154,8 +154,8 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	 * If an exception occurs during this process, then this exception needs
 	 * to be thrown.
 	 */
-	protected abstract void _concludeExecution( final IntermediateResultElementSink sink,
-	                                            final ExecutionContext execCxt ) throws ExecOpExecutionException;
+	protected abstract void _concludeExecution( IntermediateResultElementSink sink,
+	                                            QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 
 	@Override

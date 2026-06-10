@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 
 /**
@@ -49,7 +49,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	protected BaseForExecOpIndexNestedLoopsJoinWithRequestOps( final QueryType query,
 	                                                           final MemberType fm,
 	                                                           final boolean useOuterJoinSemantics,
-															   final boolean mayReduce,
+	                                                           final boolean mayReduce,
 	                                                           final int minimumInputBlockSize,
 	                                                           final boolean collectExceptions,
 	                                                           final QueryPlanningInfo qpInfo ) {
@@ -67,12 +67,12 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 
 	@Override
 	protected void _processCollectedInput( final List<SolutionMapping> input,
-	                              final IntermediateResultElementSink sink,
-	                              final ExecutionContext execCxt )
+	                                       final IntermediateResultElementSink sink,
+	                                       final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		log.info( "Starting request-based index nested loops join with {} input mappings", input.size() );
-		final CompletableFuture<?>[] futures = initiateProcessing( input, sink, execCxt );
+		final CompletableFuture<?>[] futures = initiateProcessing(input, sink, ctx);
 
 		// wait for all the futures to be completed
 		if ( futures.length > 0 ) {
@@ -91,7 +91,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	protected CompletableFuture<?>[] initiateProcessing(
 			final List<SolutionMapping> input,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt )
+			final QueryProcContextExt ctx )
 	{
 		final CompletableFuture<?>[] futures = new CompletableFuture[input.size()];
 
@@ -99,7 +99,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 		for ( final SolutionMapping sm : input ) {
 			final CompletableFuture<?> f;
 			try {
-				f = initiateProcessing( sm, sink, execCxt );
+				f = initiateProcessing(sm, sink, ctx);
 			}
 			catch ( final VariableByBlankNodeSubstitutionException e ) {
 				// this may happen if the current solution mapping contains
@@ -132,15 +132,15 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	protected CompletableFuture<?> initiateProcessing(
 			final SolutionMapping sm,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt )
+			final QueryProcContextExt ctx )
 					throws VariableByBlankNodeSubstitutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator(sm);
 
 		numberOfRequestOpsUsed++;
 
-		final Runnable processor = createProcessor( reqOp, sm, sink, execCxt );
-		final ExecutorService execService = execCxt.getExecutorServiceForPlanTasks();
+		final Runnable processor = createProcessor(reqOp, sm, sink, ctx);
+		final ExecutorService execService = ctx.getExecutorServiceForPlanTasks();
 		if ( execService != null )
 			return CompletableFuture.runAsync(processor, execService);
 		else
@@ -153,7 +153,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	protected Runnable createProcessor( final NullaryExecutableOp reqOp,
 	                                    final SolutionMapping smFromInput,
 	                                    final IntermediateResultElementSink outputSink,
-	                                    final ExecutionContext execCxt ) {
+	                                    final QueryProcContextExt ctx ) {
 		return new Runnable() {
 			@Override
 			public void run() {
@@ -166,7 +166,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 				}
 
 				try {
-					reqOp.execute( mySink, execCxt );
+					reqOp.execute(mySink, ctx);
 				}
 				catch ( final ExecOpExecutionException e ) {
 					throw new RuntimeException( "Executing a request operator used by this index nested loops join caused an exception.", e );
@@ -182,14 +182,14 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	@Override
 	protected void _concludeExecution( final List<SolutionMapping> input,
 	                                   final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt )
+	                                   final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		log.info( "Completed request-based index nested loops join. Requests issued: {}, outputs produced: {}",
 		numberOfRequestOpsUsed,
 		numberOfOutputMappingsProduced );
 		if ( input != null && ! input.isEmpty() ) {
-			_processCollectedInput(input, sink, execCxt);
+			_processCollectedInput(input, sink, ctx);
 		}
 	}
 

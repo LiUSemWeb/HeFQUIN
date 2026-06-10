@@ -28,7 +28,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * To be used for UNFOLD clauses.
@@ -71,7 +71,7 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 	@Override
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	                         final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException {
 		final NodeValue nv;
 		try {
@@ -116,7 +116,7 @@ public class ExecOpUnfold extends UnaryExecutableOpBaseWithoutBlocking
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) {
+	                                   final QueryProcContextExt ctx ) {
 		// nothing to be done here
 	}
 

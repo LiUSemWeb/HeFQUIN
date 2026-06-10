@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.RESTRequest;
 import se.liu.ida.hefquin.federation.access.StringResponse;
@@ -66,10 +66,10 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 	@Override
 	protected void _process( final SolutionMapping inputSM,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	                         final QueryProcContextExt ctx )
 			throws ExecOpExecutionException {
 		if ( solmapsFromRequest == null ) {
-			solmapsFromRequest = performRequest(execCxt);
+			solmapsFromRequest = performRequest(ctx);
 		}
 
 		for ( final SolutionMapping fetchedSM : solmapsFromRequest ) {
@@ -83,12 +83,12 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) {
+	                                   final QueryProcContextExt ctx ) {
 		if ( solmapsFromRequest != null )
 			solmapsFromRequest.clear();
 	}
 
-	protected List<SolutionMapping> performRequest( final ExecutionContext execCxt )
+	protected List<SolutionMapping> performRequest( final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		log.debug( "Sending REST request to {}", fm.getURLTemplate() );
@@ -99,7 +99,7 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 
 		final CompletableFuture<StringResponse> f;
 		try {
-			f = execCxt.getFederationAccessMgr().issueRequest(req, fm);
+			f = ctx.getFederationAccessMgr().issueRequest(req, fm);
 		}
 		catch ( final FederationAccessException e ) {
 			throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);

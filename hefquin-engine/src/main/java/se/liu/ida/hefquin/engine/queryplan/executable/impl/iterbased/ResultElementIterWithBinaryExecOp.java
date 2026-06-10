@@ -4,8 +4,8 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 {
@@ -14,14 +14,13 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 	public ResultElementIterWithBinaryExecOp( final BinaryExecutableOp op,
 	                                          final ResultElementIterator inputIter1,
 	                                          final ResultElementIterator inputIter2,
-	                                          final ExecutionContext execCxt )
+	                                          final QueryProcContextExt ctx )
 	{
-		super(execCxt);
+		super(ctx);
 
 		assert op != null;
 		assert inputIter1 != null;
 		assert inputIter2 != null;
-		assert execCxt != null;
 
 		opRunnerThread = new MyOpRunnerThread( op, inputIter1, inputIter2 );
 	}
@@ -83,14 +82,14 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 			// input two.
 
 			while ( inputIter1.hasNext() ) {
-				op.processInputFromChild1( inputIter1.next(), sink, execCxt );
+				op.processInputFromChild1( inputIter1.next(), sink, ctx );
 			}
-			op.wrapUpForChild1(sink, execCxt);
+			op.wrapUpForChild1(sink, ctx);
 
 			while ( inputIter2.hasNext() ) {
-				op.processInputFromChild2( inputIter2.next(), sink, execCxt );
+				op.processInputFromChild2( inputIter2.next(), sink, ctx );
 			}
-			op.wrapUpForChild2(sink, execCxt);
+			op.wrapUpForChild2(sink, ctx);
 		}
 
 	} // end of class OpRunnerThread

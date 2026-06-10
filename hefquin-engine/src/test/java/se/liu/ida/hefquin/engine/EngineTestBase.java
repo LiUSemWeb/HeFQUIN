@@ -31,8 +31,8 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
@@ -143,16 +143,19 @@ public abstract class EngineTestBase
 		}
 	}
 
-	protected ExecutionContext getExecContextForTests( final ExecutorService execService ) {
+	protected QueryProcContextExt getExtendedQueryProcContextForTests( final ExecutorService execService ) {
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		final LogicalToPhysicalPlanConverter lp2pp = new LogicalToPhysicalPlanConverterImpl(false, false);
 		final LogicalToPhysicalOpConverter lop2pop = getLOP2POPForTests();
 
-		return new ExecutionContext() {
+		return new QueryProcContextExt() {
+			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
+			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
+			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
 		};
 	}
 

@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * To be used for DISTINCT clauses. This algorithm removes duplicates by collecting
@@ -36,7 +36,7 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 	@Override
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt ) {
+	                         final QueryProcContextExt ctx ) {
 		if ( distinctSolMaps.add(inputSolMap) ) {
 			sink.send(inputSolMap);
 			numberOfOutputMappingsProduced++;
@@ -46,7 +46,7 @@ public class ExecOpDuplicateRemoval extends UnaryExecutableOpBase
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) {
+	                                   final QueryProcContextExt ctx ) {
 		distinctSolMaps.clear();
 	}
 

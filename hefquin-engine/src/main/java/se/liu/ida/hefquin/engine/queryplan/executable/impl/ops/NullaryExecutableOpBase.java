@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * Top-level base class for all implementations of {@link NullaryExecutableOp}.
@@ -40,7 +40,7 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 
 	@Override
 	public final void execute( final IntermediateResultElementSink sink,
-	                           final ExecutionContext execCxt ) throws ExecOpExecutionException
+	                           final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
 		log.info( "Executing {}.", getClass().getSimpleName() );
 		numberOfInvocations++;
@@ -48,14 +48,14 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 
 		if ( collectExceptions ) {
 			try {
-				_execute(sink, execCxt);
+				_execute(sink, ctx);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_execute(sink, execCxt);
+			_execute(sink, ctx);
 		}
 
 		timeAtExecEnd = System.currentTimeMillis();
@@ -71,8 +71,8 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 	 * to either be collected or be thrown, depending on whether {@link
 	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
 	 */
-	protected abstract void _execute( final IntermediateResultElementSink sink,
-                                      final ExecutionContext execCxt ) throws ExecOpExecutionException;
+	protected abstract void _execute( IntermediateResultElementSink sink,
+                                      QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	@Override
 	public void resetStats() {

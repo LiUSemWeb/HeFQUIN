@@ -29,11 +29,12 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl;
 import se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithCache;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public class ExecOpRequestTPFTest extends ExecOpTestBase
 {
@@ -79,14 +80,18 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 		// Create a federation access manager
 		final FederationAccessManager internalFedAccMgr = new AsyncFederationAccessManagerImpl(execServiceForFedAccess);
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerWithCache(internalFedAccMgr, 100);
-		final ExecutionContext execCxt = new ExecutionContext() {
+
+		final QueryProcContextExt ctx = new QueryProcContextExt() {
+			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
+			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
+			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
 		};
 
-		op.execute(sink, execCxt);
+		op.execute(sink, ctx);
 
 		final Collection<SolutionMapping> res = (Collection<SolutionMapping>) sink.getCollectedSolutionMappings();
 		assertTrue( res.size() > 100 );
@@ -106,7 +111,7 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 				null );
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
-		op.execute( sink, createExecContextForTests() );
+		op.execute( sink, createExtendedQueryProcContextForTests() );
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 
@@ -126,7 +131,7 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 	}
 
 
-	public static ExecutionContext createExecContextForTests() {
+	public static QueryProcContextExt createExtendedQueryProcContextForTests() {
 		final List<Triple> l = new ArrayList<Triple>();
 
 		final Node s = NodeFactory.createURI("http://example.org/s");
@@ -138,11 +143,14 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 		l.add( new TripleImpl(s,p,o2) );
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(null, l);
-		return new ExecutionContext() {
+		return new QueryProcContextExt() {
+			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
+			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
+			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
 		};
 	}
 

@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 {
@@ -61,7 +61,7 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 	@Override
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt ) {
+	                         final QueryProcContextExt ctx ) {
 		// Check whether the given solution mapping satisfies each of the filter expressions
 		if ( SolutionMappingUtils.checkSolutionMapping(inputSolMap, filterExpressions) == true ) {
 			sink.send(inputSolMap);
@@ -73,7 +73,7 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 	protected void _process( final Iterator<SolutionMapping> inputSolMaps,
 	                         final int maxBatchSize,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt ) {
+	                         final QueryProcContextExt ctx ) {
 		// Iterate over the given input until either we find the first solution
 		// mapping that satisfies all of the filter expressions of this operator
 		// and, thus, can be passed on as an output solution mapping, or until
@@ -126,7 +126,7 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) {
+	                                   final QueryProcContextExt ctx ) {
 		// nothing to be done here
 	}
 
