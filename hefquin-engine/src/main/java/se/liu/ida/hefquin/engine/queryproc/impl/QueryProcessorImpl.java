@@ -36,25 +36,17 @@ public class QueryProcessorImpl implements QueryProcessor
 	private static final Logger log = LoggerFactory.getLogger( QueryProcessorImpl.class );
 
 	protected final QueryPlanner planner;
-	protected final LogicalToPhysicalPlanConverter lp2pp;
-	protected final LogicalToPhysicalOpConverter lop2pop;
 	protected final QueryPlanCompiler planCompiler;
 	protected final ExecutionEngine execEngine;
 
 	public QueryProcessorImpl( final QueryPlanner planner,
-	                           final LogicalToPhysicalPlanConverter lp2pp,
-	                           final LogicalToPhysicalOpConverter lop2pop,
 	                           final QueryPlanCompiler planCompiler,
 	                           final ExecutionEngine execEngine ) {
 		assert planner != null;
-		assert lp2pp != null;
-		assert lop2pop != null;
 		assert planCompiler != null;
 		assert execEngine != null;
 
 		this.planner = planner;
-		this.lp2pp = lp2pp;
-		this.lop2pop = lop2pop;
 		this.planCompiler = planCompiler;
 		this.execEngine = execEngine;
 	}
@@ -188,12 +180,12 @@ public class QueryProcessorImpl implements QueryProcessor
 
 		@Override
 		public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() {
-			return lp2pp;
+			return planner.getLogicalToPhysicalPlanConverter();
 		}
 
 		@Override
 		public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() {
-			return lop2pop;
+			return planner.getLogicalToPhysicalOpConverter();
 		}
 	}
 

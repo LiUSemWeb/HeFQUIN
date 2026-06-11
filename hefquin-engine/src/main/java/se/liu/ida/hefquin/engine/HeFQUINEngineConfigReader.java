@@ -124,15 +124,11 @@ public class HeFQUINEngineConfigReader
 
 		final ExtendedContext ctxx = new ExtendedContext(ctx, cm);
 
-		final LogicalToPhysicalPlanConverter lp2pp = readLogicalToPhysicalPlanConverter(rsrc, ctxx);
-		final LogicalToPhysicalOpConverter lop2pop = readLogicalToPhysicalOpConverter(rsrc, ctxx);
-
 		final QueryPlanner planner = readQueryPlanner(rsrc, ctxx);
-
 		final QueryPlanCompiler compiler = readQueryPlanCompiler(rsrc, ctxx);
 		final ExecutionEngine exec = readExecutionEngine(rsrc, ctxx);
 
-		return new QueryProcessorImpl(planner, lp2pp, lop2pop, compiler, exec);
+		return new QueryProcessorImpl(planner, compiler, exec);
 	}
 
 	public CostModel readCostModel( final Resource qprocRsrc, final ExtendedContext ctx ) {
@@ -160,7 +156,10 @@ public class HeFQUINEngineConfigReader
 		final LogicalOptimizer lopt = readLogicalOptimizer(rsrc, ctx);
 		final PhysicalOptimizer popt = readPhysicalOptimizer(rsrc, ctx);
 
-		return new QueryPlannerImpl( spl, lopt, popt,
+		final LogicalToPhysicalPlanConverter lp2pp = readLogicalToPhysicalPlanConverter(rsrc, ctx);
+		final LogicalToPhysicalOpConverter lop2pop = readLogicalToPhysicalOpConverter(rsrc, ctx);
+
+		return new QueryPlannerImpl( spl, lopt, popt, lp2pp, lop2pop,
 		                             ctx.getSourceAssignmentPrinter(),
 		                             ctx.getLogicalPlanPrinter(),
 		                             ctx.getPhysicalPlanPrinter(),

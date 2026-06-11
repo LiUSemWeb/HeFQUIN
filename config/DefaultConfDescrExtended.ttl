@@ -19,15 +19,6 @@ PREFIX ex:     <http://example.org/>
    ec:queryProcessor _:b1 .
 
 _:b1 ec:queryPlanner _:b2 ;
-     ec:lptoppConverter [
-         ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl" ;
-         ec:constructorArguments ( [rdf:value false]    # ignorePhysicalOpsForLogicalAddOps
-                                   [rdf:value false] )  # ignoreParallelMultiLeftJoin
-     ] ;
-     ec:loptopopConverter [
-         ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl" ;
-         ec:constructorArguments ( _:bListOfPhysicalOpFactories )
-     ] ;
      ec:planCompiler [
          ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerForPushBasedExecution" ;
          ec:constructorArguments ( )
@@ -43,6 +34,15 @@ _:b2 ec:sourcePlanner
      ec:logicalOptimizer [
          ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicsBasedLogicalOptimizerImpl" ;
          ec:constructorArguments ( _:bListOfHeuristics )
+     ] ;;
+     ec:lptoppConverter [
+         ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl" ;
+         ec:constructorArguments ( [rdf:value false]    # ignorePhysicalOpsForLogicalAddOps
+                                   [rdf:value false] )  # ignoreParallelMultiLeftJoin
+     ] ;
+     ec:loptopopConverter [
+         ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl" ;
+         ec:constructorArguments ( _:bListOfPhysicalOpFactories )
      ] ;
      ec:physicalOptimizer
                 _:bNoPhysOptimizer .

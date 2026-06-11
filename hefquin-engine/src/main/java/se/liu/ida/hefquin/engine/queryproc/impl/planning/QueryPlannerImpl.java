@@ -11,6 +11,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter.LogicalPlanStage;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
@@ -33,6 +35,8 @@ public class QueryPlannerImpl implements QueryPlanner
 	protected final SourcePlanner sourcePlanner;
 	protected final LogicalOptimizer loptimizer;
 	protected final PhysicalOptimizer poptimizer;
+	protected final LogicalToPhysicalPlanConverter lp2pp;
+	protected final LogicalToPhysicalOpConverter lop2pop;
 	protected final LogicalPlanPrinter srcasgPrinter;
 	protected final LogicalPlanPrinter lplanPrinter;
 	protected final PhysicalPlanPrinter pplanPrinter;
@@ -41,16 +45,22 @@ public class QueryPlannerImpl implements QueryPlanner
 	public QueryPlannerImpl( final SourcePlanner sourcePlanner,
 	                         final LogicalOptimizer loptimizer, // may be null
 	                         final PhysicalOptimizer poptimizer,
+	                         final LogicalToPhysicalPlanConverter lp2pp,
+	                         final LogicalToPhysicalOpConverter lop2pop,
 	                         final LogicalPlanPrinter srcasgPrinter,     // may be null
 	                         final LogicalPlanPrinter lplanPrinter,      // may be null
 	                         final PhysicalPlanPrinter pplanPrinter,     // may be null
 	                         final ExecutablePlanPrinter eplanPrinter ) {  // may be null
 		assert sourcePlanner != null;
 		assert poptimizer != null;
+		assert lp2pp != null;
+		assert lop2pop != null;
 
 		this.sourcePlanner = sourcePlanner;
 		this.loptimizer = loptimizer;
 		this.poptimizer = poptimizer;
+		this.lp2pp = lp2pp;
+		this.lop2pop = lop2pop;
 		this.srcasgPrinter = srcasgPrinter;
 		this.lplanPrinter = lplanPrinter;
 		this.pplanPrinter = pplanPrinter;
@@ -65,6 +75,12 @@ public class QueryPlannerImpl implements QueryPlanner
 
 	@Override
 	public PhysicalOptimizer getPhysicalOptimizer() { return poptimizer; }
+
+	@Override
+	public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
+
+	@Override
+	public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
 
 	@Override
 	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query,

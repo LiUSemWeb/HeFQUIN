@@ -5,12 +5,12 @@
 []  a ec:HeFQUINEngineConfiguration ;
     ec:fedAccessMgr _:bFederationAccessManager ;
     ec:queryProcessor [
-        ec:lptoppConverter _:bLogicalToPhysicalPlanConverter ;
-        ec:loptopopConverter _:bLogicalToPhysicalOpConverter ;
         ec:queryPlanner [
-            ec:sourcePlanner _:bSourcePlanner ;
-            ec:logicalOptimizer _:bLogicalOptimizer ;
-            ec:physicalOptimizer _:bPhysicalOptimizer
+            ec:sourcePlanner     _:bSourcePlanner ;
+            ec:logicalOptimizer  _:bLogicalOptimizer ;
+            ec:physicalOptimizer _:bPhysicalOptimizer ;
+            ec:lptoppConverter   _:bLogicalToPhysicalPlanConverter ;
+            ec:loptopopConverter _:bLogicalToPhysicalOpConverter
         ] ;
         ec:planCompiler _:bPlanCompiler ;
         ec:executionEngine _:bExecutionEngine ;
