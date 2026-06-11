@@ -15,7 +15,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
@@ -36,7 +36,7 @@ public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlanner
 	@Override
 	protected LogicalPlan createPlan( final Op jenaOp,
 	                                  final boolean mayReduce,
-	                                  final QueryProcContext2 ctx ) {
+	                                  final QueryProcContext ctx ) {
 		if ( jenaOp instanceof OpBGP bgp ) {
 			return createPlanForBGP(bgp, mayReduce, ctx);
 		}
@@ -49,7 +49,7 @@ public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlanner
 
 	protected LogicalPlan createPlanForBGP( final OpBGP bgpOp,
 	                                        final boolean mayReduce,
-	                                        final QueryProcContext2 ctx ) {
+	                                        final QueryProcContext ctx ) {
 		final BasicPattern bgp = bgpOp.getPattern();
 		assert ! bgp.isEmpty();
 
@@ -67,7 +67,7 @@ public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlanner
 
 	protected LogicalPlan createSubPlanForTP( final Triple tp,
 	                                          final boolean mayReduce,
-	                                          final QueryProcContext2 ctx ) {
+	                                          final QueryProcContext ctx ) {
 		final Set<FederationMember> allFMs = ctx.getFederationCatalog().getAllFederationMembers();
 		assert ! allFMs.isEmpty();
 

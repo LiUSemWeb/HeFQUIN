@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -23,7 +23,7 @@ public class CFRNumberOfTermsShippedInResponses extends CFRBase
 
 	@Override
 	public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan,
-	                                                          final QueryProcContext2 ctx ) {
+	                                                          final QueryProcContext ctx ) {
 		final PhysicalOperator pop = plan.getRootOperator();
 		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) pop).getLogicalOperator();
 

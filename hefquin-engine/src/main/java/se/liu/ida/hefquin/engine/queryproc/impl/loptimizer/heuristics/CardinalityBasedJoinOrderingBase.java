@@ -21,7 +21,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.cardinality.RequestBasedCardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
@@ -65,7 +65,7 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan,
-	                          final QueryProcContext2 ctx )
+	                          final QueryProcContext ctx )
 			throws LogicalOptimizationException
 	{
 		// If the given plan does not have any subplans, there is nothing to do.

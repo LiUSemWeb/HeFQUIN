@@ -20,7 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.members.RDFBasedFederationMember;
@@ -32,7 +32,7 @@ import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINA
 public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 {
 	@Override
-	public void addCardinalities( final QueryProcContext2 ctx,
+	public void addCardinalities( final QueryProcContext ctx,
 	                              final LogicalPlan ... plans ) {
 		// As a first step, make sure that all nullary subplans (i.e.,
 		// with request operators) within the given plans are annotated
@@ -45,7 +45,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 	}
 
 	@Override
-	public void addCardinalities( final QueryProcContext2 ctx,
+	public void addCardinalities( final QueryProcContext ctx,
 	                              final PhysicalPlan ... plans ) {
 		// As a first step, make sure that all nullary subplans (i.e.,
 		// with request operators) within the given plans are annotated
@@ -63,7 +63,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 	 * given plans is annotated with cardinality estimates (which
 	 * are determined by issuing cardinality requests).
 	 */
-	public void addCardinalitiesForRequests( final QueryProcContext2 ctx,
+	public void addCardinalitiesForRequests( final QueryProcContext ctx,
 	                                         final LogicalPlan ... plans ) {
 		// Recursively extract all relevant nullary subplans from the
 		// given plan, where a nullary subplan is considered relevant
@@ -107,7 +107,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 	 * given plans is annotated with cardinality estimates (which
 	 * are determined by issuing cardinality requests).
 	 */
-	public void addCardinalitiesForRequests( final QueryProcContext2 ctx,
+	public void addCardinalitiesForRequests( final QueryProcContext ctx,
 	                                         final PhysicalPlan ... plans ) {
 		// Recursively extract all relevant nullary subplans from the
 		// given plan, where a nullary subplan is considered relevant
@@ -143,7 +143,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 
 	protected void addCardinalitiesForRequests( final List<LogicalOpRequest<?,?>> reqOps,
 	                                            final List<QueryPlanningInfo> infoObjs,
-	                                            final QueryProcContext2 ctx ) {
+	                                            final QueryProcContext ctx ) {
 		final CardinalityResponse[] resps;
 		try {
 			resps = FederationAccessUtils.performCardinalityRequests( ctx.getFederationAccessMgr(),

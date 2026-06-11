@@ -20,7 +20,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl;
@@ -201,7 +201,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 			final MaterializingQueryResultSinkImpl sink = new MaterializingQueryResultSinkImpl();
 
 			final Context arqCxt = execCxt.getContext();
-			final QueryProcContext2 ctx = arqCxt.get( HeFQUINEngineConstants.sysQueryProcContext );
+			final QueryProcContext ctx = arqCxt.get( HeFQUINEngineConstants.sysQueryProcContext );
 
 			final QueryProcessingStatsAndExceptions statsAndExceptions;
 			try {

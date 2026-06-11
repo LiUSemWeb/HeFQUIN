@@ -14,5 +14,5 @@ public interface SourcePlanner
 	 * ({@link LogicalOpMultiwayUnion}). 
 	 */
 	Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( Query query,
-	                                                               QueryProcContext2 ctxt ) throws SourcePlanningException;
+	                                                               QueryProcContext ctxt ) throws SourcePlanningException;
 }

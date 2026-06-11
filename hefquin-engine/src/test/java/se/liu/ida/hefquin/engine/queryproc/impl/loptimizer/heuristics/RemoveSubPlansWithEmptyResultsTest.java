@@ -29,7 +29,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootI
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
@@ -481,7 +481,7 @@ public class RemoveSubPlansWithEmptyResultsTest extends EngineTestBase
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(cardinality, Quality.ACCURATE) );
 	}
 
-	protected QueryProcContext2 getQueryProcContextForTest() {
+	protected QueryProcContext getQueryProcContextForTest() {
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		return new QueryProcContextForTests(fedAccessMgr);
 	}

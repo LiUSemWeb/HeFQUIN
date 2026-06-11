@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.cardinality.RequestBasedCardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 
@@ -50,7 +50,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 	@Override
 	public final CompletableFuture<Integer> initiateCardinalityEstimation(
 			final PhysicalPlan plan,
-			final QueryProcContext2 ctx ) {
+			final QueryProcContext ctx ) {
 		synchronized (cache) {
 			// If we already have a CompletableFuture for the
 			// given plan in the cache, return that one.
@@ -85,7 +85,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 	public CompletableFuture<Integer> _initiateCardinalityEstimation(
 			final PhysicalPlan plan,
-			final QueryProcContext2 ctx ) {
+			final QueryProcContext ctx ) {
 		final Supplier<Integer> worker;
 		if ( plan instanceof PhysicalPlanWithNullaryRoot )
 			worker = new WorkerForRequestOps(plan);
@@ -115,10 +115,10 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 	protected class WorkerForSubquery implements Supplier<Integer>
 	{
 		protected final PhysicalPlan plan;
-		protected final QueryProcContext2 ctx;
+		protected final QueryProcContext ctx;
 
 		public WorkerForSubquery( final PhysicalPlan plan,
-		                          final QueryProcContext2 ctx ) {
+		                          final QueryProcContext ctx ) {
 			this.plan = plan;
 			this.ctx = ctx;
 		}

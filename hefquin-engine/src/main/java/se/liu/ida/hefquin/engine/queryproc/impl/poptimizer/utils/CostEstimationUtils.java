@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.base.utils.CompletableFutureUtils;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
@@ -20,7 +20,7 @@ public class CostEstimationUtils
 	 * function, where the i-th value is for the i-th plan that is given.
 	 */
 	public static Double[] getEstimates( final CostModel costModel,
-	                                     final QueryProcContext2 ctx,
+	                                     final QueryProcContext ctx,
 	                                     final PhysicalPlan... plans )
 			throws CostEstimationException
 	{
@@ -36,7 +36,7 @@ public class CostEstimationUtils
 	 * plan in the given list.
 	 */
 	public static Double[] getEstimates( final CostModel costModel,
-	                                     final QueryProcContext2 ctx, 
+	                                     final QueryProcContext ctx, 
 	                                     final List<PhysicalPlan> plans )
 			throws CostEstimationException
 	{

@@ -7,7 +7,7 @@ public interface QueryProcessor
 {
 	QueryProcessingStatsAndExceptions processQuery( Query query,
 	                                                QueryResultSink resultSink,
-	                                                QueryProcContext2 ctx )
+	                                                QueryProcContext ctx )
 			throws QueryProcException;
 
 	QueryPlanner getPlanner();

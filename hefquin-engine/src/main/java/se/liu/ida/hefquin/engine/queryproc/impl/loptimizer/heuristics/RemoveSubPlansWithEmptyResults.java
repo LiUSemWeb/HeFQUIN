@@ -17,7 +17,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.cardinality.RequestBasedCardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
@@ -70,7 +70,7 @@ public class RemoveSubPlansWithEmptyResults implements HeuristicForLogicalOptimi
 
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan,
-	                          final QueryProcContext2 ctx ) {
+	                          final QueryProcContext ctx ) {
 		// Ensure that all subplans have an up-to-date
 		// cardinality estimate before rewriting.
 		cardEst.addCardinalities(ctx,inputPlan);

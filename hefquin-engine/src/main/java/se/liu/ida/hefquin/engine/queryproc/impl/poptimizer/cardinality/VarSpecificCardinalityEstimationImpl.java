@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 
 public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinalityEstimation
@@ -32,7 +32,7 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 	public CompletableFuture<Integer> initiateCardinalityEstimation(
 			final PhysicalPlan plan,
 			final Var v,
-			final QueryProcContext2 ctx )
+			final QueryProcContext ctx )
 	{
 		synchronized (cache) {
 			// If we already have a CompletableFuture for the given
@@ -67,7 +67,7 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 	protected CompletableFuture<Integer> _initiateCardinalityEstimation(
 			final PhysicalPlan plan,
 			final Var v,
-			final QueryProcContext2 ctx )
+			final QueryProcContext ctx )
 	{
 		final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
 
@@ -96,7 +96,7 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 			final PhysicalPlan plan1,
 			final PhysicalPlan plan2,
 			final Var v,
-			final QueryProcContext2 ctx )
+			final QueryProcContext ctx )
 	{
 //		Estimate cardinality of sub-queries
 		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1, ctx);
@@ -129,7 +129,7 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 	protected CompletableFuture<Integer> _initiateMultiwayUnionCardinalityEstimation(
 			final PhysicalPlan plan,
 			final Var v,
-			final QueryProcContext2 ctx )
+			final QueryProcContext ctx )
 	{
 		CompletableFuture<Integer> f = CompletableFuture.completedFuture(0);
 		boolean containVar = false;

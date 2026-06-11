@@ -30,7 +30,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRoot
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.members.TPFServer;
@@ -236,7 +236,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 		}
 
 		@Override
-		public void addCardinalities( final QueryProcContext2 ctx,
+		public void addCardinalities( final QueryProcContext ctx,
 		                              final LogicalPlan... plans ) {
 			for ( int i = 0; i < plans.length; i++ ) {
 				final LogicalPlan plan = plans[i];
@@ -259,13 +259,13 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 		}
 
 		@Override
-		public void addCardinalities( final QueryProcContext2 ctx,
+		public void addCardinalities( final QueryProcContext ctx,
 		                              final PhysicalPlan ... plans ) {
 			throw new UnsupportedOperationException();
 		}
 	}
 
-	protected QueryProcContext2 getQueryProcContextForTest() {
+	protected QueryProcContext getQueryProcContextForTest() {
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		return new QueryProcContextForTests(fedAccessMgr);
 	}

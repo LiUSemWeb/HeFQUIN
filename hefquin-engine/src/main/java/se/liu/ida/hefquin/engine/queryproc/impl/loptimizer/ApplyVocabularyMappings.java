@@ -38,7 +38,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRoo
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BGPRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -59,7 +59,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization
 
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan,
-	                          final QueryProcContext2 ctxt2 ) {
+	                          final QueryProcContext ctxt2 ) {
 		return apply(inputPlan);
 	}
 

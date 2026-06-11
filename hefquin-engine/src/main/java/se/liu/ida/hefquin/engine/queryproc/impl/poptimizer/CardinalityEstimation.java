@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer;
 import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CardinalityEstimationUtils;
 
 /**
@@ -25,5 +25,5 @@ public interface CardinalityEstimation
 	 * {@link CardinalityEstimationUtils}.
 	 */
 	CompletableFuture<Integer> initiateCardinalityEstimation( PhysicalPlan plan,
-	                                                          QueryProcContext2 ctx );
+	                                                          QueryProcContext ctx );
 }

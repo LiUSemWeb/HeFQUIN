@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.*;
 
@@ -65,7 +65,7 @@ public class HeuristicsBasedLogicalOptimizerImpl implements LogicalOptimizer
 	@Override
 	public LogicalPlan optimize( final LogicalPlan inputPlan,
 	                             final boolean keepNaryOperators,
-	                             final QueryProcContext2 ctxt ) throws LogicalOptimizationException {
+	                             final QueryProcContext ctxt ) throws LogicalOptimizationException {
 		log.debug( "Starting logical optimization with {} heuristics", heuristics.size() );
 		LogicalPlan resultPlan = inputPlan;
 		for ( final HeuristicForLogicalOptimization h : heuristics ) {

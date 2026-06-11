@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
@@ -13,7 +13,7 @@ public class PhysicalPlanWithCostUtils {
     
     public static PhysicalPlanWithCost annotatePlanWithCost( final CostModel cm,
                                                              final PhysicalPlan plan,
-                                                             final QueryProcContext2 ctx ) throws PhysicalOptimizationException {
+                                                             final QueryProcContext ctx ) throws PhysicalOptimizationException {
         final Double[] costs;
         try {
             costs = CostEstimationUtils.getEstimates(cm, ctx, plan);
@@ -26,7 +26,7 @@ public class PhysicalPlanWithCostUtils {
 
     public static List<PhysicalPlanWithCost> annotatePlansWithCost( final CostModel cost,
                                                                     final List<PhysicalPlan> plans,
-                                                                    final QueryProcContext2 ctx ) throws PhysicalOptimizationException {
+                                                                    final QueryProcContext ctx ) throws PhysicalOptimizationException {
         final Double[] costs;
         try {
             costs = CostEstimationUtils.getEstimates(cost, ctx, plans);

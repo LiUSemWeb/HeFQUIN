@@ -36,8 +36,8 @@ public class QueryProcContextBuilder
 		return this;
 	}
 
-	public QueryProcContext2 build() {
-		return new QueryProcContext2() {
+	public QueryProcContext build() {
+		return new QueryProcContext() {
 			@Override
 			public FederationCatalog getFederationCatalog() {
 				return fedCatalog;

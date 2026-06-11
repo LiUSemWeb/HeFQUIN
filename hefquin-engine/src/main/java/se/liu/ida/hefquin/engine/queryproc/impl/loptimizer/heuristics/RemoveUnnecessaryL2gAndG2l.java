@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.*;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
 import java.util.HashSet;
@@ -16,7 +16,7 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 {
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan,
-	                          final QueryProcContext2 ctxt2 ) {
+	                          final QueryProcContext ctxt2 ) {
 		return apply(inputPlan);
 	}
 

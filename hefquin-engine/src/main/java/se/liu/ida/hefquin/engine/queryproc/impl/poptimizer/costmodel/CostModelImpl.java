@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
@@ -48,7 +48,7 @@ public class CostModelImpl implements CostModel
 
 	@Override
     public CompletableFuture<Double> initiateCostEstimation( final PhysicalPlan plan,
-                                                             final QueryProcContext2 ctx )
+                                                             final QueryProcContext ctx )
     {
         synchronized (cache) {
             // If we already have a CompletableFuture for the
@@ -80,7 +80,7 @@ public class CostModelImpl implements CostModel
     }
 
     protected CompletableFuture<Double> _initiateCostEstimation( final PhysicalPlan plan,
-                                                                 final QueryProcContext2 ctx )
+                                                                 final QueryProcContext ctx )
     {
         CompletableFuture<Double> f = CompletableFuture.completedFuture( Double.valueOf(0) );
         for ( int i = 0; i < dimensions.length; ++i ) {

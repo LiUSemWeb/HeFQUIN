@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 /**
  * Implementations of this interface represent functions that determine
@@ -12,5 +12,5 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
 public interface CostFunctionForRootOp
 {
 	CompletableFuture<Integer> initiateCostEstimation( PhysicalPlan plan,
-	                                                   QueryProcContext2 ctx );
+	                                                   QueryProcContext ctx );
 }

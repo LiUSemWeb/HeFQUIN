@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 
 public class CFRNumberOfProcessedSolMaps extends CFRBase
@@ -14,7 +14,7 @@ public class CFRNumberOfProcessedSolMaps extends CFRBase
 
 	@Override
 	public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan,
-	                                                          final QueryProcContext2 ctx ) {
+	                                                          final QueryProcContext ctx ) {
 		return initiateCardinalityEstimation(plan, ctx);
 	}
 

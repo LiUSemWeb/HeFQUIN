@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 public interface VarSpecificCardinalityEstimation
 {
@@ -18,5 +18,5 @@ public interface VarSpecificCardinalityEstimation
 	 */
 	CompletableFuture<Integer> initiateCardinalityEstimation( PhysicalPlan plan,
 	                                                          Var v,
-	                                                          QueryProcContext2 ctx );
+	                                                          QueryProcContext ctx );
 }

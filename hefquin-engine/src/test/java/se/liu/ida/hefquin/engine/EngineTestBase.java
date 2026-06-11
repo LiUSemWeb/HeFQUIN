@@ -31,7 +31,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
@@ -95,7 +95,7 @@ public abstract class EngineTestBase
 		);
 	}
 
-	protected class QueryProcContextForTests implements QueryProcContext2 {
+	protected class QueryProcContextForTests implements QueryProcContext {
 		protected final FederationCatalog fedCatalog;
 		protected final FederationAccessManager fedAccMgr;
 

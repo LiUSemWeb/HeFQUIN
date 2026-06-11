@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 /**
  * Generic implementation of {@link CostFunctionForPlan} that can be used
@@ -26,7 +26,7 @@ public class CFRBasedCostFunctionForPlan implements CostFunctionForPlan
 	@Override
 	public CompletableFuture<Integer> initiateCostEstimation( final Set<PhysicalPlan> visitedPlans,
 	                                                          final PhysicalPlan plan,
-	                                                          final QueryProcContext2 ctx ) {
+	                                                          final QueryProcContext ctx ) {
 		if ( visitedPlans.contains( plan ) ){
 			return CompletableFuture.completedFuture(0);
 		}
@@ -42,7 +42,7 @@ public class CFRBasedCostFunctionForPlan implements CostFunctionForPlan
 	public CompletableFuture<Integer> aggregateValueForAllSubPlans( final Set<PhysicalPlan> visitedPlan,
 	                                                                final CompletableFuture<Integer> futureForRoot,
 	                                                                final PhysicalPlan plan,
-	                                                                final QueryProcContext2 ctx ) {
+	                                                                final QueryProcContext ctx ) {
 		CompletableFuture<Integer> f = futureForRoot;
 		for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
 			final PhysicalPlan subPlan = plan.getSubPlan(i);

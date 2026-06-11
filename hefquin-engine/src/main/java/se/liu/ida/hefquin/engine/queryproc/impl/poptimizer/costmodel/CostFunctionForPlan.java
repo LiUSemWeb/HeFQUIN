@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 /**
  * Implementations of this interface represent functions that determine
@@ -20,5 +20,5 @@ public interface CostFunctionForPlan
 	 */
 	CompletableFuture<Integer> initiateCostEstimation( Set<PhysicalPlan> visitedPlans,
 	                                                   PhysicalPlan plan,
-	                                                   QueryProcContext2 ctx );
+	                                                   QueryProcContext ctx );
 }

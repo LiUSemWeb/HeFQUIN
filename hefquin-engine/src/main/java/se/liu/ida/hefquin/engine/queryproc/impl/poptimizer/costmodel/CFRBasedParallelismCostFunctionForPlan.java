@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class CFRBasedParallelismCostFunctionForPlan extends CFRBasedCostFunction
 			final Set<PhysicalPlan> visitedPlans,
 			final CompletableFuture<Integer> futureForRoot,
 			final PhysicalPlan plan,
-			final QueryProcContext2 ctx ) {
+			final QueryProcContext ctx ) {
 		final PhysicalOperator pop = plan.getRootOperator();
 		if ( pop instanceof PhysicalOpBinaryUnion || pop instanceof PhysicalOpMultiwayUnion || pop instanceof PhysicalOpSymmetricHashJoin ){
 			CompletableFuture<Integer> cardForSubPlan = CompletableFuture.completedFuture( 0 );

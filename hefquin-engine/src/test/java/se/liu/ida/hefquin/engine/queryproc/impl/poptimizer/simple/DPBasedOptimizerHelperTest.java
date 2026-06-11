@@ -5,7 +5,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
@@ -24,7 +24,7 @@ public class DPBasedOptimizerHelperTest extends EngineTestBase {
         @Override
         public CompletableFuture<Double> initiateCostEstimation(
                 final PhysicalPlan p,
-                final QueryProcContext2 ctx ) throws CostEstimationException {
+                final QueryProcContext ctx ) throws CostEstimationException {
             throw new UnsupportedOperationException();
         }
     };

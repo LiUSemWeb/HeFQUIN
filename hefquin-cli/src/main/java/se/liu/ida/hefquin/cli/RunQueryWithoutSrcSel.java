@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 
 /**
@@ -146,7 +146,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		final QueryProcContextBuilder ctxBuilder = e.getQueryProcContextBuilder();
 		if ( contains(argSkipExecution) ) ctxBuilder.setSkipExecution();
 
-		final QueryProcContext2 ctx = ctxBuilder.build();
+		final QueryProcContext ctx = ctxBuilder.build();
 
 		QueryProcessingStatsAndExceptions statsAndExceptions = null;
 		try {

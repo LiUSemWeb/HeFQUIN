@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
@@ -24,7 +24,7 @@ public abstract class CFRBase implements CostFunctionForRootOp
 
 	protected CompletableFuture<Integer> initiateCardinalityEstimation(
 			final PhysicalPlan plan,
-			final QueryProcContext2 ctx ) {
+			final QueryProcContext ctx ) {
 		return cardEstimate.initiateCardinalityEstimation(plan, ctx);
 	}
 

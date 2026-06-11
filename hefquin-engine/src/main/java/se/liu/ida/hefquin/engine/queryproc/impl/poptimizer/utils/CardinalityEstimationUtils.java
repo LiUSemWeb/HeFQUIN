@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.base.utils.CompletableFutureUtils;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimationException;
 
@@ -25,7 +25,7 @@ public class CardinalityEstimationUtils
 	 * given {@link CardinalityEstimation} directly.
 	 */
 	public static Integer[] getEstimates( final CardinalityEstimation cardEstimate,
-	                                      final QueryProcContext2 ctx,
+	                                      final QueryProcContext ctx,
 	                                      final PhysicalPlan... plans )
 			throws CardinalityEstimationException
 	{
@@ -45,7 +45,7 @@ public class CardinalityEstimationUtils
 	 * given {@link CardinalityEstimation} directly.
 	 */
 	public static Integer[] getEstimates( final CardinalityEstimation cardEstimate,
-	                                      final QueryProcContext2 ctx,
+	                                      final QueryProcContext ctx,
 	                                      final List<PhysicalPlan> plans )
 			throws CardinalityEstimationException
 	{

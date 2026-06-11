@@ -32,7 +32,7 @@ import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
@@ -383,7 +383,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 
 		final LogicalOptimizer loptimizer = new LogicalOptimizer() {
 			@Override
-			public LogicalPlan optimize( final LogicalPlan p, final boolean keepNaryOperators, final QueryProcContext2 ctxt ) {
+			public LogicalPlan optimize( final LogicalPlan p, final boolean keepNaryOperators, final QueryProcContext ctxt ) {
 				return p;
 			}
 		};

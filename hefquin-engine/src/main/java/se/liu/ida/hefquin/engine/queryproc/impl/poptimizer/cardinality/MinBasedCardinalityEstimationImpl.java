@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CardinalityEstimationUtils;
@@ -25,7 +25,7 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
 {
     @Override
     public CompletableFuture<Integer> _initiateCardinalityEstimation( final PhysicalPlan plan,
-                                                                      final QueryProcContext2 ctx ) {
+                                                                      final QueryProcContext ctx ) {
         final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
 
         Supplier<Integer> worker;
@@ -58,12 +58,12 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
         protected final CardinalityEstimation cardEstimate;
         protected final PhysicalPlan plan1;
         protected final PhysicalPlan plan2;
-        protected final QueryProcContext2 ctx;
+        protected final QueryProcContext ctx;
 
         public WorkerForJoin( final CardinalityEstimation cardEstimate,
                               final PhysicalPlan plan1,
                               final PhysicalPlan plan2,
-                              final QueryProcContext2 ctx ) {
+                              final QueryProcContext ctx ) {
             this.cardEstimate = cardEstimate;
             this.plan1 = plan1;
             this.plan2 = plan2;
@@ -88,11 +88,11 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
     {
         protected final CardinalityEstimation cardEstimate;
         protected final PhysicalPlan plan;
-        protected final QueryProcContext2 ctx;
+        protected final QueryProcContext ctx;
 
         public WorkerForUnion( final CardinalityEstimation cardEstimate,
                                final PhysicalPlan plan,
-                               final QueryProcContext2 ctx ) {
+                               final QueryProcContext ctx ) {
             this.cardEstimate = cardEstimate;
             this.plan = plan;
             this.ctx = ctx;

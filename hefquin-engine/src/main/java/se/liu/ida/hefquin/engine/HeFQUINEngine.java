@@ -16,7 +16,7 @@ import org.apache.jena.sparql.util.QueryExecUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessingStatsAndExceptionsImpl;
@@ -111,7 +111,7 @@ public class HeFQUINEngine
 	                                                                     final PrintStream output )
 		throws UnsupportedQueryException, IllegalQueryException
 	{
-		final QueryProcContext2 ctx = getQueryProcContextBuilder().build();
+		final QueryProcContext ctx = getQueryProcContextBuilder().build();
 		return executeQueryAndPrintResult(query, outputFormat, output, ctx);
 	}
 
@@ -144,7 +144,7 @@ public class HeFQUINEngine
 	public QueryProcessingStatsAndExceptions executeQueryAndPrintResult( final Query query,
 	                                                                     final ResultsFormat outputFormat,
 	                                                                     final PrintStream output,
-	                                                                     final QueryProcContext2 ctx )
+	                                                                     final QueryProcContext ctx )
 		throws UnsupportedQueryException, IllegalQueryException
 	{
 		return _execAndPrint(query, outputFormat, output, ctx);
@@ -241,7 +241,7 @@ public class HeFQUINEngine
 	protected QueryProcessingStatsAndExceptions _execAndPrint( final Query query,
 	                                                           final ResultsFormat outputFormat,
 	                                                           final PrintStream output,
-	                                                           final QueryProcContext2 ctx )
+	                                                           final QueryProcContext ctx )
 		throws UnsupportedQueryException, IllegalQueryException
 	{
 		if ( wasShutDown == true )

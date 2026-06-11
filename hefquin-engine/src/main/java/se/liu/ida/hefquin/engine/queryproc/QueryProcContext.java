@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutorService;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
-public interface QueryProcContext2
+public interface QueryProcContext
 {
 	FederationCatalog getFederationCatalog();
 

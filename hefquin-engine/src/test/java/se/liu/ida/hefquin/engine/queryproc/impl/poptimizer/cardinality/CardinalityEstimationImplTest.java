@@ -20,7 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
@@ -60,7 +60,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void twoRequestOpsInParallel() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan1 = createRequestPlan(42);
 		final PhysicalPlan plan2 = createRequestPlan(13);
@@ -83,7 +83,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void twoRequestOpsInSequence() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan1 = createRequestPlan(42);
 		final PhysicalPlan plan2 = createRequestPlan(13);
@@ -106,7 +106,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void sameRequestOpTwiceInParallel() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createRequestPlan(42);
 
@@ -128,7 +128,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void sameRequestOpTwiceInSequence() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createRequestPlan(42);
 
@@ -150,7 +150,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void joinOfTwoRequestOps() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createJoinPlan(42, 13);
 
@@ -168,7 +168,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void joinOfTwoRequestOps_oneNegativeCard() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createJoinPlan(42, Integer.MAX_VALUE+1);
 
@@ -186,7 +186,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void joinOfTwoRequestOps_twoNegativeCard() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createJoinPlan(Integer.MAX_VALUE+2, Integer.MAX_VALUE+1);
 
@@ -204,7 +204,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void unionOfTwoRequestOps() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createUnionPlan(42, 13);
 
@@ -222,7 +222,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void unionOfTwoRequestOps_oneNegativeCard() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createUnionPlan(42, Integer.MAX_VALUE+1);
 
@@ -240,7 +240,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void unionOfTwoRequestOps_twoNegativeCard() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createUnionPlan(Integer.MAX_VALUE+1, Integer.MAX_VALUE+1);
 
@@ -258,7 +258,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void unionOfTwoRequestOps_negativeTotalCard() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createUnionPlan(2, Integer.MAX_VALUE-1);
 
@@ -276,7 +276,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void joinOfSameRequestOp() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createJoinPlan(42, 42);
 
@@ -294,7 +294,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void oneTPAdd() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createGPAddPlan(42, 13);
 
@@ -312,7 +312,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void oneTPAdd_oneNegativeCard() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan plan = createGPAddPlan(42, Integer.MAX_VALUE+1);
 
@@ -330,7 +330,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	@Test
 	public void twoTPAdd() throws InterruptedException, ExecutionException {
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl();
-		final QueryProcContext2 ctx = createQueryProcContext(SLEEP_MILLIES);
+		final QueryProcContext ctx = createQueryProcContext(SLEEP_MILLIES);
 
 		final PhysicalPlan subplan = createGPAddPlan(42, 13);
 		final PhysicalPlan plan = createGPAddPlan(subplan, 22);
@@ -356,12 +356,12 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		final PhysicalPlan plan = createRequestPlan(card);
 
 		final FederationAccessManager fedAccMgr = new MyFederationAccessManagerForTests();
-		final QueryProcContext2 ctx = new QueryProcContextForTests(fedAccMgr);
+		final QueryProcContext ctx = new QueryProcContextForTests(fedAccMgr);
 
 		return cardEstimator.initiateCardinalityEstimation(plan, ctx);
 	}
 
-	protected QueryProcContext2 createQueryProcContext( final long sleepMillis ) {
+	protected QueryProcContext createQueryProcContext( final long sleepMillis ) {
 		final FederationAccessManager fedAccMgr = new MyFederationAccessManagerForTests(sleepMillis);
 		return new QueryProcContextForTests(fedAccMgr);
 	}

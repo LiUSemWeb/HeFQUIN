@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
@@ -25,7 +25,7 @@ public abstract class SourcePlannerImplTestBase extends EngineTestBase
 	                                         final FederationCatalog fedCat )
 			 throws SourcePlanningException
 	{
-		final QueryProcContext2 ctx = new QueryProcContextForTests(fedCat);
+		final QueryProcContext ctx = new QueryProcContextForTests(fedCat);
 
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
 		return createSourcePlanner().createSourceAssignment(query, ctx).object1;

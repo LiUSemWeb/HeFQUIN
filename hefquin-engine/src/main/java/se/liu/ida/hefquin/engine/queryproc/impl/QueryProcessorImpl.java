@@ -20,7 +20,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
@@ -71,7 +71,7 @@ public class QueryProcessorImpl implements QueryProcessor
 	@Override
 	public QueryProcessingStatsAndExceptions processQuery( final Query query,
 	                                                       final QueryResultSink resultSink,
-	                                                       final QueryProcContext2 ctx )
+	                                                       final QueryProcContext ctx )
 			throws QueryProcException
 	{
 		final QueryProcContextExt ctxx = new MyQueryProcContextExt(ctx);
@@ -155,9 +155,9 @@ public class QueryProcessorImpl implements QueryProcessor
 
 	protected class MyQueryProcContextExt implements QueryProcContextExt
 	{
-		protected final QueryProcContext2 wrapped;
+		protected final QueryProcContext wrapped;
 
-		public MyQueryProcContextExt( final QueryProcContext2 wrapped ) {
+		public MyQueryProcContextExt( final QueryProcContext wrapped ) {
 			this.wrapped = wrapped;
 		}
 

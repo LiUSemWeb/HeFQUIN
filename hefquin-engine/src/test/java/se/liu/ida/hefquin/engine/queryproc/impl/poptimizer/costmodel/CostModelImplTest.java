@@ -15,7 +15,7 @@ import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext2;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -42,7 +42,7 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan = createSimplePlan();
 		final CostModel costModel = createCostModel(1, 20, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
 
-		final QueryProcContext2 ctx = getQueryProcContextForTest();
+		final QueryProcContext ctx = getQueryProcContextForTest();
 
 		final long startTime = new Date().getTime();
 
@@ -66,7 +66,7 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan = createSimplePlan();
 		final CostModel costModel = createCostModel(1, Integer.MAX_VALUE+2, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
 
-		final QueryProcContext2 ctx = getQueryProcContextForTest();
+		final QueryProcContext ctx = getQueryProcContextForTest();
 
 		final long startTime = new Date().getTime();
 
@@ -90,7 +90,7 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan = createSimplePlan();
 		final CostModel costModel = createCostModel(1, Integer.MAX_VALUE-1, SLEEP_MILLIES, 1, Integer.MAX_VALUE-1, SLEEP_MILLIES);
 
-		final QueryProcContext2 ctx = getQueryProcContextForTest();
+		final QueryProcContext ctx = getQueryProcContextForTest();
 
 		final long startTime = new Date().getTime();
 
@@ -114,7 +114,7 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan = createSimplePlan();
 		final CostModel costModel = createCostModel(1, 20, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
 
-		final QueryProcContext2 ctx = getQueryProcContextForTest();
+		final QueryProcContext ctx = getQueryProcContextForTest();
 
 		final long startTime = new Date().getTime();
 
@@ -141,7 +141,7 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan4 = createSimplePlan();
 		final CostModel costModel = createCostModel(1, 20, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
 
-		final QueryProcContext2 ctx = getQueryProcContextForTest();
+		final QueryProcContext ctx = getQueryProcContextForTest();
 
 		final long startTime = new Date().getTime();
 
@@ -172,7 +172,7 @@ public class CostModelImplTest extends EngineTestBase
 		final PhysicalPlan plan2 = createSimplePlan();
 		final CostModel costModel = createCostModel(1, 20, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
 
-		final QueryProcContext2 ctx = getQueryProcContextForTest();
+		final QueryProcContext ctx = getQueryProcContextForTest();
 
 		final long startTime = new Date().getTime();
 
@@ -231,7 +231,7 @@ public class CostModelImplTest extends EngineTestBase
 		public CompletableFuture<Integer> initiateCostEstimation(
 				final Set<PhysicalPlan> visitedPlan,
 				final PhysicalPlan plan,
-				final QueryProcContext2 ctx ) {
+				final QueryProcContext ctx ) {
 			return CompletableFuture.supplyAsync( () -> {
 				if ( sleepMillis > 0L ) {
 					try {
@@ -246,7 +246,7 @@ public class CostModelImplTest extends EngineTestBase
 		}
 	}
 
-	protected QueryProcContext2 getQueryProcContextForTest() {
+	protected QueryProcContext getQueryProcContextForTest() {
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		return new QueryProcContextForTests(fedAccessMgr);
 	}
