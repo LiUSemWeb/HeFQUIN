@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.datatypes.RDFDatatype;
@@ -92,7 +93,7 @@ public class HeFQUINEngineConfigReader
 	                                                            final Context ctx ) {
 		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( confRsrc, ECVocab.fedAccessMgr );
 
-		final ExtendedContext ctxx = new ExtendedContextImpl1(ctx);
+		final ExtendedContext ctxx = new ExtendedContext(ctx);
 
 		final Object i;
 		try {
@@ -119,15 +120,14 @@ public class HeFQUINEngineConfigReader
 	                                          final FederationAccessManager fedAccessMgr ) {
 		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( confRsrc, ECVocab.queryProcessor );
 
-		final ExtendedContext ctxx = new ExtendedContextImpl2(ctx, fedAccessMgr);
+		final CostModel cm = readCostModel( rsrc, new ExtendedContext(ctx) );
+
+		final ExtendedContext ctxx = new ExtendedContext(ctx, cm);
 
 		final LogicalToPhysicalPlanConverter lp2pp = readLogicalToPhysicalPlanConverter(rsrc, ctxx);
 		final LogicalToPhysicalOpConverter lop2pop = readLogicalToPhysicalOpConverter(rsrc, ctxx);
 
 		final QueryPlanner planner = readQueryPlanner(rsrc, ctxx);
-
-		final CostModel cm = readCostModel(rsrc, ctxx);
-		ctxx.complete(cm);
 
 		final QueryPlanCompiler compiler = readQueryPlanCompiler(rsrc, ctxx);
 		final ExecutionEngine exec = readExecutionEngine(rsrc, ctxx);
@@ -417,75 +417,31 @@ public class HeFQUINEngineConfigReader
 
 	// ----- the types of contexts used by this implementation -----
 
-	protected interface ExtendedContext extends Context {
-		void complete( CostModel cm );
-		CostModel getCostModel();
-	}
-
-	protected class ExtendedContextImpl1 implements ExtendedContext {
+	protected static class ExtendedContext implements Context {
 		protected final Context ctx;
+		protected final CostModel costModel;
 
-		public ExtendedContextImpl1( final Context ctx ) { this.ctx = ctx; }
+		public ExtendedContext( final Context ctx ) {
+			this(ctx, null);
+		}
 
-		@Override
-		public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
+		public ExtendedContext( final Context ctx, final CostModel costModel ) {
+			this.ctx = ctx;
+			this.costModel = costModel;
+		}
 
-		@Override
-		public CostModel getCostModel() { throw new UnsupportedOperationException(); }
+		public CostModel getCostModel() {
+			if ( costModel != null )
+				return costModel;
+
+			throw new NoSuchElementException();
+		}
 
 		@Override
 		public ExecutorService getExecutorServiceForFederationAccess() { return ctx.getExecutorServiceForFederationAccess(); }
 
 		@Override
 		public ExecutorService getExecutorServiceForPlanTasks() { return ctx.getExecutorServiceForPlanTasks(); }
-
-		@Override
-		public LogicalPlanPrinter getSourceAssignmentPrinter() { return ctx.getSourceAssignmentPrinter(); }
-
-		@Override
-		public LogicalPlanPrinter getLogicalPlanPrinter() { return ctx.getLogicalPlanPrinter(); }
-
-		@Override
-		public PhysicalPlanPrinter getPhysicalPlanPrinter() { return ctx.getPhysicalPlanPrinter(); }
-
-		@Override
-		public ExecutablePlanPrinter getExecutablePlanPrinter() { return ctx.getExecutablePlanPrinter(); }
-	}
-
-	protected class ExtendedContextImpl2 implements ExtendedContext {
-		protected final Context ctx;
-		protected final FederationAccessManager fedAccessMgr;
-
-		protected CostModel costModel = null;
-
-		public ExtendedContextImpl2( final Context ctx,
-		                             final FederationAccessManager fedAccessMgr ) {
-			this.ctx = ctx;
-			this.fedAccessMgr = fedAccessMgr;
-		}
-
-		@Override
-		public void complete( final CostModel cm ) {
-			costModel = cm;
-		}
-
-		@Override
-		public CostModel getCostModel() {
-			if ( costModel == null )
-				throw new UnsupportedOperationException();
-
-			return costModel;
-		}
-
-		@Override
-		public ExecutorService getExecutorServiceForFederationAccess() {
-			return ctx.getExecutorServiceForFederationAccess();
-		}
-
-		@Override
-		public ExecutorService getExecutorServiceForPlanTasks() {
-			return ctx.getExecutorServiceForPlanTasks();
-		}
 
 		@Override
 		public LogicalPlanPrinter getSourceAssignmentPrinter() { return ctx.getSourceAssignmentPrinter(); }

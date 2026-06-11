@@ -18,7 +18,6 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
 public class HeFQUINEngineConfigReaderTest
 {
@@ -277,7 +276,7 @@ public class HeFQUINEngineConfigReaderTest
 	}
 
 	protected HeFQUINEngineConfigReader.ExtendedContext createEmptyContext() {
-		return new HeFQUINEngineConfigReader.ExtendedContext() {
+		final HeFQUINEngineConfigReader.Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override
 			public ExecutorService getExecutorServiceForFederationAccess() { throw new UnsupportedOperationException(); }
 
@@ -295,19 +294,15 @@ public class HeFQUINEngineConfigReaderTest
 
 			@Override
 			public ExecutablePlanPrinter getExecutablePlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
-
-			@Override
-			public CostModel getCostModel() { throw new UnsupportedOperationException(); }
 		};
+
+		return new HeFQUINEngineConfigReader.ExtendedContext(ctx);
 	}
 
 	protected HeFQUINEngineConfigReader.ExtendedContext createNonEmptyContext() {
-		return new HeFQUINEngineConfigReader.ExtendedContext() {
-			final protected ExecutorService execService1 = Executors.newSingleThreadExecutor();
+		final ExecutorService execService1 = Executors.newSingleThreadExecutor();
 
+		final HeFQUINEngineConfigReader.Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override
 			public ExecutorService getExecutorServiceForFederationAccess() { return execService1; }
 
@@ -325,13 +320,9 @@ public class HeFQUINEngineConfigReaderTest
 
 			@Override
 			public ExecutablePlanPrinter getExecutablePlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
-
-			@Override
-			public CostModel getCostModel() { throw new UnsupportedOperationException(); }
 		};
+
+		return new HeFQUINEngineConfigReader.ExtendedContext(ctx);
 	}
 
 }
