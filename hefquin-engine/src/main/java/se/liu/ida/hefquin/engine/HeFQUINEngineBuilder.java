@@ -23,7 +23,6 @@ import org.apache.jena.sparql.serializer.QuerySerializerFactory;
 import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.serializer.SerializerRegistry;
 
-import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader.Context;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
@@ -150,9 +149,8 @@ public class HeFQUINEngineBuilder
 		}
 
 		// create context
-		final Context ctx = new HeFQUINEngineConfigReader.Context() {
+		final HeFQUINEngineConfigReader.Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override public ExecutorService getExecutorServiceForFederationAccess() { return execFed; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execPlan; }
 		};
 
 		// init engine

@@ -46,7 +46,6 @@ public class HeFQUINEngineConfigReader
 
 	public interface Context {
 		ExecutorService getExecutorServiceForFederationAccess();
-		ExecutorService getExecutorServiceForPlanTasks();
 	}
 
 
@@ -419,9 +418,6 @@ public class HeFQUINEngineConfigReader
 
 		@Override
 		public ExecutorService getExecutorServiceForFederationAccess() { return ctx.getExecutorServiceForFederationAccess(); }
-
-		@Override
-		public ExecutorService getExecutorServiceForPlanTasks() { return ctx.getExecutorServiceForPlanTasks(); }
 	}
 
 }

@@ -275,9 +275,6 @@ public class HeFQUINEngineConfigReaderTest
 		final HeFQUINEngineConfigReader.Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override
 			public ExecutorService getExecutorServiceForFederationAccess() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
 		};
 
 		return new HeFQUINEngineConfigReader.ExtendedContext(ctx);
@@ -289,9 +286,6 @@ public class HeFQUINEngineConfigReaderTest
 		final HeFQUINEngineConfigReader.Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override
 			public ExecutorService getExecutorServiceForFederationAccess() { return execService1; }
-
-			@Override
-			public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
 		};
 
 		return new HeFQUINEngineConfigReader.ExtendedContext(ctx);
