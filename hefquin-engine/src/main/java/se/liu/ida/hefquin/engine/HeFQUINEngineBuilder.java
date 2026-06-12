@@ -24,9 +24,6 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.serializer.SerializerRegistry;
 
 import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader.Context;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
@@ -47,10 +44,6 @@ public class HeFQUINEngineBuilder
 	private Model engineConf = null;
 	private ExecutorService execFed = null;
 	private ExecutorService execPlan = null;
-	private LogicalPlanPrinter srcasgPrinter = null;
-	private LogicalPlanPrinter lplanPrinter = null;
-	private PhysicalPlanPrinter pplanPrinter = null;
-	private ExecutablePlanPrinter eplanPrinter = null;
 
 	private final int DEFAULT_THREAD_POOL_SIZE = 10;
 	private final String DEFAULT_CONF_DESCR_FILE = "config/DefaultConfDescr.ttl";
@@ -133,52 +126,6 @@ public class HeFQUINEngineBuilder
 	}
 
 	/**
-	 * Sets the logical plan printer to be used by the engine.
-	 *
-	 * @param printer a logical plan printer to be used when printing the logical
-	 *                plans after logical plan optimization
-	 * @return this builder instance for method chaining
-	 */
-	public HeFQUINEngineBuilder withLogicalPlanPrinter( final LogicalPlanPrinter printer ) {
-		this.lplanPrinter = printer;
-		return this;
-	}
-
-	/**
-	 * Sets the physical plan printer to be used by the engine.
-	 *
-	 * @param printer a physical plan printer
-	 * @return this builder instance for method chaining
-	 */
-	public HeFQUINEngineBuilder withPhysicalPlanPrinter( final PhysicalPlanPrinter printer ) {
-		this.pplanPrinter = printer;
-		return this;
-	}
-
-	/**
-	 * Sets the executable plan printer to be used by the engine.
-	 *
-	 * @param printer a executable plan printer
-	 * @return this builder instance for method chaining
-	 */
-	public HeFQUINEngineBuilder withExecutablePlanPrinter( final ExecutablePlanPrinter printer ) {
-		this.eplanPrinter = printer;
-		return this;
-	}
-
-	/**
-	 * Sets the source assignment printer to be used by the engine.
-	 *
-	 * @param printer a logical plan printer to be used when printing a source
-	 *                assignment that is the input to logical plan optimization
-	 * @return this builder instance for method chaining
-	 */
-	public HeFQUINEngineBuilder withSourceAssignmentPrinter( final LogicalPlanPrinter printer ) {
-		this.srcasgPrinter = printer;
-		return this;
-	}
-
-	/**
 	 * Returns a {@link HeFQUINEngine} instance that is created using the
 	 * parameters configured via this builder.
 	 *
@@ -206,10 +153,6 @@ public class HeFQUINEngineBuilder
 		final Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override public ExecutorService getExecutorServiceForFederationAccess() { return execFed; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execPlan; }
-			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
-			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return lplanPrinter; }
-			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return pplanPrinter; }
-			@Override public ExecutablePlanPrinter getExecutablePlanPrinter() { return eplanPrinter; }
 		};
 
 		// init engine

@@ -15,10 +15,6 @@ import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
-
 public class HeFQUINEngineConfigReaderTest
 {
 	@Test
@@ -282,18 +278,6 @@ public class HeFQUINEngineConfigReaderTest
 
 			@Override
 			public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public LogicalPlanPrinter getSourceAssignmentPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public LogicalPlanPrinter getLogicalPlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public PhysicalPlanPrinter getPhysicalPlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public ExecutablePlanPrinter getExecutablePlanPrinter() { throw new UnsupportedOperationException(); }
 		};
 
 		return new HeFQUINEngineConfigReader.ExtendedContext(ctx);
@@ -308,18 +292,6 @@ public class HeFQUINEngineConfigReaderTest
 
 			@Override
 			public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public LogicalPlanPrinter getSourceAssignmentPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public LogicalPlanPrinter getLogicalPlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public PhysicalPlanPrinter getPhysicalPlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public ExecutablePlanPrinter getExecutablePlanPrinter() { throw new UnsupportedOperationException(); }
 		};
 
 		return new HeFQUINEngineConfigReader.ExtendedContext(ctx);

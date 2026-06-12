@@ -13,8 +13,11 @@ import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithoutResult;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
@@ -105,9 +108,9 @@ public class QueryProcessorImpl implements QueryProcessor
 
 			final ExecutablePlan prg = planCompiler.compile(qepAndStats.object1, ctx);
 
-			if ( planner.getExecutablePlanPrinter() != null ) {
+			if ( ctx.getExecutablePlanPrinter() != null ) {
 				log.debug( "Printing executable plan." );
-				planner.getExecutablePlanPrinter().print( prg );
+				ctx.getExecutablePlanPrinter().print( prg );
 			}
 			t3 = System.currentTimeMillis();
 
@@ -166,6 +169,26 @@ public class QueryProcessorImpl implements QueryProcessor
 		@Override
 		public ExecutorService getExecutorServiceForPlanTasks() {
 			return wrapped.getExecutorServiceForPlanTasks();
+		}
+
+		@Override
+		public LogicalPlanPrinter getSourceAssignmentPrinter() {
+			return wrapped.getSourceAssignmentPrinter();
+		}
+
+		@Override
+		public LogicalPlanPrinter getLogicalPlanPrinter() {
+			return wrapped.getLogicalPlanPrinter();
+		}
+
+		@Override
+		public PhysicalPlanPrinter getPhysicalPlanPrinter() {
+			return wrapped.getPhysicalPlanPrinter();
+		}
+
+		@Override
+		public ExecutablePlanPrinter getExecutablePlanPrinter() {
+			return wrapped.getExecutablePlanPrinter();
 		}
 
 		@Override

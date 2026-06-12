@@ -119,11 +119,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	@Override
 	protected void exec() {
 		final HeFQUINEngineBuilder builder = new HeFQUINEngineBuilder()
-			.withFederationCatalogInModels( modFederation.getFederationCatalog() )
-			.withSourceAssignmentPrinter( modPlanPrinting.getSourceAssignmentPrinter() )
-			.withLogicalPlanPrinter( modPlanPrinting.getLogicalPlanPrinter() )
-			.withPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
-			.withExecutablePlanPrinter( modPlanPrinting.getExecutablePlanPrinter() );
+			.withFederationCatalogInModels( modFederation.getFederationCatalog() );
 
 		if( modEngineConfig.getConfDescr() != null ){
 			builder.withEngineConfiguration( modEngineConfig.getConfDescr() );
@@ -143,9 +139,12 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			out = System.out;
 		}
 
-		final QueryProcContextBuilder ctxBuilder = e.getQueryProcContextBuilder();
-		if ( contains(argSkipExecution) ) ctxBuilder.setSkipExecution();
-
+		final QueryProcContextBuilder ctxBuilder = e.getQueryProcContextBuilder()
+					.setSourceAssignmentPrinter( modPlanPrinting.getSourceAssignmentPrinter() )
+					.setLogicalPlanPrinter( modPlanPrinting.getLogicalPlanPrinter() )
+					.setPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
+					.setExecutablePlanPrinter( modPlanPrinting.getExecutablePlanPrinter() )
+					.setSkipExecution( contains(argSkipExecution) );
 		final QueryProcContext ctx = ctxBuilder.build();
 
 		QueryProcessingStatsAndExceptions statsAndExceptions = null;

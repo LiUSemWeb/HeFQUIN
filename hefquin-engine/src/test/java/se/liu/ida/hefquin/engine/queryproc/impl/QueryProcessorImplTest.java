@@ -24,9 +24,12 @@ import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
@@ -365,6 +368,12 @@ public class QueryProcessorImplTest extends EngineTestBase
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
+
+			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return null; }
+			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return null; }
+			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return null; }
+			@Override public ExecutablePlanPrinter getExecutablePlanPrinter() { return null; }
+
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public boolean skipExecution() { return false; }
 
@@ -389,7 +398,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		};
 
 		final PhysicalOptimizer poptimizer = new PhysicalOptimizerWithoutOptimization();
-		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, lp2pp, lop2pop, null, null, null,  null);
+		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, lp2pp, lop2pop);
 		final QueryPlanCompiler planCompiler = new
 				//IteratorBasedQueryPlanCompilerImpl();
 				//PullBasedQueryPlanCompilerImpl();

@@ -9,8 +9,11 @@ import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.access.*;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
@@ -23,8 +26,15 @@ public class TestUtils extends EngineTestBase
 			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
+
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
+
+			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return null; }
+			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return null; }
+			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return null; }
+			@Override public ExecutablePlanPrinter getExecutablePlanPrinter() { return null; }
+
 			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
 			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
 		};

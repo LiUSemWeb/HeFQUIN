@@ -9,11 +9,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithoutResult;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter.LogicalPlanStage;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
@@ -37,20 +34,12 @@ public class QueryPlannerImpl implements QueryPlanner
 	protected final PhysicalOptimizer poptimizer;
 	protected final LogicalToPhysicalPlanConverter lp2pp;
 	protected final LogicalToPhysicalOpConverter lop2pop;
-	protected final LogicalPlanPrinter srcasgPrinter;
-	protected final LogicalPlanPrinter lplanPrinter;
-	protected final PhysicalPlanPrinter pplanPrinter;
-	protected final ExecutablePlanPrinter eplanPrinter;
 
 	public QueryPlannerImpl( final SourcePlanner sourcePlanner,
 	                         final LogicalOptimizer loptimizer, // may be null
 	                         final PhysicalOptimizer poptimizer,
 	                         final LogicalToPhysicalPlanConverter lp2pp,
-	                         final LogicalToPhysicalOpConverter lop2pop,
-	                         final LogicalPlanPrinter srcasgPrinter,     // may be null
-	                         final LogicalPlanPrinter lplanPrinter,      // may be null
-	                         final PhysicalPlanPrinter pplanPrinter,     // may be null
-	                         final ExecutablePlanPrinter eplanPrinter ) {  // may be null
+	                         final LogicalToPhysicalOpConverter lop2pop ) {
 		assert sourcePlanner != null;
 		assert poptimizer != null;
 		assert lp2pp != null;
@@ -61,10 +50,6 @@ public class QueryPlannerImpl implements QueryPlanner
 		this.poptimizer = poptimizer;
 		this.lp2pp = lp2pp;
 		this.lop2pop = lop2pop;
-		this.srcasgPrinter = srcasgPrinter;
-		this.lplanPrinter = lplanPrinter;
-		this.pplanPrinter = pplanPrinter;
-		this.eplanPrinter = eplanPrinter;
 	}
 
 	@Override
@@ -90,11 +75,14 @@ public class QueryPlannerImpl implements QueryPlanner
 		final long t1 = System.currentTimeMillis();
 		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query, ctx);
 
-		if ( srcasgPrinter != null ) {
-			srcasgPrinter.print( saAndStats.object1, LogicalPlanStage.SOURCE_ASSIGNMENT );
-		}
 		final long t2 = System.currentTimeMillis();
 		log.debug( "Source selection completed in {} ms.", (t2 - t1) );
+
+		if ( ctx.getSourceAssignmentPrinter() != null ) {
+			ctx.getSourceAssignmentPrinter().print( saAndStats.object1,
+			                                        LogicalPlanStage.SOURCE_ASSIGNMENT );
+		}
+
 		log.debug( "Starting logical optimization phase." );
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
@@ -107,14 +95,14 @@ public class QueryPlannerImpl implements QueryPlanner
 			log.debug( "No logical optimizer configured; using source assignment directly." );
 		}
 
-		if ( lplanPrinter != null ) {
-			lplanPrinter.print( lp, LogicalPlanStage.FINAL_LOGICAL_PLAN );
-		}
-
 		final long t3 = System.currentTimeMillis();
 		log.debug( "Logical optimization completed in {} ms.", (t3 - t2) );
-		log.debug( "Starting physical optimization phase." );
 
+		if ( ctx.getLogicalPlanPrinter() != null ) {
+			ctx.getLogicalPlanPrinter().print( lp, LogicalPlanStage.FINAL_LOGICAL_PLAN );
+		}
+
+		log.debug( "Starting physical optimization phase." );
 		final Pair<PhysicalPlan, PhysicalOptimizationStats> planAndStats;
 		if ( lp instanceof LogicalPlanWithoutResult ) {
 			planAndStats = new Pair<>( PhysicalPlanWithoutResult.getInstance(),
@@ -127,8 +115,8 @@ public class QueryPlannerImpl implements QueryPlanner
 		final long t4 = System.currentTimeMillis();
 		log.debug( "Physical optimization completed in {} ms.", (t4 - t3) );
 
-		if ( pplanPrinter != null ) {
-			pplanPrinter.print( planAndStats.object1 );
+		if ( ctx.getPhysicalPlanPrinter() != null ) {
+			ctx.getPhysicalPlanPrinter().print( planAndStats.object1 );
 		}
 
 		final QueryPlanningStats myStats = new QueryPlanningStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3,
@@ -141,8 +129,4 @@ public class QueryPlannerImpl implements QueryPlanner
 		return new Pair<>(planAndStats.object1, myStats);
 	}
 
-	@Override
-	public ExecutablePlanPrinter getExecutablePlanPrinter() {
-		return eplanPrinter;
-	}
 }
