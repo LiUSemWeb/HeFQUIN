@@ -11,6 +11,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Pushing projection variables and distinct into requests to SPARQL endpoints ([#600](https://github.com/LiUSemWeb/HeFQUIN/issues/600), [#629](https://github.com/LiUSemWeb/HeFQUIN/issues/629), [#638](https://github.com/LiUSemWeb/HeFQUIN/issues/638), [#639](https://github.com/LiUSemWeb/HeFQUIN/issues/639), [#642](https://github.com/LiUSemWeb/HeFQUIN/issues/642)).
 - Logging for query planner ([#636](https://github.com/LiUSemWeb/HeFQUIN/pull/636), [#637](https://github.com/LiUSemWeb/HeFQUIN/pull/637)).
+- Refactoring of  the context objects that are passed around during query processing ([#645](https://github.com/LiUSemWeb/HeFQUIN/issues/645)).
 - Fixing example vocabulary mapping for Wikidata to make the example query work ([#640](https://github.com/LiUSemWeb/HeFQUIN/issues/640)).
 ### Planned for Next Release
 - Persistent cache for requests ([#546](https://github.com/LiUSemWeb/HeFQUIN/issues/546), [#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590), [#599](https://github.com/LiUSemWeb/HeFQUIN/issues/599)).
