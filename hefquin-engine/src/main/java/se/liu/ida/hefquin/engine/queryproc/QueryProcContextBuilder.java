@@ -2,12 +2,26 @@ package se.liu.ida.hefquin.engine.queryproc;
 
 import java.util.concurrent.ExecutorService;
 
+import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
+/**
+ * Such a builder can be used to create a customizable {@link QueryProcContext}
+ * object that provides access to components and options to be used by the
+ * query-processing components of HeFQUIN.
+ * <p>
+ * The typical way to create such a builder is to use the
+ * {@link HeFQUINEngine#getQueryProcContextBuilder()} function.
+ * <p>
+ * The builder can be used multiple times (i.e., to created multiple
+ * {@link QueryProcContext} objects), and the {@link QueryProcContext}
+ * objects that it creates can also be used multiple times (i.e., for
+ * processing multiple queries).
+ */
 public class QueryProcContextBuilder
 {
 	protected final FederationCatalog fedCatalog;

@@ -34,20 +34,23 @@ import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINEngineConstants;
  *   {@link PrintStream}, in a format that can be specified. This
  *   functionality is provided via the following functions.
  *   <ul>
- *   <li>{@link #executeQueryAndPrintResult(Query)}</li>
- *   <li>{@link #executeQueryAndPrintResult(Query, PrintStream)}</li>
- *   <li>{@link #executeQueryAndPrintResult(Query, ResultsFormat)}</li>
  *   <li>{@link #executeQueryAndPrintResult(Query, ResultsFormat, PrintStream)}</li>
+ *   <li>{@link #executeQueryAndPrintResult(Query, ResultsFormat, PrintStream, QueryProcContext)}</li>
  *   </ul>
  *   </li>
  * <li>On the one hand, it can be used to process SELECT queries and
  *   obtain the query result as a {@link ResultSet} object, which can
  *   then be consumed in whatever way you like. This functionality is
- *   provided by via {@link #executeSelectQuery(Query)}.</li>
+ *   provided by via the following functions.
+ *   <ul>
+ *   <li>{@link #executeSelectQuery(Query)}.</li>
+ *   <li>{@link #executeSelectQuery(Query, QueryProcContext)}</li>
+ *   </ul>
+ *   </li>
  * </ol>
  *
  * To create a {@link HeFQUINEngine} object used {@link HeFQUINEngineBuilder}.
- * Once you do not need it anymore, make sure to call {@link #shutdown()}.
+ * When you do not need it anymore, make sure to call {@link #shutdown()}.
  * <p>
  * Technically, this is a wrapper around the Jena/ARQ query processing
  * machinery into which the query processor of this engine is integrated.
@@ -78,6 +81,23 @@ public class HeFQUINEngine
 		this.execServiceForPlanTasks = execServiceForPlanTasks;
 	}
 
+	/**
+	 * Returns a newly-created {@link QueryProcContextBuilder} that can
+	 * be used to create customizable {@link QueryProcContext} objects
+	 * to be used when calling any of the following functions of this
+	 * {@link HeFQUINEngine}.
+	 * <ul>
+	 * <li>{@link #executeQueryAndPrintResult(Query, ResultsFormat, PrintStream, QueryProcContext)}</li>
+	 * <li>{@link #executeSelectQuery(Query, QueryProcContext)}</li>
+	 * </ul>
+	 *
+	 * The returned {@link QueryProcContextBuilder} can be used multiple
+	 * times (i.e., to created multiple {@link QueryProcContext} objects),
+	 * but notice that a {@link QueryProcContext} object can also be used
+	 * multiple times.
+	 *
+	 * @return a newly-created {@link QueryProcContextBuilder}
+	 */
 	public QueryProcContextBuilder getQueryProcContextBuilder() {
 		return new QueryProcContextBuilder(fedCatalog, fedAccessMgr, execServiceForPlanTasks);
 	}
@@ -128,8 +148,10 @@ public class HeFQUINEngine
 	 *                       ({@link ResultsFormat.FMT_TEXT} may be used
 	 *                       as a default)
 	 * @param output - the output stream to which the result shall written
-	 * @param ctx - object that contains options to be considered for the
-	 *              query process
+	 * @param ctx - object that contains options to be considered during
+	 *              query processing; to create such an object, use the
+	 *              {@link QueryProcContextBuilder} that can be obtained
+	 *              via {@link #getQueryProcContextBuilder()}
 	 *
 	 * @throws UnsupportedQueryException
 	 *              thrown if the given query uses features that are not
@@ -168,7 +190,36 @@ public class HeFQUINEngine
 	 *              directly to the user.
 	 */
 	public QueryProcessingOutput executeSelectQuery( final Query query )
-		throws UnsupportedQueryException, IllegalQueryException
+			throws UnsupportedQueryException, IllegalQueryException
+	{
+		final QueryProcContext ctx = getQueryProcContextBuilder().build();
+		return executeSelectQuery(query, ctx);
+	}
+
+	/**
+	 * Assuming the given query is a SELECT query, this function executes
+	 * that query and returns an output object from which the query result
+	 * can be obtained as a {@link ResultSet}.
+	 *
+	 * @param query - the query to be executed; it needs to be a SELECT query
+	 * @param ctx - object that contains options to be considered during
+	 *              query processing; to create such an object, use the
+	 *              {@link QueryProcContextBuilder} that can be obtained
+	 *              via {@link #getQueryProcContextBuilder()}
+	 *
+	 * @throws UnsupportedQueryException
+	 *              thrown if the given query uses features that are not
+	 *              supported by HeFQUIN; the message of the exception
+	 *              describes the specific limitation and can be passed
+	 *              directly to the user.
+	 * @throws IllegalQueryException
+	 *              thrown if the given query is invalid; the message of
+	 *              the exception describes the issue and can be passed
+	 *              directly to the user.
+	 */
+	public QueryProcessingOutput executeSelectQuery( final Query query,
+	                                                 final QueryProcContext ctx )
+			throws UnsupportedQueryException, IllegalQueryException
 	{
 		if ( wasShutDown == true )
 			throw new IllegalStateException("This HeFQUINEngine instance has been shut down already.");
@@ -178,8 +229,7 @@ public class HeFQUINEngine
 
 		final QueryExecution qe = _prepareExecution(query);
 
-		qe.getContext().set( HeFQUINEngineConstants.sysQueryProcContext,
-		                     getQueryProcContextBuilder().build() );
+		qe.getContext().set( HeFQUINEngineConstants.sysQueryProcContext, ctx );
 
 		final ResultSet rs = qe.execSelect();
 
