@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.RESTRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -42,14 +42,14 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 
 	@Override
 	protected final void _execute( final IntermediateResultElementSink sink,
-	                               final ExecutionContext execCxt )
+	                               final QueryProcContextExt ctx )
 		throws ExecOpExecutionException
 	{
 		log.debug( "Issuing REST request to endpoint {}", fm.getURLTemplate() );
 
 		final StringResponse response;
 		try {
-			response = FederationAccessUtils.performRequest( execCxt.getFederationAccessMgr(),
+			response = FederationAccessUtils.performRequest( ctx.getFederationAccessMgr(),
 			                                                 createRESTRequest(),
 			                                                 fm );
 		}

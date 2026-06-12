@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 {
@@ -40,7 +40,7 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	@Override
 	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		numberOfOutputMappingsProduced++;
 		sink.send(inputSolMap);
 	}
@@ -48,21 +48,21 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	@Override
 	protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		numberOfOutputMappingsProduced += inputSolMaps.size();
 		sink.send(inputSolMaps);
 	}
 
 	@Override
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
-	                                 final ExecutionContext execCxt ) {
+	                                 final QueryProcContextExt ctx ) {
 		// nothing to be done here
 	}
 
 	@Override
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		numberOfOutputMappingsProduced++;
 		sink.send(inputSolMap);
 	}
@@ -70,14 +70,14 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	@Override
 	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		numberOfOutputMappingsProduced += inputSolMaps.size();
 		sink.send(inputSolMaps);
 	}
 
 	@Override
 	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
-	                                 final ExecutionContext execCxt ) {
+	                                 final QueryProcContextExt ctx ) {
 		// nothing to be done here
 	}
 

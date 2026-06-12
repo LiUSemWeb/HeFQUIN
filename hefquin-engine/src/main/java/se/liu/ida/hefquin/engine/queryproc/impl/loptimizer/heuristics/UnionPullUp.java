@@ -6,6 +6,7 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.*;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
 /**
@@ -66,6 +67,11 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
 public class UnionPullUp implements HeuristicForLogicalOptimization
 {
 	@Override
+	public LogicalPlan apply( final LogicalPlan inputPlan,
+	                          final QueryProcContext ctxt2 ) {
+		return apply(inputPlan);
+	}
+
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
 		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
 		if ( numberOfSubPlans == 0 ) {

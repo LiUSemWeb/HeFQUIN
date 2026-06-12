@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * A physical operator that returns a given solution mapping.
@@ -40,7 +40,7 @@ public class PhysicalOpFixedSolMap implements NullaryPhysicalOpForLogicalOp
 		return new NullaryExecutableOpBase(lop.mayReduce(), collectExceptions, qpInfo) {
 			@Override
 			protected void _execute( final IntermediateResultElementSink sink,
-			                         final ExecutionContext execCxt ) {
+			                         final QueryProcContextExt ctx ) {
 				sink.send( lop.getSolutionMapping() );
 			}
 		};

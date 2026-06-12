@@ -4,7 +4,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,20 +51,20 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		inputLHS.add(inputSolMap);
 	}
 
 	@Override
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
-	                                 final ExecutionContext execCxt ) {
+	                                 final QueryProcContextExt ctx ) {
 		// nothing to be done here
 	}
 
 	@Override
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		final List<SolutionMapping> output = new ArrayList<>();
 		for ( final SolutionMapping smL : inputLHS ) {
 			if ( SolutionMappingUtils.compatible(smL,inputSolMap) ) {
@@ -78,7 +78,7 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		final List<SolutionMapping> output = new ArrayList<>();
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
 			for ( final SolutionMapping smL : inputLHS ) {
@@ -93,7 +93,7 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 
 	@Override
 	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
-	                                 final ExecutionContext execCxt ) {
+	                                 final QueryProcContextExt ctx ) {
 		// clear the list of collected first-input solution
 		// mappings to enable the GC to release memory early
 		inputLHS.clear();

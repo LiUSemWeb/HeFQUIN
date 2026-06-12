@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.datatypes.RDFDatatype;
@@ -15,28 +16,23 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
-import se.liu.ida.hefquin.engine.queryproc.impl.ExecutionContextImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.jenaext.ModelUtils;
 import se.liu.ida.hefquin.vocabulary.ECVocab;
 
@@ -46,38 +42,19 @@ import se.liu.ida.hefquin.vocabulary.ECVocab;
  */
 public class HeFQUINEngineConfigReader
 {
-	/**
-	 * Creates a {@link HeFQUINEngine} that is configured based on
-	 * the description in the given RDF file. Assumes that the file
-	 * describes only one such configuration.
-	 */
-	public HeFQUINEngine readFromFile( final String filename, final Context ctx ) {
-		final Model m = RDFDataMgr.loadModel(filename);
-		return read(m, ctx);
+	private static final Logger log = LoggerFactory.getLogger( HeFQUINEngineConfigReader.class );
+
+	public interface Context {
+		ExecutorService getExecutorServiceForFederationAccess();
 	}
 
-	/**
-	 * Creates a {@link HeFQUINEngine} that is configured based on the
-	 * configuration identified by the given URI in the given RDF file.
-	 */
-	public HeFQUINEngine readFromFile( final String filename, final String uriOfConfRsrc, final Context ctx ) {
-		final Model m = RDFDataMgr.loadModel(filename);
-		final Resource confRsrc = m.createResource(uriOfConfRsrc);
 
-		if ( ! m.contains(confRsrc, null) )
-			throw new IllegalArgumentException("There is no description of the given URI (" + uriOfConfRsrc + ") in " + filename);
+	// ------------ federation access manager ------------
 
-		return read(confRsrc, ctx);
-	}
-
-	/**
-	 * Creates a {@link HeFQUINEngine} that is configured based on
-	 * the description in the given RDF model. Assumes that the
-	 * model describes only one such configuration.
-	 */
-	public HeFQUINEngine read( final Model m, final Context ctx ) {
+	public FederationAccessManager readFederationAccessManager( final Model m,
+	                                                            final Context ctx ) {
 		final Resource confRsrc = obtainConfigurationResource(m);
-		return read(confRsrc, ctx);
+		return readFederationAccessManager(confRsrc, ctx);
 	}
 
 	public Resource obtainConfigurationResource( final Model m ) {
@@ -96,47 +73,11 @@ public class HeFQUINEngineConfigReader
 		return r;
 	}
 
-	public HeFQUINEngine read( final Resource confRsrc, final Context ctx ) {
-		final FederationAccessManager fedAccessMgr = readFederationAccessManager(confRsrc, ctx);
-		final QueryProcessor qproc = readQueryProcessor(confRsrc, ctx, fedAccessMgr);
-
-		return new HeFQUINEngine(fedAccessMgr, qproc);
-	}
-
-	public interface Context {
-		ExecutorService getExecutorServiceForFederationAccess();
-		ExecutorService getExecutorServiceForPlanTasks();
-		FederationCatalog getFederationCatalog();
-		boolean isExperimentRun();
-		boolean skipExecution();
-
-		/** may be <code>null</code> if source assignment printing is not requested by the user */
-		LogicalPlanPrinter getSourceAssignmentPrinter();
-
-		/** may be <code>null</code> if logical plan printing is not requested by the user */
-		LogicalPlanPrinter getLogicalPlanPrinter();
-
-		/** may be <code>null</code> if physical plan printing is not requested by the user */
-		PhysicalPlanPrinter getPhysicalPlanPrinter();
-
-		/** may be <code>null</code> if executable plan printing is not requested by the user */
-		ExecutablePlanPrinter getExecutablePlanPrinter();
-	}
-
-
-	// ------------ federation access manager ------------
-
-	public FederationAccessManager readFederationAccessManager( final Model m,
-	                                                            final Context ctx ) {
-		final Resource confRsrc = obtainConfigurationResource(m);
-		return readFederationAccessManager(confRsrc, ctx);
-	}
-
 	public FederationAccessManager readFederationAccessManager( final Resource confRsrc,
 	                                                            final Context ctx ) {
 		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( confRsrc, ECVocab.fedAccessMgr );
 
-		final ExtendedContext ctxx = new ExtendedContextImpl1(ctx);
+		final ExtendedContext ctxx = new ExtendedContext(ctx);
 
 		final Object i;
 		try {
@@ -163,16 +104,15 @@ public class HeFQUINEngineConfigReader
 	                                          final FederationAccessManager fedAccessMgr ) {
 		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( confRsrc, ECVocab.queryProcessor );
 
-		final ExtendedContext ctxx = new ExtendedContextImpl2(ctx, fedAccessMgr);
+		final CostModel cm = readCostModel( rsrc, new ExtendedContext(ctx) );
+
+		final ExtendedContext ctxx = new ExtendedContext(ctx, cm);
+
 		final QueryPlanner planner = readQueryPlanner(rsrc, ctxx);
-
-		final CostModel cm = readCostModel(rsrc, ctxx);
-		ctxx.complete(cm);
-
 		final QueryPlanCompiler compiler = readQueryPlanCompiler(rsrc, ctxx);
 		final ExecutionEngine exec = readExecutionEngine(rsrc, ctxx);
 
-		return new QueryProcessorImpl( planner, compiler, exec, ctxx.getQueryProcContext() );
+		return new QueryProcessorImpl(planner, compiler, exec);
 	}
 
 	public CostModel readCostModel( final Resource qprocRsrc, final ExtendedContext ctx ) {
@@ -196,18 +136,14 @@ public class HeFQUINEngineConfigReader
 	                                      final ExtendedContext ctx ) {
 		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( queryProcRsrc, ECVocab.queryPlanner );
 
-		ctx.complete( readLogicalToPhysicalPlanConverter(rsrc, ctx) );
-		ctx.complete( readLogicalToPhysicalOpConverter(rsrc, ctx) );
-
 		final SourcePlanner spl = readSourcePlanner(rsrc, ctx);
 		final LogicalOptimizer lopt = readLogicalOptimizer(rsrc, ctx);
 		final PhysicalOptimizer popt = readPhysicalOptimizer(rsrc, ctx);
 
-		return new QueryPlannerImpl( spl, lopt, popt,
-		                             ctx.getSourceAssignmentPrinter(),
-		                             ctx.getLogicalPlanPrinter(),
-		                             ctx.getPhysicalPlanPrinter(),
-		                             ctx.getExecutablePlanPrinter() );
+		final LogicalToPhysicalPlanConverter lp2pp = readLogicalToPhysicalPlanConverter(rsrc, ctx);
+		final LogicalToPhysicalOpConverter lop2pop = readLogicalToPhysicalOpConverter(rsrc, ctx);
+
+		return new QueryPlannerImpl(spl, lopt, popt, lp2pp, lop2pop);
 	}
 
 	public LogicalToPhysicalPlanConverter readLogicalToPhysicalPlanConverter( final Resource qplRsrc, final ExtendedContext ctx ) {
@@ -313,6 +249,9 @@ public class HeFQUINEngineConfigReader
 	protected Object instantiate( final Resource r, final ExtendedContext ctx ) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		// Obtain the Java class to be instantiated.
 		final String className = ModelUtils.getSingleMandatoryProperty_XSDString( r, ECVocab.javaClassName );
+
+		log.debug( "Starting to instantiate an object of class '{}'.", className );
+
 		final Class<?> c = Class.forName(className);
 
 		// Obtain the list of constructor arguments (if any).
@@ -321,6 +260,7 @@ public class HeFQUINEngineConfigReader
 		// If there is no list of constructor arguments, create an instance
 		// of the class by using the constructor without arguments.
 		if ( list == null ) {
+			log.debug( "Instantiating an object without constructor arguments; class: '{}'.", className );
 			final Constructor<?> ctor = c.getConstructor();
 			return ctor.newInstance();
 		}
@@ -353,7 +293,6 @@ public class HeFQUINEngineConfigReader
 			final RDFNode argValueTerm;
 			if (    argDescr.isLiteral()
 			     || argDescr.equals(ECVocab.ExecServiceForFedAccess)
-			     || argDescr.equals(ECVocab.QueryProcContext)
 			     || argDescr.equals(ECVocab.CostModel_INSTANCE) ) {
 				argValueTerm = argDescr;
 			}
@@ -433,10 +372,6 @@ public class HeFQUINEngineConfigReader
 					argType = ExecutorService.class;
 					argValue = ctx.getExecutorServiceForFederationAccess();
 				}
-				else if ( argValueTerm.equals(ECVocab.QueryProcContext) ) {
-					argType = QueryProcContext.class;
-					argValue = ctx.getQueryProcContext();
-				}
 				else if ( argValueTerm.equals(ECVocab.CostModel_INSTANCE) ) {
 					argType = CostModel.class;
 					argValue = ctx.getCostModel();
@@ -461,160 +396,28 @@ public class HeFQUINEngineConfigReader
 
 	// ----- the types of contexts used by this implementation -----
 
-	protected interface ExtendedContext extends Context {
-		void complete( CostModel cm );
-		void complete( LogicalToPhysicalPlanConverter c );
-		void complete( LogicalToPhysicalOpConverter c );
-		QueryProcContext getQueryProcContext();
-		CostModel getCostModel();
-	}
-
-	protected class ExtendedContextImpl1 implements ExtendedContext {
+	protected static class ExtendedContext implements Context {
 		protected final Context ctx;
+		protected final CostModel costModel;
 
-		public ExtendedContextImpl1( final Context ctx ) { this.ctx = ctx; }
+		public ExtendedContext( final Context ctx ) {
+			this(ctx, null);
+		}
 
-		@Override
-		public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
+		public ExtendedContext( final Context ctx, final CostModel costModel ) {
+			this.ctx = ctx;
+			this.costModel = costModel;
+		}
 
-		@Override
-		public void complete( final LogicalToPhysicalPlanConverter c ) { throw new UnsupportedOperationException(); }
+		public CostModel getCostModel() {
+			if ( costModel != null )
+				return costModel;
 
-		@Override
-		public void complete( final LogicalToPhysicalOpConverter c ) { throw new UnsupportedOperationException(); }
-
-		@Override
-		public QueryProcContext getQueryProcContext() { throw new UnsupportedOperationException(); }
-
-		@Override
-		public CostModel getCostModel() { throw new UnsupportedOperationException(); }
+			throw new NoSuchElementException();
+		}
 
 		@Override
 		public ExecutorService getExecutorServiceForFederationAccess() { return ctx.getExecutorServiceForFederationAccess(); }
-
-		@Override
-		public ExecutorService getExecutorServiceForPlanTasks() { return ctx.getExecutorServiceForPlanTasks(); }
-
-		@Override
-		public FederationCatalog getFederationCatalog() { return ctx.getFederationCatalog(); }
-
-		@Override
-		public boolean isExperimentRun() { return ctx.isExperimentRun(); }
-
-		@Override
-		public boolean skipExecution() { return ctx.skipExecution(); }
-
-		@Override
-		public LogicalPlanPrinter getSourceAssignmentPrinter() { return ctx.getSourceAssignmentPrinter(); }
-
-		@Override
-		public LogicalPlanPrinter getLogicalPlanPrinter() { return ctx.getLogicalPlanPrinter(); }
-
-		@Override
-		public PhysicalPlanPrinter getPhysicalPlanPrinter() { return ctx.getPhysicalPlanPrinter(); }
-
-		@Override
-		public ExecutablePlanPrinter getExecutablePlanPrinter() { return ctx.getExecutablePlanPrinter(); }
-	}
-
-	protected class ExtendedContextImpl2 implements ExtendedContext {
-		protected final Context ctx;
-		protected final FederationAccessManager fedAccessMgr;
-
-		protected CostModel costModel = null;
-		protected LogicalToPhysicalPlanConverter lp2pp = null;
-		protected LogicalToPhysicalOpConverter lop2pop = null;
-
-		protected QueryProcContext qprocCtx = null;
-
-		public ExtendedContextImpl2( final Context ctx, final FederationAccessManager fedAccessMgr ) {
-			this.ctx = ctx;
-			this.fedAccessMgr = fedAccessMgr;
-		}
-
-		@Override
-		public void complete( final CostModel cm ) {
-			costModel = cm;
-		}
-
-		@Override
-		public void complete( final LogicalToPhysicalPlanConverter c ) { lp2pp = c; }
-
-		@Override
-		public void complete( final LogicalToPhysicalOpConverter c ) { lop2pop = c; }
-
-		@Override
-		public QueryProcContext getQueryProcContext() {
-			if ( qprocCtx != null )
-				return qprocCtx;
-
-			if ( lp2pp == null )
-				throw new UnsupportedOperationException("LogicalToPhysicalPlanConverter not set yet.");
-
-			if ( lop2pop == null )
-				throw new UnsupportedOperationException("LogicalToPhysicalOpConverter not set yet.");
-
-			qprocCtx = createQueryProcContext(ctx, fedAccessMgr, lp2pp, lop2pop);
-			return qprocCtx;
-		}
-
-		@Override
-		public CostModel getCostModel() {
-			if ( costModel == null )
-				throw new UnsupportedOperationException();
-
-			return costModel;
-		}
-
-		@Override
-		public ExecutorService getExecutorServiceForFederationAccess() {
-			return ctx.getExecutorServiceForFederationAccess();
-		}
-
-		@Override
-		public ExecutorService getExecutorServiceForPlanTasks() {
-			return qprocCtx.getExecutorServiceForPlanTasks();
-		}
-
-		@Override
-		public FederationCatalog getFederationCatalog() {
-			return qprocCtx.getFederationCatalog();
-		}
-
-		@Override
-		public boolean isExperimentRun() {
-			return ctx.isExperimentRun();
-		}
-
-		@Override
-		public boolean skipExecution() {
-			return ctx.skipExecution();
-		}
-
-		@Override
-		public LogicalPlanPrinter getSourceAssignmentPrinter() { return ctx.getSourceAssignmentPrinter(); }
-
-		@Override
-		public LogicalPlanPrinter getLogicalPlanPrinter() { return ctx.getLogicalPlanPrinter(); }
-
-		@Override
-		public PhysicalPlanPrinter getPhysicalPlanPrinter() { return ctx.getPhysicalPlanPrinter(); }
-
-		@Override
-		public ExecutablePlanPrinter getExecutablePlanPrinter() { return ctx.getExecutablePlanPrinter(); }
-	}
-
-	protected QueryProcContext createQueryProcContext( final Context ctx,
-	                                                   final FederationAccessManager fedAccessMgr,
-	                                                   final LogicalToPhysicalPlanConverter lp2pp,
-	                                                   final LogicalToPhysicalOpConverter lop2pop ) {
-		return new ExecutionContextImpl( fedAccessMgr,
-		                                 ctx.getFederationCatalog(),
-		                                 ctx.getExecutorServiceForPlanTasks(),
-		                                 lp2pp,
-		                                 lop2pop,
-		                                 ctx.isExperimentRun(),
-		                                 ctx.skipExecution() );
 	}
 
 }

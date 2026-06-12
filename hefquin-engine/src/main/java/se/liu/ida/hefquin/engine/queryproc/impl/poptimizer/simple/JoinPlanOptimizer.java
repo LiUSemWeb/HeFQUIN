@@ -6,7 +6,7 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public interface JoinPlanOptimizer
 {
@@ -14,15 +14,15 @@ public interface JoinPlanOptimizer
 	 * Returns a plan that combines the given subplans using binary joins.
 	 */
 	PhysicalPlan determineJoinPlan( List<PhysicalPlan> subplans,
-	                                QueryProcContext ctxt ) throws PhysicalOptimizationException;
+	                                QueryProcContextExt ctx ) throws PhysicalOptimizationException;
 
 	/**
 	 * Returns a plan that combines the given subplans using binary joins.
 	 */
 	default PhysicalPlan determineJoinPlan( final PhysicalPlan[] subplans,
-	                                        final QueryProcContext ctxt )
+	                                        final QueryProcContextExt ctx )
 			throws PhysicalOptimizationException
 	{
-		return determineJoinPlan( new ArrayList<>(Arrays.asList(subplans)), ctxt );
+		return determineJoinPlan( new ArrayList<>(Arrays.asList(subplans)), ctx );
 	}
 }

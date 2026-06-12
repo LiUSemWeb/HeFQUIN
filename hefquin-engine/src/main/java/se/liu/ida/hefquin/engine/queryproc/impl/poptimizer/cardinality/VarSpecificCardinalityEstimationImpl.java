@@ -14,6 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 
 public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinalityEstimation
@@ -30,7 +31,8 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 	@Override
 	public CompletableFuture<Integer> initiateCardinalityEstimation(
 			final PhysicalPlan plan,
-			final Var v )
+			final Var v,
+			final QueryProcContext ctx )
 	{
 		synchronized (cache) {
 			// If we already have a CompletableFuture for the given
@@ -43,7 +45,7 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 			// If we don't have a cache hit, create a CompletableFuture
 			// that will produce the variable-specific cardinality estimate
 			// for the given plan-variable pair, ...
-			final CompletableFuture<Integer> futRslt = _initiateCardinalityEstimation(plan, v);
+			final CompletableFuture<Integer> futRslt = _initiateCardinalityEstimation(plan, v, ctx);
 
 			// ... extend it into a CompletableFuture that will update the
 			// cache once the future result has been produced, ...
@@ -64,25 +66,26 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 
 	protected CompletableFuture<Integer> _initiateCardinalityEstimation(
 			final PhysicalPlan plan,
-			final Var v )
+			final Var v,
+			final QueryProcContext ctx )
 	{
 		final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
 
 		if ( rootOp instanceof LogicalOpRequest ) {
-			return cardEstimator.initiateCardinalityEstimation(plan);
+			return cardEstimator.initiateCardinalityEstimation(plan, ctx);
 		}
 		else if ( rootOp instanceof LogicalOpGPAdd gpAdd ) {
 			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan(gpAdd);
-			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqGP, v );
+			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqGP, v, ctx );
 		}
 		else if ( rootOp instanceof LogicalOpLocalToGlobal || rootOp instanceof LogicalOpGlobalToLocal ){
-			return _initiateCardinalityEstimation( plan.getSubPlan(0), v );
+			return _initiateCardinalityEstimation( plan.getSubPlan(0), v, ctx );
 		}
 		else if ( rootOp instanceof LogicalOpJoin ) {
-			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), plan.getSubPlan(1), v );
+			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), plan.getSubPlan(1), v, ctx );
 		}
 		else if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion ) {
-			return _initiateMultiwayUnionCardinalityEstimation( plan, v);
+			return _initiateMultiwayUnionCardinalityEstimation( plan, v, ctx );
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of root operator (" + rootOp.getClass().getName() + ").");
@@ -92,11 +95,12 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 	protected CompletableFuture<Integer> _initiateJoinCardinalityEstimation(
 			final PhysicalPlan plan1,
 			final PhysicalPlan plan2,
-			final Var v )
+			final Var v,
+			final QueryProcContext ctx )
 	{
 //		Estimate cardinality of sub-queries
-		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1);
-		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan2);
+		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1, ctx);
+		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan2, ctx);
 
 		final Set<Var> allJoinVars = PhysicalPlanUtils.intersectionOfAllVariables( plan1, plan2 );
 		if ( allJoinVars.contains(v) ) {
@@ -124,14 +128,15 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 
 	protected CompletableFuture<Integer> _initiateMultiwayUnionCardinalityEstimation(
 			final PhysicalPlan plan,
-			final Var v )
+			final Var v,
+			final QueryProcContext ctx )
 	{
 		CompletableFuture<Integer> f = CompletableFuture.completedFuture(0);
 		boolean containVar = false;
 		for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
 			final Set<Var> vars = PhysicalPlanUtils.unionOfAllVariables( plan.getSubPlan(i) );
 			if ( vars.contains(v) ) {
-				final CompletableFuture<Integer> f1 = initiateCardinalityEstimation( plan.getSubPlan(i), v );
+				final CompletableFuture<Integer> f1 = initiateCardinalityEstimation( plan.getSubPlan(i), v, ctx );
 				f = f.thenCombine(f1, (c, c1) -> (c + c1) < 0 ? Integer.MAX_VALUE : (c + c1));
 
 				containVar = true;

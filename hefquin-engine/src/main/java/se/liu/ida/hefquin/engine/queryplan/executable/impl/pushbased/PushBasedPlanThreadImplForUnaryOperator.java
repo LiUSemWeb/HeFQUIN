@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class PushBasedPlanThreadImplForUnaryOperator extends PushBasedPlanThreadImplBase
 {
@@ -17,8 +17,8 @@ public class PushBasedPlanThreadImplForUnaryOperator extends PushBasedPlanThread
 
 	public PushBasedPlanThreadImplForUnaryOperator( final UnaryExecutableOp op,
 	                                                final PushBasedPlanThread input,
-	                                                final ExecutionContext execCxt ) {
-		super(execCxt);
+	                                                final QueryProcContextExt ctx ) {
+		super(ctx);
 
 		assert op != null;
 		assert input != null;
@@ -41,10 +41,10 @@ public class PushBasedPlanThreadImplForUnaryOperator extends PushBasedPlanThread
 		while ( ! inputConsumed ) {
 			input.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
-				op.process(transferBuffer, sink, execCxt);
+				op.process(transferBuffer, sink, ctx);
 			}
 			else {
-				op.concludeExecution(sink, execCxt);
+				op.concludeExecution(sink, ctx);
 				inputConsumed = true;
 			}
 		}

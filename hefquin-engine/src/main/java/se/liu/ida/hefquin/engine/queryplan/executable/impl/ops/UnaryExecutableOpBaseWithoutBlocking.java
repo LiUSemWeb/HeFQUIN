@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * Base class for all implementations of {@link UnaryExecutableOp} that do not
@@ -42,7 +42,7 @@ public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutab
 	@Override
 	protected final void _process( final List<SolutionMapping> inputSolMaps,
 	                               final IntermediateResultElementSink sink,
-	                               final ExecutionContext execCxt )
+	                               final QueryProcContextExt ctx )
 		 throws ExecOpExecutionException
 	{
 		final int inputSize = inputSolMaps.size();
@@ -54,12 +54,12 @@ public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutab
 			// the output (but does not do so in its single-input version
 			// of the _process method).
 			final SolutionMapping inputSolMap = inputSolMaps.get(0);
-			_process(inputSolMap, sink, execCxt);
+			_process(inputSolMap, sink, ctx);
 		}
 		else if ( inputSize > 1 ) {
 			final Iterator<SolutionMapping> it = inputSolMaps.iterator();
 			while ( it.hasNext() ) {
-				_process(it, MAX_BATCH_SIZE, sink, execCxt);
+				_process(it, MAX_BATCH_SIZE, sink, ctx);
 			}
 		}
 		// no else case here - nothing to do if inputSolMaps is empty
@@ -83,13 +83,13 @@ public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutab
 	protected void _process( final Iterator<SolutionMapping> inputSolMaps,
 	                         final int maxBatchSize,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	                         final QueryProcContextExt ctx )
 			throws ExecOpExecutionException {
 		int cnt = 0;
 		while ( cnt < maxBatchSize && inputSolMaps.hasNext() ) {
 			final SolutionMapping inputSolMap = inputSolMaps.next();
 			cnt++;
-			_process(inputSolMap, sink, execCxt);
+			_process(inputSolMap, sink, ctx);
 		}
 	}
 

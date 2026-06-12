@@ -29,8 +29,8 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 
 /**
@@ -696,7 +696,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			final boolean useOuterJoinSemantics ) throws ExecutionException
 	{
 		final ExecutorService execService = getExecutorServiceForTest();
-		final ExecutionContext execCxt = getExecContextForTests(execService);
+		final QueryProcContextExt ctx = getExtendedQueryProcContextForTests(execService);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
@@ -705,9 +705,9 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final UnaryExecutableOp op = createExecOpForTest(tp, fm, expectedVariables, useOuterJoinSemantics);
 
 		for ( final SolutionMapping sm : input ) {
-			op.process(sm, sink, execCxt);
+			op.process(sm, sink, ctx);
 		}
-		op.concludeExecution(sink, execCxt);
+		op.concludeExecution(sink, ctx);
 
 		return sink.getCollectedSolutionMappings().iterator();
 	}

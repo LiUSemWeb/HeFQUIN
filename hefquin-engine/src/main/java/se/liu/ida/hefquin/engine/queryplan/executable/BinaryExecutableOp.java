@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * A specialization of the {@link ExecutableOperator} interface that
@@ -72,7 +72,7 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 */
 	void processInputFromChild1( SolutionMapping inputSolMap,
 	                             IntermediateResultElementSink sink,
-	                             ExecutionContext execCxt ) throws ExecOpExecutionException;
+	                             QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	/**
 	 * Processes the solution mappings of the given list as input coming
@@ -89,9 +89,9 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 */
 	default void processInputFromChild1( final List<SolutionMapping> inputSolMaps,
 	                                     final IntermediateResultElementSink sink,
-	                                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	                                     final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
-			processInputFromChild1(sm, sink, execCxt );
+			processInputFromChild1(sm, sink, ctx);
 		}
 	}
 
@@ -110,7 +110,7 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 * has not been called yet.
 	 */
 	void wrapUpForChild1( IntermediateResultElementSink sink,
-	                      ExecutionContext execCxt ) throws ExecOpExecutionException;
+	                      QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	/**
 	 * Processes the given solution mapping as input coming from the
@@ -124,7 +124,7 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 */
 	void processInputFromChild2( SolutionMapping inputSolMap,
 	                             IntermediateResultElementSink sink,
-	                             ExecutionContext execCxt ) throws ExecOpExecutionException;
+	                             QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	/**
 	 * Processes the solution mappings of the given list as input coming
@@ -141,9 +141,9 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 */
 	default void processInputFromChild2( final List<SolutionMapping> inputSolMaps,
 	                                     final IntermediateResultElementSink sink,
-	                                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	                                     final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
-			processInputFromChild2(sm, sink, execCxt );
+			processInputFromChild2(sm, sink, ctx);
 		}
 	}
 
@@ -162,5 +162,5 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 * has not been called yet.
 	 */
 	void wrapUpForChild2( IntermediateResultElementSink sink,
-	                      ExecutionContext execCxt ) throws ExecOpExecutionException;
+	                      QueryProcContextExt ctx ) throws ExecOpExecutionException;
 }

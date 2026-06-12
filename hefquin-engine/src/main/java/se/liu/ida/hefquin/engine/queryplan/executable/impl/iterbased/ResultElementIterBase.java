@@ -5,20 +5,20 @@ import java.util.NoSuchElementException;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.SynchronizedIntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public abstract class ResultElementIterBase implements ResultElementIterator
 {
-	protected final ExecutionContext execCxt;
+	protected final QueryProcContextExt ctx ;
 	protected final SynchronizedIntermediateResultElementSink sink;
 
 	protected boolean exhausted = false;
 	protected SolutionMapping nextElement = null;
 
-	protected ResultElementIterBase( final ExecutionContext execCxt ) {
-		assert execCxt != null;
-		this.execCxt = execCxt;
+	protected ResultElementIterBase( final QueryProcContextExt ctx ) {
+		assert ctx != null;
+		this.ctx = ctx;
 
 		sink = new SynchronizedIntermediateResultElementSink();
 	}

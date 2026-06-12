@@ -15,7 +15,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
@@ -115,7 +115,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 	}
 
 	protected void performRequestAndHandleResponse( final IntermediateResultElementSink sink,
-	                                                final ExecutionContext execCxt )
+	                                                final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		log.debug(
@@ -129,7 +129,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 		numberOfRequestOpsUsed++;
 
 		try {
-			reqOp.execute(mySink, execCxt);
+			reqOp.execute(mySink, ctx);
 		}
 		catch ( final ExecOpExecutionException e ) {
 			if ( ! trialPhase ) {
@@ -149,7 +149,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTER
 			statsOfLastReqOp = reqOp.getStats();
 			if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
 
-			performRequestAndHandleResponse(sink, execCxt);
+			performRequestAndHandleResponse(sink, ctx);
 
 			return;
 		}

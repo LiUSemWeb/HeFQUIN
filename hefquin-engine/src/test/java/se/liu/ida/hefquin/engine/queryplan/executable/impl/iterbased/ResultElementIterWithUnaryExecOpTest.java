@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOps;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class ResultElementIterWithUnaryExecOpTest
 {
@@ -21,7 +21,7 @@ public class ResultElementIterWithUnaryExecOpTest
 		final ResultElementIterWithUnaryExecOp it = new ResultElementIterWithUnaryExecOp(
 				op,
 				TestUtils.createResultElementIteratorForTests(),
-				TestUtils.createExecContextForTests() );
+				TestUtils.createQueryProcContextForTests() );
 
 		assertEquals( op, it.getOp() );
 	}
@@ -84,7 +84,7 @@ public class ResultElementIterWithUnaryExecOpTest
 		return new ResultElementIterWithUnaryExecOp(
 				op,
 				TestUtils.createResultElementIteratorForTests(elements),
-				TestUtils.createExecContextForTests() );
+				TestUtils.createQueryProcContextForTests() );
 	}
 
 	protected static ResultElementIterator createIterator2ForTests( final SolutionMapping... elements ) {
@@ -92,14 +92,14 @@ public class ResultElementIterWithUnaryExecOpTest
 		return new ResultElementIterWithUnaryExecOp(
 				op,
 				TestUtils.createResultElementIteratorForTests(elements),
-				TestUtils.createExecContextForTests() );
+				TestUtils.createQueryProcContextForTests() );
 	}
 
 	protected static class UnaryExecutableOp1ForTest extends UnaryExecutableOp2ForTest
 	{
 		@Override
 		public void concludeExecution( final IntermediateResultElementSink sink,
-		                               final ExecutionContext execCxt )
+		                               final QueryProcContextExt ctx )
 		{
 			sink.send( TestUtils.createSolutionMappingForTests("added") );
 		}
@@ -112,7 +112,7 @@ public class ResultElementIterWithUnaryExecOpTest
 		@Override
 		public void process( final SolutionMapping inputSolMap,
 		                     final IntermediateResultElementSink sink,
-		                     final ExecutionContext execCxt )
+		                     final QueryProcContextExt ctx )
 		{
 			final String token = inputSolMap.toString() + "ok";
 			sink.send( TestUtils.createSolutionMappingForTests(token) );
@@ -120,7 +120,7 @@ public class ResultElementIterWithUnaryExecOpTest
 
 		@Override
 		public void concludeExecution( final IntermediateResultElementSink sink,
-		                               final ExecutionContext execCxt )
+		                               final QueryProcContextExt ctx )
 		{
 		}
 

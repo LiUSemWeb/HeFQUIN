@@ -16,7 +16,7 @@ public abstract class SourcePlannerBase implements SourcePlanner
 {
 	@Override
 	public final Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Query query,
-	                                                                            final QueryProcContext ctxt )
+	                                                                            final QueryProcContext ctx )
 			throws SourcePlanningException
 	{
 		final Op jenaOp;
@@ -32,9 +32,9 @@ public abstract class SourcePlannerBase implements SourcePlanner
 			throw new UnsupportedOperationException( query.getClass().getName() );
 		}
 
-		return createSourceAssignment(jenaOp, ctxt);
+		return createSourceAssignment(jenaOp, ctx);
 	}
 
-	protected abstract Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( Op jenaOp, QueryProcContext ctxt )
+	protected abstract Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( Op jenaOp, QueryProcContext ctx )
 			throws SourcePlanningException;
 }

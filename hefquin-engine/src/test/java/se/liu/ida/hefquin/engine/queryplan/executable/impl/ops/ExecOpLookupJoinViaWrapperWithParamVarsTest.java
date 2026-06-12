@@ -26,8 +26,8 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 
@@ -52,7 +52,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(v, lit);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext cxt = getExecContextForTests(null);
+		final QueryProcContextExt cxt = getExtendedQueryProcContextForTests(null);
 
 		op.process(smIn, sink, cxt);
 		op.concludeExecution(sink, cxt);
@@ -91,7 +91,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final SolutionMapping smIn = SolutionMappingUtils.createSolutionMapping(v, lit);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext cxt = getExecContextForTests(null);
+		final QueryProcContextExt cxt = getExtendedQueryProcContextForTests(null);
 
 		op.process(smIn, sink, cxt);
 		op.concludeExecution(sink, cxt);
@@ -131,7 +131,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 				t, litForT );
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext cxt = getExecContextForTests(null);
+		final QueryProcContextExt cxt = getExtendedQueryProcContextForTests(null);
 
 		op.process(smIn, sink, cxt);
 		op.concludeExecution(sink, cxt);
@@ -175,7 +175,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 				t, litForT );
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext cxt = getExecContextForTests(null);
+		final QueryProcContextExt cxt = getExtendedQueryProcContextForTests(null);
 
 		op.process(smIn, sink, cxt);
 		op.concludeExecution(sink, cxt);
@@ -210,7 +210,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final SolutionMapping smIn2 = SolutionMappingUtils.createSolutionMapping(v, lit);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext cxt = getExecContextForTests(null);
+		final QueryProcContextExt cxt = getExtendedQueryProcContextForTests(null);
 
 		op.process(smIn1, sink, cxt);
 		op.process(smIn2, sink, cxt);
@@ -250,7 +250,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVarsTest extends ExecOpTestBase
 		final SolutionMapping smIn2 = SolutionMappingUtils.createSolutionMapping(v, lit);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final ExecutionContext cxt = getExecContextForTests(null);
+		final QueryProcContextExt cxt = getExtendedQueryProcContextForTests(null);
 
 		op.process(smIn1, sink, cxt);
 		op.process(smIn2, sink, cxt);

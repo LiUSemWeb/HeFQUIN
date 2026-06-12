@@ -20,9 +20,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.members.RDFBasedFederationMember;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
@@ -31,19 +31,13 @@ import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINA
 
 public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 {
-	protected final FederationAccessManager fedAccMgr;
-
-	public RequestBasedCardinalityEstimator( final FederationAccessManager fedAccMgr ) {
-		assert fedAccMgr != null;
-		this.fedAccMgr = fedAccMgr;
-	}
-
 	@Override
-	public void addCardinalities( final LogicalPlan ... plans ) {
+	public void addCardinalities( final QueryProcContext ctx,
+	                              final LogicalPlan ... plans ) {
 		// As a first step, make sure that all nullary subplans (i.e.,
 		// with request operators) within the given plans are annotated
 		// with a cardinality estimate.
-		addCardinalitiesForRequests(plans);
+		addCardinalitiesForRequests(ctx, plans);
 
 		// Now, use the worker to determine the cardinality estimates
 		// for the given plans recursively. 
@@ -51,11 +45,12 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 	}
 
 	@Override
-	public void addCardinalities( final PhysicalPlan ... plans ) {
+	public void addCardinalities( final QueryProcContext ctx,
+	                              final PhysicalPlan ... plans ) {
 		// As a first step, make sure that all nullary subplans (i.e.,
 		// with request operators) within the given plans are annotated
 		// with a cardinality estimate.
-		addCardinalitiesForRequests(plans);
+		addCardinalitiesForRequests(ctx, plans);
 
 		// Now, use the worker to determine the cardinality estimates
 		// for the given plans recursively. 
@@ -68,7 +63,8 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 	 * given plans is annotated with cardinality estimates (which
 	 * are determined by issuing cardinality requests).
 	 */
-	public void addCardinalitiesForRequests( final LogicalPlan ... plans ) {
+	public void addCardinalitiesForRequests( final QueryProcContext ctx,
+	                                         final LogicalPlan ... plans ) {
 		// Recursively extract all relevant nullary subplans from the
 		// given plan, where a nullary subplan is considered relevant
 		// if it does not yet have a cardinality estimate.
@@ -103,7 +99,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		}
 
 		// Now we are ready to add the cardinality estimates.
-		addCardinalitiesForRequests(reqOps, infoObjs);
+		addCardinalitiesForRequests(reqOps, infoObjs, ctx);
 	}
 
 	/**
@@ -111,7 +107,8 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 	 * given plans is annotated with cardinality estimates (which
 	 * are determined by issuing cardinality requests).
 	 */
-	public void addCardinalitiesForRequests( final PhysicalPlan ... plans ) {
+	public void addCardinalitiesForRequests( final QueryProcContext ctx,
+	                                         final PhysicalPlan ... plans ) {
 		// Recursively extract all relevant nullary subplans from the
 		// given plan, where a nullary subplan is considered relevant
 		// if it does not yet have a cardinality estimate.
@@ -141,14 +138,15 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		}
 
 		// Now we are ready to add the cardinality estimates.
-		addCardinalitiesForRequests(reqOps, infoObjs);
+		addCardinalitiesForRequests(reqOps, infoObjs, ctx);
 	}
 
 	protected void addCardinalitiesForRequests( final List<LogicalOpRequest<?,?>> reqOps,
-	                                            final List<QueryPlanningInfo> infoObjs ) {
+	                                            final List<QueryPlanningInfo> infoObjs,
+	                                            final QueryProcContext ctx ) {
 		final CardinalityResponse[] resps;
 		try {
-			resps = FederationAccessUtils.performCardinalityRequests( fedAccMgr,
+			resps = FederationAccessUtils.performCardinalityRequests( ctx.getFederationAccessMgr(),
 			                                                          reqOps );
 		}
 		catch ( final FederationAccessException e ) {

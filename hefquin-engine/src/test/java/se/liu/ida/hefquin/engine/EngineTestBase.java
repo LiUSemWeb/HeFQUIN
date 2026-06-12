@@ -27,11 +27,15 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
@@ -94,19 +98,94 @@ public abstract class EngineTestBase
 		);
 	}
 
-	protected ExecutionContext getExecContextForTests( final ExecutorService execService ) {
+	protected class QueryProcContextForTests implements QueryProcContext {
+		protected final FederationCatalog fedCatalog;
+		protected final FederationAccessManager fedAccMgr;
+
+		public QueryProcContextForTests( final FederationCatalog fedCatalog,
+		                                 final FederationAccessManager fedAccMgr ) {
+			this.fedCatalog = fedCatalog;
+			this.fedAccMgr = fedAccMgr;
+		}
+
+		public QueryProcContextForTests( final FederationCatalog fedCatalog ) {
+			this( fedCatalog, null );
+		}
+
+		public QueryProcContextForTests( final FederationAccessManager fedAccMgr ) {
+			this( null, fedAccMgr );
+		}
+
+		@Override
+		public FederationCatalog getFederationCatalog() {
+			if ( fedCatalog != null ) return fedCatalog;
+
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public FederationAccessManager getFederationAccessMgr() {
+			if ( fedAccMgr != null ) return fedAccMgr;
+
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public ExecutorService getExecutorServiceForPlanTasks() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public LogicalPlanPrinter getSourceAssignmentPrinter() {
+			return null;
+		}
+
+		@Override
+		public LogicalPlanPrinter getLogicalPlanPrinter() {
+			return null;
+		}
+
+		@Override
+		public PhysicalPlanPrinter getPhysicalPlanPrinter() {
+			return null;
+		}
+
+		@Override
+		public ExecutablePlanPrinter getExecutablePlanPrinter() {
+			return null;
+		}
+
+		@Override
+		public boolean isExperimentRun() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean skipExecution() {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	protected QueryProcContextExt getExtendedQueryProcContextForTests( final ExecutorService execService ) {
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		final LogicalToPhysicalPlanConverter lp2pp = new LogicalToPhysicalPlanConverterImpl(false, false);
 		final LogicalToPhysicalOpConverter lop2pop = getLOP2POPForTests();
 
-		return new ExecutionContext() {
+		return new QueryProcContextExt() {
 			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
+
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
-			@Override public boolean isExperimentRun() { return false; }
-			@Override public boolean skipExecution() { return false; }
+
+			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return null; }
+			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return null; }
+			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return null; }
+			@Override public ExecutablePlanPrinter getExecutablePlanPrinter() { return null; }
+
+			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
+			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
 		};
 	}
 

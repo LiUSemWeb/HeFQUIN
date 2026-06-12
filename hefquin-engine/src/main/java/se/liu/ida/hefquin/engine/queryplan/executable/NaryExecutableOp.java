@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * A specialization of the {@link ExecutableOperator} interface that
@@ -21,7 +21,7 @@ public interface NaryExecutableOp extends ExecutableOperator
 	void processInputFromXthChild( int x,
 	                               SolutionMapping inputSolMap,
 	                               IntermediateResultElementSink sink,
-	                               ExecutionContext execCxt ) throws ExecOpExecutionException;
+	                               QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	/**
 	 * Processes the solution mappings oft he given list as input coming from
@@ -39,9 +39,9 @@ public interface NaryExecutableOp extends ExecutableOperator
 	default void processInputFromXthChild( final int x,
 	                                       final List<SolutionMapping> inputSolMaps,
 	                                       final IntermediateResultElementSink sink,
-	                                       final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	                                       final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
-			processInputFromXthChild(x, sm, sink, execCxt );
+			processInputFromXthChild(x, sm, sink, ctx);
 		}
 	}
 
@@ -56,5 +56,5 @@ public interface NaryExecutableOp extends ExecutableOperator
 	 */
 	void wrapUpForXthChild( int x,
 	                        IntermediateResultElementSink sink,
-	                        ExecutionContext execCxt ) throws ExecOpExecutionException;
+	                        QueryProcContextExt ctx ) throws ExecOpExecutionException;
 }

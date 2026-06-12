@@ -8,5 +8,7 @@ public class HeFQUINEngineConstants extends HeFQUINConstants
 {
 	public static final Symbol sysEngine                  = Symbol.create(systemVarNS+"engine");
 
+	public static final Symbol sysQueryProcContext        = Symbol.create(systemVarNS+"queryProcContext");
+
 	public static final Symbol sysQProcStatsAndExceptions = Symbol.create(systemVarNS+"queryProcStatsAndExceptions");
 }

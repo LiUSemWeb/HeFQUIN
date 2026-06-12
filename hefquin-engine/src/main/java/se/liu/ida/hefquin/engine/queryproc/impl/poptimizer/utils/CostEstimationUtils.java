@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.base.utils.CompletableFutureUtils;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
@@ -19,10 +20,11 @@ public class CostEstimationUtils
 	 * function, where the i-th value is for the i-th plan that is given.
 	 */
 	public static Double[] getEstimates( final CostModel costModel,
+	                                     final QueryProcContext ctx,
 	                                     final PhysicalPlan... plans )
 			throws CostEstimationException
 	{
-		return getEstimates( costModel, Arrays.asList(plans) );
+		return getEstimates( costModel, ctx, Arrays.asList(plans) );
 	}
 
 	/**
@@ -34,6 +36,7 @@ public class CostEstimationUtils
 	 * plan in the given list.
 	 */
 	public static Double[] getEstimates( final CostModel costModel,
+	                                     final QueryProcContext ctx, 
 	                                     final List<PhysicalPlan> plans )
 			throws CostEstimationException
 	{
@@ -44,8 +47,9 @@ public class CostEstimationUtils
 		for ( List<PhysicalPlan> oneBlockOfPlans : blockOfPlans ) {
 			@SuppressWarnings("unchecked")
 			final CompletableFuture<Double>[] futures = new CompletableFuture[oneBlockOfPlans.size()];
-			for (int i = 0; i < oneBlockOfPlans.size(); ++i) {
-				futures[i] = costModel.initiateCostEstimation(oneBlockOfPlans.get(i));
+			for ( int i = 0; i < oneBlockOfPlans.size(); ++i ) {
+				final PhysicalPlan ithPlan = oneBlockOfPlans.get(i);
+				futures[i] = costModel.initiateCostEstimation(ithPlan, ctx);
 			}
 
 			try {

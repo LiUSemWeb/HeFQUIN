@@ -28,7 +28,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
@@ -237,19 +237,18 @@ public abstract class BaseForExecOpParallelBindJoin<
 
 		this.allJoinVarsAreCertain = BaseForExecOpSequentialBindJoin.areAllJoinVarsAreCertain(varsInQuery, inputVars);
 
-		log.info(
-			"Initialized ParallelBindJoin operator for endpoint {} with batchSize={}, outerJoinSemantics={}, joinVars={}, allJoinVarsCertain={}",
-			fm,
-			batchSize,
-			useOuterJoinSemantics,
-			varsInQuery,
-			allJoinVarsAreCertain );
+		log.info( "Initialized ParallelBindJoin operator for endpoint {} with batchSize={}, outerJoinSemantics={}, joinVars={}, allJoinVarsCertain={}",
+		          fm,
+		          batchSize,
+		          useOuterJoinSemantics,
+		          varsInQuery,
+		          allJoinVarsAreCertain );
 	}
 
 	@Override
 	protected void _processCollectedInput( final List<SolutionMapping> inputSolMaps,
 	                                       final IntermediateResultElementSink sink,
-	                                       final ExecutionContext execCxt )
+	                                       final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
 		// Iterate over the given input solution mappings to split them into
@@ -261,7 +260,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// join with every solution for the query of this operator), switch
 		// into full-retrieval mode.
 		for ( final SolutionMapping sm : inputSolMaps ) {
-			batchUp(sm, sink, execCxt);
+			batchUp(sm, sink, ctx);
 		}
 
 		// If the resulting collection of *full* batches is not empty
@@ -273,7 +272,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// populating that batch at the next call of this function or, at
 		// the latest, within the '_concludeExecution' function.
 		if ( ! batches.isEmpty() ) {
-			initiateProcessingOfBatches(sink, execCxt);
+			initiateProcessingOfBatches(sink, ctx);
 
 			// After performing the requests (and handling their
 			// responses), we can forget about the full batches
@@ -285,7 +284,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 
 	protected void batchUp( final SolutionMapping inputSolMap,
 	                        final IntermediateResultElementSink sink,
-	                        final ExecutionContext execCxt )
+	                        final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
 		// First, check whether we had to switch into full-retrieval mode,
@@ -310,7 +309,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// query/pattern of this bind-join operator. In this case, we need
 		// to switch into full-retrieval mode.
 		if ( restrictedInputSolMap.isEmpty() ) {
-			switchToFullRetrievalMode(execCxt, sink);
+			switchToFullRetrievalMode(sink, ctx);
 			joinInFullRetrievalMode(inputSolMap, sink);
 			return;
 		}
@@ -397,13 +396,13 @@ public abstract class BaseForExecOpParallelBindJoin<
 	@Override
 	protected void _concludeExecution( final List<SolutionMapping> inputSolMaps,
 	                                   final IntermediateResultElementSink sink,
-	                                   ExecutionContext execCxt )
+	                                   final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		// Before concluding, we process the given input solution mappings
 		// as usual, if there are any.
 		if ( ! inputSolMaps.isEmpty() ) {
-			_processCollectedInput(inputSolMaps, sink, execCxt);
+			_processCollectedInput(inputSolMaps, sink, ctx);
 		}
 
 		// If we did not have to switch into full-retrieval mode (i.e., we
@@ -415,7 +414,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 				batches.add(currentBatch);
 				solMapsCoveredPerBatch.add(solMapsCoveredByCurrentBatch);
 
-				initiateProcessingOfBatches(sink, execCxt);
+				initiateProcessingOfBatches(sink, ctx);
 
 				currentBatch                 = null;
 				solMapsCoveredByCurrentBatch = null;
@@ -447,7 +446,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 	 * response with the solution mappings covered by the corresponding batch.
 	 */
 	protected void initiateProcessingOfBatches( final IntermediateResultElementSink sink,
-	                                            final ExecutionContext execCxt )
+	                                            final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		assert batches.size() == solMapsCoveredPerBatch.size();
@@ -469,7 +468,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 			// Issue the request via the federation access manager.
 			final CompletableFuture<RespType> f;
 			try {
-				f = execCxt.getFederationAccessMgr().issueRequest(req, fm);
+				f = ctx.getFederationAccessMgr().issueRequest(req, fm);
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
@@ -613,11 +612,11 @@ public abstract class BaseForExecOpParallelBindJoin<
 	 * these retrieved solution mappings with all the input solution mappings
 	 * collected so far; resulting solution mappings are send to the given sink.
 	 */
-	protected void switchToFullRetrievalMode( final ExecutionContext execCxt,
-	                                          final IntermediateResultElementSink sink )
+	protected void switchToFullRetrievalMode( final IntermediateResultElementSink sink,
+	                                          final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
-		obtainFullResult(execCxt);
+		obtainFullResult(ctx);
 		handleCollectedSolMaps(sink);
 	}
 
@@ -626,14 +625,14 @@ public abstract class BaseForExecOpParallelBindJoin<
 	 * of this operator (see {@link #createExecutableReqOpForAll}) and puts
 	 * the retrieved solution mappings into {@link #fullResult}.
 	 */
-	protected void obtainFullResult( final ExecutionContext execCxt )
+	protected void obtainFullResult( final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableReqOpForAll();
 
 		final CollectingIntermediateResultElementSink mySink = new CollectingIntermediateResultElementSink();
 		try {
-			reqOp.execute(mySink, execCxt);
+			reqOp.execute(mySink, ctx);
 		}
 		catch ( final ExecOpExecutionException e ) {
 			throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
