@@ -205,6 +205,7 @@ public class SparqlServlet extends HttpServlet {
 	 *
 	 * @param queryString the SPARQL query string
 	 * @param mimeType    the MIME type for the response format
+	 * @param ctx         the processing context
 	 * @return the query result and exceptions in JSON format
 	 */
 	private static JsonObject execute( final String queryString, final String mimeType, final QueryProcContext ctx )
