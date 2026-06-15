@@ -54,11 +54,12 @@ import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12He
  */
 public class RunHttpQuery extends CmdARQ
 {
-	protected final ModTime       modTime =    new ModTime();
-	protected final ModResultsOut modResults = new ModResultsOut();
-	protected final ModQuery      modQuery =   new ModQuery();
+	protected final ModTime        modTime =     new ModTime();
+	protected final ModQuery       modQuery =    new ModQuery();
+	protected final ModResultsOut  modResults =  new ModResultsOut();
 
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl( ArgDecl.NoValue, "suppressResultPrintout" );
+	protected final ArgDecl argSkipExecution = new ArgDecl( ArgDecl.NoValue, "skipExecution" );
 	protected final ArgDecl argServerAddress = new ArgDecl( ArgDecl.HasValue, "server" );
 	protected final ArgDecl argOutputToFile =  new ArgDecl( ArgDecl.HasValue, "outputToFile" );
 
@@ -77,6 +78,7 @@ public class RunHttpQuery extends CmdARQ
 		addModule( modResults );
 
 		add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
+		add( argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)" );
 		add( argServerAddress, "--server", "Address of HeFQUIN service" );
 		add( argOutputToFile, "--outputToFile", "Output file (optional, printing to stdout if omitted)" );
 
@@ -175,12 +177,18 @@ public class RunHttpQuery extends CmdARQ
 			.connectTimeout( Duration.ofMillis(5000) )
 			.build();
 
-		final HttpRequest request = HttpRequest.newBuilder()
+		final HttpRequest.Builder builder = HttpRequest.newBuilder()
 			.uri( URI.create(serverURI) )
 			.header( "Content-Type", "application/sparql-query" )
 			.header( "Accept", "application/sparql-results+json" )
 			.timeout( Duration.ofSeconds(60) )
-			.POST( HttpRequest.BodyPublishers.ofString(prepareQuery( query )) )
+			.POST( HttpRequest.BodyPublishers.ofString(prepareQuery( query )) );
+
+		if ( contains(argSkipExecution) )
+			builder.header( "X-HeFQUIN-Skip-Execution", "true" );
+
+		final HttpRequest request = builder
+			.POST( HttpRequest.BodyPublishers.ofString(query.toString()) )
 			.build();
 
 		final HttpResponse<InputStream> response;

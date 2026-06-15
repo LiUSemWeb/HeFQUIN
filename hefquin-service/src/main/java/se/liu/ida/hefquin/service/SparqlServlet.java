@@ -27,6 +27,8 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 
 /**
@@ -137,10 +139,15 @@ public class SparqlServlet extends HttpServlet {
 			return;
 		}
 
+		// Create QueryProcContext using request-specific execution settings
+		final QueryProcContextBuilder ctxBuilder = engine.getQueryProcContextBuilder()
+					.setSkipExecution( Boolean.valueOf( request.getHeader("X-HeFQUIN-Skip-Execution") ) );
+		final QueryProcContext ctx = ctxBuilder.build();
+
 		try {
 			logger.debug( "Received SPARQL query: {}", query );
 
-			final JsonObject result = execute( query, mimeType );
+			final JsonObject result = execute( query, mimeType, ctx );
 			if ( ! result.get( "exceptions" ).getAsArray().isEmpty() ) {
 				writeJsonError( response, 500, result.get( "exceptions" ) );
 				return;
@@ -200,7 +207,7 @@ public class SparqlServlet extends HttpServlet {
 	 * @param mimeType    the MIME type for the response format
 	 * @return the query result and exceptions in JSON format
 	 */
-	private static JsonObject execute( final String queryString, final String mimeType )
+	private static JsonObject execute( final String queryString, final String mimeType, final QueryProcContext ctx )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
 		final Query query = QueryFactory.create( queryString, SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN );
@@ -209,7 +216,7 @@ public class SparqlServlet extends HttpServlet {
 
 		final QueryProcessingStatsAndExceptions statsAndExceptions;
 		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
-			statsAndExceptions = engine.executeQueryAndPrintResult(query, resultsFormat, ps);
+			statsAndExceptions = engine.executeQueryAndPrintResult(query, resultsFormat, ps, ctx);
 		}
 
 		final JsonObject res = new JsonObject();
