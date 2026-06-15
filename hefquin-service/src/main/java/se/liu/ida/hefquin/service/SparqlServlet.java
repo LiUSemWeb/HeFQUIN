@@ -141,7 +141,7 @@ public class SparqlServlet extends HttpServlet {
 
 		// Create QueryProcContext using request-specific execution settings
 		final QueryProcContextBuilder ctxBuilder = engine.getQueryProcContextBuilder()
-					.setSkipExecution( Boolean.valueOf( request.getHeader("X-HeFQUIN-Skip-Execution") ) );
+					.setSkipExecution( Boolean.parseBoolean( request.getHeader("X-HeFQUIN-Skip-Execution") ) );
 		final QueryProcContext ctx = ctxBuilder.build();
 
 		try {
