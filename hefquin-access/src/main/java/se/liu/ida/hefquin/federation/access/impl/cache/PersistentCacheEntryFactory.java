@@ -1,17 +1,16 @@
-package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
+package se.liu.ida.hefquin.federation.access.impl.cache;
 
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntry;
 
 /**
  * Factory for creating {@link PersistentCacheEntry} instances with the
  * current system time as creation timestamp.
  */
-public class ChronicleMapCacheEntryFactory implements CacheEntryFactory<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>>
+public class PersistentCacheEntryFactory implements CacheEntryFactory<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>>
 {
 	/**
 	 * Creates a new cache entry for the given object, using the current time

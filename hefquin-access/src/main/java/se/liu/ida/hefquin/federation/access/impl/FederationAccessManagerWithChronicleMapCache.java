@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntry;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntryFactory;
+import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntryFactory;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey.ResponseMode;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
@@ -318,7 +318,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 				                         CompletableFuture<? extends DataRetrievalResponse<?>>,
 				                         PersistentCacheEntry>
 	{
-		final ChronicleMapCacheEntryFactory cef = new ChronicleMapCacheEntryFactory();
+		final PersistentCacheEntryFactory cef = new PersistentCacheEntryFactory();
 
 		final CacheReplacementPolicyFactory<ChronicleMapCacheKey,
 		                                    CompletableFuture<? extends DataRetrievalResponse<?>>,
@@ -339,7 +339,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		}
 
 		@Override
-		public ChronicleMapCacheEntryFactory getEntryFactory() {
+		public PersistentCacheEntryFactory getEntryFactory() {
 			return cef;
 		}
 

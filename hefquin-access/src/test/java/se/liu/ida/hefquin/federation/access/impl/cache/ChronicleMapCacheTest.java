@@ -38,7 +38,6 @@ import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntryFactory;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
@@ -452,7 +451,7 @@ public class ChronicleMapCacheTest extends FederationTestBase
 				                         CompletableFuture<? extends DataRetrievalResponse<?>>,
 				                         PersistentCacheEntry>
 	{
-		final ChronicleMapCacheEntryFactory cef = new ChronicleMapCacheEntryFactory();
+		final PersistentCacheEntryFactory cef = new PersistentCacheEntryFactory();
 
 		final CacheReplacementPolicyFactory<ChronicleMapCacheKey,
 		                                    CompletableFuture<? extends DataRetrievalResponse<?>>,
@@ -477,7 +476,7 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		}
 
 		@Override
-		public ChronicleMapCacheEntryFactory getEntryFactory() {
+		public PersistentCacheEntryFactory getEntryFactory() {
 			return cef;
 		}
 
