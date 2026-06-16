@@ -201,7 +201,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 					jsonObject = new JsonObject(jsonString);
 				}
 				catch ( final JsonPathException e ) {
-					cmdError( "Invalid JSON input: failed to parse JSON string.", true );
+					cmdError( "Parsing JSON string from " + file.getPath() + " failed:" + e.getMessage(), true );
 					return;
 				}
 

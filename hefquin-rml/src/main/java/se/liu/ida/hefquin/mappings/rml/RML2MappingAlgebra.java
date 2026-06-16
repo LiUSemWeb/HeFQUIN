@@ -308,7 +308,7 @@ public class RML2MappingAlgebra
 			return new FileSourceReference(src);
 		else {
 			throw new RMLParserException(
-				"Unsupported rml:source type: " + src
+				"The following object of an rml:source triple has an unsupported or unspecified type: " + src
 			);
 		}
 	}
@@ -671,6 +671,6 @@ public class RML2MappingAlgebra
 			         && sr.file.equals(file) );
 		}
 
-		public File getFile() { return this.file; }
+		public File getFile() { return file; }
 	}
 }
