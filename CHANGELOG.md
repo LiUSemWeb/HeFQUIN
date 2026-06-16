@@ -10,11 +10,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Support for ChronicleMap-based persistent cache for federation requests (including cardinality requests), with support for cache replacement and invalidation policies ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
 - CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616), [#643](https://github.com/LiUSemWeb/HeFQUIN/issues/643)).
 ### Changed
-- Removes ChronicleMap-based cardinality-specific cache implementation (ChronicleMapCardinalityCache) and related files ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
 - Pushing projection variables and distinct into requests to SPARQL endpoints ([#600](https://github.com/LiUSemWeb/HeFQUIN/issues/600), [#629](https://github.com/LiUSemWeb/HeFQUIN/issues/629), [#638](https://github.com/LiUSemWeb/HeFQUIN/issues/638), [#639](https://github.com/LiUSemWeb/HeFQUIN/issues/639), [#642](https://github.com/LiUSemWeb/HeFQUIN/issues/642)).
 - Logging for query planner ([#636](https://github.com/LiUSemWeb/HeFQUIN/pull/636), [#637](https://github.com/LiUSemWeb/HeFQUIN/pull/637)).
 - Refactoring of  the context objects that are passed around during query processing ([#645](https://github.com/LiUSemWeb/HeFQUIN/issues/645)).
 - Fixing example vocabulary mapping for Wikidata to make the example query work ([#640](https://github.com/LiUSemWeb/HeFQUIN/issues/640)).
+- Removes ChronicleMap-based cardinality-specific cache implementation (ChronicleMapCardinalityCache) and related files ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
+- Remove wrapped response from CardinalityResponseImpl ([#628](https://github.com/LiUSemWeb/HeFQUIN/pull/628)).
 ### Planned for Next Release
 - Persistent cache for requests ([#546](https://github.com/LiUSemWeb/HeFQUIN/issues/546), [#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590), [#599](https://github.com/LiUSemWeb/HeFQUIN/issues/599)).
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
@@ -31,7 +32,6 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Adding a logical plan rewriting that pushes project operators ([#580](https://github.com/LiUSemWeb/HeFQUIN/pull/580)).
 - Initial version of a CLI tool to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601)).
 ### Changed
-- Remove wrapped response from CardinalityResponseImpl ([#628](https://github.com/LiUSemWeb/HeFQUIN/pull/628)).
 - Reorganization of the vocabulary for federation descriptions ([#597](https://github.com/LiUSemWeb/HeFQUIN/pull/597), [#615](https://github.com/LiUSemWeb/HeFQUIN/pull/615)).
 - Makes the parallel version of VALUES-based bind join the default bind-join variant ([#623](https://github.com/LiUSemWeb/HeFQUIN/pull/623)).
 - Refactoring the code of the logical plan rewriting rules to use the visitor pattern ([#560](https://github.com/LiUSemWeb/HeFQUIN/pull/560), [#569](https://github.com/LiUSemWeb/HeFQUIN/pull/569), [#571](https://github.com/LiUSemWeb/HeFQUIN/pull/571), [#575](https://github.com/LiUSemWeb/HeFQUIN/pull/575)).
