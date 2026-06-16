@@ -35,6 +35,7 @@ import org.apache.jena.sparql.util.QueryExecUtils;
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
+import se.liu.ida.hefquin.base.net.http.HttpConstants;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
@@ -54,11 +55,12 @@ import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12He
  */
 public class RunHttpQuery extends CmdARQ
 {
-	protected final ModTime       modTime =    new ModTime();
-	protected final ModResultsOut modResults = new ModResultsOut();
-	protected final ModQuery      modQuery =   new ModQuery();
+	protected final ModTime        modTime =     new ModTime();
+	protected final ModQuery       modQuery =    new ModQuery();
+	protected final ModResultsOut  modResults =  new ModResultsOut();
 
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl( ArgDecl.NoValue, "suppressResultPrintout" );
+	protected final ArgDecl argSkipExecution = new ArgDecl( ArgDecl.NoValue, "skipExecution" );
 	protected final ArgDecl argServerAddress = new ArgDecl( ArgDecl.HasValue, "server" );
 	protected final ArgDecl argOutputToFile =  new ArgDecl( ArgDecl.HasValue, "outputToFile" );
 
@@ -77,6 +79,7 @@ public class RunHttpQuery extends CmdARQ
 		addModule( modResults );
 
 		add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
+		add( argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)" );
 		add( argServerAddress, "--server", "Address of HeFQUIN service" );
 		add( argOutputToFile, "--outputToFile", "Output file (optional, printing to stdout if omitted)" );
 
@@ -175,13 +178,17 @@ public class RunHttpQuery extends CmdARQ
 			.connectTimeout( Duration.ofMillis(5000) )
 			.build();
 
-		final HttpRequest request = HttpRequest.newBuilder()
+		final HttpRequest.Builder builder = HttpRequest.newBuilder()
 			.uri( URI.create(serverURI) )
 			.header( "Content-Type", "application/sparql-query" )
 			.header( "Accept", "application/sparql-results+json" )
 			.timeout( Duration.ofSeconds(60) )
-			.POST( HttpRequest.BodyPublishers.ofString(prepareQuery( query )) )
-			.build();
+			.POST( HttpRequest.BodyPublishers.ofString(prepareQuery( query )) );
+
+		if ( contains(argSkipExecution) )
+			builder.header( HttpConstants.X_HEADER_SKIP_EXECUTION, "true" );
+
+		final HttpRequest request = builder.build();
 
 		final HttpResponse<InputStream> response;
 		try {
