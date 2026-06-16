@@ -47,12 +47,6 @@
       <artifactId>hefquin-service</artifactId>
       <version>0.0.12-SNAPSHOT</version>
     </dependency>
-	  <!-- hefquin-base -->
-    <dependency>
-      <groupId>se.liu.research.hefquin</groupId>
-      <artifactId>hefquin-base</artifactId>
-      <version>0.0.12-SNAPSHOT</version>
-    </dependency>
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>jena-cmds</artifactId>
