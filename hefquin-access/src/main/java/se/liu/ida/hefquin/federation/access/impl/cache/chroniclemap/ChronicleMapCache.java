@@ -18,6 +18,7 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
+import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntry;
 
 /**
  * Persistent cache backed by a {@link ChronicleMap}.
@@ -74,12 +75,12 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 	protected static final int DEFAULT_CAPACITY = 1000;
 	protected static final String DEFAULT_FILENAME = "cache/chronicle-map.dat";
 
-	protected final ChronicleMap<ChronicleMapCacheKey, ChronicleMapCacheEntry> map;
-	protected final Map<ChronicleMapCacheKey, ChronicleMapCacheEntry> inMemoryCache;
+	protected final ChronicleMap<ChronicleMapCacheKey, PersistentCacheEntry> map;
+	protected final Map<ChronicleMapCacheKey, PersistentCacheEntry> inMemoryCache;
 
-	protected final CacheEntryFactory<ChronicleMapCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> entryFactory;
-	protected final CacheReplacementPolicy<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, ChronicleMapCacheEntry> replacementPolicy;
-	protected final CacheInvalidationPolicy<ChronicleMapCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> invalidPolicy;
+	protected final CacheEntryFactory<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> entryFactory;
+	protected final CacheReplacementPolicy<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> replacementPolicy;
+	protected final CacheInvalidationPolicy<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> invalidPolicy;
 
 	protected final int capacity;
 	protected final String filename;
@@ -90,7 +91,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 	 * @param policies the cache policies to use
 	 * @throws IOException if the cache file cannot be created or opened
 	 */
-	public ChronicleMapCache( final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, ChronicleMapCacheEntry> policies )
+	public ChronicleMapCache( final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
 			throws IOException {
 		this(DEFAULT_CAPACITY, DEFAULT_FILENAME, policies);
 	}
@@ -103,7 +104,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 	 * @throws IOException if the cache file cannot be created or opened
 	 */
 	public ChronicleMapCache( final int capacity,
-	                          final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, ChronicleMapCacheEntry> policies )
+	                          final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
 			throws IOException {
 		this(capacity, DEFAULT_FILENAME, policies);
 	}
@@ -117,7 +118,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 	 * @throws IOException if the cache file cannot be created or opened
 	 */
 	public ChronicleMapCache( final String filename,
-	                          final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, ChronicleMapCacheEntry> policies )
+	                          final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
 			throws IOException {
 		this(DEFAULT_CAPACITY, filename, policies);
        }
@@ -138,7 +139,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 	 */
 	public ChronicleMapCache( final int capacity,
 	                          final String filename,
-	                          final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, ChronicleMapCacheEntry> policies )
+	                          final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
 			throws IOException {
 		assert capacity > 0;
 		assert policies != null;
@@ -154,7 +155,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 		inMemoryCache = new HashMap<>(capacity);
 
 		// Initialize replacement policy
-		for( final Entry<ChronicleMapCacheKey, ChronicleMapCacheEntry> entry : map.entrySet() ) {
+		for( final Entry<ChronicleMapCacheKey, PersistentCacheEntry> entry : map.entrySet() ) {
 			replacementPolicy.entryWasAdded( entry.getKey(), entry.getValue() );
 		}
 
@@ -203,12 +204,12 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 	 * @return an instance of {@link ChronicleMap}
 	 * @throws IOException if an error occurs while creating or accessing the file
 	 */
-	protected ChronicleMap<ChronicleMapCacheKey, ChronicleMapCacheEntry> initializeMap( final String filename,
+	protected ChronicleMap<ChronicleMapCacheKey, PersistentCacheEntry> initializeMap( final String filename,
 	                                                                                    final int capacity )
 			throws IOException
 	{
 		final File file = ensureParentDirectoryExists(filename);
-		return ChronicleMap.of( ChronicleMapCacheKey.class, ChronicleMapCacheEntry.class )
+		return ChronicleMap.of( ChronicleMapCacheKey.class, PersistentCacheEntry.class )
 			.name("cache-map")
 			.entries(10 * capacity)
 			.averageKeySize(248)
@@ -266,7 +267,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 		if ( value == null )
 			throw new IllegalArgumentException("Cache value must not be null");
 
-		final ChronicleMapCacheEntry entry = entryFactory.createCacheEntry(value);
+		final PersistentCacheEntry entry = entryFactory.createCacheEntry(value);
 		synchronized (map) {
 			map.compute( key, (k, oldEntry) -> {
 				inMemoryCache.put(k, entry);
@@ -308,8 +309,8 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 	@Override
 	public CompletableFuture<? extends DataRetrievalResponse<?>> get( final ChronicleMapCacheKey key ) {
 		synchronized (map) {
-			final ChronicleMapCacheEntry inMemoryEntry = inMemoryCache.get(key);
-			final ChronicleMapCacheEntry entry;
+			final PersistentCacheEntry inMemoryEntry = inMemoryCache.get(key);
+			final PersistentCacheEntry entry;
 
 			if ( inMemoryEntry != null ) {
 				entry = inMemoryEntry;
@@ -368,7 +369,7 @@ public class ChronicleMapCache implements Cache<ChronicleMapCacheKey, Completabl
 	@Override
 	public boolean evict( final ChronicleMapCacheKey key, final CompletableFuture<? extends DataRetrievalResponse<?>> value ) {
 		synchronized (map) {
-			final ChronicleMapCacheEntry entry = map.get(key);
+			final PersistentCacheEntry entry = map.get(key);
 			if ( entry != null && entry.getObject().equals(value) ) {
 				return evict(key);
 			}

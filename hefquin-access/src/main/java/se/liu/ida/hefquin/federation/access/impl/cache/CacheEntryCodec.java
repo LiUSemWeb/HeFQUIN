@@ -28,13 +28,12 @@ import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntry;
 import se.liu.ida.hefquin.federation.access.impl.response.CachedCardinalityResponse;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 
 /**
- * Codec for serializing and deserializing {@link ChronicleMapCacheEntry}
+ * Codec for serializing and deserializing {@link PersistentCacheEntry}
  * instances.
  *
  * <p>
@@ -124,7 +123,7 @@ public final class CacheEntryCodec {
 	 * @throws IllegalStateException if the response type is unsupported or the
 	 *                               contained future cannot be resolved
 	 */
-	public static void write( final DataOutput out, final ChronicleMapCacheEntry entry ) throws IOException {
+	public static void write( final DataOutput out, final PersistentCacheEntry entry ) throws IOException {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final DataOutputStream tmp = new DataOutputStream(baos);
 
@@ -201,7 +200,7 @@ public final class CacheEntryCodec {
 	 *
 	 * <p>
 	 * The input must contain data encoded according to the binary format defined by
-	 * {@link #write(DataOutput, ChronicleMapCacheEntry)}.
+	 * {@link #write(DataOutput, PersistentCacheEntry)}.
 	 * </p>
 	 *
 	 * <p>
@@ -217,7 +216,7 @@ public final class CacheEntryCodec {
 	 * @throws IllegalStateException if an unsupported response type identifier is
 	 *                               encountered
 	 */
-	public static ChronicleMapCacheEntry read( final DataInput in ) throws IOException {
+	public static PersistentCacheEntry read( final DataInput in ) throws IOException {
 		final long creationTime = in.readLong();
 		final CachedObjectType type = CachedObjectType.values()[in.readInt()];
 
@@ -272,7 +271,7 @@ public final class CacheEntryCodec {
 			throw new IllegalStateException( "Unsupported CachedObjectType: " + type );
 		}
 
-		return new ChronicleMapCacheEntry(CompletableFuture.completedFuture(object), creationTime);
+		return new PersistentCacheEntry(CompletableFuture.completedFuture(object), creationTime);
 	}
 
 	/**

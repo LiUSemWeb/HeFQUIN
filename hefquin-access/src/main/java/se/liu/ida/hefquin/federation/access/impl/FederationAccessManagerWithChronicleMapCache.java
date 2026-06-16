@@ -18,7 +18,7 @@ import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntry;
+import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntry;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntryFactory;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey.ResponseMode;
@@ -69,7 +69,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 */
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
-	                                                     final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, ChronicleMapCacheEntry> chronicleMapCachePolicies )
+	                                                     final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> chronicleMapCachePolicies )
 			throws IOException
 	{
 		super(fedAccMan, cacheCapacity);
@@ -316,23 +316,23 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	public static class DefaultChronicleMapCachePolicies
 				implements CachePolicies<ChronicleMapCacheKey,
 				                         CompletableFuture<? extends DataRetrievalResponse<?>>,
-				                         ChronicleMapCacheEntry>
+				                         PersistentCacheEntry>
 	{
 		final ChronicleMapCacheEntryFactory cef = new ChronicleMapCacheEntryFactory();
 
 		final CacheReplacementPolicyFactory<ChronicleMapCacheKey,
 		                                    CompletableFuture<? extends DataRetrievalResponse<?>>,
-		                                    ChronicleMapCacheEntry
+		                                    PersistentCacheEntry
 		                                   > crpf= new CacheReplacementPolicyFactory<>() {
 			@Override
 			public CacheReplacementPolicy<ChronicleMapCacheKey,
 			                              CompletableFuture<? extends DataRetrievalResponse<?>>,
-			                              ChronicleMapCacheEntry> create() {
+			                              PersistentCacheEntry> create() {
 				return new CacheReplacementPolicyLRU<>();
 			}
 		};
 
-		final CacheInvalidationPolicy<ChronicleMapCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> cip;
+		final CacheInvalidationPolicy<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> cip;
 
 		public DefaultChronicleMapCachePolicies( final long timeToLive ) {
 			cip = new CacheInvalidationPolicyTimeToLive<>(timeToLive);
@@ -346,12 +346,12 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		@Override
 		public CacheReplacementPolicyFactory<ChronicleMapCacheKey,
 		                                     CompletableFuture<? extends DataRetrievalResponse<?>>,
-		                                     ChronicleMapCacheEntry> getReplacementPolicyFactory() {
+		                                     PersistentCacheEntry> getReplacementPolicyFactory() {
 			return crpf;
 		}
 
 		@Override
-		public CacheInvalidationPolicy<ChronicleMapCacheEntry,
+		public CacheInvalidationPolicy<PersistentCacheEntry,
 		                               CompletableFuture<? extends DataRetrievalResponse<?>>> getInvalidationPolicy() {
 			return cip;
 		}

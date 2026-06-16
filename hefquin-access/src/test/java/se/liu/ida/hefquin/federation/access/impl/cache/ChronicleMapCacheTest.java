@@ -38,7 +38,6 @@ import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntry;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheEntryFactory;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
@@ -451,23 +450,23 @@ public class ChronicleMapCacheTest extends FederationTestBase
 	public static class CachePoliciesForTest
 				implements CachePolicies<ChronicleMapCacheKey,
 				                         CompletableFuture<? extends DataRetrievalResponse<?>>,
-				                         ChronicleMapCacheEntry>
+				                         PersistentCacheEntry>
 	{
 		final ChronicleMapCacheEntryFactory cef = new ChronicleMapCacheEntryFactory();
 
 		final CacheReplacementPolicyFactory<ChronicleMapCacheKey,
 		                                    CompletableFuture<? extends DataRetrievalResponse<?>>,
-		                                    ChronicleMapCacheEntry
+		                                    PersistentCacheEntry
 		                                   > crpf= new CacheReplacementPolicyFactory<>() {
 			@Override
 			public CacheReplacementPolicy<ChronicleMapCacheKey,
 			                              CompletableFuture<? extends DataRetrievalResponse<?>>,
-			                              ChronicleMapCacheEntry> create() {
+			                              PersistentCacheEntry> create() {
 				return new CacheReplacementPolicyLRU<>();
 			}
 		};
 
-		final CacheInvalidationPolicy<ChronicleMapCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> cip;
+		final CacheInvalidationPolicy<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> cip;
 
 		public CachePoliciesForTest() {
 			cip = new CacheInvalidationPolicyTimeToLive<>(60_000);
@@ -485,12 +484,12 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		@Override
 		public CacheReplacementPolicyFactory<ChronicleMapCacheKey,
 		                                     CompletableFuture<? extends DataRetrievalResponse<?>>,
-		                                     ChronicleMapCacheEntry> getReplacementPolicyFactory() {
+		                                     PersistentCacheEntry> getReplacementPolicyFactory() {
 			return crpf;
 		}
 
 		@Override
-		public CacheInvalidationPolicy<ChronicleMapCacheEntry,
+		public CacheInvalidationPolicy<PersistentCacheEntry,
 		                               CompletableFuture<? extends DataRetrievalResponse<?>>> getInvalidationPolicy() {
 			return cip;
 		}
