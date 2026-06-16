@@ -7,21 +7,41 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- Support for ChronicleMap-based persistent cache for federation requests (including cardinality requests), with support for cache replacement and invalidation policies ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
+- CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616), [#643](https://github.com/LiUSemWeb/HeFQUIN/issues/643)).
+### Changed
+- Pushing projection variables and distinct into requests to SPARQL endpoints ([#600](https://github.com/LiUSemWeb/HeFQUIN/issues/600), [#629](https://github.com/LiUSemWeb/HeFQUIN/issues/629), [#638](https://github.com/LiUSemWeb/HeFQUIN/issues/638), [#639](https://github.com/LiUSemWeb/HeFQUIN/issues/639), [#642](https://github.com/LiUSemWeb/HeFQUIN/issues/642)).
+- Logging for query planner ([#636](https://github.com/LiUSemWeb/HeFQUIN/pull/636), [#637](https://github.com/LiUSemWeb/HeFQUIN/pull/637)).
+- Refactoring of  the context objects that are passed around during query processing ([#645](https://github.com/LiUSemWeb/HeFQUIN/issues/645)).
+- Fixing example vocabulary mapping for Wikidata to make the example query work ([#640](https://github.com/LiUSemWeb/HeFQUIN/issues/640)).
+### Planned for Next Release
+- Persistent cache for requests ([#546](https://github.com/LiUSemWeb/HeFQUIN/issues/546), [#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590), [#599](https://github.com/LiUSemWeb/HeFQUIN/issues/599)).
+- SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
+
+
+## [0.0.11] - 2026-05-19
+### Added
 - Adding a limit on the number of parallel requests that are executed against any particular endpoint/server at any point in time ([#556](https://github.com/LiUSemWeb/HeFQUIN/pull/556)).
 - Support for MINUS directly within the HeFQUIN engine ([#586](https://github.com/LiUSemWeb/HeFQUIN/pull/586), [#587](https://github.com/LiUSemWeb/HeFQUIN/pull/587), [#592](https://github.com/LiUSemWeb/HeFQUIN/pull/592)).
 - Support for DISTINCT directly within the HeFQUIN engine ([#547](https://github.com/LiUSemWeb/HeFQUIN/pull/547), [#550](https://github.com/LiUSemWeb/HeFQUIN/pull/550), [#555](https://github.com/LiUSemWeb/HeFQUIN/pull/555), [#558](https://github.com/LiUSemWeb/HeFQUIN/pull/558)).
 - Support for projection directly within the HeFQUIN engine ([#566](https://github.com/LiUSemWeb/HeFQUIN/pull/566), [#568](https://github.com/LiUSemWeb/HeFQUIN/pull/568), [#574](https://github.com/LiUSemWeb/HeFQUIN/pull/574)).
 - Adding a new hash join algorithm and a (logical) left join operator; removing the right join operator ([#561](https://github.com/LiUSemWeb/HeFQUIN/pull/561)).
-- Adding a logical plan rewriting that removes subplans that are guaranteed to produce the empty result ([#584](https://github.com/LiUSemWeb/HeFQUIN/pull/584)).
+- Adding a logical plan rewriting that removes subplans that are guaranteed to produce the empty result ([#584](https://github.com/LiUSemWeb/HeFQUIN/pull/584), [#593](https://github.com/LiUSemWeb/HeFQUIN/pull/593)).
 - Adding a logical plan rewriting that pushes project operators ([#580](https://github.com/LiUSemWeb/HeFQUIN/pull/580)).
+- Initial version of a CLI tool to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601)).
 ### Changed
-- Remove ChronicleMap-based cardinality-specific cache implementation (ChronicleMapCardinalityCache) and related files ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
+- Reorganization of the vocabulary for federation descriptions ([#597](https://github.com/LiUSemWeb/HeFQUIN/pull/597), [#615](https://github.com/LiUSemWeb/HeFQUIN/pull/615)).
+- Makes the parallel version of VALUES-based bind join the default bind-join variant ([#623](https://github.com/LiUSemWeb/HeFQUIN/pull/623)).
 - Refactoring the code of the logical plan rewriting rules to use the visitor pattern ([#560](https://github.com/LiUSemWeb/HeFQUIN/pull/560), [#569](https://github.com/LiUSemWeb/HeFQUIN/pull/569), [#571](https://github.com/LiUSemWeb/HeFQUIN/pull/571), [#575](https://github.com/LiUSemWeb/HeFQUIN/pull/575)).
 - More effective filter push down and cardinality estimation for the case of a filter over a fixed-solmap operator ([#588](https://github.com/LiUSemWeb/HeFQUIN/pull/588)).
 - Extending filter push down with the option to push also into the pattern of a gpAdd operator ([#589](https://github.com/LiUSemWeb/HeFQUIN/pull/589)).
+- Bug fix in the executable operator for BIND ([#612](https://github.com/LiUSemWeb/HeFQUIN/pull/612)).
 - Separation of logical and physical plans for mapping algebra ([#581](https://github.com/LiUSemWeb/HeFQUIN/pull/581), [#596](https://github.com/LiUSemWeb/HeFQUIN/pull/596)).
+- Fix in RML-to-algebra translation algorithm ([#610](https://github.com/LiUSemWeb/HeFQUIN/pull/610)).
+- Fix in code that expands URI templates ([#611](https://github.com/LiUSemWeb/HeFQUIN/pull/611)).
 - Removes unused provenance-related methods from DataRetrievalResponse ([#582](https://github.com/LiUSemWeb/HeFQUIN/pull/582)).
+- Removes deprecated federation access manager ([#626](https://github.com/LiUSemWeb/HeFQUIN/pull/627)).
+- Changes some of the example queries to use the QLever SPARQL endpoints for DBpedia and Wikidata ([#620](https://github.com/LiUSemWeb/HeFQUIN/pull/620), [#621](https://github.com/LiUSemWeb/HeFQUIN/pull/621), [#622](https://github.com/LiUSemWeb/HeFQUIN/pull/622)).
+- Logging for executable operators ([#608](https://github.com/LiUSemWeb/HeFQUIN/pull/608), [#609](https://github.com/LiUSemWeb/HeFQUIN/pull/609), [#614](https://github.com/LiUSemWeb/HeFQUIN/pull/614), [#617](https://github.com/LiUSemWeb/HeFQUIN/pull/617), [#618](https://github.com/LiUSemWeb/HeFQUIN/pull/618), [#619](https://github.com/LiUSemWeb/HeFQUIN/pull/619), [#624](https://github.com/LiUSemWeb/HeFQUIN/pull/624), [#625](https://github.com/LiUSemWeb/HeFQUIN/pull/625)).
 
 
 ## [0.0.10] - 2026-03-25
