@@ -126,6 +126,29 @@ public class ChronicleMapCacheTest extends FederationTestBase
 	}
 
 	@Test
+	public void nextPageURLIsNull() throws IOException, InterruptedException, ExecutionException {
+		final ChronicleMapCache cache = new ChronicleMapCache( "cache/test/chronicle-map.dat",
+		                                                       new CachePoliciesForTest() );
+		cache.clear();
+
+		final ChronicleMapCacheKey k = new ChronicleMapCacheKey( new TPFRequestImpl(tp),
+		                                                         new TPFServerForTest("http://example.org/tpf"),
+		                                                         ChronicleMapCacheKey.ResponseMode.RESULT );
+
+		final DataRetrievalResponse<?> o = makeTPFResponse(1, null);
+
+		// Add to map
+		cache.put( k, CompletableFuture.completedFuture(o) );
+
+		// Assert equals
+		assertEquals( 1, cache.size() );
+		final DataRetrievalResponse<?> v = cache.get(k).get();
+		assertEquals( TPFResponseImpl.class, v.getClass() );
+		assertEquals( null, ((TPFResponseImpl) v).getNextPageURL() );
+		cache.close();
+	}
+
+	@Test
 	public void replaceTest() throws IOException, InterruptedException, ExecutionException {
 		final ChronicleMapCache cache = new ChronicleMapCache( "cache/test/chronicle-map.dat",
 		                                                       new CachePoliciesForTest() );
@@ -373,9 +396,17 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		for ( int i = 0; i < numberOfResults; i++ ) {
 			matchingTriples.add( makeTestTriple(i) );
 		}
+		return makeTPFResponse(numberOfResults, "http://example.org/page");
+	}
+
+	protected TPFResponse makeTPFResponse( final int numberOfResults, final String nextPageURL ) {
+		final List<Triple> matchingTriples = new ArrayList<>();
+		for ( int i = 0; i < numberOfResults; i++ ) {
+			matchingTriples.add( makeTestTriple(i) );
+		}
 		return new TPFResponseImpl( matchingTriples,
 		                            new ArrayList<>(),
-		                            "http://example.org/page",
+		                            nextPageURL,
 		                            new Date() );
 	}
 
