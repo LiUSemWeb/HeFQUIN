@@ -23,6 +23,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import se.liu.ida.hefquin.base.net.http.HttpConstants;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
@@ -141,7 +142,7 @@ public class SparqlServlet extends HttpServlet {
 
 		// Create QueryProcContext using request-specific execution settings
 		final QueryProcContextBuilder ctxBuilder = engine.getQueryProcContextBuilder()
-					.setSkipExecution( Boolean.parseBoolean( request.getHeader("X-HeFQUIN-Skip-Execution") ) );
+					.setSkipExecution( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_SKIP_EXECUTION) ) );
 		final QueryProcContext ctx = ctxBuilder.build();
 
 		try {

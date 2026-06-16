@@ -35,6 +35,7 @@ import org.apache.jena.sparql.util.QueryExecUtils;
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
+import se.liu.ida.hefquin.base.net.http.HttpConstants;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
@@ -185,11 +186,9 @@ public class RunHttpQuery extends CmdARQ
 			.POST( HttpRequest.BodyPublishers.ofString(prepareQuery( query )) );
 
 		if ( contains(argSkipExecution) )
-			builder.header( "X-HeFQUIN-Skip-Execution", "true" );
+			builder.header( HttpConstants.X_HEADER_SKIP_EXECUTION, "true" );
 
-		final HttpRequest request = builder
-			.POST( HttpRequest.BodyPublishers.ofString(query.toString()) )
-			.build();
+		final HttpRequest request = builder.build();
 
 		final HttpResponse<InputStream> response;
 		try {

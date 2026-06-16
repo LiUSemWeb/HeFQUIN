@@ -7,7 +7,7 @@
     <artifactId>hefquin</artifactId>
     <version>0.0.12-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>hefquin-cli</artifactId>
 
   <!-- Project Meta Data -->
@@ -45,6 +45,12 @@
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-service</artifactId>
+      <version>0.0.12-SNAPSHOT</version>
+    </dependency>
+	  <!-- hefquin-base -->
+    <dependency>
+      <groupId>se.liu.research.hefquin</groupId>
+      <artifactId>hefquin-base</artifactId>
       <version>0.0.12-SNAPSHOT</version>
     </dependency>
     <dependency>
