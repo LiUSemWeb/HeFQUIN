@@ -38,7 +38,6 @@ import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
@@ -59,29 +58,29 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		                                                        new CachePoliciesForTest() );
 		cache1.clear();
 
-		final ChronicleMapCacheKey k1 = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+		final PersistentCacheKey k1 = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 		                                                          new SPARQLEndpointForTest("http://example.org/sparql"),
-		                                                          ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                          PersistentCacheKey.ResponseMode.RESULT );
 
-		final ChronicleMapCacheKey k2 = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+		final PersistentCacheKey k2 = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 		                                                          new SPARQLEndpointForTest("http://example.org/sparql"),
-		                                                          ChronicleMapCacheKey.ResponseMode.COUNT );
+		                                                          PersistentCacheKey.ResponseMode.COUNT );
 
-		final ChronicleMapCacheKey k3 = new ChronicleMapCacheKey( new TPFRequestImpl(tp),
+		final PersistentCacheKey k3 = new PersistentCacheKey( new TPFRequestImpl(tp),
 		                                                          new TPFServerForTest("http://example.org/tpf"),
-		                                                          ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                          PersistentCacheKey.ResponseMode.RESULT );
 
-		final ChronicleMapCacheKey k4 = new ChronicleMapCacheKey( new TPFRequestImpl(tp),
+		final PersistentCacheKey k4 = new PersistentCacheKey( new TPFRequestImpl(tp),
 		                                                          new TPFServerForTest("http://example.org/tpf"),
-		                                                          ChronicleMapCacheKey.ResponseMode.COUNT );
+		                                                          PersistentCacheKey.ResponseMode.COUNT );
 
-		final ChronicleMapCacheKey k5 = new ChronicleMapCacheKey( new BRTPFRequestImpl( tp, new HashSet<>() ),
+		final PersistentCacheKey k5 = new PersistentCacheKey( new BRTPFRequestImpl( tp, new HashSet<>() ),
 		                                                          new BRTPFServerForTest("http://example.org/brtpf"),
-		                                                          ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                          PersistentCacheKey.ResponseMode.RESULT );
 
-		final ChronicleMapCacheKey k6 = new ChronicleMapCacheKey( new BRTPFRequestImpl(tp, new HashSet<>() ),
+		final PersistentCacheKey k6 = new PersistentCacheKey( new BRTPFRequestImpl(tp, new HashSet<>() ),
 		                                                          new BRTPFServerForTest("http://example.org/brtpf"),
-		                                                          ChronicleMapCacheKey.ResponseMode.COUNT );
+		                                                          PersistentCacheKey.ResponseMode.COUNT );
 
 		final SolMapsResponse o1 = makeSolMapResponse(3);
 		final CardinalityResponse o2 = makeCardinalityResponse(3);
@@ -129,9 +128,9 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		                                                       new CachePoliciesForTest() );
 		cache.clear();
 
-		final ChronicleMapCacheKey k = new ChronicleMapCacheKey( new TPFRequestImpl(tp),
+		final PersistentCacheKey k = new PersistentCacheKey( new TPFRequestImpl(tp),
 		                                                         new TPFServerForTest("http://example.org/tpf"),
-		                                                         ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                         PersistentCacheKey.ResponseMode.RESULT );
 
 		final DataRetrievalResponse<?> o = makeTPFResponse(1, null);
 
@@ -152,9 +151,9 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		                                                       new CachePoliciesForTest() );
 		cache.clear();
 
-		final ChronicleMapCacheKey k = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+		final PersistentCacheKey k = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 		                                                         new SPARQLEndpointForTest("http://example.org/sparql"),
-		                                                         ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                         PersistentCacheKey.ResponseMode.RESULT );
 
 		final DataRetrievalResponse<?> o1 = makeSolMapResponse(1);
 		final DataRetrievalResponse<?> o2 = makeSolMapResponse(2);
@@ -179,9 +178,9 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		final DataRetrievalResponse<?> o = makeSolMapResponse(1);
 		
 		for( int i=0; i < 50; i++){
-			final ChronicleMapCacheKey k = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+			final PersistentCacheKey k = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 			                                                         new SPARQLEndpointForTest("http://example.org/sparql" + i),
-			                                                         ChronicleMapCacheKey.ResponseMode.RESULT );
+			                                                         PersistentCacheKey.ResponseMode.RESULT );
 			Thread.sleep(10);
 			cache.put( k, CompletableFuture.completedFuture(o) );
 		}
@@ -191,9 +190,9 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		
 		// Assert keys
 		for ( int i = 25; i < 50; i++ ) {
-			final ChronicleMapCacheKey k = new ChronicleMapCacheKey( new SPARQLRequestImpl( tp ),
+			final PersistentCacheKey k = new PersistentCacheKey( new SPARQLRequestImpl( tp ),
 			                                                         new SPARQLEndpointForTest( "http://example.org/sparql" + i ),
-			                                                         ChronicleMapCacheKey.ResponseMode.RESULT );
+			                                                         PersistentCacheKey.ResponseMode.RESULT );
 			assertNotNull( cache.get(k).get() );
 		}
 		cache.close();
@@ -209,9 +208,9 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		final DataRetrievalResponse<?> o = makeSolMapResponse(1);
 		
 		for( int i=0; i < 100; i++){
-			final ChronicleMapCacheKey k = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+			final PersistentCacheKey k = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 			                                                         new SPARQLEndpointForTest("http://example.org/sparql" + i),
-			                                                         ChronicleMapCacheKey.ResponseMode.RESULT );
+			                                                         PersistentCacheKey.ResponseMode.RESULT );
 			cache1.put( k, CompletableFuture.completedFuture(o) );
 		}
 
@@ -233,9 +232,9 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		                                                       new CachePoliciesForTest(1000) );
 		cache.clear();
 		
-		final ChronicleMapCacheKey k = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+		final PersistentCacheKey k = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 		                                                         new SPARQLEndpointForTest("http://example.org/sparql"),
-		                                                         ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                         PersistentCacheKey.ResponseMode.RESULT );
 		final DataRetrievalResponse<?> o = makeSolMapResponse(1);
 		cache.put( k, CompletableFuture.completedFuture(o) );
 		
@@ -252,15 +251,15 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		                                                       new CachePoliciesForTest() );
 		cache.clear();
 		
-		final ChronicleMapCacheKey k1 = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+		final PersistentCacheKey k1 = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 		                                                          new SPARQLEndpointForTest( "http://example.org/sparql" + 1 ),
-		                                                          ChronicleMapCacheKey.ResponseMode.RESULT );
-		final ChronicleMapCacheKey k2 = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+		                                                          PersistentCacheKey.ResponseMode.RESULT );
+		final PersistentCacheKey k2 = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 		                                                          new SPARQLEndpointForTest( "http://example.org/sparql" + 2 ),
-		                                                          ChronicleMapCacheKey.ResponseMode.RESULT );
-		final ChronicleMapCacheKey k3 = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+		                                                          PersistentCacheKey.ResponseMode.RESULT );
+		final PersistentCacheKey k3 = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 		                                                          new SPARQLEndpointForTest( "http://example.org/sparql" + 3 ),
-		                                                          ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                          PersistentCacheKey.ResponseMode.RESULT );
 		final DataRetrievalResponse<?> o = makeSolMapResponse(1);
 
 		// Fill map
@@ -288,29 +287,29 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		                                                        new CachePoliciesForTest() );
 		cache.clear();
 
-		final ChronicleMapCacheKey k1 = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+		final PersistentCacheKey k1 = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 		                                                          new SPARQLEndpointForTest("http://example.org/sparql"),
-		                                                          ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                          PersistentCacheKey.ResponseMode.RESULT );
 
-		final ChronicleMapCacheKey k2 = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+		final PersistentCacheKey k2 = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 		                                                          new SPARQLEndpointForTest("http://example.org/sparql"),
-		                                                          ChronicleMapCacheKey.ResponseMode.COUNT );
+		                                                          PersistentCacheKey.ResponseMode.COUNT );
 
-		final ChronicleMapCacheKey k3 = new ChronicleMapCacheKey( new TPFRequestImpl(tp),
+		final PersistentCacheKey k3 = new PersistentCacheKey( new TPFRequestImpl(tp),
 		                                                          new TPFServerForTest("http://example.org/tpf"),
-		                                                          ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                          PersistentCacheKey.ResponseMode.RESULT );
 
-		final ChronicleMapCacheKey k4 = new ChronicleMapCacheKey( new TPFRequestImpl(tp),
+		final PersistentCacheKey k4 = new PersistentCacheKey( new TPFRequestImpl(tp),
 		                                                          new TPFServerForTest("http://example.org/tpf"),
-		                                                          ChronicleMapCacheKey.ResponseMode.COUNT );
+		                                                          PersistentCacheKey.ResponseMode.COUNT );
 
-		final ChronicleMapCacheKey k5 = new ChronicleMapCacheKey( new BRTPFRequestImpl( tp, new HashSet<>() ),
+		final PersistentCacheKey k5 = new PersistentCacheKey( new BRTPFRequestImpl( tp, new HashSet<>() ),
 		                                                          new BRTPFServerForTest("http://example.org/brtpf"),
-		                                                          ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                          PersistentCacheKey.ResponseMode.RESULT );
 
-		final ChronicleMapCacheKey k6 = new ChronicleMapCacheKey( new BRTPFRequestImpl(tp, new HashSet<>() ),
+		final PersistentCacheKey k6 = new PersistentCacheKey( new BRTPFRequestImpl(tp, new HashSet<>() ),
 		                                                          new BRTPFServerForTest("http://example.org/brtpf"),
-		                                                          ChronicleMapCacheKey.ResponseMode.COUNT );
+		                                                          PersistentCacheKey.ResponseMode.COUNT );
 
 		final SolMapsResponse o1 = makeSolMapResponse(3);
 		final CardinalityResponse o2 = makeCardinalityResponse(3);
@@ -350,9 +349,9 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		                                                       new CachePoliciesForTest(1000) );
 		cache.clear();
 
-		final ChronicleMapCacheKey k = new ChronicleMapCacheKey( new SPARQLRequestImpl(tp),
+		final PersistentCacheKey k = new PersistentCacheKey( new SPARQLRequestImpl(tp),
 		                                                         new SPARQLEndpointForTest("http://example.org/sparql"),
-		                                                         ChronicleMapCacheKey.ResponseMode.RESULT );
+		                                                         PersistentCacheKey.ResponseMode.RESULT );
 		final DataRetrievalResponse<?> o = makeSolMapResponse(1);
 		cache.put(k, CompletableFuture.completedFuture(o) );
 		cache.close();
@@ -447,18 +446,18 @@ public class ChronicleMapCacheTest extends FederationTestBase
 	}
 
 	public static class CachePoliciesForTest
-				implements CachePolicies<ChronicleMapCacheKey,
+				implements CachePolicies<PersistentCacheKey,
 				                         CompletableFuture<? extends DataRetrievalResponse<?>>,
 				                         PersistentCacheEntry>
 	{
 		final PersistentCacheEntryFactory cef = new PersistentCacheEntryFactory();
 
-		final CacheReplacementPolicyFactory<ChronicleMapCacheKey,
+		final CacheReplacementPolicyFactory<PersistentCacheKey,
 		                                    CompletableFuture<? extends DataRetrievalResponse<?>>,
 		                                    PersistentCacheEntry
 		                                   > crpf= new CacheReplacementPolicyFactory<>() {
 			@Override
-			public CacheReplacementPolicy<ChronicleMapCacheKey,
+			public CacheReplacementPolicy<PersistentCacheKey,
 			                              CompletableFuture<? extends DataRetrievalResponse<?>>,
 			                              PersistentCacheEntry> create() {
 				return new CacheReplacementPolicyLRU<>();
@@ -481,7 +480,7 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		}
 
 		@Override
-		public CacheReplacementPolicyFactory<ChronicleMapCacheKey,
+		public CacheReplacementPolicyFactory<PersistentCacheKey,
 		                                     CompletableFuture<? extends DataRetrievalResponse<?>>,
 		                                     PersistentCacheEntry> getReplacementPolicyFactory() {
 			return crpf;

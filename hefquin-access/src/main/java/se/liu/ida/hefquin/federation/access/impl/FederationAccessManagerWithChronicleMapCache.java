@@ -20,8 +20,8 @@ import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntry;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntryFactory;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCacheKey.ResponseMode;
+import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheKey;
+import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheKey.ResponseMode;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
@@ -69,7 +69,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 */
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
-	                                                     final CachePolicies<ChronicleMapCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> chronicleMapCachePolicies )
+	                                                     final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> chronicleMapCachePolicies )
 			throws IOException
 	{
 		super(fedAccMan, cacheCapacity);
@@ -153,9 +153,9 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		else
 			cacheRequestsOther++;
 
-		final ChronicleMapCacheKey key;
+		final PersistentCacheKey key;
 		try {
-			key = new ChronicleMapCacheKey( req, fm, ResponseMode.RESULT );
+			key = new PersistentCacheKey( req, fm, ResponseMode.RESULT );
 		} catch ( final IllegalArgumentException e ) {
 			// TODO: Currently unsupported request/member types bypass the cache silently.
 			// This may cause bugs in the future if full cache coverage is assumed later.
@@ -221,9 +221,9 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	                                                     final MemberType fm )
 			throws FederationAccessException
 	{
-		final ChronicleMapCacheKey key;
+		final PersistentCacheKey key;
 		try {
-			key = new ChronicleMapCacheKey( req, fm, ResponseMode.COUNT );
+			key = new PersistentCacheKey( req, fm, ResponseMode.COUNT );
 		} catch ( final IllegalArgumentException e ) {
 			throw new IllegalStateException( "Failed to create cache key for request/member combination: "
 					+ req.getClass().getName() + "/" + fm.getClass().getName(), e );
@@ -314,18 +314,18 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 * </p>
 	 */
 	public static class DefaultChronicleMapCachePolicies
-				implements CachePolicies<ChronicleMapCacheKey,
+				implements CachePolicies<PersistentCacheKey,
 				                         CompletableFuture<? extends DataRetrievalResponse<?>>,
 				                         PersistentCacheEntry>
 	{
 		final PersistentCacheEntryFactory cef = new PersistentCacheEntryFactory();
 
-		final CacheReplacementPolicyFactory<ChronicleMapCacheKey,
+		final CacheReplacementPolicyFactory<PersistentCacheKey,
 		                                    CompletableFuture<? extends DataRetrievalResponse<?>>,
 		                                    PersistentCacheEntry
 		                                   > crpf= new CacheReplacementPolicyFactory<>() {
 			@Override
-			public CacheReplacementPolicy<ChronicleMapCacheKey,
+			public CacheReplacementPolicy<PersistentCacheKey,
 			                              CompletableFuture<? extends DataRetrievalResponse<?>>,
 			                              PersistentCacheEntry> create() {
 				return new CacheReplacementPolicyLRU<>();
@@ -344,7 +344,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		}
 
 		@Override
-		public CacheReplacementPolicyFactory<ChronicleMapCacheKey,
+		public CacheReplacementPolicyFactory<PersistentCacheKey,
 		                                     CompletableFuture<? extends DataRetrievalResponse<?>>,
 		                                     PersistentCacheEntry> getReplacementPolicyFactory() {
 			return crpf;
