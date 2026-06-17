@@ -77,6 +77,12 @@
       <artifactId>chronicle-map</artifactId>
       <version>2026.1</version>
     </dependency>
+    <!-- MapDB -->
+    <dependency>
+      <groupId>org.mapdb</groupId>
+      <artifactId>mapdb</artifactId>
+      <version>3.1.0</version>
+    </dependency>
     <!-- Commons codec -->
     <dependency>
       <groupId>commons-codec</groupId>
