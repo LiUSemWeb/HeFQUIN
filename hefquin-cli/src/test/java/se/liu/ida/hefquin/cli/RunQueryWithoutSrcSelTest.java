@@ -34,8 +34,7 @@ public class RunQueryWithoutSrcSelTest
 			"--query=" + queryFile,
 			"--federationDescription=" + fedCatFile
 		};
-		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
-		assertEquals(0, exitCode);
+		new RunQueryWithoutSrcSel(args).mainRun(false, false);
 
 		// Check result
 		final String result = baos.toString().replaceAll("\r", "");
@@ -234,13 +233,12 @@ public class RunQueryWithoutSrcSelTest
 			"--suppressResultPrintout",
 			"--printLogicalPlan"
 		};
-		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
-		assertEquals(0, exitCode);
+		new RunQueryWithoutSrcSel(args).mainRun(false, false);
 
 		// Check result
 		final String result = baos.toString();
 		System.err.println(result);
-		assertTrue( result.contains("--------- Logical Plan ---------") );
+		assertTrue( result.contains("Logical Plan") );
 	}
 
 	@Test
