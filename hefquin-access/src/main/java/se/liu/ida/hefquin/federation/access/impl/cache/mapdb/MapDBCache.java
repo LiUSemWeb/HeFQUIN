@@ -160,6 +160,7 @@ public class MapDBCache implements Cache<PersistentCacheKey, CompletableFuture<?
 		final File file = ensureParentDirectoryExists(filename);
 		db = DBMaker.fileDB(file)
 			.fileMmapEnableIfSupported()
+			.closeOnJvmShutdown()
 			.make();
 
 		@SuppressWarnings("unchecked")
