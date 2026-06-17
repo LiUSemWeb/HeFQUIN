@@ -28,6 +28,9 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedExecutablePlanPrinterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
@@ -143,20 +146,40 @@ public class SparqlServlet extends HttpServlet {
 		// Create QueryProcContext using request-specific execution settings
 		final QueryProcContextBuilder ctxBuilder = engine.getQueryProcContextBuilder()
 					.setSkipExecution( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_SKIP_EXECUTION) ) );
+
+		final QueryResponseBuffers queryResBuf = new QueryResponseBuffers();
+		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_SOURCE_ASSIGNMENT)) )
+			ctxBuilder.setSourceAssignmentPrinter( new TextBasedLogicalPlanPrinterImpl( new PrintStream( queryResBuf.sourceAssignment, true, StandardCharsets.UTF_8 ) ) );
+		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_LOGICAL_PLAN)) )
+			ctxBuilder.setLogicalPlanPrinter( new TextBasedLogicalPlanPrinterImpl( new PrintStream( queryResBuf.logicalPlan, true, StandardCharsets.UTF_8 ) ) );
+		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_PHYSICAL_PLAN)) )
+			ctxBuilder.setPhysicalPlanPrinter( new TextBasedPhysicalPlanPrinterImpl( new PrintStream( queryResBuf.physicalPlan, true, StandardCharsets.UTF_8 ) ) );
+		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_EXECUTABLE_PLAN)) )
+			ctxBuilder.setExecutablePlanPrinter( new TextBasedExecutablePlanPrinterImpl( new PrintStream( queryResBuf.executablePlan, true, StandardCharsets.UTF_8 ) ) );
+
 		final QueryProcContext ctx = ctxBuilder.build();
 
 		try {
 			logger.debug( "Received SPARQL query: {}", query );
 
-			final JsonObject result = execute( query, mimeType, ctx );
-			if ( ! result.get( "exceptions" ).getAsArray().isEmpty() ) {
-				writeJsonError( response, 500, result.get( "exceptions" ) );
+			final JsonObject result = execute( query, mimeType, ctx, queryResBuf );
+			if ( ! result.get( HttpConstants.JSON_EXCEPTIONS ).getAsArray().isEmpty() ) {
+				writeJsonError( response, 500, result.get( HttpConstants.JSON_EXCEPTIONS ) );
 				return;
 			}
 
 			response.setStatus( 200 );
 			response.setContentType( mimeType );
-			response.getWriter().write( result.getString( "result" ) );
+
+			if ( mimeType.equals( ACCEPT_CSV ) ||
+				 mimeType.equals( ACCEPT_TSV ) ||
+				 mimeType.equals( ACCEPT_SPARQL_RESULTS_XML ) ) {
+
+				response.getWriter().write( result.getString( HttpConstants.JSON_RESULT ) );
+				return;
+			}
+			else
+				response.getWriter().write( result.toString() );
 		}
 		catch ( final IllegalQueryException e ) {
 			writeJsonError( response, 400, new JsonString( "The given query is invalid: " + e.getMessage() ) );
@@ -204,26 +227,31 @@ public class SparqlServlet extends HttpServlet {
 	/**
 	 * Executes the given SPARQL query using the HeFQUIN engine and returns the serialized result.
 	 *
-	 * @param queryString the SPARQL query string
-	 * @param mimeType    the MIME type for the response format
-	 * @param ctx         the processing context
+	 * @param queryString          the SPARQL query string
+	 * @param mimeType             the MIME type for the response format
+	 * @param ctx                  the processing context
+	 * @param QueryResponseBuffers container for optional query execution artifacts
 	 * @return the query result and exceptions in JSON format
 	 */
-	private static JsonObject execute( final String queryString, final String mimeType, final QueryProcContext ctx )
+	private static JsonObject execute( final String queryString, final String mimeType, final QueryProcContext ctx, final QueryResponseBuffers queryResponseBuffers )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
 		final Query query = QueryFactory.create( queryString, SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN );
 		final ResultsFormat resultsFormat = ServletUtils.convert( mimeType );
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final ByteArrayOutputStream resultBaos = new ByteArrayOutputStream();
 
 		final QueryProcessingStatsAndExceptions statsAndExceptions;
-		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
-			statsAndExceptions = engine.executeQueryAndPrintResult(query, resultsFormat, ps, ctx);
+		try ( PrintStream ps = new PrintStream( resultBaos, true, StandardCharsets.UTF_8 ) ) {
+			statsAndExceptions = engine.executeQueryAndPrintResult( query, resultsFormat, ps, ctx );
 		}
 
 		final JsonObject res = new JsonObject();
-		res.put( "result", baos.toString() );
-		res.put( "exceptions", ServletUtils.getExceptions(statsAndExceptions) );
+		res.put( HttpConstants.JSON_RESULT, resultBaos.toString() );
+		res.put( HttpConstants.JSON_SOURCE_ASSIGNMENT, queryResponseBuffers.sourceAssignment.toString() );
+		res.put( HttpConstants.JSON_LOGICAL_PLAN, queryResponseBuffers.logicalPlan.toString() );
+		res.put( HttpConstants.JSON_PHYSICAL_PLAN, queryResponseBuffers.physicalPlan.toString() );
+		res.put( HttpConstants.JSON_EXECUTABLE_PLAN, queryResponseBuffers.executablePlan.toString() );
+		res.put( HttpConstants.JSON_EXCEPTIONS, ServletUtils.getExceptions(statsAndExceptions) );
 		return res;
 	}
 
@@ -243,5 +271,16 @@ public class SparqlServlet extends HttpServlet {
 		final JsonObject msg = new JsonObject();
 		msg.put( "error", message );
 		response.getWriter().write( msg.toString() );
+	}
+
+	/**
+	 * Holds optional serialized query execution artifacts (plans and source assignments)
+	 * produced during query processing.
+	 */
+	private class QueryResponseBuffers {
+		public final ByteArrayOutputStream sourceAssignment = new ByteArrayOutputStream();
+		public final ByteArrayOutputStream logicalPlan = new ByteArrayOutputStream();
+		public final ByteArrayOutputStream physicalPlan = new ByteArrayOutputStream();
+		public final ByteArrayOutputStream executablePlan = new ByteArrayOutputStream();
 	}
 }

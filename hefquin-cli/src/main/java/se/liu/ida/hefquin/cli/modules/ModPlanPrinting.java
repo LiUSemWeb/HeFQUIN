@@ -32,6 +32,11 @@ public class ModPlanPrinting extends ModBase
 	protected PhysicalPlanPrinter pplanPrinter = null;
 	protected ExecutablePlanPrinter eplanPrinter = null;
 
+	protected PrintStream[] srcasgOutsList;
+	protected PrintStream[] lplanOutsList;
+	protected PrintStream[] pplanOutsList;
+	protected PrintStream[] eplanOutsList;
+
 	@Override
 	public void registerWith( final CmdGeneral cmdLine ) {
 		cmdLine.getUsage().startCategory("Query Plan Printing");
@@ -46,21 +51,21 @@ public class ModPlanPrinting extends ModBase
 	}
 
 	@Override
-	public void processArgs( final CmdArgModule cmdLine ) {	
-		final PrintStream[] srcasgOutsList = processPrintFlags( cmdLine, argPrintSrcAssignment, argPrintSrcAssignmentToFile );
+	public void processArgs( final CmdArgModule cmdLine ) {
+		srcasgOutsList = processPrintFlags( cmdLine, argPrintSrcAssignment, argPrintSrcAssignmentToFile );
 		if ( srcasgOutsList != null )
 			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl( srcasgOutsList );
 
-		final PrintStream[] lplanOutsList = processPrintFlags( cmdLine, argPrintLogicalPlan, argPrintLogicalPlanToFile );
-		if ( lplanOutsList != null ) 
+		lplanOutsList = processPrintFlags( cmdLine, argPrintLogicalPlan, argPrintLogicalPlanToFile );
+		if ( lplanOutsList != null )
 			lplanPrinter = new TextBasedLogicalPlanPrinterImpl( lplanOutsList );
 
-		final PrintStream[] pplanOutsList = processPrintFlags( cmdLine, argPrintPhysicalPlan, argPrintPhysicalPlanToFile );
-		if ( pplanOutsList != null ) 
+		pplanOutsList = processPrintFlags( cmdLine, argPrintPhysicalPlan, argPrintPhysicalPlanToFile );
+		if ( pplanOutsList != null )
 			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl( pplanOutsList );
 
-		final PrintStream[] eplanOutsList = processPrintFlags( cmdLine, argPrintExecutablePlan, argPrintExecutablePlanToFile );
-		if ( eplanOutsList != null ) 
+		eplanOutsList = processPrintFlags( cmdLine, argPrintExecutablePlan, argPrintExecutablePlanToFile );
+		if ( eplanOutsList != null )
 			eplanPrinter = new TextBasedExecutablePlanPrinterImpl( eplanOutsList );
 	}
 
@@ -94,6 +99,27 @@ public class ModPlanPrinting extends ModBase
 		}
 
 		return outsList;
+	}
+
+	public void printSourceAssignment( final String text ) {
+		print( srcasgOutsList, text );
+	}
+
+	public void printLogicalPlan( final String text ) {
+		print( lplanOutsList, text );
+	}
+
+	public void printPhysicalPlan( final String text ) {
+		print( pplanOutsList, text );
+	}
+
+	public void printExecutablePlan( final String text ) {
+		print( eplanOutsList, text );
+	}
+
+	private void print( final PrintStream[] outs, final String text ) {
+		for ( PrintStream out : outs )
+			out.print(text);
 	}
 
 	/**
