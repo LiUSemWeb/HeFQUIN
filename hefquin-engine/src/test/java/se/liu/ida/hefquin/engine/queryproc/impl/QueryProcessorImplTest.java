@@ -24,15 +24,19 @@ import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
@@ -360,14 +364,28 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final LogicalToPhysicalPlanConverter lp2pp = new LogicalToPhysicalPlanConverterImpl(false, false);
 		final LogicalToPhysicalOpConverter lop2pop = getLOP2POPForTests();
 
-		final QueryProcContext ctxt = new QueryProcContext() {
+		final QueryProcContextExt ctx = new QueryProcContextExt() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
-			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
-			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
+
+			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return null; }
+			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return null; }
+			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return null; }
+			@Override public ExecutablePlanPrinter getExecutablePlanPrinter() { return null; }
+
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public boolean skipExecution() { return false; }
+
+			@Override
+			public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() {
+				throw new UnsupportedOperationException();
+			}
 		};
 
 		final SourcePlanner sourcePlanner = new ServiceClauseBasedSourcePlannerImpl();
@@ -380,17 +398,17 @@ public class QueryProcessorImplTest extends EngineTestBase
 		};
 
 		final PhysicalOptimizer poptimizer = new PhysicalOptimizerWithoutOptimization();
-		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, null, null, null,  null);
+		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, lp2pp, lop2pop);
 		final QueryPlanCompiler planCompiler = new
-				//IteratorBasedQueryPlanCompilerImpl(ctxt);
-				//PullBasedQueryPlanCompilerImpl(ctxt);
-				QueryPlanCompilerForPushBasedExecution(ctxt);
+				//IteratorBasedQueryPlanCompilerImpl();
+				//PullBasedQueryPlanCompilerImpl();
+				QueryPlanCompilerForPushBasedExecution();
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
-		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine, ctxt);
+		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
 
-		qProc.processQuery(query, resultSink);
+		qProc.processQuery(query, resultSink, ctx);
 
 		execServiceForPlanTasks.shutdownNow();
 		try {

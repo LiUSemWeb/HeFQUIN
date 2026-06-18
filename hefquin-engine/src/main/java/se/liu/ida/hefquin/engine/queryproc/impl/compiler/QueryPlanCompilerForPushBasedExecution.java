@@ -27,29 +27,25 @@ import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
-public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBase
+public class QueryPlanCompilerForPushBasedExecution implements QueryPlanCompiler
 {
 	private static final Logger log = LoggerFactory.getLogger( QueryPlanCompilerForPushBasedExecution.class );
 
-	public QueryPlanCompilerForPushBasedExecution( final QueryProcContext ctxt ) {
-		super(ctxt);
-	}
-
 	@Override
-	public ExecutablePlan compile( final PhysicalPlan qep ) {
+	public ExecutablePlan compile( final PhysicalPlan qep,
+	                               final QueryProcContextExt ctx ) {
 		log.debug("Compiling physical plan using push-based execution model.");
-		final ExecutionContext execCtxt = createExecContext();
-		final LinkedList<PushBasedPlanThread> threads = createThreads(qep, execCtxt);
-		return new PushBasedExecutablePlanImpl(threads, execCtxt);
+		final LinkedList<PushBasedPlanThread> threads = createThreads(qep, ctx);
+		return new PushBasedExecutablePlanImpl(threads, ctx);
 	}
 
 	protected LinkedList<PushBasedPlanThread> createThreads( final PhysicalPlan qep,
-	                                                         final ExecutionContext execCxt ) {
+	                                                         final QueryProcContextExt ctx ) {
 		final LinkedList<PushBasedPlanThread> threads = new LinkedList<>();
-		createWorker().createThreads(qep, threads, execCxt);
+		createWorker().createThreads(qep, threads, ctx);
 
 		// remove all ConnectorForAdditionalConsumer from the list
 		final LinkedList<PushBasedPlanThread> threads2 = new LinkedList<>();
@@ -79,7 +75,7 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 
 		public void createThreads( final PhysicalPlan qep,
 		                           final LinkedList<PushBasedPlanThread> threads,
-		                           final ExecutionContext execCxt ) {
+		                           final QueryProcContextExt ctx ) {
 			// Check whether we have seen the given QEP before (which would be
 			// as a subplan somewhere else within the overall plan that we are
 			// recursively converting here).
@@ -87,7 +83,7 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 				// If we have not seen the given QEP before, create the
 				// relevant threads for it (which includes the threads
 				// for its subplans, if any)
-				final PushBasedPlanThread t = _createThreads(qep, threads, execCxt);
+				final PushBasedPlanThread t = _createThreads(qep, threads, ctx);
 				convertedSubPlans.put(qep, t);
 				threads.addFirst(t);
 			}
@@ -104,7 +100,7 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 
 		protected PushBasedPlanThread _createThreads( final PhysicalPlan qep,
 		                                              final LinkedList<PushBasedPlanThread> tasks,
-		                                              final ExecutionContext execCxt ) {
+		                                              final QueryProcContextExt ctx ) {
 			final QueryPlanningInfo qpInfo;
 			if ( qep.hasQueryPlanningInfo() )
 				qpInfo = qep.getQueryPlanningInfo();
@@ -115,7 +111,7 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 			if ( pop instanceof NullaryPhysicalOp npop )
 			{
 				final NullaryExecutableOp execOp = npop.createExecOp(true, qpInfo);
-				return createThread(execOp, execCxt);
+				return createThread(execOp, ctx);
 			}
 			else if ( pop instanceof UnaryPhysicalOp upop )
 			{
@@ -123,10 +119,10 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 
 				final UnaryExecutableOp execOp = upop.createExecOp( true, qpInfo, subPlan.getExpectedVariables() );
 
-				createThreads(subPlan, tasks, execCxt);
+				createThreads(subPlan, tasks, ctx);
 				final PushBasedPlanThread childTask = tasks.getFirst();
 
-				return createThread(execOp, childTask, execCxt);
+				return createThread(execOp, childTask, ctx);
 			}
 			else if ( pop instanceof BinaryPhysicalOp bpop )
 			{
@@ -139,13 +135,13 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 						subPlan1.getExpectedVariables(),
 						subPlan2.getExpectedVariables() );
 
-				createThreads( subPlan1, tasks, execCxt );
+				createThreads(subPlan1, tasks, ctx);
 				final PushBasedPlanThread childTask1 = tasks.getFirst();
 
-				createThreads( subPlan2, tasks, execCxt );
+				createThreads(subPlan2, tasks, ctx);
 				final PushBasedPlanThread childTask2 = tasks.getFirst();
 
-				return createThread(execOp, childTask1, childTask2, execCxt);
+				return createThread(execOp, childTask1, childTask2, ctx);
 			}
 			else if ( pop instanceof NaryPhysicalOp npop )
 			{
@@ -158,12 +154,12 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 
 				final PushBasedPlanThread[] childTasks = new PushBasedPlanThread[ qep.numberOfSubPlans() ];
 				for ( int i = 0; i < childTasks.length; i++ ) {
-					createThreads( qep.getSubPlan(i), tasks, execCxt );
+					createThreads( qep.getSubPlan(i), tasks, ctx );
 
 					childTasks[i] = tasks.getFirst();
 				}
 
-				return createThread(execOp, childTasks, execCxt);
+				return createThread(execOp, childTasks, ctx);
 			}
 			else
 			{
@@ -176,27 +172,27 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 
 
 	protected PushBasedPlanThread createThread( final NullaryExecutableOp op,
-	                                            final ExecutionContext execCxt ) {
-		return new PushBasedPlanThreadImplForNullaryOperator(op, execCxt);
+	                                            final QueryProcContextExt ctx ) {
+		return new PushBasedPlanThreadImplForNullaryOperator(op, ctx);
 	}
 
 	protected PushBasedPlanThread createThread( final UnaryExecutableOp op,
 	                                            final PushBasedPlanThread input,
-	                                            final ExecutionContext execCxt ) {
-		return new PushBasedPlanThreadImplForUnaryOperator(op, input, execCxt);
+	                                            final QueryProcContextExt ctx ) {
+		return new PushBasedPlanThreadImplForUnaryOperator(op, input, ctx);
 	}
 
 	protected PushBasedPlanThread createThread( final BinaryExecutableOp op,
 	                                            final PushBasedPlanThread input1,
 	                                            final PushBasedPlanThread input2,
-	                                            final ExecutionContext execCxt ) {
-		return new PushBasedPlanThreadImplForBinaryOperator(op, input1, input2, execCxt);
+	                                            final QueryProcContextExt ctx ) {
+		return new PushBasedPlanThreadImplForBinaryOperator(op, input1, input2, ctx);
 	}
 
 	protected PushBasedPlanThread createThread( final NaryExecutableOp op,
 	                                            final PushBasedPlanThread[] inputs,
-	                                            final ExecutionContext execCxt ) {
-		return new PushBasedPlanThreadImplForNaryOperator(op, inputs, execCxt);
+	                                            final QueryProcContextExt ctx ) {
+		return new PushBasedPlanThreadImplForNaryOperator(op, inputs, ctx);
 	}
 
 }

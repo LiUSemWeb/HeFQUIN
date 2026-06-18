@@ -31,7 +31,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.RESTRequest;
 import se.liu.ida.hefquin.federation.access.StringResponse;
@@ -120,7 +120,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	@Override
 	protected void _processCollectedInput( final List<SolutionMapping> input,
 	                                       final IntermediateResultElementSink sink,
-	                                       final ExecutionContext execCxt )
+	                                       final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		final Map<Map<String,Node>, List<SolutionMapping>> paramsForRequests = new HashMap<>();
@@ -172,7 +172,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 			final CompletableFuture<StringResponse> f;
 			try {
-				f = execCxt.getFederationAccessMgr().issueRequest(req, fm);
+				f = ctx.getFederationAccessMgr().issueRequest(req, fm);
 			}
 			catch ( final FederationAccessException e ) {
 				log.debug( "Request issuance failed for endpoint {} (paramValues={})", fm, entry.getKey() );
@@ -206,11 +206,11 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	@Override
 	protected void _concludeExecution( final List<SolutionMapping> input,
 	                                   final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt )
+	                                   final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		if ( input != null && ! input.isEmpty() ) {
-			_processCollectedInput(input, sink, execCxt);
+			_processCollectedInput(input, sink, ctx);
 		}
 	}
 

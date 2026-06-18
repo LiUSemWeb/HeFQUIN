@@ -64,38 +64,67 @@ public class ModPlanPrinting extends ModBase
 			eplanPrinter = new TextBasedExecutablePlanPrinterImpl( eplanOutsList );
 	}
 
-	protected PrintStream[] processPrintFlags( final CmdArgModule cmdLine, final ArgDecl argPrintPlanToTerminal, final ArgDecl argPrintPlanToFile ) {
+	protected PrintStream[] processPrintFlags( final CmdArgModule cmdLine,
+	                                           final ArgDecl argPrintPlanToTerminal,
+	                                           final ArgDecl argPrintPlanToFile ) {
 		int count = 0;
 		if ( cmdLine.contains(argPrintPlanToTerminal) ) count++;
 		if ( cmdLine.contains(argPrintPlanToFile) ) count++;
-		
+
 		if ( count == 0 ) return null;
-		
+
 		final PrintStream[] outsList = new PrintStream[count];
 		int index = 0;
-		
+
 		if ( cmdLine.contains(argPrintPlanToTerminal) ) {
 			outsList[index++] = System.out;
 		}
+
 		if ( cmdLine.contains(argPrintPlanToFile) ) {
 			final FileOutputStream fileOutputStream;
 			try {
 				fileOutputStream = new FileOutputStream(cmdLine.getValue(argPrintPlanToFile), true);
-			} catch ( final FileNotFoundException e ) {
+			}
+			catch ( final FileNotFoundException e ) {
 				cmdLine.cmdError( "Failed to create print stream for output destination: " + cmdLine.getValue(argPrintPlanToFile), false );
 				return outsList;
 			}
 
 			outsList[index++] = new PrintStream(fileOutputStream);
 		}
+
 		return outsList;
 	}
 
+	/**
+	 * Returns a {@link LogicalPlanPrinter} for source assignment printing
+	 * that is set up according to the arguments provided to the command-line
+	 * program, or returns <code>null</code> if no argument was provided to
+	 * request source assignment printing.
+	 */
 	public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
 
+	/**
+	 * Returns a {@link LogicalPlanPrinter} for logical-plan printing that
+	 * is set up according to the arguments provided to the command-line
+	 * program, or returns <code>null</code> if no argument was provided
+	 * to request logical-plan printing.
+	 */
 	public LogicalPlanPrinter getLogicalPlanPrinter() { return lplanPrinter; }
 
+	/**
+	 * Returns a {@link PhysicalPlanPrinter} for physical-plan printing that
+	 * is set up according to the arguments provided to the command-line
+	 * program, or returns <code>null</code> if no argument was provided
+	 * to request physical-plan printing.
+	 */
 	public PhysicalPlanPrinter getPhysicalPlanPrinter() { return pplanPrinter; }
 
+	/**
+	 * Returns a {@link ExecutablePlanPrinter} for executable-plan printing
+	 * that is set up according to the arguments provided to the command-line
+	 * program, or returns <code>null</code> if no argument was provided to
+	 * request executable-plan printing.
+	 */
 	public ExecutablePlanPrinter getExecutablePlanPrinter() { return eplanPrinter; }
 }

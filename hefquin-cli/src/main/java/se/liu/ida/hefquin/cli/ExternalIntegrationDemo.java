@@ -80,7 +80,7 @@ public class ExternalIntegrationDemo extends CmdARQ
 		// multiple queries).
 		QueryProcessingStatsAndExceptions statsAndExcs = null;
 		try {
-			statsAndExcs = hefquin.executeQueryAndPrintResult(query);
+			statsAndExcs = hefquin.executeQueryAndPrintResult(query, ResultsFormat.FMT_TEXT, System.out);
 		}
 		catch ( final IllegalQueryException ex ) {
 			System.err.println( "The given query is invalid: " + ex.getMessage() );

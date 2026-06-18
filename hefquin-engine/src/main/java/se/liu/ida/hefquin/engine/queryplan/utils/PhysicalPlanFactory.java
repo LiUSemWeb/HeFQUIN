@@ -412,7 +412,7 @@ public class PhysicalPlanFactory
 			return createPlanWithRequest(req, mayReduce, fm);
 		}
 		else if ( fm.isSupportedPattern(gp) ) {
-			final SPARQLRequest req = new SPARQLRequestImpl(gp);
+			final SPARQLRequest req = new SPARQLRequestImpl(gp, null, mayReduce );
 			return createPlanWithRequest(req, mayReduce, fm);
 		}
 		else {

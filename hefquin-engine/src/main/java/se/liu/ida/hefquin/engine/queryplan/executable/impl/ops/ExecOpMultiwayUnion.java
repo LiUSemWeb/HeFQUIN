@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 {
@@ -33,7 +33,7 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 	protected void _processInputFromXthChild( final int x,
 	                                          final SolutionMapping inputSolMap,
 	                                          final IntermediateResultElementSink sink,
-	                                          final ExecutionContext execCxt) {
+	                                          final QueryProcContextExt ctx ) {
 		numberOfOutputMappingsProduced++;
 		sink.send(inputSolMap);
 	}
@@ -42,7 +42,7 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 	protected void _processInputFromXthChild( final int x,
 	                                          final List<SolutionMapping> inputSolMaps,
 	                                          final IntermediateResultElementSink sink,
-	                                          final ExecutionContext execCxt) {
+	                                          final QueryProcContextExt ctx ) {
 		numberOfOutputMappingsProduced += inputSolMaps.size();
 		sink.send(inputSolMaps);
 	}
@@ -50,7 +50,7 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 	@Override
 	protected void _wrapUpForXthChild( final int x,
 	                                   final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) {
+	                                   final QueryProcContextExt ctx ) {
 		// nothing to be done here
 	}
 

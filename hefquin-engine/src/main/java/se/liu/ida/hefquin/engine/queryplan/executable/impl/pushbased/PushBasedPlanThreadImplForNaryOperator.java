@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadImplBase
 {
@@ -17,8 +17,8 @@ public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadI
 
 	public PushBasedPlanThreadImplForNaryOperator( final NaryExecutableOp op,
 	                                               final PushBasedPlanThread[] inputs,
-	                                               final ExecutionContext execCxt ) {
-		super(execCxt);
+	                                               final QueryProcContextExt ctx ) {
+		super(ctx);
 
 		assert op != null;
 		assert inputs != null;
@@ -56,10 +56,10 @@ public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadI
 			while ( ! inputConsumed ) {
 				inputs[i].transferAvailableOutput(transferBuffer);
 				if ( ! transferBuffer.isEmpty() ) {
-					op.processInputFromXthChild(i, transferBuffer, sink, execCxt);
+					op.processInputFromXthChild(i, transferBuffer, sink, ctx);
 				}
 				else {
-					op.wrapUpForXthChild(i, sink, execCxt);
+					op.wrapUpForXthChild(i, sink, ctx);
 					inputConsumed = true;
 				}
 			}
@@ -92,7 +92,7 @@ public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadI
 					// calling 'transferAvailableOutput' should not cause this thread to wait
 					inputs[i].transferAvailableOutput(transferBuffer);
 					if ( ! transferBuffer.isEmpty() ) {
-						op.processInputFromXthChild(i, transferBuffer, sink, execCxt);
+						op.processInputFromXthChild(i, transferBuffer, sink, ctx);
 					}
 
 					someInputConsumed = true;
@@ -119,10 +119,10 @@ public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadI
 				// cause this thread to wait.
 				inputs[indexOfNextInputToWaitFor].transferAvailableOutput(transferBuffer);
 				if ( ! transferBuffer.isEmpty() ) {
-					op.processInputFromXthChild(indexOfNextInputToWaitFor, transferBuffer, sink, execCxt);
+					op.processInputFromXthChild(indexOfNextInputToWaitFor, transferBuffer, sink, ctx);
 				}
 				else {
-					op.wrapUpForXthChild(indexOfNextInputToWaitFor, sink, execCxt);
+					op.wrapUpForXthChild(indexOfNextInputToWaitFor, sink, ctx);
 					inputConsumedCompletely[indexOfNextInputToWaitFor] = true;
 					numberOfInputsConsumed++;
 				}

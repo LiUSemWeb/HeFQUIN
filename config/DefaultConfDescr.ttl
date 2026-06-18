@@ -6,10 +6,10 @@
     ec:fedAccessMgr _:bFederationAccessManager ;
     ec:queryProcessor [
         ec:queryPlanner [
-            ec:sourcePlanner _:bSourcePlanner ;
-            ec:logicalOptimizer _:bLogicalOptimizer ;
+            ec:sourcePlanner     _:bSourcePlanner ;
+            ec:logicalOptimizer  _:bLogicalOptimizer ;
             ec:physicalOptimizer _:bPhysicalOptimizer ;
-            ec:lptoppConverter _:bLogicalToPhysicalPlanConverter ;
+            ec:lptoppConverter   _:bLogicalToPhysicalPlanConverter ;
             ec:loptopopConverter _:bLogicalToPhysicalOpConverter
         ] ;
         ec:planCompiler _:bPlanCompiler ;
@@ -37,15 +37,13 @@ _:bLogicalOptimizer rdf:type ec:LogicalOptimizer ;
 _:bListOfHeuristics
     ec:elementsTypeName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization" ;
     ec:elements (
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemoveSubPlansWithEmptyResults" ;
-          ec:constructorArguments (ec:value:QueryProcContext) ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemoveSubPlansWithEmptyResults" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.ProjectPushDown" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings" ]
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.CardinalityBasedJoinOrderingWithRequests" ;
-          ec:constructorArguments (ec:value:QueryProcContext) ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.CardinalityBasedJoinOrderingWithRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemoveUnnecessaryL2gAndG2l" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverJoin" ]
@@ -117,7 +115,7 @@ _:bListOfPhysicalOpFactories
 
 _:bPlanCompiler rdf:type ec:PlanCompiler ;
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerForPushBasedExecution" ;
-    ec:constructorArguments ( [rdf:value ec:value:QueryProcContext] ) .
+    ec:constructorArguments ( ) .
 
 _:bExecutionEngine rdf:type ec:ExecutionEngine ;
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl" ;
@@ -128,6 +126,10 @@ _:bCostModel rdf:type ec:CostModel ;
     ec:constructorArguments (
           [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation" ;
             ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl" ;
-            ec:constructorArguments ( [rdf:value ec:value:QueryProcContext] )
+            ec:constructorArguments (
+                  [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.cardinality.RequestBasedCardinalityEstimator" ;
+                    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.cardinality.RequestBasedCardinalityEstimator"
+                  ]
+            )
           ]
     ) .

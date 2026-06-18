@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -45,6 +46,11 @@ import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 public class FilterPushDown implements HeuristicForLogicalOptimization
 {
 	@Override
+	public LogicalPlan apply( final LogicalPlan inputPlan,
+	                          final QueryProcContext ctxt2 ) {
+		return apply(inputPlan);
+	}
+
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
 		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
 		if ( numberOfSubPlans == 0 ) {
@@ -254,11 +260,11 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return inputPlan;
 		}
 
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl(mergedPattern);
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
 
 		final boolean mayReduce = filterOp.mayReduce();
 
-		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>(fm, mayReduce, mergedReq);
+		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, mayReduce, mergedReq );
 		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 	}
 
@@ -503,7 +509,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		// Now we recurse, applying the filter-pushdown heuristic
 		// to the sub-plan under the gpAdd / gpOptAdd operator.
 		final LogicalPlan rewrittenSubPlanUnderAddOp = apply(newSubPlanUnderAddOp);
-		
+
 		final LogicalPlan newSubPlanUnderRootOp = new LogicalPlanWithUnaryRootImpl(
 				newChildOp,
 				null,

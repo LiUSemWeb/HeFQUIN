@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 /**
  * Implementations of this interface represent functions that determine
@@ -17,5 +18,7 @@ public interface CostFunctionForPlan
 	 * Record a set of sub-plans (of plan) that have been visited during the cost estimation.
 	 * This set can be used for checking if a subplan has been visited or not.
 	 */
-	CompletableFuture<Integer> initiateCostEstimation( final Set<PhysicalPlan> visitedPlans, final PhysicalPlan plan );
+	CompletableFuture<Integer> initiateCostEstimation( Set<PhysicalPlan> visitedPlans,
+	                                                   PhysicalPlan plan,
+	                                                   QueryProcContext ctx );
 }

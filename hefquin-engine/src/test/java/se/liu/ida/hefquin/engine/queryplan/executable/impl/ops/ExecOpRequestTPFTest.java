@@ -27,9 +27,12 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl;
 import se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithCache;
@@ -80,17 +83,25 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 		// Create a federation access manager
 		final FederationAccessManager internalFedAccMgr = new AsyncFederationAccessManagerImpl(execServiceForFedAccess);
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerWithCache(internalFedAccMgr, 100);
-		final ExecutionContext execCxt = new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return null; }
+
+		final QueryProcContextExt ctx = new QueryProcContextExt() {
+			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
+
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
-			@Override public boolean isExperimentRun() { return false; }
-			@Override public boolean skipExecution() { return false; }
+
+			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return null; }
+			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return null; }
+			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return null; }
+			@Override public ExecutablePlanPrinter getExecutablePlanPrinter() { return null; }
+
+			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
+			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
 		};
 
-		op.execute(sink, execCxt);
+		op.execute(sink, ctx);
 
 		final Collection<SolutionMapping> res = (Collection<SolutionMapping>) sink.getCollectedSolutionMappings();
 		assertTrue( res.size() > 100 );
@@ -110,7 +121,7 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 				null );
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
-		op.execute( sink, createExecContextForTests() );
+		op.execute( sink, createExtendedQueryProcContextForTests() );
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 
@@ -130,7 +141,7 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 	}
 
 
-	public static ExecutionContext createExecContextForTests() {
+	public static QueryProcContextExt createExtendedQueryProcContextForTests() {
 		final List<Triple> l = new ArrayList<Triple>();
 
 		final Node s = NodeFactory.createURI("http://example.org/s");
@@ -142,14 +153,21 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 		l.add( new TripleImpl(s,p,o2) );
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(null, l);
-		return new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return null; }
+		return new QueryProcContextExt() {
+			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
+
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
 			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
-			@Override public boolean isExperimentRun() { return false; }
-			@Override public boolean skipExecution() { return false; }
+
+			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return null; }
+			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return null; }
+			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return null; }
+			@Override public ExecutablePlanPrinter getExecutablePlanPrinter() { return null; }
+
+			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
+			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
 		};
 	}
 

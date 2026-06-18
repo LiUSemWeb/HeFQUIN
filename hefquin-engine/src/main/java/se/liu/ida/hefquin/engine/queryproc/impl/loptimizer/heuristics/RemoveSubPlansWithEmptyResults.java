@@ -59,8 +59,8 @@ public class RemoveSubPlansWithEmptyResults implements HeuristicForLogicalOptimi
 {
 	protected final CardinalityEstimator cardEst;
 
-	public RemoveSubPlansWithEmptyResults( final QueryProcContext ctxt ) {
-		this( new RequestBasedCardinalityEstimator( ctxt.getFederationAccessMgr() ) );
+	public RemoveSubPlansWithEmptyResults() {
+		this( new RequestBasedCardinalityEstimator() );
 	}
 
 	public RemoveSubPlansWithEmptyResults( final CardinalityEstimator cardEst ) {
@@ -69,10 +69,11 @@ public class RemoveSubPlansWithEmptyResults implements HeuristicForLogicalOptimi
 	}
 
 	@Override
-	public LogicalPlan apply( final LogicalPlan inputPlan ) {
+	public LogicalPlan apply( final LogicalPlan inputPlan,
+	                          final QueryProcContext ctx ) {
 		// Ensure that all subplans have an up-to-date
 		// cardinality estimate before rewriting.
-		cardEst.addCardinalities(inputPlan);
+		cardEst.addCardinalities(ctx,inputPlan);
 
 		return _apply(inputPlan);
 	}

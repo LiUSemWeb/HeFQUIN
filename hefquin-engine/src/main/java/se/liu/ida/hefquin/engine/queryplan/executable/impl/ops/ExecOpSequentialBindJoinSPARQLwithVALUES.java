@@ -96,12 +96,13 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUES
 	                                                         final Element pattern,
 	                                                         final SPARQLEndpoint fm,
 	                                                         final boolean mayReduce ) {
-		final SPARQLRequest request = createRequest(solMaps, pattern);
+		final SPARQLRequest request = createRequest(solMaps, pattern, mayReduce);
 		return new ExecOpRequestSPARQL<>(request, fm, mayReduce, false, null);
 	}
 
 	public static SPARQLRequest createRequest( final Set<Binding> solMaps,
-	                                           final Element pattern ) {
+	                                           final Element pattern,
+	                                           final boolean mayReduce ) {
 		// Create the VALUES clause.
 		log.debug( "Creating VALUES clause for {} bindings", solMaps.size() );
 		final Element valuesClause = createValuesClause(solMaps);
@@ -112,7 +113,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUES
 		group.addElement( pattern );
 
 		// Create the request using the combined pattern.
-		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(group) );
+		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(group), null, mayReduce );
 	}
 
 	public static Element createValuesClause( final Set<Binding> solMaps ) {

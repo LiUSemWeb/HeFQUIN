@@ -21,7 +21,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * To be used for BIND clauses.
@@ -69,7 +69,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	@Override
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	                         final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException {
 		sink.send( worker.extend(inputSolMap) );
 		numberOfOutputMappingsProduced++;
@@ -78,8 +78,8 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	@Override
 	protected void _process( final Iterator<SolutionMapping> inputSolMaps,
 	                         final int maxBatchSize,
-	                         IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	                         final IntermediateResultElementSink sink,
+	                         final QueryProcContextExt ctx )
 		 throws ExecOpExecutionException
 	{
 		final List<SolutionMapping> output = new ArrayList<>();
@@ -100,7 +100,7 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) {
+	                                   final QueryProcContextExt ctx ) {
 		// nothing to be done here
 	}
 

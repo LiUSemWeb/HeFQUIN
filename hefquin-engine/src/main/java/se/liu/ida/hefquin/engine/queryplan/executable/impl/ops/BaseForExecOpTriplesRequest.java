@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
@@ -36,9 +36,9 @@ public abstract class BaseForExecOpTriplesRequest<ReqType extends DataRetrievalR
 
 	@Override
 	protected void _execute( final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt ) throws ExecOpExecutionException
+	                         final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
-		final TriplesResponse response = performRequest( execCxt.getFederationAccessMgr() );
+		final TriplesResponse response = performRequest( ctx.getFederationAccessMgr() );
 		final Iterable<Triple> triples;
 		try {
 			triples = response.getResponseData();

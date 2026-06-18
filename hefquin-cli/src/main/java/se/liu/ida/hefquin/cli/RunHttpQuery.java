@@ -10,7 +10,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.regex.Pattern;
 
+import org.apache.commons.io.output.NullPrintStream;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
@@ -32,6 +34,8 @@ import org.apache.jena.sparql.util.QueryExecUtils;
 
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
+import arq.cmdline.ModTime;
+import se.liu.ida.hefquin.base.net.http.HttpConstants;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
@@ -51,11 +55,16 @@ import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12He
  */
 public class RunHttpQuery extends CmdARQ
 {
-	protected final ModResultsOut modResults = new ModResultsOut();
-	protected final ModQuery      modQuery =   new ModQuery();
+	protected final ModTime        modTime =     new ModTime();
+	protected final ModQuery       modQuery =    new ModQuery();
+	protected final ModResultsOut  modResults =  new ModResultsOut();
 
+	protected final ArgDecl argSuppressResultPrintout = new ArgDecl( ArgDecl.NoValue, "suppressResultPrintout" );
+	protected final ArgDecl argSkipExecution = new ArgDecl( ArgDecl.NoValue, "skipExecution" );
 	protected final ArgDecl argServerAddress = new ArgDecl( ArgDecl.HasValue, "server" );
 	protected final ArgDecl argOutputToFile =  new ArgDecl( ArgDecl.HasValue, "outputToFile" );
+
+	protected static final Pattern BASE_PATTERN = Pattern.compile( "\\bBASE\\b\\s*<[^>]+>", Pattern.CASE_INSENSITIVE );
 
 	public static void main( final String[] argv ) {
 		new RunHttpQuery( argv ).mainRun();
@@ -66,8 +75,11 @@ public class RunHttpQuery extends CmdARQ
 
 		registerHeFQUINJenaIntegration();
 
+		addModule( modTime );
 		addModule( modResults );
 
+		add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
+		add( argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)" );
 		add( argServerAddress, "--server", "Address of HeFQUIN service" );
 		add( argOutputToFile, "--outputToFile", "Output file (optional, printing to stdout if omitted)" );
 
@@ -111,9 +123,14 @@ public class RunHttpQuery extends CmdARQ
 		if ( ! contains(argServerAddress) )
 			cmdError("Must give a server address to send query to", true );
 
-		PrintStream out = System.out;
-		PrintStream ownedStream = null;
-		if ( contains(argOutputToFile) ) {
+		final PrintStream out;
+		final PrintStream ownedStream;
+		// Result printout suppression has highest precedence
+		if ( contains( argSuppressResultPrintout ) ) {
+			out = NullPrintStream.INSTANCE;
+			ownedStream = null;
+		}
+		else if ( contains(argOutputToFile) ) {
 			try {
 				// Appends to file rather than overwriting
 				ownedStream = new PrintStream(
@@ -122,7 +139,12 @@ public class RunHttpQuery extends CmdARQ
 				out = ownedStream;
 			} catch ( final FileNotFoundException e ) {
 				cmdError( "Failed to create print stream for output destination: " + getValue( argOutputToFile ), false );
+				return;
 			}
+		}
+		else {
+			out = System.out;
+			ownedStream = null;
 		}
 
 		final String serverURI = getValue( argServerAddress );
@@ -150,17 +172,23 @@ public class RunHttpQuery extends CmdARQ
 	protected void exec( final String serverURI,
 	                     final Query query,
 	                     final PrintStream out ) {
+		modTime.startTimer();
+
 		final HttpClient client = HttpClient.newBuilder()
 			.connectTimeout( Duration.ofMillis(5000) )
 			.build();
 
-		final HttpRequest request = HttpRequest.newBuilder()
+		final HttpRequest.Builder builder = HttpRequest.newBuilder()
 			.uri( URI.create(serverURI) )
 			.header( "Content-Type", "application/sparql-query" )
 			.header( "Accept", "application/sparql-results+json" )
 			.timeout( Duration.ofSeconds(60) )
-			.POST( HttpRequest.BodyPublishers.ofString(query.toString()) )
-			.build();
+			.POST( HttpRequest.BodyPublishers.ofString(prepareQuery( query )) );
+
+		if ( contains(argSkipExecution) )
+			builder.header( HttpConstants.X_HEADER_SKIP_EXECUTION, "true" );
+
+		final HttpRequest request = builder.build();
 
 		final HttpResponse<InputStream> response;
 		try {
@@ -183,6 +211,11 @@ public class RunHttpQuery extends CmdARQ
 		final ResultSet rs = ResultSetFactory.fromJSON( response.body() );
 
 		QueryExecUtils.outputResultSet( rs, query.getPrologue(), modResults.getResultsFormat(), out );
+
+		if ( modTime.timingEnabled() ) {
+			final long time = modTime.endTimer();
+			System.err.println( "Time: " + modTime.timeStr( time ) + " sec" );
+		}
 	}
 
 	/**
@@ -235,12 +268,12 @@ public class RunHttpQuery extends CmdARQ
 		);
 	}
 
-    /**
-     * Returns the SPARQL query to be executed.
-     *
-     * @return the {@code Query} object
-     * @throws TerminationException if the query file could not be found
-     */
+	/**
+	 * Returns the SPARQL query to be executed.
+	 *
+	 * @return the {@code Query} object
+	 * @throws TerminationException if the query file could not be found
+	 */
 	protected Query getQuery() {
 		try {
 			return modQuery.getQuery();
@@ -248,6 +281,27 @@ public class RunHttpQuery extends CmdARQ
 			System.err.println( "Failed to load query: " + ex.getMessage() );
 			throw new TerminationException( 1 );
 		}
+	}
+
+	/**
+	 * Prepares a SPARQL query for HTTP transmission by ensuring that any base URI
+	 * defined in the query prologue is explicitly included in the serialized query.
+	 *
+	 * <p>If the query already contains an explicit {@code BASE <...>} declaration,
+	 * it is left unchanged. Otherwise, if a base URI is present in the query
+	 * prologue (e.g., provided via the {@code --base} argument), it is injected as
+	 * a leading {@code BASE} clause.</p>
+	 */
+	protected static String prepareQuery( final Query query ) {
+		final String serialized = query.toString();
+
+		if ( query.getPrologue().getBaseURI() == null )
+			return serialized;
+
+		if ( BASE_PATTERN.matcher(serialized).find() )
+			return serialized;
+
+		return "BASE <" + query.getPrologue().getBaseURI() + ">\n" + serialized;
 	}
 
 }

@@ -9,10 +9,9 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CFRNumberOfRequests;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.*;
@@ -31,26 +30,20 @@ import java.util.*;
  */
 public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 {
-    protected final FederationAccessManager fedAccessMgr;
-
-    public CardinalityBasedGreedyJoinPlanOptimizerImpl( final QueryProcContext ctx ) {
-        fedAccessMgr = ctx.getFederationAccessMgr();
-    }
-
     @Override
     public EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans,
-                                                                final QueryProcContext ctxt ) {
-        return new GreedyConstructionAlgorithm(subplans, ctxt);
+                                                                final QueryProcContextExt ctx ) {
+        return new GreedyConstructionAlgorithm(subplans, ctx);
     }
 
     protected class GreedyConstructionAlgorithm implements EnumerationAlgorithm {
         protected final List<PhysicalPlan> subplans;
-        protected final LogicalToPhysicalOpConverter lop2pop;
+        protected final QueryProcContextExt ctx;
 
         public GreedyConstructionAlgorithm( final List<PhysicalPlan> subplans,
-                                            final QueryProcContext ctxt ) {
+                                            final QueryProcContextExt ctx ) {
             this.subplans = subplans;
-            lop2pop = ctxt.getLogicalToPhysicalOpConverter();
+            this.ctx = ctx;
         }
 
         @Override
@@ -68,8 +61,11 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             // requests for the above list of request operators.
             final CardinalityResponse[] resps;
             try {
-                resps = FederationAccessUtils.performCardinalityRequests(fedAccessMgr, reqOpsOfAllSubPlans);
-            } catch (final FederationAccessException e) {
+                resps = FederationAccessUtils.performCardinalityRequests(
+                        ctx.getFederationAccessMgr(),
+                        reqOpsOfAllSubPlans );
+            }
+            catch ( final FederationAccessException e ) {
                 throw new PhysicalOptimizationException("Issuing a cardinality request caused an exception.", e);
             }
 
@@ -262,10 +258,18 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             final PhysicalPlan newPlan;
             final QueryPlanningInfo qpInfoForNewPlan = null;
             if ( accNumSHJ <= accNumBJ ) {
-                newPlan = PhysicalPlanFactory.createPlanWithJoin(currentPlan.plan, nextPlan.plan, qpInfoForNewPlan, lop2pop);
+                newPlan = PhysicalPlanFactory.createPlanWithJoin(
+                        currentPlan.plan,
+                        nextPlan.plan,
+                        qpInfoForNewPlan,
+                        ctx.getLogicalToPhysicalOpConverter() );
             }
             else {
-                newPlan = PhysicalPlanFactory.createPlanWithDefaultUnaryOpIfPossible(currentPlan.plan, nextPlan.plan, qpInfoForNewPlan, lop2pop);
+                newPlan = PhysicalPlanFactory.createPlanWithDefaultUnaryOpIfPossible(
+                        currentPlan.plan,
+                        nextPlan.plan,
+                        qpInfoForNewPlan,
+                        ctx.getLogicalToPhysicalOpConverter() );
             }
 
             // "We estimate the join cardinality of two subexpressions SEi and SEj as the minimum of their cardinalities."(see page 1052 in paper[1])

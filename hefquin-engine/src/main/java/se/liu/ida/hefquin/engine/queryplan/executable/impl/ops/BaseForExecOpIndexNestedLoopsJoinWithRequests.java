@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
@@ -64,8 +64,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 	@Override
 	protected void _processCollectedInput( final List<SolutionMapping> input,
-	                              final IntermediateResultElementSink sink,
-	                              final ExecutionContext execCxt )
+	                                       final IntermediateResultElementSink sink,
+	                                       final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		final CompletableFuture<?>[] futures = new CompletableFuture[ input.size() ];
@@ -89,7 +89,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 			final CompletableFuture<RespType> futureResponse;
 			try {
-				futureResponse = issueRequest( req, execCxt.getFederationAccessMgr() );
+				futureResponse = issueRequest( req, ctx.getFederationAccessMgr() );
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
@@ -133,11 +133,11 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 	@Override
 	protected void _concludeExecution( final List<SolutionMapping> input,
 	                                   final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt )
+	                                   final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		if ( input != null && ! input.isEmpty() ) {
-			_processCollectedInput(input, sink, execCxt);
+			_processCollectedInput(input, sink, ctx);
 		}
 	}
 

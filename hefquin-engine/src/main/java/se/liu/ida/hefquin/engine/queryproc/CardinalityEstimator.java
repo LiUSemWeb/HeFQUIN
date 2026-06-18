@@ -22,7 +22,7 @@ public interface CardinalityEstimator
 	 * @param plans - the plans to be annotated with cardinality estimates
 	 * @see {@link LogicalPlan#getQueryPlanningInfo()}
 	 */
-	void addCardinalities( LogicalPlan ... plans );
+	void addCardinalities( QueryProcContext ctx, LogicalPlan ... plans );
 
 	/**
 	 * Annotates each of the given plans (including, recursively, each of
@@ -39,5 +39,5 @@ public interface CardinalityEstimator
 	 * @param plans - the plans to be annotated with cardinality estimates
 	 * @see {@link PhysicalPlan#getQueryPlanningInfo()}
 	 */
-	void addCardinalities( PhysicalPlan ... plans );
+	void addCardinalities( QueryProcContext ctx, PhysicalPlan ... plans );
 }

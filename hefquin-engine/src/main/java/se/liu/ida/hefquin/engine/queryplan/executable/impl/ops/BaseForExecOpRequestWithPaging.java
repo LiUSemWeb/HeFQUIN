@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
@@ -31,7 +31,7 @@ public abstract class BaseForExecOpRequestWithPaging<
 
 	@Override
 	protected final void _execute( final IntermediateResultElementSink sink,
-	                               final ExecutionContext execCxt ) throws ExecOpExecutionException
+	                               final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
 		int pageNumber = 0;
 		boolean wasLastPage = false;
@@ -43,7 +43,7 @@ public abstract class BaseForExecOpRequestWithPaging<
 			final PageReqType pageRequest = createPageRequest(pageNumber);
 			final PageRespType pageResponse;
 			try {
-				pageResponse = performPageRequest( pageRequest, execCxt.getFederationAccessMgr() );
+				pageResponse = performPageRequest( pageRequest, ctx.getFederationAccessMgr() );
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a page request caused an exception.", e, this);

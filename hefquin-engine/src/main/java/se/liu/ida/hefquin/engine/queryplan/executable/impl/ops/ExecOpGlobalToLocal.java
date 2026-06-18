@@ -13,7 +13,7 @@ import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 {
@@ -40,7 +40,7 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 	@Override
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt ) {
+	                         final QueryProcContextExt ctx ) {
 		final Set<SolutionMapping> output = vm.translateSolutionMappingFromGlobal(inputSolMap);
 		numberOfOutputMappingsProduced += output.size();
 		sink.send(output);
@@ -50,7 +50,7 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 	protected void _process( final Iterator<SolutionMapping> inputSolMaps,
 	                         final int maxBatchSize,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt ) {
+	                         final QueryProcContextExt ctx ) {
 		final List<SolutionMapping> output = new ArrayList<>();
 
 		// Produce the output solution mappings
@@ -68,7 +68,7 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) {
+	                                   final QueryProcContextExt ctx ) {
 		// nothing to be done here
 	}
 
