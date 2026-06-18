@@ -69,15 +69,6 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
 	}
 
-	public FederationAccessManagerWithCache( final FederationAccessManager fedAccMan,
-	                                         final int cacheCapacity,
-	                                         final int maxParallelRequests )
-	{
-		this(fedAccMan, cacheCapacity);
-		// Set default number of parallel request to a given endpoint address
-		HttpClientProvider.setDefaultMaxParallelRequests(maxParallelRequests);
-	}
-
 	/**
 	 * Creates a {@link FederationAccessManagerWithCache} with a default configuration.
 	 */
