@@ -52,7 +52,7 @@ import se.liu.ida.hefquin.federation.members.TPFServer;
  * independent of the internal synchronization used by the cache itself.
  * </p>
  */
-public class FederationAccessManagerWithMapDBCache extends FederationAccessManagerWithCache implements AutoCloseable
+public class FederationAccessManagerWithMapDBCache extends FederationAccessManagerWithCache
 {
 	protected static final long DEFAULT_TIME_TO_LIVE = 300_000; // 5 minutes
 	protected final MapDBCache mapDBCache;
@@ -346,8 +346,9 @@ public class FederationAccessManagerWithMapDBCache extends FederationAccessManag
 	}
 
 	@Override
-	public void close() {
+	public void shutdown() {
 		mapDBCache.close();
+		super.shutdown();
 	}
 
 	/**
