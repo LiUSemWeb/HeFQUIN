@@ -148,14 +148,22 @@ public class SparqlServlet extends HttpServlet {
 					.setSkipExecution( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_SKIP_EXECUTION) ) );
 
 		final QueryResponseBuffers queryResBuf = new QueryResponseBuffers();
-		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_SOURCE_ASSIGNMENT)) )
+		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_SOURCE_ASSIGNMENT)) ) {
+			queryResBuf.sourceAssignment = new ByteArrayOutputStream();
 			ctxBuilder.setSourceAssignmentPrinter( new TextBasedLogicalPlanPrinterImpl( new PrintStream( queryResBuf.sourceAssignment, true, StandardCharsets.UTF_8 ) ) );
-		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_LOGICAL_PLAN)) )
+		}
+		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_LOGICAL_PLAN)) ) {
+			queryResBuf.logicalPlan = new ByteArrayOutputStream();
 			ctxBuilder.setLogicalPlanPrinter( new TextBasedLogicalPlanPrinterImpl( new PrintStream( queryResBuf.logicalPlan, true, StandardCharsets.UTF_8 ) ) );
-		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_PHYSICAL_PLAN)) )
+		}
+		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_PHYSICAL_PLAN)) ) {
+			queryResBuf.physicalPlan = new ByteArrayOutputStream();
 			ctxBuilder.setPhysicalPlanPrinter( new TextBasedPhysicalPlanPrinterImpl( new PrintStream( queryResBuf.physicalPlan, true, StandardCharsets.UTF_8 ) ) );
-		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_EXECUTABLE_PLAN)) )
+		}
+		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_EXECUTABLE_PLAN)) ) {
+			queryResBuf.executablePlan = new ByteArrayOutputStream();
 			ctxBuilder.setExecutablePlanPrinter( new TextBasedExecutablePlanPrinterImpl( new PrintStream( queryResBuf.executablePlan, true, StandardCharsets.UTF_8 ) ) );
+		}
 
 		final QueryProcContext ctx = ctxBuilder.build();
 
@@ -236,7 +244,7 @@ public class SparqlServlet extends HttpServlet {
 	 * @param QueryResponseBuffers container for optional query execution artifacts
 	 * @return the query result and exceptions in JSON format
 	 */
-	private static JsonObject execute( final String queryString, final String mimeType, final QueryProcContext ctx, final QueryResponseBuffers queryResponseBuffers )
+	private static JsonObject execute( final String queryString, final String mimeType, final QueryProcContext ctx, final QueryResponseBuffers queryResBuf )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
 		final Query query = QueryFactory.create( queryString, SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN );
@@ -250,14 +258,14 @@ public class SparqlServlet extends HttpServlet {
 
 		final JsonObject res = new JsonObject();
 		res.put( HttpConstants.JSON_RESULT, resultBaos.toString() );
-		if ( queryResponseBuffers.sourceAssignment.size() > 0 )
-			res.put(HttpConstants.JSON_SOURCE_ASSIGNMENT, queryResponseBuffers.sourceAssignment.toString());
-		if ( queryResponseBuffers.logicalPlan.size() > 0 )
-			res.put(HttpConstants.JSON_LOGICAL_PLAN, queryResponseBuffers.logicalPlan.toString());
-		if ( queryResponseBuffers.physicalPlan.size() > 0 )
-			res.put(HttpConstants.JSON_PHYSICAL_PLAN, queryResponseBuffers.physicalPlan.toString());
-		if ( queryResponseBuffers.executablePlan.size() > 0 )
-			res.put(HttpConstants.JSON_EXECUTABLE_PLAN, queryResponseBuffers.executablePlan.toString());
+		if ( queryResBuf.sourceAssignment != null && queryResBuf.sourceAssignment.size() > 0 )
+			res.put(HttpConstants.JSON_SOURCE_ASSIGNMENT, queryResBuf.sourceAssignment.toString());
+		if ( queryResBuf.logicalPlan != null && queryResBuf.logicalPlan.size() > 0 )
+			res.put(HttpConstants.JSON_LOGICAL_PLAN, queryResBuf.logicalPlan.toString());
+		if ( queryResBuf.physicalPlan != null && queryResBuf.physicalPlan.size() > 0 )
+			res.put(HttpConstants.JSON_PHYSICAL_PLAN, queryResBuf.physicalPlan.toString());
+		if ( queryResBuf.executablePlan != null && queryResBuf.executablePlan.size() > 0 )
+			res.put(HttpConstants.JSON_EXECUTABLE_PLAN, queryResBuf.executablePlan.toString());
 		res.put( HttpConstants.JSON_EXCEPTIONS, ServletUtils.getExceptions(statsAndExceptions) );
 		return res;
 	}
@@ -285,9 +293,9 @@ public class SparqlServlet extends HttpServlet {
 	 * produced during query processing.
 	 */
 	private class QueryResponseBuffers {
-		public final ByteArrayOutputStream sourceAssignment = new ByteArrayOutputStream();
-		public final ByteArrayOutputStream logicalPlan = new ByteArrayOutputStream();
-		public final ByteArrayOutputStream physicalPlan = new ByteArrayOutputStream();
-		public final ByteArrayOutputStream executablePlan = new ByteArrayOutputStream();
+		public ByteArrayOutputStream sourceAssignment;
+		public ByteArrayOutputStream logicalPlan;
+		public ByteArrayOutputStream physicalPlan;
+		public ByteArrayOutputStream executablePlan;
 	}
 }
