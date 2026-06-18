@@ -12,7 +12,7 @@ public class ChronicleCacheEntryInput implements DataInput
 	private final DataInputStream in;
 
 	public ChronicleCacheEntryInput( final Bytes<?> bytes ) {
-		byte[] data = new byte[(int) bytes.readRemaining()];
+		final byte[] data = new byte[(int) bytes.readRemaining()];
 		bytes.read( data );
 		in = new DataInputStream( new ByteArrayInputStream(data) );
 	}
