@@ -67,4 +67,13 @@ public class SharedResourceInitializer implements ServletContextListener
 			throw new RuntimeException( "Failed to access: " + filenameOrURI, e );
 		}
 	}
+
+	@Override
+	public void contextDestroyed( ServletContextEvent sce ) {
+		final HeFQUINEngine engine = (HeFQUINEngine) sce.getServletContext().getAttribute("engine");
+
+		if ( engine != null ) {
+			engine.shutdown();
+		}
+	}
 }
