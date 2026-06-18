@@ -174,12 +174,15 @@ public class SparqlServlet extends HttpServlet {
 			if ( mimeType.equals( ACCEPT_CSV ) ||
 				 mimeType.equals( ACCEPT_TSV ) ||
 				 mimeType.equals( ACCEPT_SPARQL_RESULTS_XML ) ) {
-
 				response.getWriter().write( result.getString( HttpConstants.JSON_RESULT ) );
 				return;
 			}
-			else
+			else if ( mimeType.equals( ACCEPT_SPARQL_RESULTS_JSON ) )
 				response.getWriter().write( result.toString() );
+			else {
+				writeJsonError( response, 406, new JsonString( "Unsupported response format: " + mimeType ) );
+				return;
+			}
 		}
 		catch ( final IllegalQueryException e ) {
 			writeJsonError( response, 400, new JsonString( "The given query is invalid: " + e.getMessage() ) );
@@ -247,10 +250,14 @@ public class SparqlServlet extends HttpServlet {
 
 		final JsonObject res = new JsonObject();
 		res.put( HttpConstants.JSON_RESULT, resultBaos.toString() );
-		res.put( HttpConstants.JSON_SOURCE_ASSIGNMENT, queryResponseBuffers.sourceAssignment.toString() );
-		res.put( HttpConstants.JSON_LOGICAL_PLAN, queryResponseBuffers.logicalPlan.toString() );
-		res.put( HttpConstants.JSON_PHYSICAL_PLAN, queryResponseBuffers.physicalPlan.toString() );
-		res.put( HttpConstants.JSON_EXECUTABLE_PLAN, queryResponseBuffers.executablePlan.toString() );
+		if ( queryResponseBuffers.sourceAssignment.size() > 0 )
+			res.put(HttpConstants.JSON_SOURCE_ASSIGNMENT, queryResponseBuffers.sourceAssignment.toString());
+		if ( queryResponseBuffers.logicalPlan.size() > 0 )
+			res.put(HttpConstants.JSON_LOGICAL_PLAN, queryResponseBuffers.logicalPlan.toString());
+		if ( queryResponseBuffers.physicalPlan.size() > 0 )
+			res.put(HttpConstants.JSON_PHYSICAL_PLAN, queryResponseBuffers.physicalPlan.toString());
+		if ( queryResponseBuffers.executablePlan.size() > 0 )
+			res.put(HttpConstants.JSON_EXECUTABLE_PLAN, queryResponseBuffers.executablePlan.toString());
 		res.put( HttpConstants.JSON_EXCEPTIONS, ServletUtils.getExceptions(statsAndExceptions) );
 		return res;
 	}
