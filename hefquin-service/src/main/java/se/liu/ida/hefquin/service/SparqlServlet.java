@@ -28,6 +28,9 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedExecutablePlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
@@ -128,6 +131,8 @@ public class SparqlServlet extends HttpServlet {
 	private void executeRequest( final String query,
 	                             final HttpServletRequest request,
 	                             final HttpServletResponse response ) throws IOException {
+		logger.debug( "Received SPARQL query: {}", query );
+
 		response.setCharacterEncoding( "utf-8" );
 
 		// Ensure query is not null or empty
@@ -144,34 +149,12 @@ public class SparqlServlet extends HttpServlet {
 		}
 
 		// Create QueryProcContext using request-specific execution settings
-		final QueryProcContextBuilder ctxBuilder = engine.getQueryProcContextBuilder()
-					.setSkipExecution( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_SKIP_EXECUTION) ) );
-
 		final QueryResponseBuffers queryResBuf = new QueryResponseBuffers();
-		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_SOURCE_ASSIGNMENT)) ) {
-			queryResBuf.sourceAssignment = new ByteArrayOutputStream();
-			ctxBuilder.setSourceAssignmentPrinter( new TextBasedLogicalPlanPrinterImpl( new PrintStream( queryResBuf.sourceAssignment, true, StandardCharsets.UTF_8 ) ) );
-		}
-		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_LOGICAL_PLAN)) ) {
-			queryResBuf.logicalPlan = new ByteArrayOutputStream();
-			ctxBuilder.setLogicalPlanPrinter( new TextBasedLogicalPlanPrinterImpl( new PrintStream( queryResBuf.logicalPlan, true, StandardCharsets.UTF_8 ) ) );
-		}
-		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_PHYSICAL_PLAN)) ) {
-			queryResBuf.physicalPlan = new ByteArrayOutputStream();
-			ctxBuilder.setPhysicalPlanPrinter( new TextBasedPhysicalPlanPrinterImpl( new PrintStream( queryResBuf.physicalPlan, true, StandardCharsets.UTF_8 ) ) );
-		}
-		if ( Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_PRINT_EXECUTABLE_PLAN)) ) {
-			queryResBuf.executablePlan = new ByteArrayOutputStream();
-			ctxBuilder.setExecutablePlanPrinter( new TextBasedExecutablePlanPrinterImpl( new PrintStream( queryResBuf.executablePlan, true, StandardCharsets.UTF_8 ) ) );
-		}
-
-		final QueryProcContext ctx = ctxBuilder.build();
+		final QueryProcContext ctx = createQueryProcContext(queryResBuf, request);
 
 		try {
-			logger.debug( "Received SPARQL query: {}", query );
-
-			final JsonObject result = execute( query, mimeType, ctx, queryResBuf );
-			if ( ! result.get( HttpConstants.JSON_EXCEPTIONS ).getAsArray().isEmpty() ) {
+			final JsonObject result = execute(query, mimeType, ctx, queryResBuf);
+			if ( ! result.get(HttpConstants.JSON_EXCEPTIONS).getAsArray().isEmpty() ) {
 				writeJsonError( response, 500, result.get( HttpConstants.JSON_EXCEPTIONS ) );
 				return;
 			}
@@ -288,11 +271,70 @@ public class SparqlServlet extends HttpServlet {
 		response.getWriter().write( msg.toString() );
 	}
 
+	protected QueryProcContext createQueryProcContext( final QueryResponseBuffers queryResBuf,
+	                                                   final HttpServletRequest request ) {
+		final QueryProcContextBuilder ctxBuilder = engine.getQueryProcContextBuilder();
+
+		final String skipExec = request.getHeader( HttpConstants.X_HEADER_SKIP_EXECUTION );
+		ctxBuilder.setSkipExecution( Boolean.parseBoolean(skipExec) );
+
+		final String printSA = request.getHeader( HttpConstants.X_HEADER_PRINT_SOURCE_ASSIGNMENT );
+		final String printLP = request.getHeader( HttpConstants.X_HEADER_PRINT_LOGICAL_PLAN );
+		final String printPP = request.getHeader( HttpConstants.X_HEADER_PRINT_PHYSICAL_PLAN );
+		final String printEP = request.getHeader( HttpConstants.X_HEADER_PRINT_EXECUTABLE_PLAN );
+
+		if ( Boolean.parseBoolean(printSA) ) {
+			queryResBuf.sourceAssignment = new ByteArrayOutputStream();
+
+			final PrintStream ps = new PrintStream( queryResBuf.sourceAssignment,
+			                                        true, // auto flush
+			                                        StandardCharsets.UTF_8 );
+			final LogicalPlanPrinter p = new TextBasedLogicalPlanPrinterImpl(ps);
+
+			ctxBuilder.setSourceAssignmentPrinter(p);
+		}
+
+		if ( Boolean.parseBoolean(printLP) ) {
+			queryResBuf.logicalPlan = new ByteArrayOutputStream();
+
+			final PrintStream ps = new PrintStream( queryResBuf.logicalPlan,
+			                                        true, // auto flush
+			                                        StandardCharsets.UTF_8 );
+			final LogicalPlanPrinter p = new TextBasedLogicalPlanPrinterImpl(ps);
+
+			ctxBuilder.setLogicalPlanPrinter(p);
+		}
+
+		if ( Boolean.parseBoolean(printPP) ) {
+			queryResBuf.physicalPlan = new ByteArrayOutputStream();
+
+			final PrintStream ps = new PrintStream( queryResBuf.physicalPlan,
+			                                        true, // auto flush
+			                                        StandardCharsets.UTF_8 );
+			final PhysicalPlanPrinter p = new TextBasedPhysicalPlanPrinterImpl(ps);
+
+			ctxBuilder.setPhysicalPlanPrinter(p);
+		}
+
+		if ( Boolean.parseBoolean(printEP) ) {
+			queryResBuf.executablePlan = new ByteArrayOutputStream();
+
+			final PrintStream ps = new PrintStream( queryResBuf.executablePlan,
+			                                        true, // auto flush
+			                                        StandardCharsets.UTF_8 );
+			final ExecutablePlanPrinter p = new TextBasedExecutablePlanPrinterImpl(ps);
+
+			ctxBuilder.setExecutablePlanPrinter(p);
+		}
+
+		return ctxBuilder.build();
+	}
+
 	/**
 	 * Holds optional serialized query execution artifacts (plans and source assignments)
 	 * produced during query processing.
 	 */
-	private class QueryResponseBuffers {
+	protected static class QueryResponseBuffers {
 		public ByteArrayOutputStream sourceAssignment;
 		public ByteArrayOutputStream logicalPlan;
 		public ByteArrayOutputStream physicalPlan;
