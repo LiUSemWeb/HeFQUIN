@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.cli;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,11 +10,15 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.output.NullPrintStream;
 import org.apache.jena.atlas.io.IndentedWriter;
+import org.apache.jena.atlas.json.JSON;
+import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
 import org.apache.jena.query.ARQ;
@@ -36,6 +41,7 @@ import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
 import se.liu.ida.hefquin.base.net.http.HttpConstants;
+import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
@@ -55,9 +61,10 @@ import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12He
  */
 public class RunHttpQuery extends CmdARQ
 {
-	protected final ModTime        modTime =     new ModTime();
-	protected final ModQuery       modQuery =    new ModQuery();
-	protected final ModResultsOut  modResults =  new ModResultsOut();
+	protected final ModTime          modTime =          new ModTime();
+	protected final ModPlanPrinting  modPlanPrinting =  new ModPlanPrinting();
+	protected final ModResultsOut    modResults =       new ModResultsOut();
+	protected final ModQuery         modQuery =         new ModQuery();
 
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl( ArgDecl.NoValue, "suppressResultPrintout" );
 	protected final ArgDecl argSkipExecution = new ArgDecl( ArgDecl.NoValue, "skipExecution" );
@@ -76,6 +83,7 @@ public class RunHttpQuery extends CmdARQ
 		registerHeFQUINJenaIntegration();
 
 		addModule( modTime );
+		addModule( modPlanPrinting );
 		addModule( modResults );
 
 		add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
@@ -188,6 +196,18 @@ public class RunHttpQuery extends CmdARQ
 		if ( contains(argSkipExecution) )
 			builder.header( HttpConstants.X_HEADER_SKIP_EXECUTION, "true" );
 
+		if ( modPlanPrinting.getSourceAssignmentPrinter() != null )
+			builder.header( HttpConstants.X_HEADER_PRINT_SOURCE_ASSIGNMENT, "true" );
+
+		if ( modPlanPrinting.getLogicalPlanPrinter() != null )
+			builder.header( HttpConstants.X_HEADER_PRINT_LOGICAL_PLAN, "true" );
+
+		if ( modPlanPrinting.getPhysicalPlanPrinter() != null )
+			builder.header( HttpConstants.X_HEADER_PRINT_PHYSICAL_PLAN, "true" );
+
+		if ( modPlanPrinting.getExecutablePlanPrinter() != null )
+			builder.header( HttpConstants.X_HEADER_PRINT_EXECUTABLE_PLAN, "true" );
+
 		final HttpRequest request = builder.build();
 
 		final HttpResponse<InputStream> response;
@@ -195,11 +215,11 @@ public class RunHttpQuery extends CmdARQ
 			response = client.send( request, HttpResponse.BodyHandlers.ofInputStream() );
 		}
 		catch ( final IOException e ) {
-			cmdError( "Request to address at <" + serverURI.toString() + "> failed: " + e.getMessage(), true );
+			cmdError( "Request to address at <" + serverURI + "> failed: " + e.getMessage(), true );
 			return;
 		}
 		catch ( final InterruptedException e ) {
-			cmdError( "Request to address at <" + serverURI.toString() + "> failed: " + e.getMessage(), true );
+			cmdError( "Request to address at <" + serverURI + "> failed: " + e.getMessage(), true );
 			return;
 		}
 
@@ -208,7 +228,16 @@ public class RunHttpQuery extends CmdARQ
 			return;
 		}
 
-		final ResultSet rs = ResultSetFactory.fromJSON( response.body() );
+		final JsonObject obj = JSON.parse(response.body());
+
+		printPlans( obj );
+
+		final ResultSet rs = ResultSetFactory.fromJSON(
+			new ByteArrayInputStream(
+				obj.getString(HttpConstants.JSON_RESULT)
+				.getBytes(StandardCharsets.UTF_8)
+			)
+		);
 
 		QueryExecUtils.outputResultSet( rs, query.getPrologue(), modResults.getResultsFormat(), out );
 
@@ -304,4 +333,28 @@ public class RunHttpQuery extends CmdARQ
 		return "BASE <" + query.getPrologue().getBaseURI() + ">\n" + serialized;
 	}
 
+	/**
+	 * Prints any query planning and execution artifacts contained in the
+	 * given response object using the printers configured in the plan
+	 * printing module.
+	 *
+	 * @param obj JSON response object returned by the HeFQUIN service
+	 */
+	protected void printPlans( final JsonObject obj ) {
+		final JsonValue srcasgValue = obj.get(HttpConstants.JSON_SOURCE_ASSIGNMENT);
+		if ( srcasgValue != null && srcasgValue.isString() )
+			modPlanPrinting.printSourceAssignment( srcasgValue.getAsString().value() );
+
+		final JsonValue lplanValue = obj.get(HttpConstants.JSON_LOGICAL_PLAN);
+		if ( lplanValue != null && lplanValue.isString() )
+			modPlanPrinting.printLogicalPlan( lplanValue.getAsString().value() );
+
+		final JsonValue pplanValue = obj.get(HttpConstants.JSON_PHYSICAL_PLAN);
+		if ( pplanValue != null && pplanValue.isString() )
+			modPlanPrinting.printPhysicalPlan( pplanValue.getAsString().value() );
+
+		final JsonValue eplanValue = obj.get(HttpConstants.JSON_EXECUTABLE_PLAN);
+		if ( eplanValue != null && eplanValue.isString() )
+			modPlanPrinting.printExecutablePlan( eplanValue.getAsString().value() );
+	}
 }
