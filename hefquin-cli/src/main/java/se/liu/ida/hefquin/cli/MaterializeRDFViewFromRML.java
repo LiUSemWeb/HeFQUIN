@@ -112,7 +112,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	@Override
 	protected void exec() {
 		if ( ! contains(argRdfFile) )
-			cmdError("Must give an RDF input file", true );
+			cmdError("Must give an RDF input file", false );
 
 		final Model rdfModel = RDFDataMgr.loadModel( getValue( argRdfFile ) );
 
@@ -151,13 +151,16 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	                     final OutputStream out ) {
 		final ResIterator iter = rmlDescr.listResourcesWithProperty( RDF.type, RMLVocab.TriplesMap );
 		final List<MappingExpression> trMaps = new ArrayList<>();
+		final File rdfFile = (new File( getValue(argRdfFile) )).getAbsoluteFile();
+		final File mappingDir = rdfFile.getParentFile();
 		while ( iter.hasNext() ) {
 			final Resource tm = iter.next();
 			final MappingExpression trMap;
 			try {
 				trMap = RML2MappingAlgebra.convert( tm,
 				                                    rmlDescr,
-				                                    baseIRI );
+				                                    baseIRI,
+				                                    mappingDir );
 			}
 			catch ( final RMLParserException e ) {
 				cmdError("There is a problem in the RML mapping: " +  e.getMessage(), true );

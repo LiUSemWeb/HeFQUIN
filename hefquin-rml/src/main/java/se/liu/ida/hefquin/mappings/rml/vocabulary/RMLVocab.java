@@ -361,9 +361,6 @@ public class RMLVocab {
      */
     public static final Resource LogicalView = M_MODEL.createResource( "http://w3id.org/rml/LogicalView" );
 
-    /** <p>Denotes a relative path source.</p> */
-    public static final Resource RelativePathSource = M_MODEL.createResource( "http://w3id.org/rml/RelativePathSource" );
-
     /** <p>Denotes a file path.</p> */
     public static final Resource FilePath = M_MODEL.createResource( "http://w3id.org/rml/FilePath" );
 

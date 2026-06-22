@@ -15,6 +15,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
@@ -59,12 +60,14 @@ public class RML2MappingAlgebra
 	 * @param tm
 	 * @param rmlDescription
 	 * @param baseIRI
+	 * @param mappingDir
 	 * @return
 	 * @throws RMLParserException
 	 */
 	public static MappingExpression convert( final Resource tm,
 	                                         final Model rmlDescription,
-	                                         final Node baseIRI )
+	                                         final Node baseIRI,
+	                                         final File mappingDir )
 			throws RMLParserException
 	{
 		// lines 5-8 of Algorithm 1
@@ -104,7 +107,7 @@ public class RML2MappingAlgebra
 		final Map<String, String> PwithStrings = createPwithStrings(queryStrings);
 		final Map<String, JsonPathQuery> P = createP(PwithStrings, tm);
 		final MappingOperator extractOp = new MappingOpExtractJSON(
-				createSourceReference(tm),
+				createSourceReference(tm, mappingDir),
 				checkSourceAndGetRootQuery(tm),
 				P );
 		MappingExpression expr = MappingExpressionFactory.create(extractOp);
@@ -145,7 +148,7 @@ public class RML2MappingAlgebra
 			final Map<String, String> PwithStrings2 = createPwithStrings(queryStrings2);
 			final Map<String, JsonPathQuery> P2 = createP(PwithStrings2, ptm);
 			final MappingOperator extractOp2 = new MappingOpExtractJSON(
-					createSourceReference(ptm),
+					createSourceReference(ptm, mappingDir),
 					checkSourceAndGetRootQuery(ptm),
 					P2 );
 			final MappingExpression expr2 = MappingExpressionFactory.create(extractOp2);
@@ -280,7 +283,7 @@ public class RML2MappingAlgebra
 		}
 	}
 
-	public static SourceReference createSourceReference( final Resource tm )
+	public static SourceReference createSourceReference( final Resource tm, final File mappingDir )
 			throws RMLParserException
 	{
 		// Get the rml:logicalSource of the given triples map.
@@ -304,8 +307,8 @@ public class RML2MappingAlgebra
 
 		if ( src.hasProperty( RDF.type, FDVocab.TemplateBasedInterface ) || src.hasProperty( RDF.type, FDVocab.FixedEndpointInterface ) )
 			return new MySourceReference(src);
-		else if ( src.hasProperty( RDF.type, RMLVocab.RelativePathSource ) || src.hasProperty( RDF.type, RMLVocab.FilePath ) )
-			return new FileSourceReference(src);
+		else if ( src.hasProperty( RDF.type, RMLVocab.FilePath ) )
+			return new FileSourceReference(src, mappingDir);
 		else {
 			throw new RMLParserException(
 				"The following object of an rml:source triple has an unsupported or unspecified type: " + src
@@ -657,10 +660,38 @@ public class RML2MappingAlgebra
 	public static class FileSourceReference implements SourceReference {
 		public final File file;
 		public FileSourceReference( final File file ) { this.file = file; }
-		public FileSourceReference( final Resource r ) {
-			final String path = r.getProperty( RMLVocab.path ).getString();
+		public FileSourceReference( final Resource r, final File mappingDir ) {
+			final Statement s = r.getProperty( RMLVocab.path );
+			if ( s == null || ! s.getObject().isLiteral() )
+				throw new IllegalArgumentException( "Missing or invalid rml:path on " + r );
 
-			this.file = new File( path );
+			final Statement rootStatement = r.getProperty( RMLVocab.root );
+			String rootPath = System.getProperty( "user.dir" );
+
+			if ( rootStatement != null ) {
+				final RDFNode rootNode = rootStatement.getObject();
+
+				if ( rootNode.isLiteral() ) {
+					rootPath = rootNode.asLiteral().getString();
+				}
+				else if ( rootNode.isResource() ) {
+					final Resource rootRes = rootNode.asResource();
+
+					// handle special cases
+					final String uri = rootRes.getURI();
+
+					if ( uri.equals(RMLVocab.CurrentWorkingDirectory.getURI()) ) {
+						// do nothing: already default
+					}
+					else if ( uri.equals(RMLVocab.MappingDirectory.getURI()) ) {
+						rootPath = mappingDir.toString();
+					}
+					else {
+						throw new IllegalArgumentException( "Unknown rml:root resource: " + uri );
+					}
+				}
+			}
+			this.file = new File( rootPath, s.getString() );
 		}
 
 		@Override
