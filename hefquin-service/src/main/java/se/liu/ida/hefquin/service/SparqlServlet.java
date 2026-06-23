@@ -157,8 +157,6 @@ public class SparqlServlet extends HttpServlet {
 		final boolean returnFedAccessStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS));
 
 		try {
-			logger.debug( "Received SPARQL query: {}", query );
-
 			final JsonObject result = execute( query, mimeType, ctx, queryResBuf, returnQueryProcStats, returnFedAccessStats );
 			if ( ! result.get(HttpConstants.JSON_EXCEPTIONS).getAsArray().isEmpty() ) {
 				writeJsonError( response, 500, result.get( HttpConstants.JSON_EXCEPTIONS ) );

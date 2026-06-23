@@ -282,14 +282,14 @@ public class RunHttpQuery extends CmdARQ
 				}
 			}
 			if ( contains( argOnelineTimeStats ) ) {
-				final String queryProcStats = getQueryProcStats( queryProcStatsValue );
+				final String queryProcStats = extractOnelineTimeStats( queryProcStatsValue );
 				System.out.println( queryProcStats );
 			}
 			if ( contains( argOnelineTimeStatsToFile ) ) {
 				final String outputDest = getValue( argOnelineTimeStatsToFile );
 				if ( outputDestIsValid( outputDest ) ) {
 					try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest, true ) ) ) {
-						final String queryProcStats = getQueryProcStats( queryProcStatsValue );
+						final String queryProcStats = extractOnelineTimeStats( queryProcStatsValue );
 						printStream.println( queryProcStats );
 					} catch ( final FileNotFoundException ex ) {
 						cmdError( "Failed to create print stream for output destination: " + outputDest, false );
@@ -438,7 +438,7 @@ public class RunHttpQuery extends CmdARQ
 	 * @param statsAndExceptions the object containing query processing statistics
 	 * @return a comma-separated string of query processing statistics
 	 */
-	private static String getQueryProcStats( final JsonValue statsAndExceptions ) {
+	private static String extractOnelineTimeStats( final JsonValue statsAndExceptions ) {
 		final JsonObject obj = statsAndExceptions.getAsObject();
 
 		final long overallQueryProcessingTime = obj.get("overallQueryProcessingTime").getAsNumber().value().longValue();
