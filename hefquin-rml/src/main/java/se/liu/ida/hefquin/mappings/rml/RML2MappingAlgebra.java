@@ -675,11 +675,7 @@ public class RML2MappingAlgebra
 					rootPath = rootNode.asLiteral().getString();
 				}
 				else if ( rootNode.isURIResource() ) {
-					final Resource rootRes = rootNode.asResource();
-
-					// handle special cases
-					final String uri = rootRes.getURI();
-
+					final String uri = rootNode.asResource().getURI();
 					if ( uri.equals(RMLVocab.CurrentWorkingDirectory.getURI()) )
 						rootPath = System.getProperty( "user.dir" );
 					else if ( uri.equals(RMLVocab.MappingDirectory.getURI()) )

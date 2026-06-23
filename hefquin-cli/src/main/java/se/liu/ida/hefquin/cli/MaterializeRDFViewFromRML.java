@@ -250,7 +250,7 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	 */
 	protected void validateMappingArg() {
 		if ( ! contains(argRdfFile) ) {
-			throw new IllegalArgumentException( "Must give an RDF input file" );
+			throw new IllegalArgumentException( "No RML mapping file provided." );
 		}
 	}
 }
