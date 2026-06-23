@@ -8,6 +8,8 @@ public class HttpConstants
 	public static final String X_HEADER_PRINT_LOGICAL_PLAN = "X-HeFQUIN-Print-Logical-Plan";
 	public static final String X_HEADER_PRINT_PHYSICAL_PLAN = "X-HeFQUIN-Print-Physical-Plan";
 	public static final String X_HEADER_PRINT_EXECUTABLE_PLAN = "X-HeFQUIN-Print-Executable-Plan";
+	public static final String X_HEADER_RETURN_QUERY_PROC_STATS = "X-HeFQUIN-Return-Query-Proc-Stats";
+	public static final String X_HEADER_RETURN_FED_ACCESS_STATS = "X-HeFQUIN-Return-Fed-Access-Stats";
 
 	// response JSON fields
 	public static final String JSON_RESULT = "result";
@@ -16,4 +18,6 @@ public class HttpConstants
 	public static final String JSON_PHYSICAL_PLAN = "physicalPlan";
 	public static final String JSON_EXECUTABLE_PLAN = "executablePlan";
 	public static final String JSON_EXCEPTIONS = "exceptions";
+	public static final String JSON_QUERY_PROC_STATS = "queryProcStats";
+	public static final String JSON_FED_ACCESS_STATS = "fedAccessStats";
 }

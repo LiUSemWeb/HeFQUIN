@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import se.liu.ida.hefquin.base.net.http.HttpConstants;
+import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
@@ -152,8 +153,11 @@ public class SparqlServlet extends HttpServlet {
 		final QueryResponseBuffers queryResBuf = new QueryResponseBuffers();
 		final QueryProcContext ctx = createQueryProcContext(queryResBuf, request);
 
+		final boolean returnQueryProcStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_QUERY_PROC_STATS));
+		final boolean returnFedAccessStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS));
+
 		try {
-			final JsonObject result = execute(query, mimeType, ctx, queryResBuf);
+			final JsonObject result = execute( query, mimeType, ctx, queryResBuf, returnQueryProcStats, returnFedAccessStats );
 			if ( ! result.get(HttpConstants.JSON_EXCEPTIONS).getAsArray().isEmpty() ) {
 				writeJsonError( response, 500, result.get( HttpConstants.JSON_EXCEPTIONS ) );
 				return;
@@ -225,11 +229,16 @@ public class SparqlServlet extends HttpServlet {
 	 * @param mimeType             the MIME type for the response format
 	 * @param ctx                  the processing context
 	 * @param QueryResponseBuffers container for optional query execution artifacts
-	 * @return the query result and exceptions in JSON format
+	 * @param returnQueryProcStats whether query proccessing stats should be returned
+	 * @param returnFedAccessStats whether federation access stats should be returned
+	 * @return a JSON object containing the query result, any exceptions, optional plans and statistics
 	 */
-	private static JsonObject execute( final String queryString, final String mimeType, final QueryProcContext ctx, final QueryResponseBuffers queryResBuf )
-			throws UnsupportedQueryException, IllegalQueryException
-	{
+	private static JsonObject execute( final String queryString,
+	                                   final String mimeType,
+	                                   final QueryProcContext ctx,
+	                                   final QueryResponseBuffers queryResBuf,
+	                                   final boolean returnQueryProcStats,
+	                                   final boolean returnFedAccessStats ) throws UnsupportedQueryException, IllegalQueryException {
 		final Query query = QueryFactory.create( queryString, SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN );
 		final ResultsFormat resultsFormat = ServletUtils.convert( mimeType );
 		final ByteArrayOutputStream resultBaos = new ByteArrayOutputStream();
@@ -250,6 +259,16 @@ public class SparqlServlet extends HttpServlet {
 		if ( queryResBuf.executablePlan != null && queryResBuf.executablePlan.size() > 0 )
 			res.put(HttpConstants.JSON_EXECUTABLE_PLAN, queryResBuf.executablePlan.toString());
 		res.put( HttpConstants.JSON_EXCEPTIONS, ServletUtils.getExceptions(statsAndExceptions) );
+
+		final JsonObject queryProcStatsAsJson;
+		if ( statsAndExceptions != null && returnQueryProcStats ) {
+			queryProcStatsAsJson = StatsPrinter.statsAsJson(statsAndExceptions, true);
+			res.put( HttpConstants.JSON_QUERY_PROC_STATS, queryProcStatsAsJson );
+		}
+		if ( returnFedAccessStats ) {
+			final JsonObject fedAccessStatsAsJson = StatsPrinter.statsAsJson(engine.getFederationAccessStats(), true);
+			res.put( HttpConstants.JSON_FED_ACCESS_STATS, fedAccessStatsAsJson );
+		}
 		return res;
 	}
 
