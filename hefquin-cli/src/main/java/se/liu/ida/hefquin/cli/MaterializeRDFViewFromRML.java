@@ -111,8 +111,12 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	 */
 	@Override
 	protected void exec() {
-		if ( ! contains(argRdfFile) )
-			cmdError("Must give an RDF input file", false );
+		try {
+			validateMappingArg();
+		}
+		catch ( final IllegalArgumentException ex ) {
+			cmdError( ex.getMessage(), true );
+		}
 
 		final Model rdfModel = RDFDataMgr.loadModel( getValue( argRdfFile ) );
 
@@ -236,6 +240,17 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
 			System.out.println("Overall Processing Time: " + modTime.timeStr(time) + " sec");
+		}
+	}
+
+	/**
+	 * Validates that the required RDF mapping file argument is provided.
+	 *
+	 * @throws IllegalArgumentException if no RDF input file argument is provided
+	 */
+	protected void validateMappingArg() {
+		if ( ! contains(argRdfFile) ) {
+			throw new IllegalArgumentException( "Must give an RDF input file" );
 		}
 	}
 }

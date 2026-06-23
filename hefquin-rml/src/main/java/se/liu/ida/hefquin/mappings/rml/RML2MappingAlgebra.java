@@ -666,7 +666,7 @@ public class RML2MappingAlgebra
 				throw new IllegalArgumentException( "Missing or invalid rml:path on " + r );
 
 			final Statement rootStatement = r.getProperty( RMLVocab.root );
-			String rootPath = System.getProperty( "user.dir" );
+			final String rootPath;
 
 			if ( rootStatement != null ) {
 				final RDFNode rootNode = rootStatement.getObject();
@@ -674,23 +674,25 @@ public class RML2MappingAlgebra
 				if ( rootNode.isLiteral() ) {
 					rootPath = rootNode.asLiteral().getString();
 				}
-				else if ( rootNode.isResource() ) {
+				else if ( rootNode.isURIResource() ) {
 					final Resource rootRes = rootNode.asResource();
 
 					// handle special cases
 					final String uri = rootRes.getURI();
 
-					if ( uri.equals(RMLVocab.CurrentWorkingDirectory.getURI()) ) {
-						// do nothing: already default
-					}
-					else if ( uri.equals(RMLVocab.MappingDirectory.getURI()) ) {
+					if ( uri.equals(RMLVocab.CurrentWorkingDirectory.getURI()) )
+						rootPath = System.getProperty( "user.dir" );
+					else if ( uri.equals(RMLVocab.MappingDirectory.getURI()) )
 						rootPath = mappingDir.toString();
-					}
-					else {
+					else
 						throw new IllegalArgumentException( "Unknown rml:root resource: " + uri );
-					}
 				}
+				else
+					throw new IllegalArgumentException( "Unsupported rml:root value type on " + r + ": " + rootNode );
 			}
+			else
+				rootPath = System.getProperty( "user.dir" );
+
 			this.file = new File( rootPath, s.getString() );
 		}
 
