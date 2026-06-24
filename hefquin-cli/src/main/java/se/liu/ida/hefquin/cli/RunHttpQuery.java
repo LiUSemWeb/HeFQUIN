@@ -43,6 +43,7 @@ import arq.cmdline.ModTime;
 import se.liu.ida.hefquin.base.net.http.HttpConstants;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
+import se.liu.ida.hefquin.cli.modules.ModResultsOutExt;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
 
@@ -65,17 +66,10 @@ public class RunHttpQuery extends CmdARQ
 	protected final ModPlanPrinting  modPlanPrinting =  new ModPlanPrinting();
 	protected final ModResultsOut    modResults =       new ModResultsOut();
 	protected final ModQuery         modQuery =         new ModQuery();
+	protected final ModResultsOutExt modResultsExt =    new ModResultsOutExt();
 
-	protected final ArgDecl argSuppressResultPrintout = new ArgDecl( ArgDecl.NoValue, "suppressResultPrintout" );
-	protected final ArgDecl argSkipExecution = new ArgDecl( ArgDecl.NoValue, "skipExecution" );
 	protected final ArgDecl argServerAddress = new ArgDecl( ArgDecl.HasValue, "server" );
 	protected final ArgDecl argOutputToFile =  new ArgDecl( ArgDecl.HasValue, "outputToFile" );
-	protected final ArgDecl argQueryProcStats = new ArgDecl( ArgDecl.NoValue, "printQueryProcStats" );
-	protected final ArgDecl argOnelineTimeStats = new ArgDecl( ArgDecl.NoValue, "printQueryProcMeasurements" );
-	protected final ArgDecl argFedAccessStats = new ArgDecl( ArgDecl.NoValue, "printFedAccessStats" );
-	protected final ArgDecl argQueryProcStatsToFile = new ArgDecl( ArgDecl.HasValue, "printQueryProcStatsToFile" );
-	protected final ArgDecl argOnelineTimeStatsToFile = new ArgDecl( ArgDecl.HasValue, "printQueryProcMeasurementsToFile" );
-	protected final ArgDecl argFedAccessStatsToFile = new ArgDecl( ArgDecl.HasValue, "printFedAccessStatsToFile" );
 
 	protected static final Pattern BASE_PATTERN = Pattern.compile( "\\bBASE\\b\\s*<[^>]+>", Pattern.CASE_INSENSITIVE );
 
@@ -91,18 +85,10 @@ public class RunHttpQuery extends CmdARQ
 		addModule( modTime );
 		addModule( modPlanPrinting );
 		addModule( modResults );
+		addModule( modResultsExt );
 
-		add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
-		add( argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)" );
 		add( argServerAddress, "--server", "Address of HeFQUIN service" );
 		add( argOutputToFile, "--outputToFile", "Output file (optional, printing to stdout if omitted)" );
-		add( argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process" );
-		add( argQueryProcStatsToFile, "--printQueryProcStatsToFile", "Print out statistics about the query execution process to a file" );
-		add( argOnelineTimeStats, "--printQueryProcMeasurements",
-				"Print out measurements about the query processing time in one line that can be used for a CSV file" );
-		add( argOnelineTimeStatsToFile, "--printQueryProcMeasurementsToFile", "Print out measurements about the query processing time to a file" );
-		add( argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager" );
-		add( argFedAccessStatsToFile, "--printFedAccessStatsToFile", "Print out statistics of the federation access manager to a file" );
 
 		addModule( modQuery );
 	}
@@ -147,7 +133,7 @@ public class RunHttpQuery extends CmdARQ
 		final PrintStream out;
 		final PrintStream ownedStream;
 		// Result printout suppression has highest precedence
-		if ( contains( argSuppressResultPrintout ) ) {
+		if ( modResultsExt.isSuppressResultPrintout() ) {
 			out = NullPrintStream.INSTANCE;
 			ownedStream = null;
 		}
@@ -206,7 +192,7 @@ public class RunHttpQuery extends CmdARQ
 			.timeout( Duration.ofSeconds(60) )
 			.POST( HttpRequest.BodyPublishers.ofString(prepareQuery( query )) );
 
-		if ( contains( argSkipExecution ) )
+		if ( modResultsExt.isSkipExecution() )
 			builder.header( HttpConstants.X_HEADER_SKIP_EXECUTION, "true" );
 
 		if ( modPlanPrinting.getSourceAssignmentPrinter() != null )
@@ -221,10 +207,10 @@ public class RunHttpQuery extends CmdARQ
 		if ( modPlanPrinting.getExecutablePlanPrinter() != null )
 			builder.header( HttpConstants.X_HEADER_PRINT_EXECUTABLE_PLAN, "true" );
 
-		if ( contains( argQueryProcStats ) || contains( argQueryProcStatsToFile ) || contains( argOnelineTimeStats ) || contains( argOnelineTimeStatsToFile ) )
+		if ( modResultsExt.needsQueryProcStats() )
 			builder.header( HttpConstants.X_HEADER_RETURN_QUERY_PROC_STATS, "true" );
 
-		if ( contains( argFedAccessStats ) || contains( argFedAccessStatsToFile ) )
+		if ( modResultsExt.needsFedAccessStats() )
 			builder.header( HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS, "true" );
 
 		final HttpRequest request = builder.build();
@@ -267,52 +253,45 @@ public class RunHttpQuery extends CmdARQ
 
 		final JsonValue queryProcStatsValue = obj.get(HttpConstants.JSON_QUERY_PROC_STATS);
 		if ( queryProcStatsValue != null ) {
-			if ( contains( argQueryProcStats ) ) {
+			if ( modResultsExt.isPrintQueryProcStats() ) {
 				System.err.println( queryProcStatsValue.toString() );
 				System.err.println();
 			}
-			if ( contains( argQueryProcStatsToFile ) ) {
-				final String outputDest = getValue( argQueryProcStatsToFile );
-				if ( outputDestIsValid( outputDest ) ) {
-					try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest, true ) ) ) {
-						printStream.print( queryProcStatsValue.toString() );
-					} catch ( final FileNotFoundException ex ) {
-						cmdError( "Failed to create print stream for output destination: " + outputDest, false );
-					}
-				}
+			final String queryProcStatsFile = modResultsExt.getQueryProcStatsFile();
+			if ( queryProcStatsFile != null ) {
+				ModResultsOutExt.writeContentToFile(
+					queryProcStatsFile,
+					ps -> ps.print( queryProcStatsValue.toString() ),
+					msg -> cmdError( msg, false )
+				);
 			}
-			if ( contains( argOnelineTimeStats ) ) {
+			if ( modResultsExt.isPrintOnelineTimeStats() ) {
 				final String queryProcStats = extractOnelineTimeStats( queryProcStatsValue );
 				System.out.println( queryProcStats );
 			}
-			if ( contains( argOnelineTimeStatsToFile ) ) {
-				final String outputDest = getValue( argOnelineTimeStatsToFile );
-				if ( outputDestIsValid( outputDest ) ) {
-					try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest, true ) ) ) {
-						final String queryProcStats = extractOnelineTimeStats( queryProcStatsValue );
-						printStream.println( queryProcStats );
-					} catch ( final FileNotFoundException ex ) {
-						cmdError( "Failed to create print stream for output destination: " + outputDest, false );
-					}
-				}
+			final String oneLineTimeStatsFile = modResultsExt.getOnelineTimeStatsFile();
+			if ( oneLineTimeStatsFile != null ) {
+				ModResultsOutExt.writeContentToFile(
+					oneLineTimeStatsFile,
+					ps -> ps.print( extractOnelineTimeStats( queryProcStatsValue ) ),
+					msg -> cmdError( msg, false )
+				);
 			}
 		}
 
 		final JsonValue fedAccessStatsValue = obj.get(HttpConstants.JSON_FED_ACCESS_STATS);
 		if ( fedAccessStatsValue != null ) {
-			if ( contains(argFedAccessStats) ) {
+			if ( modResultsExt.isPrintFedAccessStats() ) {
 				System.err.println( fedAccessStatsValue.toString() );
 				System.err.println();
 			}
-			if ( contains(argFedAccessStatsToFile) ) {
-				final String outputDest = getValue( argFedAccessStatsToFile );
-				if ( outputDestIsValid( outputDest ) ) {
-					try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest, true ) ) ) {
-						printStream.print( fedAccessStatsValue.toString() );
-					} catch ( final FileNotFoundException ex ) {
-						cmdError( "Failed to create print stream for output destination: " + outputDest, false );
-					}
-				}
+			final String fedAccessStatsFile = modResultsExt.getFedAccessStatsFile();
+			if ( fedAccessStatsFile != null ) {
+				ModResultsOutExt.writeContentToFile(
+					fedAccessStatsFile,
+					ps -> ps.print( fedAccessStatsValue.toString() ),
+					msg -> cmdError( msg, false )
+				);
 			}
 		}
 	}
@@ -430,7 +409,7 @@ public class RunHttpQuery extends CmdARQ
 
 	/**
 	 * Extracts and formats query processing statistics from the given
-	 * {@code QueryProcessingStatsAndExceptions} object into a comma-separated string.
+	 * {@code JsonValue} object into a comma-separated string.
 	 *
 	 * The returned string contains the overall query processing time, planning time,
 	 * compilation time, and execution time, in that order.
@@ -449,21 +428,5 @@ public class RunHttpQuery extends CmdARQ
 		final String queryProcStats = overallQueryProcessingTime + ", " + planningTime + ", " + compilationTime
 				+ ", " + executionTime;
 		return queryProcStats;
-	}
-
-	/**
-	 * Validates the output destination for statistics by checking if it starts with a hyphen.
-	 * If the output destination is invalid, an error message is printed and the method returns false. Otherwise, it returns true.
-	 *
-	 * @param outputDest the output destination to validate
-	 * @return true if the output destination is valid, false otherwise
-	 */
-	private boolean outputDestIsValid( final String outputDest ) {
-		if ( outputDest.startsWith( "-" ) ) {
-			cmdError( "Invalid output destination: " + outputDest, false );
-			cmdError( "Output destination should be a file path, not an argument.", false );
-			return false;
-		}
-		return true;
 	}
 }
