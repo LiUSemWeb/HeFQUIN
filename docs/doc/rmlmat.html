@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Materializing an RDF view from an RML mapping</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-coy-without-shadows.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <script>
+        // trim any preceeding or trailing whitespaces from code snippets
+        window.addEventListener('load', trimCode);
+    </script>
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>Materializing an RDF view from an RML mapping</h1>
+        <p>
+            This command-line tool materializes an RDF dataset from an <a href="https://rml.io/specs/rml/">RML mapping</a>. It reads an RML description (Triples Maps), evaluates the mapping against its referenced JSON sources and outputs the resulting RDF dataset.
+        </p>
+        <p>
+            You can use the program as follows, assuming the file <code>MyMapping.ttl</code> contains your <a href="https://rml.io/specs/rml/">RML mapping</a>. The tool reads this mapping, materializes all <code>rml:TriplesMap</code> definitions and writes the resulting RDF dataset to standard output or a file.
+            It also assumes that you have <a href="programs.html">added the HeFQUIN programs to your <code>PATH</code></a> (otherwise, enter the directory in which you have unpacked the HeFQUIN release and replace <code>hefquin-rmlmat</code> by <code>bin/hefquin-rmlmat</code>).
+        </p>
+        <pre><code class="language-bash">hefquin-rmlmat --mapping=MyMapping.ttl</code></pre>
+        <p>
+            Further arguments can be passed to the program, which are described in detail below. You can also have the list of supported arguments printed by executing the program with the argument <code>--help</code>.
+        </p>
+        <pre><code class="language-bash">hefquin-rmlmat --help</code></pre>
+
+        <section id="arguments">
+            <h2>Arguments</h2>
+            <p id="--mapping" style="font-weight:bold">
+                --mapping=&lt;<em>rdf-file</em>>
+                <em style="padding-left:1em">(mandatory argument)</em>
+            </p>
+            <p style="padding-left:2em">
+                Path to an RDF file containing the RML mapping. The file must include <code>rml:TriplesMap</code> definitions. All Triples Maps found in the file will be processed during materialization. Supported RDF serializations include Turtle, RDF/XML, JSON-LD and N-Triples.
+            </p>
+            <p id="--outputToFile" style="font-weight:bold">
+                --outputToFile=&lt;<em>file-name</em>>
+            </p>
+            <p style="padding-left:2em">
+                Optional output destination file. If omitted, results are written to standard output. If the file already exists, output is appended rather than overwritten.
+            </p>
+            <p id="--base" style="font-weight:bold">
+                --baseIRI=&lt;<em>iri</em>>
+            </p>
+            <p style="padding-left:2em">
+                Optional base IRI used during mapping expansion and IRI resolution. If not provided, an internal default base IRI is used.
+            </p>
+            <p id="--time" style="font-weight:bold">
+                --time
+            </p>
+            <p style="padding-left:2em">
+                Enables execution timing. When active, the tool prints the total time spent in the core materialization phase (mapping evaluation + RDF generation).
+            </p>
+            <p id="--help" style="font-weight:bold">
+                --help
+            </p>
+            <p style="padding-left:2em">
+                If this argument is given, the program prints a list of all supported arguments and terminates (i.e., all other given arguments are ignored).
+            </p>
+        </section>
+
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
