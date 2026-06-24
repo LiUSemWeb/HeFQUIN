@@ -61,27 +61,6 @@ public class FederationAccessManagerWithMapDBCache extends FederationAccessManag
 	 * Creates a federation access manager with a ChronicleMap-backed persistent
 	 * cache using the given capacity and cache policies.
 	 *
-	 * @param fedAccMan           the wrapped federation access manager
-	 * @param cacheCapacity       the maximum cache capacity
-	 * @param maxParallelRequests the maximum default number of parallel requests to
-	 *                            a given endpoint address
-	 * @param cachePolicies       the cache policies used by the cache
-	 * @throws IOException if the persistent cache cannot be created or opened
-	 */
-	public FederationAccessManagerWithMapDBCache( final FederationAccessManager fedAccMan,
-	                                              final int cacheCapacity,
-	                                              final int maxParallelRequests,
-	                                              final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> cachePolicies )
-			throws IOException
-	{
-		super(fedAccMan, cacheCapacity, maxParallelRequests);
-		mapDBCache = new MapDBCache(cacheCapacity, cachePolicies);
-	}
-
-	/**
-	 * Creates a federation access manager with a ChronicleMap-backed persistent
-	 * cache using the given capacity and cache policies.
-	 *
 	 * @param fedAccMan     the wrapped federation access manager
 	 * @param cacheCapacity the maximum cache capacity
 	 * @param cachePolicies the cache policies used by the cache
@@ -140,7 +119,7 @@ public class FederationAccessManagerWithMapDBCache extends FederationAccessManag
 	                                              final int maxParallelRequests )
 			throws IOException 
 	{
-		this( fedAccMan, cacheCapacity, maxParallelRequests, new DefaultMapDBCachePolicies(timeToLive) );
+		this( fedAccMan, cacheCapacity, new DefaultMapDBCachePolicies(timeToLive) );
 	}
 
 	/**
