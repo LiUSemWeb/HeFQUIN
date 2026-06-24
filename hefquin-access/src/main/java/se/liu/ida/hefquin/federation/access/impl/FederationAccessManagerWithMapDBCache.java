@@ -27,7 +27,7 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
- * Federation access manager with a ChronicleMap-backed persistent cache.
+ * Federation access manager with a MapDB-backed persistent cache.
  *
  * <p>
  * This class stores cache entries in a persistent {@link MapDBCache} so
@@ -58,7 +58,7 @@ public class FederationAccessManagerWithMapDBCache extends FederationAccessManag
 	protected final MapDBCache mapDBCache;
 
 	/**
-	 * Creates a federation access manager with a ChronicleMap-backed persistent
+	 * Creates a federation access manager with a MapDB-backed persistent
 	 * cache using the given capacity and cache policies.
 	 *
 	 * @param fedAccMan     the wrapped federation access manager
@@ -98,32 +98,7 @@ public class FederationAccessManagerWithMapDBCache extends FederationAccessManag
 	}
 
 	/**
-	 * Creates a federation access manager with a ChronicleMap-backed persistent
-	 * cache using the given capacity and the default cache policies.
-	 *
-	 * <p>
-	 * The cache uses a least-recently-used (LRU) replacement policy and the
-	 * specified time-to-live for cache entry invalidation.
-	 * </p>
-	 *
-	 * @param fedAccMan           the wrapped federation access manager
-	 * @param cacheCapacity       the maximum cache capacity
-	 * @param timeToLive          the cache entry time-to-live in milliseconds
-	 * @param maxParallelRequests the maximum default number of parallel requests to
-	 *                            a given endpoint address
-	 * @throws IOException if the persistent cache cannot be created or opened
-	 */
-	public FederationAccessManagerWithMapDBCache( final FederationAccessManager fedAccMan,
-	                                              final int cacheCapacity,
-	                                              final int timeToLive,
-	                                              final int maxParallelRequests )
-			throws IOException 
-	{
-		this( fedAccMan, cacheCapacity, new DefaultMapDBCachePolicies(timeToLive) );
-	}
-
-	/**
-	 * Creates a federation access manager with a ChronicleMap-backed persistent
+	 * Creates a federation access manager with a MapDB-backed persistent
 	 * cache using the given capacity and the default cache policies.
 	 *
 	 * <p>
@@ -215,7 +190,7 @@ public class FederationAccessManagerWithMapDBCache extends FederationAccessManag
 		else if( req instanceof SPARQLRequest )
 			cacheHitsSPARQL++;
 		else
-			throw new IllegalArgumentException("Unrecognized request type: " + req.getClass().getName());
+			cacheHitsOther++;
 
 		@SuppressWarnings("unchecked")
 		final CompletableFuture<RespType> cachedResponse2 = (CompletableFuture<RespType>) cachedResponse;
