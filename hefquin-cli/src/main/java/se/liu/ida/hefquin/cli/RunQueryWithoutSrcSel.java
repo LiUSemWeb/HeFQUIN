@@ -1,25 +1,20 @@
 package se.liu.ida.hefquin.cli;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 import org.apache.commons.io.output.NullPrintStream;
-import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
 import org.apache.jena.query.Query;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 
 import arq.cmdline.CmdARQ;
-import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
-import se.liu.ida.hefquin.base.utils.Stats;
-import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
+import se.liu.ida.hefquin.cli.modules.ModResultsOutExt;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
@@ -41,17 +36,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModQuery         modQuery =         new ModQuery();
 	protected final ModFederation    modFederation =    new ModFederation();
 	protected final ModPlanPrinting  modPlanPrinting =  new ModPlanPrinting();
-	protected final ModResultsOut    modResults =       new ModResultsOut();
+	protected final ModResultsOutExt modResultsExt =    new ModResultsOutExt();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
-
-	protected final ArgDecl argSuppressResultPrintout = new ArgDecl( ArgDecl.NoValue, "suppressResultPrintout" );
-	protected final ArgDecl argSkipExecution = new ArgDecl( ArgDecl.NoValue, "skipExecution" );
-	protected final ArgDecl argQueryProcStats = new ArgDecl( ArgDecl.NoValue, "printQueryProcStats" );
-	protected final ArgDecl argOnelineTimeStats = new ArgDecl( ArgDecl.NoValue, "printQueryProcMeasurements" );
-	protected final ArgDecl argFedAccessStats = new ArgDecl( ArgDecl.NoValue, "printFedAccessStats" );
-	protected final ArgDecl argQueryProcStatsToFile = new ArgDecl( ArgDecl.HasValue, "printQueryProcStatsToFile" );
-	protected final ArgDecl argOnelineTimeStatsToFile = new ArgDecl( ArgDecl.HasValue, "printQueryProcMeasurementsToFile" );
-	protected final ArgDecl argFedAccessStatsToFile = new ArgDecl( ArgDecl.HasValue, "printFedAccessStatsToFile" );
 
 	/**
 	 * Main entry point of the tool, accepting command-line arguments to specify the
@@ -74,17 +60,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		addModule( modTime );
 		addModule( modPlanPrinting );
-		addModule( modResults );
-
-		add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
-		add( argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)" );
-		add( argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process" );
-		add( argQueryProcStatsToFile, "--printQueryProcStatsToFile", "Print out statistics about the query execution process to a file" );
-		add( argOnelineTimeStats, "--printQueryProcMeasurements",
-				"Print out measurements about the query processing time in one line that can be used for a CSV file" );
-		add( argOnelineTimeStatsToFile, "--printQueryProcMeasurementsToFile", "Print out measurements about the query processing time to a file" );
-		add( argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager" );
-		add( argFedAccessStatsToFile, "--printFedAccessStatsToFile", "Print out statistics of the federation access manager to a file" );
+		addModule( modResultsExt );
 
 		addModule( modQuery );
 		addModule( modEngineConfig );
@@ -100,7 +76,6 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected String getSummary() {
 		return getCommandName() + " --query=<query> --federationDescription=<federation description>";
 	}
-
 
 	/**
 	 * Returns the command name used to invoke the tool.
@@ -128,12 +103,12 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		final HeFQUINEngine e = builder.build();
 
 		final Query query = getQuery();
-		final ResultsFormat resFmt = modResults.getResultsFormat();
+		final ResultsFormat resFmt = modResultsExt.getResultsFormat();
 
 		modTime.startTimer();
 
 		final PrintStream out;
-		if ( contains( argSuppressResultPrintout ) ) {
+		if ( modResultsExt.isSuppressResultPrintout() ) {
 			out = NullPrintStream.INSTANCE;
 		} else {
 			out = System.out;
@@ -144,7 +119,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 					.setLogicalPlanPrinter( modPlanPrinting.getLogicalPlanPrinter() )
 					.setPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
 					.setExecutablePlanPrinter( modPlanPrinting.getExecutablePlanPrinter() )
-					.setSkipExecution( contains(argSkipExecution) );
+					.setSkipExecution( modResultsExt.isSkipExecution() );
 		final QueryProcContext ctx = ctxBuilder.build();
 
 		QueryProcessingStatsAndExceptions statsAndExceptions = null;
@@ -197,58 +172,16 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		e.shutdown();
 
 		if ( statsAndExceptions != null ) {
-			if ( contains(argQueryProcStats) ) {
-				StatsPrinter.print( statsAndExceptions, System.err, true );
-				System.err.println();
-			}
-			if ( contains(argQueryProcStatsToFile) ) {
-				final String outputDest = getValue( argQueryProcStatsToFile );
-				if ( outputDestIsValid( outputDest ) ) {
-					try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest, true ) ) ) {
-						StatsPrinter.print( statsAndExceptions, printStream, true );
-					} catch ( final FileNotFoundException ex ) {
-						cmdError( "Failed to create print stream for output destination: " + outputDest, false );
-					}
-				}
+			modResultsExt.handleQueryProcStats( statsAndExceptions, msg -> cmdError( msg, false ) );
 
-			}
-			if ( contains(argOnelineTimeStats) ) {
-				final String queryProcStats = getQueryProcStats( statsAndExceptions );
-				System.out.println( queryProcStats );
-			}
-			if ( contains(argOnelineTimeStatsToFile) ) {
-				final String outputDest = getValue( argOnelineTimeStatsToFile );
-				if ( outputDestIsValid( outputDest ) ) {
-					try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest, true ) ) ) {
-						final String queryProcStats = getQueryProcStats( statsAndExceptions );
-						printStream.println( queryProcStats );
-					} catch ( final FileNotFoundException ex ) {
-						cmdError( "Failed to create print stream for output destination: " + outputDest, false );
-					}
-				}
-			}
+			modResultsExt.handleOnelineTimeStats( extractOnelineTimeStats( statsAndExceptions ), msg -> cmdError( msg, false ) );
 		}
 
-		if ( contains(argFedAccessStats) ) {
-			final Stats fedAccessStats = e.getFederationAccessStats();
-			StatsPrinter.print( fedAccessStats, System.err, true );
-			System.err.println();
-		}
-		if ( contains(argFedAccessStatsToFile) ) {
-			final String outputDest = getValue( argFedAccessStatsToFile );
-			if ( outputDestIsValid( outputDest ) ) {
-				try ( final PrintStream printStream = new PrintStream( new FileOutputStream( outputDest, true ) ) ) {
-					final Stats fedAccessStats = e.getFederationAccessStats();
-					StatsPrinter.print( fedAccessStats, printStream, true );
-				} catch ( final FileNotFoundException ex ) {
-					cmdError( "Failed to create print stream for output destination: " + outputDest, false );
-				}
-			}
-		}
+		modResultsExt.handleFedAccessStats( e.getFederationAccessStats(), msg -> cmdError( msg, false ) );
 	}
 
     /**
-     * Rturns the SPARQL query to be executed.
+     * Returns the SPARQL query to be executed.
      *
      * @return the {@code Query} object
      * @throws TerminationException if the query file could not be found
@@ -291,7 +224,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	 * @param statsAndExceptions the object containing query processing statistics
 	 * @return a comma-separated string of query processing statistics
 	 */
-	private static String getQueryProcStats( final QueryProcessingStatsAndExceptions statsAndExceptions ) {
+	private static String extractOnelineTimeStats( final QueryProcessingStatsAndExceptions statsAndExceptions ) {
 		final long overallQueryProcessingTime = statsAndExceptions.getOverallQueryProcessingTime();
 		final long planningTime = statsAndExceptions.getPlanningTime();
 		final long compilationTime = statsAndExceptions.getCompilationTime();
@@ -299,21 +232,5 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		final String queryProcStats = overallQueryProcessingTime + ", " + planningTime + ", " + compilationTime
 				+ ", " + executionTime;
 		return queryProcStats;
-	}
-
-	/**
-	 * Validates the output destination for statistics by checking if it starts with a hyphen.
-	 * If the output destination is invalid, an error message is printed and the method returns false. Otherwise, it returns true.
-	 *
-	 * @param outputDest the output destination to validate
-	 * @return true if the output destination is valid, false otherwise
-	 */
-	private boolean outputDestIsValid( final String outputDest ) {
-		if ( outputDest.startsWith( "-" ) ) {
-			cmdError( "Invalid output destination: " + outputDest, false );
-			cmdError( "Output destination should be a file path, not an argument.", false );
-			return false;
-		}
-		return true;
 	}
 }
