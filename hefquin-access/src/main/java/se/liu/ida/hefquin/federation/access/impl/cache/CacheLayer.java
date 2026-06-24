@@ -48,6 +48,7 @@ public class CacheLayer<IdType,
                         EntryType extends CacheEntry<ObjectType>
                         > implements Cache<IdType, ObjectType>
 {
+	protected final Object lock = new Object();
 	protected final Map<IdType, EntryType> map;
 	protected final int capacity;
 
@@ -115,14 +116,14 @@ public class CacheLayer<IdType,
 
 		final EntryType entry = entryFactory.createCacheEntry(value);
 
-		synchronized (map) {
-			map.compute( key, (k, oldEntry) -> {
-				if ( oldEntry == null )
-					replacementPolicy.entryWasAdded(k, entry);
-				else
-					replacementPolicy.entryWasRewritten(k, entry);
-				return entry;
-			} );
+		synchronized (lock) {
+			final EntryType oldEntry = map.get(key);
+			map.put(key, entry);
+
+			if ( oldEntry == null )
+				replacementPolicy.entryWasAdded(key, entry);
+			else
+				replacementPolicy.entryWasRewritten(key, entry);
 
 			// Enforce max capacity
 			if ( map.size() > capacity ) {
@@ -154,7 +155,7 @@ public class CacheLayer<IdType,
 	 */
 	@Override
 	public final ObjectType get( final IdType key ) {
-		synchronized (map) {
+		synchronized (lock) {
 			final EntryType entry = map.get(key);
 
 			if ( entry == null ) {
@@ -186,7 +187,8 @@ public class CacheLayer<IdType,
 	 */
 	@Override
 	public boolean evict( final IdType key ) {
-		synchronized (map) {
+		System.err.println("Evict: " + key);
+		synchronized (lock) {
 			if( map.remove(key) != null ) {
 				replacementPolicy.entryWasEvicted(key);
 				return true;
@@ -212,7 +214,7 @@ public class CacheLayer<IdType,
 	 */
 	@Override
 	public boolean evict( final IdType key, final ObjectType value ) {
-		synchronized (map) {
+		synchronized (lock) {
 			final EntryType entry = map.get(key);
 			if ( entry != null && entry.getObject().equals(value) ) {
 				return evict(key);
@@ -229,7 +231,7 @@ public class CacheLayer<IdType,
 	 */
 	@Override
 	public boolean isEmpty() {
-		synchronized (map) {
+		synchronized (lock) {
 			return map.isEmpty();
 		}
 	}
@@ -244,7 +246,7 @@ public class CacheLayer<IdType,
 	 */
 	@Override
 	public void clear() {
-		synchronized (map) {
+		synchronized (lock) {
 			map.clear();
 			replacementPolicy.clear();
 		}
