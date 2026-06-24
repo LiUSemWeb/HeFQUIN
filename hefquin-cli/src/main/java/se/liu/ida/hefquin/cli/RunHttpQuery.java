@@ -38,7 +38,6 @@ import org.apache.jena.sparql.serializer.SerializerRegistry;
 import org.apache.jena.sparql.util.QueryExecUtils;
 
 import arq.cmdline.CmdARQ;
-import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
 import se.liu.ida.hefquin.base.net.http.HttpConstants;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
@@ -64,7 +63,6 @@ public class RunHttpQuery extends CmdARQ
 {
 	protected final ModTime          modTime =          new ModTime();
 	protected final ModPlanPrinting  modPlanPrinting =  new ModPlanPrinting();
-	protected final ModResultsOut    modResults =       new ModResultsOut();
 	protected final ModQuery         modQuery =         new ModQuery();
 	protected final ModResultsOutExt modResultsExt =    new ModResultsOutExt();
 
@@ -84,7 +82,6 @@ public class RunHttpQuery extends CmdARQ
 
 		addModule( modTime );
 		addModule( modPlanPrinting );
-		addModule( modResults );
 		addModule( modResultsExt );
 
 		add( argServerAddress, "--server", "Address of HeFQUIN service" );
@@ -244,7 +241,7 @@ public class RunHttpQuery extends CmdARQ
 			)
 		);
 
-		QueryExecUtils.outputResultSet( rs, query.getPrologue(), modResults.getResultsFormat(), out );
+		QueryExecUtils.outputResultSet( rs, query.getPrologue(), modResultsExt.getResultsFormat(), out );
 
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
@@ -253,46 +250,14 @@ public class RunHttpQuery extends CmdARQ
 
 		final JsonValue queryProcStatsValue = obj.get(HttpConstants.JSON_QUERY_PROC_STATS);
 		if ( queryProcStatsValue != null ) {
-			if ( modResultsExt.isPrintQueryProcStats() ) {
-				System.err.println( queryProcStatsValue.toString() );
-				System.err.println();
-			}
-			final String queryProcStatsFile = modResultsExt.getQueryProcStatsFile();
-			if ( queryProcStatsFile != null ) {
-				ModResultsOutExt.writeContentToFile(
-					queryProcStatsFile,
-					ps -> ps.print( queryProcStatsValue.toString() ),
-					msg -> cmdError( msg, false )
-				);
-			}
-			if ( modResultsExt.isPrintOnelineTimeStats() ) {
-				final String queryProcStats = extractOnelineTimeStats( queryProcStatsValue );
-				System.out.println( queryProcStats );
-			}
-			final String oneLineTimeStatsFile = modResultsExt.getOnelineTimeStatsFile();
-			if ( oneLineTimeStatsFile != null ) {
-				ModResultsOutExt.writeContentToFile(
-					oneLineTimeStatsFile,
-					ps -> ps.print( extractOnelineTimeStats( queryProcStatsValue ) ),
-					msg -> cmdError( msg, false )
-				);
-			}
+			modResultsExt.handleQueryProcStats( queryProcStatsValue, msg -> cmdError( msg, false ) );
+
+			modResultsExt.handleOnelineTimeStats( extractOnelineTimeStats( queryProcStatsValue ), msg -> cmdError( msg, false ) );
 		}
 
 		final JsonValue fedAccessStatsValue = obj.get(HttpConstants.JSON_FED_ACCESS_STATS);
 		if ( fedAccessStatsValue != null ) {
-			if ( modResultsExt.isPrintFedAccessStats() ) {
-				System.err.println( fedAccessStatsValue.toString() );
-				System.err.println();
-			}
-			final String fedAccessStatsFile = modResultsExt.getFedAccessStatsFile();
-			if ( fedAccessStatsFile != null ) {
-				ModResultsOutExt.writeContentToFile(
-					fedAccessStatsFile,
-					ps -> ps.print( fedAccessStatsValue.toString() ),
-					msg -> cmdError( msg, false )
-				);
-			}
+			modResultsExt.handleFedAccessStats( fedAccessStatsValue, msg -> cmdError( msg, false ) );
 		}
 	}
 

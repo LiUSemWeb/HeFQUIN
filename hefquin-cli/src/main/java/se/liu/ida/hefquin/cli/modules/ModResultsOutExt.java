@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.function.Consumer;
 
+import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.CmdArgModule;
 import org.apache.jena.cmd.CmdGeneral;
@@ -12,6 +13,7 @@ import org.apache.jena.cmd.CmdGeneral;
 import arq.cmdline.ModResultsOut;
 import se.liu.ida.hefquin.base.utils.Stats;
 import se.liu.ida.hefquin.base.utils.StatsPrinter;
+import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 
 /**
  * Command-line argument module for specifying result output,
@@ -39,7 +41,7 @@ public class ModResultsOutExt extends ModResultsOut
 
 	@Override
 	public void registerWith( final CmdGeneral cmdLine ) {
-		cmdLine.getUsage().startCategory("Execution Statistics");
+		super.registerWith(cmdLine);
 		cmdLine.add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
 		cmdLine.add( argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)" );
 		cmdLine.add( argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process" );
@@ -53,6 +55,8 @@ public class ModResultsOutExt extends ModResultsOut
 
 	@Override
 	public void processArgs( final CmdArgModule cmdLine ) {
+		super.processArgs(cmdLine);
+
 		suppressResultPrintout = cmdLine.contains(argSuppressResultPrintout);
 
 		skipExecution = cmdLine.contains(argSkipExecution);
@@ -117,6 +121,77 @@ public class ModResultsOutExt extends ModResultsOut
 			|| fedAccessStatsFile != null;
 	}
 
+	public void handleQueryProcStats( final JsonValue value,
+	                                  final Consumer<String> errorHandler ) {
+		if ( printQueryProcStats ) {
+			System.err.println( value.toString() );
+			System.err.println();
+		}
+
+		if ( queryProcStatsFile != null ) {
+			writeContentToFile(
+				queryProcStatsFile,
+				ps -> ps.print( value.toString() ),
+				errorHandler
+			);
+		}
+	}
+
+	public void handleQueryProcStats( final QueryProcessingStatsAndExceptions statsAndExceptions,
+	                                  final Consumer<String> errorHandler ) {
+		if ( printQueryProcStats ) {
+			StatsPrinter.print( statsAndExceptions, System.err, true );
+			System.err.println();
+		}
+
+		if ( queryProcStatsFile != null ) {
+			writeStatsToFile( queryProcStatsFile, statsAndExceptions, errorHandler );
+		}
+	}
+
+	public void handleOnelineTimeStats( final String statsToBePrinted,
+	                                    final Consumer<String> errorHandler ) {
+		if ( printOnelineTimeStats ) {
+			System.out.println( statsToBePrinted );
+		}
+
+		if ( onelineTimeStatsFile != null ) {
+			writeContentToFile(
+				onelineTimeStatsFile,
+				ps -> ps.print( statsToBePrinted ),
+				errorHandler
+			);
+		}
+	}
+
+	public void handleFedAccessStats( final JsonValue value,
+	                                  final Consumer<String> errorHandler ) {
+		if ( printFedAccessStats ) {
+			System.err.println( value.toString() );
+			System.err.println();
+		}
+
+		if ( fedAccessStatsFile != null ) {
+			writeContentToFile(
+				fedAccessStatsFile,
+				ps -> ps.print( value.toString() ),
+				errorHandler
+			);
+		}
+	}
+
+	public void handleFedAccessStats( final Stats fedAccessStats,
+	                                  final Consumer<String> errorHandler ) {
+		if ( printFedAccessStats ) {
+			StatsPrinter.print( fedAccessStats, System.err, true );
+			System.err.println();
+		}
+
+		if ( fedAccessStatsFile != null ) {
+			writeStatsToFile( fedAccessStatsFile, fedAccessStats, errorHandler );
+		}
+	}
+
 	/**
 	 * Executes the given write action using a print stream that appends to
 	 * the specified file.
@@ -128,7 +203,7 @@ public class ModResultsOutExt extends ModResultsOut
 	 * @param action the write operation to execute
 	 * @param errorHandler handler for reporting errors
 	 */
-	public static void writeContentToFile( final String outputDest,
+	private static void writeContentToFile( final String outputDest,
 	                                       final Consumer<PrintStream> action,
 	                                       final Consumer<String> errorHandler ) {
 		if ( ! outputDestIsValid(outputDest) ) {
@@ -158,7 +233,7 @@ public class ModResultsOutExt extends ModResultsOut
 	 * @param stats statistics to write
 	 * @param errorHandler handler for reporting errors
 	 */
-	public static void writeStatsToFile( final String file,
+	private static void writeStatsToFile( final String file,
 	                                     final Stats stats,
 	                                     final Consumer<String> errorHandler ) {
 		writeContentToFile(
@@ -178,4 +253,5 @@ public class ModResultsOutExt extends ModResultsOut
 	private static boolean outputDestIsValid( final String outputDest ) {
 		return ! outputDest.startsWith( "-" );
 	}
+
 }

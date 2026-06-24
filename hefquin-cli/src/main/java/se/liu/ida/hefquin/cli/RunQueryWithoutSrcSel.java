@@ -9,10 +9,7 @@ import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 
 import arq.cmdline.CmdARQ;
-import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
-import se.liu.ida.hefquin.base.utils.Stats;
-import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
@@ -39,7 +36,6 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModQuery         modQuery =         new ModQuery();
 	protected final ModFederation    modFederation =    new ModFederation();
 	protected final ModPlanPrinting  modPlanPrinting =  new ModPlanPrinting();
-	protected final ModResultsOut    modResults =       new ModResultsOut();
 	protected final ModResultsOutExt modResultsExt =    new ModResultsOutExt();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 
@@ -64,7 +60,6 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		addModule( modTime );
 		addModule( modPlanPrinting );
-		addModule( modResults );
 		addModule( modResultsExt );
 
 		addModule( modQuery );
@@ -108,7 +103,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		final HeFQUINEngine e = builder.build();
 
 		final Query query = getQuery();
-		final ResultsFormat resFmt = modResults.getResultsFormat();
+		final ResultsFormat resFmt = modResultsExt.getResultsFormat();
 
 		modTime.startTimer();
 
@@ -177,42 +172,16 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		e.shutdown();
 
 		if ( statsAndExceptions != null ) {
-			if ( modResultsExt.isPrintQueryProcStats() ) {
-				StatsPrinter.print( statsAndExceptions, System.err, true );
-				System.err.println();
-			}
-			final String queryProcStatsFile = modResultsExt.getQueryProcStatsFile();
-			if ( queryProcStatsFile != null ) {
-				ModResultsOutExt.writeStatsToFile( queryProcStatsFile, statsAndExceptions, msg -> cmdError( msg, false ) );
-			}
-			if ( modResultsExt.isPrintOnelineTimeStats() ) {
-				final String queryProcStats = extractOnelineTimeStats( statsAndExceptions );
-				System.out.println( queryProcStats );
-			}
-			final String oneLineTimeStatsFile = modResultsExt.getOnelineTimeStatsFile();
-			if ( oneLineTimeStatsFile != null ) {
-				final String onelineTimeStats = extractOnelineTimeStats( statsAndExceptions );
-				ModResultsOutExt.writeContentToFile(
-					oneLineTimeStatsFile,
-					ps -> ps.print( onelineTimeStats ),
-					msg -> cmdError( msg, false )
-				);
-			}
+			modResultsExt.handleQueryProcStats( statsAndExceptions, msg -> cmdError( msg, false ) );
+
+			modResultsExt.handleOnelineTimeStats( extractOnelineTimeStats( statsAndExceptions ), msg -> cmdError( msg, false ) );
 		}
 
-		if ( modResultsExt.isPrintFedAccessStats() ) {
-			final Stats fedAccessStats = e.getFederationAccessStats();
-			StatsPrinter.print( fedAccessStats, System.err, true );
-			System.err.println();
-		}
-		final String fedAccessStatsFile = modResultsExt.getFedAccessStatsFile();
-		if ( fedAccessStatsFile != null ) {
-			ModResultsOutExt.writeStatsToFile( fedAccessStatsFile, e.getFederationAccessStats(), msg -> cmdError( msg, false ) );
-		}
+		modResultsExt.handleFedAccessStats( e.getFederationAccessStats(), msg -> cmdError( msg, false ) );
 	}
 
     /**
-     * Rturns the SPARQL query to be executed.
+     * Returns the SPARQL query to be executed.
      *
      * @return the {@code Query} object
      * @throws TerminationException if the query file could not be found
