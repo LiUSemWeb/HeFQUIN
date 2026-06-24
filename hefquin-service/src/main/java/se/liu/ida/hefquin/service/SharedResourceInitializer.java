@@ -69,7 +69,7 @@ public class SharedResourceInitializer implements ServletContextListener
 	}
 
 	@Override
-	public void contextDestroyed( ServletContextEvent sce ) {
+	public void contextDestroyed( final ServletContextEvent sce ) {
 		final HeFQUINEngine engine = (HeFQUINEngine) sce.getServletContext().getAttribute("engine");
 
 		if ( engine != null ) {
