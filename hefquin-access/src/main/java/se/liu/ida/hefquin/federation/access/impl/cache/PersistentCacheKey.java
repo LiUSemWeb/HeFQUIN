@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
+package se.liu.ida.hefquin.federation.access.impl.cache;
 
 import java.io.Serializable;
 import java.net.URLEncoder;
@@ -27,7 +27,7 @@ import se.liu.ida.hefquin.federation.members.TPFServer;
  * This representation is hashed using SHA-256 and stored as a 32-byte digest,
  * and equality and hash code are based solely on this digest.
  */
-public class ChronicleMapCacheKey implements Serializable {
+public class PersistentCacheKey implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	// Binary SHA-256 digest (32 bytes)
@@ -54,7 +54,7 @@ public class ChronicleMapCacheKey implements Serializable {
 	 * @throws IllegalArgumentException if the request/member combination is
 	 *                                  unsupported
 	 */
-	public ChronicleMapCacheKey( final DataRetrievalRequest req,
+	public PersistentCacheKey( final DataRetrievalRequest req,
 	                             final FederationMember fm,
 	                             final ResponseMode responseMode ) {
 		assert req != null;
@@ -92,8 +92,8 @@ public class ChronicleMapCacheKey implements Serializable {
 	/**
 	 * Compares this key with another object for equality.
 	 *
-	 * Two {@code ChronicleMapCacheKey} instances are considered equal if and only
-	 * if the other object is also a {@code ChronicleMapCacheKey} and their SHA-256
+	 * Two {@code PersistentCacheKey} instances are considered equal if and only
+	 * if the other object is also a {@code PersistentCacheKey} and their SHA-256
 	 * digests are identical.
 	 */
 	@Override
@@ -103,7 +103,7 @@ public class ChronicleMapCacheKey implements Serializable {
 		if ( obj == null )
 			return false;
 
-		return    ( obj instanceof ChronicleMapCacheKey other )
+		return    ( obj instanceof PersistentCacheKey other )
 		       && Arrays.equals(requestDigest, other.requestDigest);
 	}
 
@@ -119,6 +119,6 @@ public class ChronicleMapCacheKey implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ChronicleMapCacheKey{" + Hex.encodeHexString(requestDigest) + "}";
+		return "PersistentCacheKey{" + Hex.encodeHexString(requestDigest) + "}";
 	}
 }

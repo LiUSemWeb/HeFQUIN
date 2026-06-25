@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
+package se.liu.ida.hefquin.federation.access.impl.cache;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryBase;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 
 /**
- * Cache entry implementation for ChronicleMap-based caching.
+ * Cache entry implementation for persistent caching.
  *
  * <p>
  * Wraps a {@link CompletableFuture} holding a {@link DataRetrievalResponse}
@@ -18,7 +18,7 @@ import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
  * may be already completed when stored in or retrieved from the cache.
  * </p>
  */
-public class ChronicleMapCacheEntry extends CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>
+public class PersistentCacheEntry extends CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>
 {
 	/**
 	 * Creates a new cache entry.
@@ -26,13 +26,13 @@ public class ChronicleMapCacheEntry extends CacheEntryBase<CompletableFuture<? e
 	 * @param object       a future providing the cached {@link DataRetrievalResponse}
 	 * @param creationTime the timestamp representing when this entry was created
 	 */
-	public ChronicleMapCacheEntry( final CompletableFuture<? extends DataRetrievalResponse<?>> object,
+	public PersistentCacheEntry( final CompletableFuture<? extends DataRetrievalResponse<?>> object,
 	                               final long creationTime ) {
 		super(object, creationTime);
 	}
 
 	@Override
 	public String toString() {
-		return "ChronicleMapCacheEntry{object=" + getObject() + ", creationTime=" + creationTime + "}";
+		return "PersistentCacheEntry{object=" + getObject() + ", creationTime=" + creationTime + "}";
 	}
 }

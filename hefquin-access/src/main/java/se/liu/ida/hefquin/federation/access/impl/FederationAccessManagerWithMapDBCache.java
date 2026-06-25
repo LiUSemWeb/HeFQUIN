@@ -17,20 +17,20 @@ import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntry;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntryFactory;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheKey;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheKey.ResponseMode;
+import se.liu.ida.hefquin.federation.access.impl.cache.mapdb.MapDBCache;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
- * Federation access manager with a ChronicleMap-backed persistent cache.
+ * Federation access manager with a MapDB-backed persistent cache.
  *
  * <p>
- * This class stores cache entries in a persistent {@link ChronicleMapCache} so
+ * This class stores cache entries in a persistent {@link MapDBCache} so
  * that successful responses can be reused across repeated requests and runs.
  * </p>
  *
@@ -47,37 +47,36 @@ import se.liu.ida.hefquin.federation.members.TPFServer;
  * </p>
  *
  * <p>
- * Synchronization in this class is performed on the {@link ChronicleMapCache}
+ * Synchronization in this class is performed on the {@link MapDBCache}
  * instance to avoid issuing duplicate requests concurrently. This is
  * independent of the internal synchronization used by the cache itself.
  * </p>
  */
-public class FederationAccessManagerWithChronicleMapCache extends FederationAccessManagerWithCache implements AutoCloseable
+public class FederationAccessManagerWithMapDBCache extends FederationAccessManagerWithCache
 {
 	protected static final long DEFAULT_TIME_TO_LIVE = 300_000; // 5 minutes
-	protected final ChronicleMapCache chronicleMapCache;
+	protected final MapDBCache mapDBCache;
 
 	/**
-	 * Creates a federation access manager with a ChronicleMap-backed persistent
+	 * Creates a federation access manager with a MapDB-backed persistent
 	 * cache using the given capacity and cache policies.
 	 *
-	 * @param fedAccMan                 the wrapped federation access manager
-	 * @param cacheCapacity             the maximum cache capacity
-	 * @param chronicleMapCachePolicies the cache policies used by the
-	 *                                  ChronicleMap-backed cache
+	 * @param fedAccMan     the wrapped federation access manager
+	 * @param cacheCapacity the maximum cache capacity
+	 * @param cachePolicies the cache policies used by the cache
 	 * @throws IOException if the persistent cache cannot be created or opened
 	 */
-	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-	                                                     final int cacheCapacity,
-	                                                     final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> chronicleMapCachePolicies )
+	public FederationAccessManagerWithMapDBCache( final FederationAccessManager fedAccMan,
+	                                              final int cacheCapacity,
+	                                              final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> cachePolicies )
 			throws IOException
 	{
 		super(fedAccMan, cacheCapacity);
-		chronicleMapCache = new ChronicleMapCache(cacheCapacity, chronicleMapCachePolicies);
+		mapDBCache = new MapDBCache(cacheCapacity, cachePolicies);
 	}
 
 	/**
-	 * Creates a federation access manager with a ChronicleMap-backed persistent
+	 * Creates a federation access manager with a MapDB-backed persistent
 	 * cache using the given capacity and the default cache policies.
 	 *
 	 * <p>
@@ -90,16 +89,16 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 * @param timeToLive    the cache entry time-to-live in milliseconds
 	 * @throws IOException if the persistent cache cannot be created or opened
 	 */
-	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-	                                                     final int cacheCapacity,
-	                                                     final int timeToLive )
+	public FederationAccessManagerWithMapDBCache( final FederationAccessManager fedAccMan,
+	                                              final int cacheCapacity,
+	                                              final int timeToLive )
 			throws IOException
 	{
-		this(fedAccMan, cacheCapacity, new DefaultChronicleMapCachePolicies(timeToLive) );
+		this(fedAccMan, cacheCapacity, new DefaultMapDBCachePolicies(timeToLive) );
 	}
 
 	/**
-	 * Creates a federation access manager with a ChronicleMap-backed persistent
+	 * Creates a federation access manager with a MapDB-backed persistent
 	 * cache using the given capacity and the default cache policies.
 	 *
 	 * <p>
@@ -111,11 +110,11 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 * @param cacheCapacity the maximum cache capacity
 	 * @throws IOException if the persistent cache cannot be created or opened
 	 */
-	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-	                                                     final int cacheCapacity )
+	public FederationAccessManagerWithMapDBCache( final FederationAccessManager fedAccMan,
+	                                              final int cacheCapacity )
 			throws IOException
 	{
-		this(fedAccMan, cacheCapacity, new DefaultChronicleMapCachePolicies(DEFAULT_TIME_TO_LIVE) );
+		this(fedAccMan, cacheCapacity, new DefaultMapDBCachePolicies(DEFAULT_TIME_TO_LIVE) );
 	}
 
 	/**
@@ -169,16 +168,16 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<?> cachedResponse;
 
-		// We synchronize on the chronicleMapCache instance to prevent multiple threads
+		// We synchronize on the mapDBCache instance to prevent multiple threads
 		// from issuing the same request concurrently and inserting duplicate
 		// CompletableFutures. We cache the CompletableFuture immediately (before
 		// completion), so that concurrent callers can share the same future. The actual
 		// response data can only be persisted on disk once the future completes.
-		synchronized (chronicleMapCache) {
-			cachedResponse = chronicleMapCache.get(key);
+		synchronized (mapDBCache) {
+			cachedResponse = mapDBCache.get(key);
 			if ( cachedResponse == null ) {
 				final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm);
-				chronicleMapCache.put(key, newResponse);
+				mapDBCache.put(key, newResponse);
 				return newResponse;
 			}
 		}
@@ -191,7 +190,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		else if( req instanceof SPARQLRequest )
 			cacheHitsSPARQL++;
 		else
-			throw new IllegalArgumentException("Unrecognized request type: " + req.getClass().getName());
+			cacheHitsOther++;
 
 		@SuppressWarnings("unchecked")
 		final CompletableFuture<RespType> cachedResponse2 = (CompletableFuture<RespType>) cachedResponse;
@@ -231,13 +230,13 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<?> cachedResponse;
 
-		// We synchronize on the chronicleMapCache instance to prevent multiple threads
+		// We synchronize on the mapDBCache instance to prevent multiple threads
 		// from issuing the same request concurrently and inserting duplicate
 		// CompletableFutures. We cache the CompletableFuture immediately (before
 		// completion), so that concurrent callers can share the same future. The actual
 		// response data can only be persisted on disk once the future completes.
-		synchronized (chronicleMapCache) {
-			cachedResponse = chronicleMapCache.get(key);
+		synchronized (mapDBCache) {
+			cachedResponse = mapDBCache.get(key);
 			if ( cachedResponse == null ) {
 				final CompletableFuture<CardinalityResponse> newResponse;
 				if (    req instanceof TPFRequest tpfReq
@@ -256,7 +255,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 					throw new IllegalStateException( "Unsupported request/federation member combination: " +
 													req.getClass().getName() + "/" + fm.getClass().getName() );
 
-				chronicleMapCache.put(key, newResponse);
+				mapDBCache.put(key, newResponse);
 				return newResponse;
 			}
 		}
@@ -301,19 +300,20 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	}
 
 	@Override
-	public void close() {
-		chronicleMapCache.close();
+	public void shutdown() {
+		mapDBCache.close();
+		super.shutdown();
 	}
 
 	/**
-	 * Default cache policies for {@link ChronicleMapCache}.
+	 * Default cache policies for {@link MapDBCache}.
 	 *
 	 * <p>
 	 * Uses a least-recently-used (LRU) replacement policy and a time-to-live-based
 	 * invalidation policy.
 	 * </p>
 	 */
-	public static class DefaultChronicleMapCachePolicies
+	public static class DefaultMapDBCachePolicies
 				implements CachePolicies<PersistentCacheKey,
 				                         CompletableFuture<? extends DataRetrievalResponse<?>>,
 				                         PersistentCacheEntry>
@@ -334,7 +334,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CacheInvalidationPolicy<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> cip;
 
-		public DefaultChronicleMapCachePolicies( final long timeToLive ) {
+		public DefaultMapDBCachePolicies( final long timeToLive ) {
 			cip = new CacheInvalidationPolicyTimeToLive<>(timeToLive);
 		}
 
@@ -355,5 +355,5 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		                               CompletableFuture<? extends DataRetrievalResponse<?>>> getInvalidationPolicy() {
 			return cip;
 		}
-	} // end of DefaultChronicleMapCachePolicies
+	} // end of DefaultMapDBCachePolicies
 }

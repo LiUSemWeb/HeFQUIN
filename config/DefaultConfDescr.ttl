@@ -18,7 +18,7 @@
    ] .
 
 _:bFederationAccessManager rdf:type ec:FederationAccessManager ;
-    ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithCache" ;
+    ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithMapDBCache" ;
     ec:constructorArguments (
         [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.FederationAccessManager" ;
           ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl" ;
@@ -27,7 +27,8 @@ _:bFederationAccessManager rdf:type ec:FederationAccessManager ;
             10  # defaultMaxParallelRequests
           )
         ]
-        100  # cacheCapacity
+        100    # cacheCapacity
+        600000 # timeToLive, 10 minutes
     ) .
 
 _:bSourcePlanner rdf:type ec:SourcePlanner ;

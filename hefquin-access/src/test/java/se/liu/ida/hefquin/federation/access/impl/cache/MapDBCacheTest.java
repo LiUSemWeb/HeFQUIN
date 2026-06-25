@@ -37,7 +37,7 @@ import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
+import se.liu.ida.hefquin.federation.access.impl.cache.mapdb.MapDBCache;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
@@ -45,17 +45,18 @@ import se.liu.ida.hefquin.federation.access.impl.response.CachedCardinalityRespo
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 
-public class ChronicleMapCacheTest extends FederationTestBase
+public class MapDBCacheTest extends FederationTestBase
 {
 
 	protected final TriplePattern tp = new TriplePatternImpl( NodeFactory.createURI("http://example.org/s"),
 	                                                          NodeFactory.createURI("http://example.org/p"),
 	                                                          NodeFactory.createVariable("o") );
+	protected final static String filename = "cache/test/mapdb-map.dat";
 
 	@Test
 	public void addAndGetTest() throws Exception {
-		final ChronicleMapCache cache1 = new ChronicleMapCache( "cache/test/chronicle-map.dat",
-		                                                        new CachePoliciesForTest() );
+		final MapDBCache cache1 = new MapDBCache( filename,
+		                                          new CachePoliciesForTest() );
 		cache1.clear();
 
 		final PersistentCacheKey k1 = new PersistentCacheKey( new SPARQLRequestImpl(tp),
@@ -108,8 +109,8 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		cache1.close();
 
 		// Load map from disk
-		final ChronicleMapCache cache2 = new ChronicleMapCache( "cache/test/chronicle-map.dat",
-		                                                        new CachePoliciesForTest() );
+		final MapDBCache cache2 = new MapDBCache( filename,
+		                                          new CachePoliciesForTest() );
 
 		// Assert equals
 		assertSolMapsEqual( o1, (SolMapsResponse) cache2.get(k1).get() );
@@ -124,8 +125,8 @@ public class ChronicleMapCacheTest extends FederationTestBase
 
 	@Test
 	public void nextPageURLIsNull() throws IOException, InterruptedException, ExecutionException {
-		final ChronicleMapCache cache = new ChronicleMapCache( "cache/test/chronicle-map.dat",
-		                                                       new CachePoliciesForTest() );
+		final MapDBCache cache = new MapDBCache( filename,
+		                                         new CachePoliciesForTest() );
 		cache.clear();
 
 		final PersistentCacheKey k = new PersistentCacheKey( new TPFRequestImpl(tp),
@@ -147,8 +148,8 @@ public class ChronicleMapCacheTest extends FederationTestBase
 
 	@Test
 	public void replaceTest() throws IOException, InterruptedException, ExecutionException {
-		final ChronicleMapCache cache = new ChronicleMapCache( "cache/test/chronicle-map.dat",
-		                                                       new CachePoliciesForTest() );
+		final MapDBCache cache = new MapDBCache( filename,
+		                                         new CachePoliciesForTest() );
 		cache.clear();
 
 		final PersistentCacheKey k = new PersistentCacheKey( new SPARQLRequestImpl(tp),
@@ -170,9 +171,9 @@ public class ChronicleMapCacheTest extends FederationTestBase
 
 	@Test
 	public void sizeLimitTest() throws IOException, InterruptedException, ExecutionException {
-		final ChronicleMapCache cache = new ChronicleMapCache( 25,
-		                                                       "cache/test/chronicle-map.dat",
-		                                                       new CachePoliciesForTest() );
+		final MapDBCache cache = new MapDBCache( 25,
+		                                         filename,
+		                                         new CachePoliciesForTest() );
 		cache.clear();
 		
 		final DataRetrievalResponse<?> o = makeSolMapResponse(1);
@@ -200,17 +201,17 @@ public class ChronicleMapCacheTest extends FederationTestBase
 
 	@Test
 	public void shrinkTest() throws IOException {
-		final ChronicleMapCache cache1 = new ChronicleMapCache( 100,
-		                                                        "cache/test/chronicle-map.dat",
-		                                                        new CachePoliciesForTest() );
+		final MapDBCache cache1 = new MapDBCache( 100,
+		                                         filename,
+		                                         new CachePoliciesForTest() );
 		cache1.clear();
 		
 		final DataRetrievalResponse<?> o = makeSolMapResponse(1);
 		
 		for( int i=0; i < 100; i++){
 			final PersistentCacheKey k = new PersistentCacheKey( new SPARQLRequestImpl(tp),
-			                                                     new SPARQLEndpointForTest("http://example.org/sparql" + i),
-			                                                     PersistentCacheKey.ResponseMode.RESULT );
+			                                                         new SPARQLEndpointForTest("http://example.org/sparql" + i),
+			                                                         PersistentCacheKey.ResponseMode.RESULT );
 			cache1.put( k, CompletableFuture.completedFuture(o) );
 		}
 
@@ -219,17 +220,17 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		cache1.close();
 
 		// Map should now shrink to 50
-		final ChronicleMapCache cache2 = new ChronicleMapCache( 50,
-		                                                        "cache/test/chronicle-map.dat",
-		                                                        new CachePoliciesForTest() );
+		final MapDBCache cache2 = new MapDBCache( 50,
+		                                         filename,
+		                                         new CachePoliciesForTest() );
 		assertEquals( 50, cache2.size() );
 		cache2.close();
 	}
 
 	@Test
 	public void invalidationTest() throws IOException, InterruptedException, ExecutionException {
-		final ChronicleMapCache cache = new ChronicleMapCache( "cache/test/chronicle-map.dat",
-		                                                       new CachePoliciesForTest(1000) );
+		final MapDBCache cache = new MapDBCache( filename,
+		                                         new CachePoliciesForTest(1000) );
 		cache.clear();
 		
 		final PersistentCacheKey k = new PersistentCacheKey( new SPARQLRequestImpl(tp),
@@ -246,9 +247,9 @@ public class ChronicleMapCacheTest extends FederationTestBase
 
 	@Test
 	public void leastRecentlyUsedTest() throws IOException, InterruptedException, ExecutionException {
-		final ChronicleMapCache cache = new ChronicleMapCache( 2,
-		                                                       "cache/test/chronicle-map.dat",
-		                                                       new CachePoliciesForTest() );
+		final MapDBCache cache = new MapDBCache( 2,
+		                                         filename,
+		                                         new CachePoliciesForTest() );
 		cache.clear();
 		
 		final PersistentCacheKey k1 = new PersistentCacheKey( new SPARQLRequestImpl(tp),
@@ -283,8 +284,8 @@ public class ChronicleMapCacheTest extends FederationTestBase
 
 	@Test
 	public void readFromDisk() throws IOException, InterruptedException, ExecutionException, Throwable {
-		final ChronicleMapCache cache = new ChronicleMapCache( "cache/test/chronicle-map.dat",
-		                                                        new CachePoliciesForTest() );
+		final MapDBCache cache = new MapDBCache( filename,
+		                                         new CachePoliciesForTest() );
 		cache.clear();
 
 		final PersistentCacheKey k1 = new PersistentCacheKey( new SPARQLRequestImpl(tp),
@@ -329,8 +330,8 @@ public class ChronicleMapCacheTest extends FederationTestBase
 		cache.close();
 
 		// Load map from disk
-		final ChronicleMapCache loadedCache = new ChronicleMapCache( "cache/test/chronicle-map.dat",
-		                                                             new CachePoliciesForTest() );
+		final MapDBCache loadedCache = new MapDBCache( filename,
+		                                               new CachePoliciesForTest() );
 
 		// Assert equals
 		assertSolMapsEqual( o1, (SolMapsResponse) loadedCache.get(k1).get() );
@@ -345,20 +346,19 @@ public class ChronicleMapCacheTest extends FederationTestBase
 
 	@Test
 	public void invalidationFromDiskTest() throws IOException, InterruptedException {
-		final ChronicleMapCache cache = new ChronicleMapCache( "cache/test/chronicle-map.dat",
-		                                                       new CachePoliciesForTest(1000) );
+		final MapDBCache cache = new MapDBCache( filename,
+		                                         new CachePoliciesForTest(1000) );
 		cache.clear();
 
 		final PersistentCacheKey k = new PersistentCacheKey( new SPARQLRequestImpl(tp),
-		                                                     new SPARQLEndpointForTest("http://example.org/sparql"),
-		                                                     PersistentCacheKey.ResponseMode.RESULT );
+		                                                         new SPARQLEndpointForTest("http://example.org/sparql"),
+		                                                         PersistentCacheKey.ResponseMode.RESULT );
 		final DataRetrievalResponse<?> o = makeSolMapResponse(1);
 		cache.put(k, CompletableFuture.completedFuture(o) );
 		cache.close();
 		Thread.sleep(1250);
-
-		final ChronicleMapCache loadedCache = new ChronicleMapCache( "cache/test/chronicle-map.dat",
-		                                                             new CachePoliciesForTest(1000) );
+		final MapDBCache loadedCache = new MapDBCache( filename,
+		                                               new CachePoliciesForTest(1000) );
 		assertNull( loadedCache.get(k) );
 		loadedCache.close();
 	}

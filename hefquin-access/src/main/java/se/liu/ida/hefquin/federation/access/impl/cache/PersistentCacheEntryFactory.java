@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap;
+package se.liu.ida.hefquin.federation.access.impl.cache;
 
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
@@ -7,10 +7,10 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 
 /**
- * Factory for creating {@link ChronicleMapCacheEntry} instances with the
+ * Factory for creating {@link PersistentCacheEntry} instances with the
  * current system time as creation timestamp.
  */
-public class ChronicleMapCacheEntryFactory implements CacheEntryFactory<ChronicleMapCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>>
+public class PersistentCacheEntryFactory implements CacheEntryFactory<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>>
 {
 	/**
 	 * Creates a new cache entry for the given object, using the current time
@@ -18,10 +18,10 @@ public class ChronicleMapCacheEntryFactory implements CacheEntryFactory<Chronicl
 	 *
 	 * @param object the cached object, represented as a {@link CompletableFuture}
 	 *               providing a {@link DataRetrievalResponse}
-	 * @return a new {@link ChronicleMapCacheEntry} wrapping the given object
+	 * @return a new {@link PersistentCacheEntry} wrapping the given object
 	 */
 	@Override
-	public ChronicleMapCacheEntry createCacheEntry( final CompletableFuture<? extends DataRetrievalResponse<?>> object ) {
-		return new ChronicleMapCacheEntry( object, Instant.now().toEpochMilli() );
+	public PersistentCacheEntry createCacheEntry( final CompletableFuture<? extends DataRetrievalResponse<?>> object ) {
+		return new PersistentCacheEntry( object, Instant.now().toEpochMilli() );
 	}
 }

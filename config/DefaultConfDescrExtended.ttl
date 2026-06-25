@@ -6,7 +6,7 @@ PREFIX ex:     <http://example.org/>
 
 [] rdf:type ec:HeFQUINEngineConfiguration ;
    ec:fedAccessMgr [
-        ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithCache" ;
+        ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithMapDBCache" ;
         ec:constructorArguments (
             [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.FederationAccessManager" ;
               ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl" ;
@@ -15,7 +15,8 @@ PREFIX ex:     <http://example.org/>
                 10  # defaultMaxParallelRequests
               )
             ]
-            100  # cacheCapacity
+            100    # cacheCapacity
+            600000 # timeToLive, 10 minutes
         )
    ] ;
    ec:queryProcessor _:b1 .
