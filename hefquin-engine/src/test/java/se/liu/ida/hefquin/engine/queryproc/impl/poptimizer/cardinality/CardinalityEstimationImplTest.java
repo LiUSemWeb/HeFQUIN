@@ -24,6 +24,8 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
@@ -446,32 +448,41 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		}
 
 		@Override
-		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
-				final TPFRequest req,
-				final TPFServer fm ) throws FederationAccessException
+		public < ReqType extends DataRetrievalRequest,
+				RespType extends DataRetrievalResponse<?>,
+				MemberType extends FederationMember >
+		CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+				final ReqType req,
+				final MemberType fm )
+						throws FederationAccessException
 		{
-			final Object o = req.getQueryPattern().asJenaTriple().getObject().getLiteralValue();
-			final int c = ((Integer) o).intValue();
-
-			final CardinalityResponse resp = new CardinalityResponse() {
-				@Override public Date getRetrievalEndTime() { return null; }
-				@Override public Date getRequestStartTime() { return null; }
-				@Override public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
-					if( isError() ){
-						throw new UnsupportedOperationDueToRetrievalError();
+			if(    req instanceof TPFRequest tpfReq
+			    && fm instanceof TPFServer ) {
+				final Object o = tpfReq.getQueryPattern().asJenaTriple().getObject().getLiteralValue();
+				final int c = ((Integer) o).intValue();
+				final CardinalityResponse resp = new CardinalityResponse() {
+					@Override public Date getRetrievalEndTime() { return null; }
+					@Override public Date getRequestStartTime() { return null; }
+					@Override public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
+						if( isError() ){
+							throw new UnsupportedOperationDueToRetrievalError();
+						}
+						return c;
 					}
-					return c; }
-			};
+				};
 
-			if ( sleepMillis > 0L ) {
-				try {
-					Thread.sleep(sleepMillis);
-				} catch ( final InterruptedException e ) {
-					throw new FederationAccessException(e, req, fm);
+				if ( sleepMillis > 0L ) {
+					try {
+						Thread.sleep(sleepMillis);
+					} catch ( final InterruptedException e ) {
+						throw new FederationAccessException(e, req, fm);
+					}
 				}
-			}
 
-			return CompletableFuture.completedFuture(resp);
+				return CompletableFuture.completedFuture(resp);
+			} else {
+				return super.issueCardinalityRequest(req, fm);
+			}
 		}
 	}
 
