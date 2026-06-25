@@ -187,7 +187,6 @@ public class CacheLayer<IdType,
 	 */
 	@Override
 	public boolean evict( final IdType key ) {
-		System.err.println("Evict: " + key);
 		synchronized (lock) {
 			if( map.remove(key) != null ) {
 				replacementPolicy.entryWasEvicted(key);
