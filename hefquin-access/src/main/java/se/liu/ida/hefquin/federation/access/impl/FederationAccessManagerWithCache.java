@@ -123,7 +123,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 
 	@Override
 	public < ReqType extends DataRetrievalRequest,
-	         RespType extends DataRetrievalResponse,
+	         RespType extends DataRetrievalResponse<?>,
 	         MemberType extends FederationMember >
 	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 			final ReqType req,
