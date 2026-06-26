@@ -8,7 +8,7 @@ package se.liu.ida.hefquin.base.datastructures;
  * @param <IdType> the type of the values by which the cached objects can be identified
  * @param <ObjectType> the type of the objects to be maintained in this cache
  */
-public interface Cache<IdType,ObjectType>
+public interface Cache<IdType,ObjectType> extends AutoCloseable
 {
 	/**
 	 * Adds the given object to this cache, associated with the given ID.
@@ -67,4 +67,22 @@ public interface Cache<IdType,ObjectType>
 	 * Removes all objects from this cache.
 	 */
 	void clear();
+
+	/**
+	 * Releases all resources associated with this cache.
+	 *
+	 * <p>
+	 * After this method returns, the cache should not be used anymore.
+	 * Implementations may release memory, close files, flush pending updates,
+	 * terminate background tasks, or perform other cleanup operations as required.
+	 * </p>
+	 *
+	 * <p>
+	 * The default implementation performs no action, which is suitable for caches
+	 * that do not manage external resources.
+	 * </p>
+	 */
+	default void close() {
+		// Do nothing
+	}
 }

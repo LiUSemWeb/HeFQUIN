@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.federation.access.impl;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+
+import se.liu.ida.hefquin.base.datastructures.Cache;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicyTimeToLive;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
@@ -17,7 +19,7 @@ import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
-import se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache;
+import se.liu.ida.hefquin.federation.access.impl.cache.HierarchicalCache;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntry;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntryFactory;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheKey;
@@ -27,95 +29,59 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
- * Federation access manager with a ChronicleMap-backed persistent cache.
+ * A federation access manager that uses a hierarchical cache to store
+ * federation access results and cardinality estimates.
  *
  * <p>
- * This class stores cache entries in a persistent {@link ChronicleMapCache} so
- * that successful responses can be reused across repeated requests and runs.
+ * The cache consists of two cache layers arranged hierarchically. Requests are
+ * first looked up in the primary cache layer. If no cached entry is found, the
+ * secondary cache layer is consulted. Entries retrieved from the secondary
+ * layer are promoted to the primary layer to improve the performance of future
+ * lookups.
  * </p>
  *
  * <p>
- * On a cache miss, the request is delegated to the wrapped federation access
- * manager. Successful responses are converted into cache objects and written to
- * the persistent cache.
+ * Both data retrieval requests and cardinality requests are cached. Cache keys
+ * are represented by {@link PersistentCacheKey} objects, which uniquely
+ * identify a request, the targeted federation member, and the type of cached
+ * response.
  * </p>
  *
  * <p>
- * Cache writes happen asynchronously and the returned futures represent the
- * underlying retrieval results. Cache population is performed after successful
- * completion of that future.
+ * To reduce duplicate request execution, this class stores
+ * {@link CompletableFuture} instances in the cache whenever possible. If the
+ * underlying cache layers preserve the cached futures, concurrent requests for
+ * the same data may share both the same future and the same underlying request
+ * execution. However, some cache implementations may store serialized or
+ * reconstructed representations of cached values rather than the original
+ * future instance. In such cases, the degree to which concurrent requests can
+ * be coalesced depends on the behavior of the underlying cache layers.
  * </p>
  *
  * <p>
- * Synchronization in this class is performed on the {@link ChronicleMapCache}
- * instance to avoid issuing duplicate requests concurrently. This is
- * independent of the internal synchronization used by the cache itself.
+ * Cache replacement and invalidation behavior are determined by the policies
+ * configured for the underlying cache layers.
  * </p>
  */
-public class FederationAccessManagerWithChronicleMapCache extends FederationAccessManagerWithCache implements AutoCloseable
+public class FederationAccessManagerWithHierarchicalCache extends FederationAccessManagerWithCache
 {
-	protected static final long DEFAULT_TIME_TO_LIVE = 300_000; // 5 minutes
-	protected final ChronicleMapCache chronicleMapCache;
+	protected final HierarchicalCache<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> cache;
 
 	/**
 	 * Creates a federation access manager with a ChronicleMap-backed persistent
 	 * cache using the given capacity and cache policies.
 	 *
 	 * @param fedAccMan                 the wrapped federation access manager
-	 * @param cacheCapacity             the maximum cache capacity
-	 * @param chronicleMapCachePolicies the cache policies used by the
-	 *                                  ChronicleMap-backed cache
-	 * @throws IOException if the persistent cache cannot be created or opened
+	 * @param l1Cache
+	 * @param l2Cache
 	 */
-	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-	                                                     final int cacheCapacity,
-	                                                     final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> chronicleMapCachePolicies )
+	public FederationAccessManagerWithHierarchicalCache( final FederationAccessManager fedAccMan,
+	                                                     final Cache<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>> l1Cache,
+	                                                     final Cache<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>> l2Cache )
 			throws IOException
 	{
-		super(fedAccMan, cacheCapacity);
-		chronicleMapCache = new ChronicleMapCache(cacheCapacity, chronicleMapCachePolicies);
-	}
-
-	/**
-	 * Creates a federation access manager with a ChronicleMap-backed persistent
-	 * cache using the given capacity and the default cache policies.
-	 *
-	 * <p>
-	 * The cache uses a least-recently-used (LRU) replacement policy and the
-	 * specified time-to-live for cache entry invalidation.
-	 * </p>
-	 *
-	 * @param fedAccMan     the wrapped federation access manager
-	 * @param cacheCapacity the maximum cache capacity
-	 * @param timeToLive    the cache entry time-to-live in milliseconds
-	 * @throws IOException if the persistent cache cannot be created or opened
-	 */
-	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-	                                                     final int cacheCapacity,
-	                                                     final int timeToLive )
-			throws IOException
-	{
-		this(fedAccMan, cacheCapacity, new DefaultChronicleMapCachePolicies(timeToLive) );
-	}
-
-	/**
-	 * Creates a federation access manager with a ChronicleMap-backed persistent
-	 * cache using the given capacity and the default cache policies.
-	 *
-	 * <p>
-	 * The default policies use least-recently-used (LRU) replacement and a
-	 * time-to-live of {@value #DEFAULT_TIME_TO_LIVE} milliseconds.
-	 * </p>
-	 *
-	 * @param fedAccMan     the wrapped federation access manager
-	 * @param cacheCapacity the maximum cache capacity
-	 * @throws IOException if the persistent cache cannot be created or opened
-	 */
-	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-	                                                     final int cacheCapacity )
-			throws IOException
-	{
-		this(fedAccMan, cacheCapacity, new DefaultChronicleMapCachePolicies(DEFAULT_TIME_TO_LIVE) );
+		super(fedAccMan, 1);
+		cache = new HierarchicalCache<>(l1Cache, l2Cache);
 	}
 
 	/**
@@ -169,16 +135,16 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<?> cachedResponse;
 
-		// We synchronize on the chronicleMapCache instance to prevent multiple threads
+		// We synchronize on the cache instance to prevent multiple threads
 		// from issuing the same request concurrently and inserting duplicate
 		// CompletableFutures. We cache the CompletableFuture immediately (before
 		// completion), so that concurrent callers can share the same future. The actual
 		// response data can only be persisted on disk once the future completes.
-		synchronized (chronicleMapCache) {
-			cachedResponse = chronicleMapCache.get(key);
+		synchronized (cache) {
+			cachedResponse = cache.get(key);
 			if ( cachedResponse == null ) {
 				final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm);
-				chronicleMapCache.put(key, newResponse);
+				cache.put(key, newResponse);
 				return newResponse;
 			}
 		}
@@ -234,32 +200,31 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<?> cachedResponse;
 
-		// We synchronize on the chronicleMapCache instance to prevent multiple threads
+		// We synchronize on the cache instance to prevent multiple threads
 		// from issuing the same request concurrently and inserting duplicate
 		// CompletableFutures. We cache the CompletableFuture immediately (before
-		// completion), so that concurrent callers can share the same future. The actual
-		// response data can only be persisted on disk once the future completes.
-		synchronized (chronicleMapCache) {
-			cachedResponse = chronicleMapCache.get(key);
+		// completion), so that concurrent callers can share the same future.
+		synchronized (cache) {
+			cachedResponse = cache.get(key);
 			if ( cachedResponse == null ) {
 				final CompletableFuture<CardinalityResponse> newResponse;
 				if (    req instanceof TPFRequest tpfReq
-					&& fm instanceof TPFServer tpfServer )
+					 && fm instanceof TPFServer tpfServer )
 					newResponse = fedAccMan.issueCardinalityRequest(tpfReq, tpfServer);
 				else if (    req instanceof TPFRequest tpfReq
-						&& fm instanceof BRTPFServer brtpfServer )
+						  && fm instanceof BRTPFServer brtpfServer )
 					newResponse = fedAccMan.issueCardinalityRequest(tpfReq, brtpfServer);
 				else if (    req instanceof BRTPFRequest brtpfReq
-						&& fm instanceof BRTPFServer brtpfServer )
+						  && fm instanceof BRTPFServer brtpfServer )
 					newResponse = fedAccMan.issueCardinalityRequest(brtpfReq, brtpfServer);
 				else if (    req instanceof SPARQLRequest sparqlReq
-						&& fm instanceof SPARQLEndpoint sparqlEndpoint )
+						  && fm instanceof SPARQLEndpoint sparqlEndpoint )
 					newResponse = fedAccMan.issueCardinalityRequest(sparqlReq, sparqlEndpoint);
 				else
 					throw new IllegalStateException( "Unsupported request/federation member combination: " +
 													req.getClass().getName() + "/" + fm.getClass().getName() );
 
-				chronicleMapCache.put(key, newResponse);
+				cache.put(key, newResponse);
 				return newResponse;
 			}
 		}
@@ -280,19 +245,20 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	}
 
 	@Override
-	public void close() {
-		chronicleMapCache.close();
+	public void shutdown() {
+		cache.close();
+		super.shutdown();
 	}
 
 	/**
-	 * Default cache policies for {@link ChronicleMapCache}.
+	 * Default cache policies for {@link HierarchicalCache}.
 	 *
 	 * <p>
 	 * Uses a least-recently-used (LRU) replacement policy and a time-to-live-based
 	 * invalidation policy.
 	 * </p>
 	 */
-	public static class DefaultChronicleMapCachePolicies
+	public static class DefaultHierarchicalMapCachePolicies
 				implements CachePolicies<PersistentCacheKey,
 				                         CompletableFuture<? extends DataRetrievalResponse<?>>,
 				                         PersistentCacheEntry>
@@ -313,8 +279,14 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CacheInvalidationPolicy<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> cip;
 
-		public DefaultChronicleMapCachePolicies( final long timeToLive ) {
-			cip = new CacheInvalidationPolicyTimeToLive<>(timeToLive);
+		/**
+		 * Creates a policy configuration with the given cache entry lifetime.
+		 *
+		 * @param timeToLive maximum lifetime of a cache entry, in seconds, before it is
+		 *                   considered invalid and eligible for eviction
+		 */
+		public DefaultHierarchicalMapCachePolicies( final int timeToLive ) {
+			cip = new CacheInvalidationPolicyTimeToLive<>( timeToLive * 1000L );
 		}
 
 		@Override
@@ -334,5 +306,5 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		                               CompletableFuture<? extends DataRetrievalResponse<?>>> getInvalidationPolicy() {
 			return cip;
 		}
-	} // end of DefaultChronicleMapCachePolicies
+	} // end of DefaultHierarchicalMapCachePolicies
 }
