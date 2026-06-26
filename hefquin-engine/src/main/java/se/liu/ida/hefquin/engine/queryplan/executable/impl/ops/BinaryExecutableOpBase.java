@@ -12,7 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * Top-level base class for all implementations of {@link BinaryExecutableOp}.
@@ -59,7 +59,7 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	public final void processInputFromChild1(
 			final SolutionMapping inputSolMap,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException
+			final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
 		log.info( "Processing solution mapping from child1 in {}.", getClass().getSimpleName() );
 
@@ -67,14 +67,14 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 
 		if ( collectExceptions ) {
 			try {
-				_processInputFromChild1(inputSolMap, sink, execCxt);
+				_processInputFromChild1(inputSolMap, sink, ctx);
 			}
 			catch ( ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_processInputFromChild1(inputSolMap, sink, execCxt);
+			_processInputFromChild1(inputSolMap, sink, ctx);
 		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentLeftProcStart;
@@ -92,20 +92,20 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	public final void processInputFromChild1(
 			final List<SolutionMapping> inputSolMaps,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException
+			final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
 		log.info( "Processing batch of {} solution mappings from child1 in {}.", inputSolMaps.size(), getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
 			try {
-				_processInputFromChild1(inputSolMaps, sink, execCxt);
+				_processInputFromChild1(inputSolMaps, sink, ctx);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_processInputFromChild1(inputSolMaps, sink, execCxt);
+			_processInputFromChild1(inputSolMaps, sink, ctx);
 		}
 
 		numberOfLeftInputMappingsProcessed += inputSolMaps.size();
@@ -115,10 +115,10 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 
 	@Override
 	public final void wrapUpForChild1( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	                                   final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		log.info( "Wrapping up processing of child1 input in {}.", getClass().getSimpleName() );
 		leftInputConsumed = true;
-		_wrapUpForChild1(sink, execCxt);
+		_wrapUpForChild1(sink, ctx);
 		log.info( "Finished processing child1 input in {}.", getClass().getSimpleName() );
 	}
 
@@ -126,7 +126,7 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	public final void processInputFromChild2(
 			final SolutionMapping inputSolMap,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException
+			final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
 		log.info( "Processing solution mapping from child2 in {}.", getClass().getSimpleName() );
 
@@ -134,14 +134,14 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 
 		if ( collectExceptions ) {
 			try {
-				_processInputFromChild2(inputSolMap, sink, execCxt);
+				_processInputFromChild2(inputSolMap, sink, ctx);
 			}
 			catch ( ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_processInputFromChild2(inputSolMap, sink, execCxt);
+			_processInputFromChild2(inputSolMap, sink, ctx);
 		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentRightProcStart;
@@ -159,20 +159,20 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	public final void processInputFromChild2(
 			final List<SolutionMapping> inputSolMaps,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException
+			final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
 		log.info( "Processing batch of {} solution mappings from child2 in {}.", inputSolMaps.size(), getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
 			try {
-				_processInputFromChild2(inputSolMaps, sink, execCxt);
+				_processInputFromChild2(inputSolMaps, sink, ctx);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_processInputFromChild2(inputSolMaps, sink, execCxt);
+			_processInputFromChild2(inputSolMaps, sink, ctx);
 		}
 
 		numberOfRightInputMappingsProcessed += inputSolMaps.size();
@@ -182,10 +182,10 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 
 	@Override
 	public final void wrapUpForChild2( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	                                   final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		log.info( "Wrapping up processing of child2 input in {}.", getClass().getSimpleName() );
 		rightInputConsumed = true;
-		_wrapUpForChild2(sink, execCxt);
+		_wrapUpForChild2(sink, ctx);
 		log.info( "Finished processing child2 input in {}.", getClass().getSimpleName() );
 	}
 
@@ -199,9 +199,9 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	 * this exception needs to be thrown.
 	 */
 	protected abstract void _processInputFromChild1(
-			final SolutionMapping inputSolMap,
-			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException;
+			SolutionMapping inputSolMap,
+			IntermediateResultElementSink sink,
+			QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	/**
 	 * Processes the input solution mappings of the given list by calling
@@ -217,9 +217,9 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	protected void _processInputFromChild1(
 			final List<SolutionMapping> inputSolMaps,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException {
+			final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
-			_processInputFromChild1(sm, sink, execCxt );
+			_processInputFromChild1(sm, sink, ctx);
 		}
 	}
 
@@ -232,8 +232,8 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	 * needs to be thrown.
 	 */
 	protected abstract void _wrapUpForChild1(
-			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException;
+			IntermediateResultElementSink sink,
+			QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	/**
 	 * Implementations of this function need to process the given solution
@@ -249,9 +249,9 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	 * has not been called yet.
 	 */
 	protected abstract void _processInputFromChild2(
-			final SolutionMapping inputSolMap,
-			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException;
+			SolutionMapping inputSolMap,
+			IntermediateResultElementSink sink,
+			QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	/**
 	 * Processes the input solution mappings of the given list by calling
@@ -267,9 +267,9 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	protected void _processInputFromChild2(
 			final List<SolutionMapping> inputSolMaps,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException {
+			final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
-			_processInputFromChild2(sm, sink, execCxt );
+			_processInputFromChild2(sm, sink, ctx);
 		}
 	}
 
@@ -287,8 +287,8 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	 * has not been called yet.
 	 */
 	protected abstract void _wrapUpForChild2(
-			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException;
+			IntermediateResultElementSink sink,
+			QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 
 	@Override

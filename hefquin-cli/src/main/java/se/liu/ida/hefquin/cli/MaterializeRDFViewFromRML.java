@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.cli;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +34,7 @@ import se.liu.ida.hefquin.mappings.algebra.exprs.MappingExpressionUtils;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpProject;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpUnion;
 import se.liu.ida.hefquin.mappings.rml.RML2MappingAlgebra;
+import se.liu.ida.hefquin.mappings.rml.RML2MappingAlgebra.FileSourceReference;
 import se.liu.ida.hefquin.mappings.rml.RMLParserException;
 import se.liu.ida.hefquin.mappings.rml.vocabulary.RMLVocab;
 import se.liu.ida.hefquin.mappings.sources.DataObject;
@@ -110,8 +111,12 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	 */
 	@Override
 	protected void exec() {
-		if ( ! contains(argRdfFile) )
-			cmdError("Must give an RDF input file", true );
+		try {
+			validateMappingArg();
+		}
+		catch ( final IllegalArgumentException ex ) {
+			cmdError( ex.getMessage(), true );
+		}
 
 		final Model rdfModel = RDFDataMgr.loadModel( getValue( argRdfFile ) );
 
@@ -150,13 +155,16 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	                     final OutputStream out ) {
 		final ResIterator iter = rmlDescr.listResourcesWithProperty( RDF.type, RMLVocab.TriplesMap );
 		final List<MappingExpression> trMaps = new ArrayList<>();
+		final File rdfFile = (new File( getValue(argRdfFile) )).getAbsoluteFile();
+		final File mappingDir = rdfFile.getParentFile();
 		while ( iter.hasNext() ) {
 			final Resource tm = iter.next();
 			final MappingExpression trMap;
 			try {
 				trMap = RML2MappingAlgebra.convert( tm,
 				                                    rmlDescr,
-				                                    baseIRI );
+				                                    baseIRI,
+				                                    mappingDir );
 			}
 			catch ( final RMLParserException e ) {
 				cmdError("There is a problem in the RML mapping: " +  e.getMessage(), true );
@@ -181,28 +189,40 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 				MappingOpUnion.getInstance(),
 				exprs );
 
-		// NOTE: currently using a fixed JSON source for evaluation.
-		final String jsonString;
-		try {
-			jsonString = Files.readString(Path.of("examples/ExampleJSONSource.json"));
-		}
-		catch ( final Exception e ) {
-			cmdError( "Failed to read sources.json: " + e.getMessage(), true );
-			return; // Primarily used to avoid "variable not initialized" compiler error
-		}
-
-		final JsonObject jsonObject;
-		try {
-			jsonObject = new JsonObject(jsonString);
-		}
-		catch ( final JsonPathException e ) {
-			cmdError( "Invalid JSON input: failed to parse JSON string.", true );
-			return;
-		}
-
 		final Map<SourceReference,DataObject> map = new HashMap<>();
 		for ( final SourceReference sr : MappingExpressionUtils.extractAllSrcRefs(expr) ) {
-			map.put( sr, jsonObject );
+			if ( sr instanceof FileSourceReference fsr ) {
+				final File file = fsr.getFile();
+
+				final String jsonString;
+				try {
+					jsonString = Files.readString(file.toPath());
+				}
+				catch ( final Exception e ) {
+					cmdError( "Failed to read " + file.getPath() + ":" + e.getMessage(), true );
+					return; // Primarily used to avoid "variable not initialized" compiler error
+				}
+
+				final JsonObject jsonObject;
+				try {
+					jsonObject = new JsonObject(jsonString);
+				}
+				catch ( final JsonPathException e ) {
+					cmdError( "Parsing JSON string from " + file.getPath() + " failed:" + e.getMessage(), true );
+					return;
+				}
+
+				map.put( sr, jsonObject );
+			}
+			else {
+				cmdError(
+					"MaterializeRDFViewFromRML only supports file-based logical sources. "
+					+ "Found source reference of type "
+					+ sr.getClass().getSimpleName(),
+					true
+				);
+				return;
+			}
 		}
 
 		// Measure only the core RML evaluation + materialization phase
@@ -220,6 +240,17 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
 			System.out.println("Overall Processing Time: " + modTime.timeStr(time) + " sec");
+		}
+	}
+
+	/**
+	 * Validates that the required RDF mapping file argument is provided.
+	 *
+	 * @throws IllegalArgumentException if no RDF input file argument is provided
+	 */
+	protected void validateMappingArg() {
+		if ( ! contains(argRdfFile) ) {
+			throw new IllegalArgumentException( "No RML mapping file provided." );
 		}
 	}
 }

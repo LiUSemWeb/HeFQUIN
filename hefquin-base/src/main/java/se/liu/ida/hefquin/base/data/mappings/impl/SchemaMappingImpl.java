@@ -7,6 +7,8 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.vocabulary.OWL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
@@ -19,6 +21,7 @@ import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 
 public class SchemaMappingImpl implements SchemaMapping
 {
+	private static final Logger log = LoggerFactory.getLogger( SchemaMappingImpl.class );
 	/**
 	 * The keys of this map are global terms, and the value for each such
 	 * global term is a set of all term mappings that have the global term
@@ -114,6 +117,8 @@ public class SchemaMappingImpl implements SchemaMapping
 		// Collect all ways of translating the predicate of the given triple pattern
 		final Set<Node> newPredicates = new HashSet<>();
 		if( givenPredicate.isURI() ) {
+			log.debug("Given predicate: {}", givenPredicate);
+			log.debug("Available mapping keys: {}", g2lMap.keySet());
 			final Set<TermMapping> mappingsForPredicate = g2lMap.get(givenPredicate);
 			if( mappingsForPredicate != null && ! mappingsForPredicate.isEmpty() ) {
 				for ( final TermMapping tm : mappingsForPredicate ) {

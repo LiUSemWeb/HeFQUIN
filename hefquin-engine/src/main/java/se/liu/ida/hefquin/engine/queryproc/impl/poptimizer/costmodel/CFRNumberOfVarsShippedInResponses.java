@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -21,7 +22,8 @@ public class CFRNumberOfVarsShippedInResponses extends CFRBase
 	}
 
 	@Override
-	public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan ) {
+	public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan,
+	                                                          final QueryProcContext ctx ) {
 		final PhysicalOperator pop = plan.getRootOperator();
 		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) pop).getLogicalOperator();
 
@@ -30,7 +32,7 @@ public class CFRNumberOfVarsShippedInResponses extends CFRBase
 
 			if ( fm instanceof SPARQLEndpoint ) {
 				final int numberOfVars = gpAdd.getPattern().getAllMentionedVariables().size();
-				final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
+				final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan, ctx);
 				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
 			}
 			else if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
@@ -46,7 +48,7 @@ public class CFRNumberOfVarsShippedInResponses extends CFRBase
 			if ( fm instanceof SPARQLEndpoint ) {
 				final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 				final int numberOfVars = req.getQueryPattern().getAllMentionedVariables().size();
-				final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
+				final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan, ctx);
 				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
 			}
 			else if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {

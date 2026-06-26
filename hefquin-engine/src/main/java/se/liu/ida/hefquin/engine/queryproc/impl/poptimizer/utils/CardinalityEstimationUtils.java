@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.base.utils.CompletableFutureUtils;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimationException;
 
@@ -24,10 +25,11 @@ public class CardinalityEstimationUtils
 	 * given {@link CardinalityEstimation} directly.
 	 */
 	public static Integer[] getEstimates( final CardinalityEstimation cardEstimate,
+	                                      final QueryProcContext ctx,
 	                                      final PhysicalPlan... plans )
 			throws CardinalityEstimationException
 	{
-		return getEstimates( cardEstimate, Arrays.asList(plans) );
+		return getEstimates( cardEstimate, ctx, Arrays.asList(plans) );
 	}
 
 	/**
@@ -43,6 +45,7 @@ public class CardinalityEstimationUtils
 	 * given {@link CardinalityEstimation} directly.
 	 */
 	public static Integer[] getEstimates( final CardinalityEstimation cardEstimate,
+	                                      final QueryProcContext ctx,
 	                                      final List<PhysicalPlan> plans )
 			throws CardinalityEstimationException
 	{
@@ -53,8 +56,10 @@ public class CardinalityEstimationUtils
 		for ( List<PhysicalPlan> oneBlockOfPlans: blockOfPlans ){
 			@SuppressWarnings("unchecked")
 			final CompletableFuture<Integer>[] futures = new CompletableFuture[oneBlockOfPlans.size()];
-			for (int i = 0; i < oneBlockOfPlans.size(); ++i) {
-				futures[i] = cardEstimate.initiateCardinalityEstimation(oneBlockOfPlans.get(i));
+			for ( int i = 0; i < oneBlockOfPlans.size(); i++ ) {
+				futures[i] = cardEstimate.initiateCardinalityEstimation(
+						oneBlockOfPlans.get(i),
+						ctx );
 			}
 
 			try {

@@ -23,10 +23,20 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import se.liu.ida.hefquin.base.net.http.HttpConstants;
+import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedExecutablePlanPrinterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 
 /**
@@ -122,6 +132,8 @@ public class SparqlServlet extends HttpServlet {
 	private void executeRequest( final String query,
 	                             final HttpServletRequest request,
 	                             final HttpServletResponse response ) throws IOException {
+		logger.debug( "Received SPARQL query: {}", query );
+
 		response.setCharacterEncoding( "utf-8" );
 
 		// Ensure query is not null or empty
@@ -137,18 +149,35 @@ public class SparqlServlet extends HttpServlet {
 			return;
 		}
 
-		try {
-			logger.debug( "Received SPARQL query: {}", query );
+		// Create QueryProcContext using request-specific execution settings
+		final QueryResponseBuffers queryResBuf = new QueryResponseBuffers();
+		final QueryProcContext ctx = createQueryProcContext(queryResBuf, request);
 
-			final JsonObject result = execute( query, mimeType );
-			if ( ! result.get( "exceptions" ).getAsArray().isEmpty() ) {
-				writeJsonError( response, 500, result.get( "exceptions" ) );
+		final boolean returnQueryProcStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_QUERY_PROC_STATS));
+		final boolean returnFedAccessStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS));
+
+		try {
+			final JsonObject result = execute( query, mimeType, ctx, queryResBuf, returnQueryProcStats, returnFedAccessStats );
+			if ( ! result.get(HttpConstants.JSON_EXCEPTIONS).getAsArray().isEmpty() ) {
+				writeJsonError( response, 500, result.get( HttpConstants.JSON_EXCEPTIONS ) );
 				return;
 			}
 
 			response.setStatus( 200 );
 			response.setContentType( mimeType );
-			response.getWriter().write( result.getString( "result" ) );
+
+			if ( mimeType.equals( ACCEPT_CSV ) ||
+				 mimeType.equals( ACCEPT_TSV ) ||
+				 mimeType.equals( ACCEPT_SPARQL_RESULTS_XML ) ) {
+				response.getWriter().write( result.getString( HttpConstants.JSON_RESULT ) );
+				return;
+			}
+			else if ( mimeType.equals( ACCEPT_SPARQL_RESULTS_JSON ) )
+				response.getWriter().write( result.toString() );
+			else {
+				writeJsonError( response, 406, new JsonString( "Unsupported response format: " + mimeType ) );
+				return;
+			}
 		}
 		catch ( final IllegalQueryException e ) {
 			writeJsonError( response, 400, new JsonString( "The given query is invalid: " + e.getMessage() ) );
@@ -196,25 +225,50 @@ public class SparqlServlet extends HttpServlet {
 	/**
 	 * Executes the given SPARQL query using the HeFQUIN engine and returns the serialized result.
 	 *
-	 * @param queryString the SPARQL query string
-	 * @param mimeType    the MIME type for the response format
-	 * @return the query result and exceptions in JSON format
+	 * @param queryString          the SPARQL query string
+	 * @param mimeType             the MIME type for the response format
+	 * @param ctx                  the processing context
+	 * @param QueryResponseBuffers container for optional query execution artifacts
+	 * @param returnQueryProcStats whether query proccessing stats should be returned
+	 * @param returnFedAccessStats whether federation access stats should be returned
+	 * @return a JSON object containing the query result, any exceptions, optional plans and statistics
 	 */
-	private static JsonObject execute( final String queryString, final String mimeType )
-			throws UnsupportedQueryException, IllegalQueryException
-	{
+	private static JsonObject execute( final String queryString,
+	                                   final String mimeType,
+	                                   final QueryProcContext ctx,
+	                                   final QueryResponseBuffers queryResBuf,
+	                                   final boolean returnQueryProcStats,
+	                                   final boolean returnFedAccessStats ) throws UnsupportedQueryException, IllegalQueryException {
 		final Query query = QueryFactory.create( queryString, SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN );
 		final ResultsFormat resultsFormat = ServletUtils.convert( mimeType );
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final ByteArrayOutputStream resultBaos = new ByteArrayOutputStream();
 
 		final QueryProcessingStatsAndExceptions statsAndExceptions;
-		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
-			statsAndExceptions = engine.executeQueryAndPrintResult(query, resultsFormat, ps);
+		try ( PrintStream ps = new PrintStream( resultBaos, true, StandardCharsets.UTF_8 ) ) {
+			statsAndExceptions = engine.executeQueryAndPrintResult( query, resultsFormat, ps, ctx );
 		}
 
 		final JsonObject res = new JsonObject();
-		res.put( "result", baos.toString() );
-		res.put( "exceptions", ServletUtils.getExceptions(statsAndExceptions) );
+		res.put( HttpConstants.JSON_RESULT, resultBaos.toString() );
+		if ( queryResBuf.sourceAssignment != null && queryResBuf.sourceAssignment.size() > 0 )
+			res.put(HttpConstants.JSON_SOURCE_ASSIGNMENT, queryResBuf.sourceAssignment.toString());
+		if ( queryResBuf.logicalPlan != null && queryResBuf.logicalPlan.size() > 0 )
+			res.put(HttpConstants.JSON_LOGICAL_PLAN, queryResBuf.logicalPlan.toString());
+		if ( queryResBuf.physicalPlan != null && queryResBuf.physicalPlan.size() > 0 )
+			res.put(HttpConstants.JSON_PHYSICAL_PLAN, queryResBuf.physicalPlan.toString());
+		if ( queryResBuf.executablePlan != null && queryResBuf.executablePlan.size() > 0 )
+			res.put(HttpConstants.JSON_EXECUTABLE_PLAN, queryResBuf.executablePlan.toString());
+		res.put( HttpConstants.JSON_EXCEPTIONS, ServletUtils.getExceptions(statsAndExceptions) );
+
+		final JsonObject queryProcStatsAsJson;
+		if ( statsAndExceptions != null && returnQueryProcStats ) {
+			queryProcStatsAsJson = StatsPrinter.statsAsJson(statsAndExceptions, true);
+			res.put( HttpConstants.JSON_QUERY_PROC_STATS, queryProcStatsAsJson );
+		}
+		if ( returnFedAccessStats ) {
+			final JsonObject fedAccessStatsAsJson = StatsPrinter.statsAsJson(engine.getFederationAccessStats(), true);
+			res.put( HttpConstants.JSON_FED_ACCESS_STATS, fedAccessStatsAsJson );
+		}
 		return res;
 	}
 
@@ -234,5 +288,75 @@ public class SparqlServlet extends HttpServlet {
 		final JsonObject msg = new JsonObject();
 		msg.put( "error", message );
 		response.getWriter().write( msg.toString() );
+	}
+
+	protected QueryProcContext createQueryProcContext( final QueryResponseBuffers queryResBuf,
+	                                                   final HttpServletRequest request ) {
+		final QueryProcContextBuilder ctxBuilder = engine.getQueryProcContextBuilder();
+
+		final String skipExec = request.getHeader( HttpConstants.X_HEADER_SKIP_EXECUTION );
+		ctxBuilder.setSkipExecution( Boolean.parseBoolean(skipExec) );
+
+		final String printSA = request.getHeader( HttpConstants.X_HEADER_PRINT_SOURCE_ASSIGNMENT );
+		final String printLP = request.getHeader( HttpConstants.X_HEADER_PRINT_LOGICAL_PLAN );
+		final String printPP = request.getHeader( HttpConstants.X_HEADER_PRINT_PHYSICAL_PLAN );
+		final String printEP = request.getHeader( HttpConstants.X_HEADER_PRINT_EXECUTABLE_PLAN );
+
+		if ( Boolean.parseBoolean(printSA) ) {
+			queryResBuf.sourceAssignment = new ByteArrayOutputStream();
+
+			final PrintStream ps = new PrintStream( queryResBuf.sourceAssignment,
+			                                        true, // auto flush
+			                                        StandardCharsets.UTF_8 );
+			final LogicalPlanPrinter p = new TextBasedLogicalPlanPrinterImpl(ps);
+
+			ctxBuilder.setSourceAssignmentPrinter(p);
+		}
+
+		if ( Boolean.parseBoolean(printLP) ) {
+			queryResBuf.logicalPlan = new ByteArrayOutputStream();
+
+			final PrintStream ps = new PrintStream( queryResBuf.logicalPlan,
+			                                        true, // auto flush
+			                                        StandardCharsets.UTF_8 );
+			final LogicalPlanPrinter p = new TextBasedLogicalPlanPrinterImpl(ps);
+
+			ctxBuilder.setLogicalPlanPrinter(p);
+		}
+
+		if ( Boolean.parseBoolean(printPP) ) {
+			queryResBuf.physicalPlan = new ByteArrayOutputStream();
+
+			final PrintStream ps = new PrintStream( queryResBuf.physicalPlan,
+			                                        true, // auto flush
+			                                        StandardCharsets.UTF_8 );
+			final PhysicalPlanPrinter p = new TextBasedPhysicalPlanPrinterImpl(ps);
+
+			ctxBuilder.setPhysicalPlanPrinter(p);
+		}
+
+		if ( Boolean.parseBoolean(printEP) ) {
+			queryResBuf.executablePlan = new ByteArrayOutputStream();
+
+			final PrintStream ps = new PrintStream( queryResBuf.executablePlan,
+			                                        true, // auto flush
+			                                        StandardCharsets.UTF_8 );
+			final ExecutablePlanPrinter p = new TextBasedExecutablePlanPrinterImpl(ps);
+
+			ctxBuilder.setExecutablePlanPrinter(p);
+		}
+
+		return ctxBuilder.build();
+	}
+
+	/**
+	 * Holds optional serialized query execution artifacts (plans and source assignments)
+	 * produced during query processing.
+	 */
+	protected static class QueryResponseBuffers {
+		public ByteArrayOutputStream sourceAssignment;
+		public ByteArrayOutputStream logicalPlan;
+		public ByteArrayOutputStream physicalPlan;
+		public ByteArrayOutputStream executablePlan;
 	}
 }

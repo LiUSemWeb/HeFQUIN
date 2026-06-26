@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThreadImplBase
 {
@@ -19,8 +19,8 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 	public PushBasedPlanThreadImplForBinaryOperator( final BinaryExecutableOp op,
 	                                                 final PushBasedPlanThread input1,
 	                                                 final PushBasedPlanThread input2,
-	                                                 final ExecutionContext execCxt ) {
-		super(execCxt);
+	                                                 final QueryProcContextExt ctx ) {
+		super(ctx);
 
 		assert op != null;
 		assert input1 != null;
@@ -59,10 +59,10 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 		while ( ! input1Consumed ) {
 			input1.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
-				op.processInputFromChild1(transferBuffer, sink, execCxt);
+				op.processInputFromChild1(transferBuffer, sink, ctx);
 			}
 			else {
-				op.wrapUpForChild1(sink, execCxt);
+				op.wrapUpForChild1(sink, ctx);
 				input1Consumed = true;
 			}
 		}
@@ -71,10 +71,10 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 		while ( ! input2Consumed ) {
 			input2.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
-				op.processInputFromChild2(transferBuffer, sink, execCxt);
+				op.processInputFromChild2(transferBuffer, sink, ctx);
 			}
 			else {
-				op.wrapUpForChild2(sink, execCxt);
+				op.wrapUpForChild2(sink, ctx);
 				input2Consumed = true;
 			}
 		}
@@ -92,10 +92,10 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 		while ( ! input2Consumed ) {
 			input2.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
-				op.processInputFromChild2(transferBuffer, sink, execCxt);
+				op.processInputFromChild2(transferBuffer, sink, ctx);
 			}
 			else {
-				op.wrapUpForChild2(sink, execCxt);
+				op.wrapUpForChild2(sink, ctx);
 				input2Consumed = true;
 			}
 		}
@@ -104,10 +104,10 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 		while ( ! input1Consumed ) {
 			input1.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
-				op.processInputFromChild1(transferBuffer, sink, execCxt);
+				op.processInputFromChild1(transferBuffer, sink, ctx);
 			}
 			else {
-				op.wrapUpForChild1(sink, execCxt);
+				op.wrapUpForChild1(sink, ctx);
 				input1Consumed = true;
 			}
 		}
@@ -136,7 +136,7 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 				// calling 'transferAvailableOutput' should not cause this thread to wait
 				input1.transferAvailableOutput(transferBuffer);
 				if ( ! transferBuffer.isEmpty() ) {
-					op.processInputFromChild1(transferBuffer, sink, execCxt);
+					op.processInputFromChild1(transferBuffer, sink, ctx);
 				}
 
 				someInputConsumed = true;
@@ -147,7 +147,7 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 				// calling 'transferAvailableOutput' should not cause this thread to wait
 				input2.transferAvailableOutput(transferBuffer);
 				if ( ! transferBuffer.isEmpty() ) {
-					op.processInputFromChild2(transferBuffer, sink, execCxt);
+					op.processInputFromChild2(transferBuffer, sink, ctx);
 				}
 
 				someInputConsumed = true;
@@ -168,10 +168,10 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 					// calling 'transferAvailableOutput' may cause this thread to wait
 					input1.transferAvailableOutput(transferBuffer);
 					if ( ! transferBuffer.isEmpty() ) {
-						op.processInputFromChild1(transferBuffer, sink, execCxt);
+						op.processInputFromChild1(transferBuffer, sink, ctx);
 					}
 					else {
-						op.wrapUpForChild1(sink, execCxt);
+						op.wrapUpForChild1(sink, ctx);
 						input1ConsumedCompletely = true;
 					}
 				}
@@ -179,10 +179,10 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 					// calling 'transferAvailableOutput)' may cause this thread to wait
 					input2.transferAvailableOutput(transferBuffer);
 					if ( ! transferBuffer.isEmpty() ) {
-						op.processInputFromChild2(transferBuffer, sink, execCxt);
+						op.processInputFromChild2(transferBuffer, sink, ctx);
 					}
 					else {
-						op.wrapUpForChild2(sink, execCxt);
+						op.wrapUpForChild2(sink, ctx);
 						input2ConsumedCompletely = true;
 					}
 				}

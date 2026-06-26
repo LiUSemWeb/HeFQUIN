@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -7,20 +10,26 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public abstract class PhysicalOptimizerBase implements PhysicalOptimizer
 {
+	private static final Logger log = LoggerFactory.getLogger( PhysicalOptimizerBase.class );
+
 	@Override
 	public final Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan lp,
-	                                                                     final QueryProcContext ctxt )
+	                                                                     final QueryProcContextExt ctx )
 			throws PhysicalOptimizationException {
 		final boolean keepMultiwayJoins = keepMultiwayJoinsInInitialPhysicalPlan();
 
-		final LogicalToPhysicalPlanConverter lp2pp = ctxt.getLogicalToPhysicalPlanConverter();
-		final PhysicalPlan initialPhysicalPlan = lp2pp.convert(lp, keepMultiwayJoins, ctxt);
+		log.debug( "Converting logical plan to physical plan (keepMultiwayJoins={})", keepMultiwayJoins );
 
-		return optimize(initialPhysicalPlan, ctxt);
+		final LogicalToPhysicalPlanConverter lp2pp = ctx.getLogicalToPhysicalPlanConverter();
+		final PhysicalPlan initialPhysicalPlan = lp2pp.convert( lp,
+		                                                        keepMultiwayJoins,
+		                                                        ctx.getLogicalToPhysicalOpConverter() );
+
+		return optimize(initialPhysicalPlan, ctx);
 	}
 
 	/**
@@ -35,5 +44,5 @@ public abstract class PhysicalOptimizerBase implements PhysicalOptimizer
 
 	protected abstract Pair<PhysicalPlan, PhysicalOptimizationStats> optimize(
 			PhysicalPlan initialPhysicalPlan,
-			QueryProcContext ctxt ) throws PhysicalOptimizationException;
+			QueryProcContextExt ctx ) throws PhysicalOptimizationException;
 }

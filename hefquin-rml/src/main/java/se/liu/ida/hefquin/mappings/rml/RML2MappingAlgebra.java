@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.mappings.rml;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +15,9 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 
 import se.liu.ida.hefquin.jenaext.ModelUtils;
@@ -37,9 +40,10 @@ import se.liu.ida.hefquin.mappings.rml.vocabulary.RMLVocab;
 import se.liu.ida.hefquin.mappings.sources.SourceReference;
 import se.liu.ida.hefquin.mappings.sources.json.JsonPathQuery;
 import se.liu.ida.hefquin.mappings.sources.json.MappingOpExtractJSON;
+import se.liu.ida.hefquin.vocabulary.FDVocab;
 
 /**
- * This class can be used to translated RML mappings into the mapping algebra.
+ * This class can be used to translate RML mappings into the mapping algebra.
  * <p>
  * The translation is implemented using the algorithms introduced in the
  * following research paper.
@@ -56,12 +60,14 @@ public class RML2MappingAlgebra
 	 * @param tm
 	 * @param rmlDescription
 	 * @param baseIRI
+	 * @param mappingDir
 	 * @return
 	 * @throws RMLParserException
 	 */
 	public static MappingExpression convert( final Resource tm,
 	                                         final Model rmlDescription,
-	                                         final Node baseIRI )
+	                                         final Node baseIRI,
+	                                         final File mappingDir )
 			throws RMLParserException
 	{
 		// lines 5-8 of Algorithm 1
@@ -101,7 +107,7 @@ public class RML2MappingAlgebra
 		final Map<String, String> PwithStrings = createPwithStrings(queryStrings);
 		final Map<String, JsonPathQuery> P = createP(PwithStrings, tm);
 		final MappingOperator extractOp = new MappingOpExtractJSON(
-				createSourceReference(tm),
+				createSourceReference(tm, mappingDir),
 				checkSourceAndGetRootQuery(tm),
 				P );
 		MappingExpression expr = MappingExpressionFactory.create(extractOp);
@@ -142,7 +148,7 @@ public class RML2MappingAlgebra
 			final Map<String, String> PwithStrings2 = createPwithStrings(queryStrings2);
 			final Map<String, JsonPathQuery> P2 = createP(PwithStrings2, ptm);
 			final MappingOperator extractOp2 = new MappingOpExtractJSON(
-					createSourceReference(ptm),
+					createSourceReference(ptm, mappingDir),
 					checkSourceAndGetRootQuery(ptm),
 					P2 );
 			final MappingExpression expr2 = MappingExpressionFactory.create(extractOp2);
@@ -229,7 +235,7 @@ public class RML2MappingAlgebra
 	 * Checks that the logical source of the given triples map has
 	 * rml:JSONPath as its reference formulation and obtains the
 	 * root iterator query of the logical source.
-	 * 
+	 *
 	 * @param tm - assumed to represent an RML triples map
 	 * @return JSONPath query created from the rml:iterator of the logical source
 	 * @throws RMLParserException
@@ -277,7 +283,7 @@ public class RML2MappingAlgebra
 		}
 	}
 
-	public static SourceReference createSourceReference( final Resource tm )
+	public static SourceReference createSourceReference( final Resource tm, final File mappingDir )
 			throws RMLParserException
 	{
 		// Get the rml:logicalSource of the given triples map.
@@ -299,7 +305,15 @@ public class RML2MappingAlgebra
 			throw new RMLParserException("There is a triples map (" + tm.toString() + ") whose logical source does not have an rm:source.", e);
 		}
 
-		return new MySourceReference(src);
+		if ( src.hasProperty( RDF.type, FDVocab.TemplateBasedInterface ) || src.hasProperty( RDF.type, FDVocab.FixedEndpointInterface ) )
+			return new MySourceReference(src);
+		else if ( src.hasProperty( RDF.type, RMLVocab.FilePath ) )
+			return new FileSourceReference(src, mappingDir);
+		else {
+			throw new RMLParserException(
+				"The following object of an rml:source triple has an unsupported or unspecified type: " + src
+			);
+		}
 	}
 
 	/**
@@ -643,4 +657,49 @@ public class RML2MappingAlgebra
 		}
 	}
 
+	public static class FileSourceReference implements SourceReference {
+		public final File file;
+		public FileSourceReference( final File file ) { this.file = file; }
+		public FileSourceReference( final Resource r, final File mappingDir ) {
+			final Statement s = r.getProperty( RMLVocab.path );
+			if ( s == null || ! s.getObject().isLiteral() )
+				throw new IllegalArgumentException( "Missing or invalid rml:path on " + r );
+
+			final Statement rootStatement = r.getProperty( RMLVocab.root );
+			final String rootPath;
+
+			if ( rootStatement != null ) {
+				final RDFNode rootNode = rootStatement.getObject();
+
+				if ( rootNode.isLiteral() ) {
+					rootPath = rootNode.asLiteral().getString();
+				}
+				else if ( rootNode.isURIResource() ) {
+					final String uri = rootNode.asResource().getURI();
+					if ( uri.equals(RMLVocab.CurrentWorkingDirectory.getURI()) )
+						rootPath = System.getProperty( "user.dir" );
+					else if ( uri.equals(RMLVocab.MappingDirectory.getURI()) )
+						rootPath = mappingDir.toString();
+					else
+						throw new IllegalArgumentException( "Unknown rml:root resource: " + uri );
+				}
+				else
+					throw new IllegalArgumentException( "Unsupported rml:root value type on " + r + ": " + rootNode );
+			}
+			else
+				rootPath = System.getProperty( "user.dir" );
+
+			this.file = new File( rootPath, s.getString() );
+		}
+
+		@Override
+		public boolean equals( final Object other ) {
+			if ( other == this ) return true;
+
+			return (    other instanceof FileSourceReference sr
+			         && sr.file.equals(file) );
+		}
+
+		public File getFile() { return file; }
+	}
 }

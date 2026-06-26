@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.base.utils.Stats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 import java.util.*;
 
@@ -118,7 +118,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _processInputFromChild1( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		buffer.clear();
 
 		_processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
@@ -132,7 +132,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		buffer.clear();
 
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
@@ -147,7 +147,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 
 	@Override
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
-									 final ExecutionContext execCxt ) {
+									 final QueryProcContextExt ctx ) {
 		child1InputComplete = true;
 
 		if ( child2InputComplete ) {
@@ -158,7 +158,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		buffer.clear();
 
 		_processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
@@ -172,7 +172,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	@Override
 	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
 	                                        final IntermediateResultElementSink sink,
-	                                        final ExecutionContext execCxt ) {
+	                                        final QueryProcContextExt ctx ) {
 		buffer.clear();
 
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
@@ -187,7 +187,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 
 	@Override
 	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
-	                                 final ExecutionContext execCxt ) {
+	                                 final QueryProcContextExt ctx ) {
 		child2InputComplete = true;
 
 		if ( child1InputComplete ) {

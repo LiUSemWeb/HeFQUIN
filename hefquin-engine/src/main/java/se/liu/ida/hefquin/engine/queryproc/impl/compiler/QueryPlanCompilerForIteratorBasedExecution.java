@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
@@ -11,27 +14,26 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultEleme
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterator;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryCompilationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
-public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompilerBase
+public class QueryPlanCompilerForIteratorBasedExecution implements QueryPlanCompiler
 {
-	public QueryPlanCompilerForIteratorBasedExecution( final QueryProcContext ctxt ) {
-		super(ctxt);
-	}
+	private static final Logger log = LoggerFactory.getLogger( QueryPlanCompilerForIteratorBasedExecution.class );
 
 	@Override
-	public ExecutablePlan compile( final PhysicalPlan qep )
+	public ExecutablePlan compile( final PhysicalPlan qep,
+	                               final QueryProcContextExt ctx )
 			throws QueryCompilationException
 	{
-		final ExecutionContext execCxt = createExecContext();
-		final ResultElementIterator it = compile( qep, execCxt );
+		log.debug("Compiling physical plan using iterator-based execution model.");
+		final ResultElementIterator it = _compile(qep, ctx);
 		return new IteratorBasedExecutablePlanImpl(it);
 	}
 
-	protected ResultElementIterator compile( final PhysicalPlan qep,
-	                                         final ExecutionContext execCxt )
+	protected ResultElementIterator _compile( final PhysicalPlan qep,
+	                                          final QueryProcContextExt ctx )
 	{
 		final QueryPlanningInfo qpInfo;
 		if ( qep.hasQueryPlanningInfo() )
@@ -42,7 +44,7 @@ public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompile
 		if ( qep.numberOfSubPlans() == 0 )
 		{
 			final NullaryExecutableOp execOp = (NullaryExecutableOp) qep.getRootOperator().createExecOp(true, qpInfo);
-			return new ResultElementIterWithNullaryExecOp(execOp, execCxt);
+			return new ResultElementIterWithNullaryExecOp(execOp, ctx);
 		}
 		else if ( qep.numberOfSubPlans() == 1 )
 		{
@@ -50,8 +52,8 @@ public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompile
 
 			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( true, qpInfo, subPlan.getExpectedVariables() );
 
-			final ResultElementIterator elmtIterSubPlan = compile(subPlan, execCxt);
-			return new ResultElementIterWithUnaryExecOp(execOp, elmtIterSubPlan, execCxt);
+			final ResultElementIterator elmtIterSubPlan = _compile(subPlan, ctx);
+			return new ResultElementIterWithUnaryExecOp(execOp, elmtIterSubPlan, ctx);
 		}
 		else if ( qep.numberOfSubPlans() == 2 )
 		{
@@ -64,12 +66,16 @@ public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompile
 					subPlan1.getExpectedVariables(),
 					subPlan2.getExpectedVariables() );
 
-			final ResultElementIterator elmtIterSubPlan1 = compile(subPlan1, execCxt);
-			final ResultElementIterator elmtIterSubPlan2 = compile(subPlan2, execCxt);
-			return new ResultElementIterWithBinaryExecOp(execOp, elmtIterSubPlan1, elmtIterSubPlan2, execCxt);
+			final ResultElementIterator elmtIterSubPlan1 = _compile(subPlan1, ctx);
+			final ResultElementIterator elmtIterSubPlan2 = _compile(subPlan2, ctx);
+			return new ResultElementIterWithBinaryExecOp(execOp, elmtIterSubPlan1, elmtIterSubPlan2, ctx);
 		}
 		else
 		{
+			log.debug(
+				"Unsupported operator arity: {} for operator {}",
+				qep.numberOfSubPlans(),
+				qep.getRootOperator().getClass().getSimpleName() );
 			throw new IllegalArgumentException();
 		}
 	}

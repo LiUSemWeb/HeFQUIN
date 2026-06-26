@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
+import se.liu.ida.hefquin.base.net.http.HttpClientProvider;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
@@ -58,6 +59,22 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 		      new BRTPFRequestProcessorImpl(),
 		      new Neo4jRequestProcessorImpl(),
 		      new RESTRequestProcessorImpl() );
+	}
+
+	/**
+	 * Creates an {@link AsyncFederationAccessManagerImpl} using the given executor
+	 * service and sets the default maximum number of parallel requests to a given
+	 * endpoint address.
+	 *
+	 * @param execService         the executor service used for asynchronous request
+	 *                            execution
+	 * @param maxParallelRequests the default maximum number of parallel requests to
+	 *                            any given endpoint address
+	 */
+	public AsyncFederationAccessManagerImpl( final ExecutorService execService, final int maxParallelRequests ) {
+		this(execService);
+		// Set default number of parallel request to any given endpoint address
+		HttpClientProvider.setDefaultMaxParallelRequests(maxParallelRequests);
 	}
 
 	@Override

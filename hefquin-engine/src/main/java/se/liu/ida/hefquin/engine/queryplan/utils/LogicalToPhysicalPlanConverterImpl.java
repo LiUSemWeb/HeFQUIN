@@ -20,7 +20,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlanConverter
 {
@@ -36,8 +35,8 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 	@Override
 	public PhysicalPlan convert( final LogicalPlan lp,
 	                             final boolean keepMultiwayJoins,
-	                             final QueryProcContext ctxt ) {
-		final Worker w = new Worker( ctxt.getLogicalToPhysicalOpConverter() );
+	                             final LogicalToPhysicalOpConverter lop2pop ) {
+		final Worker w = new Worker(lop2pop);
 		return w.convert(lp, keepMultiwayJoins);
 	}
 

@@ -34,7 +34,6 @@ public class ExecOpHashBasedMinusTest
 		final Node x2 = NodeFactory.createURI("http://example.org/x2");
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
-		final Node y3 = NodeFactory.createURI("http://example.org/y3");
 
 		final List<SolutionMapping> input1 = List.of(
 			SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1),
@@ -76,9 +75,7 @@ public class ExecOpHashBasedMinusTest
 		final Var var2 = Var.alloc("v2");
 
 		final Node x1 = NodeFactory.createURI("http://example.org/x1");
-		final Node x2 = NodeFactory.createURI("http://example.org/x2");
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
-		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 
 		final List<SolutionMapping> input1 = List.of(
 			SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1)
@@ -114,9 +111,7 @@ public class ExecOpHashBasedMinusTest
 		final Var var3 = Var.alloc("v3");
 
 		final Node x1 = NodeFactory.createURI("http://example.org/x1");
-		final Node x2 = NodeFactory.createURI("http://example.org/x2");
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
-		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 
 		final List<SolutionMapping> input1 = List.of(
 			SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1)

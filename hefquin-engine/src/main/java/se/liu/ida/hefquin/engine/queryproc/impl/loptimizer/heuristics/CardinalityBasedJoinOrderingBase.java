@@ -54,8 +54,8 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 {
 	protected final CardinalityEstimator cardEst;
 
-	public CardinalityBasedJoinOrderingBase( final QueryProcContext ctxt ) {
-		this( new RequestBasedCardinalityEstimator( ctxt.getFederationAccessMgr() ) );
+	public CardinalityBasedJoinOrderingBase() {
+		this( new RequestBasedCardinalityEstimator() );
 	}
 
 	public CardinalityBasedJoinOrderingBase( final CardinalityEstimator cardEst ) {
@@ -64,7 +64,8 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 	}
 
 	@Override
-	public LogicalPlan apply( final LogicalPlan inputPlan )
+	public LogicalPlan apply( final LogicalPlan inputPlan,
+	                          final QueryProcContext ctx )
 			throws LogicalOptimizationException
 	{
 		// If the given plan does not have any subplans, there is nothing to do.
@@ -75,7 +76,7 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 
 		// As a first step, we make sure that all subplans within the given
 		// plan are annotated with their respective cardinality estimates.
-		cardEst.addCardinalities(inputPlan);
+		cardEst.addCardinalities(ctx, inputPlan);
 
 		// Now we apply the join ordering for all joins within the given
 		// plan, for which we use a recursive function.

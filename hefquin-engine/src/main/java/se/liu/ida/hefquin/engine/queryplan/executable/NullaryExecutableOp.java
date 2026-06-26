@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable;
 
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * A specialization of the {@link ExecutableOperator} interface that
@@ -15,5 +15,5 @@ public interface NullaryExecutableOp extends ExecutableOperator
 	 * result elements (if any) to the given sink.
 	 */
 	void execute( IntermediateResultElementSink sink,
-	              ExecutionContext execCxt ) throws ExecOpExecutionException;
+	              QueryProcContextExt ctx ) throws ExecOpExecutionException;
 }

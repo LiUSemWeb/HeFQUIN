@@ -371,7 +371,8 @@ public class FederationDescriptionReader
 				try {
 					trMap = RML2MappingAlgebra.convert( tm.asResource(),
 					                                    fd,
-					                                    baseIRI );
+					                                    baseIRI,
+					                                    null );
 				}
 				catch ( final RMLParserException e ) {
 					throw new IllegalArgumentException("There is a problem in the RML mapping for <" + serviceURI + ">: " +  e.getMessage(), e );

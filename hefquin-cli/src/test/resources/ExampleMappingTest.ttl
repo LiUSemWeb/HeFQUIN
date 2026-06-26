@@ -1,0 +1,32 @@
+@prefix rml:   <http://w3id.org/rml/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:    <http://example.org/> .
+
+_:covidJsonSource
+    a rml:Source , rml:FilePath ;
+    rml:root rml:MappingDirectory ;
+    rml:path "ExampleJSONSource.json" .
+
+_:covid19TM_totalCases
+    a rml:TriplesMap ;
+
+    rml:logicalSource [
+        rml:source _:covidJsonSource ;
+        rml:referenceFormulation rml:JSONPath ;
+        rml:iterator "$"
+    ] ;
+
+    rml:subjectMap [
+        rml:reference "country" ;
+        rml:termType rml:BlankNode
+    ] ;
+
+    rml:predicateObjectMap [
+        rml:predicateMap [
+            rml:constant ex:totalCases
+        ] ;
+        rml:objectMap [
+            rml:reference "cases" ;
+            rml:datatype xsd:integer
+        ]
+    ] .

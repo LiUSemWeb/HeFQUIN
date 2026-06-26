@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
@@ -10,10 +11,12 @@ import java.util.List;
 
 public class PhysicalPlanWithCostUtils {
     
-    public static PhysicalPlanWithCost annotatePlanWithCost( final CostModel cm, final PhysicalPlan plan ) throws PhysicalOptimizationException {
+    public static PhysicalPlanWithCost annotatePlanWithCost( final CostModel cm,
+                                                             final PhysicalPlan plan,
+                                                             final QueryProcContext ctx ) throws PhysicalOptimizationException {
         final Double[] costs;
         try {
-            costs = CostEstimationUtils.getEstimates(cm, plan);
+            costs = CostEstimationUtils.getEstimates(cm, ctx, plan);
         } catch ( final CostEstimationException e ) {
             throw new PhysicalOptimizationException( "Determining the cost for the plan caused an exception.", e.getCause() );
         }
@@ -21,10 +24,12 @@ public class PhysicalPlanWithCostUtils {
         return new PhysicalPlanWithCost( plan, costs[0] );
     }
 
-    public static List<PhysicalPlanWithCost> annotatePlansWithCost(final CostModel cost, final List<PhysicalPlan> plans ) throws PhysicalOptimizationException {
+    public static List<PhysicalPlanWithCost> annotatePlansWithCost( final CostModel cost,
+                                                                    final List<PhysicalPlan> plans,
+                                                                    final QueryProcContext ctx ) throws PhysicalOptimizationException {
         final Double[] costs;
         try {
-            costs = CostEstimationUtils.getEstimates( cost, plans );
+            costs = CostEstimationUtils.getEstimates(cost, ctx, plans);
         } catch ( final CostEstimationException e ) {
             throw new PhysicalOptimizationException( "Determining the cost for plans caused an exception.", e.getCause() );
         }

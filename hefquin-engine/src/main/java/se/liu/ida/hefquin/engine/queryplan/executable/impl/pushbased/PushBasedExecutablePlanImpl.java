@@ -8,19 +8,25 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
 
 public class PushBasedExecutablePlanImpl implements ExecutablePlan
 {
+	private static final Logger log = LoggerFactory.getLogger( PushBasedExecutablePlanImpl.class );
+
 	protected final LinkedList<PushBasedPlanThread> tasks;
 	protected ExecutorService threadPool;
 
-	public PushBasedExecutablePlanImpl( final LinkedList<PushBasedPlanThread> tasks, final ExecutionContext ctx ) {
+	public PushBasedExecutablePlanImpl( final LinkedList<PushBasedPlanThread> tasks,
+	                                    final QueryProcContextExt ctx ) {
 		assert ! tasks.isEmpty();
 		this.tasks = tasks;
 
@@ -32,6 +38,8 @@ public class PushBasedExecutablePlanImpl implements ExecutablePlan
 		if ( threadPool == null ) {
 			throw new ExecutionException("thread pool missing");
 		}
+
+		log.debug( "Starting push-based executable plan execution with {} tasks.", tasks.size() );
 
 		// Start all tasks, beginning with the last ones (which are the
 		// ones for the leaf node operators), and collect 'Future's to
@@ -56,6 +64,8 @@ public class PushBasedExecutablePlanImpl implements ExecutablePlan
 				throw new ExecutionException("Submitting one of the tasks for execution caused an exception.", e);
 			}
 		}
+
+		log.debug( "Successfully submitted {} push-based tasks to executor service.", tasks.size() );
 
 		// Consume all solution mappings from the root operator
 		// and send them to the result sink.
@@ -114,6 +124,7 @@ public class PushBasedExecutablePlanImpl implements ExecutablePlan
 				future.cancel(true);
 			}
 		}
+		log.debug( "Push-based executable plan execution finished successfully." );
 	}
 
 	@Override

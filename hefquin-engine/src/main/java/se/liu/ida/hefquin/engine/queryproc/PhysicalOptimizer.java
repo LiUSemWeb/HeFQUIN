@@ -9,5 +9,5 @@ public interface PhysicalOptimizer
 	boolean assumesLogicalMultiwayJoins();
 
 	Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( LogicalPlan initialPlan,
-	                                                        QueryProcContext ctxt ) throws PhysicalOptimizationException;
+	                                                        QueryProcContextExt ctx ) throws PhysicalOptimizationException;
 }

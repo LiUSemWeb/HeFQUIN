@@ -9,6 +9,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.apache.jena.atlas.json.JSON;
+import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -23,10 +25,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import se.liu.ida.hefquin.base.net.http.HttpConstants;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -137,6 +142,19 @@ public class SparqlServletTest {
 		}
 	}
 
+	private static ResultSet extractResultSetJSON( final CloseableHttpResponse response ) throws IOException {
+		final String json = new String(
+			response.getEntity().getContent().readAllBytes(),
+			StandardCharsets.UTF_8
+		);
+
+		final JsonObject obj = JSON.parse(json);
+
+		final String resultJson = obj.getString(HttpConstants.JSON_RESULT);
+
+		return ResultSetFactory.fromJSON( new ByteArrayInputStream( resultJson.getBytes(StandardCharsets.UTF_8) ) );
+	}
+
 	@Test
 	public void testPostUrlEncodedRequestReturnsXmlResults() throws Exception {
 		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_XML,
@@ -154,7 +172,7 @@ public class SparqlServletTest {
 				DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 200, response.getStatusLine().getStatusCode() );
-			final ResultSet resultSet = ResultSetFactory.fromJSON( response.getEntity().getContent() );
+			final ResultSet resultSet = extractResultSetJSON( response );
 			validateResultSet( resultSet );
 		}
 	}
@@ -218,7 +236,7 @@ public class SparqlServletTest {
 			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final String contentType = response.getHeaders( "Content-Type" )[0].getValue().split( ";" )[0];
 			assertEquals( contentType, ACCEPT_SPARQL_RESULTS_JSON );
-			final ResultSet resultSet = ResultSetFactory.fromJSON( response.getEntity().getContent() );
+			final ResultSet resultSet = extractResultSetJSON( response );
 			validateResultSet( resultSet );
 		}
 	}
@@ -240,7 +258,7 @@ public class SparqlServletTest {
 				DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 200, response.getStatusLine().getStatusCode() );
-			final ResultSet resultSet = ResultSetFactory.fromJSON( response.getEntity().getContent() );
+			final ResultSet resultSet = extractResultSetJSON( response );
 			validateResultSet( resultSet );
 		}
 	}
@@ -304,7 +322,7 @@ public class SparqlServletTest {
 			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final String contentType = response.getHeaders( "Content-Type" )[0].getValue().split( ";" )[0];
 			assertEquals( contentType, ACCEPT_SPARQL_RESULTS_JSON );
-			final ResultSet resultSet = ResultSetFactory.fromJSON( response.getEntity().getContent() );
+			final ResultSet resultSet = extractResultSetJSON( response );
 			validateResultSet( resultSet );
 		}
 	}
@@ -324,7 +342,7 @@ public class SparqlServletTest {
 		final HttpGet request = createGetRequest( ACCEPT_SPARQL_RESULTS_JSON, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 200, response.getStatusLine().getStatusCode() );
-			final ResultSet resultSet = ResultSetFactory.fromJSON( response.getEntity().getContent() );
+			final ResultSet resultSet = extractResultSetJSON( response );
 			validateResultSet( resultSet );
 		}
 	}

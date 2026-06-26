@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -13,16 +14,6 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 import org.junit.Test;
-
-import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public class HeFQUINEngineConfigReaderTest
 {
@@ -225,7 +216,7 @@ public class HeFQUINEngineConfigReaderTest
 			  + System.lineSeparator()
 			  + "ex:a  ec:javaClassName 'se.liu.ida.hefquin.engine.HeFQUINEngineConfigReaderTest_DummyClass2' ;" + System.lineSeparator()
 			  + "      ec:constructorArguments (" + System.lineSeparator()
-			  + "           [ rdf:value ec:value:QueryProcContext ]" + System.lineSeparator()
+			  + "           [ rdf:value ec:value:ExecServiceForFedAccess ]" + System.lineSeparator()
 			  + "      ) ."
 		);
 
@@ -238,7 +229,7 @@ public class HeFQUINEngineConfigReaderTest
 
 		final HeFQUINEngineConfigReaderTest_DummyClass2 d = (HeFQUINEngineConfigReaderTest_DummyClass2) o;
 		assertEquals( 4321, d.i );
-		assertEquals( ctx.getQueryProcContext(), d.ctx );
+		assertEquals( ctx.getExecutorServiceForFederationAccess(), d.execService );
 	}
 
 	@Test
@@ -252,7 +243,7 @@ public class HeFQUINEngineConfigReaderTest
 			  + "ex:a  ec:javaClassName 'se.liu.ida.hefquin.engine.HeFQUINEngineConfigReaderTest_DummyClass2' ;" + System.lineSeparator()
 			  + "      ec:constructorArguments (" + System.lineSeparator()
 			  //            the constructor argument is given directly
-			  + "           ec:value:QueryProcContext" + System.lineSeparator()
+			  + "           ec:value:ExecServiceForFedAccess" + System.lineSeparator()
 			  + "      ) ."
 		);
 
@@ -265,7 +256,7 @@ public class HeFQUINEngineConfigReaderTest
 
 		final HeFQUINEngineConfigReaderTest_DummyClass2 d = (HeFQUINEngineConfigReaderTest_DummyClass2) o;
 		assertEquals( 4321, d.i );
-		assertEquals( ctx.getQueryProcContext(), d.ctx );
+		assertEquals( ctx.getExecutorServiceForFederationAccess(), d.execService );
 	}
 
 
@@ -281,134 +272,23 @@ public class HeFQUINEngineConfigReaderTest
 	}
 
 	protected HeFQUINEngineConfigReader.ExtendedContext createEmptyContext() {
-		return new HeFQUINEngineConfigReader.ExtendedContext() {
+		final HeFQUINEngineConfigReader.Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override
 			public ExecutorService getExecutorServiceForFederationAccess() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public QueryProcContext getQueryProcContext() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public boolean skipExecution() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public LogicalPlanPrinter getSourceAssignmentPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public LogicalPlanPrinter getLogicalPlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public PhysicalPlanPrinter getPhysicalPlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public ExecutablePlanPrinter getExecutablePlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
-
-			@Override
-			public CostModel getCostModel() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete( final LogicalToPhysicalPlanConverter c ) { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete( final LogicalToPhysicalOpConverter c ) { throw new UnsupportedOperationException(); }
 		};
+
+		return new HeFQUINEngineConfigReader.ExtendedContext(ctx);
 	}
 
 	protected HeFQUINEngineConfigReader.ExtendedContext createNonEmptyContext() {
-		return new HeFQUINEngineConfigReader.ExtendedContext() {
-			protected final QueryProcContext myQPC = new QueryProcContext() {
-				@Override
-				public FederationAccessManager getFederationAccessMgr() {
-					throw new UnsupportedOperationException();
-				}
+		final ExecutorService execService1 = Executors.newSingleThreadExecutor();
 
-				@Override
-				public FederationCatalog getFederationCatalog() {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public ExecutorService getExecutorServiceForPlanTasks() {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public boolean isExperimentRun() {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public boolean skipExecution() {
-					throw new UnsupportedOperationException();
-				}
-			};
-
+		final HeFQUINEngineConfigReader.Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override
-			public QueryProcContext getQueryProcContext() {
-				return myQPC;
-			}
-
-			@Override
-			public ExecutorService getExecutorServiceForFederationAccess() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public boolean skipExecution() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public LogicalPlanPrinter getSourceAssignmentPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public LogicalPlanPrinter getLogicalPlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public PhysicalPlanPrinter getPhysicalPlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public ExecutablePlanPrinter getExecutablePlanPrinter() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
-
-			@Override
-			public CostModel getCostModel() { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete(LogicalToPhysicalPlanConverter c) { throw new UnsupportedOperationException(); }
-
-			@Override
-			public void complete(LogicalToPhysicalOpConverter c) { throw new UnsupportedOperationException(); }
+			public ExecutorService getExecutorServiceForFederationAccess() { return execService1; }
 		};
+
+		return new HeFQUINEngineConfigReader.ExtendedContext(ctx);
 	}
 
 }

@@ -22,7 +22,11 @@ public class CardinalityResponseImplWithoutCardinality extends CardinalityRespon
 	 */
 	public CardinalityResponseImplWithoutCardinality( final Exception exception,
 	                                                  final DataRetrievalResponse<?> wrappedResponse ) {
-		super( wrappedResponse, Integer.MAX_VALUE );
+		super( Integer.MAX_VALUE,
+		       wrappedResponse.getRequestStartTime(),
+		       wrappedResponse.getRetrievalEndTime(),
+		       wrappedResponse.getErrorStatusCode(),
+		       wrappedResponse.getErrorDescription() );
 		this.exception = exception;
 	}
 

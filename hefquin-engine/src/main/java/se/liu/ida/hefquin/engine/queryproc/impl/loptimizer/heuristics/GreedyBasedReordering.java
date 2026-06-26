@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FormulaForComputingSelectivity;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount;
@@ -30,7 +31,12 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         this.formula = formula;
     }
 
-    @Override
+	@Override
+	public LogicalPlan apply( final LogicalPlan inputPlan,
+	                          final QueryProcContext ctxt2 ) {
+		return apply(inputPlan);
+	}
+
     public LogicalPlan apply( final LogicalPlan inputPlan ) {
         final int numberOfSubPlans = inputPlan.numberOfSubPlans();
         if ( numberOfSubPlans == 0 ) {

@@ -4,15 +4,15 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class PushBasedPlanThreadImplForNullaryOperator extends PushBasedPlanThreadImplBase
 {
 	protected final NullaryExecutableOp op;
 
 	public PushBasedPlanThreadImplForNullaryOperator( final NullaryExecutableOp op,
-	                                                  final ExecutionContext execCxt ) {
-		super(execCxt);
+	                                                  final QueryProcContextExt ctx ) {
+		super(ctx);
 
 		assert op != null;
 		this.op = op;
@@ -27,7 +27,7 @@ public class PushBasedPlanThreadImplForNullaryOperator extends PushBasedPlanThre
 	protected void produceOutput( final IntermediateResultElementSink sink )
 			throws ExecOpExecutionException
 	{
-		op.execute(sink, execCxt);
+		op.execute(sink, ctx);
 	}
 
 }
