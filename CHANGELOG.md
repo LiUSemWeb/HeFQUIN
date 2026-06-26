@@ -7,7 +7,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- Support configurable logging when using the HeFQUIN CLI (#659)[https://github.com/LiUSemWeb/HeFQUIN/pull/659].
+- Support configurable logging when using the HeFQUIN CLI ([#659](https://github.com/LiUSemWeb/HeFQUIN/pull/659)).
 - Support for MapDB-based persistent cache for federation requests (including cardinality requests), with support for cache replacement and invalidation policies ([#648](https://github.com/LiUSemWeb/HeFQUIN/pull/648)).
 - Support for ChronicleMap-based persistent cache for federation requests (including cardinality requests), with support for cache replacement and invalidation policies ([#546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
 - CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616), [#643](https://github.com/LiUSemWeb/HeFQUIN/issues/643), [#646](https://github.com/LiUSemWeb/HeFQUIN/issues/646), [#647](https://github.com/LiUSemWeb/HeFQUIN/issues/647), [#653](https://github.com/LiUSemWeb/HeFQUIN/issues/653), [#655](https://github.com/LiUSemWeb/HeFQUIN/issues/655)).
