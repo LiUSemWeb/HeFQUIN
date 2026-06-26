@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.federation.access.impl.cache;
 
-import java.util.HashMap;
-
 import se.liu.ida.hefquin.base.datastructures.Cache;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
 
@@ -50,7 +48,6 @@ public class HierarchicalCache<IdType,
 	                          final Cache<IdType, ObjectType> l2 ) {
 		this.l1 = l1;
 		this.l2 = l2;
-		new HashMap<>();
 	}
 
 	/**
