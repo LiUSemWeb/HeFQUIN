@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.graph.GraphFactory;
@@ -95,6 +96,23 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 		for ( final SolutionMapping solmap2 : emResult ) {
 			result.addAll( sm.applyToSolutionMapping(solmap2) );
 		}
+		return result;
+	}
+
+	@Override
+	public Set<Node> translateNode( final Node n ) {
+		final Set<Node> nodes = em.applyToNode(n);
+
+		final Set<Node> result = new HashSet<>();
+
+		for ( final Node n2 : nodes ) {
+			result.addAll( sm.applyToNode(n2) );
+		}
+
+		if ( result.isEmpty() ) {
+			return Set.of(n);
+		}
+
 		return result;
 	}
 

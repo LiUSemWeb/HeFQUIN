@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.base.data.mappings;
 
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 
@@ -45,4 +47,14 @@ public interface EntityMapping
 	 * mapping without any changes.
 	 */
 	Set<SolutionMapping> applyInverseToSolutionMapping( SolutionMapping solmap );
+
+	/**
+	 * Applies this entity mapping to the given node and returns the
+	 * resulting set of mapped nodes. If this entity mapping is not
+	 * relevant for the given node (i.e., applying this entity mapping
+	 * to the node does not have any effect), then the result of this
+	 * function is simply a singleton set that contains the given node
+	 * without any changes.
+	 */
+	Set<Node> applyToNode( Node n );
 }

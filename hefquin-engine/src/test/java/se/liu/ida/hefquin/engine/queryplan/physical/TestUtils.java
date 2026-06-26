@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
@@ -53,6 +54,11 @@ public class TestUtils
 			@Override
 			public boolean isEquivalenceOnly() {
 				throw new UnsupportedOperationException("Unimplemented method 'isEquivalenceOnly'");
+			}
+
+			@Override
+			public Set<Node> translateNode(Node n) {
+				throw new UnsupportedOperationException("Unimplemented method 'translateNode'");
 			}
 		};
 	}

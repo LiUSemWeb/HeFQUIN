@@ -161,6 +161,27 @@ public class SchemaMappingImpl implements SchemaMapping
 		return applyToSolutionMapping(sm, true);
 	}
 
+	@Override
+	public Set<Node> applyToNode( final Node n ) {
+		final Set<Node> result = new HashSet<>();
+
+		if ( n.isURI() ) {
+			final Set<TermMapping> mappings = g2lMap.get(n);
+
+			if ( mappings != null && ! mappings.isEmpty() ) {
+				for ( final TermMapping tm : mappings ) {
+					result.addAll( tm.getLocalTerms() );
+				}
+			}
+		}
+
+		if ( result.isEmpty() ) {
+			result.add(n);
+		}
+
+		return result;
+	}
+
 	protected Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping solMap,
 	                                                       final boolean useInverse ) {
 		final Binding sm = solMap.asJenaBinding();

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
@@ -12,7 +13,13 @@ import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.E_LogicalOr;
+import org.apache.jena.sparql.expr.E_NotEquals;
+import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.NodeValue;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.query.BGP;
@@ -37,8 +44,8 @@ public class VocabularyMappingUtils
 	public static SPARQLGraphPattern translateGraphPattern( final SPARQLGraphPattern p,
 	                                                        final VocabularyMapping vm ) {
 		if ( p instanceof TriplePattern ) {
-			return vm.translateTriplePattern( (TriplePattern) p );	
-		} 
+			return vm.translateTriplePattern( (TriplePattern) p );
+		}
 		else if ( p instanceof BGP ) {
 			return translateGraphPattern( (BGP) p, vm );
 		}
@@ -51,11 +58,11 @@ public class VocabularyMappingUtils
 		else if ( p instanceof GenericSPARQLGraphPatternImpl1 ) {
 			@SuppressWarnings("deprecation")
 			final Op op = ((GenericSPARQLGraphPatternImpl1) p).asJenaOp();
-			return translateGraphPattern(op, vm);		
+			return translateGraphPattern(op, vm);
 		}
 		else if ( p instanceof GenericSPARQLGraphPatternImpl2 ) {
 			final Op op = ((GenericSPARQLGraphPatternImpl2) p).asJenaOp();
-			return translateGraphPattern(op, vm);	
+			return translateGraphPattern(op, vm);
 		}
 		else {
 			throw new IllegalArgumentException( "Unsupported type of pattern: " + p.getClass().getName() );
@@ -162,7 +169,7 @@ public class VocabularyMappingUtils
 		boolean allSubPatternsAreTriplePatterns = true; // assume yes
 
 		for ( final Triple tp : op.getPattern().getList() ) {
-			final SPARQLGraphPattern p = vm.translateTriplePattern( new TriplePatternImpl(tp) ); 
+			final SPARQLGraphPattern p = vm.translateTriplePattern( new TriplePatternImpl(tp) );
 			allSubPatterns.add(p);
 
 			if ( allSubPatternsAreTriplePatterns && p instanceof TriplePattern tp2 ) {
@@ -201,8 +208,114 @@ public class VocabularyMappingUtils
 
 	public static ExprList translateExpressions( final ExprList exprs,
 	                                             final VocabularyMapping vm ) {
-		// TODO: translate the filter expressions
-		throw new UnsupportedOperationException("Applying vocabulary mappings into FILTER expressions is not implemented yet.");
+		final ExprList rewrittenExpressions = new ExprList();
+
+		for ( final Expr e : exprs ) {
+			final Expr rewritten = rewrite(e, vm);
+
+			if ( rewritten == null )
+				throw new UnsupportedOperationException( "Filter expression " + e + " cannot be rewritten" );
+			else
+				rewrittenExpressions.add(rewritten);
+		}
+		return rewrittenExpressions;
+	}
+
+	private static Expr rewrite( final Expr expr, final VocabularyMapping vm ) {
+		if ( expr instanceof E_LogicalAnd and ) {
+			final Expr l = rewrite( and.getArg1(), vm );
+			final Expr r = rewrite( and.getArg2(), vm );
+
+			if ( l == null || r == null ) return null;
+
+			return new E_LogicalAnd( l, r );
+		}
+
+		if ( expr instanceof E_LogicalOr or ) {
+			final Expr l = rewrite( or.getArg1(), vm) ;
+			final Expr r = rewrite( or.getArg2(), vm) ;
+
+			if ( l == null || r == null ) return null;
+
+			return new E_LogicalOr( l, r );
+		}
+
+		if ( expr instanceof E_Equals || expr instanceof E_NotEquals ) {
+			return rewriteComparison( expr, vm );
+		}
+
+		// other rexpression types aren't considered rewritable at the moment
+		return null;
+	}
+
+	private static Expr rewriteComparison( final Expr expr, final VocabularyMapping vm ) {
+		final Expr left;
+		final Expr right;
+		final boolean equals;
+
+		if ( expr instanceof E_Equals eq ) {
+			left = eq.getArg1();
+			right = eq.getArg2();
+			equals = true;
+		}
+		else if ( expr instanceof E_NotEquals neq ) {
+			left = neq.getArg1();
+			right = neq.getArg2();
+			equals = false;
+		}
+		else {
+			return null;
+		}
+
+		if ( ! right.isConstant() )
+			return null;
+
+		final Node node = ( (NodeValue) right ).asNode();
+		if ( ! node.isURI() )
+			return null;
+
+		final Set<Node> nodes = vm.translateNode(node);
+		if ( nodes.isEmpty() )
+			return null;
+
+		final List<Expr> rewritten = new ArrayList<>();
+
+		for ( final Node n : nodes ) {
+			if ( equals )
+				rewritten.add( new E_Equals(left, NodeValue.makeNode(n)) );
+			else
+				rewritten.add( new E_NotEquals(left, NodeValue.makeNode(n)) );
+		}
+
+		return equals ? buildOr(rewritten) : buildAnd(rewritten);
+	}
+
+	private static Expr buildOr( final List<Expr> exprList ) {
+		if ( exprList == null || exprList.isEmpty() ) {
+			throw new IllegalArgumentException( "Empty OR list" );
+		}
+
+		Expr result = exprList.get(0);
+
+		for ( int i = 1; i < exprList.size(); i++ ) {
+			result = new E_LogicalOr( result, exprList.get(i) );
+		}
+
+		return result;
+	}
+
+	private static Expr buildAnd( final List<Expr> exprList ) {
+		if ( exprList == null || exprList.isEmpty() ) {
+			throw new IllegalArgumentException("Empty AND list");
+		}
+
+		Expr result = exprList.get(0);
+
+		for ( int i = 1; i < exprList.size(); i++ ) {
+			result = new E_LogicalAnd( result, exprList.get(i) );
+		}
+
+		return result;
 	}
 
 }

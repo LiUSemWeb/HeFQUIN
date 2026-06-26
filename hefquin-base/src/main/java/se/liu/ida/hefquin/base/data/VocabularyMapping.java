@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.base.data;
 
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
@@ -19,7 +21,7 @@ public interface VocabularyMapping
 	 * pattern itself.
 	 */
 	SPARQLGraphPattern translateTriplePattern( TriplePattern tp );
-	
+
 	/**
 	 * Applies this vocabulary mapping to the given solution mapping expressed
 	 * in the local vocabulary and returns a resulting set of solution mappings
@@ -30,7 +32,7 @@ public interface VocabularyMapping
 	 * given solution mapping.
 	 */
 	Set<SolutionMapping> translateSolutionMapping( SolutionMapping sm );
-	
+
 	/**
 	 * Applies this vocabulary mapping to the given solution mapping expressed
 	 * in the global vocabulary and returns a resulting set of solution mappings
@@ -42,6 +44,15 @@ public interface VocabularyMapping
 	 */
 	Set<SolutionMapping> translateSolutionMappingFromGlobal( SolutionMapping sm );
 
+	/**
+	 * Applies this vocabulary mapping to the given node and returns the
+	 * resulting set of translated nodes.
+	 * If this mapping is not relevant for the given node (i.e., applying the
+	 * mapping to the node does not have any effect), then the result of this
+	 * function is simply a singleton set that contains the given node without
+	 * any changes.
+	 */
+	Set<Node> translateNode( Node n );
 
 	/**
 	 * Checks whether the vocabulary mapping only contains equivalence rules, e.g., owl:equivalentClass, owl:equivalentProperty, owl:sameAs

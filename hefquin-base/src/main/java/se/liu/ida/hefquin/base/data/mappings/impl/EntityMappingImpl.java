@@ -193,4 +193,18 @@ public class EntityMappingImpl implements EntityMapping
 		return result;
 	}
 
+	@Override
+	public Set<Node> applyToNode( final Node n ) {
+		if ( !n.isURI() ) {
+			return Collections.singleton(n);
+		}
+
+		final Set<Node> mappings = g2lMap.get(n);
+
+		if ( mappings == null || mappings.isEmpty() ) {
+			return Collections.singleton(n);
+		}
+
+		return mappings;
+	}
 }
