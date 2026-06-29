@@ -214,11 +214,14 @@ public class FederationAccessManagerWithMapDBCache extends FederationAccessManag
 	 * @throws IllegalStateException     if the request/member combination is
 	 *                                   unsupported
 	 */
+	@Override
 	public < ReqType extends DataRetrievalRequest,
+	         RespType extends DataRetrievalResponse<?>,
 	         MemberType extends FederationMember >
-	CompletableFuture<CardinalityResponse> issueCardReq( final ReqType req,
-	                                                     final MemberType fm )
-			throws FederationAccessException
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+			final ReqType req,
+			final MemberType fm )
+					throws FederationAccessException
 	{
 		final PersistentCacheKey key;
 		try {
@@ -273,30 +276,6 @@ public class FederationAccessManagerWithMapDBCache extends FederationAccessManag
 		@SuppressWarnings("unchecked")
 		final CompletableFuture<CardinalityResponse> cachedResponse2 = (CompletableFuture<CardinalityResponse>) cachedResponse;
 		return cachedResponse2;
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final SPARQLRequest req,
-	                                                                       final SPARQLEndpoint fm )
-			throws FederationAccessException
-	{
-		return issueCardReq(req, fm);
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final TPFRequest req,
-	                                                                       final TPFServer fm )
-			throws FederationAccessException
-	{
-		return issueCardReq(req, fm);
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final TPFRequest req,
-	                                                                       final BRTPFServer fm )
-			throws FederationAccessException
-	{
-		return issueCardReq(req, fm);
 	}
 
 	@Override
