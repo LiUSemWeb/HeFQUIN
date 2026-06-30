@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.Expr;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
@@ -42,6 +42,11 @@ public class TestUtils
 			}
 
 			@Override
+			public Expr translateExpression(Expr e) {
+				throw new UnsupportedOperationException("Unimplemented method 'translateExpression'");
+			}
+
+			@Override
 			public Set<SolutionMapping> translateSolutionMapping( SolutionMapping sm ) {
 				throw new UnsupportedOperationException("Unimplemented method 'translateSolutionMapping'");
 			}
@@ -54,11 +59,6 @@ public class TestUtils
 			@Override
 			public boolean isEquivalenceOnly() {
 				throw new UnsupportedOperationException("Unimplemented method 'isEquivalenceOnly'");
-			}
-
-			@Override
-			public Set<Node> translateNode(Node n) {
-				throw new UnsupportedOperationException("Unimplemented method 'translateNode'");
 			}
 		};
 	}

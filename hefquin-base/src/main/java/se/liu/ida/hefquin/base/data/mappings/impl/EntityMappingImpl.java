@@ -1,15 +1,23 @@
 package se.liu.ida.hefquin.base.data.mappings.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.E_LogicalOr;
+import org.apache.jena.sparql.expr.E_NotEquals;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.NodeValue;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
@@ -194,16 +202,126 @@ public class EntityMappingImpl implements EntityMapping
 	}
 
 	@Override
-	public Set<Node> applyToNode( final Node n ) {
+	public Expr applyToExpression( final Expr expr ) {
+		if ( expr instanceof E_LogicalAnd and ) {
+			final Expr l = applyToExpression( and.getArg1() );
+			final Expr r = applyToExpression( and.getArg2() );
+
+			if ( l == null || r == null )
+				throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+
+			if ( and.getArg1().equals(l) && and.getArg2().equals(r) )
+				return expr;
+
+			return new E_LogicalAnd( l, r );
+		}
+
+		if ( expr instanceof E_LogicalOr or ) {
+			final Expr l = applyToExpression( or.getArg1()) ;
+			final Expr r = applyToExpression( or.getArg2()) ;
+
+			if ( l == null || r == null )
+				throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+
+			if ( or.getArg1().equals(l) && or.getArg2().equals(r) )
+				return expr;
+
+			return new E_LogicalOr( l, r );
+		}
+
+		if ( expr instanceof E_Equals || expr instanceof E_NotEquals ) {
+			return rewriteComparison( expr );
+		}
+
+		// other rexpression types aren't considered rewritable at the moment
+		throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+	}
+
+	private Expr rewriteComparison( final Expr expr ) {
+		final Expr left;
+		final Expr right;
+		final boolean equals;
+
+		if ( expr instanceof E_Equals eq ) {
+			left = eq.getArg1();
+			right = eq.getArg2();
+			equals = true;
+		}
+		else if ( expr instanceof E_NotEquals neq ) {
+			left = neq.getArg1();
+			right = neq.getArg2();
+			equals = false;
+		}
+		else
+			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+
+		if ( ! right.isConstant() )
+			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+
+		final Node node = ( (NodeValue) right ).asNode();
+		if ( ! node.isURI() )
+			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+
+		final Set<Node> nodes = mapGlobalTermToLocalTerms(node);
+		if ( nodes.isEmpty() )
+			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+
+		if ( nodes.size() == 1 ) {
+			if ( equals )
+				return new E_Equals(left, NodeValue.makeNode(nodes.iterator().next()));
+			else
+				return new E_NotEquals(left, NodeValue.makeNode(nodes.iterator().next()));
+		}
+
+		final List<Expr> rewritten = new ArrayList<>();
+
+		for ( final Node n : nodes ) {
+			if ( equals )
+				rewritten.add( new E_Equals(left, NodeValue.makeNode(n)) );
+			else
+				rewritten.add( new E_NotEquals(left, NodeValue.makeNode(n)) );
+		}
+
+		return equals ? buildOr(rewritten) : buildAnd(rewritten);
+	}
+
+	private static Expr buildOr( final List<Expr> exprList ) {
+		if ( exprList == null || exprList.isEmpty() ) {
+			throw new IllegalArgumentException( "Empty OR list" );
+		}
+
+		Expr result = exprList.get(0);
+
+		for ( int i = 1; i < exprList.size(); i++ ) {
+			result = new E_LogicalOr( result, exprList.get(i) );
+		}
+
+		return result;
+	}
+
+	private static Expr buildAnd( final List<Expr> exprList ) {
+		if ( exprList == null || exprList.isEmpty() ) {
+			throw new IllegalArgumentException("Empty AND list");
+		}
+
+		Expr result = exprList.get(0);
+
+		for ( int i = 1; i < exprList.size(); i++ ) {
+			result = new E_LogicalAnd( result, exprList.get(i) );
+		}
+
+		return result;
+	}
+
+	private Set<Node> mapGlobalTermToLocalTerms( final Node n ) {
 		if ( !n.isURI() ) {
 			return Collections.singleton(n);
 		}
 
 		final Set<Node> mappings = g2lMap.get(n);
 
-		if ( mappings == null || mappings.isEmpty() ) {
+		if ( mappings == null || mappings.isEmpty() )
 			return Collections.singleton(n);
-		}
 
 		return mappings;
 	}

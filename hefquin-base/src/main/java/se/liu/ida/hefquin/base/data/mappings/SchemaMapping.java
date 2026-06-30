@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.base.data.mappings;
 
 import java.util.Set;
 
-import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.expr.Expr;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -22,6 +22,16 @@ public interface SchemaMapping
 	 * is simply the given triple pattern itself.
 	 */
 	SPARQLGraphPattern applyToTriplePattern( TriplePattern tp );
+
+	/**
+	 * Applies this schema mapping to the given filter expression, which is
+	 * assumed to use the global representation of the schema vocabulary terms
+	 * mentioned in it and returns the translated expression.
+	 * If this schema mapping is not relevant for the given expression (i.e.,
+	 * applying this schema mapping does not change the expression), then the
+	 * result of this function is simply the given expression itself.
+	 */
+	Expr applyToExpression( Expr n );
 
 	/**
 	 * Applies this schema mapping to the given solution mapping, which
@@ -45,16 +55,6 @@ public interface SchemaMapping
 	 * set that contains the given solution mapping without any changes.
 	 */
 	Set<SolutionMapping> applyInverseToSolutionMapping( SolutionMapping solmap );
-
-	/**
-	 * Applies this schema mapping to the given node and returns the
-	 * resulting set of mapped nodes. If this schema mapping is not
-	 * relevant for the given node (i.e., applying this schema mapping
-	 * to the node does not have any effect), then the result of this
-	 * function is simply a singleton set that contains the given node
-	 * without any changes.
-	 */
-	Set<Node> applyToNode(Node n);
 
 	/**
 	 * Checks whether the schema mapping only contains equivalence rules, e.g., owl:equivalentClass, owl:equivalentProperty

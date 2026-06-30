@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.base.data.mappings;
 
 import java.util.Set;
 
-import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.expr.Expr;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.TriplePattern;
@@ -23,6 +23,16 @@ public interface EntityMapping
 	 * contains the given triple pattern without any changes.
 	 */
 	Set<TriplePattern> applyToTriplePattern( TriplePattern tp );
+
+	/**
+	 * Applies this entity mapping to the given filter expression, which is
+	 * assumed to use the global representation of the entities mentioned in it
+	 * and returns the translated expression.
+	 * If this entity mapping is not relevant for the given expression (i.e.,
+	 * applying this entity mapping does not change the expression), then the
+	 * result of this function is simply the given expression itself.
+	 */
+	Expr applyToExpression( Expr e );
 
 	/**
 	 * Applies this entity mapping to the given solution mapping, which
@@ -48,13 +58,4 @@ public interface EntityMapping
 	 */
 	Set<SolutionMapping> applyInverseToSolutionMapping( SolutionMapping solmap );
 
-	/**
-	 * Applies this entity mapping to the given node and returns the
-	 * resulting set of mapped nodes. If this entity mapping is not
-	 * relevant for the given node (i.e., applying this entity mapping
-	 * to the node does not have any effect), then the result of this
-	 * function is simply a singleton set that contains the given node
-	 * without any changes.
-	 */
-	Set<Node> applyToNode( Node n );
 }

@@ -4,9 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.graph.GraphFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
@@ -100,20 +100,10 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 	}
 
 	@Override
-	public Set<Node> translateNode( final Node n ) {
-		final Set<Node> nodes = em.applyToNode(n);
+	public Expr translateExpression( final Expr e ) {
+		final Expr translatedExpr = em.applyToExpression(e);
 
-		final Set<Node> result = new HashSet<>();
-
-		for ( final Node n2 : nodes ) {
-			result.addAll( sm.applyToNode(n2) );
-		}
-
-		if ( result.isEmpty() ) {
-			return Set.of(n);
-		}
-
-		return result;
+		return sm.applyToExpression(translatedExpr);
 	}
 
 	@Override
