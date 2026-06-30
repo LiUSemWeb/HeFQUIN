@@ -255,31 +255,40 @@ public class EntityMappingImpl implements EntityMapping
 		else
 			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
-		if ( ! right.isConstant() )
+		final Node node;
+		final boolean rewriteLeft;
+		if ( left.isConstant() ) {
+			rewriteLeft = true;
+			node = ( (NodeValue) left ).asNode();
+		}
+		else if ( right.isConstant() ) {
+			rewriteLeft = false;
+			node = ( (NodeValue) right ).asNode();
+		}
+		else
 			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
-		final Node node = ( (NodeValue) right ).asNode();
 		if ( ! node.isURI() )
 			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
 		final Set<Node> nodes = mapGlobalTermToLocalTerms(node);
-		if ( nodes.isEmpty() )
-			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
 		if ( nodes.size() == 1 ) {
+			final Expr translated = NodeValue.makeNode(nodes.iterator().next());
 			if ( equals )
-				return new E_Equals(left, NodeValue.makeNode(nodes.iterator().next()));
+				return rewriteLeft ? new E_Equals(translated, right) : new E_Equals(left, translated);
 			else
-				return new E_NotEquals(left, NodeValue.makeNode(nodes.iterator().next()));
+				return rewriteLeft ? new E_NotEquals(translated, right) : new E_NotEquals(left, translated);
 		}
 
 		final List<Expr> rewritten = new ArrayList<>();
 
 		for ( final Node n : nodes ) {
+			final NodeValue translated = NodeValue.makeNode(n);
 			if ( equals )
-				rewritten.add( new E_Equals(left, NodeValue.makeNode(n)) );
+				rewritten.add( rewriteLeft ? new E_Equals(translated, right) : new E_Equals(left, translated) );
 			else
-				rewritten.add( new E_NotEquals(left, NodeValue.makeNode(n)) );
+				rewritten.add( rewriteLeft ? new E_NotEquals(translated, right) : new E_NotEquals(left, translated) );
 		}
 
 		return equals ? buildOr(rewritten) : buildAnd(rewritten);
@@ -314,7 +323,7 @@ public class EntityMappingImpl implements EntityMapping
 	}
 
 	private Set<Node> mapGlobalTermToLocalTerms( final Node n ) {
-		if ( !n.isURI() ) {
+		if ( ! n.isURI() ) {
 			return Collections.singleton(n);
 		}
 
