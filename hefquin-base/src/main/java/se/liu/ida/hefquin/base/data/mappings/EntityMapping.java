@@ -26,8 +26,8 @@ public interface EntityMapping
 
 	/**
 	 * Applies this entity mapping to the given filter expression, which is
-	 * assumed to use the global representation of the entities mentioned in it
-	 * and returns the translated expression.
+	 * assumed to use the global representation of the entities mentioned in
+	 * it, and returns the translated expression.
 	 * If this entity mapping is not relevant for the given expression (i.e.,
 	 * applying this entity mapping does not change the expression), then the
 	 * result of this function is simply the given expression itself.

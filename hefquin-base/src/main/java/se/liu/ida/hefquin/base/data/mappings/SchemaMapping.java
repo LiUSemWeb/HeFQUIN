@@ -25,8 +25,8 @@ public interface SchemaMapping
 
 	/**
 	 * Applies this schema mapping to the given filter expression, which is
-	 * assumed to use the global representation of the schema vocabulary terms
-	 * mentioned in it and returns the translated expression.
+	 * assumed to use the global schema for the vocabulary terms mentioned
+	 * in it, and returns the translated expression.
 	 * If this schema mapping is not relevant for the given expression (i.e.,
 	 * applying this schema mapping does not change the expression), then the
 	 * result of this function is simply the given expression itself.
