@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.Expr;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
@@ -38,6 +39,11 @@ public class TestUtils
 			@Override
 			public SPARQLGraphPattern translateTriplePattern( TriplePattern tp ) {
 				throw new UnsupportedOperationException("Unimplemented method 'translateTriplePattern'");
+			}
+
+			@Override
+			public Expr translateExpression(Expr e) {
+				throw new UnsupportedOperationException("Unimplemented method 'translateExpression'");
 			}
 
 			@Override

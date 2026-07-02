@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.base.data;
 
 import java.util.Set;
 
+import org.apache.jena.sparql.expr.Expr;
+
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
@@ -19,7 +21,20 @@ public interface VocabularyMapping
 	 * pattern itself.
 	 */
 	SPARQLGraphPattern translateTriplePattern( TriplePattern tp );
-	
+
+	/**
+	 * Applies this vocabulary mapping to the given filter expression, which is
+	 * assumed to use the global vocabulary, and returns the translated expression.
+	 * If this mapping is not relevant for the given expression (i.e., applying
+	 * the mapping does not change the expression), then the result of this
+	 * function is simply the given expression itself.
+	 * <p>
+	 * It may not be possible to translate every expression; if the
+	 * given expression cannot be translated, then this method
+	 * throws an {@link UnsupportedOperationException}.
+	 */
+	Expr translateExpression( Expr e );
+
 	/**
 	 * Applies this vocabulary mapping to the given solution mapping expressed
 	 * in the local vocabulary and returns a resulting set of solution mappings
@@ -30,7 +45,7 @@ public interface VocabularyMapping
 	 * given solution mapping.
 	 */
 	Set<SolutionMapping> translateSolutionMapping( SolutionMapping sm );
-	
+
 	/**
 	 * Applies this vocabulary mapping to the given solution mapping expressed
 	 * in the global vocabulary and returns a resulting set of solution mappings
@@ -41,7 +56,6 @@ public interface VocabularyMapping
 	 * given solution mapping.
 	 */
 	Set<SolutionMapping> translateSolutionMappingFromGlobal( SolutionMapping sm );
-
 
 	/**
 	 * Checks whether the vocabulary mapping only contains equivalence rules, e.g., owl:equivalentClass, owl:equivalentProperty, owl:sameAs

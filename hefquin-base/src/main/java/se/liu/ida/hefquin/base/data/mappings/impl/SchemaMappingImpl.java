@@ -6,6 +6,12 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.E_LogicalOr;
+import org.apache.jena.sparql.expr.E_NotEquals;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.vocabulary.OWL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,6 +163,36 @@ public class SchemaMappingImpl implements SchemaMapping
 	}
 
 	@Override
+	public Expr applyToExpression( final Expr expr ) {
+		if ( expr instanceof E_LogicalAnd and ) {
+			final Expr l = applyToExpression( and.getArg1() );
+			final Expr r = applyToExpression( and.getArg2() );
+
+			if ( and.getArg1().equals(l) && and.getArg2().equals(r) )
+				return expr;
+
+			return new E_LogicalAnd( l, r );
+		}
+
+		if ( expr instanceof E_LogicalOr or ) {
+			final Expr l = applyToExpression( or.getArg1()) ;
+			final Expr r = applyToExpression( or.getArg2()) ;
+
+			if ( or.getArg1().equals(l) && or.getArg2().equals(r) )
+				return expr;
+
+			return new E_LogicalOr( l, r );
+		}
+
+		if ( expr instanceof E_Equals || expr instanceof E_NotEquals ) {
+			return rewriteComparison( expr );
+		}
+
+		// other rexpression types aren't considered rewritable at the moment
+		throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+	}
+
+	@Override
 	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
 		return applyToSolutionMapping(sm, false);
 	}
@@ -231,6 +267,104 @@ public class SchemaMappingImpl implements SchemaMapping
 		for( final BindingBuilder bb : builders ) {
 			final SolutionMapping newSolMap = new SolutionMappingImpl( bb.build() );
 			result.add(newSolMap);
+		}
+
+		return result;
+	}
+
+	private Expr rewriteComparison( final Expr expr ) {
+		final Expr left;
+		final Expr right;
+		final boolean equals;
+
+		if ( expr instanceof E_Equals eq ) {
+			left = eq.getArg1();
+			right = eq.getArg2();
+			equals = true;
+		}
+		else if ( expr instanceof E_NotEquals neq ) {
+			left = neq.getArg1();
+			right = neq.getArg2();
+			equals = false;
+		}
+		else
+			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+
+		final List<Expr> leftExprs = new ArrayList<>();
+		final List<Expr> rightExprs = new ArrayList<>();
+
+		if ( left.isConstant() ) {
+			for ( final Node n : mapGlobalTermToLocalTerms(((NodeValue) left).asNode()) ) {
+				leftExprs.add(NodeValue.makeNode(n));
+			}
+		} else
+			leftExprs.add(left);
+
+		if ( right.isConstant() ) {
+			for ( final Node n : mapGlobalTermToLocalTerms(((NodeValue) right).asNode()) ) {
+				rightExprs.add(NodeValue.makeNode(n));
+			}
+		} else
+			rightExprs.add(right);
+
+		final List<Expr> rewritten = new ArrayList<>();
+
+		for ( final Expr l : leftExprs ) {
+			for ( final Expr r : rightExprs ) {
+				rewritten.add(
+					equals
+						? new E_Equals(l, r)
+						: new E_NotEquals(l, r)
+				);
+			}
+		}
+
+		return equals ? buildOr(rewritten) : buildAnd(rewritten);
+	}
+
+	private static Expr buildOr( final List<Expr> exprList ) {
+		if ( exprList == null || exprList.isEmpty() ) {
+			throw new IllegalArgumentException( "Empty OR list" );
+		}
+
+		Expr result = exprList.get(0);
+
+		for ( int i = 1; i < exprList.size(); i++ ) {
+			result = new E_LogicalOr( result, exprList.get(i) );
+		}
+
+		return result;
+	}
+
+	private static Expr buildAnd( final List<Expr> exprList ) {
+		if ( exprList == null || exprList.isEmpty() ) {
+			throw new IllegalArgumentException("Empty AND list");
+		}
+
+		Expr result = exprList.get(0);
+
+		for ( int i = 1; i < exprList.size(); i++ ) {
+			result = new E_LogicalAnd( result, exprList.get(i) );
+		}
+
+		return result;
+	}
+
+	private Set<Node> mapGlobalTermToLocalTerms( final Node n ) {
+		final Set<Node> result = new HashSet<>();
+
+		if ( n.isURI() ) {
+			final Set<TermMapping> mappings = g2lMap.get(n);
+
+			if ( mappings != null && ! mappings.isEmpty() ) {
+				for ( final TermMapping tm : mappings ) {
+					result.addAll( tm.getLocalTerms() );
+				}
+			}
+		}
+
+		if ( result.isEmpty() ) {
+			result.add(n);
 		}
 
 		return result;

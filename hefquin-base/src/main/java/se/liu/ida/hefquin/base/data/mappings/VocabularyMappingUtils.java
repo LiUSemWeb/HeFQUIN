@@ -12,6 +12,7 @@ import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
@@ -37,8 +38,8 @@ public class VocabularyMappingUtils
 	public static SPARQLGraphPattern translateGraphPattern( final SPARQLGraphPattern p,
 	                                                        final VocabularyMapping vm ) {
 		if ( p instanceof TriplePattern ) {
-			return vm.translateTriplePattern( (TriplePattern) p );	
-		} 
+			return vm.translateTriplePattern( (TriplePattern) p );
+		}
 		else if ( p instanceof BGP ) {
 			return translateGraphPattern( (BGP) p, vm );
 		}
@@ -51,11 +52,11 @@ public class VocabularyMappingUtils
 		else if ( p instanceof GenericSPARQLGraphPatternImpl1 ) {
 			@SuppressWarnings("deprecation")
 			final Op op = ((GenericSPARQLGraphPatternImpl1) p).asJenaOp();
-			return translateGraphPattern(op, vm);		
+			return translateGraphPattern(op, vm);
 		}
 		else if ( p instanceof GenericSPARQLGraphPatternImpl2 ) {
 			final Op op = ((GenericSPARQLGraphPatternImpl2) p).asJenaOp();
-			return translateGraphPattern(op, vm);	
+			return translateGraphPattern(op, vm);
 		}
 		else {
 			throw new IllegalArgumentException( "Unsupported type of pattern: " + p.getClass().getName() );
@@ -162,7 +163,7 @@ public class VocabularyMappingUtils
 		boolean allSubPatternsAreTriplePatterns = true; // assume yes
 
 		for ( final Triple tp : op.getPattern().getList() ) {
-			final SPARQLGraphPattern p = vm.translateTriplePattern( new TriplePatternImpl(tp) ); 
+			final SPARQLGraphPattern p = vm.translateTriplePattern( new TriplePatternImpl(tp) );
 			allSubPatterns.add(p);
 
 			if ( allSubPatternsAreTriplePatterns && p instanceof TriplePattern tp2 ) {
@@ -201,8 +202,13 @@ public class VocabularyMappingUtils
 
 	public static ExprList translateExpressions( final ExprList exprs,
 	                                             final VocabularyMapping vm ) {
-		// TODO: translate the filter expressions
-		throw new UnsupportedOperationException("Applying vocabulary mappings into FILTER expressions is not implemented yet.");
-	}
+		final ExprList rewrittenExpressions = new ExprList();
 
+		for ( final Expr e : exprs ) {
+			final Expr rewritten = vm.translateExpression(e);
+
+			rewrittenExpressions.add(rewritten);
+		}
+		return rewrittenExpressions;
+	}
 }
