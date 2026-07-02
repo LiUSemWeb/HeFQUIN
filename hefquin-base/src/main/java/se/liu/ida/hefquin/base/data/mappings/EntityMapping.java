@@ -31,6 +31,10 @@ public interface EntityMapping
 	 * If this entity mapping is not relevant for the given expression (i.e.,
 	 * applying this entity mapping does not change the expression), then the
 	 * result of this function is simply the given expression itself.
+	 * <p>
+	 * It may not be possible to translate every expression; if the
+	 * given expression cannot be translated, then this method
+	 * throws an {@link UnsupportedOperationException}.
 	 */
 	Expr applyToExpression( Expr e );
 

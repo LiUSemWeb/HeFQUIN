@@ -163,23 +163,10 @@ public class SchemaMappingImpl implements SchemaMapping
 	}
 
 	@Override
-	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
-		return applyToSolutionMapping(sm, false);
-	}
-
-	@Override
-	public Set<SolutionMapping> applyInverseToSolutionMapping( final SolutionMapping sm ) {
-		return applyToSolutionMapping(sm, true);
-	}
-
-	@Override
 	public Expr applyToExpression( final Expr expr ) {
 		if ( expr instanceof E_LogicalAnd and ) {
 			final Expr l = applyToExpression( and.getArg1() );
 			final Expr r = applyToExpression( and.getArg2() );
-
-			if ( l == null || r == null )
-				throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
 			if ( and.getArg1().equals(l) && and.getArg2().equals(r) )
 				return expr;
@@ -190,9 +177,6 @@ public class SchemaMappingImpl implements SchemaMapping
 		if ( expr instanceof E_LogicalOr or ) {
 			final Expr l = applyToExpression( or.getArg1()) ;
 			final Expr r = applyToExpression( or.getArg2()) ;
-
-			if ( l == null || r == null )
-				throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
 			if ( or.getArg1().equals(l) && or.getArg2().equals(r) )
 				return expr;
@@ -208,89 +192,14 @@ public class SchemaMappingImpl implements SchemaMapping
 		throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 	}
 
-	private Expr rewriteComparison( final Expr expr ) {
-		final Expr left;
-		final Expr right;
-		final boolean equals;
-
-		if ( expr instanceof E_Equals eq ) {
-			left = eq.getArg1();
-			right = eq.getArg2();
-			equals = true;
-		}
-		else if ( expr instanceof E_NotEquals neq ) {
-			left = neq.getArg1();
-			right = neq.getArg2();
-			equals = false;
-		}
-		else
-			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
-
-		final Node node;
-		final boolean rewriteLeft;
-		if ( left.isConstant() ) {
-			rewriteLeft = true;
-			node = ( (NodeValue) left ).asNode();
-		}
-		else if ( right.isConstant() ) {
-			rewriteLeft = false;
-			node = ( (NodeValue) right ).asNode();
-		}
-		else
-			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
-
-		if ( ! node.isURI() )
-			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
-
-		final Set<Node> nodes = mapGlobalTermToLocalTerms(node);
-
-		if ( nodes.size() == 1 ) {
-			final Expr translated = NodeValue.makeNode(nodes.iterator().next());
-			if ( equals )
-				return rewriteLeft ? new E_Equals(translated, right) : new E_Equals(left, translated);
-			else
-				return rewriteLeft ? new E_NotEquals(translated, right) : new E_NotEquals(left, translated);
-		}
-
-		final List<Expr> rewritten = new ArrayList<>();
-
-		for ( final Node n : nodes ) {
-			final NodeValue translated = NodeValue.makeNode(n);
-			if ( equals )
-				rewritten.add( rewriteLeft ? new E_Equals(translated, right) : new E_Equals(left, translated) );
-			else
-				rewritten.add( rewriteLeft ? new E_NotEquals(translated, right) : new E_NotEquals(left, translated) );
-		}
-
-		return equals ? buildOr(rewritten) : buildAnd(rewritten);
+	@Override
+	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
+		return applyToSolutionMapping(sm, false);
 	}
 
-	private static Expr buildOr( final List<Expr> exprList ) {
-		if ( exprList == null || exprList.isEmpty() ) {
-			throw new IllegalArgumentException( "Empty OR list" );
-		}
-
-		Expr result = exprList.get(0);
-
-		for ( int i = 1; i < exprList.size(); i++ ) {
-			result = new E_LogicalOr( result, exprList.get(i) );
-		}
-
-		return result;
-	}
-
-	private static Expr buildAnd( final List<Expr> exprList ) {
-		if ( exprList == null || exprList.isEmpty() ) {
-			throw new IllegalArgumentException("Empty AND list");
-		}
-
-		Expr result = exprList.get(0);
-
-		for ( int i = 1; i < exprList.size(); i++ ) {
-			result = new E_LogicalAnd( result, exprList.get(i) );
-		}
-
-		return result;
+	@Override
+	public Set<SolutionMapping> applyInverseToSolutionMapping( final SolutionMapping sm ) {
+		return applyToSolutionMapping(sm, true);
 	}
 
 	protected Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping solMap,
@@ -358,6 +267,84 @@ public class SchemaMappingImpl implements SchemaMapping
 		for( final BindingBuilder bb : builders ) {
 			final SolutionMapping newSolMap = new SolutionMappingImpl( bb.build() );
 			result.add(newSolMap);
+		}
+
+		return result;
+	}
+
+	private Expr rewriteComparison( final Expr expr ) {
+		final Expr left;
+		final Expr right;
+		final boolean equals;
+
+		if ( expr instanceof E_Equals eq ) {
+			left = eq.getArg1();
+			right = eq.getArg2();
+			equals = true;
+		}
+		else if ( expr instanceof E_NotEquals neq ) {
+			left = neq.getArg1();
+			right = neq.getArg2();
+			equals = false;
+		}
+		else
+			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+
+		final List<Expr> leftExprs = new ArrayList<>();
+		final List<Expr> rightExprs = new ArrayList<>();
+
+		if ( left.isConstant() ) {
+			for ( final Node n : mapGlobalTermToLocalTerms(((NodeValue) left).asNode()) ) {
+				leftExprs.add(NodeValue.makeNode(n));
+			}
+		} else
+			leftExprs.add(left);
+
+		if ( right.isConstant() ) {
+			for ( final Node n : mapGlobalTermToLocalTerms(((NodeValue) right).asNode()) ) {
+				rightExprs.add(NodeValue.makeNode(n));
+			}
+		} else
+			rightExprs.add(right);
+
+		final List<Expr> rewritten = new ArrayList<>();
+
+		for ( final Expr l : leftExprs ) {
+			for ( final Expr r : rightExprs ) {
+				rewritten.add(
+					equals
+						? new E_Equals(l, r)
+						: new E_NotEquals(l, r)
+				);
+			}
+		}
+
+		return equals ? buildOr(rewritten) : buildAnd(rewritten);
+	}
+
+	private static Expr buildOr( final List<Expr> exprList ) {
+		if ( exprList == null || exprList.isEmpty() ) {
+			throw new IllegalArgumentException( "Empty OR list" );
+		}
+
+		Expr result = exprList.get(0);
+
+		for ( int i = 1; i < exprList.size(); i++ ) {
+			result = new E_LogicalOr( result, exprList.get(i) );
+		}
+
+		return result;
+	}
+
+	private static Expr buildAnd( final List<Expr> exprList ) {
+		if ( exprList == null || exprList.isEmpty() ) {
+			throw new IllegalArgumentException("Empty AND list");
+		}
+
+		Expr result = exprList.get(0);
+
+		for ( int i = 1; i < exprList.size(); i++ ) {
+			result = new E_LogicalAnd( result, exprList.get(i) );
 		}
 
 		return result;

@@ -496,6 +496,35 @@ public class VocabularyMappingUtilsTest
 		assertThrows( UnsupportedOperationException.class, () -> VocabularyMappingUtils.translateExpressions(exprList, vm) );
 	}
 
+	@Test
+	public void translate_filter_twosided_equals_expression() {
+		// Equality expressions with mapped terms on both sides are expanded into
+		// the Cartesian product of all translated terms, combined with logical OR.
+
+		// Set up
+		final Expr expr =
+			new E_Equals(
+				NodeValue.makeNode(s_g),
+				NodeValue.makeNode(e_g)
+			);
+
+		final ExprList exprList = new ExprList(expr);
+
+		// Test
+		final ExprList result = VocabularyMappingUtils.translateExpressions(exprList, vm);
+
+		// Check
+		final Set<String> actual = extractEqualsPairs(result.get(0));
+
+		// Order doesn't matter here
+		assertEquals( Set.of(
+			"<http://example.org/local/s1>=<http://example.org/local/e1>",
+			"<http://example.org/local/s1>=<http://example.org/local/e2>",
+			"<http://example.org/local/s2>=<http://example.org/local/e1>",
+			"<http://example.org/local/s2>=<http://example.org/local/e2>"
+		), actual );
+	}
+
 	// -------------- helpers --------------
 
 	@SuppressWarnings("deprecation")
@@ -545,5 +574,19 @@ public class VocabularyMappingUtilsTest
 		RDFDataMgr.read( mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE );
 		final Map<Node, Set<Node>> g2lMap = EntityMappingReader.read(mapping);
 		return new EntityMappingImpl(g2lMap);
+	}
+
+	protected Set<String> extractEqualsPairs( final Expr e ) {
+		final Set<String> result = new HashSet<>();
+
+		if ( e instanceof E_Equals eq ) {
+			result.add( eq.getArg1().toString() + "=" + eq.getArg2().toString() );
+		}
+		else if ( e instanceof E_LogicalOr or ) {
+			result.addAll( extractEqualsPairs(or.getArg1()) );
+			result.addAll( extractEqualsPairs(or.getArg2()) );
+		}
+
+		return result;
 	}
 }

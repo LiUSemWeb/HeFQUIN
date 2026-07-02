@@ -127,6 +127,36 @@ public class EntityMappingImpl implements EntityMapping
 	}
 
 	@Override
+	public Expr applyToExpression( final Expr expr ) {
+		if ( expr instanceof E_LogicalAnd and ) {
+			final Expr l = applyToExpression( and.getArg1() );
+			final Expr r = applyToExpression( and.getArg2() );
+
+			if ( and.getArg1().equals(l) && and.getArg2().equals(r) )
+				return expr;
+
+			return new E_LogicalAnd( l, r );
+		}
+
+		if ( expr instanceof E_LogicalOr or ) {
+			final Expr l = applyToExpression( or.getArg1()) ;
+			final Expr r = applyToExpression( or.getArg2()) ;
+
+			if ( or.getArg1().equals(l) && or.getArg2().equals(r) )
+				return expr;
+
+			return new E_LogicalOr( l, r );
+		}
+
+		if ( expr instanceof E_Equals || expr instanceof E_NotEquals ) {
+			return rewriteComparison( expr );
+		}
+
+		// other rexpression types aren't considered rewritable at the moment
+		throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+	}
+
+	@Override
 	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
 		final Set<SolutionMapping> result = applyMapToSolutionMapping(sm, g2lMap);
 		return result;
@@ -201,42 +231,6 @@ public class EntityMappingImpl implements EntityMapping
 		return result;
 	}
 
-	@Override
-	public Expr applyToExpression( final Expr expr ) {
-		if ( expr instanceof E_LogicalAnd and ) {
-			final Expr l = applyToExpression( and.getArg1() );
-			final Expr r = applyToExpression( and.getArg2() );
-
-			if ( l == null || r == null )
-				throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
-
-			if ( and.getArg1().equals(l) && and.getArg2().equals(r) )
-				return expr;
-
-			return new E_LogicalAnd( l, r );
-		}
-
-		if ( expr instanceof E_LogicalOr or ) {
-			final Expr l = applyToExpression( or.getArg1()) ;
-			final Expr r = applyToExpression( or.getArg2()) ;
-
-			if ( l == null || r == null )
-				throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
-
-			if ( or.getArg1().equals(l) && or.getArg2().equals(r) )
-				return expr;
-
-			return new E_LogicalOr( l, r );
-		}
-
-		if ( expr instanceof E_Equals || expr instanceof E_NotEquals ) {
-			return rewriteComparison( expr );
-		}
-
-		// other rexpression types aren't considered rewritable at the moment
-		throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
-	}
-
 	private Expr rewriteComparison( final Expr expr ) {
 		final Expr left;
 		final Expr right;
@@ -255,40 +249,33 @@ public class EntityMappingImpl implements EntityMapping
 		else
 			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
-		final Node node;
-		final boolean rewriteLeft;
+		final List<Expr> leftExprs = new ArrayList<>();
+		final List<Expr> rightExprs = new ArrayList<>();
+
 		if ( left.isConstant() ) {
-			rewriteLeft = true;
-			node = ( (NodeValue) left ).asNode();
-		}
-		else if ( right.isConstant() ) {
-			rewriteLeft = false;
-			node = ( (NodeValue) right ).asNode();
-		}
-		else
-			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+			for ( final Node n : mapGlobalTermToLocalTerms(((NodeValue) left).asNode()) ) {
+				leftExprs.add(NodeValue.makeNode(n));
+			}
+		} else
+			leftExprs.add(left);
 
-		if ( ! node.isURI() )
-			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
-
-		final Set<Node> nodes = mapGlobalTermToLocalTerms(node);
-
-		if ( nodes.size() == 1 ) {
-			final Expr translated = NodeValue.makeNode(nodes.iterator().next());
-			if ( equals )
-				return rewriteLeft ? new E_Equals(translated, right) : new E_Equals(left, translated);
-			else
-				return rewriteLeft ? new E_NotEquals(translated, right) : new E_NotEquals(left, translated);
-		}
+		if ( right.isConstant() ) {
+			for ( final Node n : mapGlobalTermToLocalTerms(((NodeValue) right).asNode()) ) {
+				rightExprs.add(NodeValue.makeNode(n));
+			}
+		} else
+			rightExprs.add(right);
 
 		final List<Expr> rewritten = new ArrayList<>();
 
-		for ( final Node n : nodes ) {
-			final NodeValue translated = NodeValue.makeNode(n);
-			if ( equals )
-				rewritten.add( rewriteLeft ? new E_Equals(translated, right) : new E_Equals(left, translated) );
-			else
-				rewritten.add( rewriteLeft ? new E_NotEquals(translated, right) : new E_NotEquals(left, translated) );
+		for ( final Expr l : leftExprs ) {
+			for ( final Expr r : rightExprs ) {
+				rewritten.add(
+					equals
+						? new E_Equals(l, r)
+						: new E_NotEquals(l, r)
+				);
+			}
 		}
 
 		return equals ? buildOr(rewritten) : buildAnd(rewritten);
