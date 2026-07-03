@@ -56,14 +56,12 @@ public class ExprUtils
 
 			return exprs;
 		}
-
-		if ( containsMappedGlobalTerm(e, containsGlobalTerm) ) {
+		else if ( containsMappedGlobalTerm(e, containsGlobalTerm) ) {
 			throw new UnsupportedOperationException(
 				"Filter expression " + e + " cannot be rewritten"
 			);
 		}
-
-		return List.of(e);
+		else return List.of(e);
 	}
 
 	/**
@@ -108,8 +106,12 @@ public class ExprUtils
 
 			return exprs;
 		}
-		else
-			return List.of(e);
+		else if ( containsMappedGlobalTerm(e, containsGlobalTerm) ) {
+			throw new UnsupportedOperationException(
+				"Filter expression " + e + " cannot be rewritten"
+			);
+		}
+		else return List.of(e);
 	}
 
 	/**
