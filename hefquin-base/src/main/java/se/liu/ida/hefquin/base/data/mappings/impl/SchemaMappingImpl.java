@@ -11,7 +11,6 @@ import org.apache.jena.sparql.expr.E_LogicalAnd;
 import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.E_NotEquals;
 import org.apache.jena.sparql.expr.Expr;
-import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.vocabulary.OWL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,7 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.jenaext.sparql.expr.ExprUtils;
 
 public class SchemaMappingImpl implements SchemaMapping
 {
@@ -290,22 +290,8 @@ public class SchemaMappingImpl implements SchemaMapping
 		else
 			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
-		final List<Expr> leftExprs = new ArrayList<>();
-		final List<Expr> rightExprs = new ArrayList<>();
-
-		if ( left.isConstant() ) {
-			for ( final Node n : mapGlobalTermToLocalTerms(((NodeValue) left).asNode()) ) {
-				leftExprs.add(NodeValue.makeNode(n));
-			}
-		} else
-			leftExprs.add(left);
-
-		if ( right.isConstant() ) {
-			for ( final Node n : mapGlobalTermToLocalTerms(((NodeValue) right).asNode()) ) {
-				rightExprs.add(NodeValue.makeNode(n));
-			}
-		} else
-			rightExprs.add(right);
+		final List<Expr> leftExprs = ExprUtils.expandExpressionUsingSchemaMapping(left, g2lMap::get, g2lMap::containsKey);
+		final List<Expr> rightExprs = ExprUtils.expandExpressionUsingSchemaMapping(right, g2lMap::get, g2lMap::containsKey);
 
 		final List<Expr> rewritten = new ArrayList<>();
 
@@ -345,26 +331,6 @@ public class SchemaMappingImpl implements SchemaMapping
 
 		for ( int i = 1; i < exprList.size(); i++ ) {
 			result = new E_LogicalAnd( result, exprList.get(i) );
-		}
-
-		return result;
-	}
-
-	private Set<Node> mapGlobalTermToLocalTerms( final Node n ) {
-		final Set<Node> result = new HashSet<>();
-
-		if ( n.isURI() ) {
-			final Set<TermMapping> mappings = g2lMap.get(n);
-
-			if ( mappings != null && ! mappings.isEmpty() ) {
-				for ( final TermMapping tm : mappings ) {
-					result.addAll( tm.getLocalTerms() );
-				}
-			}
-		}
-
-		if ( result.isEmpty() ) {
-			result.add(n);
 		}
 
 		return result;

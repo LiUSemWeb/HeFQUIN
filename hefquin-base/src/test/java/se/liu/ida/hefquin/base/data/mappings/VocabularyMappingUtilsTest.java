@@ -19,6 +19,7 @@ import org.apache.jena.sparql.expr.E_Equals;
 import org.apache.jena.sparql.expr.E_LogicalAnd;
 import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.E_NotEquals;
+import org.apache.jena.sparql.expr.E_Str;
 import org.apache.jena.sparql.expr.E_StrContains;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
@@ -492,7 +493,7 @@ public class VocabularyMappingUtilsTest
 
 		final ExprList exprList = new ExprList( new E_LogicalOr(expr, notAllowedExpr) );
 
-		// Test & Check
+		// Test & check
 		assertThrows( UnsupportedOperationException.class, () -> VocabularyMappingUtils.translateExpressions(exprList, vm) );
 	}
 
@@ -523,6 +524,20 @@ public class VocabularyMappingUtilsTest
 			"<http://example.org/local/s2>=<http://example.org/local/e1>",
 			"<http://example.org/local/s2>=<http://example.org/local/e2>"
 		), actual );
+	}
+
+	@Test
+	public void translate_nonrewritable_expression_with_mapped_uri() {
+		// Non-rewritable expressions containing mapped global URIs are rejected.
+
+		// Set up
+		final Expr expr =
+			new E_Str(
+				NodeValue.makeNode(e_g)
+			);
+
+		// Test & check
+		assertThrows( UnsupportedOperationException.class, () -> vm.translateExpression(expr) );
 	}
 
 	// -------------- helpers --------------

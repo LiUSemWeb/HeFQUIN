@@ -17,13 +17,13 @@ import org.apache.jena.sparql.expr.E_LogicalAnd;
 import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.E_NotEquals;
 import org.apache.jena.sparql.expr.Expr;
-import org.apache.jena.sparql.expr.NodeValue;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.base.data.mappings.EntityMapping;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.jenaext.sparql.expr.ExprUtils;
 
 import org.apache.jena.graph.Triple;
 
@@ -249,22 +249,8 @@ public class EntityMappingImpl implements EntityMapping
 		else
 			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
-		final List<Expr> leftExprs = new ArrayList<>();
-		final List<Expr> rightExprs = new ArrayList<>();
-
-		if ( left.isConstant() ) {
-			for ( final Node n : mapGlobalTermToLocalTerms(((NodeValue) left).asNode()) ) {
-				leftExprs.add(NodeValue.makeNode(n));
-			}
-		} else
-			leftExprs.add(left);
-
-		if ( right.isConstant() ) {
-			for ( final Node n : mapGlobalTermToLocalTerms(((NodeValue) right).asNode()) ) {
-				rightExprs.add(NodeValue.makeNode(n));
-			}
-		} else
-			rightExprs.add(right);
+		final List<Expr> leftExprs = ExprUtils.expandExpressionUsingEntityMapping(left, g2lMap::get, g2lMap::containsKey);
+		final List<Expr> rightExprs = ExprUtils.expandExpressionUsingEntityMapping(right, g2lMap::get, g2lMap::containsKey);
 
 		final List<Expr> rewritten = new ArrayList<>();
 
@@ -309,16 +295,4 @@ public class EntityMappingImpl implements EntityMapping
 		return result;
 	}
 
-	private Set<Node> mapGlobalTermToLocalTerms( final Node n ) {
-		if ( ! n.isURI() ) {
-			return Collections.singleton(n);
-		}
-
-		final Set<Node> mappings = g2lMap.get(n);
-
-		if ( mappings == null || mappings.isEmpty() )
-			return Collections.singleton(n);
-
-		return mappings;
-	}
 }
