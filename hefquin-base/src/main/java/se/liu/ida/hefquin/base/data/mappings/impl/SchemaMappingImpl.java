@@ -11,6 +11,7 @@ import org.apache.jena.sparql.expr.E_LogicalAnd;
 import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.E_NotEquals;
 import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.vocabulary.OWL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -272,7 +273,7 @@ public class SchemaMappingImpl implements SchemaMapping
 		return result;
 	}
 
-	private Expr rewriteComparison( final Expr expr ) {
+	protected Expr rewriteComparison( final Expr expr ) {
 		final Expr left;
 		final Expr right;
 		final boolean equals;
@@ -290,8 +291,8 @@ public class SchemaMappingImpl implements SchemaMapping
 		else
 			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
-		final List<Expr> leftExprs = ExprUtils.expandExpressionUsingSchemaMapping(left, g2lMap::get, g2lMap::containsKey);
-		final List<Expr> rightExprs = ExprUtils.expandExpressionUsingSchemaMapping(right, g2lMap::get, g2lMap::containsKey);
+		final List<Expr> leftExprs = expandExpression(left);
+		final List<Expr> rightExprs = expandExpression(right);
 
 		final List<Expr> rewritten = new ArrayList<>();
 
@@ -305,35 +306,54 @@ public class SchemaMappingImpl implements SchemaMapping
 			}
 		}
 
-		return equals ? buildOr(rewritten) : buildAnd(rewritten);
+		return equals ? ExprUtils.buildOr(rewritten) : ExprUtils.buildAnd(rewritten);
 	}
 
-	private static Expr buildOr( final List<Expr> exprList ) {
-		if ( exprList == null || exprList.isEmpty() ) {
-			throw new IllegalArgumentException( "Empty OR list" );
+	/**
+	 * Expands the given expression according to a schema mapping.
+	 * <p>
+	 * If the expression is a constant URI, it is translated using the given
+	 * lookup function. If multiple local terms exist, a corresponding expression
+	 * is created for each of them. Expressions that are not constant URIs are
+	 * returned unchanged as a singleton list. Non-constant expressions are only returned
+	 * unchanged if they do not contain any mapped global URIs anywhere in their
+ 	 * structure.
+	 *
+	 * @param e the expression to expand
+	 * @param lookup lookup function that returns the term mappings for a given
+	 *               global schema term
+	 * @return the translated expressions
+	 */
+	public List<Expr> expandExpression( final Expr e ) {
+		if ( e.isConstant() ) {
+			final Node n = e.getConstant().asNode();
+
+			if ( ! n.isURI() )
+				return List.of(e);
+
+			final List<Expr> exprs = new ArrayList<>();
+			final Set<TermMapping> mappings = g2lMap.get(n);
+
+			if ( mappings != null && ! mappings.isEmpty() )
+				for ( final TermMapping tm : mappings )
+					for ( final Node localTerm :  tm.getLocalTerms() )
+						exprs.add(NodeValue.makeNode(localTerm));
+
+			if ( exprs.isEmpty() )
+				exprs.add(NodeValue.makeNode(n));
+
+			return exprs;
 		}
 
-		Expr result = exprList.get(0);
-
-		for ( int i = 1; i < exprList.size(); i++ ) {
-			result = new E_LogicalOr( result, exprList.get(i) );
+		for ( final Node uri : ExprUtils.collectURIs(e) ) {
+			if ( g2lMap.containsKey(uri) ) {
+				throw new UnsupportedOperationException(
+					"Filter expression " + e + " cannot be rewritten"
+				);
+			}
 		}
 
-		return result;
-	}
-
-	private static Expr buildAnd( final List<Expr> exprList ) {
-		if ( exprList == null || exprList.isEmpty() ) {
-			throw new IllegalArgumentException("Empty AND list");
-		}
-
-		Expr result = exprList.get(0);
-
-		for ( int i = 1; i < exprList.size(); i++ ) {
-			result = new E_LogicalAnd( result, exprList.get(i) );
-		}
-
-		return result;
+		return List.of(e);
 	}
 
 	protected Set<Node> extractGlobalTermsForLocalTerm( final Set<TermMapping> mappingsForTerm ) {
