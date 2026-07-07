@@ -689,6 +689,12 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		// estimate of 0 that is ACCURATE, which means that the join
 		// result is guaranteed to be empty and, thus, we copy the
 		// cardinality of 0 over as the join cardinality.)
+		//
+		// The quality of the resulting cardinality estimate is
+		// derived from the qualities of the input estimates and is
+		// reduced to reflect that the join cardinality itself is
+		// computed using this heuristic.
+		//
 		// TODO: There is probably a slightly better approach.
 		// TODO: An initial addition that is certainly useful (and
 		// easy to implement) is to consider the special case of a
@@ -701,7 +707,7 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 
 		int crdValue = 0;
 		int maxValue = 1;
-		Quality crdQuality = Quality.ACCURATE;
+		Quality inputQuality = Quality.ACCURATE;
 		Quality maxQuality = Quality.ACCURATE;
 
 		for ( int x = 0; x < currentSubPlan.numberOfSubPlans(); x++ ) {
@@ -721,26 +727,10 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 			crdValue = Math.max( crdValue, crdX.getValue() );
 
 			maxQuality = pickWorse( maxQuality, maxX.getQuality() );
-
-			if (    x == 1
-			     || crdX.getQuality() == Quality.PURE_GUESS
-			     || crdX.getQuality() == Quality.MIN_OR_MAX_POSSIBLE
-			     || crdX.getQuality() == Quality.ESTIMATE_BASED_ON_ESTIMATES ) {
-				crdQuality = crdX.getQuality();
-			}
-			else if (    crdQuality == Quality.PURE_GUESS
-			          || crdQuality == Quality.MIN_OR_MAX_POSSIBLE
-			          || crdQuality == Quality.ESTIMATE_BASED_ON_ESTIMATES ) {
-				// crdQuality = crdQuality;  // do nothing
-			}
-			else if (    crdQuality == Quality.ACCURATE
-			          && crdX.getQuality()  == Quality.ACCURATE ) {
-				crdQuality = Quality.ESTIMATE_BASED_ON_ACCURATES;
-			}
-			else {
-				crdQuality = Quality.ESTIMATE_BASED_ON_ESTIMATES;
-			}
+			inputQuality = pickWorse ( inputQuality, crdX.getQuality() );
 		}
+
+		final Quality crdQuality = QueryPlanProperty.getReducedQuality(inputQuality);
 
 		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
 		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
