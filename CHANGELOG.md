@@ -22,6 +22,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixing example vocabulary mapping for Wikidata to make the example query work ([#640](https://github.com/LiUSemWeb/HeFQUIN/issues/640)).
 - Removes ChronicleMap-based cardinality-specific cache implementation (ChronicleMapCardinalityCache) and related files ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
 - Remove wrapped response from CardinalityResponseImpl ([#628](https://github.com/LiUSemWeb/HeFQUIN/pull/628)).
+- Bug fix in quality assignment during join cardinality estimation ([#665](https://github.com/LiUSemWeb/HeFQUIN/pull/665)).
 ### Planned for Next Release
 - Persistent cache for requests ([#546](https://github.com/LiUSemWeb/HeFQUIN/issues/546), [#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590), [#599](https://github.com/LiUSemWeb/HeFQUIN/issues/599)).
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
