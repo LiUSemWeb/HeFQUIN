@@ -2,10 +2,8 @@ package se.liu.ida.hefquin.federation.access.impl.cache.mapdb;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.mapdb.DB;
@@ -15,31 +13,14 @@ import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.liu.ida.hefquin.base.datastructures.Cache;
-import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
-import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
-import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
+import se.liu.ida.hefquin.federation.access.impl.cache.CacheLayer;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheEntry;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheKey;
 
 /**
- * Persistent cache backed by a {@link HTreeMap}.
- *
- * <p>
- * This implementation uses a two-level design:
- * </p>
- * <ul>
- * <li>An off-heap {@link HTreeMap} as the persistent store</li>
- * <li>An on-heap cache ({@link HashMap}) for recently accessed or written entries</li>
- * </ul>
- *
- * <p>
- * The in-memory cache is a performance optimization that avoids repeated
- * deserialization of entries from off-heap storage. All in-memory entries
- * originate from and are synchronized with the HTreeMap.
- * </p>
+ * Persistent cache backed by a MapDB {@link HTreeMap}.
  *
  * <p>
  * This class is thread-safe for concurrent access through its public methods on
@@ -63,8 +44,8 @@ import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheKey;
  * </p>
  * <p>
  * Thread safety is provided only at the level of this cache instance. If two
- * cache objects point to the same persisted file, this class does
- * not coordinate:
+ * MapDBCache objects point to the same persisted file, this class does not
+ * coordinate:
  * </p>
  * <ul>
  * <li>replacement policy state</li>
@@ -72,7 +53,9 @@ import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheKey;
  * <li>invalidation/eviction decisions</li>
  * </ul>
  */
-public class MapDBCache implements Cache<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>>, AutoCloseable
+public class MapDBCache extends CacheLayer<PersistentCacheKey,
+                                           CompletableFuture<? extends DataRetrievalResponse<?>>,
+                                           PersistentCacheEntry>
 {
 	private static final Logger logger = LoggerFactory.getLogger( MapDBCache.class );
 
@@ -80,15 +63,6 @@ public class MapDBCache implements Cache<PersistentCacheKey, CompletableFuture<?
 	protected static final String DEFAULT_FILENAME = "cache/mapdb-map.dat";
 
 	protected final DB db;
-	protected final HTreeMap<PersistentCacheKey, PersistentCacheEntry> map;
-	protected final Map<PersistentCacheKey, PersistentCacheEntry> inMemoryCache;
-
-	protected final CacheEntryFactory<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> entryFactory;
-	protected final CacheReplacementPolicy<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> replacementPolicy;
-	protected final CacheInvalidationPolicy<PersistentCacheEntry, CompletableFuture<? extends DataRetrievalResponse<?>>> invalidPolicy;
-
-	protected final int capacity;
-	protected final String filename;
 
 	/**
 	 * Creates a cache with the default capacity and default file path.
@@ -146,31 +120,11 @@ public class MapDBCache implements Cache<PersistentCacheKey, CompletableFuture<?
 	                   final String filename,
 	                   final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
 			throws IOException {
-		assert capacity > 0;
-		assert policies != null;
-		assert filename != null && ! filename.isBlank();
-
-		this.capacity = capacity;
-		entryFactory = policies.getEntryFactory();
-		replacementPolicy = policies.getReplacementPolicyFactory().create();
-		invalidPolicy = policies.getInvalidationPolicy();
-
-		this.filename = filename;
-
-		final File file = ensureParentDirectoryExists(filename);
-		db = DBMaker.fileDB(file)
-			.fileMmapEnableIfSupported()
-			.closeOnJvmShutdown()
-			.make();
-
-		@SuppressWarnings("unchecked")
-		final HTreeMap<PersistentCacheKey, PersistentCacheEntry> tmpMap = db.hashMap("cache")
-			.keySerializer( Serializer.JAVA )
-			.valueSerializer( MapDBCacheEntrySerializer.INSTANCE )
-			.createOrOpen();
-		map = tmpMap;
-
-		inMemoryCache = new HashMap<>(capacity);
+		this(
+			open(filename),
+			capacity,
+			policies
+		);
 
 		// Initialize replacement policy
 		for( final Entry<PersistentCacheKey, PersistentCacheEntry> entry : map.entrySet() ) {
@@ -192,6 +146,52 @@ public class MapDBCache implements Cache<PersistentCacheKey, CompletableFuture<?
 		);
 	}
 
+	private MapDBCache( final DB db,
+	                    final int capacity,
+	                    final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
+			throws IOException {
+		super(
+			createMap(db),
+			capacity,
+			policies
+		);
+
+		this.db = db;
+	}
+
+	/**
+	 * Opens the MapDB database associated with the given file.
+	 *
+	 * @param filename path to the database file
+	 *
+	 * @return the opened MapDB database
+	 */
+	private static DB open( final String filename ) {
+		final File file = ensureParentDirectoryExists(filename);
+		return DBMaker.fileDB(file)
+			.fileMmapEnableIfSupported()
+			.closeOnJvmShutdown()
+			.make();
+	}
+
+	/**
+	 * Creates or opens the persisted MapDB hash map used to store cache entries.
+	 *
+	 * @param db the MapDB database that owns the map
+	 *
+	 * @return an {@link HTreeMap} containing the persisted cache entries
+	 */
+	private static Map<PersistentCacheKey, PersistentCacheEntry> createMap( final DB db ) {
+		@SuppressWarnings("unchecked")
+		final HTreeMap<PersistentCacheKey, PersistentCacheEntry> map =
+				db.hashMap("cache")
+				.keySerializer(Serializer.JAVA)
+				.valueSerializer(MapDBCacheEntrySerializer.INSTANCE)
+				.createOrOpen();
+
+		return map;
+	}
+
 	/**
 	 * Ensures that the parent directory of the given file path exists.
 	 *
@@ -209,203 +209,15 @@ public class MapDBCache implements Cache<PersistentCacheKey, CompletableFuture<?
 		return file;
 	}
 
-	@Override
-	public boolean isEmpty() {
-		synchronized (map) {
-			return map.isEmpty();
-		}
-	}
-
 	/**
-	 * Removes all entries from both the map and the in-memory cache, and
-	 * resets the replacement policy state.
-	 */
-	@Override
-	public void clear() {
-		synchronized (map) {
-			map.clear();
-			inMemoryCache.clear();
-			replacementPolicy.clear();
-		}
-	}
-
-	/**
-	 * Stores the given key-value pair in the cache.
+	 * Closes the underlying MapDB database and releases associated resources.
 	 *
 	 * <p>
-	 * The value is written to the map and also inserted into the in-memory
-	 * cache to avoid future deserialization overhead.
-	 * </p>
-	 *
-	 * <p>
-	 * If the key already exists, the corresponding entry is replaced and the
-	 * replacement policy is notified accordingly. Otherwise, the entry is added. If the
-	 * cache exceeds max capacity, an entry is evicted according to the replacement
-	 * policy.
-	 * </p>
-	 *
-	 * @param key   the cache key
-	 * @param value the cache value
-	 * @throws IllegalArgumentException if {@code key} or {@code value} is
-	 *                                  {@code null}
-	 */
-	@Override
-	public void put( final PersistentCacheKey key, final CompletableFuture<? extends DataRetrievalResponse<?>> value ) {
-		if ( key == null )
-			throw new IllegalArgumentException( "Cache key must not be null" );
-
-		if ( value == null )
-			throw new IllegalArgumentException( "Cache value must not be null" );
-
-		final PersistentCacheEntry entry = entryFactory.createCacheEntry(value);
-
-		synchronized (map) {
-			final PersistentCacheEntry oldEntry = map.get(key);
-			map.put(key, entry);
-			inMemoryCache.put(key, entry);
-
-			if ( oldEntry == null )
-				replacementPolicy.entryWasAdded(key, entry);
-			else
-				replacementPolicy.entryWasRewritten(key, entry);
-
-			// Enforce max capacity
-			if ( map.size() > capacity ) {
-				final Iterable<PersistentCacheKey> evictionCandidates = replacementPolicy
-						.getEvictionCandidates( map.size() - capacity );
-				evictionCandidates.forEach(this::evict);
-			}
-		}
-	}
-
-	/**
-	 * Returns the cached object for the given key.
-	 *
-	 * <p>
-	 * This method first checks the in-memory cache. If a valid entry is found, the
-	 * replacement policy is notified and the entry returned immediately. Otherwise,
-	 * the map is consulted.
-	 * </p>
-	 *
-	 * <p>
-	 * If the key is present but the corresponding entry is no longer valid
-	 * according to the invalidation policy, the entry is evicted and {@code null}
-	 * is returned.
-	 * </p>
-	 *
-	 * @param key the cache key
-	 * @return the cached object, or {@code null} if no valid entry exists
-	 */
-	@Override
-	public CompletableFuture<? extends DataRetrievalResponse<?>> get( final PersistentCacheKey key ) {
-		synchronized (map) {
-			final PersistentCacheEntry inMemoryEntry = inMemoryCache.get(key);
-			final PersistentCacheEntry entry;
-
-			if ( inMemoryEntry != null ) {
-				entry = inMemoryEntry;
-			}
-			else {
-				entry = map.get(key);
-				if ( entry != null ) {
-					inMemoryCache.put(key, entry);
-				}
-			}
-
-			if ( entry == null ) {
-				return null;
-			}
-
-			if ( ! invalidPolicy.isStillValid(entry) ) {
-				evict(key);
-				return null;
-			}
-
-			replacementPolicy.entryWasRequested(key, entry);
-			return entry.getObject();
-		}
-	}
-
-	/**
-	 * Evicts the cache entry for the given key.
-	 *
-	 * <p>
-	 * The entry is removed from both the map and the in-memory cache.
-	 * </p>
-	 *
-	 * @param key the key to evict
-	 * @return {@code true} if an entry was removed, otherwise {@code false}
-	 */
-	@Override
-	public boolean evict( final PersistentCacheKey key ) {
-		synchronized (map) {
-			inMemoryCache.remove(key);
-			if( map.remove(key) != null ) {
-				replacementPolicy.entryWasEvicted(key);
-				return true;
-			}
-			return false;
-		}
-	}
-
-	/**
-	 * Evicts the cache entry for the given key if it currently maps to the given
-	 * value.
-	 *
-	 * @param key   the key to evict
-	 * @param value the expected value
-	 * @return {@code true} if an entry was removed, otherwise {@code false}
-	 */
-	@Override
-	public boolean evict( final PersistentCacheKey key, final CompletableFuture<? extends DataRetrievalResponse<?>> value ) {
-		synchronized (map) {
-			final PersistentCacheEntry entry = map.get(key);
-			if ( entry != null && entry.getObject().equals(value) ) {
-				return evict(key);
-			}
-			return false;
-		}
-	}
-
-	/**
-	 * Returns the current number of entries stored in the cache.
-	 *
-	 * @return the cache size
-	 */
-	public int size() {
-		synchronized (map) {
-			return map.size();
-		}
-	}
-
-	@Override
-	public String toString() {
-		return "MapDBCache{filename=" + filename + ", capacity=" + capacity + ", size=" + map.size() + "}";
-	}
-
-	/**
-	 * Closes the underlying {@link HTreeMap}, {@link DB} and releases associated resources.
-	 *
-	 * <p>
-	 * Closing the map is not required but ensures that all data is properly flushed
-	 * to disk and that off-heap resources are released.
+	 * After this method returns, the cache must not be used anymore.
 	 * </p>
 	 */
 	@Override
 	public void close() {
-		synchronized (map) {
-			db.close();
-		}
-	}
-
-	/**
-	 * Returns the set of keys currently stored in the cache.
-	 *
-	 * @return  an immutable copy of the current key set
-	 */
-	public Set<PersistentCacheKey> keySet() {
-		synchronized (map) {
-			return Set.copyOf( map.keySet() );
-		}
+		db.close();
 	}
 }
