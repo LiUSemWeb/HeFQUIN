@@ -1,21 +1,30 @@
 package se.liu.ida.hefquin.base.data.mappings.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.E_LogicalOr;
+import org.apache.jena.sparql.expr.E_NotEquals;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.NodeValue;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.base.data.mappings.EntityMapping;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.jenaext.sparql.expr.ExprUtils;
 
 import org.apache.jena.graph.Triple;
 
@@ -119,6 +128,36 @@ public class EntityMappingImpl implements EntityMapping
 	}
 
 	@Override
+	public Expr applyToExpression( final Expr expr ) {
+		if ( expr instanceof E_LogicalAnd and ) {
+			final Expr l = applyToExpression( and.getArg1() );
+			final Expr r = applyToExpression( and.getArg2() );
+
+			if ( and.getArg1().equals(l) && and.getArg2().equals(r) )
+				return expr;
+
+			return new E_LogicalAnd( l, r );
+		}
+
+		if ( expr instanceof E_LogicalOr or ) {
+			final Expr l = applyToExpression( or.getArg1()) ;
+			final Expr r = applyToExpression( or.getArg2()) ;
+
+			if ( or.getArg1().equals(l) && or.getArg2().equals(r) )
+				return expr;
+
+			return new E_LogicalOr( l, r );
+		}
+
+		if ( expr instanceof E_Equals || expr instanceof E_NotEquals ) {
+			return rewriteComparison( expr );
+		}
+
+		// other rexpression types aren't considered rewritable at the moment
+		throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+	}
+
+	@Override
 	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
 		final Set<SolutionMapping> result = applyMapToSolutionMapping(sm, g2lMap);
 		return result;
@@ -191,6 +230,84 @@ public class EntityMappingImpl implements EntityMapping
 		}
 
 		return result;
+	}
+
+	protected Expr rewriteComparison( final Expr expr ) {
+		final Expr left;
+		final Expr right;
+		final boolean equals;
+
+		if ( expr instanceof E_Equals eq ) {
+			left = eq.getArg1();
+			right = eq.getArg2();
+			equals = true;
+		}
+		else if ( expr instanceof E_NotEquals neq ) {
+			left = neq.getArg1();
+			right = neq.getArg2();
+			equals = false;
+		}
+		else
+			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
+
+		final List<Expr> leftExprs = expandExpression(left);
+		final List<Expr> rightExprs = expandExpression(right);
+
+		final List<Expr> rewritten = new ArrayList<>();
+
+		for ( final Expr l : leftExprs ) {
+			for ( final Expr r : rightExprs ) {
+				rewritten.add(
+					equals
+						? new E_Equals(l, r)
+						: new E_NotEquals(l, r)
+				);
+			}
+		}
+
+		return equals ? ExprUtils.buildOr(rewritten) : ExprUtils.buildAnd(rewritten);
+	}
+
+	/**
+	 * Expands the given expression according to an entity mapping.
+	 * <p>
+	 * If the expression is a constant URI, it is translated to its corresponding local terms.
+	 * If multiple local terms exist, a corresponding expression is created for each of them.
+	 * Expressions that are not constant URIs are returned unchanged as a singleton list.
+	 * Non-constant expressions are only returned unchanged if they do not contain any mapped
+	 * global URIs anywhere in their structure.
+	 *
+	 * @param e the expression to expand
+	 * @return the translated expressions
+	 */
+	protected List<Expr> expandExpression( final Expr e ) {
+		if ( e.isConstant() ) {
+			final Node n = e.getConstant().asNode();
+
+			if ( ! n.isURI() )
+				return List.of(e);
+
+			final List<Expr> exprs = new ArrayList<>();
+			final Set<Node> mappings = g2lMap.get(n);
+
+			if ( mappings == null || mappings.isEmpty() )
+				exprs.add(e);
+			else
+				for ( final Node node : mappings )
+					exprs.add(NodeValue.makeNode(node));
+
+			return exprs;
+		}
+
+		for ( final Node uri : ExprUtils.collectURIs(e) ) {
+			if ( g2lMap.containsKey(uri) ) {
+				throw new UnsupportedOperationException(
+					"Filter expression " + e + " cannot be rewritten"
+				);
+			}
+		}
+
+		return List.of(e);
 	}
 
 }

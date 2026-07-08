@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.base.data.mappings;
 
 import java.util.Set;
 
+import org.apache.jena.sparql.expr.Expr;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 
@@ -21,6 +23,20 @@ public interface EntityMapping
 	 * contains the given triple pattern without any changes.
 	 */
 	Set<TriplePattern> applyToTriplePattern( TriplePattern tp );
+
+	/**
+	 * Applies this entity mapping to the given filter expression, which is
+	 * assumed to use the global representation of the entities mentioned in
+	 * it, and returns the translated expression.
+	 * If this entity mapping is not relevant for the given expression (i.e.,
+	 * applying this entity mapping does not change the expression), then the
+	 * result of this function is simply the given expression itself.
+	 * <p>
+	 * It may not be possible to translate every expression; if the
+	 * given expression cannot be translated, then this method
+	 * throws an {@link UnsupportedOperationException}.
+	 */
+	Expr applyToExpression( Expr e );
 
 	/**
 	 * Applies this entity mapping to the given solution mapping, which
@@ -45,4 +61,5 @@ public interface EntityMapping
 	 * mapping without any changes.
 	 */
 	Set<SolutionMapping> applyInverseToSolutionMapping( SolutionMapping solmap );
+
 }

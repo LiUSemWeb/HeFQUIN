@@ -6,6 +6,7 @@ import java.util.Set;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.graph.GraphFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
@@ -96,6 +97,13 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 			result.addAll( sm.applyToSolutionMapping(solmap2) );
 		}
 		return result;
+	}
+
+	@Override
+	public Expr translateExpression( final Expr e ) {
+		final Expr translatedExpr = em.applyToExpression(e);
+
+		return sm.applyToExpression(translatedExpr);
 	}
 
 	@Override
