@@ -271,16 +271,13 @@ public class EntityMappingImpl implements EntityMapping
 	/**
 	 * Expands the given expression according to an entity mapping.
 	 * <p>
-	 * If the expression is a constant URI, it is translated using the given
-	 * lookup function. If multiple local terms exist, a corresponding expression
-	 * is created for each of them. Expressions that are not constant URIs are
-	 * returned unchanged as a singleton list. Non-constant expressions are only returned
-	 * unchanged if they do not contain any mapped global URIs anywhere in their
-	 * structure.
+	 * If the expression is a constant URI, it is translated to its corresponding local terms.
+	 * If multiple local terms exist, a corresponding expression is created for each of them.
+	 * Expressions that are not constant URIs are returned unchanged as a singleton list.
+	 * Non-constant expressions are only returned unchanged if they do not contain any mapped
+	 * global URIs anywhere in their structure.
 	 *
 	 * @param e the expression to expand
-	 * @param lookup lookup function that returns the local terms for a given
-	 *               global entity
 	 * @return the translated expressions
 	 */
 	protected List<Expr> expandExpression( final Expr e ) {
@@ -294,7 +291,7 @@ public class EntityMappingImpl implements EntityMapping
 			final Set<Node> mappings = g2lMap.get(n);
 
 			if ( mappings == null || mappings.isEmpty() )
-				exprs.add(NodeValue.makeNode(n));
+				exprs.add(e);
 			else
 				for ( final Node node : mappings )
 					exprs.add(NodeValue.makeNode(node));

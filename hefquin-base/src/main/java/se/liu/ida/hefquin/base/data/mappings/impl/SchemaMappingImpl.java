@@ -312,16 +312,13 @@ public class SchemaMappingImpl implements SchemaMapping
 	/**
 	 * Expands the given expression according to a schema mapping.
 	 * <p>
-	 * If the expression is a constant URI, it is translated using the given
-	 * lookup function. If multiple local terms exist, a corresponding expression
-	 * is created for each of them. Expressions that are not constant URIs are
-	 * returned unchanged as a singleton list. Non-constant expressions are only returned
-	 * unchanged if they do not contain any mapped global URIs anywhere in their
- 	 * structure.
+	 * If the expression is a constant URI, it is translated to its corresponding local terms.
+	 * If multiple local terms exist, a corresponding expression is created for each of them.
+	 * Expressions that are not constant URIs are returned unchanged as a singleton list.
+	 * Non-constant expressions are only returned unchanged if they do not contain any mapped
+	 * global URIs anywhere in their structure.
 	 *
 	 * @param e the expression to expand
-	 * @param lookup lookup function that returns the term mappings for a given
-	 *               global schema term
 	 * @return the translated expressions
 	 */
 	public List<Expr> expandExpression( final Expr e ) {
@@ -340,7 +337,7 @@ public class SchemaMappingImpl implements SchemaMapping
 						exprs.add(NodeValue.makeNode(localTerm));
 
 			if ( exprs.isEmpty() )
-				exprs.add(NodeValue.makeNode(n));
+				exprs.add(e);
 
 			return exprs;
 		}
