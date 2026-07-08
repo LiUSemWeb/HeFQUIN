@@ -79,5 +79,12 @@ JVM_ARGS="$JVM_ARGS \
   --add-opens=java.base/java.lang=ALL-UNNAMED \
   --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
   --add-opens=java.base/java.io=ALL-UNNAMED \
-  --add-opens=java.base/java.util=ALL-UNNAMED \
-  --sun-misc-unsafe-memory-access=allow"
+  --add-opens=java.base/java.util=ALL-UNNAMED"
+
+# Suppress Unsafe memory-access warnings on Java 23+.
+# Older JDKs do not recognize this flag.
+JAVA_VERSION=$("$JAVA" -XshowSettings:properties -version 2>&1 \
+  | sed -n 's/.*java.specification.version = //p')
+if [ "$JAVA_VERSION" -ge 23 ]; then
+  JVM_ARGS="$JVM_ARGS --sun-misc-unsafe-memory-access=allow"
+fi
