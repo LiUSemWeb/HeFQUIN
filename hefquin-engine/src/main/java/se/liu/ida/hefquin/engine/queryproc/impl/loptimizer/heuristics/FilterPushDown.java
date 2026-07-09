@@ -120,6 +120,13 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		}
 
 		@Override
+		public void visit( final LogicalOpMultiRequest op ) {
+			createdPlan = createPlanForMultiRequestUnderFilter( filterOp,
+			                                                    op,
+			                                                    inputPlan );
+		}
+
+		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
 			// The filter cannot be pushed below this operator. However, since the
 			// root operator of the subplan is a FixedSolMap with a known solution
@@ -252,8 +259,8 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return inputPlan;
 		}
 
-		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 		final ExprList exprList = filterOp.getFilterExpressions();
+		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(exprList);
 
 		if ( ! fm.isSupportedPattern(mergedPattern) ) {
@@ -265,6 +272,19 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		final boolean mayReduce = filterOp.mayReduce();
 
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, mayReduce, mergedReq );
+		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
+	}
+
+	protected LogicalPlan createPlanForMultiRequestUnderFilter( final LogicalOpFilter filterOp,
+	                                                            final LogicalOpMultiRequest reqOp,
+	                                                            final LogicalPlan inputPlan ) {
+		final ExprList exprList = filterOp.getFilterExpressions();
+		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
+		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(exprList);
+
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+
+		final LogicalOpMultiRequest mergedReqOp = new LogicalOpMultiRequest( mergedReq, reqOp.getFederationMembers() );
 		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 	}
 

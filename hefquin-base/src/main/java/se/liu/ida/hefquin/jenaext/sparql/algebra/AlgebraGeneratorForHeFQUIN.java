@@ -8,7 +8,9 @@ import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.sparql.util.Context;
 
 import se.liu.ida.hefquin.jenaext.sparql.algebra.op.OpServiceWithParams;
+import se.liu.ida.hefquin.jenaext.sparql.algebra.op.OpServiceWithValues;
 import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementServiceWithParams;
+import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementServiceWithValues;
 
 /**
  * This class is an extension of Jena's {@link AlgebraGenerator} that
@@ -27,7 +29,7 @@ public class AlgebraGeneratorForHeFQUIN extends AlgebraGenerator
 
 	protected AlgebraGeneratorForHeFQUIN( final Context cxt, final int depth ) {
 		super(cxt, depth);
-		
+
 		this.context = cxt;
 		this.subQueryDepth = depth;
 	}
@@ -39,6 +41,12 @@ public class AlgebraGeneratorForHeFQUIN extends AlgebraGenerator
 			                                compileElement( ewp.getElement() ),
 			                                ewp.getSilent(),
 			                                ewp.getParamVars() );
+		}
+		else if ( e instanceof ElementServiceWithValues ewv ) {
+			return new OpServiceWithValues( ewv.getServiceNode(),
+			                                compileElement( ewv.getElement() ),
+			                                ewv.getSilent(),
+			                                ewv.getPossibleValues() );
 		}
 		else
 			return super.compileElementService(e);

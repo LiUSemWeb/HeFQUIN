@@ -2,9 +2,12 @@ package se.liu.ida.hefquin.engine.queryproc.impl.srcsel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.*;
 import org.apache.jena.sparql.core.BasicPattern;
@@ -39,6 +42,7 @@ import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.jenaext.sparql.algebra.op.OpServiceWithParams;
+import se.liu.ida.hefquin.jenaext.sparql.algebra.op.OpServiceWithValues;
 
 /**
  * This implementation of {@link SourcePlanner} does not actually perform
@@ -99,6 +103,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		}
 		else if ( jenaOp instanceof OpTable opTable ) {
 			return createPlanForValues(opTable, ctx);
+		}
+		else if ( jenaOp instanceof OpServiceWithValues opService ) {
+			return createPlanForServicePatternWithValues(opService, mayReduce, ctx);
 		}
 		else if ( jenaOp instanceof OpService opService ) {
 			return createPlanForServicePattern(opService, mayReduce, ctx);
@@ -259,15 +266,20 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 	/**
 	 * This function assumes that the given operator comes from a SERVICE
-	 * clause that did not have a PARAMS part (or an empty one), and it
+	 * clause that did not have a PARAMS part (or an empty one) and that
+	 * was not in the scope of a SERVICE-restricting VALUES clause, and it
 	 * produces a plan with a request operator as root.
 	 */
 	protected LogicalPlan createPlanForServicePattern( final OpService jenaOp,
 	                                                   final boolean mayReduce,
 	                                                   final QueryProcContext ctx ) {
 		log.debug( "SERVICE clause: {}", jenaOp.getService() );
+
+		if ( jenaOp instanceof OpServiceWithValues op )
+			return createPlanForServicePatternWithValues(op, mayReduce, ctx);
+
 		if ( jenaOp.getService().isVariable() )
-			throw new IllegalArgumentException( "unsupported SERVICE clause" );
+			throw new IllegalArgumentException( "unsupported SERVICE clause: it has a variable (" + jenaOp.getService().toString() + ") as service node" );
 
 		if (    jenaOp instanceof OpServiceWithParams op
 		     && op.getParamVars() != null
@@ -288,12 +300,41 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 				throw new IllegalArgumentException( "Invalid SERVICE clause: missing PARAMS for " + ep.toString() );
 
 			final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-			final SPARQLRequest req = new SPARQLRequestImpl( p, null, false );
+			final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(ep, mayReduce, req);
 			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
 
 		return createPlan( jenaOp.getSubOp(), mayReduce, fm );
+	}
+
+	/**
+	 * This function assumes that the given operator comes from a
+	 * VALUES-extended SERVICE clause, and it produces a plan with
+	 * a multi-request operator as root.
+	 */
+	protected LogicalPlan createPlanForServicePatternWithValues(
+			final OpServiceWithValues jenaOp,
+			final boolean mayReduce,
+			final QueryProcContext ctx ) {
+		log.debug( "VALUES-extended SERVICE clause: {}", jenaOp.getService() );
+
+		if ( ! jenaOp.getService().isVariable() )
+			throw new IllegalArgumentException( "unsupported VALUES-extended SERVICE clause" );
+
+		final Set<FederationMember> fms = new HashSet<>();
+		for ( final Node n : jenaOp.getPossibleValues() ) {
+			final FederationMember fm = ctx.getFederationCatalog().getFederationMemberByURI( n.getURI() );
+			if ( ! (fm instanceof SPARQLEndpoint) )
+				throw new IllegalArgumentException( "VALUES-extended SERVICE clause with a federation member that is not a SPARQL endpoint (service URI: " + n.toString() + ")" );
+
+			fms.add(fm);
+		}
+
+		final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
+		final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
+		final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, fms);
+		return new LogicalPlanWithNullaryRootImpl(op, null);
 	}
 
 	/**

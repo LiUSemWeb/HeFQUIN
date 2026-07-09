@@ -29,7 +29,9 @@ import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformCopyBase;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
 
 import se.liu.ida.hefquin.jenaext.PatternVarsAll;
+import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementServiceWithValues;
 import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementUtils;
+import se.liu.ida.hefquin.jenaext.sparql.syntax.syntaxtransform.ExtendedElementTransformCleanGroupsOfOne;
 
 /**
  * Queries with a WHERE clause of a form such as the following one need to be
@@ -220,7 +222,7 @@ public class ValuesServiceQueryResolver
 			}
 
 			// Clean up groups of one in the new query pattern (if any) and ...
-			final ElementTransform t = new ElementTransformCleanGroupsOfOne();
+			final ElementTransform t = new ExtendedElementTransformCleanGroupsOfOne();
 			final Element newQueryPattern2 = ElementTransformer.transform(newQueryPattern, t);
 			// ... establish the result as the new query pattern.
 			q.setQueryPattern(newQueryPattern2);
@@ -460,19 +462,61 @@ public class ValuesServiceQueryResolver
 		// First, rewrite the relevant list elements based on the
 		// first solution mapping of the given VALUES clause.
 		final Iterator<Binding> it = valClause.getRows().iterator();
-		final List<Element> rewriteUsingFirstRow = rewrite( it.next(), elmts, startPos, endPos, valClause.getVars() );
+		final Binding firstRow = it.next();
 
 		// If the given VALUES clause contains only one solution mapping,
-		// we are done and can return the result of rewriting based on
-		// that solution mapping.
-		if ( ! it.hasNext() )
-			return rewriteUsingFirstRow;
+		// we may simply rewrite the relevant list elements based on that
+		// solution mapping and are done.
+		if ( ! it.hasNext() ) {
+			return rewrite( firstRow, elmts, startPos, endPos, valClause.getVars() );
+		}
 
+// --- quick hack --------------
+		// assuming there are only SERVICE clauses between the VALUES clauses
+		final List<Element> result = new ArrayList<>( endPos - startPos + 1 );
+		for ( int i = startPos; i <= endPos; i++ ) {
+			final Element eOld = elmts.get(i);
+
+			if ( ! (eOld instanceof ElementService) )
+				throw new MyIllegalQueryException("The POC assumes that there are only SERVICE clauses between the VALUES clauses.");
+
+			final ElementService oldServiceClause = (ElementService) eOld;
+			if ( oldServiceClause.getServiceNode().isVariable() ) {
+				final Var var = Var.alloc( oldServiceClause.getServiceNode() );
+				if ( ! valClause.getVars().contains(var) )
+					throw new MyIllegalQueryException("There is a SERVICE clause with a variable (" + var.toString() + ") that is not assigned by the previous VALUES clause.");
+
+				final Set<Node> valuesForVar = new HashSet<>();
+				final Iterator<Binding> it2 = valClause.getRows().iterator();
+				while ( it2.hasNext() ) {
+					final Node n = it2.next().get(var);
+					if ( ! n.isURI() ) {
+						final String typeNameForMsg = ( n.isLiteral() ) ? "literal" : n.getClass().getName();
+						throw new MyIllegalQueryException("A VALUES clause can only assign IRIs to service variables. This is not the case for variable ?" + var.getName() + ", which is assigned a " + typeNameForMsg + " (" + n.toString()+ ").");
+					}
+
+					valuesForVar.add(n);
+				}
+
+				result.add( new ElementServiceWithValues(var,
+				                                         oldServiceClause.getElement(),
+				                                         oldServiceClause.getSilent(),
+				                                         valuesForVar) );
+			}
+			else {
+				result.add(oldServiceClause);
+			}
+		}
+
+		return result;
+// ------------------
+/*
 		// If the given VALUES clause contains more than one solution mapping,
 		// then we need to combine the rewritings obtained based on each of
 		// these solution mappings into a UNION pattern. The rewriting created
 		// based on the first solution mapping becomes the first part of this
 		// UNION pattern.
+		final List<Element> rewriteUsingFirstRow = rewrite( firstRow, elmts, startPos, endPos, valClause.getVars() );
 		final ElementUnion eu = new ElementUnion();
 		eu.addElement( ElementUtils.createElementGroupIfNeeded(rewriteUsingFirstRow) );
 
@@ -488,6 +532,7 @@ public class ValuesServiceQueryResolver
 		final List<Element> result = new ArrayList<>();
 		result.add(eu);
 		return result;
+*/
 	}
 
 	/**

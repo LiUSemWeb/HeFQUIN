@@ -155,6 +155,28 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		}
 
 		@Override
+		public void visit( final LogicalOpMultiRequest op ) {
+			record( op.getRequest() );
+
+			final int n = op.getFederationMembers().size();
+			props.add( "number of fed.members: " + n );
+
+			if ( n > 0 ) {
+				final Iterator<FederationMember> it = op.getFederationMembers().iterator();
+
+				// print first member at the same line
+				props.add( "fed.members: " + it.next().toString() );
+
+				// print each of the remaining members at a separate line
+				while ( it.hasNext() ) {
+					props.add( "             " + it.next().toString() );
+				}
+			}
+
+			props.add( "may reduce duplicates: " + op.mayReduce() );
+		}
+
+		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
 			props.add( "solmap: " + op.getSolutionMapping().toString() );
 			props.add( "may reduce duplicates: " + op.mayReduce() );

@@ -98,6 +98,13 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 		}
 
 		@Override
+		public void visit( final LogicalOpMultiRequest op ) {
+			collectedTPs.addAll( op.getRequest()
+			                       .getQueryPattern()
+			                       .getAllMentionedTPs() );
+		}
+
+		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
 			// nothing to do here; this operator does not contain any triple pattern
 		}

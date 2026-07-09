@@ -31,6 +31,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -150,6 +151,12 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			createdPlan = createPlanForRequestUnderProject( projectOp,
 			                                                op,
 			                                                inputPlan );
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiRequest op ) {
+			createdPlan = createPlanForMultiRequestUnderProject( projectOp,
+			                                                     op );
 		}
 
 		@Override
@@ -311,6 +318,42 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 		}
 		return inputPlan;
+	}
+
+	/**
+	 * Pushes a project operator into a multi-request operator.
+	 *
+	 * A new request is created whose projection variables correspond to the
+	 * variables required by the project operator. If the request already
+	 * contains request-level projection variables, then the new request uses
+	 * the intersection of the existing projection variables and the variables
+	 * required by the project operator.
+	 *
+	 * The resulting request preserves the duplicate-elimination requirement
+	 * of the original request.
+	 *
+	 * A new request operator containing the rewritten request is then returned
+	 * as a plan with a nullary root.
+	 */
+	protected LogicalPlan createPlanForMultiRequestUnderProject(
+			final LogicalOpProject projectOp,
+			final LogicalOpMultiRequest reqOp ) {
+		final SPARQLRequest oldReq = reqOp.getRequest();
+		final Set<Var> newProj;
+		if ( oldReq.getProjectionVars() != null ) {
+			newProj = new HashSet<>( projectOp.getVariables() );
+			newProj.retainAll( oldReq.getProjectionVars() );
+		}
+		else {
+			newProj = projectOp.getVariables();
+		}
+
+		final boolean mayReduce = reqOp.mayReduce() && projectOp.mayReduce();
+
+		final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getDistinctRequired() || mayReduce );
+
+		final LogicalOpMultiRequest mergedReqOp = new LogicalOpMultiRequest( newReq, reqOp.getFederationMembers() );
+		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 	}
 
 	/**

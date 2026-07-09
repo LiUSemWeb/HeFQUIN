@@ -13,6 +13,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -21,6 +22,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.members.RDFBasedFederationMember;
@@ -77,15 +79,31 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		// the extracted subplans, obtain the request operator and the
 		// QueryPlanningInfo object of each of these subplans (and,
 		// also, handle the special case of fixed-input operators).
-		final List<LogicalOpRequest<?,?>> reqOps  = new ArrayList<>( subPlans.size() );
-		final List<QueryPlanningInfo> infoObjs    = new ArrayList<>( subPlans.size() );
+		List<LogicalOpRequest<?,?>> reqOps  = null;
+		List<LogicalOpMultiRequest> mreqOps = null;
+		List<QueryPlanningInfo> infoObjs1 = null;
+		List<QueryPlanningInfo> infoObjs2 = null;
 		for ( final LogicalPlan subPlan : subPlans )
 		{
 			final LogicalOperator rootOp = subPlan.getRootOperator();
-			if (    rootOp instanceof LogicalOpRequest reqOp
-			     && reqOp.getFederationMember() instanceof RDFBasedFederationMember ) {
+			if ( rootOp instanceof LogicalOpMultiRequest mreqOp ) {
+				if ( mreqOps == null ) {
+					mreqOps   = new ArrayList<>( subPlans.size() );
+					infoObjs2 = new ArrayList<>( subPlans.size() );
+				}
+
+				mreqOps.add( mreqOp );
+				infoObjs2.add( subPlan.getQueryPlanningInfo() );
+			}
+			else if ( rootOp instanceof LogicalOpRequest reqOp
+			       && reqOp.getFederationMember() instanceof RDFBasedFederationMember ) {
+				if ( reqOps == null ) {
+					reqOps    = new ArrayList<>( subPlans.size() );
+					infoObjs1 = new ArrayList<>( subPlans.size() );
+				}
+
 				reqOps.add( reqOp );
-				infoObjs.add( subPlan.getQueryPlanningInfo() );
+				infoObjs1.add( subPlan.getQueryPlanningInfo() );
 			}
 			else if ( rootOp instanceof LogicalOpRequest reqOp ) {
 				addCardinalityForRequestViaWrapper( subPlan.getQueryPlanningInfo(), reqOp );
@@ -98,8 +116,14 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 			}
 		}
 
+		if ( reqOps == null && mreqOps == null ) {
+			// The plan did not contain any requests operator
+			// for which we need to do cardinality requests.
+			return;
+		}
+
 		// Now we are ready to add the cardinality estimates.
-		addCardinalitiesForRequests(reqOps, infoObjs, ctx);
+		addCardinalitiesForRequests(reqOps, infoObjs1, mreqOps, infoObjs2, ctx);
 	}
 
 	/**
@@ -138,16 +162,23 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		}
 
 		// Now we are ready to add the cardinality estimates.
-		addCardinalitiesForRequests(reqOps, infoObjs, ctx);
+		addCardinalitiesForRequests(reqOps, infoObjs, null, null, ctx);
 	}
 
 	protected void addCardinalitiesForRequests( final List<LogicalOpRequest<?,?>> reqOps,
-	                                            final List<QueryPlanningInfo> infoObjs,
+	                                            final List<QueryPlanningInfo> reqInfoObjs,
+	                                            final List<LogicalOpMultiRequest> mreqOps,
+	                                            final List<QueryPlanningInfo> mreqInfoObjs,
 	                                            final QueryProcContext ctx ) {
+		assert reqOps != null || mreqOps != null;
+		assert reqOps  == null || ( reqInfoObjs != null && reqInfoObjs.size() == reqOps.size() );
+		assert mreqOps == null || ( mreqInfoObjs != null && mreqInfoObjs.size() == mreqOps.size() );
+
 		final CardinalityResponse[] resps;
 		try {
 			resps = FederationAccessUtils.performCardinalityRequests( ctx.getFederationAccessMgr(),
-			                                                          reqOps );
+			                                                          reqOps,
+			                                                          mreqOps );
 		}
 		catch ( final FederationAccessException e ) {
 			// If the cardinality requests fail, we need to guess. For the
@@ -162,52 +193,40 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 			                                                               Quality.MIN_OR_MAX_POSSIBLE);
 			final QueryPlanProperty max = QueryPlanProperty.maxCardinality(Integer.MAX_VALUE,
 			                                                               Quality.MIN_OR_MAX_POSSIBLE);
-			for ( final QueryPlanningInfo qpInfo : infoObjs ) {
-				qpInfo.addProperty(est);
-				qpInfo.addProperty(min);
-				qpInfo.addProperty(max);
+			if ( reqOps != null ) {
+				for ( final QueryPlanningInfo qpInfo : reqInfoObjs ) {
+					qpInfo.addProperty(est);
+					qpInfo.addProperty(min);
+					qpInfo.addProperty(max);
+				}
+			}
+
+			if ( mreqOps != null ) {
+				for ( final QueryPlanningInfo qpInfo : mreqInfoObjs ) {
+					qpInfo.addProperty(est);
+					qpInfo.addProperty(min);
+					qpInfo.addProperty(max);
+				}
 			}
 			return;
 		}
 
-		if ( resps.length != reqOps.size() )
-			throw new IllegalStateException("Wrong number of cardinality responses (namely, " + resps.length + ", but " + reqOps.size() + " expected).");
+		if ( reqOps != null ) {
+			if ( resps.length < reqOps.size() )
+				throw new IllegalStateException("Wrong number of cardinality responses (namely, " + resps.length + ", but at least " + reqOps.size() + " expected).");
 
-		for ( int i = 0; i < resps.length; i++ ) {
-			final LogicalOpRequest<?,?> reqOp = reqOps.get(i);
-			final QueryPlanningInfo infoObj = infoObjs.get(i);
+			for ( int i = 0; i < reqOps.size(); i++ ) {
+				final LogicalOpRequest<?,?> reqOp = reqOps.get(i);
+				final QueryPlanningInfo infoObj = reqInfoObjs.get(i);
 
-			final int cardValue;
-			final int minCardValue;
-			final int maxCardValue;
-			final QueryPlanProperty.Quality cardQuality;
-			final QueryPlanProperty.Quality minCardQuality;
-			final QueryPlanProperty.Quality maxCardQuality;
+				final int cardValue;
+				final int minCardValue;
+				final int maxCardValue;
+				final QueryPlanProperty.Quality cardQuality;
+				final QueryPlanProperty.Quality minCardQuality;
+				final QueryPlanProperty.Quality maxCardQuality;
 
-			if ( resps[i].isError() ) {
-				cardValue = Integer.MAX_VALUE;
-				cardQuality = Quality.PURE_GUESS;
-				minCardValue = 0;
-				minCardQuality = Quality.MIN_OR_MAX_POSSIBLE;
-				maxCardValue = Integer.MAX_VALUE;
-				maxCardQuality = Quality.MIN_OR_MAX_POSSIBLE;
-			}
-			else {
-				final int cardValueOfResponse;
-				try {
-					cardValueOfResponse = resps[i].getCardinality();
-				}
-				catch ( final Exception e ) {
-					// We should not get an exception here because we are
-					// in the branch where resps[i].isError() is false.
-					throw new IllegalStateException();
-				}
-
-				// Check that the cardinality value retrieved via the
-				// request is valid, where we consider any non-negative
-				// integer a valid value.
-				if ( cardValueOfResponse < 0 ) {
-					// This is the case in which the value is invalid.
+				if ( resps[i].isError() ) {
 					cardValue = Integer.MAX_VALUE;
 					cardQuality = Quality.PURE_GUESS;
 					minCardValue = 0;
@@ -216,27 +235,133 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 					maxCardQuality = Quality.MIN_OR_MAX_POSSIBLE;
 				}
 				else {
-					// This is the case in which the value is valid.
-					cardValue = cardValueOfResponse;
-					minCardValue = cardValueOfResponse;
-					maxCardValue = cardValueOfResponse;
+					final int cardValueOfResponse;
+					try {
+						cardValueOfResponse = resps[i].getCardinality();
+					}
+					catch ( final Exception e ) {
+						// We should not get an exception here because we are
+						// in the branch where resps[i].isError() is false.
+						throw new IllegalStateException();
+					}
 
-					if ( reqOp.getFederationMember() instanceof SPARQLEndpoint )
-						cardQuality = Quality.ACCURATE;
-					else
-						cardQuality = Quality.DIRECT_ESTIMATE;
+					// Check that the cardinality value retrieved via the
+					// request is valid, where we consider any non-negative
+					// integer a valid value.
+					if ( cardValueOfResponse < 0 ) {
+						// This is the case in which the value is invalid.
+						cardValue = Integer.MAX_VALUE;
+						cardQuality = Quality.PURE_GUESS;
+						minCardValue = 0;
+						minCardQuality = Quality.MIN_OR_MAX_POSSIBLE;
+						maxCardValue = Integer.MAX_VALUE;
+						maxCardQuality = Quality.MIN_OR_MAX_POSSIBLE;
+					}
+					else {
+						// This is the case in which the value is valid.
+						cardValue = cardValueOfResponse;
+						minCardValue = cardValueOfResponse;
+						maxCardValue = cardValueOfResponse;
 
-					minCardQuality = cardQuality;
-					maxCardQuality = cardQuality;
+						if ( reqOp.getFederationMember() instanceof SPARQLEndpoint )
+							cardQuality = Quality.ACCURATE;
+						else
+							cardQuality = Quality.DIRECT_ESTIMATE;
+
+						minCardQuality = cardQuality;
+						maxCardQuality = cardQuality;
+					}
+				}
+
+				infoObj.addProperty( QueryPlanProperty.cardinality(cardValue,
+				                                                   cardQuality) );
+
+				infoObj.addProperty( QueryPlanProperty.minCardinality(minCardValue,
+				                                                      minCardQuality) );
+
+				infoObj.addProperty( QueryPlanProperty.maxCardinality(maxCardValue,
+				                                                      maxCardQuality) );
+			}
+		}
+
+		if ( mreqOps == null || mreqOps.isEmpty() )
+			return;
+
+		int respIdx = (reqOps == null) ? -1 : reqOps.size() - 1;
+		for ( int i = 0; i < mreqOps.size(); i++ ) {
+			final LogicalOpMultiRequest mreqOp = mreqOps.get(i);
+
+			int cardValue = 0; // to be updated in the loop below
+			boolean errorFound = false;
+			boolean nonSparqlEndpointFound = false;
+
+			for ( final FederationMember fm : mreqOp.getFederationMembers() ) {
+				if ( ! (fm instanceof SPARQLEndpoint) ) {
+					nonSparqlEndpointFound = true;
+				}
+
+				respIdx++;
+				if ( resps.length < respIdx - 1 )
+					throw new IllegalStateException("Wrong number of cardinality responses (namely, " + resps.length + ", but at least " + respIdx + " expected).");
+
+				if ( resps[respIdx].isError() ) {
+					errorFound = true;
+				}
+				else {
+					final int cardValueOfResponse;
+					try {
+						cardValueOfResponse = resps[respIdx].getCardinality();
+					}
+					catch ( final Exception e ) {
+						// We should not get an exception here because we are
+						// in the branch where resps[i].isError() is false.
+						throw new IllegalStateException();
+					}
+
+					// Check that the cardinality value retrieved via the
+					// request is valid, where we consider any non-negative
+					// integer a valid value.
+					if ( cardValueOfResponse < 0 ) {
+						// This is the case in which the value is invalid.
+						errorFound = true;
+					}
+					else {
+						// This is the case in which the value is valid.
+						cardValue += cardValueOfResponse;
+					}
 				}
 			}
 
+			final int minCardValue;
+			final int maxCardValue;
+			final QueryPlanProperty.Quality cardQuality;
+			final QueryPlanProperty.Quality minCardQuality;
+			final QueryPlanProperty.Quality maxCardQuality;
+			if ( errorFound ) {
+				cardValue    = Integer.MAX_VALUE;
+				minCardValue = cardValue;
+				maxCardValue = Integer.MAX_VALUE;
+				cardQuality    = Quality.PURE_GUESS;
+				minCardQuality = Quality.MIN_OR_MAX_POSSIBLE;
+				maxCardQuality = Quality.MIN_OR_MAX_POSSIBLE;
+			}
+			else {
+				if ( nonSparqlEndpointFound )
+					cardQuality = Quality.DIRECT_ESTIMATE;
+				else
+					cardQuality = Quality.ACCURATE;
+
+				minCardValue = cardValue;
+				maxCardValue = cardValue;
+				minCardQuality = cardQuality;
+				maxCardQuality = cardQuality;
+			}
+
+			final QueryPlanningInfo infoObj = mreqInfoObjs.get(i);
 			infoObj.addProperty( QueryPlanProperty.cardinality(cardValue,
 			                                                   cardQuality) );
-
 			infoObj.addProperty( QueryPlanProperty.minCardinality(minCardValue,
 			                                                      minCardQuality) );
-
 			infoObj.addProperty( QueryPlanProperty.maxCardinality(maxCardValue,
 			                                                      maxCardQuality) );
 		}

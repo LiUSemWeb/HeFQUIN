@@ -123,6 +123,9 @@ public class BaseForTextBasedPlanPrinters
 		public void visit( final LogicalOpRequest<?, ?> op )    { name = "req"; }
 
 		@Override
+		public void visit( final LogicalOpMultiRequest op )     { name = "mreq"; }
+
+		@Override
 		public void visit( final LogicalOpFixedSolMap op )      { name = "sm"; }
 
 		@Override
