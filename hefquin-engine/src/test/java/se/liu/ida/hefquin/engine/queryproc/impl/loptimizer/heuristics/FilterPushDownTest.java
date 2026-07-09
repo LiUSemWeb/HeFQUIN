@@ -524,9 +524,9 @@ public class FilterPushDownTest extends EngineTestBase
 
 	@Test
 	public void pushFilterUnderL2G() {
-		// a filter on top of a minus of two triple pattern requests,
-		// where the filter is expected to push into the first request
-		// but not the second
+		// a filter above a LocalToGlobal operator is pushed below the operator,
+		// the filter expression is rewritten from the global vocabulary to the local
+		// vocabulary before being pushed into the request
 
 		// set up
 		final Var v1 = Var.alloc("x");
@@ -575,10 +575,54 @@ public class FilterPushDownTest extends EngineTestBase
 	}
 
 	@Test
+	public void pushNonRewritableFilterUnderL2G() {
+		// a non-rewritable filter above a GlobalToLocal operator is not
+		// pushed below the operator
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final FederationMember fmA = new SPARQLEndpointForTest("http://exA.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
+
+
+		final VocabularyMappingWrappingImpl vm = createVocabularyMapping();
+		final LogicalOpLocalToGlobal l2gOp = new LogicalOpLocalToGlobal(vm, false);
+
+		final LogicalPlan l2gSubPlan = new LogicalPlanWithUnaryRootImpl(l2gOp, null, new LogicalPlanWithNullaryRootImpl(reqOp, null));
+
+		final Expr e = new E_IsIRI( new ExprVar(v1) );
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, l2gSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpFilter );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpLocalToGlobal );
+
+		final LogicalPlan subSubResult = subResult.getSubPlan(0);
+		assertTrue( subSubResult.getRootOperator() instanceof LogicalOpRequest );
+
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subSubResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fmA );
+
+		// check that the request is unchanged
+		final SPARQLRequest resultReq = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq.getQueryPattern() );
+		assertTrue( resultElmt1 instanceof ElementTriplesBlock );
+		assertEquals( tp1.asJenaTriple(), ((ElementTriplesBlock) resultElmt1).getPattern().get(0) );
+	}
+
+	@Test
 	public void pushFilterUnderG2L() {
-		// a filter on top of a minus of two triple pattern requests,
-		// where the filter is expected to push into the first request
-		// but not the second
+		// a filter above a GlobalToLocal operator is pushed below the operator,
+		// the filter expression is rewritten from the global vocabulary to the local
+		// vocabulary before being pushed into the request.
 
 		// set up
 		final Var v1 = Var.alloc("x");
