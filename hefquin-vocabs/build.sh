@@ -101,6 +101,29 @@ function procHydraVocab
          ../hefquin-vocabs/src/main/java/se/liu/ida/hefquin/vocabulary/
 }
 
+function procWoTSecVocab
+{
+    #syntaxCheck https://www.w3.org/2019/wot/security
+    syntaxCheck wotsec.ttl
+    #proc https://www.w3.org/2019/wot/security \
+    proc wotsec.ttl \
+         WoTSecVocab \
+         "https://www.w3.org/2019/wot/security#" \
+         "se.liu.ida.hefquin.vocabulary" \
+         ../hefquin-vocabs/src/main/java/se/liu/ida/hefquin/vocabulary/
+}
+
+function procWoTTDVocab
+{
+    syntaxCheck https://www.w3.org/2019/wot/td
+    proc https://www.w3.org/2019/wot/td \
+         WoTTDVocab \
+         "https://www.w3.org/2019/wot/td#" \
+         "se.liu.ida.hefquin.vocabulary" \
+         ../hefquin-vocabs/src/main/java/se/liu/ida/hefquin/vocabulary/
+}
+
+
 ### Below, uncomment the line for which you want to run the script.
 
 #procLPGtoRDF
@@ -108,3 +131,5 @@ function procHydraVocab
 #procFDVocab
 #procRMLCore
 #procHydraVocab
+#procWoTSecVocab
+#procWoTTDVocab
