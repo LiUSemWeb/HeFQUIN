@@ -211,4 +211,16 @@ public class VocabularyMappingUtils
 		}
 		return rewrittenExpressions;
 	}
+
+	public static ExprList translateExpressionsFromGlobal( final ExprList exprs,
+	                                                       final VocabularyMapping vm ) {
+		final ExprList rewrittenExpressions = new ExprList();
+
+		for ( final Expr e : exprs ) {
+			final Expr rewritten = vm.translateExpressionFromGlobal(e);
+
+			rewrittenExpressions.add(rewritten);
+		}
+		return rewrittenExpressions;
+	}
 }

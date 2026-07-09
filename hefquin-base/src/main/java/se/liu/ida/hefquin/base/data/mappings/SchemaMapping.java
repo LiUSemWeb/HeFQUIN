@@ -38,6 +38,20 @@ public interface SchemaMapping
 	Expr applyToExpression( Expr n );
 
 	/**
+	 * Applies this schema mapping to the given filter expression, which is
+	 * assumed to use the local schema for the vocabulary terms mentioned
+	 * in it, and returns the translated expression.
+	 * If this schema mapping is not relevant for the given expression (i.e.,
+	 * applying this schema mapping does not change the expression), then the
+	 * result of this function is simply the given expression itself.
+	 * <p>
+	 * It may not be possible to translate every expression; if the
+	 * given expression cannot be translated, then this method
+	 * throws an {@link UnsupportedOperationException}.
+	 */
+	Expr applyInverseToExpression( Expr n );
+
+	/**
 	 * Applies this schema mapping to the given solution mapping, which
 	 * is assumed to use the global schema for the vocabulary terms that
 	 * it binds to its query variables. If this schema mapping is not

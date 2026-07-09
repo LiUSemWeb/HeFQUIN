@@ -377,7 +377,7 @@ public class VocabularyMappingUtilsTest
 		final ExprList exprList = new ExprList(expr);
 
 		// Test
-		final ExprList result = VocabularyMappingUtils.translateExpressions(exprList, vm);
+		final ExprList result = VocabularyMappingUtils.translateExpressionsFromGlobal(exprList, vm);
 
 		// Check
 		assertTrue( result.get(0) instanceof E_LogicalOr );
@@ -418,7 +418,7 @@ public class VocabularyMappingUtilsTest
 		final ExprList exprList = new ExprList( new E_LogicalOr(expr, expr1) );
 
 		// Test
-		final ExprList result = VocabularyMappingUtils.translateExpressions(exprList, vm);
+		final ExprList result = VocabularyMappingUtils.translateExpressionsFromGlobal(exprList, vm);
 
 		// Check
 		assertTrue( result.get(0) instanceof E_LogicalOr );
@@ -470,7 +470,7 @@ public class VocabularyMappingUtilsTest
 		final ExprList exprList = new ExprList(notAllowedExpr);
 
 		// Test & Check
-		assertThrows( UnsupportedOperationException.class, () -> VocabularyMappingUtils.translateExpressions(exprList, vm) );
+		assertThrows( UnsupportedOperationException.class, () -> VocabularyMappingUtils.translateExpressionsFromGlobal(exprList, vm) );
 	}
 
 	@Test
@@ -494,7 +494,7 @@ public class VocabularyMappingUtilsTest
 		final ExprList exprList = new ExprList( new E_LogicalOr(expr, notAllowedExpr) );
 
 		// Test & check
-		assertThrows( UnsupportedOperationException.class, () -> VocabularyMappingUtils.translateExpressions(exprList, vm) );
+		assertThrows( UnsupportedOperationException.class, () -> VocabularyMappingUtils.translateExpressionsFromGlobal(exprList, vm) );
 	}
 
 	@Test
@@ -512,7 +512,7 @@ public class VocabularyMappingUtilsTest
 		final ExprList exprList = new ExprList(expr);
 
 		// Test
-		final ExprList result = VocabularyMappingUtils.translateExpressions(exprList, vm);
+		final ExprList result = VocabularyMappingUtils.translateExpressionsFromGlobal(exprList, vm);
 
 		// Check
 		final Set<String> actual = extractEqualsPairs(result.get(0));
@@ -538,6 +538,37 @@ public class VocabularyMappingUtilsTest
 
 		// Test & check
 		assertThrows( UnsupportedOperationException.class, () -> vm.translateExpression(expr) );
+	}
+
+	@Test
+	public void translate_filter_expression_l2g() {
+		// A filter expression containing a local term is rewritten to use the
+		// corresponding global term.
+
+		// Set up
+		final Node x = NodeFactory.createVariable("x");
+
+		final Expr expr =
+			new E_Equals(
+				new ExprVar(x),
+				NodeValue.makeNode(e_l1)
+			);
+
+		final ExprList exprList = new ExprList(expr);
+
+		// Test
+		final ExprList result = VocabularyMappingUtils.translateExpressions(exprList, vm);
+
+		// Check
+		assertTrue( result.get(0) instanceof E_Equals );
+
+		final E_Equals equals = (E_Equals) result.get(0);
+
+		final Node node =
+			( (NodeValue) equals.getArg2() ).asNode();
+
+		assertEquals( Set.of(e_g),
+					  Set.of(node) );
 	}
 
 	// -------------- helpers --------------

@@ -24,7 +24,7 @@ public interface VocabularyMapping
 
 	/**
 	 * Applies this vocabulary mapping to the given filter expression, which is
-	 * assumed to use the global vocabulary, and returns the translated expression.
+	 * assumed to use the local vocabulary, and returns the translated expression.
 	 * If this mapping is not relevant for the given expression (i.e., applying
 	 * the mapping does not change the expression), then the result of this
 	 * function is simply the given expression itself.
@@ -34,6 +34,19 @@ public interface VocabularyMapping
 	 * throws an {@link UnsupportedOperationException}.
 	 */
 	Expr translateExpression( Expr e );
+
+	/**
+	 * Applies this vocabulary mapping to the given filter expression, which is
+	 * assumed to use the global vocabulary, and returns the translated expression.
+	 * If this mapping is not relevant for the given expression (i.e., applying
+	 * the mapping does not change the expression), then the result of this
+	 * function is simply the given expression itself.
+	 * <p>
+	 * It may not be possible to translate every expression; if the
+	 * given expression cannot be translated, then this method
+	 * throws an {@link UnsupportedOperationException}.
+	 */
+	Expr translateExpressionFromGlobal( Expr e );
 
 	/**
 	 * Applies this vocabulary mapping to the given solution mapping expressed

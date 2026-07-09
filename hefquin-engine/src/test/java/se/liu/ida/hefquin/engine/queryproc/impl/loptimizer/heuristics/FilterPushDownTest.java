@@ -5,10 +5,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.E_Bound;
@@ -16,6 +23,7 @@ import org.apache.jena.sparql.expr.E_Equals;
 import org.apache.jena.sparql.expr.E_IsBlank;
 import org.apache.jena.sparql.expr.E_IsIRI;
 import org.apache.jena.sparql.expr.E_LogicalNot;
+import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVar;
@@ -28,6 +36,14 @@ import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.mappings.EntityMapping;
+import se.liu.ida.hefquin.base.data.mappings.SchemaMapping;
+import se.liu.ida.hefquin.base.data.mappings.TermMapping;
+import se.liu.ida.hefquin.base.data.mappings.impl.EntityMappingImpl;
+import se.liu.ida.hefquin.base.data.mappings.impl.EntityMappingReader;
+import se.liu.ida.hefquin.base.data.mappings.impl.SchemaMappingImpl;
+import se.liu.ida.hefquin.base.data.mappings.impl.SchemaMappingReader;
+import se.liu.ida.hefquin.base.data.mappings.impl.VocabularyMappingWrappingImpl;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
@@ -42,7 +58,9 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -505,6 +523,113 @@ public class FilterPushDownTest extends EngineTestBase
 	}
 
 	@Test
+	public void pushFilterUnderL2G() {
+		// a filter on top of a minus of two triple pattern requests,
+		// where the filter is expected to push into the first request
+		// but not the second
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final FederationMember fmA = new SPARQLEndpointForTest("http://exA.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
+
+		final Node e_l1 = NodeFactory.createURI("http://example.org/local/e1");
+		final Node x = NodeFactory.createVariable("x");
+
+		final VocabularyMappingWrappingImpl vm = createVocabularyMapping();
+		final LogicalOpLocalToGlobal l2gOp = new LogicalOpLocalToGlobal(vm, false);
+
+		final LogicalPlan l2gSubPlan = new LogicalPlanWithUnaryRootImpl(l2gOp, null, new LogicalPlanWithNullaryRootImpl(reqOp, null));
+
+		final Expr e =
+			new E_Equals(
+				new ExprVar(x),
+				NodeValue.makeNode(e_l1)
+			);
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, l2gSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpLocalToGlobal );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fmA );
+
+		final SPARQLRequest resultReq = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq.getQueryPattern() );
+		assertTrue(                                        resultElmt1 instanceof ElementGroup );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(0) instanceof ElementTriplesBlock );
+		assertTrue( ((ElementTriplesBlock) ((ElementGroup) resultElmt1).get(0)).getPattern().get(0).equals(tp1.asJenaTriple()) );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
+
+		final Set<String> actual = extractEqualsPairs( ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr() );
+		assertEquals( Set.of(x + "=<http://example.org/global/e>"), actual );
+	}
+
+	@Test
+	public void pushFilterUnderG2L() {
+		// a filter on top of a minus of two triple pattern requests,
+		// where the filter is expected to push into the first request
+		// but not the second
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final FederationMember fmA = new SPARQLEndpointForTest("http://exA.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
+
+		final Node e_g  = NodeFactory.createURI("http://example.org/global/e");
+		final Node x = NodeFactory.createVariable("x");
+
+		final VocabularyMappingWrappingImpl vm = createVocabularyMapping();
+		final LogicalOpGlobalToLocal g2lOp = new LogicalOpGlobalToLocal(vm, false);
+
+		final LogicalPlan g2lSubPlan = new LogicalPlanWithUnaryRootImpl(g2lOp, null, new LogicalPlanWithNullaryRootImpl(reqOp, null));
+
+		final Expr e =
+			new E_Equals(
+				new ExprVar(x),
+				NodeValue.makeNode(e_g)
+			);
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, g2lSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpGlobalToLocal );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fmA );
+
+		final SPARQLRequest resultReq = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq.getQueryPattern() );
+		assertTrue(                                        resultElmt1 instanceof ElementGroup );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(0) instanceof ElementTriplesBlock );
+		assertTrue( ((ElementTriplesBlock) ((ElementGroup) resultElmt1).get(0)).getPattern().get(0).equals(tp1.asJenaTriple()) );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
+
+		final Set<String> actual = extractEqualsPairs( ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr() );
+		assertEquals( Set.of(
+			x + "=<http://example.org/local/e1>",
+			x + "=<http://example.org/local/e2>"
+		), actual );
+	}
+
+	@Test
 	public void pushFilterUnderMinus() {
 		// a filter on top of a minus of two triple pattern requests,
 		// where the filter is expected to push into the first request
@@ -820,5 +945,62 @@ public class FilterPushDownTest extends EngineTestBase
 		assertTrue( ((ElementTriplesBlock) ((ElementGroup) resultElmt1).get(0)).getPattern().get(0).equals(tp1.asJenaTriple()) );
 		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
 		assertTrue(       ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr().equals(e1) );
+	}
+
+	// -------------- helpers --------------
+
+	protected VocabularyMappingWrappingImpl createVocabularyMapping() {
+		final String entityMapping = """
+			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+			@prefix l:    <http://example.org/local/> .
+			@prefix g:    <http://example.org/global/> .
+			l:e1 owl:sameAs g:e .
+			l:e2 owl:sameAs g:e .
+			""";
+
+		final String schemaMapping = """
+			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+			@prefix l:    <http://example.org/local/> .
+			@prefix g:    <http://example.org/global/> .
+			l:s1 owl:equivalentClass g:s .
+			l:s2 owl:equivalentClass g:s .
+			l:p1 owl:equivalentProperty g:p .
+			l:p2 owl:equivalentProperty g:p .
+			l:o1 owl:equivalentClass g:o .
+			l:o2 owl:equivalentClass g:o .
+			""";
+
+		final SchemaMapping sm = createSchemaMapping(schemaMapping);
+		final EntityMapping em = createEntityMapping(entityMapping);
+		return new VocabularyMappingWrappingImpl(em, sm);
+	}
+
+	protected SchemaMapping createSchemaMapping( final String mappingAsTurtle ) {
+		final Graph mapping = GraphFactory.createDefaultGraph();
+		RDFDataMgr.read( mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE );
+
+		final Map<Node, Set<TermMapping>> g2lMap = SchemaMappingReader.read(mapping);
+		return new SchemaMappingImpl(g2lMap);
+	}
+
+	protected EntityMapping createEntityMapping( final String mappingAsTurtle ) {
+		final Graph mapping = GraphFactory.createDefaultGraph();
+		RDFDataMgr.read( mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE );
+		final Map<Node, Set<Node>> g2lMap = EntityMappingReader.read(mapping);
+		return new EntityMappingImpl(g2lMap);
+	}
+
+	protected Set<String> extractEqualsPairs( final Expr e ) {
+		final Set<String> result = new HashSet<>();
+
+		if ( e instanceof E_Equals eq ) {
+			result.add( eq.getArg1().toString() + "=" + eq.getArg2().toString() );
+		}
+		else if ( e instanceof E_LogicalOr or ) {
+			result.addAll( extractEqualsPairs(or.getArg1()) );
+			result.addAll( extractEqualsPairs(or.getArg2()) );
+		}
+
+		return result;
 	}
 }
