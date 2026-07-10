@@ -1,11 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import org.apache.jena.graph.Node;
@@ -39,10 +38,12 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 	protected final boolean serviceVarIsInPattern;
 
 	// statistics
-	private AtomicLong numberOfOutputMappingsProduced = new AtomicLong(0L);
 	protected int numberOfRequestsIssued = 0;
-	protected List<Long> requestDurationsInMS = new Vector<>(); // Vector is thread safe
-	protected List<Integer> numOfSolMapsRetrievedPerReq = new Vector<>();
+	// (access to any of the following three statistics must be
+	//  synchronized on the first of them, requestDurationsInMS)
+	private List<Long> requestDurationsInMS = new ArrayList<>();
+	private List<Integer> numOfSolMapsRetrievedPerReq = new ArrayList<>();
+	private long numberOfOutputMappingsProduced = 0L;
 
 	public ExecOpMultiRequest( final SPARQLRequest req,
 	                           final Var serviceVar,
@@ -70,13 +71,18 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 	protected void _execute( final IntermediateResultElementSink sink,
 	                         final QueryProcContextExt ctx )
 			throws ExecOpExecutionException {
-		log.debug( "Starting to execute multi-request for {}", serviceVar.toString() );
+		log.debug( "Starting to execute the multi-request operator for {}", serviceVar.toString() );
 
+		// Create an array to collect the CompletableFuture:s for all
+		// the requests that we are going to issue (which will be one
+		// per federation member covered by this operator).
 		final CompletableFuture<?>[] futures = new CompletableFuture[ fms.size() ];
 
 		int i = 0;
 		for ( final FederationMember fm : fms ) {
-			// Issue the request via the federation access manager.
+			// For every federation member covered by this operator:
+			// i) issue the request of this operator via the federation
+			// access manager, ...
 			final CompletableFuture<SolMapsResponse> f;
 			try {
 				f = ctx.getFederationAccessMgr().issueRequest(req, fm);
@@ -87,23 +93,25 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 
 			numberOfRequestsIssued++;
 
-			// Create a response processor that shall handle the response
-			// obtained via the request.
+			// ... ii) create a response processor that shall handle the
+			// response obtained via the request issued in the previous
+			// step, and ...
 			final Consumer<SolMapsResponse> respProc;
 			if ( serviceVarIsInPattern )
 				respProc = new MyResponseProcessor2( fm.getServiceURI(), sink );
 			else
 				respProc = new MyResponseProcessor1( fm.getServiceURI(), sink );
 
-			// Attach the response processor to the future for the request and
-			// remember the future so that we can wait for its completion later.
+			// ... iii) attach the response processor to the future for
+			// the request and remember the future so that we can wait
+			// for its completion later.
 			futures[i++] = f.thenAccept(respProc);
 		}
 
-		// Now we wait for all the futures to be completed. Note that this
-		// needs to be done outside of the previous if-block because, even
-		// if we had to switch into full-retrieval mode, we may have futures
-		// from before we made that switch.
+		log.debug( "All requests for the multi-request operator for {} are issued; waiting for them to complete now.", serviceVar.toString() );
+
+		// Now we simply wait for all the futures to be completed. Once
+		// they are, the execution of this operator is finished.
 		final CompletableFuture<?> combinedFuture = CompletableFuture.allOf(futures);
 		try {
 			combinedFuture.get();
@@ -114,25 +122,74 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 		catch ( final ExecutionException e ) {
 			throw new ExecOpExecutionException("The execution of the futures that perform the requests and process the responses caused an exception.", e, this);
 		}
+
+		log.debug( "Execution of the multi-request operator for {} is finished.", serviceVar.toString() );
 	}
 
 	@Override
 	public void resetStats() {
 		super.resetStats();
-//		timeAfterResponse = 0L;
-//		solMapsRetrieved = 0L;
-//		numberOfOutputMappingsProduced = 0L;
+
+		numberOfRequestsIssued = 0;
+
+		synchronized (requestDurationsInMS) {
+			requestDurationsInMS.clear();
+			numOfSolMapsRetrievedPerReq.clear();
+			numberOfOutputMappingsProduced = 0L;
+		}
 	}
 
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
-//		s.put( "requestExecTime",                Long.valueOf( timeAtExecEnd - timeAfterResponse ) );
-//		s.put( "responseProcTime",               Long.valueOf( timeAfterResponse - timeAtExecStart ) );
-//		s.put( "solMapsRetrieved",               Long.valueOf( solMapsRetrieved ) );
-//		s.put( "numberOfOutputMappingsProduced", Long.valueOf( numberOfOutputMappingsProduced ) );
+
+		final double avgRequestDurationInMS;
+		long minRequestDurationInMS = Long.MAX_VALUE;
+		long maxRequestDurationInMS = Long.MIN_VALUE;
+		final double avgNumOfSolMapsRetrievedPerReq;
+		int minNumOfSolMapsRetrievedPerReq = Integer.MAX_VALUE;
+		int maxNumOfSolMapsRetrievedPerReq = Integer.MIN_VALUE;
+		final long totalNumOfSolMapsRetrieved;
+		final long outputSize;
+		synchronized (requestDurationsInMS) {
+			long sumRequestDuration = 0L;
+			for ( final long x : requestDurationsInMS ) {
+				sumRequestDuration += x;
+				if ( x < minRequestDurationInMS ) minRequestDurationInMS = x;
+				if ( x > maxRequestDurationInMS ) maxRequestDurationInMS = x;
+			}
+
+			long sumSolMapsRetrieved = 0L;
+			for ( final int x : numOfSolMapsRetrievedPerReq ) {
+				sumSolMapsRetrieved += x;
+				if ( x < minNumOfSolMapsRetrievedPerReq ) minNumOfSolMapsRetrievedPerReq = x;
+				if ( x > maxNumOfSolMapsRetrievedPerReq ) maxNumOfSolMapsRetrievedPerReq = x;
+			}
+
+			avgRequestDurationInMS = sumRequestDuration / requestDurationsInMS.size();
+			avgNumOfSolMapsRetrievedPerReq = sumSolMapsRetrieved / numOfSolMapsRetrievedPerReq.size();
+			totalNumOfSolMapsRetrieved = sumSolMapsRetrieved;
+			outputSize = numberOfOutputMappingsProduced;
+		}
+
+		s.put( "numberOfRequestsIssued",          Integer.valueOf(numberOfRequestsIssued) );
+		s.put( "avgRequestDurationInMS",          Double.valueOf(avgRequestDurationInMS) );
+		s.put( "minRequestDurationInMS",          Long.valueOf(minRequestDurationInMS) );
+		s.put( "maxRequestDurationInMS",          Long.valueOf(maxRequestDurationInMS) );
+		s.put( "avgNumOfSolMapsRetrievedPerReq",  Double.valueOf(avgNumOfSolMapsRetrievedPerReq) );
+		s.put( "minNumOfSolMapsRetrievedPerReq",  Integer.valueOf(minNumOfSolMapsRetrievedPerReq) );
+		s.put( "maxNumOfSolMapsRetrievedPerReq",  Integer.valueOf(maxNumOfSolMapsRetrievedPerReq) );
+		s.put( "totalNumOfSolMapsRetrieved",      Long.valueOf(totalNumOfSolMapsRetrieved) );
+		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(outputSize) );
+
 		return s;
 	}
 
+	/**
+	 * This response processor can be used for cases in which the service
+	 * variable of this operator is not in the request of this operator
+	 * and, thus, does not show up in the solution mappings obtained via
+	 * this request.
+	 */
 	protected class MyResponseProcessor1 implements Consumer<SolMapsResponse> {
 		protected final Node serviceURI;
 		protected final IntermediateResultElementSink sink;
@@ -172,7 +229,11 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 				}
 			}
 
-			numberOfOutputMappingsProduced.addAndGet(cntOut);
+			synchronized (requestDurationsInMS) {
+				requestDurationsInMS.add( response.getRequestDuration().toMillis() );
+				numOfSolMapsRetrievedPerReq.add(cntIn);
+				numberOfOutputMappingsProduced += cntOut;
+			}
 
 			log.info("Retrieved {} solution mappings from the endpoint with service URI {}, and produced {} output solution mappings from them", cntIn, serviceURI, cntOut);
 		}
@@ -184,6 +245,13 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 		}
 	}
 
+	/**
+	 * This response processor can be used for cases in which the service
+	 * variable of this operator is also in the request of this operator,
+	 * which means that the solution mappings obtained via this request
+	 * may already have a binding for this variable and, thus, need to
+	 * be checked for compatibility.
+	 */
 	protected class MyResponseProcessor2 extends MyResponseProcessor1 {
 		public MyResponseProcessor2( final String serviceURI,
 		                             final IntermediateResultElementSink sink ) {

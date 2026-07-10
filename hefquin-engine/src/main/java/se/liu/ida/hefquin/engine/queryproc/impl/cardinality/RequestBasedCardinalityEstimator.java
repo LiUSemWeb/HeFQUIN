@@ -19,6 +19,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFixedSolMap;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
@@ -145,13 +146,30 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		// extracted subplans, obtain the request operator and the
 		// QueryPlanningInfo object of each of these subplans (and,
 		// also, handle the special case of fixed-input operators).
-		final List<LogicalOpRequest<?,?>> reqOps  = new ArrayList<>( subPlans.size() );
-		final List<QueryPlanningInfo> infoObjs    = new ArrayList<>( subPlans.size() );
-		for ( final PhysicalPlan subPlan : subPlans ) {
+		List<LogicalOpRequest<?,?>> reqOps  = null;
+		List<LogicalOpMultiRequest> mreqOps = null;
+		List<QueryPlanningInfo> infoObjs1 = null;
+		List<QueryPlanningInfo> infoObjs2 = null;
+		for ( final PhysicalPlan subPlan : subPlans )
+		{
 			final PhysicalOperator rootOp = subPlan.getRootOperator();
+			if ( rootOp instanceof PhysicalOpMultiRequest mreqOp ) {
+				if ( mreqOps == null ) {
+					mreqOps   = new ArrayList<>( subPlans.size() );
+					infoObjs2 = new ArrayList<>( subPlans.size() );
+				}
+
+				mreqOps.add( mreqOp.getLogicalOperator() );
+				infoObjs2.add( subPlan.getQueryPlanningInfo() );
+			}
 			if ( rootOp instanceof PhysicalOpRequest reqOp ) {
+				if ( reqOps == null ) {
+					reqOps    = new ArrayList<>( subPlans.size() );
+					infoObjs1 = new ArrayList<>( subPlans.size() );
+				}
+
 				reqOps.add( reqOp.getLogicalOperator() );
-				infoObjs.add( subPlan.getQueryPlanningInfo() );
+				infoObjs1.add( subPlan.getQueryPlanningInfo() );
 			}
 			else if ( rootOp instanceof PhysicalOpFixedSolMap ) {
 				addCardinalityForFixedInputOps( subPlan.getQueryPlanningInfo() );
@@ -162,7 +180,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		}
 
 		// Now we are ready to add the cardinality estimates.
-		addCardinalitiesForRequests(reqOps, infoObjs, null, null, ctx);
+		addCardinalitiesForRequests(reqOps, infoObjs1, mreqOps, infoObjs2, ctx);
 	}
 
 	protected void addCardinalitiesForRequests( final List<LogicalOpRequest<?,?>> reqOps,

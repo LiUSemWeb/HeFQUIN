@@ -464,8 +464,8 @@ public class PhysicalPlanFactory
 	/**
 	 * This function takes two physical plans as input, with the assumptions
 	 * that the second of these plans i) has a union as its root operator and
-	 * ii) every sub plan under this union is either a request or a filter
-	 * with a request.
+	 * ii) every sub plan under this union is either a request, a filter with
+	 * a request or a bind operator over a request.
 	 *
 	 * Given such input plans, the function turns the requests under the union
 	 * into gpAdd operators with the first given plan as a common subplan.
@@ -498,8 +498,9 @@ public class PhysicalPlanFactory
 
 	/**
 	 * If the second of the two given plans is either a request, a filter
-	 * with request, or a union over requests, then this function turns the
-	 * request(s) into gpAdd operators with the first given plan as subplan.
+	 * with request, a bind operator over a request, or a union over requests,
+	 * then this function turns the request(s) into gpAdd operators with the
+	 * first given plan as subplan.
 	 *
 	 * Otherwise, the function returns a plan with a binary join over the two
 	 * given plans (using the default physical operator).
@@ -519,6 +520,36 @@ public class PhysicalPlanFactory
 	                                                                   final LogicalToPhysicalOpConverter lop2pop ) {
 		final PhysicalOperator rootOp = nextPlan.getRootOperator();
 
+		// Handle special cases first.
+		// Special case 1: The second plan is a fin operator (providing
+		// a fixed solution mapping). In this case, we return a plan with
+		// a binary join over the two given plans. This case should actually
+		// never happen because, during join ordering, the fin subplan should
+		// become the first subplan. In this sense, handling this case here
+		// is more to be on the safe side.
+		if ( rootOp instanceof PhysicalOpFixedSolMap ) {
+			return createPlanWithJoin(inputPlan, nextPlan, qpInfo, lop2pop);
+		}
+
+		// Special case 2: The second plan is a mreq operator. In this case,
+		// we also return a plan with a binary join over the two given plans.
+		// TODO: we may change this behavior and consider decomposing the
+		// mreq operator into its individual requests and, then, turn them
+		// into a union of gpAdd operators that all have the first plan as
+		// subplan. Or, even more sophisticated, after decomposing the mreq
+		// operator, identify the extracted requests for which turning them
+		// into gpAdd operators does not seem to be a good idea and put them
+		// back into an mreq operator again. 
+		if ( rootOp instanceof PhysicalOpMultiRequest ) {
+			return createPlanWithJoin(inputPlan, nextPlan, qpInfo, lop2pop);
+		}
+
+		// Now we come to the actual functionality, where we consider all
+		// cases in which turning the second plan into a gpAdd operator
+		// is possible.
+
+		// Case 1: The second plan is simply a request. In this case, we
+		// turn this request directly into a gpAdd operator.
 		if ( rootOp instanceof PhysicalOpRequest reqOp ) {
 			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
 			return PhysicalPlanFactory.createPlan(addOp, qpInfo, lop2pop, inputPlan);
@@ -526,6 +557,9 @@ public class PhysicalPlanFactory
 
 		final PhysicalOperator subPlanRootOp = nextPlan.getSubPlan(0).getRootOperator();
 
+		// Case 2: The second plan is a request with a filter on top. In this
+		// case, we turn the request into a gpAdd operator and put the filter
+		// on top of that one.
 		if (    rootOp instanceof PhysicalOpFilter filterOp
 		     && subPlanRootOp instanceof PhysicalOpRequest reqOp ) {
 			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
@@ -533,6 +567,21 @@ public class PhysicalPlanFactory
 			return PhysicalPlanFactory.createPlan(filterOp, qpInfo, addOpPlan);
 		}
 
+		// Case 3: The second plan is a request with a bind operator on top.
+		// In this case, we turn the request into a gpAdd operator and put
+		// the bind operator on top of that one.
+		if (    rootOp instanceof PhysicalOpBind bindOp
+			     && subPlanRootOp instanceof PhysicalOpRequest reqOp ) {
+			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
+			final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan(addOp, lop2pop, inputPlan);
+			return PhysicalPlanFactory.createPlan(bindOp, qpInfo, addOpPlan);
+		}
+
+		// Case 4: The second plan is a request with an l2g operator on top.
+		// In this case, we create a corresponding g2l operator, put that one
+		// on top of the first given plan, use that as input to the gpAdd
+		// operator created from the request, and put the l2g operator on
+		// top of that.
 		if (    rootOp instanceof PhysicalOpLocalToGlobal l2gPOP
 		     && subPlanRootOp instanceof PhysicalOpRequest reqOp ) {
 			final LogicalOpLocalToGlobal l2gLOP = (LogicalOpLocalToGlobal) l2gPOP.getLogicalOperator();
@@ -548,6 +597,9 @@ public class PhysicalPlanFactory
 			return PhysicalPlanFactory.createPlan(l2gPOP, qpInfo, addOpPlan);
 		}
 
+		// Case 5: The second plan is a union. In this case, we check whether
+		// the subplans under that union can be turned into gpAdd operators
+		// with the first given plan as input.
 		if (    (rootOp instanceof PhysicalOpBinaryUnion || rootOp instanceof PhysicalOpMultiwayUnion)
 		     && PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(nextPlan) ) {
 			return PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(inputPlan, nextPlan, qpInfo, lop2pop);
@@ -562,7 +614,8 @@ public class PhysicalPlanFactory
 	 * following forms:
 	 * i) a request,
 	 * ii) a filter over a request,
-	 * iii) an l2g operator over either a request or a filter with a request.
+	 * iii) a bind over a request,
+	 * iv) an l2g operator over either a request or a filter with a request.
 	 */
 	public static boolean checkUnaryOpApplicableToUnionPlan( final PhysicalPlan unionPlan ){
 		final PhysicalOperator rootOp = unionPlan.getRootOperator();
@@ -577,6 +630,7 @@ public class PhysicalPlanFactory
 
 			if (    ! (subRootOp instanceof PhysicalOpRequest)
 			     && ! (subRootOp instanceof PhysicalOpFilter)
+			     && ! (subRootOp instanceof PhysicalOpBind)
 			     && ! (subRootOp instanceof PhysicalOpLocalToGlobal) ) {
 				return false;
 			}
@@ -598,7 +652,8 @@ public class PhysicalPlanFactory
 				}
 			}
 
-			if ( subRootOp instanceof PhysicalOpFilter ) {
+			if (    subRootOp instanceof PhysicalOpFilter
+			     || subRootOp instanceof PhysicalOpBind ) {
 				final PhysicalOperator subSubRootOp = subPlan.getSubPlan(0).getRootOperator();
 
 				if ( ! (subSubRootOp instanceof PhysicalOpRequest) ) {
