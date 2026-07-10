@@ -41,7 +41,7 @@ _:bLogicalOptimizer rdf:type ec:LogicalOptimizer ;
 _:bListOfHeuristics
     ec:elementsTypeName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization" ;
     ec:elements (
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings" ]
+#        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemoveSubPlansWithEmptyResults" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown" ]
@@ -80,6 +80,7 @@ _:bListOfPhysicalOpFactories
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpDuplicateRemoval$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpProject$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiRequest$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal$Factory" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF$Factory" ;

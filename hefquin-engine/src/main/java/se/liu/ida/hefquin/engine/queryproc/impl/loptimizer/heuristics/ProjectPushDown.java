@@ -352,8 +352,10 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getDistinctRequired() || mayReduce );
 
-		final LogicalOpMultiRequest mergedReqOp = new LogicalOpMultiRequest( newReq, reqOp.getFederationMembers() );
-		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
+		final LogicalOpMultiRequest mergedOp = new LogicalOpMultiRequest( newReq,
+		                                                                  reqOp.getServiceVariable(),
+		                                                                  reqOp.getFederationMembers() );
+		return new LogicalPlanWithNullaryRootImpl(mergedOp, null);
 	}
 
 	/**

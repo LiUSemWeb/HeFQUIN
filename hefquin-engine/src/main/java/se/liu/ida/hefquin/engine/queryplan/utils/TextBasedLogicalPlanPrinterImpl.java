@@ -156,7 +156,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 		@Override
 		public void visit( final LogicalOpMultiRequest op ) {
-			record( op.getRequest() );
+			props.add( "service variable: " + op.getServiceVariable().toString() );
 
 			final int n = op.getFederationMembers().size();
 			props.add( "number of fed.members: " + n );
@@ -172,6 +172,8 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 					props.add( "             " + it.next().toString() );
 				}
 			}
+
+			record( op.getRequest() );
 
 			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}

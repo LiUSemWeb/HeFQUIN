@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.atlas.json.JsonString;
+import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLArgument;
@@ -28,7 +29,8 @@ public class GraphQLRequestProcessorImplTest extends FederationTestBase
 	protected static class GraphQLEndpointTest extends GraphQLEndpointImpl
 	{
 		public GraphQLEndpointTest() {
-			super( "http://localhost:4000/graphql",
+			super( NodeFactory.createURI("http://example.org/graphql"),
+			       "http://localhost:4000/graphql",
 			       new GraphQLSchemaForTest() );
 		}
 	}

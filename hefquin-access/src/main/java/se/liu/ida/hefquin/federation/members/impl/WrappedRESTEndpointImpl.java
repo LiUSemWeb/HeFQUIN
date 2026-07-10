@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -32,10 +33,11 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 	protected final MappingExpression mappingExpression;
 	protected final Set<SourceReference> srcRefs;
 
-	public WrappedRESTEndpointImpl( final String urlTemplate,
+	public WrappedRESTEndpointImpl( final Node serviceURI,
+	                                final String urlTemplate,
 	                                final List<RESTEndpoint.Parameter> params,
 	                                final MappingExpression mappingExpression ) {
-		super(urlTemplate, params);
+		super(serviceURI, urlTemplate, params);
 
 		assert mappingExpression != null;
 		this.mappingExpression = mappingExpression;

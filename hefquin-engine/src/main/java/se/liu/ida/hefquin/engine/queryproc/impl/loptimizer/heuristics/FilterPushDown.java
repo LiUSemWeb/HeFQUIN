@@ -284,8 +284,10 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
 
-		final LogicalOpMultiRequest mergedReqOp = new LogicalOpMultiRequest( mergedReq, reqOp.getFederationMembers() );
-		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
+		final LogicalOpMultiRequest mergedOp = new LogicalOpMultiRequest( mergedReq,
+		                                                                  reqOp.getServiceVariable(),
+		                                                                  reqOp.getFederationMembers() );
+		return new LogicalPlanWithNullaryRootImpl(mergedOp, null);
 	}
 
 	protected LogicalPlan createPlanForFilterUnderFilter( final LogicalOpFilter parentFilterOp,

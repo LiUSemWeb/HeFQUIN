@@ -6,6 +6,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementService;
+import org.apache.jena.sparql.util.NodeIsomorphismMap;
 
 /**
  * Represents the combination of a SERVICE clause that has a variable as
@@ -39,5 +40,15 @@ public class ElementServiceWithValues extends ElementService
 	 */
 	public Set<Node> getPossibleValues() {
 		return values;
+	}
+
+	@Override
+	public boolean equalTo( final Element other, final NodeIsomorphismMap isoMap ) {
+		if ( other == this ) return true;
+		if ( ! (other instanceof ElementServiceWithValues) ) return false;
+		if ( ! super.equalTo(other, isoMap) ) return false;
+
+		final ElementServiceWithValues o = (ElementServiceWithValues) other;
+		return o.values.equals(values);
 	}
 }

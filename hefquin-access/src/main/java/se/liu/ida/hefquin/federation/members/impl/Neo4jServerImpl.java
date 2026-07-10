@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.federation.members.impl;
 
+import org.apache.jena.graph.Node;
+
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
 
 public class Neo4jServerImpl extends BaseForFederationMember
@@ -7,7 +9,9 @@ public class Neo4jServerImpl extends BaseForFederationMember
 {
 	protected final String url;
 
-	public Neo4jServerImpl( final String url ) {
+	public Neo4jServerImpl( final Node serviceURI, final String url ) {
+		super(serviceURI);
+
 		assert url != null && ! url.isEmpty();
 
 		this.url = url;

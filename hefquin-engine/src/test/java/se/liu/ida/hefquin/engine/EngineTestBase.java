@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.core.Var;
@@ -190,7 +191,8 @@ public abstract class EngineTestBase
 	}
 
 	protected TPFServer getDBpediaTPFServer() {
-		return new TPFServerImpl( "http://fragments.dbpedia.org/2016-04/en",
+		return new TPFServerImpl( NodeFactory.createURI("http://example.org/tpf"),
+		                          "http://fragments.dbpedia.org/2016-04/en",
 		                          null ); // no vocab.mapping
 	}
 
@@ -199,6 +201,7 @@ public abstract class EngineTestBase
 		protected final Graph data;
 
 		public FederationMemberBaseForTest( final Graph data ) {
+			super( NodeFactory.createURI("http://example.org/fm") );
 			this.data = data;
 		}
 

@@ -29,21 +29,24 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 	public final String httpQueryArgumentForPredicate;
 	public final String httpQueryArgumentForObject;
 
-	public TPFServerImpl( final String baseURL,
+	public TPFServerImpl( final Node serviceURI,
+	                      final String baseURL,
 	                      final VocabularyMapping vm ) {
-		this( baseURL,
+		this( serviceURI,
+		      baseURL,
 		      DfltHttpQueryArgumentForSubject,
 		      DfltHttpQueryArgumentForPredicate,
 		      DfltHttpQueryArgumentForObject,
 		      vm );
 	}
 
-	public TPFServerImpl( final String baseURL,
+	public TPFServerImpl( final Node serviceURI,
+	                      final String baseURL,
 	                      final String httpQueryArgumentForSubject,
 	                      final String httpQueryArgumentForPredicate,
 	                      final String httpQueryArgumentForObject,
 	                      final VocabularyMapping vm ) {
-		super(vm);
+		super(serviceURI, vm);
 
 		assert baseURL != null;
 		assert httpQueryArgumentForSubject    != null;

@@ -2,13 +2,22 @@ package se.liu.ida.hefquin.engine;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Set;
+
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementService;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformCleanGroupsOfOne;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
 import org.junit.Test;
+
+import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementServiceWithValues;
 
 public class ValuesServiceQueryResolverTest
 {
@@ -174,21 +183,20 @@ public class ValuesServiceQueryResolverTest
 		ValuesServiceQueryResolver.expandValuesPlusServicePattern(q);
 
 		final String expectedQueryString =
-				  "SELECT * WHERE {"
-				+ " {"
-				+ "   SERVICE <http://example1.org> { ?x a ?y }"
-				+ "   BIND( <http://example1.org> AS ?s )"
-				+ " } UNION {"
-				+ "   SERVICE <http://example2.org> { ?x a ?y }"
-				+ "   BIND( <http://example2.org> AS ?s )"
-				+ " }"
-				+ "}";
-		final Element expectedPattern = QueryFactory.create(expectedQueryString).getQueryPattern();
+				  "SELECT * WHERE { SERVICE ?s { ?x a ?y }  }";
+		final Element e1 = QueryFactory.create(expectedQueryString).getQueryPattern();
+		final Element e2 = ((ElementGroup) e1).get(0);
+		final ElementService s = (ElementService) e2;
 
-		final ElementTransform t = new ElementTransformCleanGroupsOfOne();
-		final Element expectedPattern2 = ElementTransformer.transform(expectedPattern, t);
+		final Set<Node> values = Set.of( NodeFactory.createURI("http://example1.org"),
+		                                 NodeFactory.createURI("http://example2.org") );
 
-		assertTrue( q.getQueryPattern().equals(expectedPattern2) );
+		final Element expectedPattern = new ElementServiceWithValues( Var.alloc("s"),
+		                                                              s.getElement(),
+		                                                              s.getSilent(),
+		                                                              values );
+
+		assertTrue( q.getQueryPattern().equals(expectedPattern) );
 	}
 
 	@Test
@@ -291,20 +299,24 @@ public class ValuesServiceQueryResolverTest
 				  "SELECT * WHERE {"
 				+ " SERVICE <http://example1.org> { ?x a ?y }"
 				+ " BIND( <http://example1.org> AS ?s1 )"
-				+ " {"
-				+ "     SERVICE <http://example2.org> { ?z a ?y }"
-				+ "     BIND( <http://example2.org> AS ?s2 )"
-				+ " } UNION {"
-				+ "     SERVICE <http://example3.org> { ?z a ?y }"
-				+ "     BIND( <http://example3.org> AS ?s2 )"
-				+ " }"
+				+ " SERVICE ?s2 { ?z a ?y }"
 				+ "}";
-		final Element expectedPattern = QueryFactory.create(expectedQueryString).getQueryPattern();
+		final Element e1 = QueryFactory.create(expectedQueryString).getQueryPattern();
+		final ElementGroup eg = (ElementGroup) e1;
+		final ElementService s = (ElementService) eg.get(2);
 
-		final ElementTransform t = new ElementTransformCleanGroupsOfOne();
-		final Element expectedPattern2 = ElementTransformer.transform(expectedPattern, t);
+		final Set<Node> values = Set.of( NodeFactory.createURI("http://example2.org"),
+		                                 NodeFactory.createURI("http://example3.org") );
 
-		assertTrue( q.getQueryPattern().equals(expectedPattern2) );
+		final ElementGroup egExpected = new ElementGroup();
+		egExpected.addElement( eg.get(0) );
+		egExpected.addElement( eg.get(1) );
+		egExpected.addElement( new ElementServiceWithValues(Var.alloc("s2"),
+		                                                    s.getElement(),
+		                                                    s.getSilent(),
+		                                                    values) );
+
+		assertTrue( q.getQueryPattern().equals(egExpected) );
 	}
 
 	@Test

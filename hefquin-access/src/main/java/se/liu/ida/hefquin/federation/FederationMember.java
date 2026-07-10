@@ -14,6 +14,13 @@ public interface FederationMember
 	int getID();
 
 	/**
+	 * Returns the (unique) service URI of this federation member. The
+	 * service URI is the URI via which the federation member is referred
+	 * to in the SERVICE clauses.
+	 */
+	String getServiceURI();
+
+	/**
 	 * Returns {@code false} if the only types of graph patterns that
 	 * can be answered by a single request to this federation member
 	 * are triple patterns.

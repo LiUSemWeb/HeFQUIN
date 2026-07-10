@@ -24,7 +24,6 @@ import org.apache.jena.sparql.syntax.ElementVisitor;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
-import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformCleanGroupsOfOne;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformCopyBase;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
 
@@ -459,63 +458,72 @@ public class ValuesServiceQueryResolver
 	                                        final List<Element> elmts,
 	                                        final int startPos,
 	                                        final int endPos ) {
-		// First, rewrite the relevant list elements based on the
-		// first solution mapping of the given VALUES clause.
-		final Iterator<Binding> it = valClause.getRows().iterator();
-		final Binding firstRow = it.next();
-
-		// If the given VALUES clause contains only one solution mapping,
-		// we may simply rewrite the relevant list elements based on that
-		// solution mapping and are done.
-		if ( ! it.hasNext() ) {
+		// First, we handle the special case in which the given
+		// VALUES clause contains only one solution mapping. In
+		// this case, we simply rewrite the relevant list elements
+		// based on that solution mapping and are done. We do not
+		// use the multi-request operator in this case.
+		if ( valClause.getRows().size() == 1 ) {
+			final Binding firstRow = valClause.getRows().get(0);
 			return rewrite( firstRow, elmts, startPos, endPos, valClause.getVars() );
 		}
 
-// --- quick hack --------------
-		// assuming there are only SERVICE clauses between the VALUES clauses
-		final List<Element> result = new ArrayList<>( endPos - startPos + 1 );
-		for ( int i = startPos; i <= endPos; i++ ) {
-			final Element eOld = elmts.get(i);
+		// Now we check whether we can use the multi-request operator.
+		// For the moment, we use it only if the given VALUES clause
+		// is a single column table. Additionally, we assume that the
+		// relevant list elements include only one SERVICE clause that
+		// has a variable as service node, where this variable must be
+		// the one assigned by the VALUES clause.
+		if ( valClause.getVars().size() == 1 ) {
+			final List<Element> result = new ArrayList<>( endPos - startPos + 1 );
+			boolean foundServiceWithVariable = false;
+			for ( int i = startPos; i <= endPos; i++ ) {
+				final Element eOld = elmts.get(i);
 
-			if ( ! (eOld instanceof ElementService) )
-				throw new MyIllegalQueryException("The POC assumes that there are only SERVICE clauses between the VALUES clauses.");
+				if (    eOld instanceof ElementService oldServiceClause
+				     && oldServiceClause.getServiceNode().isVariable() )
+				{
+					final Var var = Var.alloc( oldServiceClause.getServiceNode() );
+					if ( ! valClause.getVars().contains(var) )
+						throw new MyIllegalQueryException("There is a SERVICE clause with a variable (" + var.toString() + ") that is not assigned by the previous VALUES clause.");
 
-			final ElementService oldServiceClause = (ElementService) eOld;
-			if ( oldServiceClause.getServiceNode().isVariable() ) {
-				final Var var = Var.alloc( oldServiceClause.getServiceNode() );
-				if ( ! valClause.getVars().contains(var) )
-					throw new MyIllegalQueryException("There is a SERVICE clause with a variable (" + var.toString() + ") that is not assigned by the previous VALUES clause.");
+					if ( foundServiceWithVariable == true )
+						throw new MyIllegalQueryException("There are two SERVICE clauses with a variable under the scope of the previous VALUES clause.");
 
-				final Set<Node> valuesForVar = new HashSet<>();
-				final Iterator<Binding> it2 = valClause.getRows().iterator();
-				while ( it2.hasNext() ) {
-					final Node n = it2.next().get(var);
-					if ( ! n.isURI() ) {
-						final String typeNameForMsg = ( n.isLiteral() ) ? "literal" : n.getClass().getName();
-						throw new MyIllegalQueryException("A VALUES clause can only assign IRIs to service variables. This is not the case for variable ?" + var.getName() + ", which is assigned a " + typeNameForMsg + " (" + n.toString()+ ").");
+					foundServiceWithVariable = true;
+
+					final Set<Node> valuesForVar = new HashSet<>();
+					final Iterator<Binding> it2 = valClause.getRows().iterator();
+					while ( it2.hasNext() ) {
+						final Node n = it2.next().get(var);
+						if ( ! n.isURI() ) {
+							final String typeNameForMsg = ( n.isLiteral() ) ? "literal" : n.getClass().getName();
+							throw new MyIllegalQueryException("A VALUES clause can only assign IRIs to service variables. This is not the case for variable ?" + var.getName() + ", which is assigned a " + typeNameForMsg + " (" + n.toString()+ ").");
+						}
+
+						valuesForVar.add(n);
 					}
 
-					valuesForVar.add(n);
+					result.add( new ElementServiceWithValues(var,
+					                                         oldServiceClause.getElement(),
+					                                         oldServiceClause.getSilent(),
+					                                         valuesForVar) );
 				}
+				else {
+					result.add(eOld);
+				}
+			}
 
-				result.add( new ElementServiceWithValues(var,
-				                                         oldServiceClause.getElement(),
-				                                         oldServiceClause.getSilent(),
-				                                         valuesForVar) );
-			}
-			else {
-				result.add(oldServiceClause);
-			}
+			return result;
 		}
 
-		return result;
-// ------------------
-/*
-		// If the given VALUES clause contains more than one solution mapping,
-		// then we need to combine the rewritings obtained based on each of
-		// these solution mappings into a UNION pattern. The rewriting created
-		// based on the first solution mapping becomes the first part of this
-		// UNION pattern.
+		// If the given VALUES clause contains more than one column / variable
+		// and more than one row / solution mapping, then we need to combine
+		// the rewritings obtained based on each of these solution mappings
+		// into a UNION pattern. The rewriting created based on the first
+		// solution mapping becomes the first part of this UNION pattern.
+		final Iterator<Binding> it = valClause.getRows().iterator();
+		final Binding firstRow = it.next();
 		final List<Element> rewriteUsingFirstRow = rewrite( firstRow, elmts, startPos, endPos, valClause.getVars() );
 		final ElementUnion eu = new ElementUnion();
 		eu.addElement( ElementUtils.createElementGroupIfNeeded(rewriteUsingFirstRow) );
@@ -532,7 +540,6 @@ public class ValuesServiceQueryResolver
 		final List<Element> result = new ArrayList<>();
 		result.add(eu);
 		return result;
-*/
 	}
 
 	/**

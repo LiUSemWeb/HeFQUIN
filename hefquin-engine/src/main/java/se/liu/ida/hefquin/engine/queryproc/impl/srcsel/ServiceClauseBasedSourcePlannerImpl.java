@@ -333,7 +333,8 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 		final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
 		final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
-		final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, fms);
+		final Var var = Var.alloc( jenaOp.getService() );
+		final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, var, fms);
 		return new LogicalPlanWithNullaryRootImpl(op, null);
 	}
 

@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.federation;
 
+import org.apache.jena.graph.NodeFactory;
+
 import se.liu.ida.hefquin.federation.members.TPFServer;
 import se.liu.ida.hefquin.federation.members.impl.BRTPFServerImpl;
 import se.liu.ida.hefquin.federation.members.impl.Neo4jServerImpl;
@@ -27,47 +29,61 @@ public abstract class FederationTestBase
 
 
 	protected TPFServer getDBpediaTPFServer() {
-		return new TPFServerImpl( "http://fragments.dbpedia.org/2016-04/en",
+		return new TPFServerImpl( NodeFactory.createURI("http://example.org/tpf"),
+		                          "http://fragments.dbpedia.org/2016-04/en",
 		                          null ); // no vocab.mapping
 	}
 
 	protected static class SPARQLEndpointForTest extends SPARQLEndpointImpl
 	{
 		public SPARQLEndpointForTest() {
-			super("http://example.org/sparql", null);
+			super( NodeFactory.createURI("http://example.org/sparql"),
+			       "http://example.org/sparql",
+			       null );
 		}
 
 		public SPARQLEndpointForTest( final String url ) {
-			super(url, null);
+			super( NodeFactory.createURI("http://example.org/sparql"),
+			       url,
+			       null );
 		}
 	}
 
 	protected static class TPFServerForTest extends TPFServerImpl
 	{
 		public TPFServerForTest() {
-			super("http://example.org/", null);
+			super( NodeFactory.createURI("http://example.org/tpf"),
+			       "http://example.org/",
+			       null );
 		}
 
 		public TPFServerForTest( final String baseURL ) {
-			super(baseURL, null);
+			super( NodeFactory.createURI("http://example.org/tpf"),
+			       baseURL,
+			       null );
 		}
 	}
 
 	protected static class BRTPFServerForTest extends BRTPFServerImpl
 	{
 		public BRTPFServerForTest() {
-			super("http://example.org/", null);
+			super( NodeFactory.createURI("http://example.org/brtpf"),
+			       "http://example.org/",
+			       null );
 		}
 
 		public BRTPFServerForTest( final String baseURL ) {
-			super(baseURL, null);
+			super( NodeFactory.createURI("http://example.org/brtpf"),
+			       baseURL,
+			       null );
 		}
 	}
 
 	protected static class Neo4jServerImpl4Test extends Neo4jServerImpl
 	{
 		public Neo4jServerImpl4Test() {
-			super("http://localhost:7474/db/neo4j/tx");
+			super( NodeFactory.createURI("http://example.org/neo"),
+			       "http://localhost:7474/db/neo4j/tx" );
 		}
 	}
 
