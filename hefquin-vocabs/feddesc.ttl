@@ -10,7 +10,8 @@
     rdf:type owl:Ontology ;
     dc:creator       "Olaf Hartig",
                      "Robin Keskisärkkä",
-                     "Jonas Westman" ;
+                     "Jonas Westman",
+                     "Kent Thang" ;
     dc:date          "2026-04-30" ;
     dc:format        "RDF" ;
     dc:identifier    <http://w3id.org/hefquin/feddesc> ;
