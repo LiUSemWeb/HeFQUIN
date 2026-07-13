@@ -160,14 +160,14 @@ fd:GenericWebAPIProtocol a fd:DataRetrievalProtocol ;
 fd:usernameEnv a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:label "username environment variable"@en ;
-    rdfs:comment "The name of the environment variable from which the username is obtained."@en .
+    rdfs:comment "The name of the environment variable from which the username is obtained. This property is intended to be used with authentication schemes that require a username, such as wotsec:BasicSecurityScheme. At runtime, the implementation is expected to resolve the environment variable and use its value when authenticating requests."@en .
 
 fd:passwordEnv a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:label "password environment variable"@en ;
-    rdfs:comment "The name of the environment variable from which the password is obtained."@en .
+    rdfs:comment "The name of the environment variable from which the password is obtained. This property is intended to be used with authentication schemes that require a password, such as wotsec:BasicSecurityScheme. At runtime, the implementation is expected to resolve the environment variable and use its value when authenticating requests."@en .
 
 fd:tokenEnv a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:label "token environment variable"@en ;
-    rdfs:comment "The name of the environment variable from which the authentication token is obtained."@en .
+    rdfs:comment "The name of the environment variable from which an authentication token is obtained. This property is intended to be used with token-based authentication schemes, such as wotsec:BearerSecurityScheme. At runtime, the implementation is expected to resolve the environment variable and use its value when authenticating requests."@en .
