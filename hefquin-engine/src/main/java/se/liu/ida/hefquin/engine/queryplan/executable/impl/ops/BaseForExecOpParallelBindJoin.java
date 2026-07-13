@@ -19,6 +19,10 @@ import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
+import se.liu.ida.hefquin.base.datastructures.SolutionMappingsIndex;
+import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTable;
+import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
+import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -110,9 +114,10 @@ public abstract class BaseForExecOpParallelBindJoin<
 	protected final QueryType query;
 	protected final MemberType fm;
 
+	protected final Set<Var> varsInQuery;
+	protected final ExpectedVariables inputVars;
 	protected final boolean useOuterJoinSemantics;
 
-	protected final Set<Var> varsInQuery;
 	protected final boolean allJoinVarsAreCertain;
 
 	/**
@@ -178,8 +183,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 	 * this one contains all solution mappings retrieved for the query
 	 * of this operator.
 	 */
-	// TODO: Use a more suitable data structure for this (some type of hash index).
-	protected Iterable<SolutionMapping> fullResult = null;
+	protected SolutionMappingsIndex fullResult = null;
 
 	// statistics
 	private AtomicLong numberOfOutputMappingsProduced = new AtomicLong(0L);
@@ -232,6 +236,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 		this.query = query;
 		this.varsInQuery = varsInQuery;
 		this.fm = fm;
+		this.inputVars = inputVars;
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 		this.batchSize = batchSize;
 
@@ -640,7 +645,26 @@ public abstract class BaseForExecOpParallelBindJoin<
 
 		statsOfFullRetrievalReqOp = reqOp.getStats();
 
-		fullResult = mySink.getCollectedSolutionMappings();
+		final Set<Var> certainJoinVars = new HashSet<>(varsInQuery);
+		certainJoinVars.removeAll(inputVars.getPossibleVariables());
+
+		if ( certainJoinVars.size() == 1 ) {
+			final Var joinVar = certainJoinVars.iterator().next();
+			fullResult = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
+		}
+		else if ( certainJoinVars.size() == 2 ) {
+			final Iterator<Var> liVar = certainJoinVars.iterator();
+			final Var joinVar1 = liVar.next();
+			final Var joinVar2 = liVar.next();
+
+			fullResult = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
+		}
+		else {
+			fullResult = new SolutionMappingsHashTable(certainJoinVars);
+		}
+
+		for ( final SolutionMapping sm : mySink.getCollectedSolutionMappings() )
+			fullResult.add(sm);
 	}
 
 	/**
@@ -680,8 +704,8 @@ public abstract class BaseForExecOpParallelBindJoin<
 	{
 		long cnt = 0L;
 		boolean hasJoinPartners = false;
-		for ( final SolutionMapping retrievedSM : fullResult ) {
-			if ( SolutionMappingUtils.compatible(retrievedSM, inputSolMap) ) {
+		for ( final SolutionMapping retrievedSM : fullResult.getJoinPartners(inputSolMap) ) {
+			if ( allJoinVarsAreCertain || SolutionMappingUtils.compatible(retrievedSM, inputSolMap) ) {
 				hasJoinPartners = true;
 				cnt++;
 				sink.send( SolutionMappingUtils.merge(retrievedSM, inputSolMap) );
