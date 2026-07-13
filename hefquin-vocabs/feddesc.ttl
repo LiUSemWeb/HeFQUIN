@@ -10,7 +10,8 @@
     rdf:type owl:Ontology ;
     dc:creator       "Olaf Hartig",
                      "Robin Keskisärkkä",
-                     "Jonas Westman" ;
+                     "Jonas Westman",
+                     "Kent Thang" ;
     dc:date          "2026-04-30" ;
     dc:format        "RDF" ;
     dc:identifier    <http://w3id.org/hefquin/feddesc> ;
@@ -61,7 +62,6 @@ fd:Wrapper a owl:Class ;
 fd:DataRetrievalProtocol a owl:Class ;
     rdfs:label "Data Retrieval Protocol"@en ;
     rdfs:comment "Instances of this class represent the different protocols to be used when interacting with the interface of a federation member."@en .
-
 
 ### ===== PROPERTY DECLARATIONS =====
 
@@ -157,3 +157,18 @@ fd:brTPFProtocol a fd:DataRetrievalProtocol ;
 fd:GenericWebAPIProtocol a fd:DataRetrievalProtocol ;
     rdfs:label "Generic Web API protocol"@en ;
     rdfs:comment "The protocol to be used when interacting with a generic Web API."@en .
+
+fd:usernameEnv a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "username environment variable"@en ;
+    rdfs:comment "The name of the environment variable from which the username is obtained. This property is intended to be used with authentication schemes that require a username, such as wotsec:BasicSecurityScheme. At runtime, the implementation is expected to resolve the environment variable and use its value when authenticating requests."@en .
+
+fd:passwordEnv a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "password environment variable"@en ;
+    rdfs:comment "The name of the environment variable from which the password is obtained. This property is intended to be used with authentication schemes that require a password, such as wotsec:BasicSecurityScheme. At runtime, the implementation is expected to resolve the environment variable and use its value when authenticating requests."@en .
+
+fd:tokenEnv a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "token environment variable"@en ;
+    rdfs:comment "The name of the environment variable from which an authentication token is obtained. This property is intended to be used with token-based authentication schemes, such as wotsec:BearerSecurityScheme. At runtime, the implementation is expected to resolve the environment variable and use its value when authenticating requests."@en .
