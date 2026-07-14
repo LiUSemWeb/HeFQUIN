@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.base.datastructures.SolutionMappingsIndex;
 import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTable;
 import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
 import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
+import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsIndexNoJoinVars;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -629,7 +630,10 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		final Set<Var> certainJoinVars = new HashSet<>(varsInQuery);
 		certainJoinVars.removeAll(inputVars.getPossibleVariables());
 
-		if ( certainJoinVars.size() == 1 ) {
+		if ( certainJoinVars.isEmpty() ) {
+			fullResult = new SolutionMappingsIndexNoJoinVars();
+		}
+		else if ( certainJoinVars.size() == 1 ) {
 			final Var joinVar = certainJoinVars.iterator().next();
 			fullResult = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
 		}
