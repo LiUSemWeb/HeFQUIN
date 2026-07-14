@@ -6,13 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.*;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.expr.E_Equals;
@@ -25,17 +21,11 @@ import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.junit.Before;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
-import se.liu.ida.hefquin.base.data.mappings.impl.EntityMappingImpl;
-import se.liu.ida.hefquin.base.data.mappings.impl.EntityMappingReader;
-import se.liu.ida.hefquin.base.data.mappings.impl.SchemaMappingImpl;
-import se.liu.ida.hefquin.base.data.mappings.impl.SchemaMappingReader;
-import se.liu.ida.hefquin.base.data.mappings.impl.VocabularyMappingWrappingImpl;
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
@@ -47,6 +37,7 @@ import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.base.query.impl.SPARQLGroupPatternImpl;
 import se.liu.ida.hefquin.base.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.testutils.TestUtils;
 
 public class VocabularyMappingUtilsTest
 {
@@ -76,28 +67,7 @@ public class VocabularyMappingUtilsTest
 
 	@Before
 	public void setup() {
-		final String entityMapping = """
-			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-			@prefix l:    <http://example.org/local/> .
-			@prefix g:    <http://example.org/global/> .
-			l:e1 owl:sameAs g:e .
-			l:e2 owl:sameAs g:e .
-			""";
-
-		final String schemaMapping = """
-			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-			@prefix l:    <http://example.org/local/> .
-			@prefix g:    <http://example.org/global/> .
-			l:s1 owl:equivalentClass g:s .
-			l:s2 owl:equivalentClass g:s .
-			l:p1 owl:equivalentProperty g:p .
-			l:p2 owl:equivalentProperty g:p .
-			l:o1 owl:equivalentClass g:o .
-			l:o2 owl:equivalentClass g:o .
-			""";
-		final SchemaMapping sm = createSchemaMapping(schemaMapping);
-		final EntityMapping em = createEntityMapping(entityMapping);
-		vm = new VocabularyMappingWrappingImpl(em, sm);
+		vm = TestUtils.createVocabularyMapping();
 	}
 
 	// TriplePattern
@@ -515,7 +485,7 @@ public class VocabularyMappingUtilsTest
 		final ExprList result = VocabularyMappingUtils.translateExpressionsFromGlobal(exprList, vm);
 
 		// Check
-		final Set<String> actual = extractEqualsPairs(result.get(0));
+		final Set<String> actual = TestUtils.extractEqualsPairs(result.get(0));
 
 		// Order doesn't matter here
 		assertEquals( Set.of(
@@ -605,34 +575,5 @@ public class VocabularyMappingUtilsTest
 	                                         final Set<TriplePattern> expected ) {
 		final Set<TriplePattern> results = translateAndCollect(input);
 		assertEquals(expected, results);
-	}
-
-	protected SchemaMapping createSchemaMapping( final String mappingAsTurtle ) {
-		final Graph mapping = GraphFactory.createDefaultGraph();
-		RDFDataMgr.read( mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE );
-
-		final Map<Node, Set<TermMapping>> g2lMap = SchemaMappingReader.read(mapping);
-		return new SchemaMappingImpl(g2lMap);
-	}
-
-	protected EntityMapping createEntityMapping( final String mappingAsTurtle ) {
-		final Graph mapping = GraphFactory.createDefaultGraph();
-		RDFDataMgr.read( mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE );
-		final Map<Node, Set<Node>> g2lMap = EntityMappingReader.read(mapping);
-		return new EntityMappingImpl(g2lMap);
-	}
-
-	protected Set<String> extractEqualsPairs( final Expr e ) {
-		final Set<String> result = new HashSet<>();
-
-		if ( e instanceof E_Equals eq ) {
-			result.add( eq.getArg1().toString() + "=" + eq.getArg2().toString() );
-		}
-		else if ( e instanceof E_LogicalOr or ) {
-			result.addAll( extractEqualsPairs(or.getArg1()) );
-			result.addAll( extractEqualsPairs(or.getArg2()) );
-		}
-
-		return result;
 	}
 }
