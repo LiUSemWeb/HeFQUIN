@@ -196,7 +196,7 @@ public class VocabularyMappingUtils
 	                                                        final VocabularyMapping vm ) {
 		final Op subOp = op.getSubOp();
 		final SPARQLGraphPattern translatedSubPlan = translateGraphPattern(subOp, vm);
-		final ExprList translatedExprs = translateExpressions( op.getExprs(), vm );
+		final ExprList translatedExprs = translateExpressionsFromGlobal( op.getExprs(), vm );
 		return translatedSubPlan.mergeWith(translatedExprs);
 	}
 
