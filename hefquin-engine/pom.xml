@@ -47,7 +47,7 @@
       <artifactId>hefquin-base</artifactId>
       <version>0.0.12-SNAPSHOT</version>
     </dependency>
-    <!-- hefquin-base-test-jar -->
+    <!-- hefquin-base (test-jar) -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-base</artifactId>
