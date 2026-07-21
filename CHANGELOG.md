@@ -20,6 +20,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Extending the application of vocabulary mappings to (some kinds of) FILTER / BIND expressions ([#660](https://github.com/LiUSemWeb/HeFQUIN/issues/660)).
 - Logging for query planner ([#636](https://github.com/LiUSemWeb/HeFQUIN/pull/636), [#637](https://github.com/LiUSemWeb/HeFQUIN/pull/637)).
 - Refactoring of  the context objects that are passed around during query processing ([#645](https://github.com/LiUSemWeb/HeFQUIN/issues/645)).
+- Hash index for full-retrieval mode of the bind join variants ([#668](https://github.com/LiUSemWeb/HeFQUIN/issues/668)).
 - Fixing example vocabulary mapping for Wikidata to make the example query work ([#640](https://github.com/LiUSemWeb/HeFQUIN/issues/640)).
 - Removes ChronicleMap-based cardinality-specific cache implementation (ChronicleMapCardinalityCache) and related files ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
 - Remove wrapped response from CardinalityResponseImpl ([#628](https://github.com/LiUSemWeb/HeFQUIN/pull/628)).
