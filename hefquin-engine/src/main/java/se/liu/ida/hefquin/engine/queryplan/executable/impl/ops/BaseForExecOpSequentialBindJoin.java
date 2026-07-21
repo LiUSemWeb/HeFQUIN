@@ -13,6 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
+import se.liu.ida.hefquin.base.datastructures.SolutionMappingsIndex;
+import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTable;
+import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
+import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
+import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsIndexNoJoinVars;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -90,6 +95,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	protected final MemberType fm;
 
 	protected final Set<Var> varsInQuery;
+	protected final ExpectedVariables inputVars;
 	protected final boolean useOuterJoinSemantics;
 
 	protected final boolean allJoinVarsAreCertain;
@@ -144,8 +150,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	 * this one contains all solution mappings retrieved for the query
 	 * of this operator.
 	 */
-	// TODO: Use a more suitable data structure for this (some type of hash index).
-	protected Iterable<SolutionMapping> fullResult = null;
+	protected SolutionMappingsIndex fullResult = null;
 
 	// statistics
 	private long numberOfOutputMappingsProduced = 0L;
@@ -199,6 +204,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		this.query = query;
 		this.varsInQuery = varsInQuery;
 		this.fm = fm;
+		this.inputVars = inputVars;
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 		this.requestBlockSize = batchSize;
 
@@ -621,7 +627,29 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		statsOfLastReqOp = reqOp.getStats();
 		if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
 
-		fullResult = mySink.getCollectedSolutionMappings();
+		final Set<Var> certainJoinVars = new HashSet<>(varsInQuery);
+		certainJoinVars.removeAll(inputVars.getPossibleVariables());
+
+		if ( certainJoinVars.isEmpty() ) {
+			fullResult = new SolutionMappingsIndexNoJoinVars();
+		}
+		else if ( certainJoinVars.size() == 1 ) {
+			final Var joinVar = certainJoinVars.iterator().next();
+			fullResult = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
+		}
+		else if ( certainJoinVars.size() == 2 ) {
+			final Iterator<Var> liVar = certainJoinVars.iterator();
+			final Var joinVar1 = liVar.next();
+			final Var joinVar2 = liVar.next();
+
+			fullResult = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
+		}
+		else {
+			fullResult = new SolutionMappingsHashTable(certainJoinVars);
+		}
+
+		for ( final SolutionMapping sm : mySink.getCollectedSolutionMappings() )
+			fullResult.add(sm);
 	}
 
 	protected void joinInFullRetrievalMode( final Iterable<SolutionMapping> batchOfSolMaps,
@@ -636,10 +664,9 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	                                        final IntermediateResultElementSink sink )
 	{
 		boolean hasJoinPartners = false;
-		for ( final SolutionMapping retrievedSM : fullResult ) {
-			if ( SolutionMappingUtils.compatible(retrievedSM, inputSolMap) ) {
+		for ( final SolutionMapping retrievedSM : fullResult.getJoinPartners(inputSolMap) ) {
+			if ( allJoinVarsAreCertain || SolutionMappingUtils.compatible(retrievedSM, inputSolMap) ) {
 				hasJoinPartners = true;
-				numberOfOutputMappingsProduced++;
 				sink.send( SolutionMappingUtils.merge(retrievedSM, inputSolMap) );
 			}
 		}
