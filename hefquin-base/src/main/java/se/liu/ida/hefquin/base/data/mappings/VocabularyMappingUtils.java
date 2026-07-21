@@ -205,7 +205,7 @@ public class VocabularyMappingUtils
 		final ExprList rewrittenExpressions = new ExprList();
 
 		for ( final Expr e : exprs ) {
-			final Expr rewritten = vm.translateExpression(e);
+			final Expr rewritten = vm.translateExpressionFromLocal(e);
 
 			rewrittenExpressions.add(rewritten);
 		}

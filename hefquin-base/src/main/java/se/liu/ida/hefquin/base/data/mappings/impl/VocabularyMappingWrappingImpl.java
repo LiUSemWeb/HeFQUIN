@@ -100,7 +100,7 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 	}
 
 	@Override
-	public Expr translateExpression( final Expr e ) {
+	public Expr translateExpressionFromLocal( final Expr e ) {
 		final Expr translatedExpr = em.applyInverseToExpression(e);
 
 		return sm.applyInverseToExpression(translatedExpr);

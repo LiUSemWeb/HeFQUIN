@@ -33,7 +33,7 @@ public interface VocabularyMapping
 	 * given expression cannot be translated, then this method
 	 * throws an {@link UnsupportedOperationException}.
 	 */
-	Expr translateExpression( Expr e );
+	Expr translateExpressionFromLocal( Expr e );
 
 	/**
 	 * Applies this vocabulary mapping to the given filter expression, which is

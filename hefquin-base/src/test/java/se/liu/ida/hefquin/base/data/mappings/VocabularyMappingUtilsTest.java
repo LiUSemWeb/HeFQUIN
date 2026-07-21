@@ -507,7 +507,7 @@ public class VocabularyMappingUtilsTest
 			);
 
 		// Test & check
-		assertThrows( UnsupportedOperationException.class, () -> vm.translateExpression(expr) );
+		assertThrows( UnsupportedOperationException.class, () -> vm.translateExpressionFromLocal(expr) );
 	}
 
 	@Test
