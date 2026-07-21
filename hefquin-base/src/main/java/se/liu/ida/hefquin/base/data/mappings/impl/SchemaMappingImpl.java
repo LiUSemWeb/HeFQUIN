@@ -165,9 +165,19 @@ public class SchemaMappingImpl implements SchemaMapping
 
 	@Override
 	public Expr applyToExpression( final Expr expr ) {
+		return applyToExpression(expr, false);
+	}
+
+	@Override
+	public Expr applyInverseToExpression( final Expr expr ) {
+		return applyToExpression(expr, true);
+	}
+
+	protected Expr applyToExpression( final Expr expr,
+	                                  final boolean useInverse ) {
 		if ( expr instanceof E_LogicalAnd and ) {
-			final Expr l = applyToExpression( and.getArg1() );
-			final Expr r = applyToExpression( and.getArg2() );
+			final Expr l = applyToExpression( and.getArg1(), useInverse );
+			final Expr r = applyToExpression( and.getArg2(), useInverse );
 
 			if ( and.getArg1().equals(l) && and.getArg2().equals(r) )
 				return expr;
@@ -176,8 +186,8 @@ public class SchemaMappingImpl implements SchemaMapping
 		}
 
 		if ( expr instanceof E_LogicalOr or ) {
-			final Expr l = applyToExpression( or.getArg1()) ;
-			final Expr r = applyToExpression( or.getArg2()) ;
+			final Expr l = applyToExpression( or.getArg1(), useInverse );
+			final Expr r = applyToExpression( or.getArg2(), useInverse );
 
 			if ( or.getArg1().equals(l) && or.getArg2().equals(r) )
 				return expr;
@@ -186,7 +196,7 @@ public class SchemaMappingImpl implements SchemaMapping
 		}
 
 		if ( expr instanceof E_Equals || expr instanceof E_NotEquals ) {
-			return rewriteComparison( expr );
+			return rewriteComparison( expr, useInverse );
 		}
 
 		// other rexpression types aren't considered rewritable at the moment
@@ -273,7 +283,8 @@ public class SchemaMappingImpl implements SchemaMapping
 		return result;
 	}
 
-	protected Expr rewriteComparison( final Expr expr ) {
+	protected Expr rewriteComparison( final Expr expr,
+	                                  final boolean useInverse ) {
 		final Expr left;
 		final Expr right;
 		final boolean equals;
@@ -291,8 +302,8 @@ public class SchemaMappingImpl implements SchemaMapping
 		else
 			throw new UnsupportedOperationException( "Filter expression " + expr + " cannot be rewritten" );
 
-		final List<Expr> leftExprs = expandExpression(left);
-		final List<Expr> rightExprs = expandExpression(right);
+		final List<Expr> leftExprs = expandExpression(left, useInverse);
+		final List<Expr> rightExprs = expandExpression(right, useInverse);
 
 		final List<Expr> rewritten = new ArrayList<>();
 
@@ -321,23 +332,28 @@ public class SchemaMappingImpl implements SchemaMapping
 	 * @param e the expression to expand
 	 * @return the translated expressions
 	 */
-	public List<Expr> expandExpression( final Expr e ) {
+	public List<Expr> expandExpression( final Expr e,
+	                                    final boolean useInverse ) {
 		if ( e.isConstant() ) {
 			final Node n = e.getConstant().asNode();
 
 			if ( ! n.isURI() )
 				return List.of(e);
 
+			final Set<TermMapping> mappings = useInverse ? l2gMap.get(n) : g2lMap.get(n);
+
+			final Set<Node> translatedTerms = new HashSet<>();
+			if ( mappings != null && ! mappings.isEmpty() ) {
+				translatedTerms.addAll(useInverse ? extractGlobalTermsForLocalTerm(mappings) : extractLocalTermsForGlobalTerm(mappings));
+			}
+
+			if ( translatedTerms.isEmpty() )
+				return List.of(e);
+
 			final List<Expr> exprs = new ArrayList<>();
-			final Set<TermMapping> mappings = g2lMap.get(n);
 
-			if ( mappings != null && ! mappings.isEmpty() )
-				for ( final TermMapping tm : mappings )
-					for ( final Node localTerm :  tm.getLocalTerms() )
-						exprs.add(NodeValue.makeNode(localTerm));
-
-			if ( exprs.isEmpty() )
-				exprs.add(e);
+			for ( final Node term : translatedTerms )
+				exprs.add(NodeValue.makeNode(term));
 
 			return exprs;
 		}

@@ -11,6 +11,8 @@ import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVars;
 
+import se.liu.ida.hefquin.base.data.VocabularyMapping;
+import se.liu.ida.hefquin.base.data.mappings.VocabularyMappingUtils;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -209,7 +211,8 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			createdPlan = createPlanForL2GOrG2LUnderFilter( filterOp,
 			                                                op,
 			                                                subPlanUnderFilter.getSubPlan(0),
-			                                                inputPlan );
+			                                                inputPlan,
+			                                                op.getVocabularyMapping() );
 		}
 
 		@Override
@@ -217,7 +220,8 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			createdPlan = createPlanForL2GOrG2LUnderFilter( filterOp,
 			                                                op,
 			                                                subPlanUnderFilter.getSubPlan(0),
-			                                                inputPlan );
+			                                                inputPlan,
+			                                                op.getVocabularyMapping() );
 		}
 
 		@Override
@@ -364,21 +368,23 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 	 * or a {@link LogicalOpGlobalToLocal}.
 	 */
 	protected LogicalPlan createPlanForL2GOrG2LUnderFilter( final LogicalOpFilter parentFilterOp,
-	                                                        final UnaryLogicalOp childOp,
+	                                                        final UnaryLogicalOp mappingOp,
 	                                                        final LogicalPlan subPlanUnderChildOp,
-	                                                        final LogicalPlan inputPlan ) {
-		// The current implementation does not try to push filter
-		// conditions under the vocabulary rewriting operators,
-		// LogicalOpLocalToGlobal and LogicalOpGlobalToLocal.
-		// Extending the implementation to try to push filter
-		// conditions in these cases is captured as issue #271.
-		//
-		// https://github.com/LiUSemWeb/HeFQUIN/issues/271
-		//
-		// However, for the time being, we only apply the filter
-		// push-down heuristic to the subplan that is under the
-		// given vocabulary rewriting operator.
-		return createPlanAfterPushingInSubPlan(parentFilterOp, childOp, subPlanUnderChildOp, inputPlan);
+	                                                        final LogicalPlan inputPlan,
+	                                                        final VocabularyMapping vm ) {
+		final ExprList exprs;
+		try {
+			if ( mappingOp instanceof LogicalOpLocalToGlobal )
+				exprs = VocabularyMappingUtils.translateExpressions(parentFilterOp.getFilterExpressions(), vm);
+			else
+				exprs = VocabularyMappingUtils.translateExpressionsFromGlobal(parentFilterOp.getFilterExpressions(), vm);
+		}
+		catch ( final UnsupportedOperationException e ) {
+			return createPlanAfterPushingInSubPlan(parentFilterOp, mappingOp, subPlanUnderChildOp, inputPlan);
+		}
+		final LogicalOpFilter translatedFilter = new LogicalOpFilter(exprs, parentFilterOp.mayReduce());
+		final LogicalPlan rewrittenPlan = new LogicalPlanWithUnaryRootImpl(translatedFilter, null, subPlanUnderChildOp);
+		return new LogicalPlanWithUnaryRootImpl(mappingOp, null, apply(rewrittenPlan));
 	}
 
 	/**

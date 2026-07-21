@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -28,6 +29,7 @@ import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.mappings.impl.VocabularyMappingWrappingImpl;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
@@ -42,7 +44,9 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -54,6 +58,7 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.testutils.TestUtils;
 
 public class FilterPushDownTest extends EngineTestBase
 {
@@ -502,6 +507,157 @@ public class FilterPushDownTest extends EngineTestBase
 
 		final LogicalPlan subResult1 = result.getSubPlan(0);
 		assertTrue( subResult1.getRootOperator() instanceof LogicalOpFilter );
+	}
+
+	@Test
+	public void pushFilterUnderL2G() {
+		// a filter above a LocalToGlobal operator is pushed below the operator,
+		// the filter expression is rewritten from the global vocabulary to the local
+		// vocabulary before being pushed into the request
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final FederationMember fmA = new SPARQLEndpointForTest("http://exA.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
+
+		final Node e_l1 = NodeFactory.createURI("http://example.org/local/e1");
+		final Node x = NodeFactory.createVariable("x");
+
+		final VocabularyMappingWrappingImpl vm = TestUtils.createVocabularyMapping();
+		final LogicalOpLocalToGlobal l2gOp = new LogicalOpLocalToGlobal(vm, false);
+
+		final LogicalPlan l2gSubPlan = new LogicalPlanWithUnaryRootImpl(l2gOp, null, new LogicalPlanWithNullaryRootImpl(reqOp, null));
+
+		final Expr e =
+			new E_Equals(
+				new ExprVar(x),
+				NodeValue.makeNode(e_l1)
+			);
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, l2gSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpLocalToGlobal );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fmA );
+
+		final SPARQLRequest resultReq = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq.getQueryPattern() );
+		assertTrue(                                        resultElmt1 instanceof ElementGroup );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(0) instanceof ElementTriplesBlock );
+		assertTrue( ((ElementTriplesBlock) ((ElementGroup) resultElmt1).get(0)).getPattern().get(0).equals(tp1.asJenaTriple()) );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
+
+		final Set<String> actual = TestUtils.extractEqualsPairs( ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr() );
+		assertEquals( Set.of(x + "=<http://example.org/global/e>"), actual );
+	}
+
+	@Test
+	public void pushNonRewritableFilterUnderL2G() {
+		// a non-rewritable filter above a GlobalToLocal operator is not
+		// pushed below the operator
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final FederationMember fmA = new SPARQLEndpointForTest("http://exA.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
+
+
+		final VocabularyMappingWrappingImpl vm = TestUtils.createVocabularyMapping();
+		final LogicalOpLocalToGlobal l2gOp = new LogicalOpLocalToGlobal(vm, false);
+
+		final LogicalPlan l2gSubPlan = new LogicalPlanWithUnaryRootImpl(l2gOp, null, new LogicalPlanWithNullaryRootImpl(reqOp, null));
+
+		final Expr e = new E_IsIRI( new ExprVar(v1) );
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, l2gSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpFilter );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpLocalToGlobal );
+
+		final LogicalPlan subSubResult = subResult.getSubPlan(0);
+		assertTrue( subSubResult.getRootOperator() instanceof LogicalOpRequest );
+
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subSubResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fmA );
+
+		// check that the request is unchanged
+		final SPARQLRequest resultReq = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq.getQueryPattern() );
+		assertTrue( resultElmt1 instanceof ElementTriplesBlock );
+		assertEquals( tp1.asJenaTriple(), ((ElementTriplesBlock) resultElmt1).getPattern().get(0) );
+	}
+
+	@Test
+	public void pushFilterUnderG2L() {
+		// a filter above a GlobalToLocal operator is pushed below the operator,
+		// the filter expression is rewritten from the global vocabulary to the local
+		// vocabulary before being pushed into the request.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final FederationMember fmA = new SPARQLEndpointForTest("http://exA.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
+
+		final Node e_g  = NodeFactory.createURI("http://example.org/global/e");
+		final Node x = NodeFactory.createVariable("x");
+
+		final VocabularyMappingWrappingImpl vm = TestUtils.createVocabularyMapping();
+		final LogicalOpGlobalToLocal g2lOp = new LogicalOpGlobalToLocal(vm, false);
+
+		final LogicalPlan g2lSubPlan = new LogicalPlanWithUnaryRootImpl(g2lOp, null, new LogicalPlanWithNullaryRootImpl(reqOp, null));
+
+		final Expr e =
+			new E_Equals(
+				new ExprVar(x),
+				NodeValue.makeNode(e_g)
+			);
+		final UnaryLogicalOp rootOp = new LogicalOpFilter(e, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(rootOp, null, g2lSubPlan);
+
+		// test
+		final LogicalPlan result = new FilterPushDown().apply(filterPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpGlobalToLocal );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subResult.getRootOperator();
+		assertTrue( resultReqOp.getFederationMember() == fmA );
+
+		final SPARQLRequest resultReq = (SPARQLRequest) resultReqOp.getRequest();
+		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultReq.getQueryPattern() );
+		assertTrue(                                        resultElmt1 instanceof ElementGroup );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(0) instanceof ElementTriplesBlock );
+		assertTrue( ((ElementTriplesBlock) ((ElementGroup) resultElmt1).get(0)).getPattern().get(0).equals(tp1.asJenaTriple()) );
+		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
+
+		final Set<String> actual = TestUtils.extractEqualsPairs( ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr() );
+		assertEquals( Set.of(
+			x + "=<http://example.org/local/e1>",
+			x + "=<http://example.org/local/e2>"
+		), actual );
 	}
 
 	@Test

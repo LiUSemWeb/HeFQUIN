@@ -196,7 +196,7 @@ public class VocabularyMappingUtils
 	                                                        final VocabularyMapping vm ) {
 		final Op subOp = op.getSubOp();
 		final SPARQLGraphPattern translatedSubPlan = translateGraphPattern(subOp, vm);
-		final ExprList translatedExprs = translateExpressions( op.getExprs(), vm );
+		final ExprList translatedExprs = translateExpressionsFromGlobal( op.getExprs(), vm );
 		return translatedSubPlan.mergeWith(translatedExprs);
 	}
 
@@ -205,7 +205,19 @@ public class VocabularyMappingUtils
 		final ExprList rewrittenExpressions = new ExprList();
 
 		for ( final Expr e : exprs ) {
-			final Expr rewritten = vm.translateExpression(e);
+			final Expr rewritten = vm.translateExpressionFromLocal(e);
+
+			rewrittenExpressions.add(rewritten);
+		}
+		return rewrittenExpressions;
+	}
+
+	public static ExprList translateExpressionsFromGlobal( final ExprList exprs,
+	                                                       final VocabularyMapping vm ) {
+		final ExprList rewrittenExpressions = new ExprList();
+
+		for ( final Expr e : exprs ) {
+			final Expr rewritten = vm.translateExpressionFromGlobal(e);
 
 			rewrittenExpressions.add(rewritten);
 		}

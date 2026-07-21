@@ -42,8 +42,13 @@ public class TestUtils
 			}
 
 			@Override
-			public Expr translateExpression(Expr e) {
+			public Expr translateExpressionFromLocal( Expr e ) {
 				throw new UnsupportedOperationException("Unimplemented method 'translateExpression'");
+			}
+
+			@Override
+			public Expr translateExpressionFromGlobal( Expr e ) {
+				throw new UnsupportedOperationException("Unimplemented method 'translateExpressionFromGlobal'");
 			}
 
 			@Override
