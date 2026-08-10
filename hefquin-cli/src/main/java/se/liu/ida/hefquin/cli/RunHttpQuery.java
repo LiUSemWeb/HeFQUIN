@@ -20,6 +20,7 @@ import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.cmd.ArgDecl;
+import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.cmd.TerminationException;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
@@ -36,8 +37,8 @@ import org.apache.jena.sparql.serializer.QuerySerializerFactory;
 import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.serializer.SerializerRegistry;
 import org.apache.jena.sparql.util.QueryExecUtils;
+import org.apache.jena.sys.JenaSystem;
 
-import arq.cmdline.CmdARQ;
 import arq.cmdline.ModTime;
 import se.liu.ida.hefquin.base.net.http.HttpConstants;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
@@ -59,15 +60,18 @@ import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12He
  * The resulting solution mappings are printed to standard output or written
  * to a file in a user-selected results format.
  */
-public class RunHttpQuery extends CmdARQ
+public class RunHttpQuery extends CmdGeneral
 {
+	static {
+		JenaSystem.init();
+	}
+
 	protected final ModTime          modTime =          new ModTime();
 	protected final ModPlanPrinting  modPlanPrinting =  new ModPlanPrinting();
 	protected final ModQuery         modQuery =         new ModQuery();
 	protected final ModResultsOutExt modResultsExt =    new ModResultsOutExt();
 
 	protected final ArgDecl argServerAddress = new ArgDecl( ArgDecl.HasValue, "server" );
-	protected final ArgDecl argOutputToFile =  new ArgDecl( ArgDecl.HasValue, "outputToFile" );
 
 	protected static final Pattern BASE_PATTERN = Pattern.compile( "\\bBASE\\b\\s*<[^>]+>", Pattern.CASE_INSENSITIVE );
 
@@ -83,11 +87,10 @@ public class RunHttpQuery extends CmdARQ
 		addModule( modTime );
 		addModule( modPlanPrinting );
 		addModule( modResultsExt );
-
-		add( argServerAddress, "--server", "Address of HeFQUIN service" );
-		add( argOutputToFile, "--outputToFile", "Output file (optional, printing to stdout if omitted)" );
-
 		addModule( modQuery );
+
+		getUsage().startCategory("Server");
+		add( argServerAddress, "--server", "Address of HeFQUIN service" );
 	}
 
 	/**
@@ -134,15 +137,16 @@ public class RunHttpQuery extends CmdARQ
 			out = NullPrintStream.INSTANCE;
 			ownedStream = null;
 		}
-		else if ( contains(argOutputToFile) ) {
+		else if ( modResultsExt.getOutputFile() != null ) {
+			final String filename = modResultsExt.getOutputFile();
 			try {
-				// Appends to file rather than overwriting
 				ownedStream = new PrintStream(
-					new FileOutputStream( getValue( argOutputToFile ), true ),
-					true );
+						new FileOutputStream(filename, true), // append to file
+						true ); // auto-flush
 				out = ownedStream;
-			} catch ( final FileNotFoundException e ) {
-				cmdError( "Failed to create print stream for output destination: " + getValue( argOutputToFile ), false );
+			}
+			catch ( final FileNotFoundException e ) {
+				cmdError( "Failed to create print stream for output destination: " + filename, false );
 				return;
 			}
 		}

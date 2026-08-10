@@ -21,6 +21,7 @@ import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
  */
 public class ModResultsOutExt extends ModResultsOut
 {
+	protected final ArgDecl argOutputToFile           = new ArgDecl( ArgDecl.HasValue, "outputToFile" );
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl( ArgDecl.NoValue, "suppressResultPrintout" );
 	protected final ArgDecl argSkipExecution          = new ArgDecl( ArgDecl.NoValue, "skipExecution" );
 	protected final ArgDecl argQueryProcStats         = new ArgDecl( ArgDecl.NoValue, "printQueryProcStats" );
@@ -35,15 +36,14 @@ public class ModResultsOutExt extends ModResultsOut
 	protected boolean printQueryProcStats;
 	protected boolean printFedAccessStats;
 	protected boolean printOnelineTimeStats;
+	protected String outputFile;
 	protected String queryProcStatsFile;
 	protected String fedAccessStatsFile;
 	protected String onelineTimeStatsFile;
 
 	@Override
 	public void registerWith( final CmdGeneral cmdLine ) {
-		super.registerWith(cmdLine);
-		cmdLine.add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
-		cmdLine.add( argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)" );
+		cmdLine.getUsage().startCategory("Statistics Printing");
 		cmdLine.add( argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process" );
 		cmdLine.add( argQueryProcStatsToFile, "--printQueryProcStatsToFile", "Print out statistics about the query execution process to a file" );
 		cmdLine.add( argOnelineTimeStats, "--printQueryProcMeasurements",
@@ -51,6 +51,20 @@ public class ModResultsOutExt extends ModResultsOut
 		cmdLine.add( argOnelineTimeStatsToFile, "--printQueryProcMeasurementsToFile", "Print out measurements about the query processing time to a file" );
 		cmdLine.add( argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager" );
 		cmdLine.add( argFedAccessStatsToFile, "--printFedAccessStatsToFile", "Print out statistics of the federation access manager to a file" );
+
+		// -------------
+		// Instead of using the super-class functionality ...
+		//super.registerWith(cmdLine);
+		// ... we do that part also ourselves:
+		cmdLine.getUsage().startCategory("Results");
+		cmdLine.add( resultsFmtDecl,
+		             "--rfmt",
+		             "Result format (Result set: text, XML, JSON, CSV, TSV; Graph: TTL, NTRIPLES, JSONLD, RDF/XML)") ;
+		// -------------
+
+		cmdLine.add( argOutputToFile, "--outputToFile", "Output file (optional, printing to stdout if omitted)" );
+		cmdLine.add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
+		cmdLine.add( argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)" );
 	}
 
 	@Override
@@ -67,6 +81,9 @@ public class ModResultsOutExt extends ModResultsOut
 
 		printFedAccessStats = cmdLine.contains(argFedAccessStats);
 
+		if ( cmdLine.contains(argOutputToFile) )
+			outputFile = cmdLine.getValue(argOutputToFile);
+
 		if ( cmdLine.contains(argQueryProcStatsToFile) )
 			queryProcStatsFile = cmdLine.getValue(argQueryProcStatsToFile);
 
@@ -75,6 +92,10 @@ public class ModResultsOutExt extends ModResultsOut
 
 		if ( cmdLine.contains(argFedAccessStatsToFile) )
 			fedAccessStatsFile = cmdLine.getValue(argFedAccessStatsToFile);
+	}
+
+	public String getOutputFile() {
+		return outputFile;
 	}
 
 	public boolean isSuppressResultPrintout() {
