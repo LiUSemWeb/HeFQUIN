@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeFQUIN - Materializing an RDF view from an RML mapping</title>
+    <title>HeFQUIN - Executing RML Mappings</title>
 
     <!-- Prism -->
     <link href="../css/prism-coy-without-shadows.css" rel="stylesheet" />
@@ -29,15 +29,17 @@
     <div id="header"></div>
 
     <main>
-        <h1>Materializing an RDF view from an RML mapping</h1>
+        <h1>Command-Line Program to Execute RML Mappings</h1>
         <p>
-            This command-line tool materializes an RDF dataset from an <a href="https://rml.io/specs/rml/">RML mapping</a>. It reads an RML description (Triples Maps), evaluates the mapping against its referenced JSON sources and outputs the resulting RDF dataset.
+            HeFQUIN comes with its own RML processor. The primary use of this RML processor is to create ephemeral RDF representations of non-RDF data obtained from some types of federation members at query runtime (e.g., from JSON-based Web APIs). However, for debugging purposes we also provide a command-line program called <code>hefquin-rmlmat</code> via which the RML processor of HeFQUIN can be used to execute an RML mapping and save the resulting RDF data into a file. This page describes how to use this program. There are related pages that describe the <a href="rml.html">specifics of RML support in HeFQUIN</a> and <a href="programs.html">how to set up the command-line programs</a>.
         </p>
         <p>
-            You can use the program as follows, assuming the file <code>MyMapping.ttl</code> contains your <a href="https://rml.io/specs/rml/">RML mapping</a>. The tool reads this mapping, materializes all <code>rml:TriplesMap</code> definitions and writes the resulting RDF dataset to standard output or a file.
-            It also assumes that you have <a href="programs.html">added the HeFQUIN programs to your <code>PATH</code></a> (otherwise, enter the directory in which you have unpacked the HeFQUIN release and replace <code>hefquin-rmlmat</code> by <code>bin/hefquin-rmlmat</code>).
+            The core functionality of the <code>hefquin-rmlmat</code> program is to read an RDF file that describes an RML mapping, to apply this mapping to the source data files mentioned in the mapping, and to print out the RDF data produced by the previous step. For the moment, only JSON files are supported as source data files.
         </p>
-        <pre><code class="language-bash">hefquin-rmlmat --mapping=MyMapping.ttl</code></pre>
+        <p>
+            You can use the program as follows, assuming the file that contains your RML mapping is called <code>MyMapping.ttl</code>, and assuming that you have <a href="programs.html">added the HeFQUIN programs to your <code>PATH</code></a> (otherwise, enter the directory in which you have unpacked the HeFQUIN release and replace <code>hefquin-rmlmat</code> by <code>bin/hefquin-rmlmat</code>). When using the program in this way, the resulting RDF data will be written to stdout.
+        </p>
+        <pre><code class="language-bash">hefquin-rmlmat --mapping MyMapping.ttl</code></pre>
         <p>
             Further arguments can be passed to the program, which are described in detail below. You can also have the list of supported arguments printed by executing the program with the argument <code>--help</code>.
         </p>
@@ -46,29 +48,29 @@
         <section id="arguments">
             <h2>Arguments</h2>
             <p id="--mapping" style="font-weight:bold">
-                --mapping=&lt;<em>rdf-file</em>>
+                --mapping &lt;<em>file</em>>
                 <em style="padding-left:1em">(mandatory argument)</em>
             </p>
             <p style="padding-left:2em">
-                Path to an RDF file containing the RML mapping. The file must include <code>rml:TriplesMap</code> definitions. All Triples Maps found in the file will be processed during materialization. Supported RDF serializations include Turtle, RDF/XML, JSON-LD and N-Triples.
+                Refers to an RDF file that describes the RML mapping; hence, the file must contain <code>rml:TriplesMap</code> definitions. Every <code>rml:TriplesMap</code> found in the file will be used for the materialization. Supported serialization formats for the given RDF file include Turtle, RDF/XML, JSON-LD and N-Triples.
             </p>
             <p id="--outputToFile" style="font-weight:bold">
-                --outputToFile=&lt;<em>file-name</em>>
+                --outputToFile &lt;<em>file</em>>
             </p>
             <p style="padding-left:2em">
-                Optional output destination file. If omitted, results are written to standard output. If the file already exists, output is appended rather than overwritten.
+                Use this argument if you want the produced RDF data to be written into a file. If this argument is omitted, the result is written to stdout. If the given file already exists, output is appended rather than overwritten.
             </p>
             <p id="--base" style="font-weight:bold">
-                --baseIRI=&lt;<em>iri</em>>
+                --baseIRI &lt;<em>iri</em>>
             </p>
             <p style="padding-left:2em">
-                Optional base IRI used during mapping expansion and IRI resolution. If not provided, an internal default base IRI is used.
+                Use this argument to provide the base IRI to be used for the mapping process. If not provided, an internal default base IRI is used.
             </p>
             <p id="--time" style="font-weight:bold">
                 --time
             </p>
             <p style="padding-left:2em">
-                Enables execution timing. When active, the tool prints the total time spent in the core materialization phase (mapping evaluation + RDF generation).
+                Use this argument to print the total time spent in the core materialization phase (mapping execution + RDF generation).
             </p>
             <p id="--help" style="font-weight:bold">
                 --help
