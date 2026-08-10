@@ -36,7 +36,7 @@
         <p>
             You can use the program as follows, assuming the file <code>MyFedConf.ttl</code> contains the <a href="federation_description.html">description of your federation</a> and the file <code>ExampleQuery.rq</code> contains the <a href="queries.html">query that you want to run</a> over this federation, and assuming that you have <a href="programs.html">added the HeFQUIN programs to your <code>PATH</code></a> (otherwise, enter the directory in which you have unpacked the HeFQUIN release and replace <code>hefquin</code> by <code>bin/hefquin</code>).
         </p>
-        <pre><code class="language-bash">hefquin --fd=MyFedConf.ttl --query=ExampleQuery.rq</code></pre>
+        <pre><code class="language-bash">hefquin --fd MyFedConf.ttl --query ExampleQuery.rq</code></pre>
         <p>
             Further arguments can be passed to the program, which are described in detail below. You can also have the list of supported arguments printed by executing the program with the argument <code>--help</code>.
         </p>
@@ -77,8 +77,8 @@
 
         <section>
             <h2>Result-Related Arguments of the Program</h2>
-            <p id="--results" style="font-weight:bold">
-                --results=&lt;<em>format</em>>
+            <p id="--rfmt" style="font-weight:bold">
+                --rfmt=&lt;<em>format</em>>
             </p>
             <p style="padding-left:2em">
                 Use this argument to specify the format in which you would like the query result to be printed. The possible values for this argument depend on the type of query.
@@ -103,6 +103,12 @@
                     <li>JSONLD - <a href="https://www.w3.org/TR/json-ld/">JSON-LD</a> format.</li>
                     <li>RDF/XML - <a href="https://www.w3.org/TR/rdf-syntax-grammar/">RDF/XML</a> format.</li>
                 </ul>
+            </p>
+            <p style="font-weight:bold">
+                --outputToFile=&lt;<em>file</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument if you want the query result to be written into a file. If this argument is omitted, the result is written to stdout. If the given file already exists, the output is appended to that file (instead of overwriting the file).
             </p>
             <p style="font-weight:bold">
                 --suppressResultPrintout
