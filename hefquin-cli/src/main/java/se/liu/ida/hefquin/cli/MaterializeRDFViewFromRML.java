@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.cmd.ArgDecl;
+import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
@@ -18,11 +19,11 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sys.JenaSystem;
 import org.apache.jena.vocabulary.RDF;
 
 import com.jayway.jsonpath.JsonPathException;
 
-import arq.cmdline.CmdARQ;
 import arq.cmdline.ModLangOutput;
 import arq.cmdline.ModTime;
 import se.liu.ida.hefquin.mappings.algebra.MappingOperator;
@@ -49,8 +50,12 @@ import se.liu.ida.hefquin.mappings.sources.json.JsonObject;
  * The output RDF can be written in different serialization formats and
  * optionally stored in a file or printed to standard output.
  */
-public class MaterializeRDFViewFromRML extends CmdARQ
+public class MaterializeRDFViewFromRML extends CmdGeneral
 {
+	static {
+		JenaSystem.init();
+	}
+
 	protected final ModTime modTime =            new ModTime();
 	protected final ModLangOutput modLangOut =   new ModLangOutput();
 
@@ -81,9 +86,16 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 		addModule(modTime);
 		addModule(modLangOut);
 
-		add( argRdfFile, "--mapping", "RML mapping file" );
-		add( argOutputToFile, "--outputToFile", "Output file (optional, printing to stdout if omitted)" );
-		add( argBaseIRI, "--baseIRI", "Base IRI for mapping (optional, hardcoded IRI used if omitted)" );
+		add( argOutputToFile, "--outputToFile=file", "Output file (optional, printing to stdout if omitted)" );
+
+		getUsage().startCategory("RML-specific arguments");
+		add( argRdfFile, "--mapping=file", "RML mapping file" );
+		add( argBaseIRI, "--baseIRI=IRI", "Base IRI for the mapping process (optional, hardcoded IRI used if omitted)" );
+	}
+
+	@Override
+	protected String getCommandName() {
+		return "hefquin-rmlmat";
 	}
 
 	/**
@@ -95,9 +107,9 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 	@Override
 	protected String getSummary() {
 		return "Usage: " + getCommandName() + " " +
-			"--mapping=<rdf-file> " +
-			"[--outputToFile=<file-name>] " +
-			"[--baseIRI=<iri>]";
+			"--mapping <file> " +
+			"[--outputToFile <file>] " +
+			"[--baseIRI <iri>]";
 	}
 
 	/**
@@ -118,19 +130,22 @@ public class MaterializeRDFViewFromRML extends CmdARQ
 			cmdError( ex.getMessage(), true );
 		}
 
-		final Model rdfModel = RDFDataMgr.loadModel( getValue( argRdfFile ) );
+		final Model rdfModel = RDFDataMgr.loadModel( getValue(argRdfFile) );
 
+		// If no base IRI is given, the default one must be: http://example.org/
+		// ( see the last sentence of Sec.4.1.1 of the RML-Core spec:
+		//   https://kg-construct.github.io/rml-core/spec/docs/#base-iri )
 		final Node chosenBaseIRI =
-			contains(argBaseIRI) ? NodeFactory.createURI( getValue( argBaseIRI ) ) :
-		                           NodeFactory.createURI( "http://example.org/FixedBaseIRI/HardcodedInMaterializeRDFViewFromRML/" );
+			contains(argBaseIRI) ? NodeFactory.createURI( getValue(argBaseIRI) ) :
+		                           NodeFactory.createURI( "http://example.org/" );
 
 		OutputStream outputStream = System.out;
 		if ( contains(argOutputToFile) ) {
 			try {
-				// Appends to file rather than overwriting
-				outputStream = new FileOutputStream( getValue( argOutputToFile ), true );
+				// Should not append to the file but overwrite it
+				outputStream = new FileOutputStream( getValue(argOutputToFile) );
 			} catch ( final FileNotFoundException e ) {
-				cmdError( "Failed to create print stream for output destination: " + getValue( argOutputToFile ), false );
+				cmdError( "Failed to create print stream for output destination: " + getValue(argOutputToFile), false );
 			}
 		}
 
