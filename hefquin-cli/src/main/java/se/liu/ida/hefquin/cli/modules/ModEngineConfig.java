@@ -13,7 +13,7 @@ public class ModEngineConfig extends ModBase
 
 	@Override
 	public void registerWith( final CmdGeneral cmdLine ) {
-		cmdLine.getUsage().startCategory("Configuration options for HeFQUIN engine") ;
+		cmdLine.getUsage().startCategory("Configuration of HeFQUIN") ;
 
 		cmdLine.add(confDescrDecl, "--confDescr", "file with an RDF description of the configuration");
 	}

@@ -43,6 +43,15 @@ public class ModResultsOutExt extends ModResultsOut
 
 	@Override
 	public void registerWith( final CmdGeneral cmdLine ) {
+		cmdLine.getUsage().startCategory("Statistics Printing");
+		cmdLine.add( argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process" );
+		cmdLine.add( argQueryProcStatsToFile, "--printQueryProcStatsToFile", "Print out statistics about the query execution process to a file" );
+		cmdLine.add( argOnelineTimeStats, "--printQueryProcMeasurements",
+			"Print out measurements about the query processing time in one line that can be used for a CSV file" );
+		cmdLine.add( argOnelineTimeStatsToFile, "--printQueryProcMeasurementsToFile", "Print out measurements about the query processing time to a file" );
+		cmdLine.add( argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager" );
+		cmdLine.add( argFedAccessStatsToFile, "--printFedAccessStatsToFile", "Print out statistics of the federation access manager to a file" );
+
 		// -------------
 		// Instead of using the super-class functionality ...
 		//super.registerWith(cmdLine);
@@ -56,13 +65,6 @@ public class ModResultsOutExt extends ModResultsOut
 		cmdLine.add( argOutputToFile, "--outputToFile", "Output file (optional, printing to stdout if omitted)" );
 		cmdLine.add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
 		cmdLine.add( argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)" );
-		cmdLine.add( argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process" );
-		cmdLine.add( argQueryProcStatsToFile, "--printQueryProcStatsToFile", "Print out statistics about the query execution process to a file" );
-		cmdLine.add( argOnelineTimeStats, "--printQueryProcMeasurements",
-			"Print out measurements about the query processing time in one line that can be used for a CSV file" );
-		cmdLine.add( argOnelineTimeStatsToFile, "--printQueryProcMeasurementsToFile", "Print out measurements about the query processing time to a file" );
-		cmdLine.add( argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager" );
-		cmdLine.add( argFedAccessStatsToFile, "--printFedAccessStatsToFile", "Print out statistics of the federation access manager to a file" );
 	}
 
 	@Override

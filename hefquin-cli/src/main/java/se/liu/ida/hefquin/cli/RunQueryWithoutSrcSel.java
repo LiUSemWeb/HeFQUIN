@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.cli;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 import org.apache.commons.io.output.NullPrintStream;
@@ -51,7 +53,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 	/**
 	 * Constructor that initializes the command-line tool with necessary argument
-	 * modules for speciffying, e.g., federation configuration, engine configuration, and output format.
+	 * modules for specifying, e.g., federation configuration, engine configuration, and output format.
 	 *
 	 * @param argv Command-line arguments.
 	 */
@@ -59,11 +61,11 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		super( argv );
 
 		addModule( modTime );
+		addModule( modEngineConfig );
 		addModule( modPlanPrinting );
 		addModule( modResultsExt );
 
 		addModule( modQuery );
-		addModule( modEngineConfig );
 		addModule( modFederation );
 	}
 
@@ -74,7 +76,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	 */
 	@Override
 	protected String getSummary() {
-		return getCommandName() + " --query=<query> --federationDescription=<federation description>";
+		return getCommandName() + " --query <query> --fd <federation description>";
 	}
 
 	/**
@@ -105,13 +107,29 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		final Query query = getQuery();
 		final ResultsFormat resFmt = modResultsExt.getResultsFormat();
 
-		modTime.startTimer();
-
 		final PrintStream out;
+		final PrintStream ownedStream;
+		// Result printout suppression has highest precedence
 		if ( modResultsExt.isSuppressResultPrintout() ) {
 			out = NullPrintStream.INSTANCE;
-		} else {
+			ownedStream = null;
+		}
+		else if ( modResultsExt.getOutputFile() != null ) {
+			final String filename = modResultsExt.getOutputFile();
+			try {
+				ownedStream = new PrintStream(
+						new FileOutputStream(filename, true), // append to file
+						true ); // auto-flush
+				out = ownedStream;
+			}
+			catch ( final FileNotFoundException ex ) {
+				cmdError( "Failed to create print stream for output destination: " + filename, false );
+				return;
+			}
+		}
+		else {
 			out = System.out;
+			ownedStream = null;
 		}
 
 		final QueryProcContextBuilder ctxBuilder = e.getQueryProcContextBuilder()
@@ -121,6 +139,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 					.setExecutablePlanPrinter( modPlanPrinting.getExecutablePlanPrinter() )
 					.setSkipExecution( modResultsExt.isSkipExecution() );
 		final QueryProcContext ctx = ctxBuilder.build();
+
+		modTime.startTimer();
 
 		QueryProcessingStatsAndExceptions statsAndExceptions = null;
 		try {
@@ -141,6 +161,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			System.err.println( ex.getMessage() );
 			ex.printStackTrace( System.err );
 		}
+
+		if ( ownedStream != null )
+			ownedStream.close();
 
 		if ( statsAndExceptions != null && statsAndExceptions.containsExceptions() ) {
 			final List<Exception> exceptions = statsAndExceptions.getExceptions();
