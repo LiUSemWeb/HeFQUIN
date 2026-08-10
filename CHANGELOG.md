@@ -11,7 +11,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Support for MapDB-based persistent cache for federation requests (including cardinality requests), with support for cache replacement and invalidation policies ([#648](https://github.com/LiUSemWeb/HeFQUIN/pull/648)).
 - Support for ChronicleMap-based persistent cache for federation requests (including cardinality requests), with support for cache replacement and invalidation policies ([#546](https://github.com/LiUSemWeb/HeFQUIN/pull/546), [#666](https://github.com/LiUSemWeb/HeFQUIN/pull/666)).
 - CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616), [#643](https://github.com/LiUSemWeb/HeFQUIN/issues/643), [#646](https://github.com/LiUSemWeb/HeFQUIN/issues/646), [#647](https://github.com/LiUSemWeb/HeFQUIN/issues/647), [#653](https://github.com/LiUSemWeb/HeFQUIN/issues/653), [#655](https://github.com/LiUSemWeb/HeFQUIN/issues/655)).
-- CLI program to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601), [#644](https://github.com/LiUSemWeb/HeFQUIN/issues/644)).
+- CLI program to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601), [#644](https://github.com/LiUSemWeb/HeFQUIN/issues/644), [#670](https://github.com/LiUSemWeb/HeFQUIN/issues/670)).
 ### Changed
 - Refactoring issueCardinalityRequest to make it generic ([#630](https://github.com/LiUSemWeb/HeFQUIN/pull/630)).
 - Refactoring maxParallelRequests handling to eliminate redundant constructors in federation access managers ([#650](https://github.com/LiUSemWeb/HeFQUIN/pull/650)).
