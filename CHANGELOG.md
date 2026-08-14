@@ -18,9 +18,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - CLI program to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601), [#644](https://github.com/LiUSemWeb/HeFQUIN/issues/644)).
 ### Changed
 - Refactoring issueCardinalityRequest to make it generic ([#630](https://github.com/LiUSemWeb/HeFQUIN/pull/630)).
-- Refactoring of the persistent cache implementations by introducing cache layer abstraction and a generic hierarchical cache [#658](https://github.com/LiUSemWeb/HeFQUIN/pull/658).
 - Refactoring maxParallelRequests handling to eliminate redundant constructors in federation access managers ([#650](https://github.com/LiUSemWeb/HeFQUIN/pull/650)).
-- Refactoring of persistent cache components to improve reuse and simplify maintenance across cache implementations ([#648](https://github.com/LiUSemWeb/HeFQUIN/pull/648)).
 - Pushing projection variables and distinct into requests to SPARQL endpoints ([#600](https://github.com/LiUSemWeb/HeFQUIN/issues/600), [#629](https://github.com/LiUSemWeb/HeFQUIN/issues/629), [#638](https://github.com/LiUSemWeb/HeFQUIN/issues/638), [#639](https://github.com/LiUSemWeb/HeFQUIN/issues/639), [#642](https://github.com/LiUSemWeb/HeFQUIN/issues/642)).
 - Extending filter push down to l2g and g2l operators ([#667](https://github.com/LiUSemWeb/HeFQUIN/issues/667)).
 - Extending the application of vocabulary mappings to (some kinds of) FILTER / BIND expressions ([#660](https://github.com/LiUSemWeb/HeFQUIN/issues/660)).
