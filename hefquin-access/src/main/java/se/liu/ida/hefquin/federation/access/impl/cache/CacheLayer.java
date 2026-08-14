@@ -43,10 +43,10 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
  * @param <ObjectType> type of objects stored in the cache
  * @param <EntryType>  cache entry type used internally
  */
-public class CacheLayer<IdType,
-                        ObjectType,
-                        EntryType extends CacheEntry<ObjectType>
-                        > implements Cache<IdType, ObjectType>
+public class CacheLayer< IdType,
+                         ObjectType,
+                         EntryType extends CacheEntry<ObjectType> >
+                   implements Cache<IdType, ObjectType>
 {
 	protected final Object lock = new Object();
 	protected final Map<IdType, EntryType> map;
