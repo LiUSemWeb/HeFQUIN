@@ -27,10 +27,10 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
  * @param <ObjectType> type of objects stored in the cache
  * @param <EntryType>  cache entry type used by underlying cache layers
  */
-public class HierarchicalCache<IdType,
-                               ObjectType,
-                               EntryType extends CacheEntry<ObjectType>
-							   > implements Cache<IdType,ObjectType>
+public class HierarchicalCache< IdType,
+                                ObjectType,
+                                EntryType extends CacheEntry<ObjectType> >
+					implements Cache<IdType,ObjectType>
 {
 	protected final Cache<IdType, ObjectType> l1;
 	protected final Cache<IdType, ObjectType> l2;
