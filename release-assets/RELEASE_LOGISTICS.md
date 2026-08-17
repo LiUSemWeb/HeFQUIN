@@ -27,15 +27,18 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 ### Added
 - Support for operator y.
+### Changed
+- nothing yet
 
 ## [1.0.0] - 2024-10-03
 
 ### Changed
 - Refactored the query optimization algorithm.
 ```
-5. Update the version number on the release branch:
+5. Commit the updates to the `CHANGELOG.md` and update the version number on the release branch:
 ```bash
-mvn versions:set -DnewVersion=${RELEASE_VERSION} -DgenerateBackupPoms=false
+git add CHANGELOG.md
+nice -n 19 mvn versions:set -DnewVersion=${RELEASE_VERSION} -DgenerateBackupPoms=false
 git add pom.xml */pom.xml
 git commit -m "bump up version to "${RELEASE_VERSION}
 git push
@@ -45,13 +48,13 @@ git push
 git tag -a ${RELEASE_VERSION} -m "Release version "${RELEASE_VERSION}
 git push origin ${RELEASE_VERSION}
 ```
-7. In the GitHub UI, open a PR for the release branch, ensure that it is merged into `main`, and delete the release branch after merging.
+7. In the GitHub UI, open a [PR](https://github.com/LiUSemWeb/HeFQUIN/pulls) for the release branch, ensure that it is merged into `main`, and delete the release branch after merging.
 8. Pull the latest changes from `main`, delete the release branch locally, and prepare the binaries:
 ```bash
 git checkout main
 git pull
 git branch -d release/${RELEASE_VERSION}
-mvn clean package && mvn package -pl hefquin-service -P build-war -am
+nice -n 19 mvn clean package && nice -n 19 mvn package -pl hefquin-service -P build-war -am
 ```
 9. Prepare the distribution folder:
 ```bash
@@ -63,7 +66,7 @@ release-assets/prepare-dist.sh
 ```
 10. Push the new version to Maven Central by running the following command. Once this process succeeds, you may have to visit your account at https://central.sonatype.com/ to confirm by clicking 'Publish' for the "deployment". Yet, publishing can sometimes take several hours (but usually only takes a few minutes). So, before checking, perform the following step and we come back to checking in the step after that.
 ```bash
-mvn deploy -Dgpg.skip=false
+nice -n 19 mvn deploy -Dgpg.skip=false
 ```
 11. Create the release in GitHub. To this end, go to the `Releases` section and click [`Create a new release`](https://github.com/LiUSemWeb/HeFQUIN/releases/new). Use the version number as the release title (e.g., 1.0.0) and include the relevant parts of the changelog as the release notes. Attach the following binaries: `hefquin-service/target/hefquin-service-1.0.0.war` and `HeFQUIN-1.0.0.zip`.
 
@@ -72,7 +75,7 @@ mvn deploy -Dgpg.skip=false
 13. Increase the version number beyond the version of the release.
 ```bash
 git checkout -b snapshot/${NEXT_VERSION}-SNAPSHOT
-mvn versions:set -DnewVersion=${NEXT_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
+nice -n 19 mvn versions:set -DnewVersion=${NEXT_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
 git add pom.xml */pom.xml
 git commit -m "bump up version beyond ${RELEASE_VERSION}"
 git push --set-upstream origin snapshot/${NEXT_VERSION}-SNAPSHOT
