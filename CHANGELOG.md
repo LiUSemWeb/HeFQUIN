@@ -7,16 +7,14 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- Support for MapDB-based persistent cache for federation requests (including cardinality requests), with support for cache replacement and invalidation policies ([#648](https://github.com/LiUSemWeb/HeFQUIN/pull/648)).
-- Support for ChronicleMap-based persistent cache for federation requests (including cardinality requests), with support for cache replacement and invalidation policies ([#546](https://github.com/LiUSemWeb/HeFQUIN/pull/546), [#666](https://github.com/LiUSemWeb/HeFQUIN/pull/666)).
 - Option to print the query result to a file when using the HeFQUIN CLI ([#671](https://github.com/LiUSemWeb/HeFQUIN/issues/671)).
 - Support configurable logging when using the HeFQUIN CLI ([#659](https://github.com/LiUSemWeb/HeFQUIN/pull/659)).
 - New CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616), [#643](https://github.com/LiUSemWeb/HeFQUIN/issues/643), [#646](https://github.com/LiUSemWeb/HeFQUIN/issues/646), [#647](https://github.com/LiUSemWeb/HeFQUIN/issues/647), [#653](https://github.com/LiUSemWeb/HeFQUIN/issues/653), [#655](https://github.com/LiUSemWeb/HeFQUIN/issues/655), [#671](https://github.com/LiUSemWeb/HeFQUIN/issues/671)).
 - New CLI program to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601), [#644](https://github.com/LiUSemWeb/HeFQUIN/issues/644), [#670](https://github.com/LiUSemWeb/HeFQUIN/issues/670)).
+- Support for *two* persistent cache implementations for federation requests (including cardinality requests): a MapDB-based one and a ChronicleMap-based one, both with support for cache replacement and invalidation policies ([#546](https://github.com/LiUSemWeb/HeFQUIN/pull/546), [#648](https://github.com/LiUSemWeb/HeFQUIN/pull/648), [#658](https://github.com/LiUSemWeb/HeFQUIN/pull/658), [#666](https://github.com/LiUSemWeb/HeFQUIN/pull/666)).
 ### Changed
 - Refactoring issueCardinalityRequest to make it generic ([#630](https://github.com/LiUSemWeb/HeFQUIN/pull/630)).
 - Refactoring maxParallelRequests handling to eliminate redundant constructors in federation access managers ([#650](https://github.com/LiUSemWeb/HeFQUIN/pull/650)).
-- Refactoring of persistent cache components to improve reuse and simplify maintenance across cache implementations ([#648](https://github.com/LiUSemWeb/HeFQUIN/pull/648)).
 - Pushing projection variables and distinct into requests to SPARQL endpoints ([#600](https://github.com/LiUSemWeb/HeFQUIN/issues/600), [#629](https://github.com/LiUSemWeb/HeFQUIN/issues/629), [#638](https://github.com/LiUSemWeb/HeFQUIN/issues/638), [#639](https://github.com/LiUSemWeb/HeFQUIN/issues/639), [#642](https://github.com/LiUSemWeb/HeFQUIN/issues/642)).
 - Extending filter push down to l2g and g2l operators ([#667](https://github.com/LiUSemWeb/HeFQUIN/issues/667)).
 - Extending the application of vocabulary mappings to (some kinds of) FILTER / BIND expressions ([#660](https://github.com/LiUSemWeb/HeFQUIN/issues/660)).
