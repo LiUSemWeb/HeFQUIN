@@ -48,6 +48,11 @@ public class CacheLayer< IdType,
                          EntryType extends CacheEntry<ObjectType> >
                    implements Cache<IdType, ObjectType>
 {
+	// We introduce a separate object for synchronization, instead of simply
+	// synchronizing on the 'map' object below. For the MapDB implementation,
+	// synchronizing on 'map' can cause blocking due to MapDB's internal locking
+	// mechanisms. Using a dedicated lock object keeps the application-level
+	// lock separate and avoids this. For ChronicleMap, this is not an issue.
 	protected final Object lock = new Object();
 	protected final Map<IdType, EntryType> map;
 	protected final int capacity;
