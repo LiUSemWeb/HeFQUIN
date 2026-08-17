@@ -7,11 +7,22 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- Option to print the query result to a file when using the HeFQUIN CLI ([#671](https://github.com/LiUSemWeb/HeFQUIN/issues/671)).
-- Support configurable logging when using the HeFQUIN CLI ([#659](https://github.com/LiUSemWeb/HeFQUIN/pull/659)).
+- none yet
+### Changed
+- none yet
+### Planned for Next Release
+- Support for authentication ([#669](https://github.com/LiUSemWeb/HeFQUIN/issues/669)).
+- SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
+
+
+## [0.0.12] - 2026-08-17
+
+### Added
+- Support for *two* persistent cache implementations for federation requests (including cardinality requests): a MapDB-based one and a ChronicleMap-based one, both with support for cache replacement and invalidation policies ([#546](https://github.com/LiUSemWeb/HeFQUIN/pull/546), [#648](https://github.com/LiUSemWeb/HeFQUIN/pull/648), [#658](https://github.com/LiUSemWeb/HeFQUIN/pull/658), [#666](https://github.com/LiUSemWeb/HeFQUIN/pull/666)).
 - New CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616), [#643](https://github.com/LiUSemWeb/HeFQUIN/issues/643), [#646](https://github.com/LiUSemWeb/HeFQUIN/issues/646), [#647](https://github.com/LiUSemWeb/HeFQUIN/issues/647), [#653](https://github.com/LiUSemWeb/HeFQUIN/issues/653), [#655](https://github.com/LiUSemWeb/HeFQUIN/issues/655), [#671](https://github.com/LiUSemWeb/HeFQUIN/issues/671)).
 - New CLI program to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601), [#644](https://github.com/LiUSemWeb/HeFQUIN/issues/644), [#670](https://github.com/LiUSemWeb/HeFQUIN/issues/670)).
-- Support for *two* persistent cache implementations for federation requests (including cardinality requests): a MapDB-based one and a ChronicleMap-based one, both with support for cache replacement and invalidation policies ([#546](https://github.com/LiUSemWeb/HeFQUIN/pull/546), [#648](https://github.com/LiUSemWeb/HeFQUIN/pull/648), [#658](https://github.com/LiUSemWeb/HeFQUIN/pull/658), [#666](https://github.com/LiUSemWeb/HeFQUIN/pull/666)).
+- Option to print the query result to a file when using the HeFQUIN CLI ([#671](https://github.com/LiUSemWeb/HeFQUIN/issues/671)).
+- Configurable logging when using the HeFQUIN CLI ([#659](https://github.com/LiUSemWeb/HeFQUIN/pull/659)).
 ### Changed
 - Refactoring issueCardinalityRequest to make it generic ([#630](https://github.com/LiUSemWeb/HeFQUIN/pull/630)).
 - Refactoring maxParallelRequests handling to eliminate redundant constructors in federation access managers ([#650](https://github.com/LiUSemWeb/HeFQUIN/pull/650)).
@@ -25,12 +36,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Removes ChronicleMap-based cardinality-specific cache implementation (ChronicleMapCardinalityCache) and related files ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
 - Remove wrapped response from CardinalityResponseImpl ([#628](https://github.com/LiUSemWeb/HeFQUIN/pull/628)).
 - Bug fix in quality assignment during join cardinality estimation ([#665](https://github.com/LiUSemWeb/HeFQUIN/pull/665)).
-### Planned for Next Release
-- Persistent cache for requests ([#546](https://github.com/LiUSemWeb/HeFQUIN/issues/546), [#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590), [#599](https://github.com/LiUSemWeb/HeFQUIN/issues/599)).
-- SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
 
 
 ## [0.0.11] - 2026-05-19
+
 ### Added
 - Adding a limit on the number of parallel requests that are executed against any particular endpoint/server at any point in time ([#556](https://github.com/LiUSemWeb/HeFQUIN/pull/556)).
 - Support for MINUS directly within the HeFQUIN engine ([#586](https://github.com/LiUSemWeb/HeFQUIN/pull/586), [#587](https://github.com/LiUSemWeb/HeFQUIN/pull/587), [#592](https://github.com/LiUSemWeb/HeFQUIN/pull/592)).
