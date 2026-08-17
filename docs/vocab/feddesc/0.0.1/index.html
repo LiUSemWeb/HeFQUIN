@@ -305,6 +305,9 @@ ul, p {
       },
       {
         "@value": "Jonas Westman"
+      },
+      {
+        "@value": "Kent Thang"
       }
     ],
     "https://schema.org/description": [
@@ -352,6 +355,7 @@ ul, p {
                 <li><p>Olaf Hartig</p></li>
                 <li><p>Robin Keskisärkkä</p></li>
                 <li><p>Jonas Westman</p></li>
+                <li><p>Kent Thang</p></li>
               </ul>
             </dd>
           </div>
@@ -1255,6 +1259,87 @@ ul, p {
             </tr>
           </table>
         </div>
+        <div class="property entity" id="usernameenvironmentvariable">
+          <h3>username environment variable
+            <sup class="sup-dp" title="OWL Datatype Property">dp</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#usernameEnv</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>The name of the environment variable from which the username is obtained. This property is intended to be used with authentication schemes that require a username, such as wotsec:BasicSecurityScheme. At runtime, the implementation is expected to resolve the environment variable and use its value when authenticating requests.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2001/XMLSchema#string">xsd:string</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="passwordenvironmentvariable">
+          <h3>password environment variable
+            <sup class="sup-dp" title="OWL Datatype Property">dp</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#passwordEnv</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>The name of the environment variable from which the password is obtained. This property is intended to be used with authentication schemes that require a password, such as wotsec:BasicSecurityScheme. At runtime, the implementation is expected to resolve the environment variable and use its value when authenticating requests.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2001/XMLSchema#string">xsd:string</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="tokenenvironmentvariable">
+          <h3>token environment variable
+            <sup class="sup-dp" title="OWL Datatype Property">dp</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#tokenEnv</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>The name of the environment variable from which an authentication token is obtained. This property is intended to be used with token-based authentication schemes, such as wotsec:BearerSecurityScheme. At runtime, the implementation is expected to resolve the environment variable and use its value when authenticating requests.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2001/XMLSchema#string">xsd:string</a>
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
       <div id="namespaces">
         <h2>Namespaces</h2>
@@ -1424,6 +1509,15 @@ ul, p {
             </li>
             <li>
               <a href="#vocabularyMappingsFile">vocabulary mappings file</a>
+            </li>
+            <li>
+              <a href="#usernameenvironmentvariable">username environment variable</a>
+            </li>
+            <li>
+              <a href="#passwordenvironmentvariable">password environment variable</a>
+            </li>
+            <li>
+              <a href="#tokenenvironmentvariable">token environment variable</a>
             </li>
           </ul>
         </li>

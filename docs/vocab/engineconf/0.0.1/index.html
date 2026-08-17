@@ -699,12 +699,6 @@ ul, p {
                   </li>
                   <li>
                     <span>
-                      <a href="#value:QueryProcContext">http://w3id.org/hefquin/engineconf#value:QueryProcContext</a>
-                      <sup class="sup-ni" title="OWL Named Individual">ni</sup>
-                    </span>
-                  </li>
-                  <li>
-                    <span>
                       <a href="#value:CostModel">http://w3id.org/hefquin/engineconf#value:CostModel</a>
                       <sup class="sup-ni" title="OWL Named Individual">ni</sup>
                     </span>
@@ -872,18 +866,6 @@ ul, p {
                 <ul>
                   <li>
                     <span>
-                      <a href="#lptoppConverter">logical-to-physical plan converter</a>
-                      <sup class="sup-p" title="RDF Property">p</sup>
-                    </span>
-                  </li>
-                  <li>
-                    <span>
-                      <a href="#loptopopConverter">logical-to-physical operator converter</a>
-                      <sup class="sup-p" title="RDF Property">p</sup>
-                    </span>
-                  </li>
-                  <li>
-                    <span>
                       <a href="#sourcePlanner">source planner</a>
                       <sup class="sup-p" title="RDF Property">p</sup>
                     </span>
@@ -897,6 +879,18 @@ ul, p {
                   <li>
                     <span>
                       <a href="#physicalOptimizer">physical optimizer</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#lptoppConverter">logical-to-physical plan converter</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#loptopopConverter">logical-to-physical operator converter</a>
                       <sup class="sup-p" title="RDF Property">p</sup>
                     </span>
                   </li>
@@ -1328,88 +1322,6 @@ ul, p {
             </tr>
           </table>
         </div>
-        <div class="property entity" id="lptoppConverter">
-          <h3>logical-to-physical plan converter
-            <sup class="sup-p" title="RDF Property">p</sup>
-          </h3>
-          <table>
-            <tr>
-              <th>IRI</th>
-              <td>
-                <code>http://w3id.org/hefquin/engineconf#lptoppConverter</code>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
-              </th>
-              <td><p>Specifies the logical-to-physical plan converter to be used by the query planner.</p></td>
-            </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
-              </th>
-              <td>
-                <span>
-                  <a href="#QueryPlanner">Query Planner</a>
-                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
-              </th>
-              <td>
-                <span>
-                  <a href="#LogicalToPhysicalPlanConverter">Logical-to-Physical Plan Converter</a>
-                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
-                </span>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="property entity" id="loptopopConverter">
-          <h3>logical-to-physical operator converter
-            <sup class="sup-p" title="RDF Property">p</sup>
-          </h3>
-          <table>
-            <tr>
-              <th>IRI</th>
-              <td>
-                <code>http://w3id.org/hefquin/engineconf#loptopopConverter</code>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
-              </th>
-              <td><p>Specifies the logical-to-physical operator converter to be used by the query planner.</p></td>
-            </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
-              </th>
-              <td>
-                <span>
-                  <a href="#QueryPlanner">Query Planner</a>
-                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
-              </th>
-              <td>
-                <span>
-                  <a href="#LogicalToPhysicalOpConverter">Logical-to-Physical Operator Converter</a>
-                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
-                </span>
-              </td>
-            </tr>
-          </table>
-        </div>
         <div class="property entity" id="planCompiler">
           <h3>plan compiler
             <sup class="sup-p" title="RDF Property">p</sup>
@@ -1609,6 +1521,88 @@ ul, p {
               <td>
                 <span>
                   <a href="#PhysicalOptimizer">Physical Optimizer</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="lptoppConverter">
+          <h3>logical-to-physical plan converter
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#lptoppConverter</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the logical-to-physical plan converter to be used by the query planner.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryPlanner">Query Planner</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#LogicalToPhysicalPlanConverter">Logical-to-Physical Plan Converter</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="loptopopConverter">
+          <h3>logical-to-physical operator converter
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#loptopopConverter</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the logical-to-physical operator converter to be used by the query planner.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryPlanner">Query Planner</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#LogicalToPhysicalOpConverter">Logical-to-Physical Operator Converter</a>
                   <sup class="sup-c" title="OWL/RDFS Class">c</sup>
                 </span>
               </td>
@@ -1965,12 +1959,6 @@ ul, p {
               <a href="#queryPlanner">query planner</a>
             </li>
             <li>
-              <a href="#lptoppConverter">logical-to-physical plan converter</a>
-            </li>
-            <li>
-              <a href="#loptopopConverter">logical-to-physical operator converter</a>
-            </li>
-            <li>
               <a href="#planCompiler">plan compiler</a>
             </li>
             <li>
@@ -1984,6 +1972,12 @@ ul, p {
             </li>
             <li>
               <a href="#physicalOptimizer">physical optimizer</a>
+            </li>
+            <li>
+              <a href="#lptoppConverter">logical-to-physical plan converter</a>
+            </li>
+            <li>
+              <a href="#loptopopConverter">logical-to-physical operator converter</a>
             </li>
             <li>
               <a href="#javaClassName">name of Java class</a>

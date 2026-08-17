@@ -4,19 +4,54 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 >
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">HeFQUIN Engine Configuration</rdfs:label>
+    <rdfs:comment xml:lang="en">Class of configurations of the HeFQUIN engine. Instances of this class must have exactly one 'fedAccessMgr' property and one 'queryProcessor' property.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#ConstructorArgument"/>
+    <rdfs:label xml:lang="en">List-Based Constructor Argument</rdfs:label>
+    <rdfs:comment xml:lang="en">Every instance of this class represents a 'java.util.List' that is populated and then passed as an argument to the constructor of a corresponding Java class. Instances of this class must have exactly one 'elementsTypeName' property and exactly one 'elements' property. Each element of the 'rdf:List' that the latter property refers to is expected to be of type 'InstantiableJavaClass' and the values of their respective 'javaClassName' properties are expected to be either the same as the value of the 'elementsTypeName' property (of this 'ListBasedConstructorArgument') or the name of a sub-class of the class mentioned by the 'elementsTypeName' property.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#QueryPlanner">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Query Planner</rdfs:label>
+    <rdfs:comment xml:lang="en">Instances of this class must have exactly one 'sourcePlanner' property, one 'logicalOptimizer' property, one 'physicalOptimizer' property.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#elements">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument"/>
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+    <rdfs:label xml:lang="en">list elements</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the elements to be included in a list that is created as an argument for the constructor of a Java class. Every element of this list is expected to be of type 'InstantiableJavaClass'.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#SourcePlanner">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:label xml:lang="en">Source Planner</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+    <dc:creator>Olaf Hartig</dc:creator>
+    <dc:date>2026-06-10</dc:date>
+    <dc:format>RDF</dc:format>
+    <dc:identifier rdf:resource="http://w3id.org/hefquin/engineconf"/>
+    <dc:title xml:lang="en">Vocabulary for describing configurations of the HeFQUIN engine</dc:title>
+    <rdfs:label xml:lang="en">Vocabulary for describing configurations of the HeFQUIN engine</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#ExecutionEngine">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:label xml:lang="en">Execution Engine</rdfs:label>
+  </rdf:Description>
   <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#argumentTypeName">
     <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
     <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#InstantiationBasedConstructorArgument"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/10/XMLSchema#string"/>
     <rdfs:label xml:lang="en">name of Java class or a Java interface</rdfs:label>
     <rdfs:comment xml:lang="en">Specifies the full name of a Java class or of a Java interface.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#javaClassName">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2000/10/XMLSchema#string"/>
-    <rdfs:label xml:lang="en">name of Java class</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the full name of a Java class.</rdfs:comment>
   </rdf:Description>
   <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#elementsTypeName">
     <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
@@ -25,10 +60,34 @@
     <rdfs:label xml:lang="en">name of Java class or a Java interface</rdfs:label>
     <rdfs:comment xml:lang="en">Specifies the full name of a Java class or of a Java interface.</rdfs:comment>
   </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#ConstructorArgument">
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#executionEngine">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryProcessor"/>
+    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#ExecutionEngine"/>
+    <rdfs:label xml:lang="en">execution engine</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the execution engine to be used by the query processor.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#PhysicalOptimizer">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">Constructor Argument</rdfs:label>
-    <rdfs:comment xml:lang="en">This class is a superclass of any kind of argument to be passed to the constructor of a corresponding Java class. Concrete types of arguments are captured by the subclasses of this class.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:label xml:lang="en">Physical Optimizer</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#QueryProcessor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Query Processor</rdfs:label>
+    <rdfs:comment xml:lang="en">Instances of this class must have exactly one 'queryPlanner' property, one 'planCompiler' property, one 'executionEngine' property. Additionally, they may have a 'costModel' property.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#constructorArguments">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+    <rdfs:label xml:lang="en">constructor arguments</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the list of arguments that must be passed to the constructor of the Java class. Every element of this list is expected to be of type 'ConstructorArgument'.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#PlanCompiler">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:label xml:lang="en">Plan Compiler</rdfs:label>
   </rdf:Description>
   <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#costModel">
     <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
@@ -37,19 +96,62 @@
     <rdfs:label xml:lang="en">cost model</rdfs:label>
     <rdfs:comment xml:lang="en">Specifies the cost model to be used by the query processor. This property is optional because not all configurations of the HeFQUIN query processor use a cost model.</rdfs:comment>
   </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#LogicalToPhysicalOpConverter">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:label xml:lang="en">Logical-to-Physical Operator Converter</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#javaClassName">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/10/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">name of Java class</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the full name of a Java class.</rdfs:comment>
+  </rdf:Description>
   <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#InstantiableJavaClass">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
     <rdfs:label xml:lang="en">Instantiable Java Class</rdfs:label>
     <rdfs:comment xml:lang="en">Every instance of this class represents a Java class that can be instantiated based on the given RDF description. Instances of this class must have exactly one 'javaClassName' property. Additionally, they may have a 'constructorArguments' property.</rdfs:comment>
   </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
-    <dc:creator>Olaf Hartig</dc:creator>
-    <dc:date>2023-11-29</dc:date>
-    <dc:format>RDF</dc:format>
-    <dc:identifier rdf:resource="http://w3id.org/hefquin/engineconf"/>
-    <dc:title xml:lang="en">Vocabulary for describing configurations of the HeFQUIN engine</dc:title>
-    <rdfs:label xml:lang="en">Vocabulary for describing configurations of the HeFQUIN engine</rdfs:label>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#CostModel">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:label xml:lang="en">Cost Model</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#ValueBasedConstructorArgument">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#ConstructorArgument"/>
+    <rdfs:label xml:lang="en">Value-Based Constructor Argument</rdfs:label>
+    <rdfs:comment xml:lang="en">Every instance of this class refers to a concrete value to be passed as an argument to the constructor of a corresponding Java class. In particular, to refer to this value, instances of this class must have exactly one 'rdf:value' property. The value may be either a literal or any 'DesignatedArgumentValue' defined in this vocabulary.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#queryProcessor">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration"/>
+    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#QueryProcessor"/>
+    <rdfs:label xml:lang="en">query processor</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the query processor to be used in a configuration of the HeFQUIN engine. Every such configuration has only one query processor.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#lptoppConverter">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryPlanner"/>
+    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#LogicalToPhysicalPlanConverter"/>
+    <rdfs:label xml:lang="en">logical-to-physical plan converter</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the logical-to-physical plan converter to be used by the query planner.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#physicalOptimizer">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryPlanner"/>
+    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#PhysicalOptimizer"/>
+    <rdfs:label xml:lang="en">physical optimizer</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the physical optimizer to be used by the query planner.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#ConstructorArgument">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Constructor Argument</rdfs:label>
+    <rdfs:comment xml:lang="en">This class is a superclass of any kind of argument to be passed to the constructor of a corresponding Java class. Concrete types of arguments are captured by the subclasses of this class.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#value:ExecServiceForFedAccess">
+    <rdf:type rdf:resource="http://w3id.org/hefquin/engineconf#DesignatedArgumentValue"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#InstantiationBasedConstructorArgument">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
@@ -57,6 +159,61 @@
     <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
     <rdfs:label xml:lang="en">Instantiation-Based Constructor Argument</rdfs:label>
     <rdfs:comment xml:lang="en">Every instance of this class represents a Java object that is obtained by instantiating a Java class and that is meant to be passed to a constructor in order to instantiate another Java class. In addition to the 'javaClassName' property and the (optional) 'constructorArguments' property, every instance of this class must have exactly one 'argumentTypeName' property. The value of this property is either the same as the value of the 'javaClassName' property or it is the name of a superclass or an interface of the class mentioned by the 'javaClassName' property.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#queryPlanner">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryProcessor"/>
+    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#QueryPlanner"/>
+    <rdfs:label xml:lang="en">query planner</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the query planner to be used by the query processor.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#LogicalOptimizer">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:label xml:lang="en">Logical Optimizer</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#planCompiler">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryProcessor"/>
+    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#PlanCompiler"/>
+    <rdfs:label xml:lang="en">plan compiler</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the plan compiler to be used by the query processor.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#fedAccessMgr">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration"/>
+    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#FederationAccessManager"/>
+    <rdfs:label xml:lang="en">federation access manager</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the federation access manager to be used in a configuration of the HeFQUIN engine. Every such configuration has only one federation access manager.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#logicalOptimizer">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryPlanner"/>
+    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#LogicalOptimizer"/>
+    <rdfs:label xml:lang="en">logical optimizer</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the logical optimizer to be used by the query planner.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#FederationAccessManager">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:label xml:lang="en">Federation Access Manager</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#LogicalToPhysicalPlanConverter">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
+    <rdfs:label xml:lang="en">Logical-to-Physical Plan Converter</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#DesignatedArgumentValue">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Designated Argument Value</rdfs:label>
+    <rdfs:comment xml:lang="en">The instances of this class that are defined in this vocabulary can be referred to as values by a 'ValueBasedConstructorArgument'.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#sourcePlanner">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryPlanner"/>
+    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#SourcePlanner"/>
+    <rdfs:label xml:lang="en">source planner</rdfs:label>
+    <rdfs:comment xml:lang="en">Specifies the source planner to be used by the query planner.</rdfs:comment>
   </rdf:Description>
   <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#loptopopConverter">
     <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
@@ -66,166 +223,6 @@
     <rdfs:comment xml:lang="en">Specifies the logical-to-physical operator converter to be used by the query planner.</rdfs:comment>
   </rdf:Description>
   <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#value:CostModel">
-    <rdf:type rdf:resource="http://w3id.org/hefquin/engineconf#DesignatedArgumentValue"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#QueryProcessor">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">Query Processor</rdfs:label>
-    <rdfs:comment xml:lang="en">Instances of this class must have exactly one 'queryPlanner' property, one 'planCompiler' property, one 'executionEngine' property. Additionally, they may have a 'costModel' property.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#logicalOptimizer">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryPlanner"/>
-    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#LogicalOptimizer"/>
-    <rdfs:label xml:lang="en">logical optimizer</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the logical optimizer to be used by the query planner.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#lptoppConverter">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryPlanner"/>
-    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#LogicalToPhysicalPlanConverter"/>
-    <rdfs:label xml:lang="en">logical-to-physical plan converter</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the logical-to-physical plan converter to be used by the query planner.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#queryPlanner">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryProcessor"/>
-    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#QueryPlanner"/>
-    <rdfs:label xml:lang="en">query planner</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the query planner to be used by the query processor.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#LogicalToPhysicalPlanConverter">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:label xml:lang="en">Logical-to-Physical Plan Converter</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#QueryPlanner">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">Query Planner</rdfs:label>
-    <rdfs:comment xml:lang="en">Instances of this class must have exactly one 'sourcePlanner' property, one 'logicalOptimizer' property, one 'physicalOptimizer' property.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#PhysicalOptimizer">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:label xml:lang="en">Physical Optimizer</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#sourcePlanner">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryPlanner"/>
-    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#SourcePlanner"/>
-    <rdfs:label xml:lang="en">source planner</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the source planner to be used by the query planner.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#queryProcessor">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration"/>
-    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#QueryProcessor"/>
-    <rdfs:label xml:lang="en">query processor</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the query processor to be used in a configuration of the HeFQUIN engine. Every such configuration has only one query processor.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#CostModel">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:label xml:lang="en">Cost Model</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#constructorArguments">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
-    <rdfs:label xml:lang="en">constructor arguments</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the list of arguments that must be passed to the constructor of the Java class. Every element of this list is expected to be of type 'ConstructorArgument'.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#ConstructorArgument"/>
-    <rdfs:label xml:lang="en">List-Based Constructor Argument</rdfs:label>
-    <rdfs:comment xml:lang="en">Every instance of this class represents a 'java.util.List' that is populated and then passed as an argument to the constructor of a corresponding Java class. Instances of this class must have exactly one 'elementsTypeName' property and exactly one 'elements' property. Each element of the 'rdf:List' that the latter property refers to is expected to be of type 'InstantiableJavaClass' and the values of their respective 'javaClassName' properties are expected to be either the same as the value of the 'elementsTypeName' property (of this 'ListBasedConstructorArgument') or the name of a sub-class of the class mentioned by the 'elementsTypeName' property.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#physicalOptimizer">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryPlanner"/>
-    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#PhysicalOptimizer"/>
-    <rdfs:label xml:lang="en">physical optimizer</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the physical optimizer to be used by the query planner.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#planCompiler">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryProcessor"/>
-    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#PlanCompiler"/>
-    <rdfs:label xml:lang="en">plan compiler</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the plan compiler to be used by the query processor.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#SourcePlanner">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:label xml:lang="en">Source Planner</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#elements">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument"/>
-    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
-    <rdfs:label xml:lang="en">list elements</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the elements to be included in a list that is created as an argument for the constructor of a Java class. Every element of this list is expected to be of type 'InstantiableJavaClass'.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#FederationAccessManager">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:label xml:lang="en">Federation Access Manager</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#executionEngine">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#QueryProcessor"/>
-    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#ExecutionEngine"/>
-    <rdfs:label xml:lang="en">execution engine</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the execution engine to be used by the query processor.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#ValueBasedConstructorArgument">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#ConstructorArgument"/>
-    <rdfs:label xml:lang="en">Value-Based Constructor Argument</rdfs:label>
-    <rdfs:comment xml:lang="en">Every instance of this class refers to a concrete value to be passed as an argument to the constructor of a corresponding Java class. In particular, to refer to this value, instances of this class must have exactly one 'rdf:value' property. The value may be either a literal or any 'DesignatedArgumentValue' defined in this vocabulary.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#PlanCompiler">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:label xml:lang="en">Plan Compiler</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#ExecutionEngine">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:label xml:lang="en">Execution Engine</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#LogicalOptimizer">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:label xml:lang="en">Logical Optimizer</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#fedAccessMgr">
-    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration"/>
-    <rdfs:range rdf:resource="http://w3id.org/hefquin/engineconf#FederationAccessManager"/>
-    <rdfs:label xml:lang="en">federation access manager</rdfs:label>
-    <rdfs:comment xml:lang="en">Specifies the federation access manager to be used in a configuration of the HeFQUIN engine. Every such configuration has only one federation access manager.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#value:QueryProcContext">
-    <rdf:type rdf:resource="http://w3id.org/hefquin/engineconf#DesignatedArgumentValue"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">HeFQUIN Engine Configuration</rdfs:label>
-    <rdfs:comment xml:lang="en">Class of configurations of the HeFQUIN engine. Instances of this class must have exactly one 'fedAccessMgr' property and one 'queryProcessor' property.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#LogicalToPhysicalOpConverter">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/engineconf#InstantiableJavaClass"/>
-    <rdfs:label xml:lang="en">Logical-to-Physical Operator Converter</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#DesignatedArgumentValue">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en">Designated Argument Value</rdfs:label>
-    <rdfs:comment xml:lang="en">The instances of this class that are defined in this vocabulary can be referred to as values by a 'ValueBasedConstructorArgument'.</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://w3id.org/hefquin/engineconf#value:ExecServiceForFedAccess">
     <rdf:type rdf:resource="http://w3id.org/hefquin/engineconf#DesignatedArgumentValue"/>
   </rdf:Description>
 </rdf:RDF>
