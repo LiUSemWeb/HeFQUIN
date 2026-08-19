@@ -46,7 +46,7 @@
         <pre><code class="language-bash">hefquin-rmlmat --help</code></pre>
 
         <section id="arguments">
-            <h2>RML Mapping Arguments</h2>
+            <h2>RML-Specific Arguments of the Program</h2>
             <p id="--mapping" style="font-weight:bold">
                 --mapping &lt;<em>file</em>>
                 <em style="padding-left:1em">(mandatory argument)</em>
@@ -63,9 +63,9 @@
         </section>
 
         <section>
-            <h2>Output Control Arguments</h2>
+            <h2>Output-Related Arguments of the Program</h2>
             <p id="--output" style="font-weight:bold">
-                --output=&lt;<em>format</em>>
+                --output &lt;<em>format</em>>
             </p>
             <p style="padding-left:2em">
                 Use this argument to specify the format in which the RDF output should be serialized. If the specified format supports streaming, the output is streamed. Otherwise, the output is produced using a non-streaming writer.
@@ -74,13 +74,13 @@
                 The <a href="#--output">--output</a>, <a href="#--formatted">--formatted</a> and <a href="#--stream">--stream</a> arguments are mutually exclusive.
             </p>
             <p id="--formatted" style="font-weight:bold">
-                --formatted=&lt;<em>format</em>>
+                --formatted &lt;<em>format</em>>
             </p>
             <p style="padding-left:2em">
                 Use this argument to specify the format in which the RDF output should be serialized using pretty printing. This option uses a non-streaming writer and therefore consumes memory while producing the output.
             </p>
             <p id="--stream" style="font-weight:bold">
-                --stream=&lt;<em>format</em>>
+                --stream &lt;<em>format</em>>
             </p>
             <p style="padding-left:2em">
                 Use this argument to specify the format in which the RDF output should be serialized using a streaming writer. This option is useful for producing output without keeping the entire RDF dataset in memory.
@@ -127,7 +127,7 @@
         </section>
 
         <section>
-            <h2>Experiments-Related Arguments</h2>
+            <h2>Experiments-Related Arguments of the Program</h2>
             <p id="--time" style="font-weight:bold">
                 --time
             </p>
