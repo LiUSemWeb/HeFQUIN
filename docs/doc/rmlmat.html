@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Executing RML Mappings</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-coy-without-shadows.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <script>
+        // trim any preceeding or trailing whitespaces from code snippets
+        window.addEventListener('load', trimCode);
+    </script>
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>Command-Line Program to Execute RML Mappings</h1>
+        <p>
+            HeFQUIN comes with its own RML processor. The primary use of this RML processor is to create ephemeral RDF representations of non-RDF data obtained from some types of federation members at query runtime (e.g., from JSON-based Web APIs). However, for debugging purposes we also provide a command-line program called <code>hefquin-rmlmat</code> via which the RML processor of HeFQUIN can be used to execute an RML mapping and save the resulting RDF data into a file. This page describes how to use this program. There are related pages that describe the <a href="rml.html">specifics of RML support in HeFQUIN</a> and <a href="programs.html">how to set up the command-line programs</a>.
+        </p>
+        <p>
+            The core functionality of the <code>hefquin-rmlmat</code> program is to read an RDF file that describes an RML mapping, to apply this mapping to the source data files mentioned in the mapping, and to print out the RDF data produced by the previous step. For the moment, only JSON files are supported as source data files.
+        </p>
+        <p>
+            You can use the program as follows, assuming the file that contains your RML mapping is called <code>MyMapping.ttl</code>, and assuming that you have <a href="programs.html">added the HeFQUIN programs to your <code>PATH</code></a> (otherwise, enter the directory in which you have unpacked the HeFQUIN release and replace <code>hefquin-rmlmat</code> by <code>bin/hefquin-rmlmat</code>). When using the program in this way, the resulting RDF data will be written to stdout.
+        </p>
+        <pre><code class="language-bash">hefquin-rmlmat --mapping MyMapping.ttl</code></pre>
+        <p>
+            Further arguments can be passed to the program, which are described in detail below. You can also have the list of supported arguments printed by executing the program with the argument <code>--help</code>.
+        </p>
+        <pre><code class="language-bash">hefquin-rmlmat --help</code></pre>
+
+        <section id="arguments">
+            <h2>RML-Specific Arguments of the Program</h2>
+            <p id="--mapping" style="font-weight:bold">
+                --mapping &lt;<em>file</em>>
+                <em style="padding-left:1em">(mandatory argument)</em>
+            </p>
+            <p style="padding-left:2em">
+                Refers to an RDF file that describes the RML mapping; hence, the file must contain <code>rml:TriplesMap</code> definitions. Every <code>rml:TriplesMap</code> found in the file will be used for the materialization. Supported serialization formats for the given RDF file include Turtle, RDF/XML, JSON-LD and N-Triples.
+            </p>
+            <p id="--base" style="font-weight:bold">
+                --baseIRI &lt;<em>iri</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to provide the base IRI to be used for the mapping process. If not provided, an internal default base IRI is used.
+            </p>
+        </section>
+
+        <section>
+            <h2>Output-Related Arguments of the Program</h2>
+            <p id="--output" style="font-weight:bold">
+                --output &lt;<em>format</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to specify the format in which the RDF output should be serialized. If the specified format supports streaming, the output is streamed. Otherwise, the output is produced using a non-streaming writer.
+            </p>
+            <p style="padding-left:2em">
+                The <a href="#--output">--output</a>, <a href="#--formatted">--formatted</a> and <a href="#--stream">--stream</a> arguments are mutually exclusive.
+            </p>
+            <p id="--formatted" style="font-weight:bold">
+                --formatted &lt;<em>format</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to specify the format in which the RDF output should be serialized using pretty printing. This option uses a non-streaming writer and therefore consumes memory while producing the output.
+            </p>
+            <p id="--stream" style="font-weight:bold">
+                --stream &lt;<em>format</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to specify the format in which the RDF output should be serialized using a streaming writer. This option is useful for producing output without keeping the entire RDF dataset in memory.
+            </p>
+
+            <h4>Supported Output Formats</h4>
+            <p style="padding-left:2em">
+                The following formats are supported:
+            </p>
+
+            <ul style="margin-left:4em">
+                <li>NQUADS - <a href="https://www.w3.org/TR/n-quads/">N-Quads</a> format (<b>default</b>).</li>
+                <li>TTL - <a href="https://www.w3.org/TR/turtle/">RDF Turtle</a> format.</li>
+                <li>NTRIPLES - <a href="https://www.w3.org/TR/n-triples/">N-Triples</a> format.</li>
+                <li>TRIG - <a href="https://www.w3.org/TR/trig/">TriG</a> format.</li>
+                <li>TRIX - <a href="https://www.w3.org/2004/03/trix/">TriX</a> format.</li>
+                <li>RDF-THRIFT - RDF Thrift format.</li>
+                <li>RDF-PROTO - RDF Protocol Buffers format.</li>
+                <li>RDF/XML - <a href="https://www.w3.org/TR/rdf-syntax-grammar/">RDF/XML</a> format.</li>
+                <li>JSONLD - <a href="https://www.w3.org/TR/json-ld/">JSON-LD</a> format.</li>
+                <li>RDF/JSON - <a href="https://www.w3.org/TR/rdf-json/">RDF/JSON</a> format.</li>
+            </ul>
+
+            <p style="padding-left:2em">
+                The <a href="#--output">--output</a> and
+                <a href="#--formatted">--formatted</a> arguments support all of the
+                formats listed above. The <a href="#--stream">--stream</a> argument
+                supports Turtle, N-Triples, N-Quads, TriG, TriX, RDF-THRIFT and
+                RDF-PROTO.
+            </p>
+
+            <p id="--compress" style="font-weight:bold">
+                --compress
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to compress the RDF output using GZIP.
+            </p>
+            <p id="--outputToFile" style="font-weight:bold">
+                --outputToFile &lt;<em>file</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument if you want the produced RDF data to be written into a file. If this argument is omitted, the result is written to stdout. If the given file already exists, it will be overwritten.
+            </p>
+        </section>
+
+        <section>
+            <h2>Experiments-Related Arguments of the Program</h2>
+            <p id="--time" style="font-weight:bold">
+                --time
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to print the total time spent in the core materialization phase (mapping execution + RDF generation).
+            </p>
+        </section>
+
+        <section>
+            <h2>Other Arguments of the Program</h2>
+            <p id="--help" style="font-weight:bold">
+                --help
+            </p>
+            <p style="padding-left:2em">
+                If this argument is given, the program prints a list of all supported arguments and terminates (i.e., all other given arguments are ignored).
+            </p>
+        </section>
+
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>

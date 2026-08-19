@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeFQUIN - Querying a Federation via the Command-Line Program</title>
+    <title>HeFQUIN - Querying a Federation via the Command-Line Programs</title>
 
     <!-- Prism -->
     <link href="../css/prism-coy-without-shadows.css" rel="stylesheet" />
@@ -29,24 +29,29 @@
     <div id="header"></div>
 
     <main>
-        <h1>Querying a Federation via the HeFQUIN Command-Line Program</h1>
+        <h1>Querying a Federation via the HeFQUIN Command-Line Programs</h1>
         <p>
-            HeFQUIN comes with <a href="programs.html">several command-line programs</a>, including one to run queries over a federation directly from the command line. This page focuses on that program.
+            HeFQUIN comes with <a href="programs.html">several command-line programs</a>, including <em>two programs</em> to run queries over a federation. One of them, called <code>hefquin-client</code>, provides this functionality through interacting with a <a href="index.html#service">HeFQUIN service</a>. The other one, simply called <code>hefquin</code>, uses an instance of the HeFQUIN engine created directly within this program and, thus, can be used without starting up a HeFQUIN service in a separate process. The latter may be your first choice if you simply want to try HeFQUIN, or for experimentation and testing purposes, whereas the HeFQUIN client-server combination should be the preferred choice if you want to run multiple queries, because it avoids initializing the engine for every single query.
         </p>
         <p>
-            You can use the program as follows, assuming the file <code>MyFedConf.ttl</code> contains the <a href="federation_description.html">description of your federation</a> and the file <code>ExampleQuery.rq</code> contains the <a href="queries.html">query that you want to run</a> over this federation, and assuming that you have <a href="programs.html">added the HeFQUIN programs to your <code>PATH</code></a> (otherwise, enter the directory in which you have unpacked the HeFQUIN release and replace <code>hefquin</code> by <code>bin/hefquin</code>).
+            You can use the <code>hefquin</code> program as follows, assuming the file <code>MyFedConf.ttl</code> contains the <a href="federation_description.html">description of your federation</a> and the file <code>ExampleQuery.rq</code> contains the <a href="queries.html">query that you want to run</a> over this federation, and assuming that you have <a href="programs.html">added the HeFQUIN programs to your <code>PATH</code></a> (otherwise, enter the directory in which you have unpacked the HeFQUIN release and replace <code>hefquin</code> by <code>bin/hefquin</code>).
         </p>
-        <pre><code class="language-bash">hefquin --fd=MyFedConf.ttl --query=ExampleQuery.rq</code></pre>
+        <pre><code class="language-bash">hefquin --fd MyFedConf.ttl --query ExampleQuery.rq</code></pre>
         <p>
-            Further arguments can be passed to the program, which are described in detail below. You can also have the list of supported arguments printed by executing the program with the argument <code>--help</code>.
+            Similarly, the <code>hefquin-client</code> program can be used by issuing the following command, assuming that the HeFQUIN service you want interact with is available at the address <a href="http://localhost:8080/">http://localhost:8080/</a>, and assuming again that you have <a href="programs.html">added the HeFQUIN programs to your <code>PATH</code></a> (otherwise, enter the directory in which you have unpacked the HeFQUIN release and replace <code>hefquin-client</code> by <code>bin/hefquin-client</code>). In this case, the given query (in <code>ExampleQuery.rq</code>) will be executed over the federation for which the service is set up.
+        </p>
+        <pre><code class="language-bash">hefquin-client --server http://localhost:8080/ --query ExampleQuery.rq</code></pre>
+        <p>
+            Further arguments can be passed to both programs, which are described in detail below. You can also have the list of supported arguments printed by executing the programs with the argument <code>--help</code>.
         </p>
         <pre><code class="language-bash">hefquin --help</code></pre>
+        <pre><code class="language-bash">hefquin-client --help</code></pre>
 
-        <section id="arguments">
-            <h2>Query-Related Arguments of the Program</h2>
+        <section>
+            <h2>Arguments of Only One of the Programs</h2>
             <p id="--fd" style="font-weight:bold">
                 --fd=&lt;<em>file</em>>
-                <em style="padding-left:1em">(mandatory argument)</em>
+                <em style="padding-left:1em">(mandatory argument of the <code>hefquin</code> program)</em>
             </p>
             <p style="padding-left:2em">
                 Refers to a file that contains an RDF-based description of the federation to be queried. The file can be in any RDF serialization format (e.g., Turtle, N-Triples, JSON-LD) and it must use the <a href="federation_description.html">HeFQUIN Federation Vocabulary</a>. Every instance of type <code>fd:FederationMember</code> described by this document will be considered as a member of the federation to be queried.
@@ -54,6 +59,17 @@
             <p style="padding-left:2em">
                 This argument may be provided multiple times, which is useful if the federation description is distributed across multiple files (e.g., one file per federation member).
             </p>
+            <p id="--server" style="font-weight:bold">
+                --server=&lt;<em>URI</em>>
+                <em style="padding-left:1em">(mandatory argument of the <code>hefquin-client</code> program)</em>
+            </p>
+            <p style="padding-left:2em">
+                The address of the HeFQUIN service to be used. This service should be set up using the same version of HeFQUIN as the client program that you are using.
+            </p>
+        </section>
+
+        <section>
+            <h2>Query-Related Arguments of both Programs</h2>
             <p id="--query" style="font-weight:bold">
                 --query=&lt;<em>file</em>>
                 <em style="padding-left:1em">(mandatory argument)</em>
@@ -76,9 +92,9 @@
         </section>
 
         <section>
-            <h2>Result-Related Arguments of the Program</h2>
-            <p id="--results" style="font-weight:bold">
-                --results=&lt;<em>format</em>>
+            <h2>Result-Related Arguments of both Programs</h2>
+            <p id="--rfmt" style="font-weight:bold">
+                --rfmt=&lt;<em>format</em>>
             </p>
             <p style="padding-left:2em">
                 Use this argument to specify the format in which you would like the query result to be printed. The possible values for this argument depend on the type of query.
@@ -105,6 +121,12 @@
                 </ul>
             </p>
             <p style="font-weight:bold">
+                --outputToFile=&lt;<em>file</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument if you want the query result to be written into a file. If this argument is omitted, the result is written to stdout. If the given file already exists, the output is appended to that file (instead of overwriting the file).
+            </p>
+            <p style="font-weight:bold">
                 --suppressResultPrintout
             </p>
             <p style="padding-left:2em">
@@ -113,7 +135,7 @@
         </section>
 
         <section>
-            <h2>Planning-Related Arguments of the Program</h2>
+            <h2>Planning-Related Arguments of both Programs</h2>
 
             <p id="--printSourceAssignment" style="font-weight:bold">
                 --printSourceAssignment
@@ -168,7 +190,7 @@
         </section>
 
         <section>
-            <h2>Experiments-Related Arguments of the Program</h2>
+            <h2>Experiments-Related Arguments of both Programs</h2>
             <p id="--printQueryProcMeasurements" style="font-weight:bold">
                 --printQueryProcMeasurements
             </p>
@@ -244,7 +266,7 @@
         </section>
 
         <section>
-            <h2>Other Arguments of the Program</h2>
+            <h2>Other Arguments of both Programs</h2>
             <p id="--confDescr" style="font-weight:bold">
                 --confDescr=&lt;<em>file</em>>
             </p>
