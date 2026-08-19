@@ -46,7 +46,7 @@
         <pre><code class="language-bash">hefquin-rmlmat --help</code></pre>
 
         <section id="arguments">
-            <h2>Arguments</h2>
+            <h2>RML Mapping Arguments</h2>
             <p id="--mapping" style="font-weight:bold">
                 --mapping &lt;<em>file</em>>
                 <em style="padding-left:1em">(mandatory argument)</em>
@@ -54,24 +54,63 @@
             <p style="padding-left:2em">
                 Refers to an RDF file that describes the RML mapping; hence, the file must contain <code>rml:TriplesMap</code> definitions. Every <code>rml:TriplesMap</code> found in the file will be used for the materialization. Supported serialization formats for the given RDF file include Turtle, RDF/XML, JSON-LD and N-Triples.
             </p>
-            <p id="--outputToFile" style="font-weight:bold">
-                --outputToFile &lt;<em>file</em>>
-            </p>
-            <p style="padding-left:2em">
-                Use this argument if you want the produced RDF data to be written into a file. If this argument is omitted, the result is written to stdout. If the given file already exists, it will be overwritten.
-            </p>
             <p id="--base" style="font-weight:bold">
                 --baseIRI &lt;<em>iri</em>>
             </p>
             <p style="padding-left:2em">
                 Use this argument to provide the base IRI to be used for the mapping process. If not provided, an internal default base IRI is used.
             </p>
+        </section>
+
+        <section>
+            <h2>Output Control Arguments</h2>
+            <p id="--output" style="font-weight:bold">
+                --output=&lt;<em>format</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to specify the format in which the RDF output should be serialized. If the specified format supports streaming, the output is streamed. Otherwise, the output is produced using a non-streaming writer.
+            </p>
+            <p style="padding-left:2em">
+                The <a href="#--output">--output</a>, <a href="#--formatted">--formatted</a> and <a href="#--stream">--stream</a> arguments are mutually exclusive.
+            </p>
+            <p id="--formatted" style="font-weight:bold">
+                --formatted=&lt;<em>format</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to specify the format in which the RDF output should be serialized using pretty printing. This option uses a non-streaming writer and therefore consumes memory while producing the output.
+            </p>
+            <p id="--stream" style="font-weight:bold">
+                --stream=&lt;<em>format</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to specify the format in which the RDF output should be serialized using a streaming writer. This option is useful for producing output without keeping the entire RDF dataset in memory.
+            </p>
+            <p id="--compress" style="font-weight:bold">
+                --compress
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to compress the RDF output using gzip.
+            </p>
+            <p id="--outputToFile" style="font-weight:bold">
+                --outputToFile &lt;<em>file</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument if you want the produced RDF data to be written into a file. If this argument is omitted, the result is written to stdout. If the given file already exists, it will be overwritten.
+            </p>
+        </section>
+
+        <section>
+            <h2>Experiments-Related Arguments</h2>
             <p id="--time" style="font-weight:bold">
                 --time
             </p>
             <p style="padding-left:2em">
                 Use this argument to print the total time spent in the core materialization phase (mapping execution + RDF generation).
             </p>
+        </section>
+
+        <section>
+            <h2>Other Arguments of the Program</h2>
             <p id="--help" style="font-weight:bold">
                 --help
             </p>
