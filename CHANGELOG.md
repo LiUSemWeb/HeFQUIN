@@ -7,9 +7,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- none yet
+- nothing yet
 ### Changed
-- none yet
+- Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/issues/675)).
 ### Planned for Next Release
 - Support for authentication ([#669](https://github.com/LiUSemWeb/HeFQUIN/issues/669)).
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
