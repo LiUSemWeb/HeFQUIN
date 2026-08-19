@@ -2,9 +2,20 @@ package se.liu.ida.hefquin.federation;
 
 import org.apache.jena.graph.NodeFactory;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLEntrypoint;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLField;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.impl.GraphQLEntrypointType;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 import se.liu.ida.hefquin.federation.members.impl.BRTPFServerImpl;
+import se.liu.ida.hefquin.federation.members.impl.GraphQLEndpointImpl;
 import se.liu.ida.hefquin.federation.members.impl.Neo4jServerImpl;
+import se.liu.ida.hefquin.federation.members.impl.RESTEndpointImpl;
 import se.liu.ida.hefquin.federation.members.impl.SPARQLEndpointImpl;
 import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
 
@@ -79,12 +90,69 @@ public abstract class FederationTestBase
 		}
 	}
 
-	protected static class Neo4jServerImpl4Test extends Neo4jServerImpl
+	protected static class Neo4jServerForTest extends Neo4jServerImpl
 	{
-		public Neo4jServerImpl4Test() {
+		public Neo4jServerForTest() {
 			super( NodeFactory.createURI("http://example.org/neo"),
 			       "http://localhost:7474/db/neo4j/tx" );
 		}
+
+		public Neo4jServerForTest( final String baseURL ) {
+			super( NodeFactory.createURI("http://example.org/neo"),
+			       baseURL );
+		}
 	}
 
+	protected static class RESTEndpointForTest extends RESTEndpointImpl
+	{
+		public RESTEndpointForTest( final String urlTemplate, final List<Parameter> params ) {
+			super( NodeFactory.createURI("http://example.org/rest"),
+			       urlTemplate,
+			       params );
+		}
+
+		public RESTEndpointForTest( final String baseURL, final String urlTemplate, final List<Parameter> params ) {
+			super( NodeFactory.createURI(baseURL),
+			       urlTemplate,
+			       params );
+		}
+	}
+
+	protected static class GraphQLEndpointForTest extends GraphQLEndpointImpl
+	{
+		public GraphQLEndpointForTest() {
+			super( NodeFactory.createURI("http://example.org/graphlql"),
+			       "http://example.org/graphlql",
+			       new EmptyGraphQLSchema() );
+		}
+
+		public GraphQLEndpointForTest( final String url ) {
+			super( NodeFactory.createURI("http://example.org/graphlql"),
+			       url,
+			       new EmptyGraphQLSchema() );
+		}
+	}
+
+	protected static class EmptyGraphQLSchema implements GraphQLSchema {
+		@Override
+		public boolean containsGraphQLObjectType( final String objectTypeName ) { return false; }
+
+		@Override
+		public boolean containsGraphQLField( final String objectTypeName, final String fieldName ) { return false; }
+
+		@Override
+		public GraphQLFieldType getGraphQLFieldType( final String objectTypeName, final String fieldName ) { return null; }
+
+		@Override
+		public String getGraphQLFieldValueType( final String objectTypeName, final String fieldName ) { return null; }
+
+		@Override
+		public Set<String> getGraphQLObjectTypes() { return Set.of(); }
+
+		@Override
+		public Map<String, GraphQLField> getGraphQLObjectFields( final String objectTypeName ) { return Map.of(); }
+
+		@Override
+		public GraphQLEntrypoint getEntrypoint( final String objectTypeName, final GraphQLEntrypointType fieldType ) { return null; }
+	}
 }
