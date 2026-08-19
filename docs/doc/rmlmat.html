@@ -85,11 +85,38 @@
             <p style="padding-left:2em">
                 Use this argument to specify the format in which the RDF output should be serialized using a streaming writer. This option is useful for producing output without keeping the entire RDF dataset in memory.
             </p>
+
+            <h4>Supported Output Formats</h4>
+            <p style="padding-left:2em">
+                The following formats are supported:
+            </p>
+
+            <ul style="margin-left:4em">
+                <li>NQUADS - <a href="https://www.w3.org/TR/n-quads/">N-Quads</a> format (<b>default</b>).</li>
+                <li>TTL - <a href="https://www.w3.org/TR/turtle/">RDF Turtle</a> format.</li>
+                <li>NTRIPLES - <a href="https://www.w3.org/TR/n-triples/">N-Triples</a> format.</li>
+                <li>TRIG - <a href="https://www.w3.org/TR/trig/">TriG</a> format.</li>
+                <li>TRIX - <a href="https://www.w3.org/2004/03/trix/">TriX</a> format.</li>
+                <li>RDF-THRIFT - RDF Thrift format.</li>
+                <li>RDF-PROTO - RDF Protocol Buffers format.</li>
+                <li>RDF/XML - <a href="https://www.w3.org/TR/rdf-syntax-grammar/">RDF/XML</a> format.</li>
+                <li>JSONLD - <a href="https://www.w3.org/TR/json-ld/">JSON-LD</a> format.</li>
+                <li>RDF/JSON - <a href="https://www.w3.org/TR/rdf-json/">RDF/JSON</a> format.</li>
+            </ul>
+
+            <p style="padding-left:2em">
+                The <a href="#--output">--output</a> and
+                <a href="#--formatted">--formatted</a> arguments support all of the
+                formats listed above. The <a href="#--stream">--stream</a> argument
+                supports Turtle, N-Triples, N-Quads, TriG, TriX, RDF-THRIFT and
+                RDF-PROTO.
+            </p>
+
             <p id="--compress" style="font-weight:bold">
                 --compress
             </p>
             <p style="padding-left:2em">
-                Use this argument to compress the RDF output using gzip.
+                Use this argument to compress the RDF output using GZIP.
             </p>
             <p id="--outputToFile" style="font-weight:bold">
                 --outputToFile &lt;<em>file</em>>
