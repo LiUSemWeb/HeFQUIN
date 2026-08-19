@@ -3,13 +3,16 @@ package se.liu.ida.hefquin.cli;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
+import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.graph.Node;
@@ -19,6 +22,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.sys.JenaSystem;
 import org.apache.jena.vocabulary.RDF;
 
@@ -249,13 +253,63 @@ public class MaterializeRDFViewFromRML extends CmdGeneral
 
 		final Dataset dataset = MappingRelationUtils.convertToRDF(mappingRelation);
 
+		final OutputStream outputStream = setupOutputStream(out);
+		final RDFFormat outputFormat = getOutputFormat();
+
 		// Write the model to assigned output stream
-		RDFDataMgr.write( out, dataset.getDefaultModel(), modLangOut.getOutputStreamFormat() );
+		RDFDataMgr.write( outputStream, dataset.getDefaultModel(), outputFormat );
+
+		if ( outputStream instanceof GZIPOutputStream gzip ) {
+			try {
+				gzip.finish();
+			}
+			catch ( final IOException e ) {
+				throw new RuntimeIOException(
+					"Finishing the compressed output stream caused an exception.", e );
+			}
+		}
 
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
-			System.out.println("Overall Processing Time: " + modTime.timeStr(time) + " sec");
+			System.err.println("Overall Processing Time: " + modTime.timeStr(time) + " sec");
 		}
+	}
+
+	/**
+	 * Sets up the output stream for writing RDF data. If output compression is
+	 * enabled, the given output stream is wrapped in a GZIP output stream.
+	 *
+	 * @param outStreamBase the base output stream (e.g., {@code System.out})
+	 * @return the output stream to use for writing the RDF data
+	 */
+	protected OutputStream setupOutputStream( final OutputStream outStreamBase ) {
+		if ( modLangOut.compressedOutput() ) {
+			try {
+				return new GZIPOutputStream(outStreamBase, true);
+			}
+			catch ( final IOException e ) {
+				throw new RuntimeIOException(
+					"Setting up the GZIPOutputStream caused an exception.", e );
+			}
+		}
+
+		return outStreamBase;
+	}
+
+	/**
+	 * Determines the RDF format to use for output. If a streaming output format
+	 * is configured, that format is returned; otherwise, the configured formatted
+	 * output format is returned.
+	 *
+	 * @return the RDF format to use for output
+	 */
+	protected RDFFormat getOutputFormat() {
+		final RDFFormat streamFormat = modLangOut.getOutputStreamFormat();
+
+		if ( streamFormat != null )
+			return streamFormat;
+
+		return modLangOut.getOutputFormatted();
 	}
 
 	/**
