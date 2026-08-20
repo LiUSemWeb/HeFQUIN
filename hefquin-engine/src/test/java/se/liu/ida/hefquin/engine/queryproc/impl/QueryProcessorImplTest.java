@@ -337,8 +337,14 @@ public class QueryProcessorImplTest extends EngineTestBase
 			};
 			final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessorImpl();
 			final RESTRequestProcessor reqProcREST = new RESTRequestProcessorImpl();
+			final GraphQLRequestProcessor reqProcGraphQL = new GraphQLRequestProcessorImpl();
 
-			final FederationAccessManager fedAccessMgr = new BlockingFederationAccessManagerImpl(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j, reqProcREST);
+			final FederationAccessManager fedAccessMgr = new BlockingFederationAccessManagerImpl(reqProcSPARQL,
+			                                                                                     reqProcTPF,
+			                                                                                     reqProcBRTPF,
+			                                                                                     reqProcNeo4j,
+			                                                                                     reqProcREST,
+			                                                                                     reqProcGraphQL);
 
 			// executing the tested method
 			final Iterator<SolutionMapping> it = processQuery(queryString, fedCat, fedAccessMgr);
