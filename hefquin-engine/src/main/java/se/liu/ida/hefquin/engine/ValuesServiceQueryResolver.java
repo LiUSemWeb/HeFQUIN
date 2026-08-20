@@ -157,80 +157,113 @@ import se.liu.ida.hefquin.jenaext.sparql.syntax.syntaxtransform.ExtendedElementT
  */
 public class ValuesServiceQueryResolver
 {
+	// Set to false to disable the use of multi-request operators,
+	// which should be done only for testing/evaluation purposes.
+	protected static final boolean useMultiRequestOperators = true;
+
 	/**
 	 * If the WHERE clause of the given query is of a form that should be
 	 * rewritten, then this method replaces the WHERE clause of the query
 	 * by the rewritten one. Otherwise, the WHERE clause of the query is
 	 * not changed.
 	 *
-	 * An {@link UnsupportedQueryException} is thrown if it is discovered
-	 * that the WHERE clause of the given query uses VALUES clauses and
-	 * SERVICE clauses in a way that is currently not supported.
+	 * @throws UnsupportedQueryException if the WHERE clause of the
+	 * given query uses VALUES clauses and SERVICE clauses in a way
+	 * that is currently not supported.
 	 *
-	 * An {@link IllegalQueryException} is thrown if it is discovered
-	 * that the WHERE clause of the given query uses VALUES clauses in an
-	 * incorrect way.
+	 * @throws IllegalQueryException if the WHERE clause of the given
+	 * query uses VALUES clauses in an incorrect way.
 	 */
 	public static void expandValuesPlusServicePattern( final Query q )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
-		if ( q.getQueryPattern() instanceof ElementGroup eg ) {
-			// If the query pattern does not have at least two elements, there
-			// is nothing to do here (because we need at least a VALUES clause
-			// and a SERVICE clause to do something).
-			if ( eg.size() < 2 )
-				return;
+		final Element elmt = q.getQueryPattern();
 
-			// Rewrite the elements of the query pattern.
-			final List<Element> newElmts;
-			try {
-				newElmts = expandValuesPlusServicePattern( eg.getElements() );
-			}
-			catch ( final MyUnsupportedQueryException e ) {
-				throw new UnsupportedQueryException( q, e.getMessage(), e );
-			}
-			catch ( final MyIllegalQueryException e ) {
-				throw new IllegalQueryException( q, e.getMessage(), e );
-			}
-
-			// If the attempt to rewrite the elements of the query
-			// pattern did not result in any change (as indicated
-			// by a null value), there is nothing to be done here.
-			if ( newElmts == null )
-				return;
-
-			// Safety check.
-			assert newElmts.size() > 0;
-
-			final Element newQueryPattern;
-			if ( newElmts.size() == 1 ) {
-				// If rewriting the elements of the query pattern resulted
-				// in a single new element, use that element as the new
-				// query pattern.
-				newQueryPattern = newElmts.get(0);
-			}
-			else {
-				// If rewriting the elements of the query pattern resulted
-				// in multiple new elements, gorup them together as the new
-				// query pattern.
-				final ElementGroup newGroup = new ElementGroup();
-				for ( final Element elmt : newElmts ) {
-					newGroup.addElement(elmt);
-				}
-				newQueryPattern = newGroup;
-			}
-
-			// Clean up groups of one in the new query pattern (if any) and ...
-			final ElementTransform t = new ExtendedElementTransformCleanGroupsOfOne();
-			final Element newQueryPattern2 = ElementTransformer.transform(newQueryPattern, t);
-			// ... establish the result as the new query pattern.
-			q.setQueryPattern(newQueryPattern2);
-		}
-		else {
-			// We are not expecting the query pattern to be
-			// anything else than a group graph pattern.
+		// We are not expecting the query pattern to be
+		// anything else than a group graph pattern.
+		if ( ! (elmt instanceof ElementGroup) ) {
 			throw new UnsupportedOperationException();
 		}
+
+		// Attempt to rewrite the query pattern.
+		final Element resultingElmt;
+		try {
+			resultingElmt = expandValuesPlusServicePattern( (ElementGroup) elmt );
+		}
+		catch ( final MyUnsupportedQueryException e ) {
+			throw new UnsupportedQueryException( q, e.getMessage(), e );
+		}
+		catch ( final MyIllegalQueryException e ) {
+			throw new IllegalQueryException( q, e.getMessage(), e );
+		}
+
+		// If the query pattern did not change, there is nothing more
+		// to do here (i.e., the given query can remain as is).
+		if ( resultingElmt == elmt )
+			return;
+
+		// Otherwise, change the query pattern of the given query to
+		// be the new, rewritten one.
+		q.setQueryPattern(resultingElmt);
+	}
+
+	/**
+	 * Rewrites the given group graph pattern (if needed). Returns the given
+	 * group graph pattern itself if it turns out that nothing needs to be
+	 * rewritten, which is the case if there is no VALUES clause in the given
+	 * pattern or there is a VALUES clause but only as the very last element
+	 * of the pattern.
+	 *
+	 * @throws MyIllegalQueryException if the given pattern contains two
+	 * VALUES clauses whose sets of variables are not disjoint.
+	 *
+	 * @throws MyUnsupportedQueryException if the given pattern contains
+	 * VALUES clauses and SERVICE clauses that are used in a way that is
+	 * currently not supported.
+	 */
+	protected static Element expandValuesPlusServicePattern( final ElementGroup eg )
+			throws MyUnsupportedQueryException, MyIllegalQueryException
+	{
+		// If the query pattern does not have at least two elements, there
+		// is nothing to do here (because we need at least a VALUES clause
+		// and a SERVICE clause to do something).
+		if ( eg.size() < 2 )
+			return eg;
+
+		// Rewrite the elements of the query pattern.
+		final List<Element> newElmts = expandValuesPlusServicePattern( eg.getElements() );
+
+		// If the attempt to rewrite the elements of the query
+		// pattern did not result in any change (as indicated
+		// by a null value), there is nothing to be done here.
+		if ( newElmts == null )
+			return eg;
+
+		// Safety check.
+		assert newElmts.size() > 0;
+
+		final Element result;
+		if ( newElmts.size() == 1 ) {
+			// If rewriting the elements of the query pattern resulted
+			// in a single new element, use that element as the new
+			// query pattern.
+			result = newElmts.get(0);
+		}
+		else {
+			// If rewriting the elements of the query pattern resulted
+			// in multiple new elements, group them together as the new
+			// query pattern.
+			final ElementGroup newGroup = new ElementGroup();
+			for ( final Element elmt : newElmts ) {
+				newGroup.addElement(elmt);
+			}
+			result = newGroup;
+		}
+
+		// Finally, clean up groups of one in the new query pattern (if any).
+		final ElementTransform t = new ExtendedElementTransformCleanGroupsOfOne();
+		final Element cleanedUpResult = ElementTransformer.transform(result, t);
+		return cleanedUpResult;
 	}
 
 	/**
@@ -239,8 +272,12 @@ public class ValuesServiceQueryResolver
 	 * which is the case if there is no VALUES clause in the given list or
 	 * there is a VALUES clause but only as the very last element of the list.
 	 *
-	 * Throws an {@link MyIllegalQueryException} if it discovers two
+	 * @throws MyIllegalQueryException if the given list contains two
 	 * VALUES clauses whose sets of variables are not disjoint.
+	 *
+	 * @throws MyUnsupportedQueryException if the given list contains
+	 * VALUES clauses and SERVICE clauses that are used in a way that is
+	 * currently not supported.
 	 */
 	protected static List<Element> expandValuesPlusServicePattern( final List<Element> elmts )
 			throws MyUnsupportedQueryException, MyIllegalQueryException
@@ -269,8 +306,8 @@ public class ValuesServiceQueryResolver
 
 		// If the remaining query elements have been changed and the first
 		// VALUES clause (based on which they have been changed) is the first
-		// element of the given list of query elements, then the rewritten
-		// version of the remaining elements is the result of this function.
+		// element of the given list of query elements, then the result of
+		// this function is the rewritten version of the remaining elements.
 		if ( posFirstValuesClause == 0 ) {
 			return rewrittenRemainder;
 		}
@@ -298,8 +335,12 @@ public class ValuesServiceQueryResolver
 	 * is the very last position of the list and there is another VALUES
 	 * clause at that position.
 	 *
-	 * Throws an {@link MyIllegalQueryException} if it discovers two
+	 * @throws MyIllegalQueryException if the given list contains two
 	 * VALUES clauses whose sets of variables are not disjoint.
+	 *
+	 * @throws MyUnsupportedQueryException if the given list contains
+	 * VALUES clauses and SERVICE clauses that are used in a way that is
+	 * currently not supported.
 	 */
 	protected static List<Element> expandValuesPlusServicePattern( final List<Element> elmts,
 	                                                               final ElementData valClause,
@@ -361,7 +402,10 @@ public class ValuesServiceQueryResolver
 
 		// Rewrite the elements that are in scope of the given VALUES clause
 		// (by using the solution mappings of the VALUES clause as a basis).
-		final List<Element> rewrittenValuesScope = rewrite(valClause, elmts, startPos, endOfScope );
+		final List<Element> rewrittenValuesScope = rewrite( elmts,
+		                                                    startPos,
+		                                                    endOfScope,
+		                                                    valClause );
 
 		// Create the resulting list of elements, for which we need to consider
 		// two cases: either there is no next VALUES clause or there is.
@@ -395,7 +439,8 @@ public class ValuesServiceQueryResolver
 	 * list from the given position until the end of the list, then this
 	 * function returns -1.
 	 */
-	protected static int positionOfNextVALUES( final List<Element> elmts, final int startPos ) {
+	protected static int positionOfNextVALUES( final List<Element> elmts,
+	                                           final int startPos ) {
 		// We simply iterate over the list, starting from the
 		// given position, until we find a VALUES clause.
 		int i = startPos - 1;
@@ -413,8 +458,8 @@ public class ValuesServiceQueryResolver
 	 * Merges the two given VALUES clauses into a single one by creating
 	 * a cross-product of their respective sets of solution mappings.
 	 *
-	 * Throws an {@link MyIllegalQueryException} if the sets of variables
-	 * of the two given VALUES clauses are not disjoint.
+	 * @throws MyIllegalQueryException if the sets of variables of the two
+	 * given VALUES clauses are not disjoint.
 	 */
 	protected static ElementData merge( final ElementData valClause1,
 	                                    final ElementData valClause2 )
@@ -454,10 +499,10 @@ public class ValuesServiceQueryResolver
 	 * elements from the given start position until (and including) the given
 	 * end position. Assumes that none of these elements is a VALUES clause.
 	 */
-	protected static List<Element> rewrite( final ElementData valClause,
-	                                        final List<Element> elmts,
+	protected static List<Element> rewrite( final List<Element> elmts,
 	                                        final int startPos,
-	                                        final int endPos ) {
+	                                        final int endPos,
+	                                        final ElementData valClause ) {
 		// First, we handle the special case in which the given
 		// VALUES clause contains only one solution mapping. In
 		// this case, we simply rewrite the relevant list elements
@@ -465,7 +510,7 @@ public class ValuesServiceQueryResolver
 		// use the multi-request operator in this case.
 		if ( valClause.getRows().size() == 1 ) {
 			final Binding firstRow = valClause.getRows().get(0);
-			return rewrite( firstRow, elmts, startPos, endPos, valClause.getVars() );
+			return rewrite( elmts, startPos, endPos, firstRow, valClause.getVars() );
 		}
 
 		// Now we check whether we can use the multi-request operator.
@@ -474,7 +519,7 @@ public class ValuesServiceQueryResolver
 		// relevant list elements include only one SERVICE clause that
 		// has a variable as service node, where this variable must be
 		// the one assigned by the VALUES clause.
-		if ( valClause.getVars().size() == 1 ) {
+		if ( useMultiRequestOperators && valClause.getVars().size() == 1 ) {
 			final List<Element> result = new ArrayList<>( endPos - startPos + 1 );
 			boolean foundServiceWithVariable = false;
 			for ( int i = startPos; i <= endPos; i++ ) {
@@ -517,14 +562,18 @@ public class ValuesServiceQueryResolver
 			return result;
 		}
 
-		// If the given VALUES clause contains more than one column / variable
-		// and more than one row / solution mapping, then we need to combine
+		// If the given VALUES clause contains more than one column/variable
+		// and more than one row/solution mapping, then we need to combine
 		// the rewritings obtained based on each of these solution mappings
 		// into a UNION pattern. The rewriting created based on the first
 		// solution mapping becomes the first part of this UNION pattern.
 		final Iterator<Binding> it = valClause.getRows().iterator();
 		final Binding firstRow = it.next();
-		final List<Element> rewriteUsingFirstRow = rewrite( firstRow, elmts, startPos, endPos, valClause.getVars() );
+		final List<Element> rewriteUsingFirstRow = rewrite( elmts,
+		                                                    startPos,
+		                                                    endPos,
+		                                                    firstRow,
+		                                                    valClause.getVars() );
 		final ElementUnion eu = new ElementUnion();
 		eu.addElement( ElementUtils.createElementGroupIfNeeded(rewriteUsingFirstRow) );
 
@@ -533,7 +582,11 @@ public class ValuesServiceQueryResolver
 		// and add each of the resulting rewritings as another part of the
 		// UNION clause.
 		while ( it.hasNext() ) {
-			final List<Element> rewriteUsingNextRow = rewrite( it.next(), elmts, startPos, endPos, valClause.getVars() );
+			final List<Element> rewriteUsingNextRow = rewrite( elmts,
+			                                                   startPos,
+			                                                   endPos,
+			                                                   it.next(),
+			                                                   valClause.getVars() );
 			eu.addElement( ElementUtils.createElementGroupIfNeeded(rewriteUsingNextRow) );
 		}
 
@@ -553,10 +606,10 @@ public class ValuesServiceQueryResolver
 	 * the variable, then a BIND clause is added that assigns the variable to
 	 * the corresponding RDF term of the solution mapping.
 	 */
-	protected static List<Element> rewrite( final Binding solmap,
-	                                        final List<Element> elmts,
+	protected static List<Element> rewrite( final List<Element> elmts,
 	                                        final int startPos,
 	                                        final int endPos,
+	                                        final Binding solmap,
 	                                        final List<Var> varsForBind ) {
 		// Initialization of the element transformer that changes the SERVICE
 		// clauses and of the group pattern into which the potentially rewritten
