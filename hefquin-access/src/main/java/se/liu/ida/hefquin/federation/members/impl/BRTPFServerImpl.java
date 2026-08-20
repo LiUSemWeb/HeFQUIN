@@ -9,6 +9,7 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 
 public class BRTPFServerImpl extends TPFServerImpl implements BRTPFServer
@@ -23,8 +24,10 @@ public class BRTPFServerImpl extends TPFServerImpl implements BRTPFServer
 	public final String httpQueryArgumentForBindings;
 
 	public BRTPFServerImpl( final String baseURL,
+	                        final AuthenticationInformation authInfo,
 	                        final VocabularyMapping vm ) {
 		this( baseURL,
+		      authInfo,
 		      DfltHttpQueryArgumentForSubject,
 		      DfltHttpQueryArgumentForPredicate,
 		      DfltHttpQueryArgumentForObject,
@@ -33,12 +36,14 @@ public class BRTPFServerImpl extends TPFServerImpl implements BRTPFServer
 	}
 
 	public BRTPFServerImpl( final String baseURL,
+	                        final AuthenticationInformation authInfo,
 	                        final String httpQueryArgumentForSubject,
 	                        final String httpQueryArgumentForPredicate,
 	                        final String httpQueryArgumentForObject,
 	                        final String httpQueryArgumentForBindings,
 	                        final VocabularyMapping vm ) {
 		super( baseURL,
+		       authInfo,
 		       httpQueryArgumentForSubject,
 		       httpQueryArgumentForPredicate,
 		       httpQueryArgumentForObject,

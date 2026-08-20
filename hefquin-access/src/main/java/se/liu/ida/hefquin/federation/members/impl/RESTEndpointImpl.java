@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.federation.members.impl;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 
 public class RESTEndpointImpl extends BaseForFederationMember
@@ -10,15 +11,20 @@ public class RESTEndpointImpl extends BaseForFederationMember
 {
 	protected final String urlTemplate;
 	protected final List<RESTEndpoint.Parameter> params;
+	protected final AuthenticationInformation authInfo;
 
-	public RESTEndpointImpl( final String urlTemplate, final List<RESTEndpoint.Parameter> params ) {
+	public RESTEndpointImpl( final String urlTemplate, final AuthenticationInformation authInfo, final List<RESTEndpoint.Parameter> params ) {
 		assert urlTemplate != null && ! urlTemplate.isEmpty();
 		this.urlTemplate = urlTemplate;
+		this.authInfo = authInfo;
 		this.params = (params == null) ? List.of() : params;
 	}
 
 	@Override
 	public String getURLTemplate() { return urlTemplate; }
+
+	@Override
+	public AuthenticationInformation getAuthenticationInformation() { return authInfo; }
 
 	@Override
 	public int getNumberOfParameters() { return params.size(); }

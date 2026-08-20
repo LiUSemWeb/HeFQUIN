@@ -50,9 +50,11 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 			throws FederationAccessException
 	{
 		final URI uri = req.getURI();
-		final HttpRequest.Builder builder = HttpRequest.newBuilder( uri)
+		final HttpRequest.Builder builder = HttpRequest.newBuilder( uri )
 				.header("Accept", "application/json;charset=UTF-8")
 				.header("User-Agent", BuildInfo.getUserAgent());
+
+		fm.getAuthenticationInformation().applyTo( builder );
 
 		if ( overallTimeout > 0L )
 			builder.timeout( Duration.ofMillis(overallTimeout) );

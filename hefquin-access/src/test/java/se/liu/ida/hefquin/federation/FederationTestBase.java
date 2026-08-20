@@ -28,39 +28,40 @@ public abstract class FederationTestBase
 
 	protected TPFServer getDBpediaTPFServer() {
 		return new TPFServerImpl( "http://fragments.dbpedia.org/2016-04/en",
-		                          null ); // no vocab.mapping
+		                          null, // no authentication info
+		                          null );     // no vocab.mapping
 	}
 
 	protected static class SPARQLEndpointForTest extends SPARQLEndpointImpl
 	{
 		public SPARQLEndpointForTest() {
-			super("http://example.org/sparql", null);
+			super("http://example.org/sparql", null, null);
 		}
 
 		public SPARQLEndpointForTest( final String url ) {
-			super(url, null);
+			super(url, null, null);
 		}
 	}
 
 	protected static class TPFServerForTest extends TPFServerImpl
 	{
 		public TPFServerForTest() {
-			super("http://example.org/", null);
+			super("http://example.org/", null, null);
 		}
 
 		public TPFServerForTest( final String baseURL ) {
-			super(baseURL, null);
+			super(baseURL, null, null);
 		}
 	}
 
 	protected static class BRTPFServerForTest extends BRTPFServerImpl
 	{
 		public BRTPFServerForTest() {
-			super("http://example.org/", null);
+			super("http://example.org/", null, null);
 		}
 
 		public BRTPFServerForTest( final String baseURL ) {
-			super(baseURL, null);
+			super(baseURL, null, null);
 		}
 	}
 

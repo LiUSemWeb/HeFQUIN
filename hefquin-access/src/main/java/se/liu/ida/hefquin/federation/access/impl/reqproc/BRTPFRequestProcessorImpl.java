@@ -31,6 +31,8 @@ public class BRTPFRequestProcessorImpl extends TPFRequestProcessorBase implement
 			"User-Agent", BuildInfo.getUserAgent()
 		);
 
+		fm.getAuthenticationInformation().applyTo( headers );
+
 		final TPFResponseBuilder b;
 		try {
 			b = performRequest(requestURL, tp, headers);

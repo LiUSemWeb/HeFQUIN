@@ -15,6 +15,8 @@ public interface TPFServer extends RDFBasedFederationMember
 
 	String createRequestURL( TPFRequest req );
 
+	AuthenticationInformation getAuthenticationInformation();
+
 	@Override
 	default boolean supportsMoreThanTriplePatterns() {
 		return false;

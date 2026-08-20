@@ -9,6 +9,7 @@ import org.apache.jena.sparql.exec.http.Params;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class TPFServerImpl extends BaseForRDFBasedFederationMember
@@ -24,14 +25,17 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 	protected static final NodeFormatter nodeFormatter = new NodeFormatterNT();
 
 	public final String baseURL;
+	public final AuthenticationInformation authInfo;
 	public final String baseURLWithFinalSeparator;
 	public final String httpQueryArgumentForSubject;
 	public final String httpQueryArgumentForPredicate;
 	public final String httpQueryArgumentForObject;
 
 	public TPFServerImpl( final String baseURL,
+	                      final AuthenticationInformation authInfo,
 	                      final VocabularyMapping vm ) {
 		this( baseURL,
+		      authInfo,
 		      DfltHttpQueryArgumentForSubject,
 		      DfltHttpQueryArgumentForPredicate,
 		      DfltHttpQueryArgumentForObject,
@@ -39,6 +43,7 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 	}
 
 	public TPFServerImpl( final String baseURL,
+	                      final AuthenticationInformation authInfo,
 	                      final String httpQueryArgumentForSubject,
 	                      final String httpQueryArgumentForPredicate,
 	                      final String httpQueryArgumentForObject,
@@ -51,6 +56,7 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 		assert httpQueryArgumentForObject     != null;
 
 		this.baseURL = baseURL;
+		this.authInfo = authInfo;
 		this.httpQueryArgumentForSubject    = httpQueryArgumentForSubject;
 		this.httpQueryArgumentForPredicate  = httpQueryArgumentForPredicate;
 		this.httpQueryArgumentForObject     = httpQueryArgumentForObject;
@@ -89,6 +95,9 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 
 		return baseURLWithFinalSeparator + params.httpString();
 	}
+
+	@Override
+	public AuthenticationInformation getAuthenticationInformation() { return authInfo; }
 
 	protected Params createParams( final Triple tp ) {
 		final Params params = Params.create();

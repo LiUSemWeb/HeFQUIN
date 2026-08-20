@@ -60,6 +60,7 @@ import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.StringResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
@@ -191,7 +192,8 @@ public abstract class EngineTestBase
 
 	protected TPFServer getDBpediaTPFServer() {
 		return new TPFServerImpl( "http://fragments.dbpedia.org/2016-04/en",
-		                          null ); // no vocab.mapping
+		                          null, // no authentication info
+		                          null );     // no vocab.mapping
 	}
 
 	protected static abstract class FederationMemberBaseForTest extends BaseForFederationMember
@@ -299,6 +301,12 @@ public abstract class EngineTestBase
 			return new SolMapsResponseImpl( result, new Date() );
 		}
 
+		@Override
+		public AuthenticationInformation getAuthenticationInformation() {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
+		}
+
 	}
 
 	protected static class SPARQLEndpointWithVocabularyMappingForTest extends SPARQLEndpointForTest
@@ -331,6 +339,11 @@ public abstract class EngineTestBase
 		public TPFResponse performRequest( final TPFRequest req ) {
 			final List<Triple> result = getMatchingTriples(req);
 			return new TPFResponseForTest(result, this, req);
+		}
+		@Override
+		public AuthenticationInformation getAuthenticationInformation() {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
 		}
 	}
 
@@ -387,6 +400,11 @@ public abstract class EngineTestBase
 				}
 			}
 			return new TPFResponseForTest(result, this, req);
+		}
+		@Override
+		public AuthenticationInformation getAuthenticationInformation() {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
 		}
 	}
 
@@ -468,6 +486,12 @@ public abstract class EngineTestBase
 		@Override
 		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
 			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public AuthenticationInformation getAuthenticationInformation() {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
 		}
 	}
 

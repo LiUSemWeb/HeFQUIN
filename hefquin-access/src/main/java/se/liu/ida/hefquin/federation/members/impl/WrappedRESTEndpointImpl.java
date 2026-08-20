@@ -15,6 +15,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
+import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.jenaintegration.HeFQUINConstants;
@@ -33,9 +34,10 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 	protected final Set<SourceReference> srcRefs;
 
 	public WrappedRESTEndpointImpl( final String urlTemplate,
+	                                final AuthenticationInformation authInfo,
 	                                final List<RESTEndpoint.Parameter> params,
 	                                final MappingExpression mappingExpression ) {
-		super(urlTemplate, params);
+		super(urlTemplate, authInfo, params);
 
 		assert mappingExpression != null;
 		this.mappingExpression = mappingExpression;

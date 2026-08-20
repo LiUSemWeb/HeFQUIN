@@ -9,6 +9,9 @@ public interface RESTEndpoint extends FederationMember
 	/** Returns the URL template of this REST endpoint. */
 	String getURLTemplate();
 
+	/** Returns the authentication information of this REST endpoint. */
+	AuthenticationInformation getAuthenticationInformation();
+
 	/**
 	 * Returns the number of query parameters that can be passed
 	 * in requests to this REST endpoint. This number is the size of

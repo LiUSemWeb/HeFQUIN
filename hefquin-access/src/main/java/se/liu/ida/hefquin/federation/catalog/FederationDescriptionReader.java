@@ -35,6 +35,8 @@ import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphql.impl.GraphQLSchemaInitializerImpl;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
+import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
+import se.liu.ida.hefquin.federation.members.BearerAuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.impl.BRTPFServerImpl;
 import se.liu.ida.hefquin.federation.members.impl.GraphQLEndpointImpl;
@@ -52,6 +54,8 @@ import se.liu.ida.hefquin.mappings.rml.RML2MappingAlgebra;
 import se.liu.ida.hefquin.mappings.rml.RMLParserException;
 import se.liu.ida.hefquin.vocabulary.FDVocab;
 import se.liu.ida.hefquin.vocabulary.HydraVocab;
+import se.liu.ida.hefquin.vocabulary.WoTSecVocab;
+import se.liu.ida.hefquin.vocabulary.WoTTDVocab;
 
 public class FederationDescriptionReader
 {
@@ -119,21 +123,22 @@ public class FederationDescriptionReader
 		final VocabularyMapping vocabMap = parseVocabMapping(fedMember, fd);
 
 		final Resource iface = fedMember.getProperty(FDVocab.interface_).getResource();
+		final AuthenticationInformation authInfo = parseAuthConfig(iface, fd);
 		final RDFNode ifaceType = fd.getRequiredProperty(iface, RDF.type).getObject();
 		final Resource protocol = iface.getProperty(FDVocab.supportedProtocol).getResource();
 
 		// Check the type of interface
 		if ( ifaceType.equals(FDVocab.FixedEndpointInterface) )
 		{
-			return handleFixedEndpointInterface( iface, protocol, vocabMap, fedMember, fd, serviceURI );
+			return handleFixedEndpointInterface( iface, protocol, authInfo, vocabMap, fedMember, fd, serviceURI );
 		}
 		else if ( ifaceType.equals(FDVocab.FragmentInterface) )
 		{
-			return handleFragmentInterface( iface, protocol, vocabMap );
+			return handleFragmentInterface( iface, authInfo, protocol, vocabMap );
 		}
 		else if ( ifaceType.equals(FDVocab.TemplateBasedInterface) )
 		{
-			return handleTemplateInterface( iface, protocol, vocabMap, fedMember, fd, serviceURI );
+			return handleTemplateInterface( iface, protocol, authInfo, vocabMap, fedMember, fd, serviceURI );
 		}
 		else {
 			throw new IllegalArgumentException( ifaceType.toString() );
@@ -181,6 +186,7 @@ public class FederationDescriptionReader
 	 */
 	protected FederationMember handleFixedEndpointInterface( final Resource iface,
 	                                                         final Resource protocol,
+	                                                         final AuthenticationInformation authInfo,
 	                                                         final VocabularyMapping vocabMap,
 	                                                         final Resource fedMember,
 	                                                         final Model fd,
@@ -192,7 +198,7 @@ public class FederationDescriptionReader
 				"SPARQL endpointAddress is required!",
 				"More than one SPARQL endpointAddress!" );
 
-			return createSPARQLEndpoint(addrStr, vocabMap);
+			return createSPARQLEndpoint(addrStr, authInfo, vocabMap );
 		}
 
 		if ( protocol.equals(FDVocab.GenericWebAPIProtocol) ) {
@@ -210,7 +216,7 @@ public class FederationDescriptionReader
 			if ( trMaps.isEmpty() )
 				throw new IllegalArgumentException("The wrapped REST endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
 
-			return createWrappedRESTEndpoint(addrStr, null, trMaps);
+			return createWrappedRESTEndpoint(addrStr, authInfo, null, trMaps );
 		}
 
 		if ( protocol.equals(FDVocab.BoltProtocol) ) {
@@ -246,6 +252,7 @@ public class FederationDescriptionReader
 	 * Creates a federation member for a fragment interface (TPF, brTPF).
 	 */
 	protected FederationMember handleFragmentInterface( final Resource iface,
+	                                                    final AuthenticationInformation authInfo,
 	                                                    final Resource protocol,
 	                                                    final VocabularyMapping vocabMap ) {
 		if ( protocol.equals(FDVocab.TPFProtocol) ) {
@@ -255,7 +262,7 @@ public class FederationDescriptionReader
 				"TPF exampleFragmentAddress is required!",
 				"More than one TPF exampleFragmentAddress!" );
 
-			return createTPFServer(addrStr, vocabMap);
+			return createTPFServer(addrStr, authInfo, vocabMap);
 		}
 		else if ( protocol.equals(FDVocab.brTPFProtocol) ) {
 			final String addrStr = getSingleURIProperty(
@@ -264,7 +271,7 @@ public class FederationDescriptionReader
 				"brTPF exampleFragmentAddress is required!",
 				"More than one brTPF exampleFragmentAddress!" );
 
-			return createBRTPFServer(addrStr, vocabMap);
+			return createBRTPFServer(addrStr, authInfo, vocabMap);
 		}
 		else {
 			throw new IllegalArgumentException( protocol.toString() );
@@ -277,6 +284,7 @@ public class FederationDescriptionReader
 	 */
 	protected FederationMember handleTemplateInterface( final Resource iface,
 	                                                    final Resource protocol,
+	                                                    final AuthenticationInformation authInfo,
 	                                                    final VocabularyMapping vocabMap,
 	                                                    final Resource fedMember,
 	                                                    final Model fd,
@@ -342,7 +350,7 @@ public class FederationDescriptionReader
 			if ( trMaps.isEmpty() )
 				throw new IllegalArgumentException("The wrapped REST endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
 
-			return createWrappedRESTEndpoint(uriTemplateString, params, trMaps);
+			return createWrappedRESTEndpoint(uriTemplateString, authInfo, params, trMaps );
 		}
 		else {
 			throw new IllegalArgumentException( protocol.toString() );
@@ -385,19 +393,65 @@ public class FederationDescriptionReader
 		return trMaps;
 	}
 
-	protected FederationMember createSPARQLEndpoint( final String uri, final VocabularyMapping vm ) {
-		verifyExpectedURI(uri);
-		return new SPARQLEndpointImpl(uri, vm);
+	/**
+	 * Parses the authentication configuration associated with the given interface.
+	 * <p>
+	 * Currently, only the {@code wotsec:BearerSecurityScheme} is supported. The
+	 * environment variable containing the bearer token is specified using
+	 * {@code fd:envarForToken}.
+	 *
+	 * @param iface the interface resource whose authentication configuration should
+	 *              be parsed
+	 * @param fd the federation description model
+	 * @return the parsed authentication information, or {@code null} if no security
+	 *         configuration is specified
+	 * @throws IllegalArgumentException if the security configuration is not a
+	 *         resource, the required environment variable is not set, or the
+	 *         security scheme is not supported
+	 */
+	protected AuthenticationInformation parseAuthConfig( final Resource iface, final Model fd ) {
+		final Statement securityConfigStmt = iface.getProperty( WoTTDVocab.hasSecurityConfiguration );
+
+		if ( securityConfigStmt == null )
+			return null;
+
+		final RDFNode securityConfig = securityConfigStmt.getObject();
+
+		if ( ! securityConfig.isResource() )
+			throw new IllegalArgumentException( "Security configuration must be a resource." );
+
+		final Resource securityScheme = securityConfig.asResource();
+
+		if ( securityScheme.hasProperty( RDF.type, WoTSecVocab.BearerSecurityScheme ) ) {
+			final String tokenEnv =
+				ModelUtils.getSingleMandatoryProperty_XSDString(
+					securityScheme,
+					FDVocab.envarForToken );
+
+			final String token = getEnvironmentVariable( tokenEnv );
+
+			if ( token == null )
+				throw new IllegalArgumentException( "Environment variable '" + tokenEnv + "' is not set." );
+
+			return new BearerAuthenticationInformation( token );
+		}
+
+		throw new IllegalArgumentException( "Unsupported security scheme: " + securityScheme );
 	}
 
-	protected FederationMember createTPFServer( final String uri, final VocabularyMapping vm ) {
+	protected FederationMember createSPARQLEndpoint( final String uri, final AuthenticationInformation authInfo, final VocabularyMapping vm) {
 		verifyExpectedURI(uri);
-		return new TPFServerImpl(uri, vm);
+		return new SPARQLEndpointImpl(uri, authInfo, vm );
 	}
 
-	protected FederationMember createBRTPFServer( final String uri, final VocabularyMapping vm ) {
+	protected FederationMember createTPFServer( final String uri, final AuthenticationInformation authInfo, final VocabularyMapping vm ) {
 		verifyExpectedURI(uri);
-		return new BRTPFServerImpl(uri, vm);
+		return new TPFServerImpl(uri, authInfo, vm);
+	}
+
+	protected FederationMember createBRTPFServer( final String uri, final AuthenticationInformation authInfo, final VocabularyMapping vm ) {
+		verifyExpectedURI(uri);
+		return new BRTPFServerImpl(uri, authInfo, vm);
 	}
 
 	protected FederationMember createNeo4jServer( final String uri ) {
@@ -427,13 +481,14 @@ public class FederationDescriptionReader
 	}
 
 	protected FederationMember createWrappedRESTEndpoint( final String uri,
+	                                                      final AuthenticationInformation authInfo,
 	                                                      final List<RESTEndpoint.Parameter> params,
 	                                                      final List<MappingExpression> trMaps ) {
 		assert ! trMaps.isEmpty();
 
 		if ( trMaps.size() == 1 ) {
 			final MappingExpression expr = trMaps.get(0);
-			return new WrappedRESTEndpointImpl(uri, params, expr);
+			return new WrappedRESTEndpointImpl(uri, authInfo, params, expr );
 		}
 
 		final MappingExpression[] exprs = new MappingExpression[ trMaps.size() ];
@@ -446,7 +501,7 @@ public class FederationDescriptionReader
 		final MappingExpression expr = MappingExpressionFactory.create(
 				MappingOpUnion.getInstance(),
 				exprs );
-		return new WrappedRESTEndpointImpl(uri, params, expr);
+		return new WrappedRESTEndpointImpl(uri, authInfo, params, expr );
 	}
 
 	/**
@@ -518,6 +573,16 @@ public class FederationDescriptionReader
 		}
 
 		return null;
+	}
+
+	/**
+	 * Retrieves the value of the specified environment variable.
+	 *
+	 * @param tokenEnvName the name of the environment variable
+	 * @return the value of the environment variable, or {@code null} if it is not set
+	 */
+	protected String getEnvironmentVariable( final String tokenEnvName ) {
+		return System.getenv( tokenEnvName );
 	}
 
 }

@@ -81,6 +81,7 @@ public class WrappedRESTEndpointImplTest
 	protected WrappedRESTEndpoint createEndpointForTests() {
 		return new WrappedRESTEndpointImpl( "http://example.org/",
 		                                    null,
+		                                    null,
 		                                    createMappingExpressionForTests() );
 	}
 
