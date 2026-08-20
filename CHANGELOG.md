@@ -10,6 +10,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - nothing yet
 ### Changed
 - Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/issues/675)).
+- Bug fix: adding hashCode() function to the Pair class to avoid unnecessary cache misses in FederationManagerWithCache ([#679](https://github.com/LiUSemWeb/HeFQUIN/issues/679)).
 ### Planned for Next Release
 - Support for authentication ([#669](https://github.com/LiUSemWeb/HeFQUIN/issues/669)); initial PRs: [#664](https://github.com/LiUSemWeb/HeFQUIN/issues/664), [#676](https://github.com/LiUSemWeb/HeFQUIN/issues/676)
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
