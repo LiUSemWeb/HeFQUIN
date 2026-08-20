@@ -1,6 +1,13 @@
 package se.liu.ida.hefquin.federation.access.impl;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -14,10 +21,19 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
+import se.liu.ida.hefquin.engine.wrappers.graphql.query.impl.GraphQLQueryImpl;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.access.*;
+import se.liu.ida.hefquin.federation.access.impl.req.GraphQLRequestImpl;
+import se.liu.ida.hefquin.federation.access.impl.req.Neo4jRequestImpl;
+import se.liu.ida.hefquin.federation.access.impl.req.RESTRequestImpl;
+import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.federation.members.TPFServer;
+
+import se.liu.ida.hefquin.federation.members.RESTEndpoint.Parameter;
 
 public class FederationAccessManagerWithCacheTest extends FederationTestBase
 {
@@ -128,6 +144,106 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		if ( PRINT_TIME ) System.out.println( "manyRequestsInParallel \t milliseconds passed: " + (endTime - startTime) );
 	}
 
+	@Test
+	public void tpfResponseCachingTest() throws InterruptedException, ExecutionException, FederationAccessException {
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
+
+		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createVariable("s"),
+		                                                NodeFactory.createVariable("p"),
+		                                                NodeFactory.createVariable("o") );
+		final TPFRequest req = new TPFRequestImpl(tp);
+
+		final FederationMember fm = new TPFServerForTest();
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+
+		assertEquals(fr1, fr2);
+	}
+
+	@Test
+	public void brTPFResponseCachingTest() throws InterruptedException, ExecutionException, FederationAccessException {
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
+
+		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createVariable("s"),
+		                                                NodeFactory.createVariable("p"),
+		                                                NodeFactory.createVariable("o") );
+		final TPFRequest req = new TPFRequestImpl(tp);
+
+		// brTPF requests with TPF server
+		final FederationMember fm1 = new TPFServerForTest();
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req, fm1);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req, fm1);
+
+		assertEquals(fr1, fr2);
+
+		// brTPF requests with brTPF server
+		final FederationMember fm2 = new TPFServerForTest();
+		final CompletableFuture<TPFResponse> fr3 = fedAccessMgr.issueRequest(req, fm2);
+		final CompletableFuture<TPFResponse> fr4 = fedAccessMgr.issueRequest(req, fm2);
+
+		assertEquals(fr3, fr4);
+	}
+
+	@Test
+	public void solMapsResponseCachingTest() throws InterruptedException, ExecutionException, FederationAccessException {
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
+
+		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createVariable("s"),
+		                                                NodeFactory.createVariable("p"),
+		                                                NodeFactory.createVariable("o") );
+		final SPARQLRequest req = new SPARQLRequestImpl(tp);
+
+		final FederationMember fm = new SPARQLEndpointForTest();
+		final CompletableFuture<SolMapsResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<SolMapsResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+
+		assertEquals(fr1, fr2);
+	}
+
+	@Test
+	public void neo4JResponseCachingTest() throws InterruptedException, ExecutionException, FederationAccessException {
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
+
+		final String cypherQuery = "RETURN null AS result LIMIT 0";
+		final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);
+
+		final FederationMember fm = new Neo4jServerForTest();
+		final CompletableFuture<StringResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<StringResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+
+		assertEquals(fr1, fr2);
+	}
+
+	@Test
+	public void restResponseCachingTest() throws InterruptedException, ExecutionException, FederationAccessException {
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
+
+		final String urlTemplate = "http://example.com/api";
+		final Map<String, String> bindings = new HashMap<>();
+		final RESTRequest req = new RESTRequestImpl(urlTemplate, bindings);
+
+		final List<Parameter> params = new ArrayList<>();
+		final FederationMember fm = new RESTEndpointForTest(urlTemplate, params);
+
+		final CompletableFuture<StringResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<StringResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+
+		assertEquals(fr1, fr2);
+	}
+
+	@Test
+	public void graphqlResponseCachingTest() throws InterruptedException, ExecutionException, FederationAccessException {
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
+
+		final GraphQLQuery graphQLQuery = new GraphQLQueryImpl(new HashSet<>(), new HashSet<>());
+		final GraphQLRequest req = new GraphQLRequestImpl(graphQLQuery);
+
+		final FederationMember fm = new GraphQLEndpointForTest();
+		final CompletableFuture<StringResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<StringResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+
+		assertEquals(fr1, fr2);
+	}
 
 	// ------------ helper code ------------
 
