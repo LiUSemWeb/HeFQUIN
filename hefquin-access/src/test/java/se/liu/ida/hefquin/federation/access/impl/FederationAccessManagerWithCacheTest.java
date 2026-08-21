@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -26,6 +27,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphql.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.access.*;
+import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.GraphQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.Neo4jRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.RESTRequestImpl;
@@ -153,11 +155,17 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		                                                NodeFactory.createVariable("o") );
 		final TPFRequest req = new TPFRequestImpl(tp);
 
-		final FederationMember fm = new TPFServerForTest();
-		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
-		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+		final FederationMember fm1 = new TPFServerForTest();
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req, fm1);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req, fm1);
 
 		assertEquals(fr1, fr2);
+
+		final FederationMember fm2 = new BRTPFServerForTest();
+		final CompletableFuture<TPFResponse> fr3 = fedAccessMgr.issueRequest(req, fm2);
+		final CompletableFuture<TPFResponse> fr4 = fedAccessMgr.issueRequest(req, fm2);
+
+		assertEquals(fr3, fr4);
 	}
 
 	@Test
@@ -167,21 +175,13 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createVariable("s"),
 		                                                NodeFactory.createVariable("p"),
 		                                                NodeFactory.createVariable("o") );
-		final TPFRequest req = new TPFRequestImpl(tp);
+		final BRTPFRequest req = new BRTPFRequestImpl( tp, Set.of() );
 
-		// brTPF requests with TPF server
-		final FederationMember fm1 = new TPFServerForTest();
-		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req, fm1);
-		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req, fm1);
+		final FederationMember fm = new BRTPFServerForTest();
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
 
 		assertEquals(fr1, fr2);
-
-		// brTPF requests with brTPF server
-		final FederationMember fm2 = new TPFServerForTest();
-		final CompletableFuture<TPFResponse> fr3 = fedAccessMgr.issueRequest(req, fm2);
-		final CompletableFuture<TPFResponse> fr4 = fedAccessMgr.issueRequest(req, fm2);
-
-		assertEquals(fr3, fr4);
 	}
 
 	@Test
@@ -253,5 +253,4 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 				AsyncFederationAccessManagerImplTest.createFedAccessMgrForTests(execServiceForFedAccess, sleepMillis),
 				10 );
 	}
-
 }
