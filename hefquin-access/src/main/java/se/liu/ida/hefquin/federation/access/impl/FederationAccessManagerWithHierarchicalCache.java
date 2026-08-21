@@ -123,14 +123,8 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 		try {
 			key = new PersistentCacheKey( req, fm, ResponseMode.RESULT );
 		} catch ( final IllegalArgumentException e ) {
-			// TODO: Currently unsupported request/member types bypass the cache silently.
-			// This may cause bugs in the future if full cache coverage is assumed later.
-			// In a follow-up PR (#590):
-			// (i) extend the cache implementation to support all request/member types, and
-			// (ii) replace this fallback with an exception.
-			return fedAccMan.issueRequest(req, fm);
-			// throw new IllegalStateException( "Failed to create cache key for request/member combination: "
-			// 		+ req.getClass().getName() + "/" + fm.getClass().getName(), e );
+			throw new IllegalStateException( "Failed to create cache key for request/member combination: "
+					+ req.getClass().getName() + "/" + fm.getClass().getName(), e );
 		}
 
 		final CompletableFuture<?> cachedResponse;
@@ -157,7 +151,7 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 		else if( req instanceof SPARQLRequest )
 			cacheHitsSPARQL++;
 		else
-			throw new IllegalArgumentException("Unrecognized request type: " + req.getClass().getName());
+			cacheHitsOther++;
 
 		@SuppressWarnings("unchecked")
 		final CompletableFuture<RespType> cachedResponse2 = (CompletableFuture<RespType>) cachedResponse;
