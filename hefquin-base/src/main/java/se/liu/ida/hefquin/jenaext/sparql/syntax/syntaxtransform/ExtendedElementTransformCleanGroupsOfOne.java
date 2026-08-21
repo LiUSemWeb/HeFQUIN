@@ -9,6 +9,10 @@ import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformCleanGroups
 import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementServiceWithParams;
 import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementServiceWithValues;
 
+/**
+ * Extends the base class functionality such that the HeFQUIN-specific
+ * extensions of Jena's {@link Element} classes are handled correctly.
+ */
 public class ExtendedElementTransformCleanGroupsOfOne extends ElementTransformCleanGroupsOfOne
 {
 	@Override
