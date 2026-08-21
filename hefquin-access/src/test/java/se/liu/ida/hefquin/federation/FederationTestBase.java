@@ -105,6 +105,10 @@ public abstract class FederationTestBase
 
 	protected static class RESTEndpointForTest extends RESTEndpointImpl
 	{
+		public RESTEndpointForTest() {
+			super("http://example.org/rest", List.of() );
+		}
+
 		public RESTEndpointForTest( final String urlTemplate, final List<Parameter> params ) {
 			super( NodeFactory.createURI("http://example.org/rest"),
 			       urlTemplate,
