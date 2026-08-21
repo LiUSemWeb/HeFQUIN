@@ -11,6 +11,28 @@ import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 
+/**
+ * This operator has three arguments:
+ * i) a SPARQL graph pattern P (given in the form of a {@link SPARQLRequest},
+ * ii) a variable ?v, and
+ * iii) a set of federation members.
+ *
+ * The evaluation semantics is equivalent to the one of the following SPARQL
+ * query, assuming that the URIs in the VALUES clause are the service URIs
+ * of the given federation members.
+ * <pre>
+ * SELECT * WHERE {
+ *    VALUES ?v { ex:serviceURI_1 ex:serviceURI_2 ... ex:serviceURI_n }
+ *    SERVICE ?v {
+ *       # pattern P
+ *    }
+ * }
+ * </pre>
+ *
+ * Notice that every solution mapping in the result of this operator will
+ * bind the given variable ?v to the service URI of the federation member
+ * from which the rest of this solution mapping has been received.
+ */
 public class LogicalOpMultiRequest extends BaseForLogicalOps
                                    implements NullaryLogicalOp
 {
