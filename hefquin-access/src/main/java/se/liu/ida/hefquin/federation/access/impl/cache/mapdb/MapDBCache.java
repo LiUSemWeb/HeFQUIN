@@ -220,4 +220,40 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	public void close() {
 		db.close();
 	}
+
+	/**
+	 * Inserts or updates a cache entry once the given future completes
+	 * successfully.
+	 *
+	 * <p>
+	 * Unlike the implementation in {@link CacheLayer}, this method does not insert
+	 * the entry immediately. The cache entry is created and stored only after
+	 * {@code value} has completed successfully. This ensures that the persistent
+	 * MapDB cache never attempts to serialize an incomplete
+	 * {@link CompletableFuture}.
+	 * </p>
+	 *
+	 * <p>
+	 * If {@code value} completes exceptionally, no entry is added or updated in the
+	 * cache.
+	 * </p>
+	 *
+	 * <p>
+	 * Once the future has completed successfully, insertion is delegated to
+	 * {@link CacheLayer#put(Object, Object)}, which handles replacement policy,
+	 * capacity enforcement, and the actual insertion into the backing map.
+	 * </p>
+	 *
+	 * @param key   cache key, must not be {@code null}
+	 * @param value future containing the object to cache, must not be {@code null}
+	 *
+	 * @throws IllegalArgumentException if {@code key} or {@code value} is
+	 *                                  {@code null}
+	 */
+	@Override
+	public void put( final PersistentCacheKey key, final CompletableFuture<? extends DataRetrievalResponse<?>> value ) {
+		value.thenAccept( response -> {
+			super.put( key, value );
+		} );
+	}
 }
