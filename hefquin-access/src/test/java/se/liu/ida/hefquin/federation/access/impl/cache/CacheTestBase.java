@@ -7,12 +7,17 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.jena.atlas.json.JsonArray;
+import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.atlas.json.JsonString;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -32,17 +37,28 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyF
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyLRU;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLArgument;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.impl.GraphQLArgumentImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
+import se.liu.ida.hefquin.engine.wrappers.graphql.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
+import se.liu.ida.hefquin.federation.access.JSONResponse;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.federation.access.StringResponse;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
+import se.liu.ida.hefquin.federation.access.impl.req.GraphQLRequestImpl;
+import se.liu.ida.hefquin.federation.access.impl.req.Neo4jRequestImpl;
+import se.liu.ida.hefquin.federation.access.impl.req.RESTRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.CachedCardinalityResponse;
+import se.liu.ida.hefquin.federation.access.impl.response.JSONResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.StringResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 
 public abstract class CacheTestBase extends FederationTestBase
@@ -50,7 +66,6 @@ public abstract class CacheTestBase extends FederationTestBase
 	protected final TriplePattern tp = new TriplePatternImpl( NodeFactory.createURI("http://example.org/s"),
 	                                                          NodeFactory.createURI("http://example.org/p"),
 	                                                          NodeFactory.createVariable("o") );
-
 	@Test
 	public void addAndGetTest() throws Exception {
 		final Cache<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>> cache1 =
@@ -77,9 +92,28 @@ public abstract class CacheTestBase extends FederationTestBase
 		                                                      new BRTPFServerForTest("http://example.org/brtpf"),
 		                                                      PersistentCacheKey.ResponseMode.RESULT );
 
-		final PersistentCacheKey k6 = new PersistentCacheKey( new BRTPFRequestImpl(tp, new HashSet<>() ),
+		final PersistentCacheKey k6 = new PersistentCacheKey( new BRTPFRequestImpl( tp, new HashSet<>() ),
 		                                                      new BRTPFServerForTest("http://example.org/brtpf"),
 		                                                      PersistentCacheKey.ResponseMode.COUNT );
+
+		final PersistentCacheKey k7 = new PersistentCacheKey( new Neo4jRequestImpl("RETURN null AS result LIMIT 0"),
+		                                                      new Neo4jServerForTest("http://example.org/neo4j"),
+		                                                      PersistentCacheKey.ResponseMode.RESULT );
+
+		final Map<String, String> bindings = new HashMap<>();
+		bindings.put("id", "123");
+		final PersistentCacheKey k8 = new PersistentCacheKey( new RESTRequestImpl("http://example.org/rest/{id}", bindings),
+		                                                      new RESTEndpointForTest( "http://example.org/rest/{id}", List.of() ),
+		                                                      PersistentCacheKey.ResponseMode.RESULT );
+
+		final Set<String> fieldPaths = new HashSet<>();
+		final Set<GraphQLArgument> queryArgs = new HashSet<>();
+		fieldPaths.add("author(id:$id)/name");
+		queryArgs.add( new GraphQLArgumentImpl( "id", "id", new JsonString("auth1"), "ID!" ) );
+		final GraphQLQuery graphQLQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
+		final PersistentCacheKey k9 = new PersistentCacheKey( new GraphQLRequestImpl(graphQLQuery),
+		                                                      new GraphQLEndpointForTest("http://example.org/graphql"),
+		                                                      PersistentCacheKey.ResponseMode.RESULT );
 
 		final SolMapsResponse o1 = makeSolMapResponse(3);
 		final CardinalityResponse o2 = makeCardinalityResponse(3);
@@ -87,6 +121,9 @@ public abstract class CacheTestBase extends FederationTestBase
 		final CardinalityResponse o4 = makeCardinalityResponse(4);
 		final TPFResponse o5 = makeTPFResponse(5);
 		final CardinalityResponse o6 = makeCardinalityResponse(5);
+		final StringResponse o7 = makeStringResponse(5);
+		final StringResponse o8 = makeStringResponse(5);
+		final JSONResponse o9 = makeJsonResponse(5);
 
 		// Add to map
 		cache1.put( k1, CompletableFuture.completedFuture(o1) );
@@ -95,9 +132,9 @@ public abstract class CacheTestBase extends FederationTestBase
 		cache1.put( k4, CompletableFuture.completedFuture(o4) );
 		cache1.put( k5, CompletableFuture.completedFuture(o5) );
 		cache1.put( k6, CompletableFuture.completedFuture(o6) );
-		
-		System.err.println(cache1);
-		System.err.println(cache1.get(k1).get());
+		cache1.put( k7, CompletableFuture.completedFuture(o7) );
+		cache1.put( k8, CompletableFuture.completedFuture(o8) );
+		cache1.put( k9, CompletableFuture.completedFuture(o9) );
 
 		cache1.close();
 
@@ -112,6 +149,9 @@ public abstract class CacheTestBase extends FederationTestBase
 		assertCardinalityEqual( o4, (CardinalityResponse) cache2.get(k4).get() );
 		assertTPFEqual( o5, (TPFResponse) cache2.get(k5).get() );
 		assertCardinalityEqual( o6, (CardinalityResponse) cache2.get(k6).get() );
+		assertStringEqual( o7, (StringResponse) cache2.get(k7).get() );
+		assertStringEqual( o8, (StringResponse) cache2.get(k8).get() );
+		assertJsonEqual( o9, (JSONResponse) cache2.get(k9).get() );
 
 		cache2.close();
 	}
@@ -415,6 +455,26 @@ public abstract class CacheTestBase extends FederationTestBase
 		                            new Date() );
 	}
 
+	protected StringResponse makeStringResponse( final int numberOfResults ) {
+		final List<String> results = new ArrayList<>();
+		for ( int i = 0; i < numberOfResults; i++ ) {
+			results.add( "{ \"result\" : \"hello" + i + "\"}" );
+		}
+		final String response = "[\n" + String.join( ",\n", results ) + "\n]";
+		return new StringResponseImpl( response, new Date() );
+	}
+
+	protected JSONResponse makeJsonResponse( final int numberOfResults ) {
+		final JsonObject response = new JsonObject();
+		final JsonArray results = new JsonArray();
+		for ( int i = 0; i < numberOfResults; i++ ){
+			results.add( "hello" + i );
+		}
+		response.put("results", results);
+
+		return new JSONResponseImpl( response, new Date() );
+	}
+
 	protected void assertSolMapsEqual( final SolMapsResponse expected, final SolMapsResponse actual )
 			throws UnsupportedOperationDueToRetrievalError
 	{
@@ -444,6 +504,20 @@ public abstract class CacheTestBase extends FederationTestBase
 		assertEquals(expectedMetadata, actualMetadata);
 		// Next URL
 		assertEquals( expected.getNextPageURL(), actual.getNextPageURL() );
+	}
+
+	protected void assertStringEqual( final StringResponse expected, final StringResponse actual )
+			throws UnsupportedOperationDueToRetrievalError
+	{
+		assertNotNull(actual);
+		assertEquals( expected.getResponseData(), actual.getResponseData() );
+	}
+
+	protected void assertJsonEqual( final JSONResponse expected, final JSONResponse actual )
+			throws UnsupportedOperationDueToRetrievalError
+	{
+		assertNotNull(actual);
+		assertEquals( expected.getResponseData(), actual.getResponseData() );
 	}
 
 	protected void assertCardinalityEqual( final CardinalityResponse expected, final CardinalityResponse actual )
