@@ -23,6 +23,37 @@ import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 public class ElementUtils
 {
 	/**
+	 * Appends the given expression as a filter at the end of the graph
+	 * pattern represented by the given {@link Element} object.
+	 */
+	public static Element merge( final Expr expr, final Element elmt ) {
+		// Create a new ElementGroup object, add into it the Element represented
+		// by the given graph pattern, add into it the filters, and create a new
+		// graph pattern from it.
+		final ElementGroup group = new ElementGroup();
+
+		// - convert the given graph pattern into an Element and add it to the group
+		if ( elmt instanceof ElementGroup eg ) {
+			// If the given graph pattern was converted to an ElementGroup, instead
+			// of simply adding it into the new group, copy its sub-elements over
+			// to the new group, which avoids unnecessary nesting of groups.
+			for ( final Element subElmt : eg.getElements() ) {
+				group.addElement(subElmt);
+			}
+		}
+		else {
+			// If the given graph pattern was converted to something other
+			// than an ElementGroup, simply add it into the new group.
+			group.addElement(elmt);
+		}
+
+		// - now add the filter to the group
+		final ElementFilter f = new ElementFilter(expr);
+		group.addElement(f);
+
+		return group;
+	}
+	/**
 	 * Merges the given expressions as filters into the graph
 	 * pattern represented by the given {@link Element} object.
 	 */

@@ -5,6 +5,7 @@ import java.util.Set;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
 
@@ -117,8 +118,20 @@ public interface SPARQLGraphPattern extends Query
 	SPARQLGraphPattern mergeWith( SPARQLGraphPattern other );
 
 	/**
-	 * Merges this graph pattern with FILTERS that use the given expressions
-	 * and returns the resulting, merged pattern.
+	 * Extends this graph pattern with a FILTER that uses the given
+	 * expression, and returns the resulting, merged pattern. More
+	 * specifically, the FILTER is appended to this pattern.
+	 */
+	default SPARQLGraphPattern mergeWith( final Expr expr ) {
+		final Element elmtThis = QueryPatternUtils.convertToJenaElement(this);
+		final Element elmtMerged = ElementUtils.merge(expr, elmtThis);
+		return new GenericSPARQLGraphPatternImpl1(elmtMerged);
+	}
+
+	/**
+	 * Extends this graph pattern with FILTERS that use the given
+	 * expressions, and returns the resulting, merged pattern. More
+	 * specifically, the FILTERS are appended to this pattern.
 	 */
 	default SPARQLGraphPattern mergeWith( final ExprList exprs ) {
 		final Element elmtThis = QueryPatternUtils.convertToJenaElement(this);

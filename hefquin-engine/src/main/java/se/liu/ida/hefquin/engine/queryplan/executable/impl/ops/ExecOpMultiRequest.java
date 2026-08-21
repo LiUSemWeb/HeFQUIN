@@ -11,12 +11,20 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
+import org.apache.jena.sparql.expr.E_Bound;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_LogicalNot;
+import org.apache.jena.sparql.expr.E_LogicalOr;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.NodeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -27,7 +35,31 @@ import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
+import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 
+/**
+ * Issues the same request (same query pattern) at multiple federation members
+ * and processes their respective responses, all in parallel. Every solution
+ * mapping obtained via each such response is extended with a binding for the
+ * given service variable and, then, passed on to the output. Specifically,
+ * the service variable is assigned to the service URI of the corresponding
+ * federation member.
+ * <p>
+ * In cases in which the query pattern of this request mentions the service
+ * variable, the implementation checks that the solution mappings obtained
+ * via a response bind this variable to the service URI of the federation
+ * member from which the response was received. As an additional optimization,
+ * to avoid even receiving the solution mappings that will be filtered out
+ * by this check, the implementation tries to add the following member-specific
+ * FILTER condition into the requests (which is possible only for federation
+ * members that support requests with FILTER conditions; e.g., SPARQL
+ * endpoints):
+ * <p>
+ * (! BOUND(?s)) || (?s = _uri_)
+ * <p>
+ * where ?s is the service variable and _uri_ is the service URI of the
+ * federation member.
+ */
 public class ExecOpMultiRequest extends NullaryExecutableOpBase
 {
 	private static final Logger log = LoggerFactory.getLogger( ExecOpMultiRequest.class );
@@ -35,7 +67,12 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 	protected final SPARQLRequest req;
 	protected final Var serviceVar;
 	protected final Set<FederationMember> fms;
+
 	protected final boolean serviceVarIsInPattern;
+
+	// to be created by {@link #makeRequestMemberSpecific} if needed
+	protected ExprVar serviceVarForExpressions = null;
+	protected Expr subExpr1 = null;
 
 	// statistics
 	protected int numberOfRequestsIssued = 0;
@@ -81,11 +118,28 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 		int i = 0;
 		for ( final FederationMember fm : fms ) {
 			// For every federation member covered by this operator:
-			// i) issue the request of this operator via the federation
-			// access manager, ...
+
+			// i) if the graph pattern of the request of this operator
+			// mentions the service variable, create a member-specific
+			// version of this request in which the graph pattern is
+			// append with a FILTER that restricts the service variable
+			// to the service URI of the federation member;
+			final SPARQLRequest req2;
+			if ( serviceVarIsInPattern ) {
+				final SPARQLRequest tmp = makeRequestMemberSpecific(fm);
+				// If the federation member does not support the member-
+				// specific version of the request, fall back to the
+				// original request.
+				req2 = ( tmp != null ) ? tmp : req;
+			}
+			else {
+				req2 = req;
+			}
+
+			// ii) issue the request via the federation access manager;
 			final CompletableFuture<SolMapsResponse> f;
 			try {
-				f = ctx.getFederationAccessMgr().issueRequest(req, fm);
+				f = ctx.getFederationAccessMgr().issueRequest(req2, fm);
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
@@ -93,18 +147,18 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 
 			numberOfRequestsIssued++;
 
-			// ... ii) create a response processor that shall handle the
+			// iii) create a response processor that shall handle the
 			// response obtained via the request issued in the previous
-			// step, and ...
+			// step;
 			final Consumer<SolMapsResponse> respProc;
 			if ( serviceVarIsInPattern )
 				respProc = new MyResponseProcessor2( fm.getServiceURI(), sink );
 			else
 				respProc = new MyResponseProcessor1( fm.getServiceURI(), sink );
 
-			// ... iii) attach the response processor to the future for
-			// the request and remember the future so that we can wait
-			// for its completion later.
+			// iv) attach the response processor to the future for the
+			// request and remember the future so that we can wait for
+			// its completion later.
 			futures[i++] = f.thenAccept(respProc);
 		}
 
@@ -124,6 +178,46 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 		}
 
 		log.debug( "Execution of the multi-request operator for {} is finished.", serviceVar.toString() );
+	}
+
+	/**
+	 * Returns a request with a graph pattern that is created by extending
+	 * the graph pattern of {@link #req} with a FILTER of the form
+	 *
+	 *    (! BOUND(?s)) || (?s = _uri_)
+	 *
+	 * where ?s is the service variable (see {@link #serviceVar}) and
+	 * _uri_ is the service URI of the given federation member. If the
+	 * given federation member does not support the extended graph
+	 * pattern, <code>null</code> is returned.
+	 */
+	protected SPARQLRequest makeRequestMemberSpecific( final FederationMember fm ) {
+		if ( ! fm.supportsMoreThanTriplePatterns() )
+			return null;
+
+		// Since the first subexpression is independent of the federation
+		// member, we create only one copy of the Java object for it.
+		if ( subExpr1 == null ) {
+			serviceVarForExpressions = new ExprVar(serviceVar);
+			subExpr1 = new E_LogicalNot( new E_Bound(serviceVarForExpressions) );
+		}
+
+		// Create the second subexpression.
+		final Node serviceURI = NodeFactory.createURI( fm.getServiceURI() );
+		final Expr subExpr2 = new E_Equals( serviceVarForExpressions,
+		                                    NodeValue.makeNode(serviceURI) );
+
+		// Create the overall filter expression and append it to the graph
+		// pattern of the (general) request.
+		final Expr expr = new E_LogicalOr(subExpr1, subExpr2);
+		final SPARQLGraphPattern p = req.getQueryPattern().mergeWith(expr);
+
+		if ( ! fm.isSupportedPattern(p) )
+			return null;
+
+		return new SPARQLRequestImpl( p,
+		                              req.getProjectionVars(),
+		                              req.getDistinctRequired() );
 	}
 
 	@Override
