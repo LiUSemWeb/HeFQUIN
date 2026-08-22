@@ -31,6 +31,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -42,6 +43,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRo
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
@@ -150,6 +152,13 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			createdPlan = createPlanForRequestUnderProject( projectOp,
 			                                                op,
 			                                                inputPlan );
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiRequest op ) {
+			createdPlan = createPlanForMultiRequestUnderProject( projectOp,
+			                                                     op,
+			                                                     inputPlan );
 		}
 
 		@Override
@@ -311,6 +320,55 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 		}
 		return inputPlan;
+	}
+
+	/**
+	 * Pushes a project operator into a multi-request operator, but only if
+	 * all of the federation members of this operator are SPARQL endpoints.
+	 *
+	 * A new request is created whose projection variables correspond to the
+	 * variables required by the project operator. If the request already
+	 * contains request-level projection variables, then the new request uses
+	 * the intersection of the existing projection variables and the variables
+	 * required by the project operator.
+	 *
+	 * The resulting request preserves the duplicate-elimination requirement
+	 * of the original request.
+	 *
+	 * A new request operator containing the rewritten request is then returned
+	 * as a plan with a nullary root.
+	 */
+	protected LogicalPlan createPlanForMultiRequestUnderProject(
+			final LogicalOpProject projectOp,
+			final LogicalOpMultiRequest reqOp,
+			final LogicalPlan inputPlan ) {
+		// First, make sure that all federation members of the mreq operator
+		// are SPARQL endpoints. If that is not the case, return the given
+		// input plan without pushing the projection into the request.
+		for ( final FederationMember fm : reqOp.getFederationMembers() ) {
+			if ( ! (fm instanceof SPARQLEndpoint) ) {
+				return inputPlan;
+			}
+		}
+
+		final SPARQLRequest oldReq = reqOp.getRequest();
+		final Set<Var> newProj;
+		if ( oldReq.getProjectionVars() != null ) {
+			newProj = new HashSet<>( projectOp.getVariables() );
+			newProj.retainAll( oldReq.getProjectionVars() );
+		}
+		else {
+			newProj = projectOp.getVariables();
+		}
+
+		final boolean mayReduce = reqOp.mayReduce() && projectOp.mayReduce();
+
+		final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getDistinctRequired() || mayReduce );
+
+		final LogicalOpMultiRequest mergedOp = new LogicalOpMultiRequest( newReq,
+		                                                                  reqOp.getServiceVariable(),
+		                                                                  reqOp.getFederationMembers() );
+		return new LogicalPlanWithNullaryRootImpl(mergedOp, null);
 	}
 
 	/**

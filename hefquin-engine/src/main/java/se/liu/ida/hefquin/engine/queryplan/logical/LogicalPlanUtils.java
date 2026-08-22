@@ -190,6 +190,9 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpRequest<?,?> op )     { subplanCount++; }
 
 		@Override
+		public void visit( final LogicalOpMultiRequest op )     { subplanCount++; }
+
+		@Override
 		public void visit( final LogicalOpFixedSolMap op )      { subplanCount++; }
 
 		@Override

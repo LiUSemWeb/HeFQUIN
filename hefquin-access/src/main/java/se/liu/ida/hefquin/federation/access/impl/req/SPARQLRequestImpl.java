@@ -20,6 +20,8 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 	protected final SPARQLQuery query;
 
+	// We materialize the ExpectedVariables in this case to avoid
+	// producing it over and over again whenever it is used.
 	protected final ExpectedVariables expectedVars;
 
 	public SPARQLRequestImpl( final SPARQLGraphPattern pattern ) {
@@ -35,9 +37,8 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		this.projectionVars = projectionVars;
 		this.distinctRequired = distinctRequired;
 
-		// we materialize the ExpectedVariables in this case
-		// to avoid producing it again whenever it is used
-		expectedVars = pattern.getExpectedVariables();
+		expectedVars = determineExpectedVars( pattern.getExpectedVariables(),
+		                                      projectionVars );
 	}
 
 	public SPARQLRequestImpl( final SPARQLQuery query ) {
@@ -49,9 +50,48 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		this.projectionVars = jena.isQueryResultStar() ? null : new HashSet<>( jena.getProjectVars() );
 		this.distinctRequired = jena.isDistinct();
 
-		// we materialize the ExpectedVariables in this case
-		// to avoid producing it again whenever it is used
-		expectedVars = query.getExpectedVariables();
+		expectedVars = determineExpectedVars( query.getExpectedVariables(),
+		                                      projectionVars );
+	}
+
+	protected ExpectedVariables determineExpectedVars( final ExpectedVariables expVarsOfPattern,
+	                                                   final Set<Var> projectionVars ) {
+		if ( projectionVars == null )
+			return expVarsOfPattern;
+
+		// Determine the set of certain variables of the request, which is
+		// the intersection between the certain variables of the pattern and
+		// the projection variables.
+		final Set<Var> certVars;
+		final Set<Var> certVarsOfPattern = expVarsOfPattern.getCertainVariables();
+		if ( projectionVars.containsAll(certVarsOfPattern) ) {
+			certVars = certVarsOfPattern;
+		}
+		else {
+			certVars = new HashSet<>(certVarsOfPattern);
+			certVars.retainAll(projectionVars);
+		}
+
+		// Determine the set of possible variables of the request, which is
+		// the intersection between the possible variables of the pattern and
+		// the projection variables.
+		final Set<Var> possVars;
+		final Set<Var> possVarsOfPattern = expVarsOfPattern.getPossibleVariables();
+		if ( projectionVars.containsAll(possVarsOfPattern) ) {
+			possVars = possVarsOfPattern;
+		}
+		else {
+			possVars = new HashSet<>(possVarsOfPattern);
+			possVars.retainAll(projectionVars);
+		}
+
+		if ( certVars == certVarsOfPattern && possVars == possVarsOfPattern )
+			return expVarsOfPattern;
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getCertainVariables() { return certVars; }
+			@Override public Set<Var> getPossibleVariables() { return possVars; }
+		};
 	}
 
 	@Override

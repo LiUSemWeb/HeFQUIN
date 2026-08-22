@@ -45,8 +45,10 @@ public class SPARQLRequestImplTest extends FederationTestBase
 	@Test
 	public void testProjectionVariablesInitialization() throws FederationAccessException {
 		// setting up
-		final String queryString = "SELECT ?s ?o2 WHERE { ?s <http://xmlns.com/foaf/0.1/name> \"Berlin\"@en . " +
-									"?s <http://xmlns.com/foaf/0.1/name> ?o2 . }";
+		final String queryString =
+				"SELECT ?s ?o2 WHERE { " +
+				    "?s <http://example.org/1> ?o1 . " +
+				    "?s <http://example.org/2> ?o2 }";
 
 		final SPARQLQuery baseQuery = new SPARQLQueryImpl( QueryFactory.create(queryString) );
 
@@ -57,8 +59,19 @@ public class SPARQLRequestImplTest extends FederationTestBase
 		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), false);
 
 		// checking
-		// ensure projection is applied
-		assertEquals( Set.of(Var.alloc("s"), Var.alloc("o2")), req1.getProjectionVars() );
-		assertEquals( Set.of(Var.alloc("s")), req2.getProjectionVars() );
+		// i) ensure projection is applied
+		assertEquals( Set.of(Var.alloc("s"), Var.alloc("o2")),
+		              req1.getProjectionVars() );
+		assertEquals( Set.of(Var.alloc("s")),
+		              req2.getProjectionVars() );
+
+		// ii) ensure that determining the expected variables considers projection
+		assertEquals( Set.of(Var.alloc("s"), Var.alloc("o2")),
+		              req1.getExpectedVariables().getCertainVariables() );
+		assertEquals( Set.of(Var.alloc("s")),
+		              req2.getExpectedVariables().getCertainVariables() );
+
+		assertTrue( req1.getExpectedVariables().getPossibleVariables().isEmpty() );
+		assertTrue( req2.getExpectedVariables().getPossibleVariables().isEmpty() );
 	}
 }

@@ -128,6 +128,11 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		}
 
 		@Override
+		public void visit( final LogicalOpMultiRequest op ) {
+			// nothing to do here - we are in a leaf node
+		}
+
+		@Override
 		public void visit( final LogicalOpFixedSolMap op ) {
 			// nothing to do here - we are in a leaf node
 		}
