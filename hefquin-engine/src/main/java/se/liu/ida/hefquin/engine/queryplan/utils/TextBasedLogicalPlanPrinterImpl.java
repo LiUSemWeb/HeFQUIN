@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
@@ -327,6 +328,26 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		protected void record( final DataRetrievalRequest req ) {
 			if ( req instanceof SPARQLRequest sreq ) {
 				record( sreq.getQueryPattern() );
+
+				final String prVarsString;
+				final Set<Var> prVars = sreq.getProjectionVars();
+				if ( prVars == null ) {
+					prVarsString = "*";
+				}
+				else if ( prVars.isEmpty() ) {
+					prVarsString = "-none-";
+				}
+				else {
+					final StringBuilder sb = new StringBuilder();
+					final Iterator<Var> it = prVars.iterator();
+					sb.append( it.next().toString() );
+					while ( it.hasNext() ) {
+						sb.append( ", " + it.next().toString() );
+					}
+					prVarsString = sb.toString();
+				}
+
+				props.add( "projection variables: " + prVarsString );
 			}
 			else {
 				props.add( "request (" + req.hashCode() +  "): " + req.toString() );
