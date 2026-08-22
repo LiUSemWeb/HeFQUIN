@@ -278,9 +278,34 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 	protected LogicalPlan createPlanForMultiRequestUnderFilter( final LogicalOpFilter filterOp,
 	                                                            final LogicalOpMultiRequest reqOp,
 	                                                            final LogicalPlan inputPlan ) {
+		// First, check whether filter evaluation may exceed the capabilities
+		// of any of the federation members of the mreq operator. Specifically,
+		// if at least one of these federation members can handle only triple
+		// pattern requests, then we are not attempting to push the filter.
+		// TODO: Instead of simply giving up, a better strategy is to split
+		// mreq operator into two: one that contains the subset of federation
+		// members that can handle the extended request and one that contains
+		// the federation members that cannot. Then, we can push the filter
+		// into the request of the first one, keep the filter operator on top
+		// of the second one, and combine both subplans via a union operator.
+		for ( final FederationMember fm : reqOp.getFederationMembers() ) {
+			if ( ! fm.supportsMoreThanTriplePatterns() ) {
+				return inputPlan;
+			}
+		}
+
+		// Now merge the filter into the graph pattern of the request.
 		final ExprList exprList = filterOp.getFilterExpressions();
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(exprList);
+
+		// Check again that the resulting graph pattern is supported by
+		// every federation member of the operator.
+		for ( final FederationMember fm : reqOp.getFederationMembers() ) {
+			if ( ! fm.isSupportedPattern(mergedPattern) ) {
+				return inputPlan;
+			}
+		}
 
 		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
 
