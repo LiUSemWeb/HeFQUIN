@@ -20,6 +20,8 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 	protected final SPARQLQuery query;
 
+	// We materialize the ExpectedVariables in this case to avoid
+	// producing it over and over again whenever it is used.
 	protected final ExpectedVariables expectedVars;
 
 	public SPARQLRequestImpl( final SPARQLGraphPattern pattern ) {
@@ -35,8 +37,6 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		this.projectionVars = projectionVars;
 		this.distinctRequired = distinctRequired;
 
-		// we materialize the ExpectedVariables in this case
-		// to avoid producing it again whenever it is used
 		expectedVars = determineExpectedVars( pattern.getExpectedVariables(),
 		                                      projectionVars );
 	}
@@ -50,8 +50,6 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		this.projectionVars = jena.isQueryResultStar() ? null : new HashSet<>( jena.getProjectVars() );
 		this.distinctRequired = jena.isDistinct();
 
-		// we materialize the ExpectedVariables in this case
-		// to avoid producing it again whenever it is used
 		expectedVars = determineExpectedVars( query.getExpectedVariables(),
 		                                      projectionVars );
 	}
