@@ -43,6 +43,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRo
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
@@ -156,7 +157,8 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		@Override
 		public void visit( final LogicalOpMultiRequest op ) {
 			createdPlan = createPlanForMultiRequestUnderProject( projectOp,
-			                                                     op );
+			                                                     op,
+			                                                     inputPlan );
 		}
 
 		@Override
@@ -321,7 +323,8 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	}
 
 	/**
-	 * Pushes a project operator into a multi-request operator.
+	 * Pushes a project operator into a multi-request operator, but only if
+	 * all of the federation members of this operator are SPARQL endpoints.
 	 *
 	 * A new request is created whose projection variables correspond to the
 	 * variables required by the project operator. If the request already
@@ -337,7 +340,17 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 */
 	protected LogicalPlan createPlanForMultiRequestUnderProject(
 			final LogicalOpProject projectOp,
-			final LogicalOpMultiRequest reqOp ) {
+			final LogicalOpMultiRequest reqOp,
+			final LogicalPlan inputPlan ) {
+		// First, make sure that all federation members of the mreq operator
+		// are SPARQL endpoints. If that is not the case, return the given
+		// input plan without pushing the projection into the request.
+		for ( final FederationMember fm : reqOp.getFederationMembers() ) {
+			if ( ! (fm instanceof SPARQLEndpoint) ) {
+				return inputPlan;
+			}
+		}
+
 		final SPARQLRequest oldReq = reqOp.getRequest();
 		final Set<Var> newProj;
 		if ( oldReq.getProjectionVars() != null ) {
