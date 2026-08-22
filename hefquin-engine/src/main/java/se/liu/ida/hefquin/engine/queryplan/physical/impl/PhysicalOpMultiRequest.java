@@ -12,12 +12,13 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
- * A physical operator that performs requests with the same graph
- * pattern at multiple federation members in parallel and, then,
- * outputs the solution mappings obtained via all these requests,
- * where each solution mapping is extended with a binding that
- * captures the service variable with the service URI of the
- * federation member from which it was obtained.
+ * A physical operator that is meant to be used for the logical operator
+ * {@link LogicalOpMultiRequest}. It performs requests with the same graph
+ * pattern at multiple federation members in parallel and, then, outputs
+ * the solution mappings obtained via all these requests, where each
+ * solution mapping is extended with a binding that captures the service
+ * variable with the service URI of the federation member from which it
+ * was obtained.
  *
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpMultiRequest} class.
