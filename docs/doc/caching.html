@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Cache Configuration</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-coy-without-shadows.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-sparql.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+    <main>
+        <h1>Caching</h1>
+        <p>
+            HeFQUIN supports caching of requests to federation members. When HeFQUIN needs to access a federation member,
+            it first checks whether the request is present in the cache. If it is, the corresponding cached result can be
+            reused without contacting the federation member. Otherwise, the request is evaluated and its result can be stored
+            in the cache for subsequent accesses.</p>
+        <p>
+            By default, HeFQUIN provides a two-level cache consisting of an in-memory L1 cache and a persistent L2 cache. The L1
+            cache provides fast access during an execution, while the L2 cache can retain cached results across executions.
+        </p>
+ 
+        <p>
+            The cache can be configured with a time-to-live (TTL), which determines how long cache entries remain valid,
+            as well as with size limits that determine how many entries can be stored. For details on configuring the cache,
+            see <a href="cache_configuration.html">Cache Configuration</a>.
+        </p>
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
