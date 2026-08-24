@@ -8,8 +8,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - New query plan operator that covers multiple requests with the same pattern to different federation members ([#677](https://github.com/LiUSemWeb/HeFQUIN/issues/677)).
+- Extend support for caching to all types of federation members, including REST, GraphQL, and Neo4j ([#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590)).
 ### Changed
-- Extend caching to support all federation members, including REST, GraphQL, and Neo4j ((#590)[https://github.com/LiUSemWeb/HeFQUIN/issues/590]).
 - Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/issues/675)).
 - Bug fix: adding hashCode() function to the Pair class to avoid unnecessary cache misses in FederationManagerWithCache ([#679](https://github.com/LiUSemWeb/HeFQUIN/issues/679)).
 ### Planned for Next Release
