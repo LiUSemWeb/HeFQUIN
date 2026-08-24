@@ -26,7 +26,8 @@
         <h1>Configuring the Cache</h1>
         <p>
             HeFQUIN supports a two-level cache with an in-memory L1 cache and a persistent L2 cache. The cache is configured as
-            part of the <code>FederationAccessManager</code>.
+            part of the <code>FederationAccessManager</code>. By default, HeFQUIN uses a <code>HashMap</code>-based L1 cache and
+            a <code>MapDB</code>-based L2 cache.
         </p>
 
         <h2 id="example-configuration">Example Configuration</h2>
@@ -70,7 +71,7 @@
 </code></pre>
 
         <p>
-            In the example, the L1 cache uses <code>CacheLayer</code>. Its first constructor argument specifies the <code>Map</code>
+            In the example, the L1 cache uses <code>CacheLayer</code> directly. Its first constructor argument specifies the <code>Map</code>
             implementation used internally, in this case an in-memory <code>HashMap</code>. The second argument specifies the
             maximum number of elements (<code>100</code>). The third argument is a <code>CachePolicies</code> instance whose
             constructor argument specifies the time-to-live (TTL) in seconds (<code>300</code>).
@@ -94,9 +95,10 @@
         </p>
 
         <p>
-            Both <code>MapDBCache</code> and the <code>ChronicleMap</code>-based implementation can be used as the L2 cache.
-            <code>MapDBCache</code> provides faster startup when running the regular CLI, where JVM startup time has a greater
-            impact. When HeFQUIN is run as a service, this difference in JVM startup time is not relevant.
+            Both <code>MapDBCache</code> and <code>ChronicleMapCache</code> can be used as the L2 cache. <code>MapDBCache</code>
+            provides faster startup when running the regular CLI, where JVM startup time has a greater impact. When HeFQUIN is run
+            as a service, this difference in JVM startup time is not relevant. <code>ChronicleMapCache</code> is likely to
+            perform best for high-throughput workloads.
         </p>
     </main>
 
