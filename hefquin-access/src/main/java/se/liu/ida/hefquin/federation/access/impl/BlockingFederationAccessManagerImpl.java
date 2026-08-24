@@ -25,8 +25,9 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 			final TPFRequestProcessor reqProcTPF,
 			final BRTPFRequestProcessor reqProcBRTPF,
 			final Neo4jRequestProcessor reqProcNeo4j,
-			final RESTRequestProcessor reqProcREST ) {
-		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j, reqProcREST);
+			final RESTRequestProcessor reqProcREST,
+			final GraphQLRequestProcessor reqProcGraphQL ) {
+		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j, reqProcREST, reqProcGraphQL);
 	}
 
 	@Override

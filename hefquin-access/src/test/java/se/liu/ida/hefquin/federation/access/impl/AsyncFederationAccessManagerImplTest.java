@@ -2,12 +2,14 @@ package se.liu.ida.hefquin.federation.access.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -20,13 +22,18 @@ import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.access.*;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.response.JSONResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.RecordsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.StringResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
@@ -182,17 +189,18 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 	                                                                  final long sleepMillis ) {
 		final SPARQLRequestProcessor reqProc = new MySPARQLRequestProcessor(sleepMillis);
 		final TPFRequestProcessor reqProcTPF = new MyTPFRequestProcessor(sleepMillis);
-		final BRTPFRequestProcessor reqProcBRTPF = new BRTPFRequestProcessor() {
-			@Override public TPFResponse performRequest(BRTPFRequest req, BRTPFServer fm) { throw new UnsupportedOperationException(); }
-		};
-		final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessor() {
-			@Override public RecordsResponse performRequest(Neo4jRequest req, Neo4jServer fm) { throw new UnsupportedOperationException(); }
-		};
-		final RESTRequestProcessor reqProcREST = new RESTRequestProcessor() {
-			@Override public StringResponse performRequest( RESTRequest req, RESTEndpoint fm ) { throw new UnsupportedOperationException(); }
-		};
+		final BRTPFRequestProcessor reqProcBRTPF = new MyBRTPFRequestProcessor(sleepMillis);
+		final Neo4jRequestProcessor reqProcNeo4j = new MyNeo4jRequestProcessor(sleepMillis);
+		final RESTRequestProcessor reqProcREST = new MyRESTRequestProcessor(sleepMillis);
+		final GraphQLRequestProcessor reqProcGraphQL = new MyGraphQLRequestProcessor(sleepMillis);
 
-		return new AsyncFederationAccessManagerImpl(execServiceForFedAccess, reqProc, reqProcTPF, reqProcBRTPF, reqProcNeo4j, reqProcREST);
+		return new AsyncFederationAccessManagerImpl(execServiceForFedAccess,
+		                                            reqProc,
+		                                            reqProcTPF,
+		                                            reqProcBRTPF,
+		                                            reqProcNeo4j,
+		                                            reqProcREST,
+		                                            reqProcGraphQL);
 	}
 
 	protected static class FakeRequestProcessorBase
@@ -259,4 +267,49 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		}
 	}
 
+	protected static class MyBRTPFRequestProcessor extends FakeRequestProcessorBase
+	                                               implements BRTPFRequestProcessor
+	{
+		public MyBRTPFRequestProcessor( final long sleepMillis ) { super(sleepMillis); }
+
+		@Override
+		public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm ) {
+			sleep();
+			return new TPFResponseImpl( new ArrayList<>(), new ArrayList<>(), "dummy next page", new Date() );
+		}
+	}
+
+	protected static class MyNeo4jRequestProcessor extends FakeRequestProcessorBase
+	                                              implements Neo4jRequestProcessor
+	{
+		public MyNeo4jRequestProcessor( final long sleepMillis ) { super( sleepMillis ); }
+
+		@Override
+		public RecordsResponse performRequest( final Neo4jRequest req, final Neo4jServer fm ) {
+			return new RecordsResponseImpl( new ArrayList<>(), new Date() );
+		}
+	}
+
+	protected static class MyRESTRequestProcessor extends FakeRequestProcessorBase
+	                                              implements RESTRequestProcessor
+	{
+		public MyRESTRequestProcessor( final long sleepMillis ) { super(sleepMillis); }
+
+		@Override
+		public StringResponse performRequest( final RESTRequest req, final RESTEndpoint fm ) {
+			sleep();
+			return new StringResponseImpl( "{ \"value\" : \"dummy text value\" }", new Date() );
+		}
+	}
+
+	protected static class MyGraphQLRequestProcessor extends FakeRequestProcessorBase
+	                                                 implements GraphQLRequestProcessor
+	{
+		public MyGraphQLRequestProcessor( final long sleepMillis ) { super(sleepMillis); }
+
+		@Override
+		public JSONResponse performRequest( final GraphQLRequest req, final GraphQLEndpoint fm ) throws FederationAccessException {
+			return new JSONResponseImpl( new JsonObject(), new Date() );
+		}
+	}
 }

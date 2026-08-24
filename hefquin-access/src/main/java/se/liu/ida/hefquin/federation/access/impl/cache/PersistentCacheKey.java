@@ -4,16 +4,21 @@ import java.io.Serializable;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.GraphQLRequest;
+import se.liu.ida.hefquin.federation.access.Neo4jRequest;
+import se.liu.ida.hefquin.federation.access.RESTRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
+import se.liu.ida.hefquin.federation.members.Neo4jServer;
+import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
@@ -80,6 +85,22 @@ public class PersistentCacheKey implements Serializable {
 		else if (    req instanceof BRTPFRequest brtpfRequest
 		          && fm instanceof BRTPFServer brtpfServer ) {
 			requestUrl = brtpfServer.createRequestURL(brtpfRequest);
+		}
+		else if (    req instanceof Neo4jRequest neo4jRequest
+		          && fm instanceof Neo4jServer neo4jServer ) {
+			final String query = neo4jRequest.getCypherQuery();
+			final String url = neo4jServer.getURL();
+			requestUrl = url + "?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8);
+		}
+		else if (    req instanceof RESTRequest restRequest
+		          && fm instanceof RESTEndpoint ) {
+			requestUrl = restRequest.getURI().toString();
+		}
+		else if (    req instanceof GraphQLRequest graphQLRequest
+		          && fm instanceof GraphQLEndpoint graphQLEndpoint ) {
+			final String query = graphQLRequest.getGraphQLQuery().toString();
+			final String encodedQuery = URLEncoder.encode( query, StandardCharsets.UTF_8 );
+			requestUrl = graphQLEndpoint.getURL() + "?query=" + encodedQuery;
 		}
 		else {
 			throw new IllegalArgumentException( "Unexpected request type: " + req.getClass().getName()
