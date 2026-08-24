@@ -106,7 +106,9 @@ public abstract class FederationTestBase
 	protected static class RESTEndpointForTest extends RESTEndpointImpl
 	{
 		public RESTEndpointForTest() {
-			super("http://example.org/rest", List.of() );
+			super( NodeFactory.createURI("http://example.org/rest"),
+			       "http://example.org/",
+			       List.of() );
 		}
 
 		public RESTEndpointForTest( final String urlTemplate, final List<Parameter> params ) {
@@ -125,13 +127,13 @@ public abstract class FederationTestBase
 	protected static class GraphQLEndpointForTest extends GraphQLEndpointImpl
 	{
 		public GraphQLEndpointForTest() {
-			super( NodeFactory.createURI("http://example.org/graphlql"),
-			       "http://example.org/graphlql",
+			super( NodeFactory.createURI("http://example.org/graphql"),
+			       "http://example.org/",
 			       new EmptyGraphQLSchema() );
 		}
 
 		public GraphQLEndpointForTest( final String url ) {
-			super( NodeFactory.createURI("http://example.org/graphlql"),
+			super( NodeFactory.createURI("http://example.org/graphl"),
 			       url,
 			       new EmptyGraphQLSchema() );
 		}
