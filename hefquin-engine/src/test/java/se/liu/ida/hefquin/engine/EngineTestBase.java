@@ -59,8 +59,8 @@ import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorIm
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.StringResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
@@ -341,7 +341,6 @@ public abstract class EngineTestBase
 		}
 		@Override
 		public AuthenticationInformation getAuthenticationInformation() {
-			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
 		}
 	}
@@ -402,7 +401,6 @@ public abstract class EngineTestBase
 		}
 		@Override
 		public AuthenticationInformation getAuthenticationInformation() {
-			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
 		}
 	}
@@ -489,7 +487,6 @@ public abstract class EngineTestBase
 
 		@Override
 		public AuthenticationInformation getAuthenticationInformation() {
-			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
 		}
 	}

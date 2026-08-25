@@ -9,7 +9,7 @@ import org.apache.jena.sparql.exec.http.Params;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
-import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class TPFServerImpl extends BaseForRDFBasedFederationMember

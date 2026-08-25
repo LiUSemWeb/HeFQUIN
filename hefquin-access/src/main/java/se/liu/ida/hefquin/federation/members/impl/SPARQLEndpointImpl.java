@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.federation.members.impl;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
-import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class SPARQLEndpointImpl extends BaseForRDFBasedFederationMember

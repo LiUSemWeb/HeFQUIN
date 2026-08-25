@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.federation.members.impl;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 
 public class RESTEndpointImpl extends BaseForFederationMember

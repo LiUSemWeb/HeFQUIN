@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.federation.members;
+package se.liu.ida.hefquin.federation.authentication;
 
 import java.net.http.HttpRequest.Builder;
 import java.util.Map;

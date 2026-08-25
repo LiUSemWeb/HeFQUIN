@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.federation.members;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 
 public interface SPARQLEndpoint extends RDFBasedFederationMember
 {

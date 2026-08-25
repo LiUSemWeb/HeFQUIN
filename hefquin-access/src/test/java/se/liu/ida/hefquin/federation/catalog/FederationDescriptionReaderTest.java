@@ -15,8 +15,8 @@ import org.apache.jena.riot.RiotNotFoundException;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
-import se.liu.ida.hefquin.federation.members.BearerAuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.BearerAuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 

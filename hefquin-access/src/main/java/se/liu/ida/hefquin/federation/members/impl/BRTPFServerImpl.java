@@ -9,7 +9,7 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
-import se.liu.ida.hefquin.federation.members.AuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 
 public class BRTPFServerImpl extends TPFServerImpl implements BRTPFServer
