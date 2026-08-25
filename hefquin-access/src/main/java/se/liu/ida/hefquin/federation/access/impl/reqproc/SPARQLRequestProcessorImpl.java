@@ -3,9 +3,7 @@ package se.liu.ida.hefquin.federation.access.impl.reqproc;
 import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -59,11 +57,28 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 	{
 		// see https://jena.apache.org/documentation/sparql-apis/#query-execution
 
-		final Map<String, String> headers = new HashMap<>();
-		headers.put( "User-Agent", BuildInfo.getUserAgent() );
+		// final Map<String, String> headers = new HashMap<>();
+		// headers.put( "User-Agent", BuildInfo.getUserAgent() );
 
-		if ( fm.getAuthenticationInformation() != null )
-			fm.getAuthenticationInformation().applyTo( headers );
+		// if ( fm.getAuthenticationInformation() != null )
+		// 	fm.getAuthenticationInformation().applyTo( headers );
+
+		// final QueryExecution qe;
+		// try {
+		// 	final QueryExecutionHTTPBuilder builder = QueryExecutionHTTPBuilder.create()
+		// 			.endpoint(   fm.getURL() )
+		// 			.httpClient( httpClient )
+		// 			.query(      req.getQuery().asJenaQuery() )
+		// 			.timeout(    overallTimeout, TimeUnit.MILLISECONDS );
+
+		// 	for ( final Map.Entry<String, String> header : headers.entrySet() )
+		// 		builder.httpHeader( header.getKey(), header.getValue() );
+
+		// 	qe = builder.build();
+		// }
+		// catch ( final Exception e ) {
+		// 	throw new FederationAccessException("Initiating the remote execution of a query at the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", e, req, fm);
+		// }
 
 		final QueryExecution qe;
 		try {
@@ -71,12 +86,13 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 					.endpoint(   fm.getURL() )
 					.httpClient( httpClient )
 					.query(      req.getQuery().asJenaQuery() )
-					.timeout(    overallTimeout, TimeUnit.MILLISECONDS );
+					.timeout(    overallTimeout, TimeUnit.MILLISECONDS )
+					.httpHeader( "User-Agent", BuildInfo.getUserAgent() );
 
-			for ( final Map.Entry<String, String> header : headers.entrySet() )
-				builder.httpHeader( header.getKey(), header.getValue() );
+					if ( fm.getAuthenticationInformation() != null )
+						fm.getAuthenticationInformation().applyTo( builder );
 
-			qe = builder.build();
+					qe = builder.build();
 		}
 		catch ( final Exception e ) {
 			throw new FederationAccessException("Initiating the remote execution of a query at the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", e, req, fm);

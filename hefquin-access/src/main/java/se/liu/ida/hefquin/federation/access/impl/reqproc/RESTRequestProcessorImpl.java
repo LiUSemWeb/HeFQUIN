@@ -54,7 +54,8 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 				.header("Accept", "application/json;charset=UTF-8")
 				.header("User-Agent", BuildInfo.getUserAgent());
 
-		fm.getAuthenticationInformation().applyTo( builder );
+		if ( fm.getAuthenticationInformation() != null )
+			fm.getAuthenticationInformation().applyTo( builder );
 
 		if ( overallTimeout > 0L )
 			builder.timeout( Duration.ofMillis(overallTimeout) );

@@ -3,6 +3,8 @@ package se.liu.ida.hefquin.federation.authentication;
 import java.net.http.HttpRequest;
 import java.util.Map;
 
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
+
 /**
  * Provides authentication information for requests to a federation member.
  * <p>
@@ -25,4 +27,11 @@ public interface AuthenticationInformation
 	 * @param headers HTTP headers to which the authentication information is applied
 	 */
 	void applyTo( Map<String, String> headers );
+
+	/**
+	 * Applies the authentication information to the given QueryExecutionHTTPBuilder.
+	 *
+	 * @param b QueryExecutionHTTPBuilder to which the authentication information is applied
+	 */
+	void applyTo( QueryExecutionHTTPBuilder b );
 }

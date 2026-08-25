@@ -42,7 +42,8 @@ public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements 
 			"User-Agent", BuildInfo.getUserAgent()
 		);
 
-		fm.getAuthenticationInformation().applyTo( headers );
+		if ( fm.getAuthenticationInformation() != null )
+			fm.getAuthenticationInformation().applyTo( headers );
 
 		final TPFResponseBuilder b;
 		try {

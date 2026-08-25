@@ -426,6 +426,14 @@ public class FederationDescriptionReader
 		final Resource securityScheme = securityConfig.asResource();
 
 		if ( securityScheme.hasProperty( RDF.type, WoTSecVocab.BearerSecurityScheme ) ) {
+			final String inValue =
+					ModelUtils.getSingleOptionalProperty_XSDString(
+							securityScheme,
+							WoTSecVocab.in );
+
+			if ( inValue != null && ! "header".equals(inValue) )
+				throw new IllegalArgumentException( "Only header-based bearer authentication is supported." );
+
 			final String tokenEnv =
 				ModelUtils.getSingleMandatoryProperty_XSDString(
 					securityScheme,
