@@ -322,20 +322,39 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		if ( ! jenaOp.getService().isVariable() )
 			throw new IllegalArgumentException( "unsupported VALUES-extended SERVICE clause" );
 
-		final Set<FederationMember> fms = new HashSet<>();
+		final Set<FederationMember> SPARQLfms = new HashSet<>();
+		final Set<FederationMember> nonSPARQLfms = new HashSet<>();
 		for ( final Node n : jenaOp.getPossibleValues() ) {
 			final FederationMember fm = ctx.getFederationCatalog().getFederationMemberByURI( n.getURI() );
 			if ( ! (fm instanceof SPARQLEndpoint) )
-				throw new IllegalArgumentException( "VALUES-extended SERVICE clause with a federation member that is not a SPARQL endpoint (service URI: " + n.toString() + ")" );
-
-			fms.add(fm);
+				nonSPARQLfms.add(fm);
+			else
+				SPARQLfms.add(fm);
 		}
 
-		final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
+		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
 		final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
 		final Var var = Var.alloc( jenaOp.getService() );
-		final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, var, fms);
-		return new LogicalPlanWithNullaryRootImpl(op, null);
+		final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, var, SPARQLfms);
+
+		if ( ! nonSPARQLfms.isEmpty() ) {
+			final List<LogicalPlan> lplansList = new ArrayList<>(nonSPARQLfms.size() + 1);
+			lplansList.add( new LogicalPlanWithNullaryRootImpl(op, null) );
+			for ( final FederationMember fm : nonSPARQLfms ) {
+				if ( fm instanceof WrappedRESTEndpoint ep ) {
+					if ( ep.getNumberOfParameters() != 0 )
+						throw new IllegalArgumentException( "Invalid SERVICE clause: missing PARAMS for " + ep.toString() );
+
+					final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mayReduce, req);
+					lplansList.add( new LogicalPlanWithNullaryRootImpl(reqOp, null) );
+				}
+				else
+					lplansList.add( createPlan( jenaOp.getSubOp(), mayReduce, fm ) );
+			}
+			return new LogicalPlanWithNaryRootImpl(LogicalOpMultiwayUnion.getInstance(), null, lplansList);
+		}
+		else
+			return new LogicalPlanWithNullaryRootImpl(op, null);
 	}
 
 	/**
