@@ -48,11 +48,11 @@ public class HttpClientProvider
 	// No timeout
 	private static final long NO_TIMEOUT = -1;
 
-	// Default max number of parallel requests per endpoint address
-	private static final int DEFAULT_MAX_PARALLEL_REQUESTS = 10;
+	// Default parallel request limit per server
+	private static final int DEFAULT_PARALLEL_REQUEST_LIMIT_PER_SERVER = 10;
 
 	// Mutable default (can be overridden)
-	private static int defaultMaxParallelRequests = DEFAULT_MAX_PARALLEL_REQUESTS;
+	private static int defaultParallelRequestLimitPerServer = DEFAULT_PARALLEL_REQUEST_LIMIT_PER_SERVER;
 
 	/** One limiter per endpoint address. The limiter for an endpoint address is shared across all clients. */
 	protected static final Map<String, Semaphore> LIMITERS_BY_ENDPOINT_ADDRESS = new ConcurrentHashMap<>();
@@ -97,20 +97,19 @@ public class HttpClientProvider
 	}
 
 	/**
-	 * Sets the default maximum number of concurrent requests per endpoint address.
+	 * Sets the default limit on the number of concurrent requests per server.
 	 *
 	 * This value is used when creating new endpoint limiters via
 	 * {@link #getOrCreateEndpointLimiter(String)}.
 	 *
-	 * @param maxParallelRequests maximum number of concurrent requests per
-	 *                            endpoint address
-	 * @throws IllegalArgumentException if {@code maxParallelRequests} is non-positive
+	 * @param parallelRequestLimitPerServer maximum number of concurrent requests per server
+	 * @throws IllegalArgumentException if {@code parallelRequestLimitPerServer} is non-positive
 	 */
-	public static void setDefaultMaxParallelRequests( final int maxParallelRequests ) {
-		if ( maxParallelRequests <= 0 ) {
-			throw new IllegalArgumentException("maxParallelRequests must be greater than zero");
+	public static void setDefaultParallelRequestLimitPerServer( final int parallelRequestLimitPerServer ) {
+		if ( parallelRequestLimitPerServer <= 0 ) {
+			throw new IllegalArgumentException("parallelRequestLimitPerServer must be greater than zero");
 		}
-		defaultMaxParallelRequests = maxParallelRequests;
+		defaultParallelRequestLimitPerServer = parallelRequestLimitPerServer;
 	}
 
 	/**
@@ -119,18 +118,18 @@ public class HttpClientProvider
 	 * If a limiter is already registered for the endpoint address, it is replaced.
 	 *
 	 * @param endpointAddress     endpoint address
-	 * @param maxParallelRequests maximum number of concurrent requests allowed for
-	 *                            the endpoint address
-	 * @throws IllegalArgumentException if maxParallelRequests is non-positive.
+	 * @param parallelRequestLimitPerServer limit on the number of concurrent requests allowed for
+	 *                                      the endpoint address
+	 * @throws IllegalArgumentException if parallelRequestLimitPerServer is non-positive.
 	 */
-	public static void registerEndpointLimiter( final String endpointAddress, final int maxParallelRequests ) {
-		if ( maxParallelRequests <= 0 ) {
-			throw new IllegalArgumentException("maxParallelRequests must be greater than zero");
+	public static void registerEndpointLimiter( final String endpointAddress, final int parallelRequestLimitPerServer ) {
+		if ( parallelRequestLimitPerServer <= 0 ) {
+			throw new IllegalArgumentException("parallelRequestLimitPerServer must be greater than zero");
 		}
 		final String url = endpointAddress.endsWith( "/" )
 				? endpointAddress.substring( 0, endpointAddress.length() - 1 )
 				: endpointAddress;
-		LIMITERS_BY_ENDPOINT_ADDRESS.put( url, new Semaphore(maxParallelRequests, true) );
+		LIMITERS_BY_ENDPOINT_ADDRESS.put( url, new Semaphore(parallelRequestLimitPerServer, true) );
 	}
 
 	/**
@@ -196,14 +195,14 @@ public class HttpClientProvider
 	 * Creates a new default concurrency limiter.
 	 *
 	 * <p>
-	 * The returned limiter enforces the current {@link #defaultMaxParallelRequests}
+	 * The returned limiter enforces the current {@link #defaultParallelRequestLimitPerServer}
 	 * and uses a fair (FIFO) scheduling policy.
 	 * </p>
 	 *
 	 * @return a new {@link Semaphore} configured with the default concurrency limit
 	 */
 	private static Semaphore newDefaultLimiter() {
-		return new Semaphore( defaultMaxParallelRequests, true );
+		return new Semaphore( defaultParallelRequestLimitPerServer, true );
 	}
 
 	/**
@@ -221,7 +220,7 @@ public class HttpClientProvider
 	public static void reset() {
 		CLIENT_BY_CONNECT_TIMEOUT.clear();
 		LIMITERS_BY_ENDPOINT_ADDRESS.clear();
-		defaultMaxParallelRequests = DEFAULT_MAX_PARALLEL_REQUESTS;
+		defaultParallelRequestLimitPerServer = DEFAULT_PARALLEL_REQUEST_LIMIT_PER_SERVER;
 	}
 
 	static final class LimitedHttpClient extends HttpClient
