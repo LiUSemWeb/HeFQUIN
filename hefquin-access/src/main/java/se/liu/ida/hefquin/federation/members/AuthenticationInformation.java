@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Provides authentication information for requests to a federation member.
  * <p>
- * Implementations can apply the authentication information either directly
+ * The information is provided in a form that it can be applied directly
  * to an HTTP request builder or to a collection of HTTP headers.
  */
 public interface AuthenticationInformation

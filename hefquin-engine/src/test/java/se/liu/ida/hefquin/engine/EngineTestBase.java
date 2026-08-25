@@ -303,7 +303,6 @@ public abstract class EngineTestBase
 
 		@Override
 		public AuthenticationInformation getAuthenticationInformation() {
-			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
 		}
 
