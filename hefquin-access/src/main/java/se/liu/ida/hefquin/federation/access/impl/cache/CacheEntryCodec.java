@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.jena.atlas.json.JSON;
+import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.graph.Node;
 import org.apache.jena.riot.out.NodeFmtLib;
 import org.apache.jena.sparql.core.Var;
@@ -25,11 +27,15 @@ import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.base.data.impl.TripleImpl;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
+import se.liu.ida.hefquin.federation.access.JSONResponse;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.federation.access.StringResponse;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.response.CachedCardinalityResponse;
+import se.liu.ida.hefquin.federation.access.impl.response.JSONResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.StringResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 
 /**
@@ -67,7 +73,9 @@ public final class CacheEntryCodec {
 	protected enum CachedObjectType {
 		SOLUTION_MAPPING_RESPONSE,
 		TPF_RESPONSE,
-		CARDINALITY_RESPONSE
+		CARDINALITY_RESPONSE,
+		STRING_RESPONSE,
+		JSON_RESPONSE,
 	};
 
 	private CacheEntryCodec() {
@@ -114,6 +122,12 @@ public final class CacheEntryCodec {
 	 *
 	 * CARDINALITY_RESPONSE:
 	 *   [cardinality: int]
+	 *
+	 * STRING_RESPONSE:
+	 *   [value: UTF-8]
+	 *
+	 * JSON_RESPONSE:
+	 *   [value: UTF-8]
 	 * </pre>
 	 *
 	 * @param out   destination to which the serialized representation is written
@@ -176,6 +190,14 @@ public final class CacheEntryCodec {
 			else if ( object instanceof CardinalityResponse cardResp ) {
 				tmp.writeInt( CachedObjectType.CARDINALITY_RESPONSE.ordinal() );
 				tmp.writeInt( cardResp.getCardinality() );
+			}
+			else if ( object instanceof StringResponse stringResp ) {
+				tmp.writeInt( CachedObjectType.STRING_RESPONSE.ordinal() );
+				tmp.writeUTF( stringResp.getResponseData() );
+			}
+			else if ( object instanceof JSONResponse jsonResp ) {
+				tmp.writeInt( CachedObjectType.JSON_RESPONSE.ordinal() );
+				tmp.writeUTF( jsonResp.getResponseData().toString() );
 			}
 			else {
 				throw new IllegalStateException( "Unsupported type: " + object.getClass() );
@@ -266,6 +288,13 @@ public final class CacheEntryCodec {
 		else if ( type.equals( CachedObjectType.CARDINALITY_RESPONSE ) ) {
 			final int count = in.readInt();
 			object = new CachedCardinalityResponse(count);
+		}
+		else if ( type.equals( CachedObjectType.STRING_RESPONSE ) ) {
+			object = new StringResponseImpl( in.readUTF(), new Date() );
+		}
+		else if ( type.equals( CachedObjectType.JSON_RESPONSE ) ) {
+			final JsonObject json = JSON.parse( in.readUTF() );
+			object = new JSONResponseImpl( json, new Date() );
 		}
 		else {
 			throw new IllegalStateException( "Unsupported CachedObjectType: " + type );

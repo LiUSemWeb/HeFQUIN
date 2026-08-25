@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -98,6 +99,11 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization
 			else {
 				rewrittenPlan = inputPlan;
 			}
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiRequest op ) {
+			throw new UnsupportedOperationException("Unimplemented method 'visit'");
 		}
 
 		@Override

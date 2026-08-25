@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.federation.members.impl;
 
 import java.util.Objects;
 
+import org.apache.jena.graph.Node;
+
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.federation.members.RDFBasedFederationMember;
 
@@ -11,11 +13,13 @@ public abstract class BaseForRDFBasedFederationMember
 {
 	private final VocabularyMapping vm;
 
-	protected BaseForRDFBasedFederationMember() {
-		this.vm = null;
+	protected BaseForRDFBasedFederationMember( final Node serviceURI ) {
+		this(serviceURI, null);
 	}
 
-	protected BaseForRDFBasedFederationMember( final VocabularyMapping vm ) {
+	protected BaseForRDFBasedFederationMember( final Node serviceURI,
+	                                           final VocabularyMapping vm ) {
+		super(serviceURI);
 		this.vm = vm;
 	}
 

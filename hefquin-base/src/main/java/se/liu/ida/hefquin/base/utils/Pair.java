@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.base.utils;
 
+import java.util.Objects;
+
 public class Pair<T1,T2>
 {
 	final public T1 object1;
@@ -20,5 +22,10 @@ public class Pair<T1,T2>
 			return true;
 
 		return oo.object1.equals(object1) && oo.object2.equals(object2);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( object1, object2 );
 	}
 }

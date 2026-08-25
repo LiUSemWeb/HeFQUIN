@@ -35,7 +35,7 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 	                           final QueryPlanningInfo qpInfo ) {
 		super(req, fm, mayReduce, collectExceptions, qpInfo);
 
-		assert fm.getNumberOfParameters() != 0;
+		assert fm.getNumberOfParameters() == 0;
 
 		log.debug( "Initialized ExecOpRequestOther for {}", fm );
 	}

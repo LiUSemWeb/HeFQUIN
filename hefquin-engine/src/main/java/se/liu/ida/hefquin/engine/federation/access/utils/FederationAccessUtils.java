@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import se.liu.ida.hefquin.base.utils.CompletableFutureUtils;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.*;
@@ -68,41 +69,64 @@ public class FederationAccessUtils
 	                                                                final LogicalOpRequest<?,?>... reqOps )
 					throws FederationAccessException
 	{
-		return performCardinalityRequests( fedAccessMgr, Arrays.asList(reqOps) );
+		return performCardinalityRequests( fedAccessMgr, Arrays.asList(reqOps), null );
 	}
 
 	public static CardinalityResponse[] performCardinalityRequests( final FederationAccessManager fedAccessMgr,
-	                                                                final List<LogicalOpRequest<?,?>> reqOps )
+	                                                                final List<LogicalOpRequest<?,?>> reqOps,
+	                                                                final List<LogicalOpMultiRequest> mreqOps )
 					throws FederationAccessException
 	{
+		// First, determine the number of cardinality requests needed to do.
+		int numberOfCardReqs = 0;
+		if ( reqOps != null && ! reqOps.isEmpty() ) {
+			numberOfCardReqs += reqOps.size();
+		}
+		if ( mreqOps != null && ! mreqOps.isEmpty() ) {
+			for ( final LogicalOpMultiRequest mreq : mreqOps )
+				numberOfCardReqs += mreq.getFederationMembers().size();
+		}
+
 		@SuppressWarnings("unchecked")
-		final CompletableFuture<CardinalityResponse>[] futures = new CompletableFuture[reqOps.size()];
+		final CompletableFuture<CardinalityResponse>[] futures = new CompletableFuture[numberOfCardReqs];
 
-		for ( int i = 0; i < reqOps.size(); ++i ) {
-			final LogicalOpRequest<?,?> reqOp = reqOps.get(i);
-			final DataRetrievalRequest req = reqOp.getRequest();
-			final FederationMember fm = reqOp.getFederationMember();
-			if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {
-				futures[i] = fedAccessMgr.issueCardinalityRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
-			}
-			else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {
-				final TPFRequest reqTPF = ensureTPFRequest( (TriplePatternRequest) req );
-				futures[i] = fedAccessMgr.issueCardinalityRequest( reqTPF, (TPFServer) fm );
-			}
-			else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
-				final TPFRequest reqTPF = ensureTPFRequest( (TriplePatternRequest) req );
-				futures[i] = fedAccessMgr.issueCardinalityRequest( reqTPF, (BRTPFServer) fm );
-			}
-			else if ( fm instanceof BRTPFServer && req instanceof BindingsRestrictedTriplePatternRequest ) {
-				final BRTPFRequest reqBRTPF = ensureBRTPFRequest( (BindingsRestrictedTriplePatternRequest) req );
-				futures[i] = fedAccessMgr.issueCardinalityRequest( reqBRTPF, (BRTPFServer) fm );
-			}
-			else {
-				throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
-			}
+		if ( reqOps != null && ! reqOps.isEmpty() ) {
+			for ( int i = 0; i < reqOps.size(); ++i ) {
+				final LogicalOpRequest<?,?> reqOp = reqOps.get(i);
+				final DataRetrievalRequest req = reqOp.getRequest();
+				final FederationMember fm = reqOp.getFederationMember();
+				if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {
+					futures[i] = fedAccessMgr.issueCardinalityRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
+				}
+				else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {
+					final TPFRequest reqTPF = ensureTPFRequest( (TriplePatternRequest) req );
+					futures[i] = fedAccessMgr.issueCardinalityRequest( reqTPF, (TPFServer) fm );
+				}
+				else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
+					final TPFRequest reqTPF = ensureTPFRequest( (TriplePatternRequest) req );
+					futures[i] = fedAccessMgr.issueCardinalityRequest( reqTPF, (BRTPFServer) fm );
+				}
+				else if ( fm instanceof BRTPFServer && req instanceof BindingsRestrictedTriplePatternRequest ) {
+					final BRTPFRequest reqBRTPF = ensureBRTPFRequest( (BindingsRestrictedTriplePatternRequest) req );
+					futures[i] = fedAccessMgr.issueCardinalityRequest( reqBRTPF, (BRTPFServer) fm );
+				}
+				else {
+					throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
+				}
 
-			if ( futures[i] == null ) {
-				throw new FederationAccessException("Unexpected null returned by the federation access manager (i=" + i + ")", req, fm);
+				if ( futures[i] == null ) {
+					throw new FederationAccessException("Unexpected null returned by the federation access manager (i=" + i + ")", req, fm);
+				}
+			}
+		}
+
+		if ( mreqOps != null && ! mreqOps.isEmpty() ) {
+			int i = (reqOps == null) ? 0 : reqOps.size();
+			for ( final LogicalOpMultiRequest mreqOp : mreqOps ) {
+				final SPARQLRequest req = mreqOp.getRequest();
+				for ( final FederationMember fm : mreqOp.getFederationMembers() ) {
+					futures[i++] = fedAccessMgr.issueCardinalityRequest(req, fm);
+				}
 			}
 		}
 

@@ -16,7 +16,7 @@ public class Neo4jRequestProcessorImplTest extends FederationTestBase {
             final String cypherQuery = "MATCH (x)-[e:ACTED_IN]->(y) RETURN x, e, head(labels(y)) AS l, {a: 2} AS t LIMIT 2";
             final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);
 
-            final Neo4jServer fm = new Neo4jServerImpl4Test();
+            final Neo4jServer fm = new Neo4jServerForTest();
 
             final Neo4jRequestProcessor processor = new Neo4jRequestProcessorImpl();
 

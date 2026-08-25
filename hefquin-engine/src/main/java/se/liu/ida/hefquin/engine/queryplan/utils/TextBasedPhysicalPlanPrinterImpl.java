@@ -130,6 +130,12 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
+		public void visit( final PhysicalOpMultiRequest op ) {
+			rootOpString = "mreq";
+			record( op.getLogicalOperator() );
+		}
+
+		@Override
 		public void visit( final PhysicalOpFixedSolMap op ) {
 			rootOpString = "sm";
 			record( op.getLogicalOperator() );

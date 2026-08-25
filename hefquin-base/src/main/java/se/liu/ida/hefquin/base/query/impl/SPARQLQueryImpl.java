@@ -7,17 +7,25 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
 
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLQuery;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
+import se.liu.ida.hefquin.jenaext.query.QueryUtils;
 
 public class SPARQLQueryImpl implements SPARQLQuery
 {
 	protected final Query jenaQuery;
 
+	// We materialize the ExpectedVariables in this case to avoid
+	// producing it over and over again whenever it is used.
+	protected final ExpectedVariables expectedVars;
+
 	public SPARQLQueryImpl( final Query jenaQuery ) {
 		assert jenaQuery != null;
 		this.jenaQuery = jenaQuery;
+
+		expectedVars = QueryUtils.determineExpectedVariables(jenaQuery);
 	}
 
 	public SPARQLQueryImpl( final SPARQLGraphPattern p,
@@ -44,6 +52,13 @@ public class SPARQLQueryImpl implements SPARQLQuery
 
 		jenaQuery.setDistinct( distinctRequired );
 		jenaQuery.setQueryPattern( jenaElement );
+
+		expectedVars = QueryUtils.determineExpectedVariables(jenaQuery);
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables() {
+		return expectedVars;
 	}
 
 	@Override

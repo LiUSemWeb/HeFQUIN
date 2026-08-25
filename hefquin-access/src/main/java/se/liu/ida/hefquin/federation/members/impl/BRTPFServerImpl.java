@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.federation.members.impl;
 
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.exec.http.Params;
 import org.apache.jena.sparql.serializer.SerializationContext;
@@ -23,10 +24,12 @@ public class BRTPFServerImpl extends TPFServerImpl implements BRTPFServer
 
 	public final String httpQueryArgumentForBindings;
 
-	public BRTPFServerImpl( final String baseURL,
+	public BRTPFServerImpl( final Node serviceURI,
+	                        final String baseURL,
 	                        final AuthenticationInformation authInfo,
 	                        final VocabularyMapping vm ) {
-		this( baseURL,
+		this( serviceURI,
+		      baseURL,
 		      authInfo,
 		      DfltHttpQueryArgumentForSubject,
 		      DfltHttpQueryArgumentForPredicate,
@@ -35,14 +38,16 @@ public class BRTPFServerImpl extends TPFServerImpl implements BRTPFServer
 		      vm );
 	}
 
-	public BRTPFServerImpl( final String baseURL,
+	public BRTPFServerImpl( final Node serviceURI,
+	                        final String baseURL,
 	                        final AuthenticationInformation authInfo,
 	                        final String httpQueryArgumentForSubject,
 	                        final String httpQueryArgumentForPredicate,
 	                        final String httpQueryArgumentForObject,
 	                        final String httpQueryArgumentForBindings,
 	                        final VocabularyMapping vm ) {
-		super( baseURL,
+		super( serviceURI,
+		       baseURL,
 		       authInfo,
 		       httpQueryArgumentForSubject,
 		       httpQueryArgumentForPredicate,
