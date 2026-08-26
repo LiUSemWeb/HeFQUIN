@@ -309,9 +309,11 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	}
 
 	/**
-	 * This function assumes that the given operator comes from a
-	 * VALUES-extended SERVICE clause, and it produces a plan with
-	 * a multi-request operator as root.
+	 * Creates a logical plan for a VALUES-extended SERVICE clause. Multiple SPARQL
+	 * endpoints are handled using a multi-request operator, while a single SPARQL
+	 * endpoint and non-SPARQL endpoints are handled using ordinary request
+	 * operators. If multiple federation members are involved, their plans are
+	 * combined using a multiway union.
 	 */
 	protected LogicalPlan createPlanForServicePatternWithValues(
 			final OpServiceWithValues jenaOp,
@@ -321,6 +323,13 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 		if ( ! jenaOp.getService().isVariable() )
 			throw new IllegalArgumentException( "unsupported VALUES-extended SERVICE clause" );
+
+		if ( jenaOp.getPossibleValues().size() == 1 ) {
+			final Node n = jenaOp.getPossibleValues().iterator().next();
+			final FederationMember fm = ctx.getFederationCatalog().getFederationMemberByURI( n.getURI() );
+
+			return createPlan( jenaOp.getSubOp(), mayReduce, fm );
+		}
 
 		final Set<FederationMember> SPARQLfms = new HashSet<>();
 		final Set<FederationMember> nonSPARQLfms = new HashSet<>();
@@ -334,27 +343,37 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
 		final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
-		final Var var = Var.alloc( jenaOp.getService() );
-		final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, var, SPARQLfms);
 
-		if ( ! nonSPARQLfms.isEmpty() ) {
-			final List<LogicalPlan> lplansList = new ArrayList<>(nonSPARQLfms.size() + 1);
+		final List<LogicalPlan> lplansList = new ArrayList<>(nonSPARQLfms.size() + 1);
+
+		if ( SPARQLfms.size() > 1 ) {
+			final Var var = Var.alloc( jenaOp.getService() );
+			final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, var, SPARQLfms);
 			lplansList.add( new LogicalPlanWithNullaryRootImpl(op, null) );
-			for ( final FederationMember fm : nonSPARQLfms ) {
-				if ( fm instanceof WrappedRESTEndpoint ep ) {
-					if ( ep.getNumberOfParameters() != 0 )
-						throw new IllegalArgumentException( "Invalid SERVICE clause: missing PARAMS for " + ep.toString() );
-
-					final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mayReduce, req);
-					lplansList.add( new LogicalPlanWithNullaryRootImpl(reqOp, null) );
-				}
-				else
-					lplansList.add( createPlan( jenaOp.getSubOp(), mayReduce, fm ) );
-			}
-			return new LogicalPlanWithNaryRootImpl(LogicalOpMultiwayUnion.getInstance(), null, lplansList);
 		}
-		else
-			return new LogicalPlanWithNullaryRootImpl(op, null);
+		else if ( SPARQLfms.size() == 1 ) {
+			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(SPARQLfms.iterator().next(), mayReduce, req);
+			lplansList.add( new LogicalPlanWithNullaryRootImpl(op, null) );
+		}
+
+		for ( final FederationMember fm : nonSPARQLfms ) {
+			if ( fm instanceof WrappedRESTEndpoint ep ) {
+				if ( ep.getNumberOfParameters() != 0 )
+					throw new IllegalArgumentException( "Invalid SERVICE clause: missing PARAMS for " + ep.toString() );
+
+				final SPARQLGraphPattern p1 =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
+				final SPARQLRequest req1 = new SPARQLRequestImpl( p1, null, mayReduce );
+				final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mayReduce, req1);
+				lplansList.add( new LogicalPlanWithNullaryRootImpl(reqOp, null) );
+			}
+			else
+				lplansList.add( createPlan( jenaOp.getSubOp(), mayReduce, fm ) );
+		}
+
+		if ( lplansList.size() == 1 )
+			return lplansList.get(0);
+
+		return new LogicalPlanWithNaryRootImpl(LogicalOpMultiwayUnion.getInstance(), null, lplansList);
 	}
 
 	/**
