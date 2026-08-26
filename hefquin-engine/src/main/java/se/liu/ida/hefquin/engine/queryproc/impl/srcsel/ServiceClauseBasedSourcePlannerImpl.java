@@ -309,9 +309,11 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	}
 
 	/**
-	 * This function assumes that the given operator comes from a
-	 * VALUES-extended SERVICE clause, and it produces a plan with
-	 * a multi-request operator as root.
+	 * Creates a logical plan for a VALUES-extended SERVICE clause. Multiple SPARQL
+	 * endpoints are handled using a multi-request operator, while a single SPARQL
+	 * endpoint and non-SPARQL endpoints are handled using ordinary request
+	 * operators. If multiple federation members are involved, their plans are
+	 * combined using a multiway union.
 	 */
 	protected LogicalPlan createPlanForServicePatternWithValues(
 			final OpServiceWithValues jenaOp,
@@ -322,20 +324,62 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		if ( ! jenaOp.getService().isVariable() )
 			throw new IllegalArgumentException( "unsupported VALUES-extended SERVICE clause" );
 
-		final Set<FederationMember> fms = new HashSet<>();
-		for ( final Node n : jenaOp.getPossibleValues() ) {
+		if ( jenaOp.getPossibleValues().size() == 1 ) {
+			final Node n = jenaOp.getPossibleValues().iterator().next();
 			final FederationMember fm = ctx.getFederationCatalog().getFederationMemberByURI( n.getURI() );
-			if ( ! (fm instanceof SPARQLEndpoint) )
-				throw new IllegalArgumentException( "VALUES-extended SERVICE clause with a federation member that is not a SPARQL endpoint (service URI: " + n.toString() + ")" );
 
-			fms.add(fm);
+			return createPlan( jenaOp.getSubOp(), mayReduce, fm );
 		}
 
-		final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-		final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
-		final Var var = Var.alloc( jenaOp.getService() );
-		final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, var, fms);
-		return new LogicalPlanWithNullaryRootImpl(op, null);
+		final Set<FederationMember> SPARQLfms = new HashSet<>();
+		final Set<FederationMember> nonSPARQLfms = new HashSet<>();
+		for ( final Node n : jenaOp.getPossibleValues() ) {
+			final FederationMember fm = ctx.getFederationCatalog().getFederationMemberByURI( n.getURI() );
+			if ( fm instanceof SPARQLEndpoint )
+				SPARQLfms.add(fm);
+			else
+				nonSPARQLfms.add(fm);
+		}
+
+		final List<LogicalPlan> lplansList = new ArrayList<>(nonSPARQLfms.size() + 1);
+
+		if ( SPARQLfms.size() > 1 ) {
+			final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
+			final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
+			final Var var = Var.alloc( jenaOp.getService() );
+			final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, var, SPARQLfms);
+
+			lplansList.add( new LogicalPlanWithNullaryRootImpl(op, null) );
+		}
+		else if ( SPARQLfms.size() == 1 ) {
+			final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
+			final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
+			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(SPARQLfms.iterator().next(), mayReduce, req);
+
+			lplansList.add( new LogicalPlanWithNullaryRootImpl(op, null) );
+		}
+
+		for ( final FederationMember fm : nonSPARQLfms ) {
+			if ( fm instanceof WrappedRESTEndpoint ep ) {
+				if ( ep.getNumberOfParameters() != 0 )
+					throw new IllegalArgumentException( "Invalid SERVICE clause: missing PARAMS for " + ep.toString() );
+
+				// We create a separate SPARQLGraphPattern and SPARQLRequest object
+				// for every request operator created here. This is to ensure that potential
+				// plan rewriting (e.g., projection push down) that is intended for one of the
+				// of these operators is not accidentally affecting other of these operators.
+				final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
+				final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
+				final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mayReduce, req);
+				lplansList.add( new LogicalPlanWithNullaryRootImpl(reqOp, null) );
+			}
+			else
+				lplansList.add( createPlan( jenaOp.getSubOp(), mayReduce, fm ) );
+		}
+
+		assert lplansList.size() > 1;
+
+		return new LogicalPlanWithNaryRootImpl(LogicalOpMultiwayUnion.getInstance(), null, lplansList);
 	}
 
 	/**
