@@ -107,7 +107,7 @@ public class HttpClientProvider
 	 */
 	public static void setDefaultParallelRequestLimitPerServer( final int limit ) {
 		if ( limit <= 0 ) {
-			throw new IllegalArgumentException("parallelRequestLimitPerServer must be greater than zero");
+			throw new IllegalArgumentException("defaultParallelRequestLimitPerServer must be greater than zero");
 		}
 		defaultParallelRequestLimitPerServer = limit;
 	}
