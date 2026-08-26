@@ -341,18 +341,22 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 				SPARQLfms.add(fm);
 		}
 
-		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-		final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
 
 		final List<LogicalPlan> lplansList = new ArrayList<>(nonSPARQLfms.size() + 1);
 
 		if ( SPARQLfms.size() > 1 ) {
+			final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
+			final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
 			final Var var = Var.alloc( jenaOp.getService() );
 			final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, var, SPARQLfms);
+
 			lplansList.add( new LogicalPlanWithNullaryRootImpl(op, null) );
 		}
 		else if ( SPARQLfms.size() == 1 ) {
+			final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
+			final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(SPARQLfms.iterator().next(), mayReduce, req);
+
 			lplansList.add( new LogicalPlanWithNullaryRootImpl(op, null) );
 		}
 
@@ -364,9 +368,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 				// We create a separate SPARQLGraphPattern and SPARQLRequest object
 				// for every request operator created here. This is to ensure that potential
 				// plan rewriting (e.g., projection push down) that is intended for one of the
-				// of these operators is not accidentally affecting other of these operators. 
+				// of these operators is not accidentally affecting other of these operators.
 				final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-				final SPARQLRequest req = new SPARQLRequestImpl( p1, null, mayReduce );
+				final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
 				final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mayReduce, req);
 				lplansList.add( new LogicalPlanWithNullaryRootImpl(reqOp, null) );
 			}
