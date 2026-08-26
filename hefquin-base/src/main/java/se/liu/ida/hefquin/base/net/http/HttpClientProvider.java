@@ -102,14 +102,14 @@ public class HttpClientProvider
 	 * This value is used when creating new endpoint limiters via
 	 * {@link #getOrCreateEndpointLimiter(String)}.
 	 *
-	 * @param parallelRequestLimitPerServer maximum number of concurrent requests per server
-	 * @throws IllegalArgumentException if {@code parallelRequestLimitPerServer} is non-positive
+	 * @param limit maximum number of concurrent requests per server
+	 * @throws IllegalArgumentException if {@code limit} is non-positive
 	 */
-	public static void setDefaultParallelRequestLimitPerServer( final int parallelRequestLimitPerServer ) {
-		if ( parallelRequestLimitPerServer <= 0 ) {
+	public static void setDefaultParallelRequestLimitPerServer( final int limit ) {
+		if ( limit <= 0 ) {
 			throw new IllegalArgumentException("parallelRequestLimitPerServer must be greater than zero");
 		}
-		defaultParallelRequestLimitPerServer = parallelRequestLimitPerServer;
+		defaultParallelRequestLimitPerServer = limit;
 	}
 
 	/**
@@ -117,19 +117,19 @@ public class HttpClientProvider
 	 *
 	 * If a limiter is already registered for the endpoint address, it is replaced.
 	 *
-	 * @param endpointAddress     endpoint address
-	 * @param parallelRequestLimitPerServer limit on the number of concurrent requests allowed for
-	 *                                      the endpoint address
-	 * @throws IllegalArgumentException if parallelRequestLimitPerServer is non-positive.
+	 * @param endpointAddress endpoint address
+	 * @param limit           limit on the number of concurrent requests allowed for
+	 *                        the endpoint address
+	 * @throws IllegalArgumentException if {@code limit} is non-positive.
 	 */
-	public static void registerEndpointLimiter( final String endpointAddress, final int parallelRequestLimitPerServer ) {
-		if ( parallelRequestLimitPerServer <= 0 ) {
-			throw new IllegalArgumentException("parallelRequestLimitPerServer must be greater than zero");
+	public static void registerEndpointLimiter( final String endpointAddress, final int limit ) {
+		if ( limit <= 0 ) {
+			throw new IllegalArgumentException("limit must be greater than zero");
 		}
 		final String url = endpointAddress.endsWith( "/" )
 				? endpointAddress.substring( 0, endpointAddress.length() - 1 )
 				: endpointAddress;
-		LIMITERS_BY_ENDPOINT_ADDRESS.put( url, new Semaphore(parallelRequestLimitPerServer, true) );
+		LIMITERS_BY_ENDPOINT_ADDRESS.put( url, new Semaphore(limit, true) );
 	}
 
 	/**

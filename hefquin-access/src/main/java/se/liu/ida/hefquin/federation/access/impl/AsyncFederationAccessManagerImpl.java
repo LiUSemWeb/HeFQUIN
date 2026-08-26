@@ -70,15 +70,15 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	 * service and sets the default limit on the number of parallel requests to a given
 	 * server.
 	 *
-	 * @param execService                   the executor service used for asynchronous request
-	 *                                      execution
-	 * @param parallelRequestLimitPerServer the default limit on the number of parallel requests to
-	 *                                      any given server
+	 * @param execService                          the executor service used for asynchronous request
+	 *                                             execution
+	 * @param defaultParallelRequestLimitPerServer the default limit on the number of parallel requests to
+	 *                                             any given server
 	 */
-	public AsyncFederationAccessManagerImpl( final ExecutorService execService, final int parallelRequestLimitPerServer ) {
+	public AsyncFederationAccessManagerImpl( final ExecutorService execService, final int defaultParallelRequestLimitPerServer ) {
 		this(execService);
 		// Set default number of parallel request to any given server
-		HttpClientProvider.setDefaultParallelRequestLimitPerServer(parallelRequestLimitPerServer);
+		HttpClientProvider.setDefaultParallelRequestLimitPerServer(defaultParallelRequestLimitPerServer);
 	}
 
 	@Override
