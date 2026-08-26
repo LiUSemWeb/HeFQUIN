@@ -335,12 +335,11 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		final Set<FederationMember> nonSPARQLfms = new HashSet<>();
 		for ( final Node n : jenaOp.getPossibleValues() ) {
 			final FederationMember fm = ctx.getFederationCatalog().getFederationMemberByURI( n.getURI() );
-			if ( ! (fm instanceof SPARQLEndpoint) )
-				nonSPARQLfms.add(fm);
-			else
+			if ( fm instanceof SPARQLEndpoint )
 				SPARQLfms.add(fm);
+			else
+				nonSPARQLfms.add(fm);
 		}
-
 
 		final List<LogicalPlan> lplansList = new ArrayList<>(nonSPARQLfms.size() + 1);
 
