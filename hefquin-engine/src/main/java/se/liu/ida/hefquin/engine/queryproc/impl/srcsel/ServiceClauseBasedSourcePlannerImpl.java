@@ -361,17 +361,20 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 				if ( ep.getNumberOfParameters() != 0 )
 					throw new IllegalArgumentException( "Invalid SERVICE clause: missing PARAMS for " + ep.toString() );
 
-				final SPARQLGraphPattern p1 =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-				final SPARQLRequest req1 = new SPARQLRequestImpl( p1, null, mayReduce );
-				final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mayReduce, req1);
+				// We create a separate SPARQLGraphPattern and SPARQLRequest object
+				// for every request operator created here. This is to ensure that potential
+				// plan rewriting (e.g., projection push down) that is intended for one of the
+				// of these operators is not accidentally affecting other of these operators. 
+				final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
+				final SPARQLRequest req = new SPARQLRequestImpl( p1, null, mayReduce );
+				final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mayReduce, req);
 				lplansList.add( new LogicalPlanWithNullaryRootImpl(reqOp, null) );
 			}
 			else
 				lplansList.add( createPlan( jenaOp.getSubOp(), mayReduce, fm ) );
 		}
 
-		if ( lplansList.size() == 1 )
-			return lplansList.get(0);
+		assert lplansList.size() > 1;
 
 		return new LogicalPlanWithNaryRootImpl(LogicalOpMultiwayUnion.getInstance(), null, lplansList);
 	}
