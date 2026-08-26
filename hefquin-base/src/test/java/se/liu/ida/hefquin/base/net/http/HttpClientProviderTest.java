@@ -48,7 +48,7 @@ public class HttpClientProviderTest
 	@Test
 	public void limitConcurrentRequestsToOneViaGlobal() throws IOException {
 		final int numberOfRequests = 20;
-		HttpClientProvider.setDefaultMaxParallelRequests(1);
+		HttpClientProvider.setDefaultParallelRequestLimitPerServer(1);
 		final long start = System.currentTimeMillis();
 		final HttpClient client = HttpClientProvider.client();
 		final CompletableFuture<?>[] futures = sendAsyncRequests(client, url, numberOfRequests);
@@ -67,7 +67,7 @@ public class HttpClientProviderTest
 	@Test
 	public void limitConcurrentRequestsToOne() throws IOException {
 		final int numberOfRequests = 20;
-		HttpClientProvider.setDefaultMaxParallelRequests(20);
+		HttpClientProvider.setDefaultParallelRequestLimitPerServer(20);
 		HttpClientProvider.registerEndpointLimiter(url, 1);
 		final long start = System.currentTimeMillis();
 		final HttpClient client = HttpClientProvider.client();
@@ -146,7 +146,7 @@ public class HttpClientProviderTest
 	@Test
 	public void noLimitOnConcurrentRequestsViaGlobal() throws IOException {
 		final int numberOfRequests = 20;
-		HttpClientProvider.setDefaultMaxParallelRequests(numberOfRequests);
+		HttpClientProvider.setDefaultParallelRequestLimitPerServer(numberOfRequests);
 		final long start = System.currentTimeMillis();
 		final HttpClient client = HttpClientProvider.client();
 		final CompletableFuture<?>[] futures = sendAsyncRequests(client, url, numberOfRequests);
@@ -180,7 +180,7 @@ public class HttpClientProviderTest
 	@Test
 	public void endpointLimiterOverridesDefaultLimit() throws IOException {
 		final int numberOfRequests = 20;
-		HttpClientProvider.setDefaultMaxParallelRequests(1);
+		HttpClientProvider.setDefaultParallelRequestLimitPerServer(1);
 		HttpClientProvider.registerEndpointLimiter(url, numberOfRequests);
 		final long start = System.currentTimeMillis();
 		final HttpClient client = HttpClientProvider.client();

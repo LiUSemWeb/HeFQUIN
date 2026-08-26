@@ -12,7 +12,7 @@ PREFIX ex:     <http://example.org/>
               ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl" ;
               ec:constructorArguments (
                 ec:value:ExecServiceForFedAccess
-                10  # defaultMaxParallelRequests
+                10  # defaultParallelRequestLimitPerServer
               )
             ]
             # L1 cache
