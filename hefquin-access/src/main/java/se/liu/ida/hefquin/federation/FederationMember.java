@@ -21,7 +21,12 @@ public interface FederationMember
 	 */
 	String getServiceURI();
 
-	/** Returns the authentication information of this federation member. */
+	/**
+	 * Returns the authentication information of this federation member
+	 * or {@code null} if there is no authentication information for this
+	 * federation member (in which case it can be assumed that this
+	 * federation member can be accessed without authentication).
+	*/
 	AuthenticationInformation getAuthenticationInformation();
 
 	/**
