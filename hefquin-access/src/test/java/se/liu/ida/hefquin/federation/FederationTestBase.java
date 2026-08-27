@@ -101,12 +101,14 @@ public abstract class FederationTestBase
 	{
 		public Neo4jServerForTest() {
 			super( NodeFactory.createURI("http://example.org/neo"),
-			       "http://localhost:7474/db/neo4j/tx" );
+			       "http://localhost:7474/db/neo4j/tx",
+			       null );
 		}
 
 		public Neo4jServerForTest( final String baseURL ) {
 			super( NodeFactory.createURI("http://example.org/neo"),
-			       baseURL );
+			       baseURL,
+			       null );
 		}
 	}
 
@@ -139,12 +141,14 @@ public abstract class FederationTestBase
 		public GraphQLEndpointForTest() {
 			super( NodeFactory.createURI("http://example.org/graphql"),
 			       "http://example.org/",
+			       null,
 			       new EmptyGraphQLSchema() );
 		}
 
 		public GraphQLEndpointForTest( final String url ) {
 			super( NodeFactory.createURI("http://example.org/graphl"),
 			       url,
+			       null,
 			       new EmptyGraphQLSchema() );
 		}
 	}

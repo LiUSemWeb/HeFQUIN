@@ -2,23 +2,29 @@ package se.liu.ida.hefquin.federation.members.impl;
 
 import org.apache.jena.graph.Node;
 
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
 
 public class Neo4jServerImpl extends BaseForFederationMember
                              implements Neo4jServer
 {
 	protected final String url;
+	protected final AuthenticationInformation authInfo;
 
-	public Neo4jServerImpl( final Node serviceURI, final String url ) {
+	public Neo4jServerImpl( final Node serviceURI, final String url, final AuthenticationInformation authInfo ) {
 		super(serviceURI);
 
 		assert url != null && ! url.isEmpty();
 
 		this.url = url;
+		this.authInfo =  authInfo;
 	}
 
 	@Override
 	public String getURL() { return url; }
+
+	@Override
+	public AuthenticationInformation getAuthenticationInformation() { return authInfo; }
 
 	@Override
 	public String toString() { return "Neo4j server at " + url; }

@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.federation.members.impl;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
 
 public class GraphQLEndpointImpl extends BaseForFederationMember
@@ -10,9 +11,11 @@ public class GraphQLEndpointImpl extends BaseForFederationMember
 {
 	protected final String url;
 	protected final GraphQLSchema schema;
+	protected final AuthenticationInformation authInfo;
 
 	public GraphQLEndpointImpl( final Node serviceURI,
 	                            final String url,
+	                            final AuthenticationInformation authInfo,
 	                            final GraphQLSchema schema ) {
 		super(serviceURI);
 
@@ -20,11 +23,15 @@ public class GraphQLEndpointImpl extends BaseForFederationMember
 		assert schema != null;
 
 		this.url = url;
+		this.authInfo = authInfo;
 		this.schema = schema;
 	}
 
 	@Override
 	public String getURL() { return url; }
+
+	@Override
+	public AuthenticationInformation getAuthenticationInformation() { return authInfo; }
 
 	@Override
 	public GraphQLSchema getSchema() { return schema; }

@@ -509,6 +509,11 @@ public abstract class EngineTestBase
 		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
 			return false; // keep it false to make sure that pattern pushdown fails in the tests
 		}
+
+		@Override
+		public AuthenticationInformation getAuthenticationInformation() {
+			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
+		}
 	}
 
 	protected static class BRTPFServerWithVocabularyMappingForTest extends BRTPFServerForTest

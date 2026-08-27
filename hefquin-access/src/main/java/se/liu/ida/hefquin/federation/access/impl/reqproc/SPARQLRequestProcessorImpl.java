@@ -57,29 +57,6 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 	{
 		// see https://jena.apache.org/documentation/sparql-apis/#query-execution
 
-		// final Map<String, String> headers = new HashMap<>();
-		// headers.put( "User-Agent", BuildInfo.getUserAgent() );
-
-		// if ( fm.getAuthenticationInformation() != null )
-		// 	fm.getAuthenticationInformation().applyTo( headers );
-
-		// final QueryExecution qe;
-		// try {
-		// 	final QueryExecutionHTTPBuilder builder = QueryExecutionHTTPBuilder.create()
-		// 			.endpoint(   fm.getURL() )
-		// 			.httpClient( httpClient )
-		// 			.query(      req.getQuery().asJenaQuery() )
-		// 			.timeout(    overallTimeout, TimeUnit.MILLISECONDS );
-
-		// 	for ( final Map.Entry<String, String> header : headers.entrySet() )
-		// 		builder.httpHeader( header.getKey(), header.getValue() );
-
-		// 	qe = builder.build();
-		// }
-		// catch ( final Exception e ) {
-		// 	throw new FederationAccessException("Initiating the remote execution of a query at the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", e, req, fm);
-		// }
-
 		final QueryExecution qe;
 		try {
 			final QueryExecutionHTTPBuilder builder = QueryExecutionHTTPBuilder.create()

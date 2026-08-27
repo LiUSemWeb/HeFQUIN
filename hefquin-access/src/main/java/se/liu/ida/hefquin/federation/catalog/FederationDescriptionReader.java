@@ -231,7 +231,7 @@ public class FederationDescriptionReader
 				"Bolt endpointAddress is required!",
 				"More than one Bolt endpointAddress!" );
 
-			return createNeo4jServer(serviceURI, addrStr);
+			return createNeo4jServer(serviceURI, addrStr, authInfo);
 		}
 
 		if ( protocol.equals(FDVocab.GraphQLProtocol) ) {
@@ -244,7 +244,7 @@ public class FederationDescriptionReader
 				"GraphQL endpointAddress is required!",
 				"More than one GraphQL endpointAddress!" );
 
-			return createGraphQLServer(serviceURI, addrStr);
+			return createGraphQLServer(serviceURI, addrStr, authInfo);
 		}
 
 		throw new IllegalArgumentException( protocol.toString() );
@@ -475,13 +475,15 @@ public class FederationDescriptionReader
 	}
 
 	protected FederationMember createNeo4jServer( final Node serviceURI,
-	                                              final String uri ) {
+	                                              final String uri,
+	                                              final AuthenticationInformation authInfo ) {
 		verifyExpectedURI(uri);
-		return new Neo4jServerImpl(serviceURI, uri);
+		return new Neo4jServerImpl(serviceURI, uri, authInfo);
 	}
 
 	protected FederationMember createGraphQLServer( final Node serviceURI,
-	                                                final String uri ) {
+	                                                final String uri,
+	                                                final AuthenticationInformation authInfo ) {
 		verifyExpectedURI(uri);
 
 		final GraphQLSchemaInitializer init = new GraphQLSchemaInitializerImpl();
@@ -499,7 +501,7 @@ public class FederationDescriptionReader
 			throw new IllegalArgumentException(e);
 		}
 
-		return new GraphQLEndpointImpl(serviceURI, uri, schema);
+		return new GraphQLEndpointImpl(serviceURI, uri, authInfo, schema);
 	}
 
 	protected FederationMember createWrappedRESTEndpoint( final Node serviceURI,

@@ -3,15 +3,11 @@ package se.liu.ida.hefquin.federation.members;
 import org.apache.jena.datatypes.RDFDatatype;
 
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 
 public interface RESTEndpoint extends FederationMember
 {
 	/** Returns the URL template of this REST endpoint. */
 	String getURLTemplate();
-
-	/** Returns the authentication information of this REST endpoint. */
-	AuthenticationInformation getAuthenticationInformation();
 
 	/**
 	 * Returns the number of query parameters that can be passed

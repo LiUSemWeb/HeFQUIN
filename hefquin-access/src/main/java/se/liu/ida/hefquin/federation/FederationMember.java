@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.federation;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 
 /**
  * This interface captures any kind of federation member.
@@ -19,6 +20,9 @@ public interface FederationMember
 	 * to in the SERVICE clauses.
 	 */
 	String getServiceURI();
+
+	/** Returns the authentication information of this federation member. */
+	AuthenticationInformation getAuthenticationInformation();
 
 	/**
 	 * Returns {@code false} if the only types of graph patterns that
