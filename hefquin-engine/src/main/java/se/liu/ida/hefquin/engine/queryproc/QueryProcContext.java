@@ -69,4 +69,16 @@ public interface QueryProcContext
 	 * query planning.
 	 */
 	boolean skipExecution();
+
+	/**
+	 * Returns <code>true</code> if the cache should be ignored for all data
+	 * retrieval requests.
+	 */
+	boolean ignoreCache();
+
+	/**
+	 * Returns <code>true</code> if the cache should be ignored for all cardinality
+	 * requests.
+	 */
+	boolean ignoreCardinalityCache();
 }
