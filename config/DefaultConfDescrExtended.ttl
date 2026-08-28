@@ -98,6 +98,7 @@ _:bListOfHeuristics
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PushJoinUnderUnionWithRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemovePairsOfG2lAndL2g" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.ProjectRemoval" ]
     ) .
 
 _:bListOfPhysicalOpFactories
