@@ -121,7 +121,7 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 	                                          final MemberType fm,
 	                                          final boolean ignoreCache )
 	{
-		if( !ignoreCache ) {
+		if ( ! ignoreCache ) {
 			// update the statistics only if cache is enabled
 			if ( req instanceof TPFRequest )
 				cacheRequestsTPF++;
