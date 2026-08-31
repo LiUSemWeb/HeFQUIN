@@ -14,6 +14,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Integration test that runs all queries from the examples directory ([#687](https://github.com/LiUSemWeb/HeFQUIN/issues/687)).
 - Add option to specify a request limit per federation member ([#703](https://github.com/LiUSemWeb/HeFQUIN/issues/703), [#707](https://github.com/LiUSemWeb/HeFQUIN/issues/707)).
 ### Changed
+- CLI options to bypass cache for data retrieval requests and cardinality requests independently during query execution ([#685](https://github.com/LiUSemWeb/HeFQUIN/issues/685)).
 - More user-friendly printing of exceptions in the CLI program, including support of the --debug argument for printing the full stack traces ([#699](https://github.com/LiUSemWeb/HeFQUIN/issues/699), [#708](https://github.com/LiUSemWeb/HeFQUIN/issues/708)).
 - Better handling and recording of exceptions in data retrieval responses ([#706](https://github.com/LiUSemWeb/HeFQUIN/issues/706), [#711](https://github.com/LiUSemWeb/HeFQUIN/issues/711)).
 - Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/issues/675)).
