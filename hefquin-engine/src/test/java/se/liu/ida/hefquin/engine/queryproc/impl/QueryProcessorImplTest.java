@@ -383,6 +383,9 @@ public class QueryProcessorImplTest extends EngineTestBase
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public boolean skipExecution() { return false; }
 
+			@Override public boolean ignoreCache() { return false; }
+			@Override public boolean ignoreCardinalityCache() { return false; }
+
 			@Override
 			public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() {
 				throw new UnsupportedOperationException();
