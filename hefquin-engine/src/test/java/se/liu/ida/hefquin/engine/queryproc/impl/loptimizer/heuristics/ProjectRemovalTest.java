@@ -30,10 +30,10 @@ public class ProjectRemovalTest extends EngineTestBase
 		// A project with mayReduce = false is removed.
 
 		// set up
-		final Var v1 = Var.alloc("x");
-		final Var v2 = Var.alloc("y");
+		final Var v1 = Var.alloc("v1");
+		final Var v2 = Var.alloc("v2");
 
-		// Left request produces x
+		// Request produces v1
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
@@ -41,7 +41,7 @@ public class ProjectRemovalTest extends EngineTestBase
 			new SPARQLRequestImpl(tp1) );
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
-		// Project keeps y
+		// Project keeps v2
 		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, reqPlan);
 
@@ -57,10 +57,10 @@ public class ProjectRemovalTest extends EngineTestBase
 		// A project with mayReduce = true is retained.
 
 		// set up
-		final Var v1 = Var.alloc("x");
-		final Var v2 = Var.alloc("y");
+		final Var v1 = Var.alloc("v1");
+		final Var v2 = Var.alloc("v2");
 
-		// Left request produces x
+		// Request produces v1
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
@@ -68,7 +68,7 @@ public class ProjectRemovalTest extends EngineTestBase
 			new SPARQLRequestImpl(tp1) );
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
-		// Project keeps y
+		// Project keeps v2
 		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), true);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, reqPlan);
 
@@ -84,24 +84,24 @@ public class ProjectRemovalTest extends EngineTestBase
 		// A project with mayReduce = false in a subplan is removed.
 
 		// set up
-		final Var v1 = Var.alloc("x");
-		final Var v2 = Var.alloc("y");
+		final Var v1 = Var.alloc("v1");
+		final Var v2 = Var.alloc("v2");
 
-		// Left request produces x, y
+		// Left request produces v1
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
 			false,
 			new SPARQLRequestImpl(tp1) );
 
-		// Right request produces y, z
+		// Right request produces v2
 		final TriplePattern tp2 = new TriplePatternImpl(v2, v2, v2);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exB.org"),
 			false,
 			new SPARQLRequestImpl(tp2) );
 
-		// Project only keeps y
+		// Project only keeps v2
 		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
 		final LogicalPlan projectSubPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, new LogicalPlanWithNullaryRootImpl(reqOp1, null));
 
@@ -129,24 +129,24 @@ public class ProjectRemovalTest extends EngineTestBase
 		// A project with mayReduce = true in a subplan is retained.
 
 		// set up
-		final Var v1 = Var.alloc("x");
-		final Var v2 = Var.alloc("y");
+		final Var v1 = Var.alloc("v1");
+		final Var v2 = Var.alloc("v2");
 
-		// Left request produces x, y
+		// Left request produces v1
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
 			false,
 			new SPARQLRequestImpl(tp1) );
 
-		// Right request produces y, z
+		// Right request produces v2
 		final TriplePattern tp2 = new TriplePatternImpl(v2, v2, v2);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exB.org"),
 			false,
 			new SPARQLRequestImpl(tp2) );
 
-		// Project only keeps y
+		// Project only keeps v2
 		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), true);
 		final LogicalPlan projectSubPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, new LogicalPlanWithNullaryRootImpl(reqOp1, null));
 
@@ -176,10 +176,10 @@ public class ProjectRemovalTest extends EngineTestBase
 		// is expected to be unchanged.
 
 		// set up
-		final Var v1 = Var.alloc("x");
-		final Var v2 = Var.alloc("y");
+		final Var v1 = Var.alloc("v1");
+		final Var v2 = Var.alloc("v2");
 
-		// Left request produces x
+		// Request produces v1
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>(
 			new SPARQLEndpointForTest("http://exA.org"),
@@ -187,7 +187,7 @@ public class ProjectRemovalTest extends EngineTestBase
 			new SPARQLRequestImpl(tp1) );
 		final LogicalPlan reqPlan = new LogicalPlanWithNullaryRootImpl(reqOp1, null);
 
-		// Project keeps y
+		// Bind operator
 		final Expr bindExpr = new ExprVar(v1);
 		final VarExprList bindExpressions = new VarExprList(v2, bindExpr);
 		final LogicalOpBind bindOp = new LogicalOpBind(bindExpressions, false);
