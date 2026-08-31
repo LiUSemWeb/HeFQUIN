@@ -129,6 +129,16 @@ public class QueryProcContextBuilder
 		return this;
 	}
 
+	public QueryProcContextBuilder setIgnoreCache( final boolean set ) {
+		ignoreCache = set;
+		return this;
+	}
+
+	public QueryProcContextBuilder setIgnoreCardinalityCache( final boolean set ) {
+		ignoreCardinalityCache = set;
+		return this;
+	}
+
 	public QueryProcContext build() {
 		return new QueryProcContext() {
 			@Override
