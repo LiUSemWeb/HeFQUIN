@@ -10,7 +10,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
 
 public class ProjectRemoval implements HeuristicForLogicalOptimization
 {
-
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan,
 	                          final QueryProcContext ctxt )
