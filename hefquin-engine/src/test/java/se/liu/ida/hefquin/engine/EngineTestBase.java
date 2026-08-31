@@ -164,6 +164,16 @@ public abstract class EngineTestBase
 		public boolean skipExecution() {
 			throw new UnsupportedOperationException();
 		}
+
+		@Override
+		public boolean ignoreCache() {
+			return false;
+		}
+
+		@Override
+		public boolean ignoreCardinalityCache() {
+			return false;
+		}
 	}
 
 	protected QueryProcContextExt getExtendedQueryProcContextForTests( final ExecutorService execService ) {
@@ -186,6 +196,8 @@ public abstract class EngineTestBase
 
 			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
 			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
+			@Override public boolean ignoreCache() { return false; }
+			@Override public boolean ignoreCardinalityCache() { return false; }
 		};
 	}
 

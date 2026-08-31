@@ -37,6 +37,9 @@ public class TestUtils extends EngineTestBase
 
 			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
 			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
+
+			@Override public boolean ignoreCache() { return false; }
+			@Override public boolean ignoreCardinalityCache() { return false; }
 		};
 	}
 
