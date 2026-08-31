@@ -141,7 +141,7 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 			// ii) issue the request via the federation access manager;
 			final CompletableFuture<SolMapsResponse> f;
 			try {
-				f = ctx.getFederationAccessMgr().issueRequest(req2, fm);
+				f = ctx.getFederationAccessMgr().issueRequest( req2, fm, ctx.ignoreCache() );
 			}
 			catch ( final Exception e ) {
 				// Not strictly necessary, but doesn't hurt either.

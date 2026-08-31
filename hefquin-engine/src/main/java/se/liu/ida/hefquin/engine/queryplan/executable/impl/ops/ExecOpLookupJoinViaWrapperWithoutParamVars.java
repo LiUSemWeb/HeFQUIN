@@ -98,7 +98,7 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 
 		final CompletableFuture<StringResponse> f;
 		try {
-			f = ctx.getFederationAccessMgr().issueRequest(req, fm);
+			f = ctx.getFederationAccessMgr().issueRequest( req, fm, ctx.ignoreCache() );
 		}
 		catch ( final Exception e ) {
 			// Not strictly necessary, but doesn't hurt either.

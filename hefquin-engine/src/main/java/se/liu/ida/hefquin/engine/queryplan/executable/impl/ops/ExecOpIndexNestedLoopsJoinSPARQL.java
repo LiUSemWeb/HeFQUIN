@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -60,12 +61,11 @@ public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLo
 	}
 
 	@Override
-	protected CompletableFuture<SolMapsResponse> issueRequest(
-			final SPARQLRequest req,
-			final FederationAccessManager fedAccessMgr )
-					throws FederationAccessException
+	protected CompletableFuture<SolMapsResponse> issueRequest( final SPARQLRequest req,
+	                                                           final QueryProcContext ctx )
+			throws FederationAccessException
 	{
-		return fedAccessMgr.issueRequest(req, fm);
+		return ctx.getFederationAccessMgr().issueRequest( req, fm, ctx.ignoreCache() );
 	}
 
 }
