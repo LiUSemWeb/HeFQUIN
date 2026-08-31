@@ -123,7 +123,7 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 	                                          final boolean ignoreCache )
 			throws FederationAccessException
 	{
-		if( !ignoreCache ) {
+		if ( ! ignoreCache ) {
 			// update the statistics only if cache is enabled
 			if ( req instanceof TPFRequest )
 				cacheRequestsTPF++;
