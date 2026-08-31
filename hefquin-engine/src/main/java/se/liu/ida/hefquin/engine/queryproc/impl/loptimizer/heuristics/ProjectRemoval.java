@@ -8,6 +8,16 @@ import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
+/**
+ * A heuristic that removes project operators for which the {@code mayReduce}
+ * flag is not set.
+ *
+ * <p>Project push down may leave project operators in the plan after the
+ * projection has been pushed as far down as possible. Such operators are
+ * unnecessary when they do not contribute to duplicate reduction. Therefore,
+ * this heuristic removes project operators with {@code mayReduce = false},
+ * while retaining those with {@code mayReduce = true}.</p>
+ */
 public class ProjectRemoval implements HeuristicForLogicalOptimization
 {
 	@Override
