@@ -474,7 +474,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 			// Issue the request via the federation access manager.
 			final CompletableFuture<RespType> f;
 			try {
-				f = ctx.getFederationAccessMgr().issueRequest(req, fm);
+				f = ctx.getFederationAccessMgr().issueRequest( req, fm, ctx.ignoreCache() );
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);

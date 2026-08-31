@@ -49,9 +49,7 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 
 		final StringResponse response;
 		try {
-			response = FederationAccessUtils.performRequest( ctx.getFederationAccessMgr(),
-			                                                 createRESTRequest(),
-			                                                 fm );
+			response = FederationAccessUtils.performRequest( ctx, createRESTRequest(), fm );
 		}
 		catch ( final FederationAccessException e ) {
 			throw new ExecOpExecutionException( "Performing the request caused an exception.", e, this );

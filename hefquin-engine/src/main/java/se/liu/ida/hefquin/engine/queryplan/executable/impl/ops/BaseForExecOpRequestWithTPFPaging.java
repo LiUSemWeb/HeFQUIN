@@ -59,9 +59,7 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 
 			// perform the page request
 			try {
-				currentPage = FederationAccessUtils.performRequest( ctx.getFederationAccessMgr(),
-				                                                    pageRequest,
-				                                                    fm );
+				currentPage = FederationAccessUtils.performRequest(ctx, pageRequest, fm);
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a page request caused an exception.", e, this);

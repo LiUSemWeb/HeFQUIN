@@ -44,7 +44,7 @@ public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
 
 		final SolMapsResponse response;
 		try {
-			response = FederationAccessUtils.performRequest( ctx.getFederationAccessMgr(), req, fm );
+			response = FederationAccessUtils.performRequest(ctx, req, fm);
 		}
 		catch ( final FederationAccessException e ) {
 			throw new ExecOpExecutionException( "Performing the request caused an exception.", e, this );
