@@ -13,25 +13,20 @@ public class RESTEndpointImpl extends BaseForFederationMember
 {
 	protected final String urlTemplate;
 	protected final List<RESTEndpoint.Parameter> params;
-	protected final AuthenticationInformation authInfo;
 
 	public RESTEndpointImpl( final Node serviceURI,
 	                         final String urlTemplate,
 	                         final List<RESTEndpoint.Parameter> params,
 	                         final AuthenticationInformation authInfo ) {
-		super(serviceURI);
+		super(serviceURI, authInfo);
 
 		assert urlTemplate != null && ! urlTemplate.isEmpty();
 		this.urlTemplate = urlTemplate;
-		this.authInfo = authInfo;
 		this.params = (params == null) ? List.of() : params;
 	}
 
 	@Override
 	public String getURLTemplate() { return urlTemplate; }
-
-	@Override
-	public AuthenticationInformation getAuthenticationInformation() { return authInfo; }
 
 	@Override
 	public int getNumberOfParameters() { return params.size(); }

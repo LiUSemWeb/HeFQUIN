@@ -11,27 +11,22 @@ public class GraphQLEndpointImpl extends BaseForFederationMember
 {
 	protected final String url;
 	protected final GraphQLSchema schema;
-	protected final AuthenticationInformation authInfo;
 
 	public GraphQLEndpointImpl( final Node serviceURI,
 	                            final String url,
 	                            final AuthenticationInformation authInfo,
 	                            final GraphQLSchema schema ) {
-		super(serviceURI);
+		super(serviceURI, authInfo);
 
 		assert url != null && ! url.isEmpty();
 		assert schema != null;
 
 		this.url = url;
-		this.authInfo = authInfo;
 		this.schema = schema;
 	}
 
 	@Override
 	public String getURL() { return url; }
-
-	@Override
-	public AuthenticationInformation getAuthenticationInformation() { return authInfo; }
 
 	@Override
 	public GraphQLSchema getSchema() { return schema; }

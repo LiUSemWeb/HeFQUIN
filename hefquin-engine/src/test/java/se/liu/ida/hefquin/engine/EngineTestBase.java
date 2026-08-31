@@ -60,7 +60,6 @@ import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorIm
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.StringResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
-import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
@@ -203,7 +202,7 @@ public abstract class EngineTestBase
 		protected final Graph data;
 
 		public FederationMemberBaseForTest( final Graph data ) {
-			super( NodeFactory.createURI("http://example.org/fm") );
+			super( NodeFactory.createURI("http://example.org/fm"), null );
 			this.data = data;
 		}
 
@@ -304,11 +303,6 @@ public abstract class EngineTestBase
 			return new SolMapsResponseImpl( result, new Date() );
 		}
 
-		@Override
-		public AuthenticationInformation getAuthenticationInformation() {
-			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
-		}
-
 	}
 
 	protected static class SPARQLEndpointWithVocabularyMappingForTest extends SPARQLEndpointForTest
@@ -341,10 +335,6 @@ public abstract class EngineTestBase
 		public TPFResponse performRequest( final TPFRequest req ) {
 			final List<Triple> result = getMatchingTriples(req);
 			return new TPFResponseForTest(result, this, req);
-		}
-		@Override
-		public AuthenticationInformation getAuthenticationInformation() {
-			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
 		}
 	}
 
@@ -401,10 +391,6 @@ public abstract class EngineTestBase
 				}
 			}
 			return new TPFResponseForTest(result, this, req);
-		}
-		@Override
-		public AuthenticationInformation getAuthenticationInformation() {
-			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
 		}
 	}
 
@@ -487,11 +473,6 @@ public abstract class EngineTestBase
 		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
 			throw new UnsupportedOperationException();
 		}
-
-		@Override
-		public AuthenticationInformation getAuthenticationInformation() {
-			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
-		}
 	}
 
 	public static class RejectingGraphFederationMemberForTest extends FederationMemberBaseForTest
@@ -508,11 +489,6 @@ public abstract class EngineTestBase
 		@Override
 		public boolean isSupportedPattern( final SPARQLGraphPattern p ) {
 			return false; // keep it false to make sure that pattern pushdown fails in the tests
-		}
-
-		@Override
-		public AuthenticationInformation getAuthenticationInformation() {
-			throw new UnsupportedOperationException("Unimplemented method 'getAuthenticationInformation'");
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.RDFBasedFederationMember;
 
 public abstract class BaseForRDFBasedFederationMember
@@ -13,13 +14,14 @@ public abstract class BaseForRDFBasedFederationMember
 {
 	private final VocabularyMapping vm;
 
-	protected BaseForRDFBasedFederationMember( final Node serviceURI ) {
-		this(serviceURI, null);
+	protected BaseForRDFBasedFederationMember( final Node serviceURI, final AuthenticationInformation authInfo ) {
+		this(serviceURI, authInfo, null);
 	}
 
 	protected BaseForRDFBasedFederationMember( final Node serviceURI,
+	                                           final AuthenticationInformation authInfo,
 	                                           final VocabularyMapping vm ) {
-		super(serviceURI);
+		super(serviceURI, authInfo);
 		this.vm = vm;
 	}
 

@@ -25,7 +25,6 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 	protected static final NodeFormatter nodeFormatter = new NodeFormatterNT();
 
 	public final String baseURL;
-	public final AuthenticationInformation authInfo;
 	public final String baseURLWithFinalSeparator;
 	public final String httpQueryArgumentForSubject;
 	public final String httpQueryArgumentForPredicate;
@@ -51,7 +50,7 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 	                      final String httpQueryArgumentForPredicate,
 	                      final String httpQueryArgumentForObject,
 	                      final VocabularyMapping vm ) {
-		super(serviceURI, vm);
+		super(serviceURI, authInfo, vm);
 
 		assert baseURL != null;
 		assert httpQueryArgumentForSubject    != null;
@@ -59,7 +58,6 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 		assert httpQueryArgumentForObject     != null;
 
 		this.baseURL = baseURL;
-		this.authInfo = authInfo;
 		this.httpQueryArgumentForSubject    = httpQueryArgumentForSubject;
 		this.httpQueryArgumentForPredicate  = httpQueryArgumentForPredicate;
 		this.httpQueryArgumentForObject     = httpQueryArgumentForObject;
@@ -98,9 +96,6 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 
 		return baseURLWithFinalSeparator + params.httpString();
 	}
-
-	@Override
-	public AuthenticationInformation getAuthenticationInformation() { return authInfo; }
 
 	protected Params createParams( final Triple tp ) {
 		final Params params = Params.create();

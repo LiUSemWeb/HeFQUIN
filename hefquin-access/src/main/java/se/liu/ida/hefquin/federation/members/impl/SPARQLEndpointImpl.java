@@ -10,25 +10,19 @@ public class SPARQLEndpointImpl extends BaseForRDFBasedFederationMember
                                 implements SPARQLEndpoint
 {
 	protected final String url;
-	protected final AuthenticationInformation authInfo;
 
 	public SPARQLEndpointImpl( final Node serviceURI,
 	                           final String url,
 	                           final AuthenticationInformation authInfo,
 	                           final VocabularyMapping vm ) {
-		super(serviceURI, vm);
+		super(serviceURI, authInfo, vm);
 
 		assert url != null && ! url.isEmpty();
 		this.url = url;
-
-		this.authInfo = authInfo;
 	}
 
 	@Override
 	public String getURL() { return url; }
-
-	@Override
-	public AuthenticationInformation getAuthenticationInformation() { return authInfo; }
 
 	@Override
 	public String toString() { return "SPARQL endpoint at " + url; }
