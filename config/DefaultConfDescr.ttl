@@ -25,6 +25,18 @@ _:bFederationAccessManager rdf:type ec:FederationAccessManager ;
           ec:constructorArguments (
             ec:value:ExecServiceForFedAccess
             10  # defaultParallelRequestLimitPerServer
+            [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor" ;
+              ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessorImpl" ]
+            [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor" ;
+              ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessorImpl" ]
+            [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor" ;
+              ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessorImpl" ]
+            [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor" ;
+              ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl" ]
+            [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor" ;
+              ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessorImpl" ]
+            [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessor" ;
+              ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessorImpl" ]
           )
         ]
         # L1 cache

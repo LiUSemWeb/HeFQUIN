@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.federation.access.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -195,6 +194,7 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		final GraphQLRequestProcessor reqProcGraphQL = new MyGraphQLRequestProcessor(sleepMillis);
 
 		return new AsyncFederationAccessManagerImpl(execServiceForFedAccess,
+		                                            10,
 		                                            reqProc,
 		                                            reqProcTPF,
 		                                            reqProcBRTPF,
