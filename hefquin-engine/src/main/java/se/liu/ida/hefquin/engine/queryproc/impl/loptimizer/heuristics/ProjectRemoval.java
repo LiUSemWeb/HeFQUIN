@@ -34,6 +34,10 @@ public class ProjectRemoval implements HeuristicForLogicalOptimization
 			return inputPlan;
 		}
 
+		final LogicalOperator rootOp = inputPlan.getRootOperator();
+		if ( rootOp instanceof LogicalOpProject op && !op.mayReduce() )
+			return inputPlan.getSubPlan(0);
+
 		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlans];
 		boolean noChanges = true;
 		for ( int i = 0; i < numberOfSubPlans; i++ ) {
@@ -45,23 +49,11 @@ public class ProjectRemoval implements HeuristicForLogicalOptimization
 			}
 		}
 
-		final LogicalPlan newPlan;
-		final LogicalOperator rootOp = inputPlan.getRootOperator();
-
-		if ( rootOp instanceof LogicalOpProject op && !op.mayReduce() )
-			return newSubPlans[0];
-
 		if ( noChanges ) {
-			newPlan = inputPlan;
-		}
-		else {
-			newPlan = LogicalPlanUtils.createPlanWithSubPlans(
-					rootOp,
-					null,
-					newSubPlans);
+			return inputPlan;
 		}
 
-		return removeProjectIfNecessary(newPlan);
+		return LogicalPlanUtils.createPlanWithSubPlans(rootOp, null, newSubPlans);
 	}
 
 	protected LogicalPlan removeProjectIfNecessary( final LogicalPlan plan ) {
