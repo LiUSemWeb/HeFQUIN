@@ -89,6 +89,16 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		return "hefquin";
 	}
 
+	@Override
+	protected void processModulesAndArgs() {
+		super.processModulesAndArgs();
+
+		// Fix because 'ModGeneral' currently sets the verbose flag instead
+		// of the debug flag whenever the --debug argument is given.
+		if ( isVerbose() )
+			modGeneral.debug = true;
+	}
+
 	/**
 	 * Executes the query using the HeFQUIN federation engine and handles the
 	 * results and statistics.
@@ -180,7 +190,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			for ( int i = 0; i < numberOfExceptions; i++ ) {
 				final Exception ex = exceptions.get(i);
 				System.err.println( "Exception " + (i + 1) + ": " + ex.getMessage() );
-				if ( isVerbose() ) {
+				if ( isDebug() ) {
 					System.err.println( "StackTrace:" );
 					ex.printStackTrace( System.err );
 				}
