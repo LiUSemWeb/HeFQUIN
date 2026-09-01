@@ -10,6 +10,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Support for authentication ([#664](https://github.com/LiUSemWeb/HeFQUIN/issues/664), [#676](https://github.com/LiUSemWeb/HeFQUIN/issues/676), [#680](https://github.com/LiUSemWeb/HeFQUIN/issues/680)).
 - New query plan operator that covers multiple requests with the same pattern to different federation members ([#677](https://github.com/LiUSemWeb/HeFQUIN/issues/677), [#690](https://github.com/LiUSemWeb/HeFQUIN/issues/690)).
 - Extend support for caching to all types of federation members, including REST, GraphQL, and Neo4j ([#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590)).
+- New logical plan rewriting rule that removes unnecessary project operators ([#693](https://github.com/LiUSemWeb/HeFQUIN/issues/693)).
 - Integration test that runs all queries from the examples directory ([#687](https://github.com/LiUSemWeb/HeFQUIN/issues/687)).
 ### Changed
 - Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/issues/675)).
