@@ -37,6 +37,12 @@ import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl;
 import se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithCache;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public class ExecOpRequestTPFTest extends ExecOpTestBase
@@ -81,7 +87,15 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		// Create a federation access manager
-		final FederationAccessManager internalFedAccMgr = new AsyncFederationAccessManagerImpl(execServiceForFedAccess);
+		final FederationAccessManager internalFedAccMgr = new AsyncFederationAccessManagerImpl(
+			execServiceForFedAccess,
+			10,
+			new SPARQLRequestProcessorImpl(),
+			new TPFRequestProcessorImpl(),
+			new BRTPFRequestProcessorImpl(),
+			new Neo4jRequestProcessorImpl(),
+			new RESTRequestProcessorImpl(),
+			new GraphQLRequestProcessorImpl() );
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerWithCache(internalFedAccMgr, 100);
 
 		final QueryProcContextExt ctx = new QueryProcContextExt() {

@@ -29,6 +29,12 @@ import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessorImpl;
 
 public class FederationAccessManagerWithCache implements FederationAccessManager
 {
@@ -51,7 +57,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 
 	public FederationAccessManagerWithCache( final FederationAccessManager fedAccMan,
 	                                         final int cacheCapacity,
-	                                         final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies ) 
+	                                         final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies )
 	{
 		assert fedAccMan != null;
 		this.fedAccMan = fedAccMan;
@@ -60,7 +66,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	}
 
 	public FederationAccessManagerWithCache( final FederationAccessManager fedAccMan,
-	                                         final int cacheCapacity ) 
+	                                         final int cacheCapacity )
 	{
 		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
 	}
@@ -68,9 +74,17 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	/**
 	 * Creates a {@link FederationAccessManagerWithCache} with a default configuration.
 	 */
-	public FederationAccessManagerWithCache( final ExecutorService execService ) 
+	public FederationAccessManagerWithCache( final ExecutorService execService )
 	{
-		this( new AsyncFederationAccessManagerImpl(execService),
+		this( new AsyncFederationAccessManagerImpl(
+		      execService,
+			  10,
+		      new SPARQLRequestProcessorImpl(),
+		      new TPFRequestProcessorImpl(),
+		      new BRTPFRequestProcessorImpl(),
+		      new Neo4jRequestProcessorImpl(),
+		      new RESTRequestProcessorImpl(),
+		      new GraphQLRequestProcessorImpl()),
 		      100,
 		      new MyDefaultCachePolicies() );
 	}

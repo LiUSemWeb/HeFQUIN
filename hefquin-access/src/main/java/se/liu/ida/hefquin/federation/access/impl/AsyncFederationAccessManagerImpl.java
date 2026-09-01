@@ -12,17 +12,11 @@ import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessorImpl;
 
 public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBase2
 {
@@ -40,6 +34,7 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 
 	public AsyncFederationAccessManagerImpl(
 			final ExecutorService execService,
+			final int defaultParallelRequestLimitPerServer,
 			final SPARQLRequestProcessor reqProcSPARQL,
 			final TPFRequestProcessor reqProcTPF,
 			final BRTPFRequestProcessor reqProcBRTPF,
@@ -50,33 +45,6 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 
 		assert execService != null;
 		threadPool = execService;
-	}
-
-	/**
-	 * Creates an {@link AsyncFederationAccessManagerImpl} with a default configuration.
-	 */
-	public AsyncFederationAccessManagerImpl( final ExecutorService execService ) {
-		this( execService,
-		      new SPARQLRequestProcessorImpl(),
-		      new TPFRequestProcessorImpl(),
-		      new BRTPFRequestProcessorImpl(),
-		      new Neo4jRequestProcessorImpl(),
-		      new RESTRequestProcessorImpl(),
-		      new GraphQLRequestProcessorImpl() );
-	}
-
-	/**
-	 * Creates an {@link AsyncFederationAccessManagerImpl} using the given executor
-	 * service and sets the default limit on the number of parallel requests to a given
-	 * server.
-	 *
-	 * @param execService                          the executor service used for asynchronous request
-	 *                                             execution
-	 * @param defaultParallelRequestLimitPerServer the default limit on the number of parallel requests to
-	 *                                             any given server
-	 */
-	public AsyncFederationAccessManagerImpl( final ExecutorService execService, final int defaultParallelRequestLimitPerServer ) {
-		this(execService);
 		// Set default number of parallel request to any given server
 		HttpClientProvider.setDefaultParallelRequestLimitPerServer(defaultParallelRequestLimitPerServer);
 	}
