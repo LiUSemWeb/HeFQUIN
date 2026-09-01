@@ -274,6 +274,12 @@
                 Refers to a file that contains an RDF-based description of the configuration to be used for the HeFQUIN engine and its components. The file can be in any RDF serialization format (e.g., Turtle, N-Triples, JSON-LD), it must use the <a href="http://w3id.org/hefquin/engineconf/latest/">HeFQUIN Configuration Vocabulary</a>, and contain exactly one instance of type <code><a href="http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration">ec:HeFQUINEngineConfiguration</a></code>.
                 This argument is relevant primarily during development and for conducting experiments with different internal components.
             </p>
+            <p id="--debug" style="font-weight:bold">
+                --debug
+            </p>
+            <p style="padding-left:2em">
+                If this argument is given and there are exceptions being thrown during execution, the program prints these exceptions with their complete stack traces (printing to stderr). If the argument is not given, then the program prints only the type and message of each of the exceptions (i.e., no stack traces).
+            </p>
             <p id="--help" style="font-weight:bold">
                 --help
             </p>
