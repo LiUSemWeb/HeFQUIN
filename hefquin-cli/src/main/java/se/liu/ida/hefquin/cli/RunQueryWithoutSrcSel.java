@@ -12,6 +12,7 @@ import org.apache.jena.sparql.resultset.ResultsFormat;
 
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModTime;
+import se.liu.ida.hefquin.cli.modules.ModCaching;
 import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
@@ -40,6 +41,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModPlanPrinting  modPlanPrinting =  new ModPlanPrinting();
 	protected final ModResultsOutExt modResultsExt =    new ModResultsOutExt();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
+	protected final ModCaching       modCaching =       new ModCaching();
 
 	/**
 	 * Main entry point of the tool, accepting command-line arguments to specify the
@@ -60,6 +62,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	public RunQueryWithoutSrcSel( final String[] argv ) {
 		super( argv );
 
+		addModule( modCaching );
 		addModule( modTime );
 		addModule( modEngineConfig );
 		addModule( modPlanPrinting );
@@ -137,7 +140,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 					.setLogicalPlanPrinter( modPlanPrinting.getLogicalPlanPrinter() )
 					.setPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
 					.setExecutablePlanPrinter( modPlanPrinting.getExecutablePlanPrinter() )
-					.setSkipExecution( modResultsExt.isSkipExecution() );
+					.setSkipExecution( modResultsExt.isSkipExecution() )
+					.setIgnoreCache( modCaching.isIgnoreCache() )
+					.setIgnoreCardinalityCache( modCaching.isIgnoreCardinalityCache() );
 		final QueryProcContext ctx = ctxBuilder.build();
 
 		modTime.startTimer();

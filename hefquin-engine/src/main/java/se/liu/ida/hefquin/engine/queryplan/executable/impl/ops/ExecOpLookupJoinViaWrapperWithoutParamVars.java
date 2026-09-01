@@ -99,7 +99,7 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 
 		final CompletableFuture<StringResponse> f;
 		try {
-			f = ctx.getFederationAccessMgr().issueRequest(req, fm);
+			f = ctx.getFederationAccessMgr().issueRequest( req, fm, ctx.ignoreCache() );
 		}
 		catch ( final FederationAccessException e ) {
 			throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);

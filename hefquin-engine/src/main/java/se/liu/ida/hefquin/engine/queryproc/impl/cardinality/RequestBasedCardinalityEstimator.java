@@ -194,9 +194,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 
 		final CardinalityResponse[] resps;
 		try {
-			resps = FederationAccessUtils.performCardinalityRequests( ctx.getFederationAccessMgr(),
-			                                                          reqOps,
-			                                                          mreqOps );
+			resps = FederationAccessUtils.performCardinalityRequests(ctx, reqOps, mreqOps);
 		}
 		catch ( final FederationAccessException e ) {
 			// If the cardinality requests fail, we need to guess. For the

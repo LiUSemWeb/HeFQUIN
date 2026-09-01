@@ -113,6 +113,9 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 
 			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
 			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
+
+			@Override public boolean ignoreCache() { return false; }
+			@Override public boolean ignoreCardinalityCache() { return false; }
 		};
 
 		op.execute(sink, ctx);
@@ -182,6 +185,9 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 
 			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
 			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
+
+			@Override public boolean ignoreCache() { return false; }
+			@Override public boolean ignoreCardinalityCache() { return false; }
 		};
 	}
 

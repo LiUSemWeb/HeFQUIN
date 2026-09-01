@@ -139,7 +139,7 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 			// ii) issue the request via the federation access manager;
 			final CompletableFuture<SolMapsResponse> f;
 			try {
-				f = ctx.getFederationAccessMgr().issueRequest(req2, fm);
+				f = ctx.getFederationAccessMgr().issueRequest( req2, fm, ctx.ignoreCache() );
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);

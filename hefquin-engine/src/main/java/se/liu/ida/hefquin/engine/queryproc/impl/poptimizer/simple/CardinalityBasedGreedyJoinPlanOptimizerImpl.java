@@ -61,10 +61,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             // requests for the above list of request operators.
             final CardinalityResponse[] resps;
             try {
-                resps = FederationAccessUtils.performCardinalityRequests(
-                        ctx.getFederationAccessMgr(),
-                        reqOpsOfAllSubPlans,
-                        null );
+                resps = FederationAccessUtils.performCardinalityRequests(ctx, reqOpsOfAllSubPlans, null);
             }
             catch ( final FederationAccessException e ) {
                 throw new PhysicalOptimizationException("Issuing a cardinality request caused an exception.", e);
