@@ -22,10 +22,10 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * More background: Pushing down project operators is useful for two reasons:
  * <ol>
  * <li>If a projection ends up being pushed down all the way into a request operator,
- *      this request operator retrieves less data.</li>
- *      <li> If the query uses {@code SELECT DISTINCT}, duplicate removal through our
- *      {@code mayReduce} flags may become more effective in some cases if there are
- *      project operators in the plan that project away unnecessary variables early.</li>
+ *     this request operator retrieves less data.</li>
+ * <li> If the query uses {@code SELECT DISTINCT}, duplicate removal through our
+ *     {@code mayReduce} flags may become more effective in some cases if there are
+ *     project operators in the plan that project away unnecessary variables early.</li>
  * </ol>
  * Notice that, in the context of the first of these reasons, project operators have no
  * use once projection push down has been completed; they are more like an intermediate
