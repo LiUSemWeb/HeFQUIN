@@ -89,6 +89,16 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		return "hefquin";
 	}
 
+	@Override
+	protected void processModulesAndArgs() {
+		super.processModulesAndArgs();
+
+		// Fix because 'ModGeneral' currently sets the verbose flag instead
+		// of the debug flag whenever the --debug argument is given.
+		if ( isVerbose() )
+			modGeneral.debug = true;
+	}
+
 	/**
 	 * Executes the query using the HeFQUIN federation engine and handles the
 	 * results and statistics.
@@ -179,10 +189,11 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			System.err.println();
 			for ( int i = 0; i < numberOfExceptions; i++ ) {
 				final Exception ex = exceptions.get(i);
-				final Throwable rc = getRootCause( ex );
-				System.err.println( (i + 1) + " " + rc.getClass().getName() + ": " + rc.getMessage() );
-				System.err.println( "StackTrace:" );
-				ex.printStackTrace( System.err );
+				System.err.println( "Exception " + (i + 1) + ": " + ex.getMessage() );
+				if ( isDebug() ) {
+					System.err.println( "StackTrace:" );
+					ex.printStackTrace( System.err );
+				}
 				System.err.println();
 			}
 		}
@@ -216,25 +227,6 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			System.err.println( "Failed to load query: " + ex.getMessage() );
 			throw new TerminationException( 1 );
 		}
-	}
-
-	/**
-	 * Returns the root cause of a throwable by traversing the cause chain.
-	 *
-	 * This method follows the chain of {@code Throwable.getCause()} until it
-	 * reaches the deepest non-null cause. If the input {@code throwable} has no
-	 * cause, the method returns the throwable itself.
-	 *
-	 * @param throwable the throwable from which to extract the root cause
-	 * @return the root cause of the throwable, or {@code null} if {@code throwable}
-	 *         is {@code null}
-	 */
-	private static Throwable getRootCause( final Throwable throwable ) {
-		Throwable cause = throwable;
-		while ( cause.getCause() != null ) {
-			cause = cause.getCause();
-		}
-		return cause;
 	}
 
 	/**
