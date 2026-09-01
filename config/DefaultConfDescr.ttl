@@ -79,6 +79,7 @@ _:bListOfHeuristics
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.ProjectPushDown" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.ProjectRemoval" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.CardinalityBasedJoinOrderingWithRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemoveUnnecessaryL2gAndG2l" ]
