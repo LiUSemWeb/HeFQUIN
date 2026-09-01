@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.federation.members.impl;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class SPARQLEndpointImpl extends BaseForRDFBasedFederationMember
@@ -12,8 +13,9 @@ public class SPARQLEndpointImpl extends BaseForRDFBasedFederationMember
 
 	public SPARQLEndpointImpl( final Node serviceURI,
 	                           final String url,
+	                           final AuthenticationInformation authInfo,
 	                           final VocabularyMapping vm ) {
-		super(serviceURI, vm);
+		super(serviceURI, authInfo, vm);
 
 		assert url != null && ! url.isEmpty();
 		this.url = url;

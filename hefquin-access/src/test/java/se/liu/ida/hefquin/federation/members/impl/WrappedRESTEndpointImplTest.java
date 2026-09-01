@@ -82,6 +82,7 @@ public class WrappedRESTEndpointImplTest
 		return new WrappedRESTEndpointImpl( NodeFactory.createURI("http://example.org/"),
 		                                    "http://example.org/",
 		                                    null,
+		                                    null,
 		                                    createMappingExpressionForTests() );
 	}
 

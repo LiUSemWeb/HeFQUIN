@@ -31,6 +31,7 @@ public class GraphQLRequestProcessorImplTest extends FederationTestBase
 		public GraphQLEndpointTest() {
 			super( NodeFactory.createURI("http://example.org/graphql"),
 			       "http://localhost:4000/graphql",
+			       null,
 			       new GraphQLSchemaForTest() );
 		}
 	}

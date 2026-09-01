@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.federation.members.impl;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
 
 public class GraphQLEndpointImpl extends BaseForFederationMember
@@ -13,8 +14,9 @@ public class GraphQLEndpointImpl extends BaseForFederationMember
 
 	public GraphQLEndpointImpl( final Node serviceURI,
 	                            final String url,
+	                            final AuthenticationInformation authInfo,
 	                            final GraphQLSchema schema ) {
-		super(serviceURI);
+		super(serviceURI, authInfo);
 
 		assert url != null && ! url.isEmpty();
 		assert schema != null;

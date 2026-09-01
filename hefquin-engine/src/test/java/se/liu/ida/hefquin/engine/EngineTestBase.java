@@ -193,6 +193,7 @@ public abstract class EngineTestBase
 	protected TPFServer getDBpediaTPFServer() {
 		return new TPFServerImpl( NodeFactory.createURI("http://example.org/tpf"),
 		                          "http://fragments.dbpedia.org/2016-04/en",
+		                          null, // no authentication info
 		                          null ); // no vocab.mapping
 	}
 
@@ -201,7 +202,7 @@ public abstract class EngineTestBase
 		protected final Graph data;
 
 		public FederationMemberBaseForTest( final Graph data ) {
-			super( NodeFactory.createURI("http://example.org/fm") );
+			super( NodeFactory.createURI("http://example.org/fm"), null );
 			this.data = data;
 		}
 

@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 
 public class RESTEndpointImpl extends BaseForFederationMember
@@ -15,8 +16,9 @@ public class RESTEndpointImpl extends BaseForFederationMember
 
 	public RESTEndpointImpl( final Node serviceURI,
 	                         final String urlTemplate,
-	                         final List<RESTEndpoint.Parameter> params ) {
-		super(serviceURI);
+	                         final List<RESTEndpoint.Parameter> params,
+	                         final AuthenticationInformation authInfo ) {
+		super(serviceURI, authInfo);
 
 		assert urlTemplate != null && ! urlTemplate.isEmpty();
 		this.urlTemplate = urlTemplate;

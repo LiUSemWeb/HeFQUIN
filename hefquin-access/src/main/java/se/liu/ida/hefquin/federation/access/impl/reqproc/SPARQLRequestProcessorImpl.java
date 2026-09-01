@@ -59,13 +59,17 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 
 		final QueryExecution qe;
 		try {
-			qe = QueryExecutionHTTPBuilder.create()
+			final QueryExecutionHTTPBuilder builder = QueryExecutionHTTPBuilder.create()
 					.endpoint(   fm.getURL() )
 					.httpClient( httpClient )
 					.query(      req.getQuery().asJenaQuery() )
 					.timeout(    overallTimeout, TimeUnit.MILLISECONDS )
-					.httpHeader( "User-Agent", BuildInfo.getUserAgent() )
-					.build();
+					.httpHeader( "User-Agent", BuildInfo.getUserAgent() );
+
+					if ( fm.getAuthenticationInformation() != null )
+						fm.getAuthenticationInformation().applyTo( builder );
+
+					qe = builder.build();
 		}
 		catch ( final Exception e ) {
 			throw new FederationAccessException("Initiating the remote execution of a query at the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", e, req, fm);

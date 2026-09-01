@@ -15,6 +15,8 @@ import org.apache.jena.riot.RiotNotFoundException;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.BearerAuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
@@ -244,6 +246,46 @@ public class FederationDescriptionReaderTest
 		final String expectedErrorMessage = "Not found: dummy/vocab.nt";
 		final String actualErrorMessage = exception.getCause().getMessage();
 		assertEquals( expectedErrorMessage, actualErrorMessage );
+	}
+
+	@Test
+	public void tokenEnvVarIsParsed() {
+		final String turtle =
+				  "PREFIX xsd:        <http://www.w3.org/2001/XMLSchema#>\n"
+				+ "PREFIX fd:         <http://w3id.org/hefquin/feddesc#>\n"
+				+ "PREFIX ex:         <http://example.org/>\n"
+				+ "PREFIX td:         <https://www.w3.org/2019/wot/td#>\n"
+				+ "PREFIX wotsec:     <https://www.w3.org/2019/wot/security#>\n"
+				+ "\n"
+				+ "ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;\n"
+				+ "      fd:serviceURI \"http://dbpedia.org/sparql\"^^xsd:anyURI ;\n"
+				+ "      fd:interface [ a                         fd:FixedEndpointInterface ;\n"
+				+ "                     fd:supportedProtocol      fd:SPARQLProtocol ;\n"
+				+ "                     fd:endpointAddress        \"http://dbpedia.org/sparql\"^^xsd:anyURI ;\n"
+				+ "\n"
+				+ "                     td:hasSecurityConfiguration [ a                wotsec:BearerSecurityScheme ;\n"
+				+ "                                                   wotsec:in        \"header\" ;\n"
+				+ "                                                   fd:envarForToken \"ENV_VAR_FOR_TOKEN\" ; ] ] ." ;
+
+		final Model fd = ModelFactory.createDefaultModel();
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
+		b.parse( fd );
+
+		final FederationDescriptionReader reader = new FederationDescriptionReader() {
+			@Override
+			protected String getEnvironmentVariable( final String name ) {
+				return "ENV_VAR_FOR_TOKEN".equals(name)
+						? "TOKEN12345"
+						: null;
+			}
+		};
+
+		final FederationCatalog cat = reader.parseFedDescr( fd );
+		final FederationMember fm = cat.getFederationMemberByURI( "http://dbpedia.org/sparql" );
+		final AuthenticationInformation auth = ( ( SPARQLEndpoint ) fm ).getAuthenticationInformation();
+
+		assertTrue( auth instanceof BearerAuthenticationInformation );
+		assertEquals( "TOKEN12345", ( ( BearerAuthenticationInformation ) auth ).getToken() );
 	}
 
 }

@@ -9,6 +9,7 @@ import org.apache.jena.sparql.exec.http.Params;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class TPFServerImpl extends BaseForRDFBasedFederationMember
@@ -31,9 +32,11 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 
 	public TPFServerImpl( final Node serviceURI,
 	                      final String baseURL,
+	                      final AuthenticationInformation authInfo,
 	                      final VocabularyMapping vm ) {
 		this( serviceURI,
 		      baseURL,
+		      authInfo,
 		      DfltHttpQueryArgumentForSubject,
 		      DfltHttpQueryArgumentForPredicate,
 		      DfltHttpQueryArgumentForObject,
@@ -42,11 +45,12 @@ public class TPFServerImpl extends BaseForRDFBasedFederationMember
 
 	public TPFServerImpl( final Node serviceURI,
 	                      final String baseURL,
+	                      final AuthenticationInformation authInfo,
 	                      final String httpQueryArgumentForSubject,
 	                      final String httpQueryArgumentForPredicate,
 	                      final String httpQueryArgumentForObject,
 	                      final VocabularyMapping vm ) {
-		super(serviceURI, vm);
+		super(serviceURI, authInfo, vm);
 
 		assert baseURL != null;
 		assert httpQueryArgumentForSubject    != null;

@@ -42,7 +42,8 @@ public abstract class FederationTestBase
 	protected TPFServer getDBpediaTPFServer() {
 		return new TPFServerImpl( NodeFactory.createURI("http://example.org/tpf"),
 		                          "http://fragments.dbpedia.org/2016-04/en",
-		                          null ); // no vocab.mapping
+		                          null, // no authentication info
+								  null ); // no vocab.mapping
 	}
 
 	protected static class SPARQLEndpointForTest extends SPARQLEndpointImpl
@@ -50,12 +51,14 @@ public abstract class FederationTestBase
 		public SPARQLEndpointForTest() {
 			super( NodeFactory.createURI("http://example.org/sparql"),
 			       "http://example.org/sparql",
+			       null,
 			       null );
 		}
 
 		public SPARQLEndpointForTest( final String url ) {
 			super( NodeFactory.createURI("http://example.org/sparql"),
 			       url,
+			       null,
 			       null );
 		}
 	}
@@ -65,12 +68,14 @@ public abstract class FederationTestBase
 		public TPFServerForTest() {
 			super( NodeFactory.createURI("http://example.org/tpf"),
 			       "http://example.org/",
+			       null,
 			       null );
 		}
 
 		public TPFServerForTest( final String baseURL ) {
 			super( NodeFactory.createURI("http://example.org/tpf"),
 			       baseURL,
+			       null,
 			       null );
 		}
 	}
@@ -80,12 +85,14 @@ public abstract class FederationTestBase
 		public BRTPFServerForTest() {
 			super( NodeFactory.createURI("http://example.org/brtpf"),
 			       "http://example.org/",
+			       null,
 			       null );
 		}
 
 		public BRTPFServerForTest( final String baseURL ) {
 			super( NodeFactory.createURI("http://example.org/brtpf"),
 			       baseURL,
+			       null,
 			       null );
 		}
 	}
@@ -94,12 +101,14 @@ public abstract class FederationTestBase
 	{
 		public Neo4jServerForTest() {
 			super( NodeFactory.createURI("http://example.org/neo"),
-			       "http://localhost:7474/db/neo4j/tx" );
+			       "http://localhost:7474/db/neo4j/tx",
+			       null );
 		}
 
 		public Neo4jServerForTest( final String baseURL ) {
 			super( NodeFactory.createURI("http://example.org/neo"),
-			       baseURL );
+			       baseURL,
+			       null );
 		}
 	}
 
@@ -108,19 +117,22 @@ public abstract class FederationTestBase
 		public RESTEndpointForTest() {
 			super( NodeFactory.createURI("http://example.org/rest"),
 			       "http://example.org/",
-			       List.of() );
+			       List.of(),
+			       null );
 		}
 
 		public RESTEndpointForTest( final String urlTemplate, final List<Parameter> params ) {
 			super( NodeFactory.createURI("http://example.org/rest"),
 			       urlTemplate,
-			       params );
+			       params,
+			       null );
 		}
 
 		public RESTEndpointForTest( final String baseURL, final String urlTemplate, final List<Parameter> params ) {
 			super( NodeFactory.createURI(baseURL),
 			       urlTemplate,
-			       params );
+			       params,
+			       null );
 		}
 	}
 
@@ -129,12 +141,14 @@ public abstract class FederationTestBase
 		public GraphQLEndpointForTest() {
 			super( NodeFactory.createURI("http://example.org/graphql"),
 			       "http://example.org/",
+			       null,
 			       new EmptyGraphQLSchema() );
 		}
 
 		public GraphQLEndpointForTest( final String url ) {
 			super( NodeFactory.createURI("http://example.org/graphl"),
 			       url,
+			       null,
 			       new EmptyGraphQLSchema() );
 		}
 	}
