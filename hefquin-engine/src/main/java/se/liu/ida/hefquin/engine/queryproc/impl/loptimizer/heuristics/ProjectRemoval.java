@@ -71,12 +71,4 @@ public class ProjectRemoval implements HeuristicForLogicalOptimization
 
 		return LogicalPlanUtils.createPlanWithSubPlans(rootOp, null, newSubPlans);
 	}
-
-	protected LogicalPlan removeProjectIfNecessary( final LogicalPlan plan ) {
-		if ( plan.getRootOperator() instanceof LogicalOpProject op && ! op.mayReduce() )
-			return plan.getSubPlan(0);
-
-		return plan;
-	}
-
 }
