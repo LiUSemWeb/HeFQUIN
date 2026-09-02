@@ -12,9 +12,6 @@ import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
@@ -37,24 +34,20 @@ public abstract class FederationAccessManagerBase2 extends FederationAccessManag
 			final SPARQLRequestProcessor reqProcSPARQL,
 			final TPFRequestProcessor reqProcTPF,
 			final BRTPFRequestProcessor reqProcBRTPF,
-			final Neo4jRequestProcessor reqProcNeo4j,
-			final RESTRequestProcessor reqProcREST,
-			final GraphQLRequestProcessor reqProcGraphQL )
+			final List<RequestProcessor<?,?,?>> otherReqProcessors )
 	{
 		assert reqProcSPARQL  != null;
 		assert reqProcTPF     != null;
 		assert reqProcBRTPF   != null;
-		assert reqProcNeo4j   != null;
-		assert reqProcREST    != null;
-		assert reqProcGraphQL != null;
 
 		this.reqProcSPARQL    = reqProcSPARQL;
 		this.reqProcTPF       = reqProcTPF;
 		this.reqProcBRTPF     = reqProcBRTPF;
 
-		reqProcessors.add(reqProcREST);
-		reqProcessors.add(reqProcNeo4j);
-		reqProcessors.add(reqProcGraphQL);
+		for ( final RequestProcessor<?,?,?> reqProc : otherReqProcessors ) {
+			assert reqProc != null;
+			reqProcessors.add(reqProc);
+		}
 	}
 
 	protected < ReqType extends DataRetrievalRequest,

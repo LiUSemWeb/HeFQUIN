@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.federation.access.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 
 import se.liu.ida.hefquin.base.datastructures.Cache;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
@@ -29,12 +28,6 @@ import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessorImpl;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessorImpl;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessorImpl;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessorImpl;
 
 public class FederationAccessManagerWithCache implements FederationAccessManager
 {
@@ -69,24 +62,6 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	                                         final int cacheCapacity )
 	{
 		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
-	}
-
-	/**
-	 * Creates a {@link FederationAccessManagerWithCache} with a default configuration.
-	 */
-	public FederationAccessManagerWithCache( final ExecutorService execService )
-	{
-		this( new AsyncFederationAccessManagerImpl(
-		      execService,
-			  10,
-		      new SPARQLRequestProcessorImpl(),
-		      new TPFRequestProcessorImpl(),
-		      new BRTPFRequestProcessorImpl(),
-		      new Neo4jRequestProcessorImpl(),
-		      new RESTRequestProcessorImpl(),
-		      new GraphQLRequestProcessorImpl()),
-		      100,
-		      new MyDefaultCachePolicies() );
 	}
 
 

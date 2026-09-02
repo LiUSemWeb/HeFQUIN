@@ -93,9 +93,10 @@ public class ExecOpRequestTPFTest extends ExecOpTestBase
 			new SPARQLRequestProcessorImpl(),
 			new TPFRequestProcessorImpl(),
 			new BRTPFRequestProcessorImpl(),
-			new Neo4jRequestProcessorImpl(),
-			new RESTRequestProcessorImpl(),
-			new GraphQLRequestProcessorImpl() );
+			List.of(
+				new Neo4jRequestProcessorImpl(),
+				new RESTRequestProcessorImpl(),
+				new GraphQLRequestProcessorImpl() ) );
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerWithCache(internalFedAccMgr, 100);
 
 		final QueryProcContextExt ctx = new QueryProcContextExt() {

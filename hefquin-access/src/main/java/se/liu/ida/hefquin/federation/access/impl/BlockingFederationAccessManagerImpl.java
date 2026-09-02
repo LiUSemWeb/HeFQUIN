@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.federation.access.impl;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -24,10 +25,8 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 			final SPARQLRequestProcessor reqProcSPARQL,
 			final TPFRequestProcessor reqProcTPF,
 			final BRTPFRequestProcessor reqProcBRTPF,
-			final Neo4jRequestProcessor reqProcNeo4j,
-			final RESTRequestProcessor reqProcREST,
-			final GraphQLRequestProcessor reqProcGraphQL ) {
-		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j, reqProcREST, reqProcGraphQL);
+			final List<RequestProcessor<?,?,?>> otherRequestProcessors ) {
+		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF, otherRequestProcessors);
 	}
 
 	@Override
