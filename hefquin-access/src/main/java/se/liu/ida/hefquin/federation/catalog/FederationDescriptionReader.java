@@ -35,6 +35,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphql.impl.GraphQLSchemaInitializerImpl;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.BasicAuthenticationInformation;
 import se.liu.ida.hefquin.federation.authentication.BearerAuthenticationInformation;
 import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
@@ -399,9 +400,12 @@ public class FederationDescriptionReader
 	/**
 	 * Parses the authentication configuration associated with the given interface.
 	 * <p>
-	 * Currently, only the {@code wotsec:BearerSecurityScheme} is supported. The
-	 * environment variable containing the bearer token is specified using
-	 * {@code fd:envarForToken}.
+	 * Currently, both {@code wotsec:BearerSecurityScheme} and
+	 * {@code wotsec:BasicSecurityScheme} are supported. For bearer authentication,
+	 * the environment variable containing the token is specified using
+	 * {@code fd:envarForToken}. For basic authentication, the environment variables
+	 * containing the username and password are specified using {@code fd:envarForUsername}
+	 * and {@code fd:envarForPassword}. Only header-based authentication is supported.
 	 *
 	 * @param iface the interface resource whose authentication configuration should
 	 *              be parsed
@@ -426,25 +430,35 @@ public class FederationDescriptionReader
 		final Resource securityScheme = securityConfig.asResource();
 
 		if ( securityScheme.hasProperty( RDF.type, WoTSecVocab.BearerSecurityScheme ) ) {
-			final String inValue =
-					ModelUtils.getSingleOptionalProperty_XSDString(
-							securityScheme,
-							WoTSecVocab.in );
-
-			if ( inValue != null && ! "header".equals(inValue) )
-				throw new IllegalArgumentException( "Only header-based bearer authentication is supported." );
+			requireHeaderBasedAuthentication( securityScheme, "bearer" );
 
 			final String tokenEnv =
 				ModelUtils.getSingleMandatoryProperty_XSDString(
 					securityScheme,
 					FDVocab.envarForToken );
 
-			final String token = getEnvironmentVariable( tokenEnv );
-
-			if ( token == null )
-				throw new IllegalArgumentException( "Environment variable '" + tokenEnv + "' is not set." );
+			final String token = getRequiredEnvironmentVariable( tokenEnv );
 
 			return new BearerAuthenticationInformation( token );
+		}
+		else if ( securityScheme.hasProperty( RDF.type, WoTSecVocab.BasicSecurityScheme ) ) {
+			requireHeaderBasedAuthentication( securityScheme, "basic" );
+
+			final String usernameEnv =
+				ModelUtils.getSingleMandatoryProperty_XSDString(
+					securityScheme,
+					FDVocab.envarForUsername );
+
+			final String username = getRequiredEnvironmentVariable( usernameEnv );
+
+			final String passwordEnv =
+				ModelUtils.getSingleMandatoryProperty_XSDString(
+					securityScheme,
+					FDVocab.envarForPassword );
+
+			final String password = getRequiredEnvironmentVariable( passwordEnv );
+
+			return new BasicAuthenticationInformation( username, password );
 		}
 
 		throw new IllegalArgumentException( "Unsupported security scheme: " + securityScheme );
@@ -601,13 +615,34 @@ public class FederationDescriptionReader
 	}
 
 	/**
-	 * Retrieves the value of the specified environment variable.
+	 * Checks whether the given security scheme specifies HTTP headers as the
+	 * location for authentication information.
+	*/
+	protected void requireHeaderBasedAuthentication( final Resource securityScheme, final String authenticationType ) {
+		final String inValue =
+				ModelUtils.getSingleOptionalProperty_XSDString(
+				securityScheme,
+				WoTSecVocab.in );
+
+		if ( inValue != null && ! "header".equals(inValue) )
+			throw new IllegalArgumentException( "Only header-based " + authenticationType + " authentication is supported." );
+	}
+
+	/**
+	 * Retrieves the value of the specified environment variable and throws an
+	 * exception if the variable is not set.
 	 *
-	 * @param tokenEnvName the name of the environment variable
-	 * @return the value of the environment variable, or {@code null} if it is not set
-	 */
-	protected String getEnvironmentVariable( final String tokenEnvName ) {
-		return System.getenv( tokenEnvName );
+	 * @param variableName the name of the environment variable
+	 * @return the value of the environment variable
+	 * @throws IllegalArgumentException if the environment variable is not set
+*/
+	protected String getRequiredEnvironmentVariable( final String variableName ) {
+		final String value = System.getenv( variableName );
+
+		if ( value == null )
+			throw new IllegalArgumentException( "Environment variable '" + variableName + "' is not set." );
+
+		return value;
 	}
 
 }
