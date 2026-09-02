@@ -16,7 +16,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - More user-friendly printing of exceptions in the CLI program, including support of the --debug argument for printing the full stack traces ([#699](https://github.com/LiUSemWeb/HeFQUIN/issues/699)).
 - Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/issues/675)).
 - Bug fix: adding hashCode() function to the Pair class to avoid unnecessary cache misses in FederationManagerWithCache ([#679](https://github.com/LiUSemWeb/HeFQUIN/issues/679)).
-- Merge the various constructors of AsyncFederationAccessManagerImpl into one ([#697](https://github.com/LiUSemWeb/HeFQUIN/issues/697)).
+- Merge the various constructors of AsyncFederationAccessManagerImpl into one ([#697](https://github.com/LiUSemWeb/HeFQUIN/issues/697), [#700](https://github.com/LiUSemWeb/HeFQUIN/issues/700)).
 ### Planned for Next Release
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
 
