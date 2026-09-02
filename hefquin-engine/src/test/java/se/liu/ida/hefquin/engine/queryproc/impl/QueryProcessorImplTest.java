@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +71,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/s"),
 				NodeFactory.createURI("http://example.org/p"),
 				NodeFactory.createURI("http://example.org/o")) );
-		
+
 		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest(dataForMember) );
 
@@ -154,7 +155,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/s"),
 				NodeFactory.createURI("http://example.org/p2"),
 				NodeFactory.createURI("http://example.org/o2")) );
-		
+
 		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org/tpf1", new TPFServerForTest(dataForMember1) );
 		fedCat.addMember( "http://example.org/tpf2", new TPFServerForTest(dataForMember2) );
@@ -201,7 +202,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/s"),
 				NodeFactory.createURI("http://example.org/p1"),
 				NodeFactory.createURI("http://example.org/o2")) );
-		
+
 		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org/tpf1", new TPFServerForTest(dataForMember1) );
 		fedCat.addMember( "http://example.org/tpf2", new TPFServerForTest(dataForMember2) );
@@ -252,7 +253,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/s2"),
 				NodeFactory.createURI("http://example.org/p"),
 				NodeFactory.createURI("http://example.org/o2")) );
-		
+
 		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest(dataForMember) );
 
@@ -292,7 +293,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/s2"),
 				NodeFactory.createURI("http://example.org/p"),
 				NodeFactory.createURI("http://example.org/o2")) );
-		
+
 		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest(dataForMember) );
 
@@ -342,9 +343,10 @@ public class QueryProcessorImplTest extends EngineTestBase
 			final FederationAccessManager fedAccessMgr = new BlockingFederationAccessManagerImpl(reqProcSPARQL,
 			                                                                                     reqProcTPF,
 			                                                                                     reqProcBRTPF,
-			                                                                                     reqProcNeo4j,
-			                                                                                     reqProcREST,
-			                                                                                     reqProcGraphQL);
+			                                                                                     List.of(
+			                                                                                         reqProcNeo4j,
+			                                                                                         reqProcREST,
+			                                                                                         reqProcGraphQL ));
 
 			// executing the tested method
 			final Iterator<SolutionMapping> it = processQuery(queryString, fedCat, fedAccessMgr);

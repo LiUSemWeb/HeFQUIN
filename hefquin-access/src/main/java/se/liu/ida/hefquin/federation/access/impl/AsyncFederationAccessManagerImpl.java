@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.federation.access.impl;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -12,9 +13,6 @@ import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
 
@@ -38,10 +36,8 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 			final SPARQLRequestProcessor reqProcSPARQL,
 			final TPFRequestProcessor reqProcTPF,
 			final BRTPFRequestProcessor reqProcBRTPF,
-			final Neo4jRequestProcessor reqProcNeo4j,
-			final RESTRequestProcessor reqProcREST,
-			final GraphQLRequestProcessor reqProcGraphQL ) {
-		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j, reqProcREST, reqProcGraphQL);
+			final List<RequestProcessor<?,?,?>> otherRequestProcessors ) {
+		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF, otherRequestProcessors);
 
 		assert execService != null;
 		threadPool = execService;
