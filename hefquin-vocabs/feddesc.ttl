@@ -131,6 +131,11 @@ fd:mappingConfiguration a owl:ObjectProperty ;
     rdfs:label "mapping configuration"@en ;
     rdfs:comment "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, PG)."@en .
 
+fd:parallelRequestLimit a owl:DatatypeProperty ;
+    rdfs:domain fd:FederationMember ;
+    rdfs:range  xsd:integer ;
+    rdfs:label "parallel request limit"@en ;
+    rdfs:comment "Parallel request limit per federation member"@en .
 
 ### ===== INSTANCES =====
 
