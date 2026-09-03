@@ -63,6 +63,10 @@ fd:DataRetrievalProtocol a owl:Class ;
     rdfs:label "Data Retrieval Protocol"@en ;
     rdfs:comment "Instances of this class represent the different protocols to be used when interacting with the interface of a federation member."@en .
 
+fd:TokenBasedSecurityScheme a owl:Class ;
+    rdfs:label "Token-based Security Scheme"@en ;
+    rdfs:comment "A security scheme that uses a token to authenticate requests."@en .
+
 ### ===== PROPERTY DECLARATIONS =====
 
 fd:serviceURI a owl:DatatypeProperty ;
