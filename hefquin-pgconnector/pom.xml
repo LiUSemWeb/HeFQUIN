@@ -7,7 +7,7 @@
     <artifactId>hefquin</artifactId>
     <version>0.0.13-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>hefquin-pgconnector</artifactId>
 
   <!-- Project Meta Data -->
@@ -46,6 +46,20 @@
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-base</artifactId>
       <version>0.0.13-SNAPSHOT</version>
+    </dependency>
+    <!-- hefquin-access -->
+    <dependency>
+      <groupId>se.liu.research.hefquin</groupId>
+      <artifactId>hefquin-access</artifactId>
+      <version>0.0.13-SNAPSHOT</version>
+    </dependency>
+    <!-- hefquin-access (test-jar) -->
+    <dependency>
+      <groupId>se.liu.research.hefquin</groupId>
+      <artifactId>hefquin-access</artifactId>
+      <version>0.0.13-SNAPSHOT</version>
+      <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>

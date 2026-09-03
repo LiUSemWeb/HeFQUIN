@@ -59,12 +59,6 @@
       <artifactId>hefquin-rml</artifactId>
       <version>0.0.13-SNAPSHOT</version>
     </dependency>
-    <!-- hefquin-pgconnector -->
-    <dependency>
-      <groupId>se.liu.research.hefquin</groupId>
-      <artifactId>hefquin-pgconnector</artifactId>
-      <version>0.0.13-SNAPSHOT</version>
-    </dependency>
     <!-- hefquin-graphqlconnector -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
@@ -90,4 +84,21 @@
       <version>1.21.0</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Package test classes in a separate JAR for use by tests in other modules -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
