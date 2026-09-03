@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpg;
+package se.liu.ida.hefquin.engine.wrappers.lpg.access;
 
 import java.util.List;
 

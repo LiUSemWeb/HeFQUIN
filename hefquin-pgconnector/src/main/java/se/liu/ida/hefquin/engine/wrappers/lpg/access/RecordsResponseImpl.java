@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpg;
+package se.liu.ida.hefquin.engine.wrappers.lpg.access;
 
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
 import se.liu.ida.hefquin.federation.access.impl.response.DataRetrievalResponseBase;

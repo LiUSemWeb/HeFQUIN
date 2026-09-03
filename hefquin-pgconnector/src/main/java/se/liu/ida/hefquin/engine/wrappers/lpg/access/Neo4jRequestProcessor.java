@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpg.reqproc;
+package se.liu.ida.hefquin.engine.wrappers.lpg.access;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;

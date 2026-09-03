@@ -37,9 +37,9 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterI
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
-import se.liu.ida.hefquin.engine.wrappers.lpg.RecordsResponse;
-import se.liu.ida.hefquin.engine.wrappers.lpg.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.engine.wrappers.lpg.reqproc.Neo4jRequestProcessorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.Neo4jRequestProcessor;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.Neo4jRequestProcessorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.RecordsResponse;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;

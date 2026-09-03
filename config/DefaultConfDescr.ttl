@@ -34,10 +34,9 @@ _:bFederationAccessManager rdf:type ec:FederationAccessManager ;
             [
               ec:elementsTypeName "se.liu.ida.hefquin.federation.access.impl.RequestProcessor" ;
               ec:elements (
-                [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor" ;
-                ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessorImpl" ]
-                [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessor" ;
-                ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessorImpl" ]
+                [ ec:javaClassName "se.liu.ida.hefquin.engine.wrappers.lpg.access.Neo4jRequestProcessorImpl" ]
+                [ ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessorImpl" ]
+                [ ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessorImpl" ]
               )
             ]
           )

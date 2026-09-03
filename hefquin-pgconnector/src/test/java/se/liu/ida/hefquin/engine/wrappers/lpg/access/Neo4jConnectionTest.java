@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpg.conn;
+package se.liu.ida.hefquin.engine.wrappers.lpg.access;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.wrappers.lpg.Neo4jException;
-import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory.Neo4jConnection;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.Neo4jConnectionFactory.Neo4jConnection;
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.impl.LPGEdgeValue;

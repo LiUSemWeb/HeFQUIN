@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpg.reqproc;
+package se.liu.ida.hefquin.engine.wrappers.lpg.access;
 
 import org.junit.Test;
 
