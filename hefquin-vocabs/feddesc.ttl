@@ -65,7 +65,7 @@ fd:DataRetrievalProtocol a owl:Class ;
 
 fd:TokenBasedSecurityScheme a owl:Class ;
     rdfs:label "Token-based Security Scheme"@en ;
-    rdfs:comment "A security scheme that uses a token to authenticate requests."@en .
+    rdfs:comment "A security scheme that uses a token to authenticate requests, similar to wotsec:BearerSecurityScheme but with the option to specify the name of the scheme to be mentioned in the request header (where wotsec:BearerSecurityScheme uses the fixed string 'Bearer'). To specify the name use the wotsec;name property. Otherwise, this class can be used exactly like wotsec:BearerSecurityScheme. Especially, every instance of this class must have an fd:envarForToken property and the value of the wotsec:in property, if given, must be the string 'header'."@en .
 
 ### ===== PROPERTY DECLARATIONS =====
 
