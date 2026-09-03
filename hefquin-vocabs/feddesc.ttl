@@ -5,6 +5,7 @@
 @prefix dc:     <http://purl.org/dc/elements/1.1/> .
 @prefix fd:     <http://w3id.org/hefquin/feddesc#> .
 @prefix hydra:  <http://www.w3.org/ns/hydra/core#> .
+@prefix wotsec: <https://www.w3.org/2019/wot/security#> .
 
 <http://w3id.org/hefquin/feddesc>
     rdf:type owl:Ontology ;
@@ -64,6 +65,7 @@ fd:DataRetrievalProtocol a owl:Class ;
     rdfs:comment "Instances of this class represent the different protocols to be used when interacting with the interface of a federation member."@en .
 
 fd:TokenBasedSecurityScheme a owl:Class ;
+    rdfs:subClassOf wotsec:SecurityScheme ;
     rdfs:label "Token-based Security Scheme"@en ;
     rdfs:comment "A security scheme that uses a token to authenticate requests, similar to wotsec:BearerSecurityScheme but with the option to specify the name of the scheme to be mentioned in the request header (where wotsec:BearerSecurityScheme uses the fixed string 'Bearer'). To specify the name use the wotsec;name property. Otherwise, this class can be used exactly like wotsec:BearerSecurityScheme. Especially, every instance of this class must have an fd:envarForToken property and the value of the wotsec:in property, if given, must be the string 'header'."@en .
 
