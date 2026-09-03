@@ -135,7 +135,7 @@ fd:parallelRequestLimit a owl:DatatypeProperty ;
     rdfs:domain fd:FederationMember ;
     rdfs:range  xsd:integer ;
     rdfs:label "parallel request limit"@en ;
-    rdfs:comment "Parallel request limit per federation member"@en .
+    rdfs:comment "Specifies a limit on the number of requests that HeFQUIN sends in parallel to the federation member. If the limit is reached and further requests are to be sent, these requests are queued until the number of currently active requests drops below the limit."@en .
 
 ### ===== INSTANCES =====
 
