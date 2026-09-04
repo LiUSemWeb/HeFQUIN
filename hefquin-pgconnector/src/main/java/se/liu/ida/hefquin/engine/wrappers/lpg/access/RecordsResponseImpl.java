@@ -1,7 +1,7 @@
-package se.liu.ida.hefquin.federation.access.impl.response;
+package se.liu.ida.hefquin.engine.wrappers.lpg.access;
 
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
-import se.liu.ida.hefquin.federation.access.RecordsResponse;
+import se.liu.ida.hefquin.federation.access.impl.response.DataRetrievalResponseBase;
 
 import java.util.Date;
 import java.util.List;

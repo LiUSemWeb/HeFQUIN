@@ -25,9 +25,9 @@ import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpg.Record2SolutionMappingTranslator;
 import se.liu.ida.hefquin.engine.wrappers.lpg.SPARQL2CypherTranslationResult;
 import se.liu.ida.hefquin.engine.wrappers.lpg.SPARQLStar2CypherTranslator;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.Neo4jConnectionFactory;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.Neo4jConnectionFactory.Neo4jConnection;
 import se.liu.ida.hefquin.engine.wrappers.lpg.conf.LPG2RDFConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory;
-import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory.Neo4jConnection;
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpg.impl.Record2SolutionMappingTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpg.impl.SPARQL2CypherTranslationResultImpl;
@@ -53,7 +53,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected final ArgDecl argPrintCypher = new ArgDecl(ArgDecl.NoValue, "printCypherQuery");
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
 	protected final ArgDecl argSkipExecution = new ArgDecl(ArgDecl.NoValue, "skipExecution");
-	
+
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j( args ).mainRun();
 	}

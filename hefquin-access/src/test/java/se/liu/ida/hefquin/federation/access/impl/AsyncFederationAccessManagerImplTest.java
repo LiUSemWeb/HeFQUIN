@@ -23,18 +23,15 @@ import se.liu.ida.hefquin.federation.access.*;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.response.JSONResponseImpl;
-import se.liu.ida.hefquin.federation.access.impl.response.RecordsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.StringResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
-import se.liu.ida.hefquin.federation.members.Neo4jServer;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
@@ -190,7 +187,6 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		final SPARQLRequestProcessor reqProc = new MySPARQLRequestProcessor(sleepMillis);
 		final TPFRequestProcessor reqProcTPF = new MyTPFRequestProcessor(sleepMillis);
 		final BRTPFRequestProcessor reqProcBRTPF = new MyBRTPFRequestProcessor(sleepMillis);
-		final Neo4jRequestProcessor reqProcNeo4j = new MyNeo4jRequestProcessor(sleepMillis);
 		final RESTRequestProcessor reqProcREST = new MyRESTRequestProcessor(sleepMillis);
 		final GraphQLRequestProcessor reqProcGraphQL = new MyGraphQLRequestProcessor(sleepMillis);
 
@@ -200,7 +196,6 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		                                            reqProcTPF,
 		                                            reqProcBRTPF,
 		                                            List.of(
-		                                                reqProcNeo4j,
 		                                                reqProcREST,
 		                                                reqProcGraphQL )
 		                                            );
@@ -279,17 +274,6 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm ) {
 			sleep();
 			return new TPFResponseImpl( new ArrayList<>(), new ArrayList<>(), "dummy next page", new Date() );
-		}
-	}
-
-	protected static class MyNeo4jRequestProcessor extends FakeRequestProcessorBase
-	                                              implements Neo4jRequestProcessor
-	{
-		public MyNeo4jRequestProcessor( final long sleepMillis ) { super( sleepMillis ); }
-
-		@Override
-		public RecordsResponse performRequest( final Neo4jRequest req, final Neo4jServer fm ) {
-			return new RecordsResponseImpl( new ArrayList<>(), new Date() );
 		}
 	}
 

@@ -1,11 +1,8 @@
-package se.liu.ida.hefquin.federation.access.impl.reqproc;
+package se.liu.ida.hefquin.engine.wrappers.lpg.access;
 
 import se.liu.ida.hefquin.engine.wrappers.lpg.Neo4jException;
-import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionException;
-import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory;
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
 import se.liu.ida.hefquin.federation.access.*;
-import se.liu.ida.hefquin.federation.access.impl.response.RecordsResponseImpl;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
 
 import java.util.Date;
