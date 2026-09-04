@@ -444,7 +444,7 @@ public class FederationDescriptionReader
 		else if ( securityScheme.hasProperty( RDF.type, FDVocab.TokenBasedSecurityScheme ) ) {
 			requireHeaderBasedAuthentication( securityScheme, "token" );
 
-			final String tokenSecurityScheme =
+			final String authenticationScheme =
 				ModelUtils.getSingleMandatoryProperty_XSDString(
 					securityScheme,
 					WoTSecVocab.name );
@@ -456,7 +456,7 @@ public class FederationDescriptionReader
 
 			final String token = getRequiredEnvironmentVariable( tokenEnv );
 
-			return new TokenBasedAuthenticationInformation( tokenSecurityScheme, token );
+			return new TokenBasedAuthenticationInformation( authenticationScheme, token );
 		}
 		else if ( securityScheme.hasProperty( RDF.type, WoTSecVocab.BasicSecurityScheme ) ) {
 			requireHeaderBasedAuthentication( securityScheme, "basic" );
