@@ -10,23 +10,32 @@ public interface TPFResponse extends TriplesResponse
 	/**
 	 * Returns the number of triples contained in this response,
 	 * which considers both the payload and the metadata.
+	 *
+	 * @throws UnsupportedOperationDueToRetrievalError if the response to the
+	 * corresponding request was an error message (see {@link #isError()}) or
+	 * the response is defective (see {@link #isDefective()}).
 	 */
 	default int getSize() throws UnsupportedOperationDueToRetrievalError {
 		return getPayloadSize() + getMetadataSize();
 	}
 
 	/**
-	 * While {@link #getResponseData()} returns an iterator over all triples contained in the given TPF response,this method
-	 * here returns an iterator only over the matching triples that have been requested.
+	 * While {@link #getResponseData()} returns an iterator over all triples
+	 * contained in the given TPF response, this method here returns an
+	 * iterator only over the matching triples that have been requested.
 	 *
-	 * @throws UnsupportedOperationDueToRetrievalError
+	 * @throws UnsupportedOperationDueToRetrievalError if the response to the
+	 * corresponding request was an error message (see {@link #isError()}) or
+	 * the response is defective (see {@link #isDefective()}).
 	 */
 	Iterable<Triple> getPayload() throws UnsupportedOperationDueToRetrievalError;
 
 	/**
 	 * Returns the number of triples that are returned by {@link #getPayload()}.
 	 *
-	 * @throws UnsupportedOperationDueToRetrievalError
+	 * @throws UnsupportedOperationDueToRetrievalError if the response to the
+	 * corresponding request was an error message (see {@link #isError()}) or
+	 * the response is defective (see {@link #isDefective()}).
 	 */
 	default int getPayloadSize() throws UnsupportedOperationDueToRetrievalError {
 		final Iterable<Triple> triples = getPayload();
@@ -42,14 +51,23 @@ public interface TPFResponse extends TriplesResponse
 	}
 
 	/**
-	 * Returns an iterator over all metadata triples contained in the given TPF response.
+	 * Returns an iterator over all metadata triples contained in the given
+	 * TPF response.
+	 *
+	 * @throws UnsupportedOperationDueToRetrievalError if the response to the
+	 * corresponding request was an error message (see {@link #isError()}) or
+	 * the response is defective (see {@link #isDefective()}).
 	 */
-	Iterable<Triple> getMetadata();
+	Iterable<Triple> getMetadata() throws UnsupportedOperationDueToRetrievalError;
 
 	/**
-	 * Returns the number of triples that are returned by {@link #getMetadata()}. 
+	 * Returns the number of triples that are returned by {@link #getMetadata()}.
+	 *
+	 * @throws UnsupportedOperationDueToRetrievalError if the response to the
+	 * corresponding request was an error message (see {@link #isError()}) or
+	 * the response is defective (see {@link #isDefective()}).
 	 */
-	default int getMetadataSize(){
+	default int getMetadataSize() throws UnsupportedOperationDueToRetrievalError {
 		final Iterable<Triple> triples = getMetadata();
 		if ( triples instanceof Collection c ) {
 			return c.size();
@@ -67,19 +85,31 @@ public interface TPFResponse extends TriplesResponse
 	 * indicates that this response is the last page of matching triples.
 	 *
 	 * Returns <code>null</code> of there is no metadata related to paging.
+	 *
+	 * @throws UnsupportedOperationDueToRetrievalError if the response to the
+	 * corresponding request was an error message (see {@link #isError()}) or
+	 * the response is defective (see {@link #isDefective()}).
 	 */
-	Boolean isLastPage();
+	Boolean isLastPage() throws UnsupportedOperationDueToRetrievalError;
 
 	/**
 	 * Returns the URL via which the next page of the TPF can be requested.
 	 * Returns <code>null</code> of no such URL is mentioned in the metadata.
+	 *
+	 * @throws UnsupportedOperationDueToRetrievalError if the response to the
+	 * corresponding request was an error message (see {@link #isError()}) or
+	 * the response is defective (see {@link #isDefective()}).
 	 */
-	String getNextPageURL();
+	String getNextPageURL() throws UnsupportedOperationDueToRetrievalError;
 
 	/**
 	 * Returns the cardinality estimate provided as metadata in the given
 	 * TPF response. Returns <code>null</code> if there is no metadata
 	 * with a cardinality estimate.
+	 *
+	 * @throws UnsupportedOperationDueToRetrievalError if the response to the
+	 * corresponding request was an error message (see {@link #isError()}) or
+	 * the response is defective (see {@link #isDefective()}).
 	 */
-	Integer getCardinalityEstimate();
+	Integer getCardinalityEstimate() throws UnsupportedOperationDueToRetrievalError;
 }

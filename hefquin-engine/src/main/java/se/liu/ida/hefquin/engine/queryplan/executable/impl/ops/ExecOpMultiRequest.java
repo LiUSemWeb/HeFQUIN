@@ -3,7 +3,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
@@ -81,6 +83,7 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 	private List<Long> requestDurationsInMS = new ArrayList<>();
 	private List<Integer> numOfSolMapsRetrievedPerReq = new ArrayList<>();
 	private long numberOfOutputMappingsProduced = 0L;
+	private int numberOfRequestsCompleted = 0;
 
 	public ExecOpMultiRequest( final SPARQLRequest req,
 	                           final Var serviceVar,
@@ -168,12 +171,20 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 		// they are, the execution of this operator is finished.
 		final CompletableFuture<?> combinedFuture = CompletableFuture.allOf(futures);
 		try {
-			combinedFuture.get();
+			combinedFuture.join();
 		}
+/*
 		catch ( final InterruptedException e ) {
 			throw new ExecOpExecutionException("Interruption of the futures that perform the requests and process the responses", e, this);
 		}
 		catch ( final ExecutionException e ) {
+			throw new ExecOpExecutionException("The execution of the futures that perform the requests and process the responses caused an exception.", e, this);
+		}
+*/
+		catch ( final CancellationException e ) {
+			throw new ExecOpExecutionException("The futures that perform the requests and process the responses were cancelled.", e, this);
+		}
+		catch ( final CompletionException e ) {
 			throw new ExecOpExecutionException("The execution of the futures that perform the requests and process the responses caused an exception.", e, this);
 		}
 
@@ -230,6 +241,7 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 			requestDurationsInMS.clear();
 			numOfSolMapsRetrievedPerReq.clear();
 			numberOfOutputMappingsProduced = 0L;
+			numberOfRequestsCompleted = 0;
 		}
 	}
 
@@ -244,6 +256,7 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 		int maxNumOfSolMapsRetrievedPerReq = Integer.MIN_VALUE;
 		final long totalNumOfSolMapsRetrieved;
 		final long outputSize;
+		final int _numberOfRequestsCompleted;
 		synchronized (requestDurationsInMS) {
 			long sumRequestDuration = 0L;
 			for ( final long x : requestDurationsInMS ) {
@@ -262,10 +275,13 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 			avgRequestDurationInMS = sumRequestDuration / requestDurationsInMS.size();
 			avgNumOfSolMapsRetrievedPerReq = sumSolMapsRetrieved / numOfSolMapsRetrievedPerReq.size();
 			totalNumOfSolMapsRetrieved = sumSolMapsRetrieved;
+
 			outputSize = numberOfOutputMappingsProduced;
+			_numberOfRequestsCompleted = numberOfRequestsCompleted;
 		}
 
 		s.put( "numberOfRequestsIssued",          Integer.valueOf(numberOfRequestsIssued) );
+		s.put( "numberOfRequestsCompleted",       Integer.valueOf(_numberOfRequestsCompleted) );
 		s.put( "avgRequestDurationInMS",          Double.valueOf(avgRequestDurationInMS) );
 		s.put( "minRequestDurationInMS",          Long.valueOf(minRequestDurationInMS) );
 		s.put( "maxRequestDurationInMS",          Long.valueOf(maxRequestDurationInMS) );
@@ -327,6 +343,7 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 				requestDurationsInMS.add( response.getRequestDuration().toMillis() );
 				numOfSolMapsRetrievedPerReq.add(cntIn);
 				numberOfOutputMappingsProduced += cntOut;
+				numberOfRequestsCompleted++;
 			}
 
 			log.info("Retrieved {} solution mappings from the endpoint with service URI {}, and produced {} output solution mappings from them", cntIn, serviceURI, cntOut);
