@@ -137,6 +137,11 @@ fd:mappingConfiguration a owl:ObjectProperty ;
     rdfs:label "mapping configuration"@en ;
     rdfs:comment "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, PG)."@en .
 
+fd:parallelRequestLimit a owl:DatatypeProperty ;
+    rdfs:domain fd:FederationMember ;
+    rdfs:range  xsd:integer ;
+    rdfs:label "parallel request limit"@en ;
+    rdfs:comment "Specifies a limit on the number of requests that HeFQUIN sends in parallel to the federation member. If the limit is reached and further requests are to be sent, these requests are queued until the number of currently active requests drops below the limit."@en .
 
 ### ===== INSTANCES =====
 
