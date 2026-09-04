@@ -36,7 +36,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphql.impl.GraphQLSchemaInitializerI
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.authentication.BasicAuthenticationInformation;
-import se.liu.ida.hefquin.federation.authentication.BearerAuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.TokenBasedAuthenticationInformation;
 import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.impl.BRTPFServerImpl;
@@ -439,7 +439,24 @@ public class FederationDescriptionReader
 
 			final String token = getRequiredEnvironmentVariable( tokenEnv );
 
-			return new BearerAuthenticationInformation( token );
+			return new TokenBasedAuthenticationInformation( token );
+		}
+		else if ( securityScheme.hasProperty( RDF.type, FDVocab.TokenBasedSecurityScheme ) ) {
+			requireHeaderBasedAuthentication( securityScheme, "token" );
+
+			final String tokenSecurityScheme =
+				ModelUtils.getSingleMandatoryProperty_XSDString(
+					securityScheme,
+					WoTSecVocab.name );
+
+			final String tokenEnv =
+				ModelUtils.getSingleMandatoryProperty_XSDString(
+					securityScheme,
+					FDVocab.envarForToken );
+
+			final String token = getRequiredEnvironmentVariable( tokenEnv );
+
+			return new TokenBasedAuthenticationInformation( tokenSecurityScheme, token );
 		}
 		else if ( securityScheme.hasProperty( RDF.type, WoTSecVocab.BasicSecurityScheme ) ) {
 			requireHeaderBasedAuthentication( securityScheme, "basic" );
