@@ -10,6 +10,7 @@ import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
  * <p>
  * The token is applied to outgoing HTTP requests using an
  * {@code Authorization} header with the configured authentication scheme.
+ * If no authentication scheme is specified, {@code Bearer} is used by default.
  * This class supports applying the authentication information to different
  * HTTP request representations used by HeFQUIN.
  */
