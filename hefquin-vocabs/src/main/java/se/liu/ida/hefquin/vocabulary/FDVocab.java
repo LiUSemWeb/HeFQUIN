@@ -160,6 +160,16 @@ public class FDVocab {
      */
     public static final Resource TemplateBasedInterface = M_MODEL.createResource( "http://w3id.org/hefquin/feddesc#TemplateBasedInterface" );
     
+    /** <p>A security scheme that uses a token to authenticate requests, similar to wotsec:BearerSecurityScheme 
+     *  but with the option to specify the name of the scheme to be mentioned in the 
+     *  request header (where wotsec:BearerSecurityScheme uses the fixed string 'Bearer'). 
+     *  To specify the name use the wotsec;name property. Otherwise, this class can 
+     *  be used exactly like wotsec:BearerSecurityScheme. Especially, every instance 
+     *  of this class must have an fd:envarForToken property and the value of the 
+     *  wotsec:in property, if given, must be the string 'header'.</p>
+     */
+    public static final Resource TokenBasedSecurityScheme = M_MODEL.createResource( "http://w3id.org/hefquin/feddesc#TokenBasedSecurityScheme" );
+    
     /** <p>A federation member that provides access to non-RDF data, for which it is 
      *  associated with a wrapper that defines and RDF view of the data of that federation 
      *  member. In addition to the properties that are expected for any kind of federation 
