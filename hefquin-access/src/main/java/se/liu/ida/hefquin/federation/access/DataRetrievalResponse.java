@@ -105,7 +105,10 @@ public interface DataRetrievalResponse<T>
 	 * In case that issuing the request that was supposed to result in this
 	 * response failed with an exception or reading the data obtained via
 	 * the request failed with an exception, this method returns that
-	 * exception; otherwise it returns {@code null}.
+	 * exception; otherwise it returns {@code null}. The exception returned
+	 * by this method (if any) should have a message that contains the right
+	 * amount of detail to be shown to the user as part of an explanation
+	 * that the query result produced by HeFQUIN may be incomplete.
 	 */
 	Exception getException();
 }

@@ -271,7 +271,7 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 			if ( ! simulateError ) {
 				r = new SolMapsResponseImpl( Arrays.asList(sm), new Date() );
 			} else {
-				r = new SolMapsResponseImpl( Arrays.asList(sm), new Date(), 400, "Response error" );
+				r = new SolMapsResponseImpl( 400, "Response error", new Date() );
 			}
 
 			return CompletableFuture.supplyAsync( () -> {
@@ -294,7 +294,7 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 			if ( ! simulateError ) {
 				r = new TPFResponseImpl( Collections.emptyList(),
 				                         Collections.emptyList(),
-				                         null,
+				                         null, // no nextPageURL
 				                         new Date() ) {
 					@Override
 					public Integer getCardinalityEstimate() {
@@ -303,12 +303,9 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 				};
 			}
 			else {
-				r = new TPFResponseImpl( Collections.emptyList(),
-				                         Collections.emptyList(),
-				                         null,
-				                         new Date(),
-				                         400,
-				                         "Response error" );
+				r = new TPFResponseImpl( 400,
+				                         "Response error",
+				                         new Date() );
 			}
 
 			return CompletableFuture.supplyAsync( () -> {

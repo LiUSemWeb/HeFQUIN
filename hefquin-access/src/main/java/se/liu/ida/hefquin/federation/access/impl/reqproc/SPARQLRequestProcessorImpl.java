@@ -44,18 +44,16 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 
 	@Override
 	public SolMapsResponse performRequest( final SPARQLRequest req,
-	                                       final SPARQLEndpoint fm )
-			throws FederationAccessException
-	{
+	                                       final SPARQLEndpoint fm ) {
 		return performRequestWithQueryExecutionHTTP(req, fm);
 		//return performRequestWithRDFConnection(req, fm);
 	}
 
 	protected SolMapsResponse performRequestWithQueryExecutionHTTP( final SPARQLRequest req,
-	                                                                final SPARQLEndpoint fm )
-			throws FederationAccessException
-	{
+	                                                                final SPARQLEndpoint fm ) {
 		// see https://jena.apache.org/documentation/sparql-apis/#query-execution
+
+		final Date requestStartTime = new Date();
 
 		final QueryExecution qe;
 		try {
@@ -72,12 +70,28 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 					qe = builder.build();
 		}
 		catch ( final Exception e ) {
-			throw new FederationAccessException("Initiating the remote execution of a query at the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", e, req, fm);
+			final String msg = "Initiating the remote execution of a query at " +
+					"the SPARQL endpoint with service URI " + fm.getServiceURI() +
+					" caused an exception (type: " + e.getClass().getName() +
+					") with the following message: " + e.getMessage();
+			return new SolMapsResponseImpl(
+					new FederationAccessException(msg,e,req,fm),
+					requestStartTime );
 		}
 
-		final ResultSet result = qe.execSelect();
-
-		final Date requestStartTime = new Date();
+		final ResultSet result;
+		try {
+			result = qe.execSelect();
+		}
+		catch ( final Exception e ) {
+			final String msg = "Performing the remote execution of a query at " +
+					"the SPARQL endpoint with service URI " + fm.getServiceURI() +
+					" caused an exception (type: " + e.getClass().getName() +
+					") with the following message: " + e.getMessage();
+			return new SolMapsResponseImpl(
+					new FederationAccessException(msg,e,req,fm),
+					requestStartTime );
+		}
 
 		// consume the query result
 		final List<SolutionMapping> solMaps = new ArrayList<>();
@@ -87,9 +101,16 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 				solMaps.add( SolutionMappingUtils.createSolutionMapping(s) );
 			}
 		}
-		catch ( final Exception ex ) {
-			try { result.close(); } catch ( final Exception e ) { e.printStackTrace(); }
-			throw new FederationAccessException("Consuming the query result from the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", ex, req, fm);
+		catch ( final Exception e ) {
+			try { result.close(); } catch ( final Exception ex ) { ex.printStackTrace(); }
+
+			final String msg = "Consuming the result of a query executed at " +
+					"the SPARQL endpoint with service URI " + fm.getServiceURI() +
+					" caused an exception (type: " + e.getClass().getName() +
+					") with the following message: " + e.getMessage();
+			return new SolMapsResponseImpl(
+					new FederationAccessException(msg,e,req,fm),
+					requestStartTime );
 		}
 
 		result.close();
@@ -98,9 +119,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 	}
 
 	protected SolMapsResponse performRequestWithRDFConnection( final SPARQLRequest req,
-	                                                           final SPARQLEndpoint fm )
-			throws FederationAccessException
-	{
+	                                                           final SPARQLEndpoint fm ) {
 		// see https://jena.apache.org/documentation/sparql-apis/#ttrdfconnectiontt
 
 		final Query query = req.getQuery().asJenaQuery();
@@ -114,23 +133,42 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 					.httpClient(httpClient)
 					.build();
 		}
-		catch ( final Exception ex ) {
-			throw new FederationAccessException("Creating the connection to the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", ex, req, fm);
+		catch ( final Exception e ) {
+			final String msg = "Creating the connection to the SPARQL endpoint " +
+					"with service URI " + fm.getServiceURI() + " caused an " +
+					"exception (type: " + e.getClass().getName() + ") with " +
+					"the following message: " + e.getMessage();
+			return new SolMapsResponseImpl(
+					new FederationAccessException(msg,e,req,fm),
+					requestStartTime );
 		}
 
 		try {
 			conn.querySelect(query, sink);
 		}
-		catch ( final Exception ex ) {
-			try { conn.close(); } catch ( final Exception e ) { e.printStackTrace(); }
-			throw new FederationAccessException("Issuing the given query to the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", ex, req, fm);
+		catch ( final Exception e ) {
+			try { conn.close(); } catch ( final Exception ex ) { ex.printStackTrace(); }
+
+			final String msg = "Running the remote execution of a query at " +
+					"the SPARQL endpoint with service URI " + fm.getServiceURI() +
+					" caused an exception (type: " + e.getClass().getName() +
+					") with the following message: " + e.getMessage();
+			return new SolMapsResponseImpl(
+					new FederationAccessException(msg,e,req,fm),
+					requestStartTime );
 		}
 
 		try {
 			conn.close();
 		}
-		catch ( final Exception ex ) {
-			throw new FederationAccessException("Closing the connection to the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", ex, req, fm);
+		catch ( final Exception e ) {
+			final String msg = "Creating the connection to the SPARQL endpoint " +
+					"with service URI " + fm.getServiceURI() + " caused an " +
+					"exception (type: " + e.getClass().getName() + ") with " +
+					"the following message: " + e.getMessage();
+			return new SolMapsResponseImpl(
+					new FederationAccessException(msg,e,req,fm),
+					requestStartTime );
 		}
 
 		return new SolMapsResponseImpl(sink.solMaps, requestStartTime);

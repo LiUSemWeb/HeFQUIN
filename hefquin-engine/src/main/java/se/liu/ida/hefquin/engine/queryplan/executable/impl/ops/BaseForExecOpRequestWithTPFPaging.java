@@ -14,6 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorSta
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
@@ -67,13 +68,34 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 				throw new ExecOpExecutionException("Issuing a page request caused an exception.", e, this);
 			}
 
+			// check the response
+			if ( currentPage.isDefective() ) {
+				final Exception ex = currentPage.getException();
+				final String type = (req instanceof BRTPFRequest) ? "brTPF" : "TPF";
+				final String msg = "Retrieving a " + type + " page from the " +
+						"server with the service URI " + fm.getServiceURI() +
+						" caused an exception with the following message: " +
+						ex.getMessage();
+				throw new ExecOpExecutionException(msg, ex, this);
+			}
+
+			if ( currentPage.isError() ) {
+				final String type = (req instanceof BRTPFRequest) ? "brTPF" : "TPF";
+				final String msg = "Retrieving a " + type + " page from the " +
+						"server with the service URI " + fm.getServiceURI() +
+						" resulted in an error with error code " +
+						currentPage.getErrorStatusCode() + " and the " +
+						"following message: " + currentPage.getErrorDescription();
+				throw new ExecOpExecutionException(msg, this);
+			}
+
 			// update stats
 			final int payloadSize;
 			try {
 				payloadSize = currentPage.getPayloadSize();
 			}
 			catch( UnsupportedOperationDueToRetrievalError e ) {
-				throw new ExecOpExecutionException( "Accessing the response size caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+				throw new IllegalStateException("We should not end up here.", e);
 			}
 
 			totalNumberOfMatchingTriplesRetrieved += payloadSize;
@@ -86,7 +108,7 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 				triples = currentPage.getPayload();
 			}
 			catch( UnsupportedOperationDueToRetrievalError e ) {
-				throw new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+				throw new IllegalStateException("We should not end up here.", e);
 			}
 			consumeMatchingTriples( triples, sink );
 		}
@@ -99,23 +121,37 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 			numberOfOutputMappingsProduced );
 	}
 
-	protected PageReqType createPageRequest( final TPFResponse previousPage ) {
+	protected PageReqType createPageRequest( final TPFResponse previousPage )  {
 		if ( previousPage == null ) {
 			return createPageRequest( (String) null );
 		}
 
-		final String nextPageURL = previousPage.getNextPageURL();
+		final String nextPageURL;
+		try {
+			nextPageURL = previousPage.getNextPageURL();
+		}
+		catch ( final UnsupportedOperationDueToRetrievalError e ) {
+			throw new IllegalStateException("We should not end up here.", e);
+		}
+
 		if ( nextPageURL == null ) {
-			throw new IllegalStateException();
+			throw new IllegalStateException("We should not end up here.");
 		}
 
 		return createPageRequest(nextPageURL);
 	}
 
-	protected boolean isLastPage( final TPFResponse response ) throws ExecOpExecutionException {
+	protected boolean isLastPage( final TPFResponse response ) {
 		// To check whether the given response is the last page of the TPF
 		// we simply consider the page-related metadata in the response.
-		final Boolean isLastPage = response.isLastPage();
+		final Boolean isLastPage;
+		try {
+			isLastPage = response.isLastPage();
+		}
+		catch ( final UnsupportedOperationDueToRetrievalError e ) {
+			throw new IllegalStateException("We should not end up here.", e);
+		}
+
 		if ( isLastPage != null ) {
 			return isLastPage.booleanValue();
 		}
@@ -128,8 +164,9 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 			payloadSize = response.getPayloadSize();
 		}
 		catch( UnsupportedOperationDueToRetrievalError e ) {
-			throw new ExecOpExecutionException( "Accessing the response size caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+			throw new IllegalStateException("We should not end up here.", e);
 		}
+
 		return payloadSize == 0;
 	}
 

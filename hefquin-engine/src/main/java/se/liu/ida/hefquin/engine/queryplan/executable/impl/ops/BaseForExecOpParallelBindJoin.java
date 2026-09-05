@@ -436,10 +436,18 @@ public abstract class BaseForExecOpParallelBindJoin<
 			CompletableFuture.allOf(arr).get();
 		}
 		catch ( final InterruptedException e ) {
-			throw new ExecOpExecutionException("Interruption of the futures that perform the requests and process the responses", e, this);
+			final String msg = "Waiting for the requests of this bind " +
+					"join at the federation member with service URI " +
+					fm.getServiceURI() + "was interrupted with the " +
+					"following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 		catch ( final ExecutionException e ) {
-			throw new ExecOpExecutionException("The execution of the futures that perform the requests and process the responses caused an exception.", e, this);
+			final String msg = "Processing the requests of this bind " +
+					"join at the federation member with service URI " +
+					fm.getServiceURI() + "caused an exception with " +
+					"the following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 	}
 
@@ -477,7 +485,10 @@ public abstract class BaseForExecOpParallelBindJoin<
 				f = ctx.getFederationAccessMgr().issueRequest(req, fm);
 			}
 			catch ( final FederationAccessException e ) {
-				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
+				final String msg = "Issuing a request during the execution " +
+						"of a bind join caused an exception with the " +
+						"following message: " + e.getMessage();
+				throw new ExecOpExecutionException(msg, e, this);
 			}
 
 			numberOfRequestsUsed++;
@@ -641,7 +652,10 @@ public abstract class BaseForExecOpParallelBindJoin<
 			reqOp.execute(mySink, ctx);
 		}
 		catch ( final ExecOpExecutionException e ) {
-			throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
+			final String msg = "Executing a request operator used by " +
+					"this bind join caused an exception with the " +
+					"following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 
 		statsOfFullRetrievalReqOp = reqOp.getStats();

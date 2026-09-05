@@ -20,6 +20,8 @@ import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
  */
 public class PersistentCacheEntry extends CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>
 {
+	private static final long serialVersionUID = -8133991885684799839L;
+
 	/**
 	 * Creates a new cache entry.
 	 *

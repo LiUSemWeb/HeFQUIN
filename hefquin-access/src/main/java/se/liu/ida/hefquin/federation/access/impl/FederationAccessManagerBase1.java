@@ -18,7 +18,6 @@ import se.liu.ida.hefquin.base.query.impl.SPARQLQueryImpl;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
-import se.liu.ida.hefquin.federation.access.CardinalityEstimationUnavailableError;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
@@ -32,7 +31,6 @@ import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.CardinalityResponseImpl;
-import se.liu.ida.hefquin.federation.access.impl.response.CardinalityResponseImplWithoutCardinality;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
@@ -52,6 +50,8 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	public static final String enNumberOfBRTPFCardRequestsIssued    = "numberOfBRTPFCardRequestsIssued";
 
 	protected static final Var countVar = Var.alloc("__hefquinCountVar");
+	protected static final Function<SolMapsResponse, CardinalityResponse> fctToObtainCardinalityResponseFromSolMapsResponse = new FunctionToObtainCardinalityResponseFromSolMapsResponse();
+	protected static final Function<TPFResponse, CardinalityResponse> fctToObtainCardinalityResponseFromTPFResponse= new FunctionToObtainCardinalityResponseFromTPFResponse();
 
 	protected AtomicLong issuedCardRequestsSPARQL = new AtomicLong( 0L );
 	protected AtomicLong issuedCardRequestsTPF    = new AtomicLong( 0L );
@@ -116,7 +116,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		// the CardinalityResponse to be returned
 		final SPARQLRequest reqCount = new SPARQLRequestImpl( new SPARQLQueryImpl( countQuery ) );
 		final CompletableFuture<SolMapsResponse> ftr = issueRequest(reqCount, fm);
-		return ftr.thenApply( getFctToObtainCardinalityResponseFromSolMapsResponse() );
+		return ftr.thenApply(fctToObtainCardinalityResponseFromSolMapsResponse);
 	}
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
@@ -125,7 +125,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 					throws FederationAccessException
 	{
 		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
-		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
+		return ftr.thenApply(fctToObtainCardinalityResponseFromTPFResponse);
 	}
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
@@ -134,7 +134,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 					throws FederationAccessException
 	{
 		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
-		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
+		return ftr.thenApply(fctToObtainCardinalityResponseFromTPFResponse);
 	}
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
@@ -143,7 +143,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 					throws FederationAccessException
 	{
 		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
-		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
+		return ftr.thenApply(fctToObtainCardinalityResponseFromTPFResponse);
 	}
 
 	@Override
@@ -179,73 +179,124 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 
 	protected abstract void _resetStats();
 
-	protected Function<SolMapsResponse, CardinalityResponse> getFctToObtainCardinalityResponseFromSolMapsResponse() {
-		return new FunctionToObtainCardinalityResponseFromSolMapsResponse();
-	}
-
-	protected Function<TPFResponse, CardinalityResponse> getFctToObtainCardinalityResponseFromTPFResponse() {
-		return new FunctionToObtainCardinalityResponseFromTPFResponse();
-	}
 
 	// ---------- HELPER CLASSES ----------
 
 	protected static class FunctionToObtainCardinalityResponseFromSolMapsResponse implements Function<SolMapsResponse, CardinalityResponse>
 	{
 		public CardinalityResponse apply( final SolMapsResponse smResp ) {
-			final Integer cardinality;
+			// First, check that the given response is not defective
+			// and does not represent an error response.
+			if ( smResp.isError() )
+				return new CardinalityResponseImpl( smResp.getErrorStatusCode(),
+				                                    smResp.getErrorDescription(),
+				                                    smResp.getRequestStartTime(),
+				                                    smResp.getRetrievalEndTime() );
+
+			if ( smResp.isDefective() )
+				return new CardinalityResponseImpl( smResp.getException(),
+				                                    smResp.getRequestStartTime(),
+				                                    smResp.getRetrievalEndTime() );
+
+			// Now, we extract the cardinality from
+			// the solution mapping of the response.
+
+			final Iterator<SolutionMapping> it;
 			try {
-				cardinality = extractCardinality( smResp );
+				it = smResp.getResponseData().iterator();
 			}
-			catch ( final UnsupportedOperationDueToRetrievalError | IllegalArgumentException e ) {
-				return new CardinalityResponseImplWithoutCardinality(e, smResp);
+			catch ( final UnsupportedOperationDueToRetrievalError e ) {
+				throw new IllegalStateException("We should not end up here.", e);
 			}
 
-			return new CardinalityResponseImpl( cardinality,
-			                                    smResp.getRequestStartTime(),
-			                                    smResp.getRetrievalEndTime(),
-			                                    smResp.getErrorStatusCode(),
-			                                    smResp.getErrorDescription() );
-		}
+			if ( ! it.hasNext() ) {
+				final String msg = "The result obtained for a cardinality-related SPARQL query is unexpectedly empty.";
+				return new CardinalityResponseImpl( new IllegalArgumentException(msg),
+				                                    smResp.getRequestStartTime(),
+				                                    smResp.getRetrievalEndTime() );
+			}
 
-		protected Integer extractCardinality( final SolMapsResponse smResp ) throws UnsupportedOperationDueToRetrievalError {
-			final Iterator<SolutionMapping> it = smResp.getResponseData().iterator();
 			final SolutionMapping sm = it.next();
-			final Node countValueNode = sm.asJenaBinding().get( countVar );
+			final Node countValueNode = sm.asJenaBinding().get(countVar);
+
+			if ( countValueNode == null ) {
+				final String msg = "The result obtained for a cardinality-related SPARQL query does not contain the count variable.";
+				return new CardinalityResponseImpl( new IllegalArgumentException(msg),
+				                                    smResp.getRequestStartTime(),
+				                                    smResp.getRetrievalEndTime() );
+			}
+
+			if ( ! countValueNode.isLiteral() ) {
+				final String msg = "The result obtained for a cardinality-related SPARQL query does not have a literal for the count variable.";
+				return new CardinalityResponseImpl( new IllegalArgumentException(msg),
+				                                    smResp.getRequestStartTime(),
+				                                    smResp.getRetrievalEndTime() );
+			}
+
 			final Object countValueObj = countValueNode.getLiteralValue();
 
+			final Integer cardinality;
 			if ( countValueObj instanceof Integer value ) {
-				return value.intValue();
+				cardinality = value.intValue();
 			}
 			else if ( countValueObj instanceof Long value ) {
-				return (Integer.MAX_VALUE < value) ? Integer.MAX_VALUE : (int) value.longValue();
+				if ( Integer.MAX_VALUE < value )
+					cardinality = Integer.MAX_VALUE;
+				else
+					cardinality = (int) value.longValue();
 			}
 			else {
-				throw new IllegalArgumentException( "Expected literal to be of type Integer or Long but was " + countValueObj.getClass() );
+				final String msg = "The result obtained for a cardinality-related SPARQL query does not have an integer or long literal for the count variable (but " + countValueObj.getClass() + ").";
+				return new CardinalityResponseImpl( new IllegalArgumentException(msg),
+				                                    smResp.getRequestStartTime(),
+				                                    smResp.getRetrievalEndTime() );
 			}
+
+			// Finally, we can create the cardinality response.
+			return new CardinalityResponseImpl( cardinality,
+			                                    smResp.getRequestStartTime(),
+			                                    smResp.getRetrievalEndTime() );
 		}
 	}
 
 	protected static class FunctionToObtainCardinalityResponseFromTPFResponse implements Function<TPFResponse, CardinalityResponse>
 	{
 		public CardinalityResponse apply( final TPFResponse tpfResp ) {
-			if ( tpfResp == null ) {
-				throw new IllegalArgumentException( "The given TPFResponse is null" );
+			// First, check that the given response is not defective
+			// and does not represent an error response.
+			if ( tpfResp.isError() )
+				return new CardinalityResponseImpl( tpfResp.getErrorStatusCode(),
+				                                    tpfResp.getErrorDescription(),
+				                                    tpfResp.getRequestStartTime(),
+				                                    tpfResp.getRetrievalEndTime() );
+
+			if ( tpfResp.isDefective() )
+				return new CardinalityResponseImpl( tpfResp.getException(),
+				                                    tpfResp.getRequestStartTime(),
+				                                    tpfResp.getRetrievalEndTime() );
+
+			// Now, we extract the cardinality from
+			// the solution mapping of the response.
+
+			final Integer cardinality;
+			try {
+				cardinality = tpfResp.getCardinalityEstimate();
+			}
+			catch ( final UnsupportedOperationDueToRetrievalError e ) {
+				throw new IllegalStateException("We should not end up here.", e);
 			}
 
-			final Integer cardinality = tpfResp.getCardinalityEstimate();
-			if ( cardinality != null ) {
-				return new CardinalityResponseImpl( cardinality,
+			if ( cardinality == null ) {
+				final String msg = "Cardinality estimation for a TPF or brTPF request is unavailable due to missing metadata triples.";
+				return new CardinalityResponseImpl( new IllegalArgumentException(msg),
 				                                    tpfResp.getRequestStartTime(),
-				                                    tpfResp.getRetrievalEndTime(),
-				                                    tpfResp.getErrorStatusCode(),
-				                                    tpfResp.getErrorDescription() );
+				                                    tpfResp.getRetrievalEndTime() );
 			}
-			else {
-				final CardinalityEstimationUnavailableError e = new CardinalityEstimationUnavailableError(
-					"Cardinality estimation is unavailable due to missing metadata triples."
-				);
-				return new CardinalityResponseImplWithoutCardinality(e, tpfResp);
-			}
+
+
+			return new CardinalityResponseImpl( cardinality,
+			                                    tpfResp.getRequestStartTime(),
+			                                    tpfResp.getRetrievalEndTime() );
 		}
 	}
 

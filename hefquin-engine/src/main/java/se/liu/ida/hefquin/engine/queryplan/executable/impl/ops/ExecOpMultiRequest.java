@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import org.apache.jena.graph.Node;
@@ -78,12 +77,14 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 
 	// statistics
 	protected int numberOfRequestsIssued = 0;
-	// (access to any of the following three statistics must be
+	// (access to any of the following statistics must be
 	//  synchronized on the first of them, requestDurationsInMS)
 	private List<Long> requestDurationsInMS = new ArrayList<>();
 	private List<Integer> numOfSolMapsRetrievedPerReq = new ArrayList<>();
 	private long numberOfOutputMappingsProduced = 0L;
-	private int numberOfRequestsCompleted = 0;
+	private int numberOfRequestsCompletedSuccessfully = 0;
+	private int numberOfRequestsCompletedWithError = 0;
+	private int numberOfRequestsCompletedWithException = 0;
 
 	public ExecOpMultiRequest( final SPARQLRequest req,
 	                           final Var serviceVar,
@@ -241,23 +242,27 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 			requestDurationsInMS.clear();
 			numOfSolMapsRetrievedPerReq.clear();
 			numberOfOutputMappingsProduced = 0L;
-			numberOfRequestsCompleted = 0;
+			numberOfRequestsCompletedSuccessfully = 0;
+			numberOfRequestsCompletedWithError = 0;
+			numberOfRequestsCompletedWithException = 0;
 		}
 	}
 
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
 
-		final double avgRequestDurationInMS;
-		long minRequestDurationInMS = Long.MAX_VALUE;
-		long maxRequestDurationInMS = Long.MIN_VALUE;
-		final double avgNumOfSolMapsRetrievedPerReq;
-		int minNumOfSolMapsRetrievedPerReq = Integer.MAX_VALUE;
-		int maxNumOfSolMapsRetrievedPerReq = Integer.MIN_VALUE;
-		final long totalNumOfSolMapsRetrieved;
-		final long outputSize;
-		final int _numberOfRequestsCompleted;
+		s.put( "numberOfRequestsIssued",          Integer.valueOf(numberOfRequestsIssued) );
+
 		synchronized (requestDurationsInMS) {
+			s.put( "numberOfRequestsCompletedSuccessfully",  Integer.valueOf(numberOfRequestsCompletedSuccessfully) );
+			s.put( "numberOfRequestsCompletedWithError",     Integer.valueOf(numberOfRequestsCompletedWithError) );
+			s.put( "numberOfRequestsCompletedWithException", Integer.valueOf(numberOfRequestsCompletedWithException) );
+
+			long minRequestDurationInMS = Long.MAX_VALUE;
+			long maxRequestDurationInMS = Long.MIN_VALUE;
+			int minNumOfSolMapsRetrievedPerReq = Integer.MAX_VALUE;
+			int maxNumOfSolMapsRetrievedPerReq = Integer.MIN_VALUE;
+
 			long sumRequestDuration = 0L;
 			for ( final long x : requestDurationsInMS ) {
 				sumRequestDuration += x;
@@ -272,24 +277,19 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 				if ( x > maxNumOfSolMapsRetrievedPerReq ) maxNumOfSolMapsRetrievedPerReq = x;
 			}
 
-			avgRequestDurationInMS = sumRequestDuration / requestDurationsInMS.size();
-			avgNumOfSolMapsRetrievedPerReq = sumSolMapsRetrieved / numOfSolMapsRetrievedPerReq.size();
-			totalNumOfSolMapsRetrieved = sumSolMapsRetrieved;
+			final double avgRequestDurationInMS = sumRequestDuration / requestDurationsInMS.size();
+			final double avgNumOfSolMapsRetrievedPerReq = sumSolMapsRetrieved / numOfSolMapsRetrievedPerReq.size();
 
-			outputSize = numberOfOutputMappingsProduced;
-			_numberOfRequestsCompleted = numberOfRequestsCompleted;
+			s.put( "avgRequestDurationInMS",          Double.valueOf(avgRequestDurationInMS) );
+			s.put( "minRequestDurationInMS",          Long.valueOf(minRequestDurationInMS) );
+			s.put( "maxRequestDurationInMS",          Long.valueOf(maxRequestDurationInMS) );
+			s.put( "avgNumOfSolMapsRetrievedPerReq",  Double.valueOf(avgNumOfSolMapsRetrievedPerReq) );
+			s.put( "minNumOfSolMapsRetrievedPerReq",  Integer.valueOf(minNumOfSolMapsRetrievedPerReq) );
+			s.put( "maxNumOfSolMapsRetrievedPerReq",  Integer.valueOf(maxNumOfSolMapsRetrievedPerReq) );
+
+			s.put( "totalNumOfSolMapsRetrieved",      Long.valueOf(sumSolMapsRetrieved) );
+			s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
 		}
-
-		s.put( "numberOfRequestsIssued",          Integer.valueOf(numberOfRequestsIssued) );
-		s.put( "numberOfRequestsCompleted",       Integer.valueOf(_numberOfRequestsCompleted) );
-		s.put( "avgRequestDurationInMS",          Double.valueOf(avgRequestDurationInMS) );
-		s.put( "minRequestDurationInMS",          Long.valueOf(minRequestDurationInMS) );
-		s.put( "maxRequestDurationInMS",          Long.valueOf(maxRequestDurationInMS) );
-		s.put( "avgNumOfSolMapsRetrievedPerReq",  Double.valueOf(avgNumOfSolMapsRetrievedPerReq) );
-		s.put( "minNumOfSolMapsRetrievedPerReq",  Integer.valueOf(minNumOfSolMapsRetrievedPerReq) );
-		s.put( "maxNumOfSolMapsRetrievedPerReq",  Integer.valueOf(maxNumOfSolMapsRetrievedPerReq) );
-		s.put( "totalNumOfSolMapsRetrieved",      Long.valueOf(totalNumOfSolMapsRetrieved) );
-		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(outputSize) );
 
 		return s;
 	}
@@ -319,13 +319,41 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 		public void accept( final SolMapsResponse response ) {
 			log.info("Received response from endpoint with service URI {}", serviceURI);
 
+			// check the response
+			if ( response.isDefective() ) {
+				recordException( response.getException().getMessage(),
+				                 response.getException() );
+
+				synchronized (requestDurationsInMS) {
+					requestDurationsInMS.add( response.getRequestDuration().toMillis() );
+					numberOfRequestsCompletedWithException++;
+				}
+
+				return;
+			}
+
+			if ( response.isError() ) {
+				final String msg = "Requesting the execution of a query at the " +
+						"server with the service URI " + serviceURI.toString() +
+						" resulted in an error with error code " +
+						response.getErrorStatusCode() + " and the " +
+						"following message: " + response.getErrorDescription();
+				recordException(msg, null);
+
+				synchronized (requestDurationsInMS) {
+					requestDurationsInMS.add( response.getRequestDuration().toMillis() );
+					numberOfRequestsCompletedWithError++;
+				}
+
+				return;
+			}
+
 			final Iterable<SolutionMapping> solMaps;
 			try {
 				solMaps = response.getResponseData();
 			}
 			catch ( final UnsupportedOperationDueToRetrievalError e ) {
-				recordException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e );
-				return;
+				throw new IllegalStateException("We should not end up here.", e);
 			}
 
 			int cntIn = 0;
@@ -343,7 +371,7 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 				requestDurationsInMS.add( response.getRequestDuration().toMillis() );
 				numOfSolMapsRetrievedPerReq.add(cntIn);
 				numberOfOutputMappingsProduced += cntOut;
-				numberOfRequestsCompleted++;
+				numberOfRequestsCompletedSuccessfully++;
 			}
 
 			log.info("Retrieved {} solution mappings from the endpoint with service URI {}, and produced {} output solution mappings from them", cntIn, serviceURI, cntOut);

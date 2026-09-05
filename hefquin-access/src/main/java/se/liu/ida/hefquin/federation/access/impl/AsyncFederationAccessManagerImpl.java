@@ -56,12 +56,7 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 
 		final Supplier<RespType> supplier = new Supplier<RespType>() {
 			@Override public RespType get() {
-				final RespType resp;
-				try {
-					resp = reqProc.performRequest(req, fm);
-				} catch ( final FederationAccessException e ) {
-					throw new RuntimeException("Performing a request caused an exception with the following message: " + e.getMessage(), e);
-				}
+				final RespType resp = reqProc.performRequest(req, fm);
 
 				if ( resp == null ) {
 					throw new RuntimeException("reqProc returned null");

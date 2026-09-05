@@ -295,7 +295,7 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		public MyGraphQLRequestProcessor( final long sleepMillis ) { super(sleepMillis); }
 
 		@Override
-		public JSONResponse performRequest( final GraphQLRequest req, final GraphQLEndpoint fm ) throws FederationAccessException {
+		public JSONResponse performRequest( final GraphQLRequest req, final GraphQLEndpoint fm ) {
 			return new JSONResponseImpl( new JsonObject(), new Date() );
 		}
 	}
