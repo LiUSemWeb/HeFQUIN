@@ -3,9 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import org.apache.jena.graph.Node;
@@ -32,7 +31,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorSta
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
@@ -145,8 +143,14 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 			try {
 				f = ctx.getFederationAccessMgr().issueRequest(req2, fm);
 			}
-			catch ( final FederationAccessException e ) {
-				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
+			catch ( final Exception e ) {
+				// Not strictly necessary, but doesn't hurt either.
+				final String msg = "Issuing a request to the federation member " +
+						"with the service URI " + fm.getServiceURI() + "during " +
+						"the execution of a multi-request operator at caused " +
+						"an exception (type: " + e.getClass().getName() + ") " +
+						"with the following message: " + e.getMessage();
+				throw new ExecOpExecutionException(msg, e, this);
 			}
 
 			numberOfRequestsIssued++;
@@ -172,21 +176,19 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 		// they are, the execution of this operator is finished.
 		final CompletableFuture<?> combinedFuture = CompletableFuture.allOf(futures);
 		try {
-			combinedFuture.join();
+			combinedFuture.get();
 		}
-/*
 		catch ( final InterruptedException e ) {
-			throw new ExecOpExecutionException("Interruption of the futures that perform the requests and process the responses", e, this);
+			final String msg = "Waiting for the requests of this multi-" +
+					"request operator was interrupted with the following " +
+					"message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 		catch ( final ExecutionException e ) {
-			throw new ExecOpExecutionException("The execution of the futures that perform the requests and process the responses caused an exception.", e, this);
-		}
-*/
-		catch ( final CancellationException e ) {
-			throw new ExecOpExecutionException("The futures that perform the requests and process the responses were cancelled.", e, this);
-		}
-		catch ( final CompletionException e ) {
-			throw new ExecOpExecutionException("The execution of the futures that perform the requests and process the responses caused an exception.", e, this);
+			final String msg = "Processing the requests of this multi-" +
+					"request operator caused an exception with the " +
+					"following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 
 		log.debug( "Execution of the multi-request operator for {} is finished.", serviceVar.toString() );
@@ -353,6 +355,8 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 				solMaps = response.getResponseData();
 			}
 			catch ( final UnsupportedOperationDueToRetrievalError e ) {
+				// We should never end up here because we have explicitly
+				// checked for a potential error or defective response before.
 				throw new IllegalStateException("We should not end up here.", e);
 			}
 

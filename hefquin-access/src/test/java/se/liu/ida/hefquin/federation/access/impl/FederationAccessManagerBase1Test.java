@@ -244,9 +244,8 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 		public <ReqType extends DataRetrievalRequest,
 		        RespType extends DataRetrievalResponse<?>,
 		        MemberType extends FederationMember>
-		CompletableFuture<RespType> issueRequest( final ReqType req, final MemberType fm)
-				throws FederationAccessException
-		{
+		CompletableFuture<RespType> issueRequest( final ReqType req,
+		                                          final MemberType fm ) {
 			if (    req instanceof SPARQLRequest reqSPARQL
 			     && fm instanceof SPARQLEndpoint fmSPARQL ) {
 				@SuppressWarnings("unchecked")

@@ -11,7 +11,6 @@ import se.liu.ida.hefquin.base.net.http.HttpClientProvider;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
@@ -50,8 +49,7 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	         RespType extends DataRetrievalResponse<?>,
 	         MemberType extends FederationMember >
 	CompletableFuture<RespType> issueRequest( final ReqType req,
-	                                          final MemberType fm )
-			throws FederationAccessException {
+	                                          final MemberType fm ) {
 		final RequestProcessor<ReqType, RespType, MemberType> reqProc = getReqProc(req, fm);
 
 		final Supplier<RespType> supplier = new Supplier<RespType>() {

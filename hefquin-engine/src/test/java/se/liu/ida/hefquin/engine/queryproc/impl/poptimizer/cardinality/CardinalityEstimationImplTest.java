@@ -26,7 +26,6 @@ import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
@@ -448,13 +447,11 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 		@Override
 		public < ReqType extends DataRetrievalRequest,
-				RespType extends DataRetrievalResponse<?>,
-				MemberType extends FederationMember >
+		         RespType extends DataRetrievalResponse<?>,
+		         MemberType extends FederationMember >
 		CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final ReqType req,
-				final MemberType fm )
-						throws FederationAccessException
-		{
+				final MemberType fm ) {
 			if(    req instanceof TPFRequest tpfReq
 			    && fm instanceof TPFServer ) {
 				final Object o = tpfReq.getQueryPattern().asJenaTriple().getObject().getLiteralValue();
@@ -471,8 +468,9 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 				if ( sleepMillis > 0L ) {
 					try {
 						Thread.sleep(sleepMillis);
-					} catch ( final InterruptedException e ) {
-						throw new FederationAccessException(e, req, fm);
+					}
+					catch ( final InterruptedException e ) {
+						throw new RuntimeException("Unexpected interruption.", e);
 					}
 				}
 

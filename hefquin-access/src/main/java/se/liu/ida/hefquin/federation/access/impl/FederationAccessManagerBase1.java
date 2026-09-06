@@ -21,7 +21,6 @@ import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -62,9 +61,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	         MemberType extends FederationMember >
 	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 			final ReqType req,
-	        final MemberType fm )
-					throws FederationAccessException
-	{
+	        final MemberType fm ) {
 		final CompletableFuture<CardinalityResponse> response;
 		if (    req instanceof TPFRequest tpfReq
 		     && fm instanceof TPFServer tpfServer )
@@ -86,9 +83,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final SPARQLRequest req,
-			final SPARQLEndpoint fm )
-					throws FederationAccessException
-	{
+			final SPARQLEndpoint fm ) {
 		// The idea of this implementation is to take the graph pattern of the
 		// given request, wrap it in a COUNT(*) query, and send that query as
 		// a request to the given endpoint.
@@ -121,27 +116,21 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final TPFRequest req,
-			final TPFServer fm )
-					throws FederationAccessException
-	{
+			final TPFServer fm ) {
 		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
 		return ftr.thenApply(fctToObtainCardinalityResponseFromTPFResponse);
 	}
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final TPFRequest req,
-			final BRTPFServer fm )
-					throws FederationAccessException
-	{
+			final BRTPFServer fm ) {
 		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
 		return ftr.thenApply(fctToObtainCardinalityResponseFromTPFResponse);
 	}
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final BRTPFRequest req,
-			final BRTPFServer fm )
-					throws FederationAccessException
-	{
+			final BRTPFServer fm ) {
 		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
 		return ftr.thenApply(fctToObtainCardinalityResponseFromTPFResponse);
 	}

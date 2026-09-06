@@ -7,7 +7,6 @@ import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
@@ -54,9 +53,7 @@ public abstract class FederationAccessManagerBase2 extends FederationAccessManag
 	            RespType extends DataRetrievalResponse<?>,
 	            MemberType extends FederationMember >
 	RequestProcessor<ReqType, RespType, MemberType> getReqProc( final ReqType req,
-	                                                            final MemberType fm )
-			throws FederationAccessException
-	{
+	                                                            final MemberType fm ) {
 		final Class<? extends DataRetrievalRequest> reqClass = req.getClass();
 		final Class<? extends FederationMember> fmClass = fm.getClass();
 
@@ -78,7 +75,10 @@ public abstract class FederationAccessManagerBase2 extends FederationAccessManag
 			}
 		}
 
-		throw new FederationAccessException("No request processor registered for requests of type " + reqClass.getName() + " (at federation members of type " + fmClass.getName() + ").", req, fm);
+		final String msg = "No request processor registered for requests of " +
+				"type " + reqClass.getName() + " at federation members of " +
+				"type " + fmClass.getName() + ".";
+		throw new UnsupportedOperationException(msg);
 	}
 
 	private RequestProcessor<?,?,?> getCommonReqProc( final DataRetrievalRequest req,

@@ -23,7 +23,6 @@ import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -70,9 +69,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	         RespType extends DataRetrievalResponse<?>,
 	         MemberType extends FederationMember >
 	CompletableFuture<RespType> issueRequest( final ReqType req,
-	                                          final MemberType fm )
-			throws FederationAccessException
-	{
+	                                          final MemberType fm ) {
 		// update the statistics
 		if ( req instanceof TPFRequest )
 			cacheRequestsTPF++;
@@ -112,9 +109,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	         MemberType extends FederationMember >
 	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 			final ReqType req,
-			final MemberType fm )
-					throws FederationAccessException
-	{
+			final MemberType fm ) {
 		final Key key = new Key(req, fm);
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
