@@ -106,9 +106,7 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 	         RespType extends DataRetrievalResponse<?>,
 	         MemberType extends FederationMember >
 	CompletableFuture<RespType> issueRequest( final ReqType req,
-	                                          final MemberType fm )
-			throws FederationAccessException
-	{
+	                                          final MemberType fm ) {
 		// update the statistics
 		if ( req instanceof TPFRequest )
 			cacheRequestsTPF++;
@@ -181,9 +179,7 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 	         MemberType extends FederationMember >
 	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 			final ReqType req,
-			final MemberType fm )
-					throws FederationAccessException
-	{
+			final MemberType fm ) {
 		final PersistentCacheKey key;
 		try {
 			key = new PersistentCacheKey( req, fm, ResponseMode.COUNT );

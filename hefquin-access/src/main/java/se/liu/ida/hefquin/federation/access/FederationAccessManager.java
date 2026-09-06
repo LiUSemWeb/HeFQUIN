@@ -10,14 +10,12 @@ public interface FederationAccessManager extends StatsProvider
 	< ReqType extends DataRetrievalRequest,
 	  RespType extends DataRetrievalResponse<?>,
 	  MemberType extends FederationMember >
-	CompletableFuture<RespType> issueRequest( ReqType req, MemberType fm )
-			throws FederationAccessException;
+	CompletableFuture<RespType> issueRequest( ReqType req, MemberType fm );
 
 	< ReqType extends DataRetrievalRequest,
 	  RespType extends DataRetrievalResponse<?>,
 	  MemberType extends FederationMember >
-	CompletableFuture<CardinalityResponse> issueCardinalityRequest( ReqType req, MemberType fm )
-			throws FederationAccessException;
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest( ReqType req, MemberType fm );
 
 	@Override
 	FederationAccessStats getStats();

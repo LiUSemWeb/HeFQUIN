@@ -32,7 +32,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.RESTRequest;
 import se.liu.ida.hefquin.federation.access.StringResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
@@ -64,7 +63,9 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 	// statistics
 	private long numberOfRequestsIssued = 0L;
-	private AtomicLong numberOfRequestsFailed = new AtomicLong(0L);
+	private AtomicLong numberOfRequestsCompletedSuccessfully = new AtomicLong(0L);
+	private AtomicLong numberOfRequestsCompletedWithException = new AtomicLong(0L);
+	private AtomicLong numberOfRequestsCompletedWithError = new AtomicLong(0L);
 	private List<Integer> errorCodesOfFailedRequests = Collections.synchronizedList( new ArrayList<>() );
 	private AtomicLong sumOfRequestExecutionTimes = new AtomicLong(0L);
 	private AtomicLong sumOfResponseProcTimes = new AtomicLong(0L);
@@ -174,9 +175,16 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			try {
 				f = ctx.getFederationAccessMgr().issueRequest(req, fm);
 			}
-			catch ( final FederationAccessException e ) {
+			catch ( final Exception e ) {
 				log.debug( "Request issuance failed for endpoint {} (paramValues={})", fm, entry.getKey() );
-				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
+
+				// Not strictly necessary, but doesn't hurt either.
+				final String msg = "Issuing a request during the execution of " +
+						"a lookup join at the federation member with the service" +
+						"URI " + fm.getServiceURI() + " caused an exception " +
+						"(type: " + e.getClass().getName() + ") with the " +
+						"following message: " + e.getMessage();
+				throw new ExecOpExecutionException(msg, e, this);
 			}
 
 			numberOfRequestsIssued++;
@@ -195,10 +203,18 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			CompletableFuture.allOf(futures).get();
 		}
 		catch ( final InterruptedException e ) {
-			throw new ExecOpExecutionException("interruption of the futures that perform the requests and process the responses", e, this);
+			final String msg = "Waiting for the requests of this lookup " +
+					"join at the federation member with service URI " +
+					fm.getServiceURI() + " was interrupted with the " +
+					"following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 		catch ( final ExecutionException e ) {
-			throw new ExecOpExecutionException("The execution of the futures that perform the requests and process the responses caused an exception.", e, this);
+			final String msg = "Processing the requests of this lookup " +
+					"join at the federation member with service URI " +
+					fm.getServiceURI() + " caused an exception with " +
+					"the following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 		log.debug( "Completed lookup join batch for {} (requests={})", fm, numberOfRequestsIssued );
 	}
@@ -302,12 +318,22 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 		@Override
 		public void accept( final StringResponse response ) {
+			// check the response
+			if ( response.isDefective() ) {
+				numberOfRequestsCompletedWithException.incrementAndGet();
+				final ExecOpExecutionException e = new ExecOpExecutionException(
+						response.getException().getMessage(),
+						response.getException(),
+						op );
+				recordExceptionCaughtDuringExecution(e);
+			}
+
 			// If the given response captures the fact that an error was
 			// returned for the corresponding request, then the given input
 			// solution mappings (see 'solmaps') can be dropped and, thus,
 			// we can immediately stop at this point.
 			if ( response.isError() ) {
-				numberOfRequestsFailed.incrementAndGet();
+				numberOfRequestsCompletedWithError.incrementAndGet();
 				errorCodesOfFailedRequests.add( response.getErrorStatusCode() );
 				return;
 			}
@@ -320,7 +346,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 			}
 			catch ( final UnsupportedOperationDueToRetrievalError e ) {
 				// We should never end up here because we have explicitly
-				// checked for a potential error before.
+				// checked for a potential error or defective response before.
 				throw new IllegalStateException("Unexpected exception at this point.", e);
 			}
 
@@ -345,6 +371,7 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 			final long time2 = System.currentTimeMillis();
 
+			numberOfRequestsCompletedSuccessfully.incrementAndGet();
 			sumOfRequestExecutionTimes.addAndGet( response.getRequestDuration().toMillis() );
 			sumOfResponseProcTimes.addAndGet( time2 - time1 );
 		}
@@ -392,7 +419,9 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		super.resetStats();
 
 		numberOfRequestsIssued = 0L;
-		numberOfRequestsFailed.set(0L);
+		numberOfRequestsCompletedSuccessfully.set(0L);
+		numberOfRequestsCompletedWithException.set(0L);
+		numberOfRequestsCompletedWithError.set(0L);
 		errorCodesOfFailedRequests.clear();
 		sumOfRequestExecutionTimes.set(0L);
 		sumOfResponseProcTimes.set(0L);
@@ -404,9 +433,12 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
 
-		s.put( "numberOfRequestsIssued",   numberOfRequestsIssued );
-		s.put( "numberOfRequestsFailed",   numberOfRequestsFailed );
+		s.put( "numberOfRequestsIssued",                  numberOfRequestsIssued );
+		s.put( "numberOfRequestsCompletedSuccessfully",   numberOfRequestsCompletedSuccessfully );
+		s.put( "numberOfRequestsCompletedWithException",  numberOfRequestsCompletedWithException );
+		s.put( "numberOfRequestsCompletedWithError",      numberOfRequestsCompletedWithError );
 		s.put( "errorCodesOfFailedRequests",   errorCodesOfFailedRequests );
+		s.put( "numberOfDataConversionExceptions",  numberOfDataConversionExceptions );
 
 		double avgRequestExecTime = Double.NaN;
 		double avgResponseProcTimes = Double.NaN;
@@ -418,7 +450,6 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		s.put( "avgRequestExecTime",    avgRequestExecTime );
 		s.put( "avgResponseProcTimes",  avgResponseProcTimes );
 
-		s.put( "numberOfDataConversionExceptions",  numberOfDataConversionExceptions );
 		s.put( "numberOfOutputMappingsProduced",    numberOfOutputMappingsProduced );
 		return s;
 	}

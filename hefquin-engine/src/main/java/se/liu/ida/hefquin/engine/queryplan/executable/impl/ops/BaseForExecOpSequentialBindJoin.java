@@ -386,7 +386,10 @@ public abstract class BaseForExecOpSequentialBindJoin<
 //				_processBatch(joinableInputSMs, mySink, execCxt);
 //			}
 //			else {
-				throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
+				final String msg = "Executing a request operator used by " +
+						"this bind join caused an exception with the " +
+						"following message: " + e.getMessage();
+				throw new ExecOpExecutionException(msg, e, this);
 //			}
 		}
 
@@ -621,7 +624,10 @@ public abstract class BaseForExecOpSequentialBindJoin<
 			reqOp.execute(mySink, ctx);
 		}
 		catch ( final ExecOpExecutionException e ) {
-			throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
+			final String msg = "Executing a request operator used by " +
+					"this bind join caused an exception with the " +
+					"following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 
 		statsOfLastReqOp = reqOp.getStats();

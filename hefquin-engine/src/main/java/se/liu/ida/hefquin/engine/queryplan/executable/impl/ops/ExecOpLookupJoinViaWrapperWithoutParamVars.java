@@ -15,7 +15,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.RESTRequest;
 import se.liu.ida.hefquin.federation.access.StringResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
@@ -101,8 +100,14 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 		try {
 			f = ctx.getFederationAccessMgr().issueRequest(req, fm);
 		}
-		catch ( final FederationAccessException e ) {
-			throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
+		catch ( final Exception e ) {
+			// Not strictly necessary, but doesn't hurt either.
+			final String msg = "Issuing a request during the execution of " +
+					"a lookup join at the federation member with the service" +
+					"URI " + fm.getServiceURI() + " caused an exception " +
+					"(type: " + e.getClass().getName() + ") with the " +
+					"following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 
 		final StringResponse response;
@@ -110,21 +115,43 @@ public class ExecOpLookupJoinViaWrapperWithoutParamVars
 			response = f.get();
 		}
 		catch ( final InterruptedException e ) {
-			throw new ExecOpExecutionException("Interruption of the future that performs the request.", e, this);
+			final String msg = "Waiting for the requests of this lookup " +
+					"join at the federation member with service URI " +
+					fm.getServiceURI() + " was interrupted with the " +
+					"following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 		catch ( final ExecutionException e ) {
-			throw new ExecOpExecutionException("The execution of the futures that performs the request caused an exception.", e, this);
+			final String msg = "Processing the requests of this lookup " +
+					"join at the federation member with service URI " +
+					fm.getServiceURI() + " caused an exception with " +
+					"the following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 
 		final long time2 = System.currentTimeMillis();
+
+		if ( response.isDefective() ) {
+			retrievalError = response.getException().getMessage();
+			throw new ExecOpExecutionException( response.getException().getMessage(),
+			                                    response.getException(),
+			                                    this );
+		}
+
+		if ( response.isError() ) {
+			retrievalError = response.getErrorStatusCode() + " - " +
+			                 response.getErrorDescription();
+			return List.of();
+		}
 
 		final String data;
 		try {
 			data = response.getResponseData();
 		}
 		catch ( final UnsupportedOperationDueToRetrievalError e ) {
-			retrievalError = e.getMessage();
-			return List.of();
+			// We should never end up here because we have explicitly
+			// checked for a potential error or defective response before.
+			throw new IllegalStateException("Unexpected exception at this point.", e);
 		}
 
 		final List<SolutionMapping> result;

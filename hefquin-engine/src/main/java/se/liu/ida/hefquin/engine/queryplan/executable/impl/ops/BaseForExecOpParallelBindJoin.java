@@ -37,7 +37,6 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
 /**
@@ -188,7 +187,10 @@ public abstract class BaseForExecOpParallelBindJoin<
 
 	// statistics
 	private AtomicLong numberOfOutputMappingsProduced = new AtomicLong(0L);
-	protected int numberOfRequestsUsed = 0;
+	protected int numberOfRequestsIssued = 0;
+	private AtomicLong numberOfRequestsCompletedSuccessfully = new AtomicLong(0L);
+	private AtomicLong numberOfRequestsCompletedWithException = new AtomicLong(0L);
+	private AtomicLong numberOfRequestsCompletedWithError = new AtomicLong(0L);
 	protected List<Long> requestDurationsInMS = new Vector<>(); // Vector is thread safe
 	protected List<Integer> numOfSolMapsRetrievedPerReq = new Vector<>();
 	protected ExecutableOperatorStats statsOfFullRetrievalReqOp = null;
@@ -436,10 +438,18 @@ public abstract class BaseForExecOpParallelBindJoin<
 			CompletableFuture.allOf(arr).get();
 		}
 		catch ( final InterruptedException e ) {
-			throw new ExecOpExecutionException("Interruption of the futures that perform the requests and process the responses", e, this);
+			final String msg = "Waiting for the requests of this bind " +
+					"join at the federation member with service URI " +
+					fm.getServiceURI() + " was interrupted with the " +
+					"following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 		catch ( final ExecutionException e ) {
-			throw new ExecOpExecutionException("The execution of the futures that perform the requests and process the responses caused an exception.", e, this);
+			final String msg = "Processing the requests of this bind " +
+					"join at the federation member with service URI " +
+					fm.getServiceURI() + " caused an exception with " +
+					"the following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 	}
 
@@ -476,11 +486,17 @@ public abstract class BaseForExecOpParallelBindJoin<
 			try {
 				f = ctx.getFederationAccessMgr().issueRequest(req, fm);
 			}
-			catch ( final FederationAccessException e ) {
-				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
+			catch ( final Exception e ) {
+				// Not strictly necessary, but doesn't hurt either.
+				final String msg = "Issuing a request during the execution of " +
+						"a bind join at the federation member with the service" +
+						"URI " + fm.getServiceURI() + " caused an exception " +
+						"(type: " + e.getClass().getName() + ") with the " +
+						"following message: " + e.getMessage();
+				throw new ExecOpExecutionException(msg, e, this);
 			}
 
-			numberOfRequestsUsed++;
+			numberOfRequestsIssued++;
 
 			// Create a response processor that shall handle the response
 			// obtained via the bind-join request (namely, joining it with
@@ -489,7 +505,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 			                                                              sink );
 
 			// Attach the response processor to the future for the request and
-			// remember the future so thatwe can wait for its completion later.
+			// remember the future so that we can wait for its completion later.
 			futures.add( f.thenAccept(respProc) );
 		}
 	}
@@ -511,13 +527,39 @@ public abstract class BaseForExecOpParallelBindJoin<
 
 		@Override
 		public void accept( final RespType response ) {
+			// check the response
+			if ( response.isDefective() ) {
+				recordException( response.getException().getMessage(),
+				                 response.getException() );
+
+				numberOfRequestsCompletedWithException.getAndIncrement();
+				requestDurationsInMS.add( response.getRequestDuration().toMillis() );
+
+				return;
+			}
+
+			if ( response.isError() ) {
+				final String msg = "Requesting the execution of a bin join " +
+						"request at the server with the service URI " +
+						fm.getServiceURI() + " resulted in an error with error " +
+						"code " + response.getErrorStatusCode() + " and the " +
+						"following message: " + response.getErrorDescription();
+				recordException(msg, null);
+
+				numberOfRequestsCompletedWithError.getAndIncrement();
+				requestDurationsInMS.add( response.getRequestDuration().toMillis() );
+
+				return;
+			}
+
 			final Iterable<SolutionMapping> solmaps;
 			try {
 				solmaps = extractSolMaps(response);
 			}
 			catch( final UnsupportedOperationDueToRetrievalError e ) {
-				recordException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e );
-				return;
+				// We should never end up here because we have explicitly
+				// checked for a potential error or defective response before.
+				throw new IllegalStateException("We should not end up here.", e);
 			}
 
 			log.info("Received response from endpoint {}, processing {} join results", fm, solmaps);
@@ -530,6 +572,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 
 			// Update statistics.
 			numberOfOutputMappingsProduced.addAndGet(outputCount);
+			numberOfRequestsCompletedSuccessfully.getAndIncrement();
 			requestDurationsInMS.add( response.getRequestDuration().toMillis() );
 			if ( solmaps instanceof Collection c ) {
 				numOfSolMapsRetrievedPerReq.add( c.size() );
@@ -641,7 +684,10 @@ public abstract class BaseForExecOpParallelBindJoin<
 			reqOp.execute(mySink, ctx);
 		}
 		catch ( final ExecOpExecutionException e ) {
-			throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
+			final String msg = "Executing a request operator used by " +
+					"this bind join caused an exception with the " +
+					"following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 
 		statsOfFullRetrievalReqOp = reqOp.getStats();
@@ -741,7 +787,10 @@ public abstract class BaseForExecOpParallelBindJoin<
 	public void resetStats() {
 		super.resetStats();
 		numberOfOutputMappingsProduced.set(0L);
-		numberOfRequestsUsed = 0;
+		numberOfRequestsIssued = 0;
+		numberOfRequestsCompletedSuccessfully.set(0L);
+		numberOfRequestsCompletedWithException.set(0L);
+		numberOfRequestsCompletedWithError.set(0L);
 		requestDurationsInMS.clear();
 		numOfSolMapsRetrievedPerReq.clear();
 		statsOfFullRetrievalReqOp = null;
@@ -754,7 +803,10 @@ public abstract class BaseForExecOpParallelBindJoin<
 		s.put( "fedMemberAsString",  fm.toString() );
 		s.put( "numberOfOutputMappingsProduced",   Long.valueOf(numberOfOutputMappingsProduced.get()) );
 		s.put( "hadToSwitchToFullRetrievalMode",   Boolean.valueOf(fullResult != null) );
-		s.put( "numberOfRequestsUsed",             Integer.valueOf(numberOfRequestsUsed) );
+		s.put( "numberOfRequestsIssued",           Integer.valueOf(numberOfRequestsIssued) );
+		s.put( "numberOfRequestsCompletedSuccessfully",   numberOfRequestsCompletedSuccessfully );
+		s.put( "numberOfRequestsCompletedWithException",  numberOfRequestsCompletedWithException );
+		s.put( "numberOfRequestsCompletedWithError",      numberOfRequestsCompletedWithError );
 		s.put( "requestDurationsInMS",             requestDurationsInMS.toString() );
 		s.put( "numberOfSolMapsRetrievedPerReqOp", numOfSolMapsRetrievedPerReq.toString() );
 

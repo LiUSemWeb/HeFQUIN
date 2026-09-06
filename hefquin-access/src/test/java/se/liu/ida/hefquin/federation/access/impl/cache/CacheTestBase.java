@@ -157,7 +157,7 @@ public abstract class CacheTestBase extends FederationTestBase
 	}
 
 	@Test
-	public void nextPageURLIsNull() throws IOException, InterruptedException, ExecutionException {
+	public void nextPageURLIsNull() throws IOException, InterruptedException, ExecutionException, UnsupportedOperationDueToRetrievalError {
 		final Cache<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>> cache =
 				createCache( 10, new CachePoliciesForTest() );
 		cache.clear();

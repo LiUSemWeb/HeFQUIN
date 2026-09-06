@@ -31,10 +31,8 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 	}
 
 	@Override
-	public JSONResponse performRequest(final GraphQLRequest req,
-			final GraphQLEndpoint fm)
-			throws FederationAccessException {
-
+	public JSONResponse performRequest( final GraphQLRequest req,
+	                                    final GraphQLEndpoint fm ) {
 		final Date startTime = new Date();
 		final GraphQLQuery query = req.getGraphQLQuery();
 		final String url = fm.getURL();
@@ -44,7 +42,13 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 			jsonObj = GraphQLConnection.performRequest(query, url, connectionTimeout, readTimeout);
 		}
 		catch ( final GraphQLConnectionException e ) {
-			throw new FederationAccessException("Issuing a request to a GraphQL endpoint caused an exception.", e, req, fm);
+			final String msg = "Performing a request via the GraphQL endpoint " +
+					"with service URI " + fm.getServiceURI() + " resulted in " +
+					"an exception with the following message: " +
+					e.getMessage();
+			return new JSONResponseImpl(
+					new FederationAccessException(msg,e,req,fm),
+					startTime );
 		}
 
 		return new JSONResponseImpl(jsonObj, startTime);

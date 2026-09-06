@@ -56,12 +56,25 @@ public class FederationAccessUtils
 			return CompletableFutureUtils.getAll(futures, DataRetrievalResponse.class);
 		}
 		catch ( final CompletableFutureUtils.GetAllException ex ) {
-			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
-				throw new FederationAccessException("Unexpected interruption when getting the response to a data retrieval request.", ex.getCause(), reqOps[ex.i].getRequest(), reqOps[ex.i].getFederationMember() );
+			final Throwable cause = ex.getCause();
+			final FederationMember fm = reqOps[ex.i].getFederationMember();
+			final DataRetrievalRequest req = reqOps[ex.i].getRequest();
+
+			final String msg;
+			if ( cause != null && cause instanceof InterruptedException ) {
+				msg = "Unexpected interruption when getting the response " +
+						"to a data retrieval request to the federation " +
+						"member with service URI " + fm.getServiceURI() +
+						"(interruption message: " + cause.getMessage() + ")";
 			}
 			else {
-				throw new FederationAccessException("Getting the response to a data retrieval request caused an exception: " + ex.getMessage(), ex.getCause(), reqOps[ex.i].getRequest(), reqOps[ex.i].getFederationMember() );
+				msg = "Getting the response to a data retrieval request " +
+						"to the federation member with service URI " +
+						fm.getServiceURI() + " caused an exception with " +
+						"the following message: " + cause.getMessage();
 			}
+
+			throw new FederationAccessException(msg, cause, req, fm);
 		}
 	}
 
@@ -134,12 +147,25 @@ public class FederationAccessUtils
 			return CompletableFutureUtils.getAll(futures, CardinalityResponse.class);
 		}
 		catch ( final CompletableFutureUtils.GetAllException ex ) {
-			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
-				throw new FederationAccessException("Unexpected interruption when getting the response to a cardinality retrieval request.", ex.getCause(), reqOps.get(ex.i).getRequest(), reqOps.get(ex.i).getFederationMember() );
+			final Throwable cause = ex.getCause();
+			final FederationMember fm = reqOps.get(ex.i).getFederationMember();
+			final DataRetrievalRequest req = reqOps.get(ex.i).getRequest();
+
+			final String msg;
+			if ( cause != null && cause instanceof InterruptedException ) {
+				msg = "Unexpected interruption when getting the response " +
+						"to a data retrieval request to the federation " +
+						"member with service URI " + fm.getServiceURI() +
+						"(interruption message: " + cause.getMessage() + ")";
 			}
 			else {
-				throw new FederationAccessException("Getting the response to a cardinality retrieval request caused an exception: " + ex.getMessage(), ex.getCause(), reqOps.get(ex.i).getRequest(), reqOps.get(ex.i).getFederationMember() );
+				msg = "Getting the response to a data retrieval request " +
+						"to the federation member with service URI " +
+						fm.getServiceURI() + " caused an exception with " +
+						"the following message: " + cause.getMessage();
 			}
+
+			throw new FederationAccessException(msg, cause, req, fm);
 		}
 	}
 
@@ -156,29 +182,32 @@ public class FederationAccessUtils
 			return f.get();
 		}
 		catch ( final InterruptedException e ) {
-			throw new FederationAccessException("Unexpected interruption when getting the response to a data retrieval request.", e, req, fm);
+			final String msg = "Unexpected interruption when getting the " +
+					"response to a data retrieval request to the federation " +
+					"member with service URI " + fm.getServiceURI() +
+					"(interruption message: " + e.getMessage() + ")";
+			throw new FederationAccessException(msg, e, req, fm);
 		}
 		catch ( final ExecutionException e ) {
-			throw new FederationAccessException("Getting the response to a data retrieval request caused an exception.", e, req, fm);
+			final String msg = "Getting the response to a data retrieval " +
+					"request to the federation member with service URI " +
+					fm.getServiceURI() + " caused an exception with the " +
+					"following message: " + e.getMessage();
+			throw new FederationAccessException(msg, e, req, fm);
 		}
 	}
 
-    public static TPFRequest ensureTPFRequest( final TriplePatternRequest req ) {
-        if ( req instanceof TPFRequest ) {
-            return (TPFRequest) req;
-        }
-        else {
-            return new TPFRequestImpl( req.getQueryPattern() );
-        }
-    }
+	public static TPFRequest ensureTPFRequest( final TriplePatternRequest req ) {
+		if ( req instanceof TPFRequest t ) return t;
 
-    public static BRTPFRequest ensureBRTPFRequest( final BindingsRestrictedTriplePatternRequest req ) {
-        if ( req instanceof BRTPFRequest ) {
-            return (BRTPFRequest) req;
-        }
-        else {
-            return new BRTPFRequestImpl( req.getTriplePattern(), req.getSolutionMappings() );
-        }
-    }
+		return new TPFRequestImpl( req.getQueryPattern() );
+	}
+
+	public static BRTPFRequest ensureBRTPFRequest( final BindingsRestrictedTriplePatternRequest req ) {
+		if ( req instanceof BRTPFRequest b ) return b;
+
+		return new BRTPFRequestImpl( req.getTriplePattern(),
+		                             req.getSolutionMappings() );
+	}
 
 }
