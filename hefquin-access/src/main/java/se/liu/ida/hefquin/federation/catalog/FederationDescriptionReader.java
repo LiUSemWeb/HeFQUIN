@@ -439,7 +439,7 @@ public class FederationDescriptionReader
 
 			final String token = getRequiredEnvironmentVariable( tokenEnv );
 
-			return new TokenBasedAuthenticationInformation( token );
+			return new TokenBasedAuthenticationInformation( "Bearer", token );
 		}
 		else if ( securityScheme.hasProperty( RDF.type, FDVocab.TokenBasedSecurityScheme ) ) {
 			requireHeaderBasedAuthentication( securityScheme, "token" );

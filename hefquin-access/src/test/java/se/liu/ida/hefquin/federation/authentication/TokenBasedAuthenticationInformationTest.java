@@ -13,7 +13,7 @@ public class TokenBasedAuthenticationInformationTest
 	public void addsAuthorizationBearerHeader() {
 		final Map<String, String> headers = new HashMap<>();
 
-		final AuthenticationInformation auth = new TokenBasedAuthenticationInformation("TOKEN12345");
+		final AuthenticationInformation auth = new TokenBasedAuthenticationInformation( "Bearer", "TOKEN12345");
 
 		auth.applyTo( headers );
 
