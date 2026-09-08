@@ -10,34 +10,18 @@ public interface FederationAccessManager extends StatsProvider
 	< ReqType extends DataRetrievalRequest,
 	  RespType extends DataRetrievalResponse<?>,
 	  MemberType extends FederationMember >
-	CompletableFuture<RespType> issueRequest( ReqType req, MemberType fm )
+	CompletableFuture<RespType> issueRequest( ReqType req,
+	                                          MemberType fm,
+	                                          boolean ignoreRetrievalCache )
 			throws FederationAccessException;
 
 	< ReqType extends DataRetrievalRequest,
 	  RespType extends DataRetrievalResponse<?>,
 	  MemberType extends FederationMember >
-	CompletableFuture<CardinalityResponse> issueCardinalityRequest( ReqType req, MemberType fm )
-			throws FederationAccessException;
-
-	default < ReqType extends DataRetrievalRequest,
-	          RespType extends DataRetrievalResponse<?>,
-	          MemberType extends FederationMember >
-	CompletableFuture<RespType> issueRequest( ReqType req, MemberType fm, boolean ignoreCache )
-			throws FederationAccessException
-	{
-		return issueRequest(req, fm);
-	};
-
-	default < ReqType extends DataRetrievalRequest,
-	          RespType extends DataRetrievalResponse<?>,
-	          MemberType extends FederationMember >
 	CompletableFuture<CardinalityResponse> issueCardinalityRequest( ReqType req,
 	                                                                MemberType fm,
 	                                                                boolean ignoreCardinalityCache )
-			throws FederationAccessException
-	{
-		return issueCardinalityRequest(req, fm);
-	}
+			throws FederationAccessException;
 
 	@Override
 	FederationAccessStats getStats();
