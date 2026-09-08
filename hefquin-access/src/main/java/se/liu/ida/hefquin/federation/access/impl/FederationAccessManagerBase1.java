@@ -62,7 +62,8 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	         MemberType extends FederationMember >
 	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 			final ReqType req,
-	        final MemberType fm )
+	        final MemberType fm,
+	        final boolean ignoreCardinalityCache )
 					throws FederationAccessException
 	{
 		final CompletableFuture<CardinalityResponse> response;
@@ -115,7 +116,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		// issue the query as a request, the response will then be processed to create
 		// the CardinalityResponse to be returned
 		final SPARQLRequest reqCount = new SPARQLRequestImpl( new SPARQLQueryImpl( countQuery ) );
-		final CompletableFuture<SolMapsResponse> ftr = issueRequest(reqCount, fm);
+		final CompletableFuture<SolMapsResponse> ftr = issueRequest(reqCount, fm, false);
 		return ftr.thenApply( getFctToObtainCardinalityResponseFromSolMapsResponse() );
 	}
 
@@ -124,7 +125,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final TPFServer fm )
 					throws FederationAccessException
 	{
-		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
+		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm, false);
 		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
 
@@ -133,7 +134,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final BRTPFServer fm )
 					throws FederationAccessException
 	{
-		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
+		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm, false);
 		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
 
@@ -142,7 +143,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final BRTPFServer fm )
 					throws FederationAccessException
 	{
-		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
+		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm, false);
 		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
 

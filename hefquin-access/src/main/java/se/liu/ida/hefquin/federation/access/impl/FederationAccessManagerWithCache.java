@@ -75,28 +75,16 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		      new MyDefaultCachePolicies() );
 	}
 
-
-	@Override
-	public < ReqType extends DataRetrievalRequest,
-	         RespType extends DataRetrievalResponse<?>,
-	         MemberType extends FederationMember >
-	CompletableFuture<RespType> issueRequest( final ReqType req,
-	                                          final MemberType fm )
-			throws FederationAccessException
-	{
-		return issueRequest(req, fm, false);
-	}
-
 	@Override
 	public < ReqType extends DataRetrievalRequest,
 	         RespType extends DataRetrievalResponse<?>,
 	         MemberType extends FederationMember >
 	CompletableFuture<RespType> issueRequest( final ReqType req,
 	                                          final MemberType fm,
-	                                          final boolean ignoreCache )
+	                                          final boolean ignoreRetrievalCache )
 			throws FederationAccessException
 	{
-		if(! ignoreCache ) {
+		if(! ignoreRetrievalCache ) {
 			// update the statistics only if cache is enabled
 			if ( req instanceof TPFRequest )
 				cacheRequestsTPF++;
@@ -110,7 +98,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 
 		final Key key = new Key(req, fm);
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse;
-		if ( ! ignoreCache )
+		if ( ! ignoreRetrievalCache )
 			cachedResponse = cache.get(key) ;
 		else
 			cachedResponse = null;
@@ -131,21 +119,9 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 			return cachedResponse2;
 		}
 
-		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm, ignoreCache);
+		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm, ignoreRetrievalCache);
 		cache.put(key, newResponse);
 		return newResponse;
-	}
-
-	@Override
-	public < ReqType extends DataRetrievalRequest,
-	         RespType extends DataRetrievalResponse<?>,
-	         MemberType extends FederationMember >
-	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
-			final ReqType req,
-			final MemberType fm )
-					throws FederationAccessException
-	{
-		return issueCardinalityRequest(req, fm, false);
 	}
 
 	@Override

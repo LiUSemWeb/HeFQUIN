@@ -84,17 +84,6 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 		cache = new HierarchicalCache<>(l1Cache, l2Cache);
 	}
 
-	@Override
-	public < ReqType extends DataRetrievalRequest,
-	         RespType extends DataRetrievalResponse<?>,
-	         MemberType extends FederationMember >
-	CompletableFuture<RespType> issueRequest( final ReqType req,
-	                                          final MemberType fm )
-			throws FederationAccessException
-	{
-		return issueRequest(req, fm, false);
-	}
-
 	/**
 	 * Issues a request for the given request and federation member.
 	 *
@@ -104,10 +93,10 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 	 * result asynchronously.
 	 * </p>
 	 *
-	 * @param req         the data retrieval request (TPF, BRTPF, or SPARQL)
-	 * @param fm          the federation member handling the request
-	 * @param ignoreCache whether to bypass the cache and pass the request
-	 *                    directly to the wrapped federation access manager
+	 * @param req                  the data retrieval request (TPF, BRTPF, or SPARQL)
+	 * @param fm                   the federation member handling the request
+	 * @param ignoreRetrievalCache whether to bypass the cache and pass the request
+	 *                             directly to the wrapped federation access manager
 	 * @return a {@link CompletableFuture} with the response
 	 *
 	 * @throws FederationAccessException if the request fails
@@ -120,10 +109,10 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 	         MemberType extends FederationMember >
 	CompletableFuture<RespType> issueRequest( final ReqType req,
 	                                          final MemberType fm,
-	                                          final boolean ignoreCache )
+	                                          final boolean ignoreRetrievalCache )
 			throws FederationAccessException
 	{
-		if ( ! ignoreCache ) {
+		if ( ! ignoreRetrievalCache ) {
 			// update the statistics only if cache is enabled
 			if ( req instanceof TPFRequest )
 				cacheRequestsTPF++;
@@ -151,13 +140,13 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 		// completion), so that concurrent callers can share the same future. The actual
 		// response data can only be persisted on disk once the future completes.
 		synchronized (cache) {
-			if ( ! ignoreCache )
+			if ( ! ignoreRetrievalCache )
 				cachedResponse = cache.get(key);
 			else
 				cachedResponse = null;
 
 			if ( cachedResponse == null ) {
-				final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm, ignoreCache);
+				final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm, ignoreRetrievalCache);
 				cache.put(key, newResponse);
 				return newResponse;
 			}
@@ -178,18 +167,6 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 		return cachedResponse2;
 	}
 
-	@Override
-	public < ReqType extends DataRetrievalRequest,
-	         RespType extends DataRetrievalResponse<?>,
-	         MemberType extends FederationMember >
-	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
-			final ReqType req,
-			final MemberType fm )
-					throws FederationAccessException
-	{
-		return issueCardinalityRequest(req, fm, false);
-	}
-
 	/**
 	 * Issues a cardinality request for the given request and federation member.
 	 *
@@ -199,10 +176,10 @@ public class FederationAccessManagerWithHierarchicalCache extends FederationAcce
 	 * result asynchronously.
 	 * </p>
 	 *
-	 * @param req         the data retrieval request (TPF, BRTPF, or SPARQL)
-	 * @param fm          the federation member handling the request
-	 * @param ignoreCache whether to bypass the cache and pass the request directly
-	 *                    to the wrapped federation access manager
+	 * @param req                    the data retrieval request (TPF, BRTPF, or SPARQL)
+	 * @param fm                     the federation member handling the request
+	 * @param ignoreCardinalityCache whether to bypass the cache and pass the request
+	 *                               directly to the wrapped federation access manager
 	 * @return a {@link CompletableFuture} with the cardinality response
 	 *
 	 * @throws FederationAccessException if the request fails
