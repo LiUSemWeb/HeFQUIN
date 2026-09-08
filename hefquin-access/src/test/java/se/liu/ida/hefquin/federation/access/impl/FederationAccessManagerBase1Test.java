@@ -59,7 +59,7 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 		final int card = 42;
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card );
 
-		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
+		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest(req, fm, false).get();
 
 		assertEquals( card, r.getCardinality() );
 	}
@@ -77,7 +77,7 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 		final int card = 42;
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card );
 
-		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
+		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest(req, fm, false).get();
 
 		assertEquals( card, r.getCardinality() );
 	}
@@ -99,8 +99,8 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<CardinalityResponse> fr1 = fedAccessMgr.issueCardinalityRequest( req1, fm1 );
-		final CompletableFuture<CardinalityResponse> fr2 = fedAccessMgr.issueCardinalityRequest( req2, fm2 );
+		final CompletableFuture<CardinalityResponse> fr1 = fedAccessMgr.issueCardinalityRequest(req1, fm1, false);
+		final CompletableFuture<CardinalityResponse> fr2 = fedAccessMgr.issueCardinalityRequest(req2, fm2, false);
 
 		final CardinalityResponse r1 = fr1.get();
 		final CardinalityResponse r2 = fr2.get();
@@ -131,10 +131,10 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<CardinalityResponse> fr1 = fedAccessMgr.issueCardinalityRequest( req1, fm1 );
+		final CompletableFuture<CardinalityResponse> fr1 = fedAccessMgr.issueCardinalityRequest(req1, fm1, false);
 		final CardinalityResponse r1 = fr1.get();
 
-		final CompletableFuture<CardinalityResponse> fr2 = fedAccessMgr.issueCardinalityRequest( req2, fm2 );
+		final CompletableFuture<CardinalityResponse> fr2 = fedAccessMgr.issueCardinalityRequest(req2, fm2, false);
 		final CardinalityResponse r2 = fr2.get();
 
 		final long endTime = new Date().getTime();
@@ -157,8 +157,8 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
 
 		final int card = 42;
-		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card, true );
-		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
+		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr(card, true );
+		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest(req, fm, false).get();
 		assertTrue( r.isError() );
 		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getCardinality() );
 		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getResponseData() );
@@ -176,7 +176,7 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 
 		final int card = 42;
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card, true );
-		final CompletableFuture<SolMapsResponse> ftr = fedAccessMgr.issueRequest( req, fm );
+		final CompletableFuture<SolMapsResponse> ftr = fedAccessMgr.issueRequest(req, fm, false);
 		final SolMapsResponse r = ftr.get();
 		assertTrue( r.isError() );
 		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getResponseData() );
@@ -194,7 +194,7 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 
 		final int card = 42;
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card, true );
-		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
+		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest(req, fm, false).get();
 		assertTrue( r.isError() );
 		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getCardinality() );
 		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getResponseData() );
@@ -212,7 +212,7 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 
 		final int card = 42;
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card, true );
-		final CompletableFuture<TPFResponse> ftr = fedAccessMgr.issueRequest( req, fm );
+		final CompletableFuture<TPFResponse> ftr = fedAccessMgr.issueRequest(req, fm, false);
 		final TPFResponse r = ftr.get();
 		assertTrue( r.isError() );
 		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getResponseData() );
@@ -244,7 +244,9 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 		public <ReqType extends DataRetrievalRequest,
 		        RespType extends DataRetrievalResponse<?>,
 		        MemberType extends FederationMember>
-		CompletableFuture<RespType> issueRequest( final ReqType req, final MemberType fm)
+		CompletableFuture<RespType> issueRequest( final ReqType req,
+		                                          final MemberType fm,
+		                                          final boolean ignoreRetrievalCache )
 				throws FederationAccessException
 		{
 			if (    req instanceof SPARQLRequest reqSPARQL

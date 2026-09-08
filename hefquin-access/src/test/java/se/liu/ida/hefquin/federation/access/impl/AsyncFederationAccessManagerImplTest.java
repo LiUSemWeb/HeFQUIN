@@ -75,7 +75,7 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 
 		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
 
-		final CompletableFuture<TPFResponse> fr = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<TPFResponse> fr = fedAccessMgr.issueRequest(req, fm, false);
 		fr.get();
 	}
 
@@ -91,7 +91,7 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 
 		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
 
-		final CompletableFuture<TPFResponse> fr = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<TPFResponse> fr = fedAccessMgr.issueRequest(req, fm, false);
 		fr.get();
 	}
 
@@ -111,10 +111,10 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1);
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1, false);
 		fr1.get();
 
-		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req2, fm2);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req2, fm2, false);
 		fr2.get();
 
 		final long endTime = new Date().getTime();
@@ -137,8 +137,8 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1);
-		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req2, fm2);
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1, false);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req2, fm2, false);
 
 		fr1.get();
 		fr2.get();
@@ -170,7 +170,7 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		final long startTime = new Date().getTime();
 
 		for ( int i = 0; i < n; ++i ) {
-			futures[i] = fedAccessMgr.issueRequest(reqs[i], fms[i]);
+			futures[i] = fedAccessMgr.issueRequest(reqs[i], fms[i], false);
 		}
 
 		for ( int i = 0; i < n; ++i ) {

@@ -559,7 +559,8 @@ public abstract class EngineTestBase
 		         RespType extends DataRetrievalResponse<?>,
 		         MemberType extends FederationMember >
 		CompletableFuture<RespType> issueRequest( final ReqType req,
-		                                          final MemberType fm )
+		                                          final MemberType fm,
+		                                          final boolean ignoreRetrievalCache )
 				throws FederationAccessException
 		{
 			if ( req instanceof SPARQLRequest reqSPARQL && fm instanceof SPARQLEndpoint fmSPARQL ) {
@@ -690,7 +691,8 @@ public abstract class EngineTestBase
 				MemberType extends FederationMember >
 		CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final ReqType req,
-				final MemberType fm )
+				final MemberType fm,
+				final boolean ignoreCardinalityCache )
 						throws FederationAccessException
 		{
 			throw new UnsupportedOperationException();

@@ -453,7 +453,8 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 				MemberType extends FederationMember >
 		CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final ReqType req,
-				final MemberType fm )
+				final MemberType fm,
+				final boolean ignoreCardinalityCache )
 						throws FederationAccessException
 		{
 			if(    req instanceof TPFRequest tpfReq
@@ -481,7 +482,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 				return CompletableFuture.completedFuture(resp);
 			} else {
-				return super.issueCardinalityRequest(req, fm);
+				return super.issueCardinalityRequest(req, fm, false);
 			}
 		}
 	}

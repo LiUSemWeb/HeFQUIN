@@ -77,10 +77,10 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1);
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1, false);
 		fr1.get();
 
-		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req1, fm2);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req1, fm2, false);
 		fr2.get();
 
 		final long endTime = new Date().getTime();
@@ -102,8 +102,8 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 
 		final long startTime = new Date().getTime();
 
-		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1);
-		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req1, fm2);
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1, false);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req1, fm2, false);
 
 		fr1.get();
 		fr2.get();
@@ -135,7 +135,7 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final long startTime = new Date().getTime();
 
 		for ( int i = 0; i < n; ++i ) {
-			futures[i] = fedAccessMgr.issueRequest(reqs[i], fms[i]);
+			futures[i] = fedAccessMgr.issueRequest(reqs[i], fms[i], false);
 		}
 
 		for ( int i = 0; i < n; ++i ) {
@@ -156,14 +156,14 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final TPFRequest req = new TPFRequestImpl(tp);
 
 		final FederationMember fm1 = new TPFServerForTest();
-		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req, fm1);
-		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req, fm1);
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req, fm1, false);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req, fm1, false);
 
 		assertEquals(fr1, fr2);
 
 		final FederationMember fm2 = new BRTPFServerForTest();
-		final CompletableFuture<TPFResponse> fr3 = fedAccessMgr.issueRequest(req, fm2);
-		final CompletableFuture<TPFResponse> fr4 = fedAccessMgr.issueRequest(req, fm2);
+		final CompletableFuture<TPFResponse> fr3 = fedAccessMgr.issueRequest(req, fm2, false);
+		final CompletableFuture<TPFResponse> fr4 = fedAccessMgr.issueRequest(req, fm2, false);
 
 		assertEquals(fr3, fr4);
 	}
@@ -178,8 +178,8 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final BRTPFRequest req = new BRTPFRequestImpl( tp, Set.of() );
 
 		final FederationMember fm = new BRTPFServerForTest();
-		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
-		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req, fm, false);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req, fm, false);
 
 		assertEquals(fr1, fr2);
 	}
@@ -194,8 +194,8 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final SPARQLRequest req = new SPARQLRequestImpl(tp);
 
 		final FederationMember fm = new SPARQLEndpointForTest();
-		final CompletableFuture<SolMapsResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
-		final CompletableFuture<SolMapsResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<SolMapsResponse> fr1 = fedAccessMgr.issueRequest(req, fm, false);
+		final CompletableFuture<SolMapsResponse> fr2 = fedAccessMgr.issueRequest(req, fm, false);
 
 		assertEquals(fr1, fr2);
 	}
@@ -208,8 +208,8 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);
 
 		final FederationMember fm = new Neo4jServerForTest();
-		final CompletableFuture<StringResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
-		final CompletableFuture<StringResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<StringResponse> fr1 = fedAccessMgr.issueRequest(req, fm, false);
+		final CompletableFuture<StringResponse> fr2 = fedAccessMgr.issueRequest(req, fm, false);
 
 		assertEquals(fr1, fr2);
 	}
@@ -225,8 +225,8 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final List<Parameter> params = new ArrayList<>();
 		final FederationMember fm = new RESTEndpointForTest(urlTemplate, params);
 
-		final CompletableFuture<StringResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
-		final CompletableFuture<StringResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<StringResponse> fr1 = fedAccessMgr.issueRequest(req, fm, false);
+		final CompletableFuture<StringResponse> fr2 = fedAccessMgr.issueRequest(req, fm, false);
 
 		assertEquals(fr1, fr2);
 	}
@@ -239,8 +239,8 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final GraphQLRequest req = new GraphQLRequestImpl(graphQLQuery);
 
 		final FederationMember fm = new GraphQLEndpointForTest();
-		final CompletableFuture<StringResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
-		final CompletableFuture<StringResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
+		final CompletableFuture<StringResponse> fr1 = fedAccessMgr.issueRequest(req, fm, false);
+		final CompletableFuture<StringResponse> fr2 = fedAccessMgr.issueRequest(req, fm, false);
 
 		assertEquals(fr1, fr2);
 	}
