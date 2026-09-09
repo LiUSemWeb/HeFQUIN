@@ -36,7 +36,7 @@ public class QueryProcContextBuilder
 	protected boolean isExperimentRun  = false;
 	protected boolean skipExecution    = false;
 
-	protected boolean ignoreCache            = false;
+	protected boolean ignoreRetrievalCache   = false;
 	protected boolean ignoreCardinalityCache = false;
 
 	public QueryProcContextBuilder( final FederationCatalog fedCatalog,
@@ -129,8 +129,8 @@ public class QueryProcContextBuilder
 		return this;
 	}
 
-	public QueryProcContextBuilder setIgnoreCache( final boolean set ) {
-		ignoreCache = set;
+	public QueryProcContextBuilder setIgnoreRetrievalCache( final boolean set ) {
+		ignoreRetrievalCache = set;
 		return this;
 	}
 
@@ -187,8 +187,8 @@ public class QueryProcContextBuilder
 			}
 
 			@Override
-			public boolean ignoreCache() {
-				return ignoreCache;
+			public boolean ignoreRetrievalCache() {
+				return ignoreRetrievalCache;
 			}
 
 			@Override

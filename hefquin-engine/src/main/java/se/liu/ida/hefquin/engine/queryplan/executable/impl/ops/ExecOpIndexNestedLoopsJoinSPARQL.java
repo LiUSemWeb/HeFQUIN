@@ -64,7 +64,7 @@ public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLo
 	                                                           final QueryProcContext ctx )
 			throws FederationAccessException
 	{
-		return ctx.getFederationAccessMgr().issueRequest( req, fm, ctx.ignoreCache() );
+		return ctx.getFederationAccessMgr().issueRequest( req, fm, ctx.ignoreRetrievalCache() );
 	}
 
 }

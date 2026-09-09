@@ -33,22 +33,22 @@ public class FederationAccessUtils
 			final DataRetrievalRequest req = reqOps[i].getRequest();
 			final FederationMember fm = reqOps[i].getFederationMember();
 			if ( fm instanceof SPARQLEndpoint ep && req instanceof SPARQLRequest sreq ) {
-				futures[i] = fedAccessMgr.issueRequest( sreq, ep, ctx.ignoreCache() );
+				futures[i] = fedAccessMgr.issueRequest( sreq, ep, ctx.ignoreRetrievalCache() );
 			}
 			else if ( fm instanceof TPFServer tpf && req instanceof TriplePatternRequest tpreq ) {
 				final TPFRequest reqTPF = ensureTPFRequest(tpreq);
-				futures[i] = fedAccessMgr.issueRequest( reqTPF, tpf, ctx.ignoreCache() );
+				futures[i] = fedAccessMgr.issueRequest( reqTPF, tpf, ctx.ignoreRetrievalCache() );
 			}
 			else if ( fm instanceof BRTPFServer brtpf && req instanceof TriplePatternRequest tpreq ) {
 				final TPFRequest reqTPF = ensureTPFRequest(tpreq);
-				futures[i] = fedAccessMgr.issueRequest( reqTPF, brtpf, ctx.ignoreCache() );
+				futures[i] = fedAccessMgr.issueRequest( reqTPF, brtpf, ctx.ignoreRetrievalCache() );
 			}
 			else if ( fm instanceof BRTPFServer brtpf && req instanceof BindingsRestrictedTriplePatternRequest brreq ) {
 				final BRTPFRequest reqBRTPF = ensureBRTPFRequest(brreq);
-				futures[i] = fedAccessMgr.issueRequest( reqBRTPF, brtpf, ctx.ignoreCache() );
+				futures[i] = fedAccessMgr.issueRequest( reqBRTPF, brtpf, ctx.ignoreRetrievalCache() );
 			}
 			else if ( fm instanceof Neo4jServer neo && req instanceof Neo4jRequest nreq ) {
-				futures[i] = fedAccessMgr.issueRequest( nreq, neo, ctx.ignoreCache() );
+				futures[i] = fedAccessMgr.issueRequest( nreq, neo, ctx.ignoreRetrievalCache() );
 			}
 			else {
 				throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");

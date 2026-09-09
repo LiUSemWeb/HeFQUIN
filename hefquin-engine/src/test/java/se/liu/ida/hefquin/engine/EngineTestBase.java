@@ -167,7 +167,7 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public boolean ignoreCache() {
+		public boolean ignoreRetrievalCache() {
 			return false;
 		}
 
@@ -197,7 +197,7 @@ public abstract class EngineTestBase
 
 			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
 			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
-			@Override public boolean ignoreCache() { return false; }
+			@Override public boolean ignoreRetrievalCache() { return false; }
 			@Override public boolean ignoreCardinalityCache() { return false; }
 		};
 	}

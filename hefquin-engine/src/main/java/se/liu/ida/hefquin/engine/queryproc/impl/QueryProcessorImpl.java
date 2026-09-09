@@ -212,8 +212,8 @@ public class QueryProcessorImpl implements QueryProcessor
 		}
 
 		@Override
-		public boolean ignoreCache() {
-			return wrapped.ignoreCache();
+		public boolean ignoreRetrievalCache() {
+			return wrapped.ignoreRetrievalCache();
 		}
 
 		@Override

@@ -141,7 +141,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 					.setPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
 					.setExecutablePlanPrinter( modPlanPrinting.getExecutablePlanPrinter() )
 					.setSkipExecution( modResultsExt.isSkipExecution() )
-					.setIgnoreCache( modCaching.isIgnoreCache() )
+					.setIgnoreRetrievalCache( modCaching.isIgnoreRetrievalCache() )
 					.setIgnoreCardinalityCache( modCaching.isIgnoreCardinalityCache() );
 		final QueryProcContext ctx = ctxBuilder.build();
 
