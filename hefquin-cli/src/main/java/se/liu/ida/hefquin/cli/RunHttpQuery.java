@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.output.NullPrintStream;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.json.JSON;
+import org.apache.jena.atlas.json.JsonArray;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.cmd.ArgDecl;
@@ -114,6 +115,16 @@ public class RunHttpQuery extends CmdGeneral
 	@Override
 	protected String getCommandName() {
 		return "hefquin-client";
+	}
+
+	@Override
+	protected void processModulesAndArgs() {
+		super.processModulesAndArgs();
+
+		// Fix because 'ModGeneral' currently sets the verbose flag instead
+		// of the debug flag whenever the --debug argument is given.
+		if ( isVerbose() )
+			modGeneral.debug = true;
 	}
 
 	/**
@@ -214,6 +225,10 @@ public class RunHttpQuery extends CmdGeneral
 		if ( modResultsExt.needsFedAccessStats() )
 			builder.header( HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS, "true" );
 
+		if ( isDebug() ) {
+			builder.header( HttpConstants.X_HEADER_RETURN_FULL_STACK_TRACE, "true" );
+		}
+
 		final HttpRequest request = builder.build();
 
 		final HttpResponse<InputStream> response;
@@ -230,6 +245,25 @@ public class RunHttpQuery extends CmdGeneral
 		}
 
 		if ( response.statusCode() != 200 ) {
+			final String errorBody;
+			try {
+				errorBody = new String(
+					response.body().readAllBytes(),
+					StandardCharsets.UTF_8
+				);
+			}
+			catch ( final IOException e ) {
+				cmdError( "Failed to read error response from server: " + e.getMessage(), true );
+				return;
+			}
+
+			final JsonObject errorJson = JSON.parse( errorBody ).getAsObject();
+			final JsonArray errors = errorJson.get( "error" ).getAsArray();
+
+			for ( final JsonValue error : errors ) {
+				cmdError( error.getAsString().value(), false );
+			}
+
 			cmdError( "Request failed with HTTP status " + response.statusCode(), true );
 			return;
 		}

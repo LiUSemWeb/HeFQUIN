@@ -418,7 +418,7 @@ public class SparqlServletTest {
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 500, response.getStatusLine().getStatusCode() );
 			final String responseContent = EntityUtils.toString( response.getEntity() );
-			assertTrue( responseContent.contains("http://invalid/federation/member") );
+			assertTrue( responseContent.contains("Exception occurred when outputting the result of a SELECT query using the Jena machinery.") );
 		}
 	}
 
@@ -431,7 +431,7 @@ public class SparqlServletTest {
 			assertEquals( 500, response.getStatusLine().getStatusCode() );
 			final String responseContent = EntityUtils.toString( response.getEntity() );
 			assertFalse( responseContent.contains("PARAMS") );
-			assertTrue( responseContent.contains("example.org") );
+			assertTrue( responseContent.contains("Exception occurred when outputting the result of a SELECT query using the Jena machinery.") );
 		}
 
 		final String invalidQueryStr = "SELECT * WHERE { SERVICE <http://example.org/> WRONG_KEYWORD(?v) { ?s ?p ?o } }";
