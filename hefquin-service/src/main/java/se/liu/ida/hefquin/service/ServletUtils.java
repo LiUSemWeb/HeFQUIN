@@ -92,9 +92,10 @@ public class ServletUtils
 				final Exception ex = exceptions.get(i);
 				final StringWriter sw = new StringWriter();
 				final PrintWriter pw = new PrintWriter(sw);
-				pw.append( "Exception " + (i + 1) + ": " + ex.getMessage() );
+				pw.println( ex.getMessage() );
+
 				if ( debug ) {
-					pw.append( "StackTrace:" );
+					pw.println( "StackTrace:" );
 					ex.printStackTrace( pw );
 				}
 				list.add( sw.toString() );

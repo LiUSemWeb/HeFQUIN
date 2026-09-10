@@ -260,9 +260,7 @@ public class RunHttpQuery extends CmdGeneral
 			final JsonObject errorJson = JSON.parse( errorBody ).getAsObject();
 			final JsonArray errors = errorJson.get( "error" ).getAsArray();
 
-			for ( final JsonValue error : errors ) {
-				cmdError( error.getAsString().value(), false );
-			}
+			printExceptions(errors);
 
 			cmdError( "Request failed with HTTP status " + response.statusCode(), true );
 			return;
@@ -271,6 +269,10 @@ public class RunHttpQuery extends CmdGeneral
 		final JsonObject obj = JSON.parse(response.body());
 
 		printPlans( obj );
+
+		final JsonValue exceptions = obj.get( HttpConstants.JSON_EXCEPTIONS );
+		if ( exceptions != null )
+			printExceptions( exceptions.getAsArray() );
 
 		final ResultSet rs = ResultSetFactory.fromJSON(
 			new ByteArrayInputStream(
@@ -431,5 +433,16 @@ public class RunHttpQuery extends CmdGeneral
 		final String queryProcStats = overallQueryProcessingTime + ", " + planningTime + ", " + compilationTime
 				+ ", " + executionTime;
 		return queryProcStats;
+	}
+
+	/**
+	 * Prints the given exceptions with their corresponding exception number.
+	 *
+	 * @param exceptions the exceptions to print
+	 */
+	protected void printExceptions( final JsonArray exceptions ) {
+		for ( int i = 0; i < exceptions.size(); i++ ) {
+			cmdError( "Exception " + (i + 1) + ": " + exceptions.get(i).getAsString().value(), false );
+		}
 	}
 }
