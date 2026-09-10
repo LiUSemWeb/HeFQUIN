@@ -244,35 +244,22 @@ public class RunHttpQuery extends CmdGeneral
 			return;
 		}
 
-		if ( response.statusCode() != 200 ) {
-			final String errorBody;
-			try {
-				errorBody = new String(
-					response.body().readAllBytes(),
-					StandardCharsets.UTF_8
-				);
-			}
-			catch ( final IOException e ) {
-				cmdError( "Failed to read error response from server: " + e.getMessage(), true );
-				return;
-			}
-
-			final JsonObject errorJson = JSON.parse( errorBody ).getAsObject();
-			final JsonArray errors = errorJson.get( "error" ).getAsArray();
-
-			printExceptions(errors);
-
-			cmdError( "Request failed with HTTP status " + response.statusCode(), true );
-			return;
-		}
-
 		final JsonObject obj = JSON.parse(response.body());
-
-		printPlans( obj );
 
 		final JsonValue exceptions = obj.get( HttpConstants.JSON_EXCEPTIONS );
 		if ( exceptions != null )
 			printExceptions( exceptions.getAsArray() );
+
+		final JsonValue error = obj.get( "error" );
+		if ( error != null )
+			printExceptions( error.getAsArray() );
+
+		if ( response.statusCode() != 200 ) {
+			cmdError( "Request failed with HTTP status " + response.statusCode(), true );
+			return;
+		}
+
+		printPlans( obj );
 
 		final ResultSet rs = ResultSetFactory.fromJSON(
 			new ByteArrayInputStream(
@@ -447,6 +434,7 @@ public class RunHttpQuery extends CmdGeneral
 			cmdError( "Exception " + (i + 1) + ": " + exception.getString("msg"), false );
 
 			if ( isDebug() )
+				cmdError( "StackTrace:", false );
 				cmdError( exception.getString("stacktrace"), false );
 		}
 	}

@@ -57,16 +57,17 @@ public class ServletUtils
 	}
 
 	/**
-	 * Converts the exceptions of the given object into a JSON array.
-	 * Each exception is represented by its message and, if debug mode
-	 * is enabled, the full stack trace for each exception.
+	 * Converts the exceptions of the given object into a JSON array
+	 * of JSON objects. Each JSON object contains the exception type,
+	 * message and, if debug mode is enabled, the full stack trace.
 	 *
 	 * @param statsAndExcs object that contain a list of exceptions;
 	 *                     may be null or empty
 	 * @param debug        {@code true} if full stack trace for each exception should be
 	 *                     included
-	 * @return a JSON array where each entry contains the exception message and, if debug
-	 *         mode is enabled, its full stack trace
+	 * @return a JSON array where each entry is a JSON object containing
+	 *         the exception type, message and, if debug mode is enabled,
+	 *         its full stack trace
 	 */
 	public static JsonArray getExceptions( final QueryProcessingStatsAndExceptions statsAndExcs, final boolean debug ) {
 		if ( statsAndExcs == null || ! statsAndExcs.containsExceptions() )
@@ -76,15 +77,17 @@ public class ServletUtils
 	}
 
 	/**
-	 * Converts a list of exceptions into a JSON array. Each exception is represented
-	 * by its message and, if debug mode is enabled, its full stack trace.
+	 * Converts the exceptions of the given object into a JSON array
+	 * of JSON objects. Each JSON object contains the exception type,
+	 * message and, if debug mode is enabled, the full stack trace.
 	 *
 	 * @param exceptions the list of exceptions encountered during query processing;
 	 *                   may be null or empty
 	 * @param debug      {@code true} if full stack trace for each exception should be
 	 *                   included
-	 * @return a JSON array where each entry contains the exception message and, if debug
-	 *         mode is enabled, its full stack trace
+	 * @return a JSON array where each entry is a JSON object containing
+	 *         the exception type, message and, if debug mode is enabled,
+	 *         its full stack trace
 	 */
 	public static JsonArray getExceptions( final List<Exception> exceptions, final boolean debug ) {
 		final JsonArray list = new JsonArray();
@@ -98,7 +101,6 @@ public class ServletUtils
 				if ( debug ) {
 					final StringWriter sw = new StringWriter();
 					final PrintWriter pw = new PrintWriter(sw);
-					pw.println( "StackTrace:" );
 					ex.printStackTrace( pw );
 					pw.close();
 
