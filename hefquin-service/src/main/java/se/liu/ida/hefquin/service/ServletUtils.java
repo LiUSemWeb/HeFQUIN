@@ -98,6 +98,7 @@ public class ServletUtils
 					ex.printStackTrace( pw );
 				}
 				list.add( sw.toString() );
+				pw.close();
 			}
 		}
 		return list;
