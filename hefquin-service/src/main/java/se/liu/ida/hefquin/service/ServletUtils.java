@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import org.apache.jena.atlas.json.JsonArray;
+import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
@@ -89,17 +90,22 @@ public class ServletUtils
 		final JsonArray list = new JsonArray();
 		if ( exceptions != null && ! exceptions.isEmpty() ) {
 			for ( int i = 0; i < exceptions.size(); i++ ) {
+				final JsonObject exception = new JsonObject();
 				final Exception ex = exceptions.get(i);
-				final StringWriter sw = new StringWriter();
-				final PrintWriter pw = new PrintWriter(sw);
-				pw.println( ex.getMessage() );
+				exception.put( "type", ex.getClass().getName() );
+				exception.put( "msg", ex.getMessage() );
 
 				if ( debug ) {
+					final StringWriter sw = new StringWriter();
+					final PrintWriter pw = new PrintWriter(sw);
 					pw.println( "StackTrace:" );
 					ex.printStackTrace( pw );
+					pw.close();
+
+					exception.put( "stacktrace", sw.toString() );
 				}
-				list.add( sw.toString() );
-				pw.close();
+
+				list.add( exception );
 			}
 		}
 		return list;
