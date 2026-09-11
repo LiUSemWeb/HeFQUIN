@@ -118,6 +118,7 @@ public abstract class FederationTestBase
 			super( NodeFactory.createURI("http://example.org/rest"),
 			       "http://example.org/",
 			       List.of(),
+			       null,
 			       null );
 		}
 
@@ -125,6 +126,7 @@ public abstract class FederationTestBase
 			super( NodeFactory.createURI("http://example.org/rest"),
 			       urlTemplate,
 			       params,
+			       null,
 			       null );
 		}
 
@@ -132,6 +134,7 @@ public abstract class FederationTestBase
 			super( NodeFactory.createURI(baseURL),
 			       urlTemplate,
 			       params,
+			       null,
 			       null );
 		}
 	}

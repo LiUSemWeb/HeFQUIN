@@ -13,16 +13,19 @@ public class RESTEndpointImpl extends BaseForFederationMember
 {
 	protected final String urlTemplate;
 	protected final List<RESTEndpoint.Parameter> params;
+	protected final Integer parallelRequestLimit;
 
 	public RESTEndpointImpl( final Node serviceURI,
 	                         final String urlTemplate,
 	                         final List<RESTEndpoint.Parameter> params,
-	                         final AuthenticationInformation authInfo ) {
+	                         final AuthenticationInformation authInfo,
+	                         final Integer parallelRequestLimit ) {
 		super(serviceURI, authInfo);
 
 		assert urlTemplate != null && ! urlTemplate.isEmpty();
 		this.urlTemplate = urlTemplate;
 		this.params = (params == null) ? List.of() : params;
+		this.parallelRequestLimit = parallelRequestLimit;
 	}
 
 	@Override
@@ -43,6 +46,9 @@ public class RESTEndpointImpl extends BaseForFederationMember
 
 	@Override
 	public Iterable<Parameter> getParameters() { return params; }
+
+	@Override
+	public Integer getParallelRequestLimit() { return parallelRequestLimit; }
 
 	@Override
 	public boolean supportsMoreThanTriplePatterns() { return true; }
