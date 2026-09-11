@@ -1,8 +1,10 @@
 package se.liu.ida.hefquin.service;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import org.apache.jena.atlas.json.JsonArray;
+import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
@@ -55,59 +57,59 @@ public class ServletUtils
 	}
 
 	/**
-	 * Converts the exceptions of the given object into a JSON array, including
-	 * class name, message, and full stack trace for each exception.
+	 * Converts the exceptions of the given object into a JSON array
+	 * of JSON objects. Each JSON object contains the exception type,
+	 * message and, if debug mode is enabled, the full stack trace.
 	 *
 	 * @param statsAndExcs object that contain a list of exceptions;
-	 *                   may be null or empty
-	 * @return a JSON array where each entry is a string representation of an
-	 *         exception and its stack trace
+	 *                     may be null or empty
+	 * @param debug        {@code true} if full stack trace for each exception should be
+	 *                     included
+	 * @return a JSON array where each entry is a JSON object containing
+	 *         the exception type, message and, if debug mode is enabled,
+	 *         its full stack trace
 	 */
-	public static JsonArray getExceptions( final QueryProcessingStatsAndExceptions statsAndExcs ) {
+	public static JsonArray getExceptions( final QueryProcessingStatsAndExceptions statsAndExcs, final boolean debug ) {
 		if ( statsAndExcs == null || ! statsAndExcs.containsExceptions() )
 			return new JsonArray();
 		else
-			return getExceptions( statsAndExcs.getExceptions() );
+			return getExceptions( statsAndExcs.getExceptions(), debug );
 	}
 
 	/**
-	 * Converts a list of exceptions into a JSON array, including class name,
-	 * message, and full stack trace for each exception.
+	 * Converts the exceptions of the given object into a JSON array
+	 * of JSON objects. Each JSON object contains the exception type,
+	 * message and, if debug mode is enabled, the full stack trace.
 	 *
 	 * @param exceptions the list of exceptions encountered during query processing;
 	 *                   may be null or empty
-	 * @return a JSON array where each entry is a string representation of an
-	 *         exception and its stack trace
+	 * @param debug      {@code true} if full stack trace for each exception should be
+	 *                   included
+	 * @return a JSON array where each entry is a JSON object containing
+	 *         the exception type, message and, if debug mode is enabled,
+	 *         its full stack trace
 	 */
-	public static JsonArray getExceptions( final List<Exception> exceptions ) {
+	public static JsonArray getExceptions( final List<Exception> exceptions, final boolean debug ) {
 		final JsonArray list = new JsonArray();
 		if ( exceptions != null && ! exceptions.isEmpty() ) {
 			for ( int i = 0; i < exceptions.size(); i++ ) {
-				final Throwable rootCause = getRootCause( exceptions.get( i ) );
-				final StringWriter sw = new StringWriter();
-				sw.append( rootCause.getClass().getName() + ": " + rootCause.getMessage() );
-				list.add( sw.toString() );
+				final JsonObject exception = new JsonObject();
+				final Exception ex = exceptions.get(i);
+				exception.put( "type", ex.getClass().getName() );
+				exception.put( "msg", ex.getMessage() );
+
+				if ( debug ) {
+					final StringWriter sw = new StringWriter();
+					final PrintWriter pw = new PrintWriter(sw);
+					ex.printStackTrace( pw );
+					pw.close();
+
+					exception.put( "stacktrace", sw.toString() );
+				}
+
+				list.add( exception );
 			}
 		}
 		return list;
-	}
-
-	/**
-	 * Returns the root cause of a throwable by traversing the cause chain.
-	 *
-	 * This method follows the chain of {@code Throwable.getCause()} until it
-	 * reaches the deepest non-null cause. If the input {@code throwable} has no
-	 * cause, the method returns the throwable itself.
-	 *
-	 * @param throwable the throwable from which to extract the root cause
-	 * @return the root cause of the throwable, or {@code null} if {@code throwable}
-	 *         is {@code null}
-	 */
-	private static Throwable getRootCause( Throwable throwable ) {
-		Throwable cause = throwable;
-		while ( cause.getCause() != null ) {
-			cause = cause.getCause();
-		}
-		return cause;
 	}
 }
