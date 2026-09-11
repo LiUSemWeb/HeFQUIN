@@ -435,16 +435,13 @@ public class RunHttpQuery extends CmdGeneral
 	 */
 	protected void printExceptions( final JsonArray exceptions ) {
 		for ( int i = 0; i < exceptions.size(); i++ ) {
-			System.err.println();
-
 			final JsonObject exception = exceptions.get(i).getAsObject();
 
 			cmdError( "Exception " + (i + 1) + ": " + exception.getString("msg"), false );
 
-			if ( isDebug() ) {
+			if ( isDebug() )
 				cmdError( "StackTrace:", false );
 				cmdError( exception.getString("stacktrace"), false );
-			}
 		}
 	}
 }
