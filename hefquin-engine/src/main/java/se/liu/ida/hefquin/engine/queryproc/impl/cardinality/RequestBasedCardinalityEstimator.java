@@ -43,7 +43,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		addCardinalitiesForRequests(ctx, plans);
 
 		// Now, use the worker to determine the cardinality estimates
-		// for the given plans recursively. 
+		// for the given plans recursively.
 		new CardinalityEstimationWorkerImpl().addCardinalities(plans);
 	}
 
@@ -56,7 +56,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		addCardinalitiesForRequests(ctx, plans);
 
 		// Now, use the worker to determine the cardinality estimates
-		// for the given plans recursively. 
+		// for the given plans recursively.
 		new CardinalityEstimationWorkerImpl().addCardinalities(plans);
 	}
 
@@ -204,7 +204,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 // TODO: We should try to be a bit smarter, using some heuristic that takes
 // the patterns of the given requests into account.
 // TODO: Also, in cases in which only some of the cardinality requests failed,
-// we should at least get the values for those that did not fail. 
+// we should at least get the values for those that did not fail.
 			final QueryPlanProperty est = QueryPlanProperty.cardinality(Integer.MAX_VALUE,
 			                                                            Quality.PURE_GUESS);
 			final QueryPlanProperty min = QueryPlanProperty.minCardinality(0,
@@ -244,7 +244,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 				final QueryPlanProperty.Quality minCardQuality;
 				final QueryPlanProperty.Quality maxCardQuality;
 
-				if ( resps[i].isError() ) {
+				if ( resps[i].isError() || resps[i].isDefective() ) {
 					cardValue = Integer.MAX_VALUE;
 					cardQuality = Quality.PURE_GUESS;
 					minCardValue = 0;
@@ -322,7 +322,7 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 				if ( resps.length < respIdx - 1 )
 					throw new IllegalStateException("Wrong number of cardinality responses (namely, " + resps.length + ", but at least " + respIdx + " expected).");
 
-				if ( resps[respIdx].isError() ) {
+				if ( resps[respIdx].isError() || resps[respIdx].isDefective() ) {
 					errorFound = true;
 				}
 				else {

@@ -158,10 +158,6 @@ public class SparqlServlet extends HttpServlet {
 
 		try {
 			final JsonObject result = execute( query, mimeType, ctx, queryResBuf, returnQueryProcStats, returnFedAccessStats );
-			if ( ! result.get(HttpConstants.JSON_EXCEPTIONS).getAsArray().isEmpty() ) {
-				writeJsonError( response, 500, result.get( HttpConstants.JSON_EXCEPTIONS ) );
-				return;
-			}
 
 			response.setStatus( 200 );
 			response.setContentType( mimeType );
