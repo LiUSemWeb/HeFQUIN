@@ -10,8 +10,6 @@ import org.apache.jena.vocabulary.VOID;
 
 import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.data.impl.TripleImpl;
-import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 
 public class TPFResponseBuilder
@@ -25,16 +23,19 @@ public class TPFResponseBuilder
 	public static final Node nextPagePredicate1 = NodeFactory.createURI("http://www.w3.org/ns/hydra/core#next");
 	public static final Node nextPagePredicate2 = NodeFactory.createURI("http://www.w3.org/ns/hydra/core#nextPage");
 
-	protected final List<Triple> matchingTriples = new ArrayList<>();
-	protected final List<Triple> metadataTriples = new ArrayList<>();
+	protected List<Triple> matchingTriples    = null;
+	protected List<Triple> metadataTriples    = null;
 
-	protected FederationMember fm             = null;
-	protected DataRetrievalRequest request    = null;
 	protected Date requestStartTime           = null;
 	protected int tripleCount                 = -1;  // TODO: should better be long, but changing affects a lot of other things
 	protected String nextPageURL              = null;
 
-	public TPFResponseBuilder addMatchingTriple( final Triple t) {
+	protected Exception exception             = null;
+
+	public TPFResponseBuilder addMatchingTriple( final Triple t ) {
+		if ( matchingTriples == null )
+			matchingTriples = new ArrayList<>();
+
 		matchingTriples.add(t);
 		return this;
 	}
@@ -48,6 +49,9 @@ public class TPFResponseBuilder
 	}
 
 	public TPFResponseBuilder addMetadataTriple( final Triple t ) {
+		if ( metadataTriples == null )
+			metadataTriples = new ArrayList<>();
+
 		metadataTriples.add(t);
 		tryExtractCountMetadataOrNextPageURL(t);
 		return this;
@@ -61,16 +65,6 @@ public class TPFResponseBuilder
 		return addMetadataTriple( new TripleImpl(s,p,o) );
 	}
 
-	public TPFResponseBuilder setFederationMember( final FederationMember fm ) {
-		this.fm = fm;
-		return this;
-	}
-
-	public TPFResponseBuilder setRequest( final DataRetrievalRequest request ) {
-		this.request = request;
-		return this;
-	}
-
 	public TPFResponseBuilder setRequestStartTime( final Date requestStartTime ) {
 		this.requestStartTime = requestStartTime;
 		return this;
@@ -80,21 +74,23 @@ public class TPFResponseBuilder
 		return setRequestStartTime( new Date() );
 	}
 
+	public TPFResponseBuilder setException( final Exception exception ) {
+		this.exception = exception;
+		return this;
+	}
+
 	public TPFResponse build() {
+		if ( requestStartTime == null )
+			throw new IllegalStateException("requestStartTime not specified");
+
+		if ( exception != null )
+			return new TPFResponseImpl(exception, requestStartTime);
+
 		if ( matchingTriples == null )
 			throw new IllegalStateException("matchingTriples not specified");
 
 		if ( metadataTriples == null )
-			throw new IllegalStateException("metadataTriples not specified");
-
-		if ( fm == null )
-			throw new IllegalStateException("fed.member not specified");
-
-		if ( request == null )
-			throw new IllegalStateException("request not specified");
-
-		if ( requestStartTime == null )
-			throw new IllegalStateException("requestStartTime not specified");
+			metadataTriples = new ArrayList<>();
 
 		if ( metadataTriples.isEmpty() ) {
 			// Attention. This case may occur if the requested triple
@@ -115,6 +111,7 @@ public class TPFResponseBuilder
 				}
 			}
 		}
+
 		if ( tripleCount < 0 )
 			return new TPFResponseImpl( matchingTriples,
 			                            metadataTriples,

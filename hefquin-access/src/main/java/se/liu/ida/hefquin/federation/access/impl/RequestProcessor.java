@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.federation.access.impl;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 
 /**
  * This interface captures any kind of request processor.
@@ -24,5 +23,5 @@ public interface RequestProcessor<ReqType extends DataRetrievalRequest,
 	boolean isSupportedResponseType( Class<? extends DataRetrievalResponse<?>> t );
 	boolean isSupportedMemberType( Class<? extends FederationMember> t );
 
-	RespType performRequest( ReqType req, MemberType fm ) throws FederationAccessException;
+	RespType performRequest( ReqType req, MemberType fm );
 }

@@ -21,9 +21,9 @@ import org.apache.jena.sparql.graph.GraphFactory;
 
 import se.liu.ida.hefquin.cli.modules.ModNeo4jEndpoint;
 import se.liu.ida.hefquin.cli.modules.ModLPG2RDFConfiguration;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.Neo4jConnectionFactory;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.Neo4jConnectionFactory.Neo4jConnection;
 import se.liu.ida.hefquin.engine.wrappers.lpg.conf.LPG2RDFConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory;
-import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory.Neo4jConnection;
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.PropertyMap;
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.Value;
@@ -93,7 +93,7 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 	 */
 	@Override
 	protected String getSummary() {
-		return "Usage: " + getCommandName() + " " + 
+		return "Usage: " + getCommandName() + " " +
 			"--endpoint=<neo4j-endpoint-url> " +
 			"--username=<neo4j-username> " +
 			"--password=<neo4j-password>";

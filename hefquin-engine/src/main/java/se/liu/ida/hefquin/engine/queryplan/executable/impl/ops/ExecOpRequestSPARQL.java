@@ -47,14 +47,31 @@ public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
 			response = FederationAccessUtils.performRequest( ctx.getFederationAccessMgr(), req, fm );
 		}
 		catch ( final FederationAccessException e ) {
-			throw new ExecOpExecutionException( "Performing the request caused an exception.", e, this );
+			throw new ExecOpExecutionException( e.getMessage(), e, this );
 		}
 
 		timeAfterResponse = System.currentTimeMillis();
+
+		if ( response.isDefective() ) {
+			throw new ExecOpExecutionException( response.getException().getMessage(),
+			                                    response.getException(),
+			                                    this );
+		}
+
+		if ( response.isError() ) {
+			final String msg = "Requesting the execution of a query at the " +
+					"server with the service URI " + fm.getServiceURI() +
+					" resulted in an error with error code " +
+					response.getErrorStatusCode() + " and the " +
+					"following message: " + response.getErrorDescription();
+			throw new ExecOpExecutionException(msg, this);
+		}
+
 		try {
 			solMapsRetrieved = response.getSize();
-		} catch ( final UnsupportedOperationDueToRetrievalError e ) {
-			throw new ExecOpExecutionException( "Accessing the response size caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+		}
+		catch ( final UnsupportedOperationDueToRetrievalError e ) {
+			throw new IllegalStateException("We should not end up here.", e);
 		}
 
 		process(response, sink);
@@ -66,15 +83,16 @@ public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
 			numberOfOutputMappingsProduced );
 	}
 
-	protected void process( final SolMapsResponse response, final IntermediateResultElementSink sink )
-		throws ExecOpExecutionException
+	protected void process( final SolMapsResponse response,
+	                        final IntermediateResultElementSink sink )
+			throws ExecOpExecutionException
 	{
 		final Iterable<SolutionMapping> solutionMappings;
 		try {
 			solutionMappings = response.getResponseData();
 		}
 		catch ( final UnsupportedOperationDueToRetrievalError e ) {
-			throw new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+			throw new IllegalStateException("We should not end up here.", e);
 		}
 
 		final int cnt = sink.send(solutionMappings);

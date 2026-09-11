@@ -155,9 +155,10 @@ public class SparqlServlet extends HttpServlet {
 
 		final boolean returnQueryProcStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_QUERY_PROC_STATS));
 		final boolean returnFedAccessStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS));
+		final boolean returnFullStackTrace = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_FULL_STACK_TRACE));
 
 		try {
-			final JsonObject result = execute( query, mimeType, ctx, queryResBuf, returnQueryProcStats, returnFedAccessStats );
+			final JsonObject result = execute( query, mimeType, ctx, queryResBuf, returnQueryProcStats, returnFedAccessStats, returnFullStackTrace );
 			if ( ! result.get(HttpConstants.JSON_EXCEPTIONS).getAsArray().isEmpty() ) {
 				writeJsonError( response, 500, result.get( HttpConstants.JSON_EXCEPTIONS ) );
 				return;
@@ -238,7 +239,8 @@ public class SparqlServlet extends HttpServlet {
 	                                   final QueryProcContext ctx,
 	                                   final QueryResponseBuffers queryResBuf,
 	                                   final boolean returnQueryProcStats,
-	                                   final boolean returnFedAccessStats ) throws UnsupportedQueryException, IllegalQueryException {
+	                                   final boolean returnFedAccessStats,
+	                                   final boolean returnFullStackTrace ) throws UnsupportedQueryException, IllegalQueryException {
 		final Query query = QueryFactory.create( queryString, SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN );
 		final ResultsFormat resultsFormat = ServletUtils.convert( mimeType );
 		final ByteArrayOutputStream resultBaos = new ByteArrayOutputStream();
@@ -258,7 +260,7 @@ public class SparqlServlet extends HttpServlet {
 			res.put(HttpConstants.JSON_PHYSICAL_PLAN, queryResBuf.physicalPlan.toString());
 		if ( queryResBuf.executablePlan != null && queryResBuf.executablePlan.size() > 0 )
 			res.put(HttpConstants.JSON_EXECUTABLE_PLAN, queryResBuf.executablePlan.toString());
-		res.put( HttpConstants.JSON_EXCEPTIONS, ServletUtils.getExceptions(statsAndExceptions) );
+		res.put( HttpConstants.JSON_EXCEPTIONS, ServletUtils.getExceptions(statsAndExceptions, returnFullStackTrace) );
 
 		final JsonObject queryProcStatsAsJson;
 		if ( statsAndExceptions != null && returnQueryProcStats ) {

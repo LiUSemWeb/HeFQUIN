@@ -54,16 +54,32 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 			                                                 fm );
 		}
 		catch ( final FederationAccessException e ) {
-			throw new ExecOpExecutionException( "Performing the request caused an exception.", e, this );
+			throw new ExecOpExecutionException( e.getMessage(), e, this );
 		}
 
 		timeAfterResponse = System.currentTimeMillis();
 
+		if ( response.isDefective() ) {
+			throw new ExecOpExecutionException( response.getException().getMessage(),
+			                                    response.getException(),
+			                                    this );
+		}
+
+		if ( response.isError() ) {
+			final String msg = "Requesting the execution of a query at the " +
+					"server with the service URI " + fm.getServiceURI() +
+					" resulted in an error with error code " +
+					response.getErrorStatusCode() + " and the " +
+					"following message: " + response.getErrorDescription();
+			throw new ExecOpExecutionException(msg, this);
+		}
+
 		final String data;
 		try {
 			data = response.getResponseData();
-		} catch ( final UnsupportedOperationDueToRetrievalError e ) {
-			throw new ExecOpExecutionException( "Accessing the response data caused an exception, which indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+		}
+		catch ( final UnsupportedOperationDueToRetrievalError e ) {
+			throw new IllegalStateException("We should not end up here.", e);
 		}
 
 		log.debug( "Received REST response from {}", fm.getURLTemplate() );
@@ -83,7 +99,11 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
 			solmaps = fm.evaluatePatternOverRDFView( req.getQueryPattern(), data );
 		}
 		catch ( final DataConversionException e ) {
-			throw new ExecOpExecutionException("Converting the reponse of a REST request into RDF failed.", e, this);
+			final String msg = "Creating RDF from the response of a " +
+					"REST request to the endpoint with the service URI " +
+					fm.getServiceURI() + " failed with the following " +
+					"message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
 		}
 
 		final int cnt = sink.send(solmaps);

@@ -37,26 +37,25 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterI
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.Neo4jRequestProcessor;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.Neo4jRequestProcessorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpg.access.RecordsResponse;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.federation.access.Neo4jRequest;
 import se.liu.ida.hefquin.federation.access.RESTRequest;
-import se.liu.ida.hefquin.federation.access.RecordsResponse;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.StringResponse;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.StringResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
@@ -288,9 +287,7 @@ public abstract class EngineTestBase
 		@Override
 		public String getURL() { return url; }
 
-		public SolMapsResponse performRequest( final SPARQLRequest req )
-				throws FederationAccessException
-		{
+		public SolMapsResponse performRequest( final SPARQLRequest req ) {
 			final List<SolutionMapping> result;
 			if ( req instanceof TriplePatternRequest ) {
 				result = getSolutions( (TriplePatternRequest) req);
@@ -548,9 +545,7 @@ public abstract class EngineTestBase
 		         RespType extends DataRetrievalResponse<?>,
 		         MemberType extends FederationMember >
 		CompletableFuture<RespType> issueRequest( final ReqType req,
-		                                          final MemberType fm )
-				throws FederationAccessException
-		{
+		                                          final MemberType fm ) {
 			if ( req instanceof SPARQLRequest reqSPARQL && fm instanceof SPARQLEndpoint fmSPARQL ) {
 				@SuppressWarnings("unchecked")
 				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqSPARQL, fmSPARQL);
@@ -591,9 +586,7 @@ public abstract class EngineTestBase
 		}
 
 		protected CompletableFuture<SolMapsResponse> _issueRequest( final SPARQLRequest req,
-		                                                            final SPARQLEndpoint fm )
-						throws FederationAccessException
-		{
+		                                                            final SPARQLEndpoint fm ) {
 			final SolMapsResponse response;
 			if ( itSolMapsForResponse != null ) {
 				response = new SolMapsResponseImpl( itSolMapsForResponse.next(),
@@ -650,18 +643,14 @@ public abstract class EngineTestBase
 		}
 
 		protected CompletableFuture<RecordsResponse> _issueRequest( final Neo4jRequest req,
-		                                                            final Neo4jServer fm )
-				throws FederationAccessException
-		{
+		                                                            final Neo4jServer fm ) {
 			final Neo4jRequestProcessor reqProc = new Neo4jRequestProcessorImpl();
 			final RecordsResponse response = reqProc.performRequest(req, fm);
 			return CompletableFuture.completedFuture(response);
 		}
 
 		protected CompletableFuture<StringResponse> _issueRequest( final RESTRequest req,
-		                                                           final RESTEndpoint fm )
-						throws FederationAccessException
-		{
+		                                                           final RESTEndpoint fm ) {
 			final String data;
 			if ( fm instanceof WrappedRESTEndpointForTest ep )
 				data = ep.getResponseData();
@@ -679,9 +668,7 @@ public abstract class EngineTestBase
 				MemberType extends FederationMember >
 		CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final ReqType req,
-				final MemberType fm )
-						throws FederationAccessException
-		{
+				final MemberType fm ) {
 			throw new UnsupportedOperationException();
 		}
 

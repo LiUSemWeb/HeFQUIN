@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpg.conn;
+package se.liu.ida.hefquin.engine.wrappers.lpg.access;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -40,7 +40,7 @@ public class Neo4jConnectionFactory
 		public Neo4jConnection( final String url ) {
 			this( URI.create(url), null, null );
 		}
-		
+
 		public Neo4jConnection( final String url, final String username, final String password ) {
 			this( URI.create(url), username, password );
 		}

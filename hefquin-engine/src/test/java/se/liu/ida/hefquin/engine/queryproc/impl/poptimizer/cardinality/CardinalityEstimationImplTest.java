@@ -26,11 +26,9 @@ import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
@@ -449,33 +447,30 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 		@Override
 		public < ReqType extends DataRetrievalRequest,
-				RespType extends DataRetrievalResponse<?>,
-				MemberType extends FederationMember >
+		         RespType extends DataRetrievalResponse<?>,
+		         MemberType extends FederationMember >
 		CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final ReqType req,
-				final MemberType fm )
-						throws FederationAccessException
-		{
+				final MemberType fm ) {
 			if(    req instanceof TPFRequest tpfReq
 			    && fm instanceof TPFServer ) {
 				final Object o = tpfReq.getQueryPattern().asJenaTriple().getObject().getLiteralValue();
 				final int c = ((Integer) o).intValue();
 				final CardinalityResponse resp = new CardinalityResponse() {
+					@Override public Integer getResponseData() { return c; }
 					@Override public Date getRetrievalEndTime() { return null; }
 					@Override public Date getRequestStartTime() { return null; }
-					@Override public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
-						if( isError() ){
-							throw new UnsupportedOperationDueToRetrievalError();
-						}
-						return c;
-					}
+					@Override public Integer getErrorStatusCode() { return null; }
+					@Override public String getErrorDescription() { return null; }
+					@Override public Exception getException() { return null; }
 				};
 
 				if ( sleepMillis > 0L ) {
 					try {
 						Thread.sleep(sleepMillis);
-					} catch ( final InterruptedException e ) {
-						throw new FederationAccessException(e, req, fm);
+					}
+					catch ( final InterruptedException e ) {
+						throw new RuntimeException("Unexpected interruption.", e);
 					}
 				}
 

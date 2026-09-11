@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.graph.Graph;
@@ -12,6 +13,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTERTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
@@ -264,11 +266,12 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUESorFILTERTest extends TestsF
 	protected SPARQLEndpoint createFedMemberForTest( final Graph dataForMember ) {
 		return new SPARQLEndpointForTest(dataForMember) {
 			@Override
-			public SolMapsResponse performRequest( final SPARQLRequest req )
-					throws FederationAccessException {
+			public SolMapsResponse performRequest( final SPARQLRequest req ) {
 				if ( forceFailureForVALUES &&
-				     req.getQueryPattern().toStringForPlanPrinters().contains("VALUES") )
-					throw new FederationAccessException("Test endpoint that pretends it cannot do VALUES clauses.", req, this);
+				     req.getQueryPattern().toStringForPlanPrinters().contains("VALUES") ) {
+					final Exception ex = new FederationAccessException("Test endpoint that pretends it cannot do VALUES clauses.", req, this);
+					return new SolMapsResponseImpl( ex, new Date() );
+				}
 				else
 					return super.performRequest(req);
 			}

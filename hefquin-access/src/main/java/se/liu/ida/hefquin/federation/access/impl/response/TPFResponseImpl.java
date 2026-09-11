@@ -120,166 +120,128 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	}
 
 	/**
-	 * Constructs a response with the given matching triples, metadata
-	 * triples, next page URL, request start time, and error details.
-	 * The retrieval end time is automatically set to the current time
-	 * at the moment of construction.
+	 * Constructs a response for the case that the response was an
+	 * error message. The retrieval end time is automatically set
+	 * to the current time at the moment of construction.
 	 *
-	 * @param matchingTriples  the list of triples matching the request pattern (must not be null)
-	 * @param metadataTriples  the list of metadata triples (must not be null)
-	 * @param nextPageURL      the URL for the next page of results, or {@code null} if there is none
-	 * @param requestStartTime the timestamp when the request started
-	 * @param errorStatusCode  the HTTP status code representing an error, or {@code null} if no error occurred
-	 * @param errorDescription a short description of the error, or {@code null} if no error occurred
+	 * *@param errorStatusCode  the HTTP status code of the error message
+	 *                         (must not be {@code null})
+	 * @param errorDescription a short description of the error (may be
+	 *                         {@code null})
+	 * @param requestStartTime the time at which the request was initiated
+	 *                         (must not be {@code null})
 	 */
-	public TPFResponseImpl( final List<Triple> matchingTriples,
-	                        final List<Triple> metadataTriples,
-	                        final String nextPageURL,
-	                        final Date requestStartTime,
-	                        final int errorStatusCode,
-	                        final String errorDescription ) {
-		super(matchingTriples, requestStartTime, errorStatusCode, errorDescription);
+	public TPFResponseImpl( final int errorStatusCode,
+	                        final String errorDescription,
+	                        final Date requestStartTime ) {
+		super(errorStatusCode, errorDescription, requestStartTime);
 
-		assert metadataTriples != null;
-
-		this.metadataTriples = metadataTriples;
-		this.nextPageURL = nextPageURL; // may be null
+		this.metadataTriples = null;
+		this.nextPageURL = null;
 		this.cardEstimate = null;
 	}
 
 	/**
-	 * Constructs a response with the given matching triples, metadata
-	 * triples, next page URL, request start time, retrieval end time,
-	 * and error details.
+	 * Constructs a response for the case that the response was an
+	 * error message.
 	 *
-	 * @param matchingTriples  the list of triples matching the request pattern (must not be null)
-	 * @param metadataTriples  the list of metadata triples (must not be null)
-	 * @param nextPageURL      the URL for the next page of results, or {@code null} if there is none
-	 * @param requestStartTime the timestamp when the request started
-	 * @param retrievalEndTime the time at which the retrieval of this response was completed (must not be {@code null})
-	 * @param errorStatusCode  the HTTP status code representing an error, or {@code null} if no error occurred
-	 * @param errorDescription a short description of the error, or {@code null} if no error occurred
+	 * *@param errorStatusCode  the HTTP status code of the error message
+	 *                         (must not be {@code null})
+	 * @param errorDescription a short description of the error (may be
+	 *                         {@code null})
+	 * @param requestStartTime the time at which the request was initiated
+	 *                         (must not be {@code null})
+	 * @param retrievalEndTime the time at which the retrieval of this response
+	 *                         was completed (must not be {@code null})
 	 */
-	public TPFResponseImpl( final List<Triple> matchingTriples,
-	                        final List<Triple> metadataTriples,
-	                        final String nextPageURL,
+	public TPFResponseImpl( final int errorStatusCode,
+	                        final String errorDescription,
 	                        final Date requestStartTime,
-	                        final Date retrievalEndTime,
-	                        final Integer errorStatusCode,
-	                        final String errorDescription ) {
-		super(matchingTriples, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription);
+	                        final Date retrievalEndTime ) {
+		super(errorStatusCode, errorDescription, requestStartTime, retrievalEndTime);
 
-		assert metadataTriples != null;
-
-		this.metadataTriples = metadataTriples;
-		this.nextPageURL = nextPageURL; // may be null
+		this.metadataTriples = null;
+		this.nextPageURL = null;
 		this.cardEstimate = null;
 	}
 
 	/**
-	 * Constructs a response with the given matching triples, metadata
-	 * triples, next page URL, triple count, request start time, and
-	 * error details. The retrieval end time is automatically set to
-	 * the current time at the moment of construction.
+	 * Constructs a defective response for the case that an exception
+	 * was thrown when producing the response. The retrieval end time
+	 * is automatically set to the current time at the moment of
+	 * construction.
 	 *
-	 * @param matchingTriples  the list of triples matching the request pattern (must not be null)
-	 * @param metadataTriples  the list of metadata triples (must not be null)
-	 * @param nextPageURL      the URL for the next page of results, or {@code null} if there is none
-	 * @param tripleCount      the triple count
-	 * @param requestStartTime the timestamp when the request started
-	 * @param errorStatusCode  the HTTP status code representing an error, or {@code null} if no error occurred
-	 * @param errorDescription a short description of the error, or {@code null} if no error occurred
+	 * @param exception  the exception (must not be {@code null})
+	 * @param requestStartTime the time at which the request was initiated
+	 *                         (must not be {@code null})
 	 */
-	public TPFResponseImpl( final List<Triple> matchingTriples,
-	                        final List<Triple> metadataTriples,
-	                        final String nextPageURL,
-	                        final int tripleCount,
-	                        final Date requestStartTime,
-	                        final Integer errorStatusCode,
-	                        final String errorDescription ) {
-		super(matchingTriples, requestStartTime, errorStatusCode, errorDescription);
+	public TPFResponseImpl( final Exception exception,
+	                        final Date requestStartTime ) {
+		super(exception, requestStartTime);
 
-		assert metadataTriples != null;
-		assert tripleCount >= 0;
-
-		this.metadataTriples = metadataTriples;
-		this.nextPageURL = nextPageURL; // may be null
-		this.cardEstimate = Integer.valueOf( tripleCount );
+		this.metadataTriples = null;
+		this.nextPageURL = null;
+		this.cardEstimate = null;
 	}
 
 	/**
-	 * Constructs a response with the given matching triples, metadata
-	 * triples, next page URL, triple count, request start time, retrieval
-	 * end time, and error details.
+	 * Constructs a defective response for the case that an exception
+	 * was thrown when producing the response.
 	 *
-	 * @param matchingTriples  the list of triples matching the request pattern (must not be null)
-	 * @param metadataTriples  the list of metadata triples (must not be null)
-	 * @param nextPageURL      the URL for the next page of results, or {@code null} if there is none
-	 * @param tripleCount      the triple count
-	 * @param requestStartTime the timestamp when the request started
-	 * @param retrievalEndTime the time at which the retrieval of this response was completed (must not be {@code null})
-	 * @param errorStatusCode  the HTTP status code representing an error, or {@code null} if no error occurred
-	 * @param errorDescription a short description of the error, or {@code null} if no error occurred
+	 * @param exception  the exception (must not be {@code null})
+	 * @param requestStartTime the time at which the request was initiated
+	 *                         (must not be {@code null})
+	 * @param retrievalEndTime the time at which the creation of this response
+	 *                         resulted in an exception (must not be {@code null})
 	 */
-	public TPFResponseImpl( final List<Triple> matchingTriples,
-	                        final List<Triple> metadataTriples,
-	                        final String nextPageURL,
-	                        final int tripleCount,
+	public TPFResponseImpl( final Exception exception,
 	                        final Date requestStartTime,
-	                        final Date retrievalEndTime,
-	                        final Integer errorStatusCode,
-	                        final String errorDescription ) {
-		super(matchingTriples, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription);
+	                        final Date retrievalEndTime ) {
+		super(exception, requestStartTime, retrievalEndTime);
 
-		assert metadataTriples != null;
-		assert tripleCount >= 0;
-
-		this.metadataTriples = metadataTriples;
-		this.nextPageURL = nextPageURL; // may be null
-		this.cardEstimate = Integer.valueOf( tripleCount );
+		this.metadataTriples = null;
+		this.nextPageURL = null;
+		this.cardEstimate = null;
 	}
 
 	@Override
-	public Iterable<Triple> getMetadata() {
+	public Iterable<Triple> getMetadata() throws UnsupportedOperationDueToRetrievalError {
+		throwExceptionIfNoResponseData();
 		return metadataTriples;
 	}
 
 	@Override
-	public Boolean isLastPage() {
+	public Boolean isLastPage() throws UnsupportedOperationDueToRetrievalError {
+		throwExceptionIfNoResponseData();
 		return nextPageURL == null;
 	}
 
 	@Override
-	public String getNextPageURL() {
+	public String getNextPageURL() throws UnsupportedOperationDueToRetrievalError {
+		throwExceptionIfNoResponseData();
 		return nextPageURL;
 	}
 
 	@Override
-	public Integer getCardinalityEstimate() {
+	public Integer getCardinalityEstimate() throws UnsupportedOperationDueToRetrievalError {
+		throwExceptionIfNoResponseData();
 		return cardEstimate;
 	}
 
 	/**
-	 * Returns an iterator over all triples contained in the TPF response, concatenating the payload
-	 * and metadata into a single iterable.
+	 * Returns an iterator over all triples contained in the TPF response,
+	 * concatenating the payload and metadata into a single iterable.
 	 *
-	 * @throws UnsupportedOperationDueToRetrievalError
+	 * @throws UnsupportedOperationDueToRetrievalError if the response to the
+	 * corresponding request was an error message (see {@link #isError()}) or
+	 * the response is defective (see {@link #isDefective()}).
 	 */
 	@Override
 	public Iterable<Triple> getResponseData() throws UnsupportedOperationDueToRetrievalError {
-		if ( isError() ) {
-			throw new UnsupportedOperationDueToRetrievalError(
-					getErrorStatusCode(),
-					getErrorDescription() );
-		}
+		throwExceptionIfNoResponseData();
 		return new ConcatenatingIterable<Triple>( getPayload(), getMetadata() );
 	}
 
-	/**
-	 * Returns an iterator over the matched triples in the TPF response.
-	 *
-	 * @throws UnsupportedOperationDueToRetrievalError
-	 */
 	@Override
 	public Iterable<Triple> getPayload() throws UnsupportedOperationDueToRetrievalError {
 		return super.getResponseData();

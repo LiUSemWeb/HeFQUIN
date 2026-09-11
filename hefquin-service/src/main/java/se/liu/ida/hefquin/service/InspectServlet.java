@@ -189,7 +189,7 @@ public class InspectServlet extends HttpServlet
 					                                   ps );
 
 			inspectionResults.put( "exceptions",
-			                       ServletUtils.getExceptions(statsAndExceptions) );
+			                       ServletUtils.getExceptions(statsAndExceptions,false) );
 
 			if( statsAndExceptions != null ){
 				inspectionResults.put( "queryMetrics", StatsPrinter.statsAsJson(statsAndExceptions) );

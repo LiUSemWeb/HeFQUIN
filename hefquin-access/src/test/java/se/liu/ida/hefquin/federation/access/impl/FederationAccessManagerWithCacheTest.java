@@ -29,7 +29,6 @@ import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.access.*;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.GraphQLRequestImpl;
-import se.liu.ida.hefquin.federation.access.impl.req.Neo4jRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.RESTRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
@@ -196,20 +195,6 @@ public class FederationAccessManagerWithCacheTest extends FederationTestBase
 		final FederationMember fm = new SPARQLEndpointForTest();
 		final CompletableFuture<SolMapsResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
 		final CompletableFuture<SolMapsResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
-
-		assertEquals(fr1, fr2);
-	}
-
-	@Test
-	public void neo4JResponseCachingTest() throws InterruptedException, ExecutionException, FederationAccessException {
-		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
-
-		final String cypherQuery = "RETURN null AS result LIMIT 0";
-		final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);
-
-		final FederationMember fm = new Neo4jServerForTest();
-		final CompletableFuture<StringResponse> fr1 = fedAccessMgr.issueRequest(req, fm);
-		final CompletableFuture<StringResponse> fr2 = fedAccessMgr.issueRequest(req, fm);
 
 		assertEquals(fr1, fr2);
 	}

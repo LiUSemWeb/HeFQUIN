@@ -30,7 +30,7 @@ public class ExecOpRequestTPF<MemberType extends FederationMember>
 	                         final QueryPlanningInfo qpInfo ) {
 		super(req, fm, mayReduce, collectExceptions, qpInfo);
 
-		log.debug( "Initialized ExecOpRequestBRTPF for server {}", fm );
+		log.debug( "Initialized ExecOpRequestTPF for server {}", fm );
 	}
 
 	@Override

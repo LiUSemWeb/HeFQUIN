@@ -46,9 +46,7 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 
 	@Override
 	public StringResponse performRequest( final RESTRequest req,
-	                                      final RESTEndpoint fm )
-			throws FederationAccessException
-	{
+	                                      final RESTEndpoint fm ) {
 		final URI uri = req.getURI();
 		final HttpRequest.Builder builder = HttpRequest.newBuilder( uri )
 				.header("Accept", "application/json;charset=UTF-8")
@@ -69,10 +67,22 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 			httpResponse = httpClient.send( httpReq, BodyHandlers.ofInputStream() );
 		}
 		catch ( final IOException e ) {
-			throw new FederationAccessException( "Request to REST API at <" + uri.toString() + "> failed: " + e.getMessage(), e, req, fm );
+			final String msg = "Sending a request to the REST API with " +
+					"service URI " + fm.getServiceURI() + " resulted in " +
+					"an I/O-related exception with the following message: " +
+					e.getMessage();
+			return new StringResponseImpl(
+					new FederationAccessException(msg,e,req,fm),
+					requestStartTime );
 		}
 		catch ( final InterruptedException e ) {
-			throw new FederationAccessException( "Request to REST API at <" + uri.toString() + "> failed: " + e.getMessage(), e, req, fm );
+			final String msg = "Performing a request at the REST API with " +
+					"service URI " + fm.getServiceURI() + " was interrupted " +
+					"through an exception with the following message: " +
+					e.getMessage();
+			return new StringResponseImpl(
+					new FederationAccessException(msg,e,req,fm),
+					requestStartTime );
 		}
 
 		final String body;
@@ -81,12 +91,17 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 		}
 		catch ( final HttpException e ) {
 			if ( e.getStatusCode() > 0 )
-				return new StringResponseImpl( "",
-				                               requestStartTime,
-				                               e.getStatusCode(),
-				                               e.getMessage() );
-			else
-				throw new FederationAccessException( "Unexpected response for request to REST API (requested URI: <" + uri.toString() + ">, message: " + e.getMessage() + ")", e, req, fm );
+				return new StringResponseImpl( e.getStatusCode(),
+				                               e.getMessage(),
+				                               requestStartTime );
+
+			final String msg = "Handling the response for a request to " +
+					"the REST API with service URI " + fm.getServiceURI() +
+					"caused an exception with the following message: " +
+					e.getMessage();
+			return new StringResponseImpl(
+					new FederationAccessException(msg,e,req,fm),
+					requestStartTime );
 		}
 
 		return new StringResponseImpl(body, requestStartTime);

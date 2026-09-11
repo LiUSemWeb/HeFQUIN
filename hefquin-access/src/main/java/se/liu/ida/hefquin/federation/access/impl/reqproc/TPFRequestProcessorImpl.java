@@ -1,15 +1,7 @@
 package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
-import java.util.Map;
-
-import org.apache.jena.riot.WebContent;
-
-import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.base.utils.BuildInfo;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
-import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseBuilder;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
@@ -24,37 +16,18 @@ public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements 
 	}
 
 	@Override
-	public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) throws FederationAccessException {
-		return _performRequest( req, fm );
+	public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) {
+		return performRequest( fm.createRequestURL(req),
+		                       req.getQueryPattern(),
+		                       req,
+		                       fm );
 	}
 
 	@Override
-	public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm ) throws FederationAccessException {
-		return _performRequest( req, fm );
-	}
-
-	protected TPFResponse _performRequest( final TPFRequest req,
-	                                       final TPFServer fm ) throws FederationAccessException {
-		final String requestURL = fm.createRequestURL(req);
-		final TriplePattern tp = req.getQueryPattern();
-		final Map<String, String> headers = Map.of(
-			"Accept", WebContent.defaultRDFAcceptHeader,
-			"User-Agent", BuildInfo.getUserAgent()
-		);
-
-		if ( fm.getAuthenticationInformation() != null )
-			fm.getAuthenticationInformation().applyTo( headers );
-
-		final TPFResponseBuilder b;
-		try {
-			b = performRequest(requestURL, tp, headers);
-		}
-		catch ( final Exception ex ) {
-			throw new FederationAccessException("Performing a TPF request caused an exception.", ex, req, fm);
-		}
-
-		return b.setRequest(req)
-		        .setFederationMember(fm)
-		        .build();
+	public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm ) {
+		return performRequest( fm.createRequestURL(req),
+		                       req.getQueryPattern(),
+		                       req,
+		                       fm );
 	}
 }

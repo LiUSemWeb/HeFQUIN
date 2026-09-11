@@ -3,14 +3,22 @@ package se.liu.ida.hefquin.federation.access.impl.reqproc;
 import java.net.http.HttpClient;
 import java.util.Map;
 
+import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.http.HttpRDF;
+import org.apache.jena.riot.RiotException;
+import org.apache.jena.riot.WebContent;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.sparql.core.Quad;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.base.net.http.HttpClientProvider;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.impl.RequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseBuilder;
@@ -35,9 +43,18 @@ public abstract class TPFRequestProcessorBase
 		httpClient = HttpClientProvider.client(connectionTimeout);
 	}
 
-	protected TPFResponseBuilder performRequest( final String requestURL,
-	                                             final TriplePattern tp,
-	                                             final Map<String, String> headers ) throws HttpRequestException {
+	protected TPFResponse performRequest( final String requestURL,
+	                                      final TriplePattern tp,
+	                                      final DataRetrievalRequest req,
+	                                      final FederationMember fm ) {
+		final Map<String, String> headers = Map.of(
+			"Accept", WebContent.defaultRDFAcceptHeader,
+			"User-Agent", BuildInfo.getUserAgent()
+		);
+
+		if ( fm.getAuthenticationInformation() != null )
+			fm.getAuthenticationInformation().applyTo(headers);
+
 		final StreamRDF_TPFResponseBuilder b = new StreamRDF_TPFResponseBuilder(tp);
 		b.setRequestStartTimeNow();
 
@@ -45,11 +62,32 @@ public abstract class TPFRequestProcessorBase
 		try {
 			HttpRDF.httpGetToStream(httpClient, requestURL, headers, b);
 		}
+		catch ( final HttpException ex ) {
+			final String type = (req instanceof BRTPFRequest) ? "an brTPF" : "a TPF";
+			final String msg = "Performing " + type + " request for the server " +
+					"with service URI " + fm.getServiceURI() + " caused " +
+					"an HTTP-related exception with the following message: " +
+					ex.getMessage();
+			b.setException( new FederationAccessException(msg,ex,req,fm) );
+		}
+		catch ( final RiotException ex ) {
+			final String type = (req instanceof BRTPFRequest) ? "an brTPF" : "a TPF";
+			final String msg = "Performing " + type + " request for the server " +
+					"with service URI " + fm.getServiceURI() + " caused " +
+					"a parsing exception with the following message: " +
+					ex.getMessage();
+			b.setException( new FederationAccessException(msg,ex,req,fm) );
+		}
 		catch ( final Exception ex ) {
-			throw new HttpRequestException("Executing an HTTP request for a TPF or brTPF server caused an exception.", ex);
+			final String type = (req instanceof BRTPFRequest) ? "an brTPF" : "a TPF";
+			final String msg = "Performing " + type + " request for the server " +
+					"with service URI " + fm.getServiceURI() + " caused " +
+					"an unexpected exception (type: " + ex.getClass().getName() +
+					") with the following message: " + ex.getMessage();
+			b.setException( new FederationAccessException(msg,ex,req,fm) );
 		}
 
-		return b;
+		return b.build();
 	}
 
 	protected static class StreamRDF_TPFResponseBuilder extends TPFResponseBuilder implements StreamRDF {
