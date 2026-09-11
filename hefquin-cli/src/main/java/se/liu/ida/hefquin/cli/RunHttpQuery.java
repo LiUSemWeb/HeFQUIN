@@ -435,7 +435,7 @@ public class RunHttpQuery extends CmdGeneral
 	 */
 	protected void printExceptions( final JsonArray exceptions ) {
 		for ( int i = 0; i < exceptions.size(); i++ ) {
-			System.err.println();
+			cmdError( "", false );
 
 			final JsonObject exception = exceptions.get(i).getAsObject();
 
