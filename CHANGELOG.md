@@ -14,7 +14,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Integration test that runs all queries from the examples directory ([#687](https://github.com/LiUSemWeb/HeFQUIN/issues/687)).
 ### Changed
 - More user-friendly printing of exceptions in the CLI program, including support of the --debug argument for printing the full stack traces ([#699](https://github.com/LiUSemWeb/HeFQUIN/issues/699), [#708](https://github.com/LiUSemWeb/HeFQUIN/issues/708)).
-- Better handling and recording of exceptions in data retrieval responses ([#706](https://github.com/LiUSemWeb/HeFQUIN/issues/706)).
+- Better handling and recording of exceptions in data retrieval responses ([#706](https://github.com/LiUSemWeb/HeFQUIN/issues/706), [#711](https://github.com/LiUSemWeb/HeFQUIN/issues/711)).
 - Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/issues/675)).
 - Bug fix: adding hashCode() function to the Pair class to avoid unnecessary cache misses in FederationManagerWithCache ([#679](https://github.com/LiUSemWeb/HeFQUIN/issues/679)).
 - Merge the various constructors of AsyncFederationAccessManagerImpl into one ([#697](https://github.com/LiUSemWeb/HeFQUIN/issues/697), [#700](https://github.com/LiUSemWeb/HeFQUIN/issues/700)).
