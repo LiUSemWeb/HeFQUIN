@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.output.NullPrintStream;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.json.JSON;
+import org.apache.jena.atlas.json.JsonArray;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.cmd.ArgDecl;
@@ -114,6 +115,16 @@ public class RunHttpQuery extends CmdGeneral
 	@Override
 	protected String getCommandName() {
 		return "hefquin-client";
+	}
+
+	@Override
+	protected void processModulesAndArgs() {
+		super.processModulesAndArgs();
+
+		// Fix because 'ModGeneral' currently sets the verbose flag instead
+		// of the debug flag whenever the --debug argument is given.
+		if ( isVerbose() )
+			modGeneral.debug = true;
 	}
 
 	/**
@@ -214,6 +225,10 @@ public class RunHttpQuery extends CmdGeneral
 		if ( modResultsExt.needsFedAccessStats() )
 			builder.header( HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS, "true" );
 
+		if ( isDebug() ) {
+			builder.header( HttpConstants.X_HEADER_RETURN_FULL_STACK_TRACE, "true" );
+		}
+
 		final HttpRequest request = builder.build();
 
 		final HttpResponse<InputStream> response;
@@ -229,12 +244,18 @@ public class RunHttpQuery extends CmdGeneral
 			return;
 		}
 
+		final JsonObject obj = JSON.parse(response.body());
+
 		if ( response.statusCode() != 200 ) {
-			cmdError( "Request failed with HTTP status " + response.statusCode(), true );
+			cmdError( "The HeFQUIN service did not execute the given query but, instead, responded with HTTP status " + response.statusCode(), false );
+			final JsonValue error = obj.get( "error" );
+			if ( error != null ) {
+				cmdError( "In its response, the HeFQUIN service has returned the following "
+						+ error.getAsArray().size() + " exceptions that occurred during the execution of the query.", false );
+				printExceptions( error.getAsArray() );
+			}
 			return;
 		}
-
-		final JsonObject obj = JSON.parse(response.body());
 
 		printPlans( obj );
 
@@ -246,6 +267,14 @@ public class RunHttpQuery extends CmdGeneral
 		);
 
 		QueryExecUtils.outputResultSet( rs, query.getPrologue(), modResultsExt.getResultsFormat(), out );
+
+		final JsonValue exceptions = obj.get( HttpConstants.JSON_EXCEPTIONS );
+		if ( exceptions != null ) {
+			final JsonArray exceptionArray = exceptions.getAsArray();
+			System.err.println( "Attention: The query result may be incomplete because the following "
+					+ exceptionArray.size() + " exceptions were caught when executing the query plan." );
+			printExceptions( exceptionArray );
+		}
 
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
@@ -397,5 +426,22 @@ public class RunHttpQuery extends CmdGeneral
 		final String queryProcStats = overallQueryProcessingTime + ", " + planningTime + ", " + compilationTime
 				+ ", " + executionTime;
 		return queryProcStats;
+	}
+
+	/**
+	 * Prints the given exceptions with their corresponding exception number.
+	 *
+	 * @param exceptions the exceptions to print
+	 */
+	protected void printExceptions( final JsonArray exceptions ) {
+		for ( int i = 0; i < exceptions.size(); i++ ) {
+			final JsonObject exception = exceptions.get(i).getAsObject();
+
+			cmdError( "Exception " + (i + 1) + ": " + exception.getString("msg"), false );
+
+			if ( isDebug() )
+				cmdError( "StackTrace:", false );
+				cmdError( exception.getString("stacktrace"), false );
+		}
 	}
 }
