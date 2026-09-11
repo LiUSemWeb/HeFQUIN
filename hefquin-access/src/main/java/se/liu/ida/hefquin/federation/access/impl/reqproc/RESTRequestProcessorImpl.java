@@ -9,6 +9,8 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.http.HttpLib;
@@ -25,6 +27,7 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 {
 	protected final HttpClient httpClient;
 	protected final long overallTimeout;
+	protected final Set<String> endpointsWithLimiters = new HashSet<>();
 
 	/**
 	 * Creates the request processor without any thresholds for timeouts.
@@ -48,6 +51,10 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 	public StringResponse performRequest( final RESTRequest req,
 	                                      final RESTEndpoint fm ) {
 		final URI uri = req.getURI();
+
+		if ( fm.getParallelRequestLimit() != null && endpointsWithLimiters.add(uri.toString()) )
+			HttpClientProvider.registerEndpointLimiter(uri.toString(), fm.getParallelRequestLimit());
+
 		final HttpRequest.Builder builder = HttpRequest.newBuilder( uri )
 				.header("Accept", "application/json;charset=UTF-8")
 				.header("User-Agent", BuildInfo.getUserAgent());

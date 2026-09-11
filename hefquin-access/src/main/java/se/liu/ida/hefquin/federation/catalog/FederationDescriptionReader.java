@@ -234,7 +234,7 @@ public class FederationDescriptionReader
 			if ( trMaps.isEmpty() )
 				throw new IllegalArgumentException("The wrapped REST endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
 
-			return createWrappedRESTEndpoint(serviceURI, addrStr, null, authInfo, trMaps);
+			return createWrappedRESTEndpoint(serviceURI, addrStr, null, authInfo, parallelRequestLimit, trMaps);
 		}
 
 		if ( protocol.equals(FDVocab.BoltProtocol) ) {
@@ -334,10 +334,6 @@ public class FederationDescriptionReader
 
 			final String uriTemplateString = ModelUtils.getSingleMandatoryProperty_XSDString(uriTemplate, HydraVocab.template);
 
-			if ( parallelRequestLimit != null ) {
-				HttpClientProvider.registerEndpointLimiter(uriTemplateString, parallelRequestLimit);
-			}
-
 			final StmtIterator paramIter = uriTemplate.listProperties(HydraVocab.mapping);
 
 			final List<RESTEndpoint.Parameter> params = new ArrayList<>();
@@ -391,7 +387,7 @@ public class FederationDescriptionReader
 			if ( trMaps.isEmpty() )
 				throw new IllegalArgumentException("The wrapped REST endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
 
-			return createWrappedRESTEndpoint(serviceURI, uriTemplateString, params, authInfo, trMaps);
+			return createWrappedRESTEndpoint(serviceURI, uriTemplateString, params, authInfo, parallelRequestLimit, trMaps);
 		}
 		else {
 			throw new IllegalArgumentException( protocol.toString() );
@@ -576,12 +572,13 @@ public class FederationDescriptionReader
 	                                                      final String uri,
 	                                                      final List<RESTEndpoint.Parameter> params,
 	                                                      final AuthenticationInformation authInfo,
+	                                                      final Integer parallelRequestLimit,
 	                                                      final List<MappingExpression> trMaps ) {
 		assert ! trMaps.isEmpty();
 
 		if ( trMaps.size() == 1 ) {
 			final MappingExpression expr = trMaps.get(0);
-			return new WrappedRESTEndpointImpl(serviceURI, uri, params, authInfo, expr);
+			return new WrappedRESTEndpointImpl(serviceURI, uri, params, authInfo, parallelRequestLimit, expr);
 		}
 
 		final MappingExpression[] exprs = new MappingExpression[ trMaps.size() ];
@@ -594,7 +591,7 @@ public class FederationDescriptionReader
 		final MappingExpression expr = MappingExpressionFactory.create(
 				MappingOpUnion.getInstance(),
 				exprs );
-		return new WrappedRESTEndpointImpl(serviceURI, uri, params, authInfo, expr);
+		return new WrappedRESTEndpointImpl(serviceURI, uri, params, authInfo, parallelRequestLimit, expr);
 	}
 
 	/**
