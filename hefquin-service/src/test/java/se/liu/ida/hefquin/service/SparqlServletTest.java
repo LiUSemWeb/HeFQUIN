@@ -414,9 +414,9 @@ public class SparqlServletTest {
 	@Test
 	public void testMissingFederationMember() throws Exception {
 		final String invalid = "SELECT * WHERE { SERVICE <http://invalid/federation/member> { ?s ?p ?o } }";
-		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_XML, invalid );
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_JSON, invalid );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			assertEquals( 500, response.getStatusLine().getStatusCode() );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final String responseContent = EntityUtils.toString( response.getEntity() );
 			assertTrue( responseContent.contains("Exception occurred when outputting the result of a SELECT query using the Jena machinery.") );
 		}
@@ -426,9 +426,9 @@ public class SparqlServletTest {
 	public void testUseOfHeFQUINParser() throws Exception {
 		final String validQueryStr = """
 			SELECT * WHERE { BIND (42 AS ?v) SERVICE <http://example.org/> PARAMS(?v AS "v") { ?s ?p ?o } }""";
-		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_XML, validQueryStr );
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_JSON, validQueryStr );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			assertEquals( 500, response.getStatusLine().getStatusCode() );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final String responseContent = EntityUtils.toString( response.getEntity() );
 			assertFalse( responseContent.contains("PARAMS") );
 			assertTrue( responseContent.contains("Exception occurred when outputting the result of a SELECT query using the Jena machinery.") );
