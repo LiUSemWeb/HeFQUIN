@@ -255,7 +255,7 @@ public class RunHttpQuery extends CmdGeneral
 			printExceptions( error.getAsArray() );
 
 		if ( response.statusCode() != 200 ) {
-			cmdError( "Request failed with HTTP status " + response.statusCode(), true );
+			cmdError( "The HeFQUIN service did not execute the given query but, instead, responded with HTTP status " + response.statusCode(), true );
 			return;
 		}
 
