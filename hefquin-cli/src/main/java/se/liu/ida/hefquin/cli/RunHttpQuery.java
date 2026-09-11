@@ -246,16 +246,14 @@ public class RunHttpQuery extends CmdGeneral
 
 		final JsonObject obj = JSON.parse(response.body());
 
-		final JsonValue exceptions = obj.get( HttpConstants.JSON_EXCEPTIONS );
-		if ( exceptions != null )
-			printExceptions( exceptions.getAsArray() );
-
-		final JsonValue error = obj.get( "error" );
-		if ( error != null )
-			printExceptions( error.getAsArray() );
-
 		if ( response.statusCode() != 200 ) {
-			cmdError( "The HeFQUIN service did not execute the given query but, instead, responded with HTTP status " + response.statusCode(), true );
+			cmdError( "The HeFQUIN service did not execute the given query but, instead, responded with HTTP status " + response.statusCode(), false );
+			final JsonValue error = obj.get( "error" );
+			if ( error != null ) {
+				cmdError( "In its response, the HeFQUIN service has returned the following "
+						+ error.getAsArray().size() + " exceptions that occurred during the execution of the query.", false );
+				printExceptions( error.getAsArray() );
+			}
 			return;
 		}
 
@@ -269,6 +267,14 @@ public class RunHttpQuery extends CmdGeneral
 		);
 
 		QueryExecUtils.outputResultSet( rs, query.getPrologue(), modResultsExt.getResultsFormat(), out );
+
+		final JsonValue exceptions = obj.get( HttpConstants.JSON_EXCEPTIONS );
+		if ( exceptions != null ) {
+			final JsonArray exceptionArray = exceptions.getAsArray();
+			System.err.println( "Attention: The query result may be incomplete because the following "
+					+ exceptionArray.size() + " exceptions were caught when executing the query plan." );
+			printExceptions( exceptionArray );
+		}
 
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
