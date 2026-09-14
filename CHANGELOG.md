@@ -12,6 +12,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Extend support for caching to all types of federation members, including REST, GraphQL, and Neo4j ([#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590)).
 - New logical plan rewriting rule that removes unnecessary project operators ([#693](https://github.com/LiUSemWeb/HeFQUIN/issues/693)).
 - Integration test that runs all queries from the examples directory ([#687](https://github.com/LiUSemWeb/HeFQUIN/issues/687)).
+- Add option to specify a request limit per federation member ([#703](https://github.com/LiUSemWeb/HeFQUIN/issues/703), [#707](https://github.com/LiUSemWeb/HeFQUIN/issues/707)).
 ### Changed
 - More user-friendly printing of exceptions in the CLI program, including support of the --debug argument for printing the full stack traces ([#699](https://github.com/LiUSemWeb/HeFQUIN/issues/699), [#708](https://github.com/LiUSemWeb/HeFQUIN/issues/708)).
 - Better handling and recording of exceptions in data retrieval responses ([#706](https://github.com/LiUSemWeb/HeFQUIN/issues/706), [#711](https://github.com/LiUSemWeb/HeFQUIN/issues/711)).
