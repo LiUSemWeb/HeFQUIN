@@ -52,8 +52,10 @@ public class RESTRequestProcessorImpl implements RESTRequestProcessor
 	                                      final RESTEndpoint fm ) {
 		final URI uri = req.getURI();
 
-		if ( fm.getParallelRequestLimit() != null && endpointsWithLimiters.add(uri.toString()) )
-			HttpClientProvider.registerEndpointLimiter(uri.toString(), fm.getParallelRequestLimit());
+		final String endpointAddress = HttpClientProvider.normalizeEndpointAddress(uri.toString());
+
+		if ( fm.getParallelRequestLimit() != null && endpointsWithLimiters.add(endpointAddress) )
+			HttpClientProvider.registerEndpointLimiter(endpointAddress, fm.getParallelRequestLimit());
 
 		final HttpRequest.Builder builder = HttpRequest.newBuilder( uri )
 				.header("Accept", "application/json;charset=UTF-8")
