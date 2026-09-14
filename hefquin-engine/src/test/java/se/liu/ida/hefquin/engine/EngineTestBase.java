@@ -462,6 +462,11 @@ public abstract class EngineTestBase
 		}
 
 		@Override
+		public Integer getParallelRequestLimit() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public boolean supportsMoreThanTriplePatterns() {
 			throw new UnsupportedOperationException();
 		}

@@ -29,6 +29,7 @@ import org.apache.jena.vocabulary.XSD;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.data.mappings.impl.VocabularyMappingWrappingImpl;
+import se.liu.ida.hefquin.base.net.http.HttpClientProvider;
 import se.liu.ida.hefquin.engine.wrappers.graphql.GraphQLException;
 import se.liu.ida.hefquin.engine.wrappers.graphql.GraphQLSchemaInitializer;
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
@@ -129,19 +130,24 @@ public class FederationDescriptionReader
 		final AuthenticationInformation authInfo = parseAuthConfig(iface, fd);
 		final RDFNode ifaceType = fd.getRequiredProperty(iface, RDF.type).getObject();
 		final Resource protocol = iface.getProperty(FDVocab.supportedProtocol).getResource();
+		final Statement parallelRequestLimitStatement = fedMember.getProperty(FDVocab.parallelRequestLimit);
+
+		final Integer parallelRequestLimit = parallelRequestLimitStatement == null
+			? null
+			: parallelRequestLimitStatement.getInt();
 
 		// Check the type of interface
 		if ( ifaceType.equals(FDVocab.FixedEndpointInterface) )
 		{
-			return handleFixedEndpointInterface( iface, protocol, authInfo, vocabMap, fedMember, fd, serviceURI );
+			return handleFixedEndpointInterface( iface, protocol, authInfo, vocabMap, parallelRequestLimit, fedMember, fd, serviceURI );
 		}
 		else if ( ifaceType.equals(FDVocab.FragmentInterface) )
 		{
-			return handleFragmentInterface( iface, protocol, authInfo, vocabMap, serviceURI );
+			return handleFragmentInterface( iface, protocol, authInfo, vocabMap, parallelRequestLimit, serviceURI );
 		}
 		else if ( ifaceType.equals(FDVocab.TemplateBasedInterface) )
 		{
-			return handleTemplateInterface( iface, protocol, authInfo, vocabMap, fedMember, fd, serviceURI );
+			return handleTemplateInterface( iface, protocol, authInfo, vocabMap, parallelRequestLimit, fedMember, fd, serviceURI );
 		}
 		else {
 			throw new IllegalArgumentException( ifaceType.toString() );
@@ -191,6 +197,7 @@ public class FederationDescriptionReader
 	                                                         final Resource protocol,
 	                                                         final AuthenticationInformation authInfo,
 	                                                         final VocabularyMapping vocabMap,
+	                                                         final Integer parallelRequestLimit,
 	                                                         final Resource fedMember,
 	                                                         final Model fd,
 	                                                         final Node serviceURI ) {
@@ -200,6 +207,10 @@ public class FederationDescriptionReader
 				FDVocab.endpointAddress,
 				"SPARQL endpointAddress is required!",
 				"More than one SPARQL endpointAddress!" );
+
+			if ( parallelRequestLimit != null ) {
+				HttpClientProvider.registerEndpointLimiter(addrStr, parallelRequestLimit);
+			}
 
 			return createSPARQLEndpoint(serviceURI, addrStr, authInfo, vocabMap);
 		}
@@ -214,12 +225,16 @@ public class FederationDescriptionReader
 				"REST endpointAddress is required!",
 				"More than one REST endpointAddress!" );
 
+			if ( parallelRequestLimit != null ) {
+				HttpClientProvider.registerEndpointLimiter(addrStr, parallelRequestLimit);
+			}
+
 			final List<MappingExpression> trMaps = parseRMLMapping(fedMember, fd, serviceURI);
 
 			if ( trMaps.isEmpty() )
 				throw new IllegalArgumentException("The wrapped REST endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
 
-			return createWrappedRESTEndpoint(serviceURI, addrStr, null, authInfo, trMaps);
+			return createWrappedRESTEndpoint(serviceURI, addrStr, null, authInfo, parallelRequestLimit, trMaps);
 		}
 
 		if ( protocol.equals(FDVocab.BoltProtocol) ) {
@@ -231,6 +246,10 @@ public class FederationDescriptionReader
 				FDVocab.endpointAddress,
 				"Bolt endpointAddress is required!",
 				"More than one Bolt endpointAddress!" );
+
+			if ( parallelRequestLimit != null ) {
+				HttpClientProvider.registerEndpointLimiter(addrStr, parallelRequestLimit);
+			}
 
 			return createNeo4jServer(serviceURI, addrStr, authInfo);
 		}
@@ -245,6 +264,10 @@ public class FederationDescriptionReader
 				"GraphQL endpointAddress is required!",
 				"More than one GraphQL endpointAddress!" );
 
+			if ( parallelRequestLimit != null ) {
+				HttpClientProvider.registerEndpointLimiter(addrStr, parallelRequestLimit);
+			}
+
 			return createGraphQLServer(serviceURI, addrStr, authInfo);
 		}
 
@@ -258,6 +281,7 @@ public class FederationDescriptionReader
 	                                                    final Resource protocol,
 	                                                    final AuthenticationInformation authInfo,
 	                                                    final VocabularyMapping vocabMap,
+	                                                    final Integer parallelRequestLimit,
 	                                                    final Node serviceURI ) {
 		if ( protocol.equals(FDVocab.TPFProtocol) ) {
 			final String addrStr = getSingleURIProperty(
@@ -265,6 +289,10 @@ public class FederationDescriptionReader
 				FDVocab.exampleFragmentAddress,
 				"TPF exampleFragmentAddress is required!",
 				"More than one TPF exampleFragmentAddress!" );
+
+			if ( parallelRequestLimit != null ) {
+				HttpClientProvider.registerEndpointLimiter(addrStr, parallelRequestLimit);
+			}
 
 			return createTPFServer(serviceURI, addrStr, authInfo, vocabMap);
 		}
@@ -274,6 +302,10 @@ public class FederationDescriptionReader
 				FDVocab.exampleFragmentAddress,
 				"brTPF exampleFragmentAddress is required!",
 				"More than one brTPF exampleFragmentAddress!" );
+
+			if ( parallelRequestLimit != null ) {
+				HttpClientProvider.registerEndpointLimiter(addrStr, parallelRequestLimit);
+			}
 
 			return createBRTPFServer(serviceURI, addrStr, authInfo, vocabMap);
 		}
@@ -290,6 +322,7 @@ public class FederationDescriptionReader
 	                                                    final Resource protocol,
 	                                                    final AuthenticationInformation authInfo,
 	                                                    final VocabularyMapping vocabMap,
+	                                                    final Integer parallelRequestLimit,
 	                                                    final Resource fedMember,
 	                                                    final Model fd,
 	                                                    final Node serviceURI ) {
@@ -354,7 +387,7 @@ public class FederationDescriptionReader
 			if ( trMaps.isEmpty() )
 				throw new IllegalArgumentException("The wrapped REST endpoint with service URI <" + serviceURI + "> does not have any RML triples maps.");
 
-			return createWrappedRESTEndpoint(serviceURI, uriTemplateString, params, authInfo, trMaps);
+			return createWrappedRESTEndpoint(serviceURI, uriTemplateString, params, authInfo, parallelRequestLimit, trMaps);
 		}
 		else {
 			throw new IllegalArgumentException( protocol.toString() );
@@ -539,12 +572,13 @@ public class FederationDescriptionReader
 	                                                      final String uri,
 	                                                      final List<RESTEndpoint.Parameter> params,
 	                                                      final AuthenticationInformation authInfo,
+	                                                      final Integer parallelRequestLimit,
 	                                                      final List<MappingExpression> trMaps ) {
 		assert ! trMaps.isEmpty();
 
 		if ( trMaps.size() == 1 ) {
 			final MappingExpression expr = trMaps.get(0);
-			return new WrappedRESTEndpointImpl(serviceURI, uri, params, authInfo, expr);
+			return new WrappedRESTEndpointImpl(serviceURI, uri, params, authInfo, parallelRequestLimit, expr);
 		}
 
 		final MappingExpression[] exprs = new MappingExpression[ trMaps.size() ];
@@ -557,7 +591,7 @@ public class FederationDescriptionReader
 		final MappingExpression expr = MappingExpressionFactory.create(
 				MappingOpUnion.getInstance(),
 				exprs );
-		return new WrappedRESTEndpointImpl(serviceURI, uri, params, authInfo, expr);
+		return new WrappedRESTEndpointImpl(serviceURI, uri, params, authInfo, parallelRequestLimit, expr);
 	}
 
 	/**

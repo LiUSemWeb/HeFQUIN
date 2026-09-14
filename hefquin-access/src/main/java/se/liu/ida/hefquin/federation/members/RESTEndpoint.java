@@ -38,6 +38,14 @@ public interface RESTEndpoint extends FederationMember
 	Parameter getParameterByName(String name);
 
 	/**
+	 * Returns the limit of parallel requests to this endpoint.
+	 *
+	 * @return the limit of parallel requests to this endpoint, or {@code null}
+	 *         if no such parameter exists
+	 */
+	Integer getParallelRequestLimit();
+
+	/**
 	 * Captures an expected query parameter for REST endpoints.
 	 */
 	public interface Parameter {

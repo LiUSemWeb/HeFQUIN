@@ -83,6 +83,7 @@ public class WrappedRESTEndpointImplTest
 		                                    "http://example.org/",
 		                                    null,
 		                                    null,
+		                                    null,
 		                                    createMappingExpressionForTests() );
 	}
 

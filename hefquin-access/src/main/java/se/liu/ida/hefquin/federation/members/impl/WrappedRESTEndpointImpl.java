@@ -38,8 +38,9 @@ public class WrappedRESTEndpointImpl extends RESTEndpointImpl
 	                                final String urlTemplate,
 	                                final List<RESTEndpoint.Parameter> params,
 	                                final AuthenticationInformation authInfo,
+	                                final Integer parallelRequestLimit,
 	                                final MappingExpression mappingExpression ) {
-		super(serviceURI, urlTemplate, params, authInfo);
+		super(serviceURI, urlTemplate, params, authInfo, parallelRequestLimit);
 
 		assert mappingExpression != null;
 		this.mappingExpression = mappingExpression;

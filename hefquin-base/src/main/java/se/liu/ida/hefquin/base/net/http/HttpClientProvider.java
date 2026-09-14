@@ -126,10 +126,20 @@ public class HttpClientProvider
 		if ( limit <= 0 ) {
 			throw new IllegalArgumentException("limit must be greater than zero");
 		}
-		final String url = endpointAddress.endsWith( "/" )
-				? endpointAddress.substring( 0, endpointAddress.length() - 1 )
-				: endpointAddress;
+		final String url = normalizeEndpointAddress(endpointAddress);
 		LIMITERS_BY_ENDPOINT_ADDRESS.put( url, new Semaphore(limit, true) );
+	}
+
+	/**
+	 * Normalizes an endpoint address by removing a trailing slash, if present.
+	 *
+	 * @param endpointAddress the endpoint address to normalize
+	 * @return the normalized endpoint address
+	 */
+	public static String normalizeEndpointAddress( final String endpointAddress ) {
+		return endpointAddress.endsWith( "/" )
+			 ? endpointAddress.substring( 0, endpointAddress.length() - 1 )
+			 : endpointAddress;
 	}
 
 	/**
