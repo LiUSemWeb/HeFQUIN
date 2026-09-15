@@ -63,17 +63,6 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
 	}
 
-
-	@Override
-	public < ReqType extends DataRetrievalRequest,
-	         RespType extends DataRetrievalResponse<?>,
-	         MemberType extends FederationMember >
-	CompletableFuture<RespType> issueRequest( final ReqType req,
-	                                          final MemberType fm )
-	{
-		return issueRequest(req, fm, false);
-	}
-
 	@Override
 	public < ReqType extends DataRetrievalRequest,
 	         RespType extends DataRetrievalResponse<?>,
@@ -120,17 +109,6 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm, ignoreCache);
 		cache.put(key, newResponse);
 		return newResponse;
-	}
-
-	@Override
-	public < ReqType extends DataRetrievalRequest,
-	         RespType extends DataRetrievalResponse<?>,
-	         MemberType extends FederationMember >
-	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
-			final ReqType req,
-			final MemberType fm )
-	{
-		return issueCardinalityRequest(req, fm, false);
 	}
 
 	@Override

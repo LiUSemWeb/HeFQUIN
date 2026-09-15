@@ -451,7 +451,8 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		         MemberType extends FederationMember >
 		CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final ReqType req,
-				final MemberType fm ) {
+				final MemberType fm,
+				final boolean ignoreCardinalityCache ) {
 			if(    req instanceof TPFRequest tpfReq
 			    && fm instanceof TPFServer ) {
 				final Object o = tpfReq.getQueryPattern().asJenaTriple().getObject().getLiteralValue();
@@ -476,7 +477,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 				return CompletableFuture.completedFuture(resp);
 			} else {
-				return super.issueCardinalityRequest(req, fm);
+				return super.issueCardinalityRequest(req, fm, ignoreCardinalityCache);
 			}
 		}
 	}

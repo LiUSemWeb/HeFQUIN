@@ -56,25 +56,27 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected AtomicLong issuedCardRequestsTPF    = new AtomicLong( 0L );
 	protected AtomicLong issuedCardRequestsBRTPF  = new AtomicLong( 0L );
 
+	@Override
 	public < ReqType extends DataRetrievalRequest,
 	         RespType extends DataRetrievalResponse<?>,
 	         MemberType extends FederationMember >
 	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 			final ReqType req,
-	        final MemberType fm ) {
+	        final MemberType fm,
+	        final boolean ignoreCardinalityCache ) {
 		final CompletableFuture<CardinalityResponse> response;
 		if (    req instanceof TPFRequest tpfReq
 		     && fm instanceof TPFServer tpfServer )
-			response = _issueCardinalityRequest(tpfReq, tpfServer);
+			response = _issueCardinalityRequest(tpfReq, tpfServer, ignoreCardinalityCache);
 		else if (    req instanceof TPFRequest tpfReq
 		          && fm instanceof BRTPFServer brtpfServer )
-			response = _issueCardinalityRequest(tpfReq, brtpfServer);
+			response = _issueCardinalityRequest(tpfReq, brtpfServer, ignoreCardinalityCache);
 		else if (    req instanceof BRTPFRequest brtpfReq
 		          && fm instanceof BRTPFServer brtpfServer )
-			response = _issueCardinalityRequest(brtpfReq, brtpfServer);
+			response = _issueCardinalityRequest(brtpfReq, brtpfServer, ignoreCardinalityCache);
 		else if (    req instanceof SPARQLRequest sparqlReq
 		          && fm instanceof SPARQLEndpoint sparqlEndpoint )
-			response = _issueCardinalityRequest(sparqlReq, sparqlEndpoint);
+			response = _issueCardinalityRequest(sparqlReq, sparqlEndpoint, ignoreCardinalityCache);
 		else
 			throw new IllegalStateException( "Unsupported request/federation member combination: " +
 			                                 req.getClass().getName() + "/" + fm.getClass().getName() );
@@ -83,7 +85,8 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final SPARQLRequest req,
-			final SPARQLEndpoint fm ) {
+			final SPARQLEndpoint fm,
+			final boolean ignoreCardinalityCache ) {
 		// The idea of this implementation is to take the graph pattern of the
 		// given request, wrap it in a COUNT(*) query, and send that query as
 		// a request to the given endpoint.
@@ -110,28 +113,31 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		// issue the query as a request, the response will then be processed to create
 		// the CardinalityResponse to be returned
 		final SPARQLRequest reqCount = new SPARQLRequestImpl( new SPARQLQueryImpl( countQuery ) );
-		final CompletableFuture<SolMapsResponse> ftr = issueRequest(reqCount, fm);
+		final CompletableFuture<SolMapsResponse> ftr = issueRequest(reqCount, fm, ignoreCardinalityCache);
 		return ftr.thenApply(fctToObtainCardinalityResponseFromSolMapsResponse);
 	}
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final TPFRequest req,
-			final TPFServer fm ) {
-		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
+			final TPFServer fm,
+			final boolean ignoreCardinalityCache ) {
+		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm, ignoreCardinalityCache);
 		return ftr.thenApply(fctToObtainCardinalityResponseFromTPFResponse);
 	}
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final TPFRequest req,
-			final BRTPFServer fm ) {
-		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
+			final BRTPFServer fm,
+			final boolean ignoreCardinalityCache ) {
+		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm, ignoreCardinalityCache);
 		return ftr.thenApply(fctToObtainCardinalityResponseFromTPFResponse);
 	}
 
 	public CompletableFuture<CardinalityResponse> _issueCardinalityRequest(
 			final BRTPFRequest req,
-			final BRTPFServer fm ) {
-		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
+			final BRTPFServer fm,
+			final boolean ignoreCardinalityCache ) {
+		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm, ignoreCardinalityCache);
 		return ftr.thenApply(fctToObtainCardinalityResponseFromTPFResponse);
 	}
 

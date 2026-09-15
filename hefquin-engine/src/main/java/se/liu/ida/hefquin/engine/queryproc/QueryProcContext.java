@@ -74,7 +74,7 @@ public interface QueryProcContext
 	 * Returns <code>true</code> if the cache should be ignored for all data
 	 * retrieval requests.
 	 */
-	boolean ignoreCache();
+	boolean ignoreRetrievalCache();
 
 	/**
 	 * Returns <code>true</code> if the cache should be ignored for all cardinality
