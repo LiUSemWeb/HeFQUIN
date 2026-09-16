@@ -10,12 +10,14 @@ public interface FederationAccessManager extends StatsProvider
 	< ReqType extends DataRetrievalRequest,
 	  RespType extends DataRetrievalResponse<?>,
 	  MemberType extends FederationMember >
-	CompletableFuture<RespType> issueRequest( ReqType req, MemberType fm );
+	CompletableFuture<RespType> issueRequest( ReqType req, MemberType fm, boolean ignoreRetrievalCache );
 
 	< ReqType extends DataRetrievalRequest,
 	  RespType extends DataRetrievalResponse<?>,
 	  MemberType extends FederationMember >
-	CompletableFuture<CardinalityResponse> issueCardinalityRequest( ReqType req, MemberType fm );
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest( ReqType req,
+	                                                                MemberType fm,
+	                                                                boolean ignoreCardinalityCache );
 
 	@Override
 	FederationAccessStats getStats();

@@ -164,6 +164,16 @@ public abstract class EngineTestBase
 		public boolean skipExecution() {
 			throw new UnsupportedOperationException();
 		}
+
+		@Override
+		public boolean ignoreRetrievalCache() {
+			return false;
+		}
+
+		@Override
+		public boolean ignoreCardinalityCache() {
+			return false;
+		}
 	}
 
 	protected QueryProcContextExt getExtendedQueryProcContextForTests( final ExecutorService execService ) {
@@ -186,6 +196,8 @@ public abstract class EngineTestBase
 
 			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
 			@Override public boolean skipExecution() { throw new UnsupportedOperationException(); }
+			@Override public boolean ignoreRetrievalCache() { return false; }
+			@Override public boolean ignoreCardinalityCache() { return false; }
 		};
 	}
 
@@ -550,7 +562,8 @@ public abstract class EngineTestBase
 		         RespType extends DataRetrievalResponse<?>,
 		         MemberType extends FederationMember >
 		CompletableFuture<RespType> issueRequest( final ReqType req,
-		                                          final MemberType fm ) {
+		                                          final MemberType fm,
+		                                          final boolean ignoreRetrievalCache ) {
 			if ( req instanceof SPARQLRequest reqSPARQL && fm instanceof SPARQLEndpoint fmSPARQL ) {
 				@SuppressWarnings("unchecked")
 				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqSPARQL, fmSPARQL);
@@ -673,7 +686,8 @@ public abstract class EngineTestBase
 				MemberType extends FederationMember >
 		CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final ReqType req,
-				final MemberType fm ) {
+				final MemberType fm,
+				final boolean ignoreCardinalityCache ) {
 			throw new UnsupportedOperationException();
 		}
 

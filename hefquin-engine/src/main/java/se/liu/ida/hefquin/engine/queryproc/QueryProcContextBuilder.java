@@ -36,6 +36,9 @@ public class QueryProcContextBuilder
 	protected boolean isExperimentRun  = false;
 	protected boolean skipExecution    = false;
 
+	protected boolean ignoreRetrievalCache   = false;
+	protected boolean ignoreCardinalityCache = false;
+
 	public QueryProcContextBuilder( final FederationCatalog fedCatalog,
 	                                final FederationAccessManager fedAccMgr,
 	                                final ExecutorService execServiceForPlanTasks ) {
@@ -126,6 +129,16 @@ public class QueryProcContextBuilder
 		return this;
 	}
 
+	public QueryProcContextBuilder setIgnoreRetrievalCache( final boolean set ) {
+		ignoreRetrievalCache = set;
+		return this;
+	}
+
+	public QueryProcContextBuilder setIgnoreCardinalityCache( final boolean set ) {
+		ignoreCardinalityCache = set;
+		return this;
+	}
+
 	public QueryProcContext build() {
 		return new QueryProcContext() {
 			@Override
@@ -171,6 +184,16 @@ public class QueryProcContextBuilder
 			@Override
 			public boolean isExperimentRun() {
 				return isExperimentRun;
+			}
+
+			@Override
+			public boolean ignoreRetrievalCache() {
+				return ignoreRetrievalCache;
+			}
+
+			@Override
+			public boolean ignoreCardinalityCache() {
+				return ignoreCardinalityCache;
 			}
 		};
 	}

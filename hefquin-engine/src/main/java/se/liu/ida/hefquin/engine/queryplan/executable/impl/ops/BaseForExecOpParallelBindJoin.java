@@ -484,7 +484,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 			// Issue the request via the federation access manager.
 			final CompletableFuture<RespType> f;
 			try {
-				f = ctx.getFederationAccessMgr().issueRequest(req, fm);
+				f = ctx.getFederationAccessMgr().issueRequest( req, fm, ctx.ignoreRetrievalCache() );
 			}
 			catch ( final Exception e ) {
 				// Not strictly necessary, but doesn't hurt either.

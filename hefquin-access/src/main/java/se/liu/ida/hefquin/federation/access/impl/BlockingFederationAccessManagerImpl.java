@@ -34,7 +34,8 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 	         RespType extends DataRetrievalResponse<?>,
 	         MemberType extends FederationMember >
 	CompletableFuture<RespType> issueRequest( final ReqType req,
-	                                          final MemberType fm ) {
+	                                          final MemberType fm,
+	                                          final boolean ignoreRetrievalCache ) {
 		final RequestProcessor<ReqType, RespType, MemberType> reqProc = getReqProc(req, fm);
 
 		// update the statistics

@@ -14,12 +14,12 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
 /**
@@ -89,7 +89,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 			final CompletableFuture<RespType> futureResponse;
 			try {
-				futureResponse = issueRequest( req, ctx.getFederationAccessMgr() );
+				futureResponse = issueRequest(req, ctx);
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
@@ -128,7 +128,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 	protected abstract MyResponseProcessor createResponseProcessor( SolutionMapping sm, IntermediateResultElementSink sink, ExecutableOperator op );
 
-	protected abstract CompletableFuture<RespType> issueRequest( ReqType req, FederationAccessManager fedAccessMgr ) throws FederationAccessException;
+	protected abstract CompletableFuture<RespType> issueRequest( ReqType req, QueryProcContext ctx )
+			throws FederationAccessException;
 
 	@Override
 	protected void _concludeExecution( final List<SolutionMapping> input,

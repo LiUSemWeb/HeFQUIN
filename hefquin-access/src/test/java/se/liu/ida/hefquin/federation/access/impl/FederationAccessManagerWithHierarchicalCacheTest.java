@@ -38,10 +38,10 @@ public class FederationAccessManagerWithHierarchicalCacheTest extends Federation
 		final ExecutorService execServiceForFedAccess = Executors.newFixedThreadPool(10);
 		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, 5);
 
-		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1);
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1, false);
 		fr1.get();
 
-		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req1, fm2);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req1, fm2, false);
 		fr2.get();
 
 		fedAccessMgr.shutdown();
@@ -61,8 +61,8 @@ public class FederationAccessManagerWithHierarchicalCacheTest extends Federation
 		final ExecutorService execServiceForFedAccess = Executors.newFixedThreadPool(10);
 		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, 5);
 
-		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1);
-		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req1, fm2);
+		final CompletableFuture<TPFResponse> fr1 = fedAccessMgr.issueRequest(req1, fm1, false);
+		final CompletableFuture<TPFResponse> fr2 = fedAccessMgr.issueRequest(req1, fm2, false);
 
 		fr1.get();
 		fr2.get();
@@ -92,7 +92,7 @@ public class FederationAccessManagerWithHierarchicalCacheTest extends Federation
 		final CompletableFuture<TPFResponse>[] futures = new CompletableFuture[n];
 
 		for ( int i = 0; i < n; ++i ) {
-			futures[i] = fedAccessMgr.issueRequest(reqs[i], fms[i]);
+			futures[i] = fedAccessMgr.issueRequest(reqs[i], fms[i], false);
 		}
 
 		for ( int i = 0; i < n; ++i ) {

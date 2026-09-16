@@ -63,25 +63,33 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
 	}
 
-
 	@Override
 	public < ReqType extends DataRetrievalRequest,
 	         RespType extends DataRetrievalResponse<?>,
 	         MemberType extends FederationMember >
 	CompletableFuture<RespType> issueRequest( final ReqType req,
-	                                          final MemberType fm ) {
-		// update the statistics
-		if ( req instanceof TPFRequest )
-			cacheRequestsTPF++;
-		else if ( req instanceof BRTPFRequest )
-			cacheRequestsBRTPF++;
-		else if ( req instanceof SPARQLRequest )
-			cacheRequestsSPARQL++;
-		else
+	                                          final MemberType fm,
+	                                          final boolean ignoreCache )
+	{
+		if(! ignoreCache ) {
+			// update the statistics only if cache is enabled
+			if ( req instanceof TPFRequest )
+				cacheRequestsTPF++;
+			else if ( req instanceof BRTPFRequest )
+				cacheRequestsBRTPF++;
+			else if ( req instanceof SPARQLRequest )
+				cacheRequestsSPARQL++;
+			else
 			cacheRequestsOther++;
+		}
 
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse;
+		if ( ! ignoreCache )
+			cachedResponse = cache.get(key) ;
+		else
+			cachedResponse = null;
+
 		if ( cachedResponse != null ) {
 			// update the statistics
 			if ( req instanceof TPFRequest )
@@ -98,7 +106,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 			return cachedResponse2;
 		}
 
-		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm);
+		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm, ignoreCache);
 		cache.put(key, newResponse);
 		return newResponse;
 	}
@@ -109,9 +117,16 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	         MemberType extends FederationMember >
 	CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 			final ReqType req,
-			final MemberType fm ) {
+			final MemberType fm,
+			final boolean ignoreCardinalityCache )
+	{
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse;
+		if ( ! ignoreCardinalityCache )
+			cachedResponse = cache.get(key) ;
+		else
+			cachedResponse = null;
+
 		if ( cachedResponse != null ) {
 			// update the statistics
 			if ( req instanceof TPFRequest )
@@ -128,7 +143,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 			return cachedResponse2;
 		}
 
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
+		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm, ignoreCardinalityCache);
 		cache.put(key, newResponse);
 		return newResponse;
 	}

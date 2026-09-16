@@ -210,6 +210,16 @@ public class QueryProcessorImpl implements QueryProcessor
 		public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() {
 			return planner.getLogicalToPhysicalOpConverter();
 		}
+
+		@Override
+		public boolean ignoreRetrievalCache() {
+			return wrapped.ignoreRetrievalCache();
+		}
+
+		@Override
+		public boolean ignoreCardinalityCache() {
+			return wrapped.ignoreCardinalityCache();
+		}
 	}
 
 }
