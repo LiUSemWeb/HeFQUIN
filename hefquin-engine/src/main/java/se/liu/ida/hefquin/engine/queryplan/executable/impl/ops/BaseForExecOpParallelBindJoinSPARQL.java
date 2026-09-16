@@ -19,10 +19,10 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
  * bind-join algorithm that use some form of SPARQL requests.
  */
 public abstract class BaseForExecOpParallelBindJoinSPARQL
-		extends BaseForExecOpParallelBindJoin<SPARQLGraphPattern,
-		                                                  SPARQLEndpoint,
-		                                                  SPARQLRequest,
-		                                                  SolMapsResponse>
+   extends BaseForExecOpParallelBindJoinWithSingleFedMember<SPARQLGraphPattern,
+                                                            SPARQLEndpoint,
+                                                            SPARQLRequest,
+                                                            SolMapsResponse>
 {
 	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpParallelBindJoinSPARQL.class );
 
@@ -45,9 +45,9 @@ public abstract class BaseForExecOpParallelBindJoinSPARQL
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
-		log.debug( "Creating FULL RETRIEVAL SPARQL request for endpoint {}", fm );
+		log.debug( "Creating full-retrieval SPARQL request for endpoint with service URI {}", fm.getServiceURI() );
 
-		final SPARQLRequest req = new SPARQLRequestImpl(query, null, this.mayReduce);
-		return new ExecOpRequestSPARQL<>(req, fm, this.mayReduce, false, null);
+		final SPARQLRequest req = new SPARQLRequestImpl(query, null, mayReduce);
+		return new ExecOpRequestSPARQL<>(req, fm, mayReduce, false, null);
 	}
 }

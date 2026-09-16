@@ -17,6 +17,8 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.jna.platform.win32.WinUser.INPUT;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.datastructures.SolutionMappingsIndex;
@@ -29,9 +31,8 @@ import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.IndexingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -102,7 +103,6 @@ import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalEr
  */
 public abstract class BaseForExecOpParallelBindJoin<
                                        QueryType extends Query,
-                                       MemberType extends FederationMember,
                                        ReqType extends DataRetrievalRequest,
                                        RespType extends DataRetrievalResponse<?>>
            extends BaseForUnaryExecOpWithCollectedInput
@@ -112,7 +112,6 @@ public abstract class BaseForExecOpParallelBindJoin<
 	public final static int DEFAULT_BATCH_SIZE = 30;
 
 	protected final QueryType query;
-	protected final MemberType fm;
 
 	protected final Set<Var> varsInQuery;
 	protected final ExpectedVariables inputVars;
@@ -193,14 +192,12 @@ public abstract class BaseForExecOpParallelBindJoin<
 	private AtomicLong numberOfRequestsCompletedWithError = new AtomicLong(0L);
 	protected List<Long> requestDurationsInMS = new Vector<>(); // Vector is thread safe
 	protected List<Integer> numOfSolMapsRetrievedPerReq = new Vector<>();
-	protected ExecutableOperatorStats statsOfFullRetrievalReqOp = null;
+	
 
 	/**
 	 * @param query - the graph pattern (or other kind of query) to be
 	 *          evaluated (in a bind-join manner) at the federation member
 	 *          given as 'fm'
-	 *
-	 * @param varsInQuery - the variables that occur in the 'query'
 	 *
 	 * @param fm - the federation member targeted by this operator
 	 *
@@ -222,7 +219,6 @@ public abstract class BaseForExecOpParallelBindJoin<
 	public BaseForExecOpParallelBindJoin(
 			final QueryType query,
 			final Set<Var> varsInQuery,
-			final MemberType fm,
 			final ExpectedVariables inputVars,
 			final boolean useOuterJoinSemantics,
 			final boolean mayReduce,
@@ -232,25 +228,16 @@ public abstract class BaseForExecOpParallelBindJoin<
 		super(mayReduce, batchSize, collectExceptions, qpInfo);
 
 		assert query != null;
-		assert fm != null;
 		assert varsInQuery != null;
 		assert batchSize > 0;
 
 		this.query = query;
 		this.varsInQuery = varsInQuery;
-		this.fm = fm;
 		this.inputVars = inputVars;
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 		this.batchSize = batchSize;
 
 		this.allJoinVarsAreCertain = BaseForExecOpSequentialBindJoin.areAllJoinVarsAreCertain(varsInQuery, inputVars);
-
-		log.info( "Initialized ParallelBindJoin operator for endpoint {} with batchSize={}, outerJoinSemantics={}, joinVars={}, allJoinVarsCertain={}",
-		          fm,
-		          batchSize,
-		          useOuterJoinSemantics,
-		          varsInQuery,
-		          allJoinVarsAreCertain );
 	}
 
 	@Override
@@ -264,9 +251,9 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// do not go into a batch (which would be the ones that have a blank
 		// node for one of the join variables and, thus, cannot have join
 		// partners). Additionally, if one of the input solution mappings
-		// does not contain any of the join variables (and, thus, can be
-		// join with every solution for the query of this operator), switch
-		// into full-retrieval mode.
+		// does not contain any of the join variables (and, thus, can join
+		// with every solution for the query of this operator), switch into
+		// full-retrieval mode.
 		for ( final SolutionMapping sm : inputSolMaps ) {
 			batchUp(sm, sink, ctx);
 		}
@@ -276,7 +263,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// requests for all these full batches and initiate the processing
 		// of their responses.
 		// Notice that we ignore the currently-populated batch (if any) at
-		// this point because that batch is not yet full; we will continue
+		// this point because that batch is not full yet. We will continue
 		// populating that batch at the next call of this function or, at
 		// the latest, within the '_concludeExecution' function.
 		if ( ! batches.isEmpty() ) {
@@ -295,9 +282,10 @@ public abstract class BaseForExecOpParallelBindJoin<
 	                        final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
-		// First, check whether we had to switch into full-retrieval mode,
-		// in which case we can find the join partners for the given input
-		// solution mapping within the full result that we had to retrieve.
+		// First, check whether we had to switch into full-retrieval mode
+		// earlier. In this case, we can find the join partners for the
+		// given input solution mapping within the full result that we had
+		// to retrieve when switching into full-retrieval mode.
 		if ( fullResult != null ) {
 			joinInFullRetrievalMode(inputSolMap, sink);
 			return;
@@ -338,9 +326,9 @@ public abstract class BaseForExecOpParallelBindJoin<
 			return;
 		}
 
-		// At this point, we know that we may retrieve join partners for
-		// the input solution mapping. Therefore, we add it to the current
-		// batch, which may have to be set up first.
+		// At this point, we know that we may retrieve join partners for the
+		// input solution mapping. Therefore, we add it to the current batch,
+		// which may have to be set up first (which is done only once).
 		if ( solMapsCoveredByCurrentBatch == null ) {
 			// set up the next batch
 			solMapsCoveredByCurrentBatch = new ArrayList<>();
@@ -348,6 +336,19 @@ public abstract class BaseForExecOpParallelBindJoin<
 		}
 
 		solMapsCoveredByCurrentBatch.add(inputSolMap);
+
+TODO: Here is the point where the implementation in ExecOpMultiBindJoin
+needs to diverge, especially in the case that its service variable is
+in the ExpectedVariables from the input. There, we need to check whether
+'inputSolMap' binds the service variable to one of the service URIs of the
+fed.members in 'fm'. If 'inputSolMap' binds the service variable (only then!)
+but not to any of these service URIs, we do not need to continue with it,
+but send it to the sink in case we are under outer-join semantics. This can
+actually be done already at the very beginning of this method here.
+At the point here now, we need to consider the service URI that 'inputSolMap'
+binds to the service variable and, for each possible service URI /fed-member,
+deal with a separate combination of 'currentBatch', 'solMapsCoveredByCurrentBatch',
+'batches' and 'solMapsCoveredPerBatch'
 
 		// Check whether the restricted version of the given input solution
 		// mapping is already covered by a solution mapping of the batch.
@@ -438,20 +439,36 @@ public abstract class BaseForExecOpParallelBindJoin<
 			CompletableFuture.allOf(arr).get();
 		}
 		catch ( final InterruptedException e ) {
-			final String msg = "Waiting for the requests of this bind " +
-					"join at the federation member with service URI " +
-					fm.getServiceURI() + " was interrupted with the " +
-					"following message: " + e.getMessage();
-			throw new ExecOpExecutionException(msg, e, this);
+			throw createExceptionIfWaitingFailed(e);
 		}
 		catch ( final ExecutionException e ) {
-			final String msg = "Processing the requests of this bind " +
-					"join at the federation member with service URI " +
-					fm.getServiceURI() + " caused an exception with " +
-					"the following message: " + e.getMessage();
-			throw new ExecOpExecutionException(msg, e, this);
+			throw createExceptionIfWaitingFailed(e);
 		}
 	}
+
+	/**
+	 * Implementations of this function should create an
+	 * {@link ExecOpExecutionException} for the case that
+	 * the exception given as an argument was caught while
+	 * waiting for all futures to complete.
+	 * <p>
+	 * The reason for separating this functionality into a dedicated
+	 * function is to enable subclasses to create a subclass-specific
+	 * message for the exception that it creates.
+	 */
+	protected abstract ExecOpExecutionException createExceptionIfWaitingFailed( InterruptedException e );
+
+	/**
+	 * Implementations of this function should create an
+	 * {@link ExecOpExecutionException} for the case that
+	 * the exception given as an argument was caught while
+	 * waiting for all futures to complete.
+	 * <p>
+	 * The reason for separating this functionality into a dedicated
+	 * function is to enable subclasses to create a subclass-specific
+	 * message for the exception that it creates.
+	 */
+	protected abstract ExecOpExecutionException createExceptionIfWaitingFailed( ExecutionException e );
 
 	/**
 	 * Issues a bind-join request for every *full* batch of solution mappings
@@ -481,34 +498,25 @@ public abstract class BaseForExecOpParallelBindJoin<
 			final ReqType req = createRequest(batch);
 			batch.clear();
 
-			// Issue the request via the federation access manager.
-			final CompletableFuture<RespType> f;
-			try {
-				f = ctx.getFederationAccessMgr().issueRequest(req, fm);
-			}
-			catch ( final Exception e ) {
-				// Not strictly necessary, but doesn't hurt either.
-				final String msg = "Issuing a request during the execution of " +
-						"a bind join at the federation member with the service" +
-						"URI " + fm.getServiceURI() + " caused an exception " +
-						"(type: " + e.getClass().getName() + ") with the " +
-						"following message: " + e.getMessage();
-				throw new ExecOpExecutionException(msg, e, this);
-			}
-
-			numberOfRequestsIssued++;
-
-			// Create a response processor that shall handle the response
-			// obtained via the bind-join request (namely, joining it with
-			// the solution mappings covered by the current batch).
-			final MyResponseProcessor respProc = new MyResponseProcessor( solMapsCoveredByBatch,
-			                                                              sink );
-
-			// Attach the response processor to the future for the request and
-			// remember the future so that we can wait for its completion later.
-			futures.add( f.thenAccept(respProc) );
+			initiateProcessingOfRequest( req, solMapsCoveredByBatch, sink, ctx );
 		}
 	}
+
+
+	/**
+	 * TODO:
+	 * add the futures to {@link #futures} and increase {@link #numberOfRequestsIssued}
+	 * @param req
+	 * @param solMapsCoveredByBatch
+	 * @param sink
+	 * @param ctx
+	 * @throws ExecOpExecutionException
+	 */
+	protected abstract void initiateProcessingOfRequest(
+			ReqType req,
+			List<SolutionMapping> solMapsCoveredByBatch,
+			IntermediateResultElementSink sink,
+			QueryProcContextExt ctx ) throws ExecOpExecutionException;
 
 	/**
 	 * Such a response processor will obtain the result from a bind-join
@@ -518,11 +526,14 @@ public abstract class BaseForExecOpParallelBindJoin<
 	protected class MyResponseProcessor implements Consumer<RespType> {
 		protected final List<SolutionMapping> solMapsCoveredByBatch;
 		protected final IntermediateResultElementSink sink;
+		protected final FederationMember fm;
 
 		public MyResponseProcessor( final List<SolutionMapping> solMapsCoveredByBatch,
-		                            final IntermediateResultElementSink sink ) {
+		                            final IntermediateResultElementSink sink,
+		                            final FederationMember fm ) {
 			this.solMapsCoveredByBatch = solMapsCoveredByBatch;
 			this.sink = sink;
+			this.fm = fm;
 		}
 
 		@Override
@@ -539,7 +550,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 			}
 
 			if ( response.isError() ) {
-				final String msg = "Requesting the execution of a bin join " +
+				final String msg = "Requesting the execution of a bind join " +
 						"request at the server with the service URI " +
 						fm.getServiceURI() + " resulted in an error with error " +
 						"code " + response.getErrorStatusCode() + " and the " +
@@ -665,33 +676,17 @@ public abstract class BaseForExecOpParallelBindJoin<
 	                                          final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
-		obtainFullResult(ctx);
+		initializeFullResultIndex();
+		obtainFullResult( new IndexingIntermediateResultElementSink(fullResult),
+		                  ctx );
 		handleCollectedSolMaps(sink);
 	}
 
 	/**
-	 * Performs a request to retrieve all solution mappings for the query
-	 * of this operator (see {@link #createExecutableReqOpForAll}) and puts
-	 * the retrieved solution mappings into {@link #fullResult}.
+	 * Initializes {@link #fullResult}.
 	 */
-	protected void obtainFullResult( final QueryProcContextExt ctx )
-			throws ExecOpExecutionException
+	protected void initializeFullResultIndex()
 	{
-		final NullaryExecutableOp reqOp = createExecutableReqOpForAll();
-
-		final CollectingIntermediateResultElementSink mySink = new CollectingIntermediateResultElementSink();
-		try {
-			reqOp.execute(mySink, ctx);
-		}
-		catch ( final ExecOpExecutionException e ) {
-			final String msg = "Executing a request operator used by " +
-					"this bind join caused an exception with the " +
-					"following message: " + e.getMessage();
-			throw new ExecOpExecutionException(msg, e, this);
-		}
-
-		statsOfFullRetrievalReqOp = reqOp.getStats();
-
 		final Set<Var> certainJoinVars = new HashSet<>(varsInQuery);
 		certainJoinVars.removeAll(inputVars.getPossibleVariables());
 
@@ -712,9 +707,6 @@ public abstract class BaseForExecOpParallelBindJoin<
 		else {
 			fullResult = new SolutionMappingsHashTable(certainJoinVars);
 		}
-
-		for ( final SolutionMapping sm : mySink.getCollectedSolutionMappings() )
-			fullResult.add(sm);
 	}
 
 	/**
@@ -771,14 +763,15 @@ public abstract class BaseForExecOpParallelBindJoin<
 	}
 
 	/**
-	 * Implementations of this function should create an executable operator
-	 * that can perform a request to retrieve all solution mappings for the
-	 * query of this operator (i.e., not a bind-join request).
-	 *
-	 * The operator created by this function should throws exceptions instead
-	 * of collecting them.
+	 * Implementations of this function should retrieve all solution mappings
+	 * for the query of this operator and send these solution mappings to the
+	 * given sink. In case an implementation retrieves the solution mappings
+	 * asynchronously, it has to make sure that the retrieval has been
+	 * completed.
 	 */
-	protected abstract NullaryExecutableOp createExecutableReqOpForAll();
+	protected abstract void obtainFullResult( IntermediateResultElementSink sink,
+	                                          QueryProcContextExt ctx )
+			throws ExecOpExecutionException;
 
 
 	// ------- functionality for Stats ------
@@ -793,14 +786,11 @@ public abstract class BaseForExecOpParallelBindJoin<
 		numberOfRequestsCompletedWithError.set(0L);
 		requestDurationsInMS.clear();
 		numOfSolMapsRetrievedPerReq.clear();
-		statsOfFullRetrievalReqOp = null;
 	}
 
 	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
-		s.put( "queryAsString",      query.toString() );
-		s.put( "fedMemberAsString",  fm.toString() );
 		s.put( "numberOfOutputMappingsProduced",   Long.valueOf(numberOfOutputMappingsProduced.get()) );
 		s.put( "hadToSwitchToFullRetrievalMode",   Boolean.valueOf(fullResult != null) );
 		s.put( "numberOfRequestsIssued",           Integer.valueOf(numberOfRequestsIssued) );
@@ -809,11 +799,6 @@ public abstract class BaseForExecOpParallelBindJoin<
 		s.put( "numberOfRequestsCompletedWithError",      numberOfRequestsCompletedWithError );
 		s.put( "requestDurationsInMS",             requestDurationsInMS.toString() );
 		s.put( "numberOfSolMapsRetrievedPerReqOp", numOfSolMapsRetrievedPerReq.toString() );
-
-		if ( statsOfFullRetrievalReqOp != null) {
-			s.put( "statsOfFullRetrievalReqOp",  statsOfFullRetrievalReqOp );
-		}
-
 		return s;
 	}
 
