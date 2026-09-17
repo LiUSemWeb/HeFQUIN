@@ -27,7 +27,6 @@ public class ModStatsPrinting extends ModBase
 	protected boolean printQueryProcStats;
 	protected boolean printFedAccessStats;
 	protected boolean printOnelineTimeStats;
-	protected String outputFile;
 	protected String queryProcStatsFile;
 	protected String fedAccessStatsFile;
 	protected String onelineTimeStatsFile;

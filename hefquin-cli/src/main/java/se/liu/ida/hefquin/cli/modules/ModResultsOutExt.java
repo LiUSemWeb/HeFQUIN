@@ -44,6 +44,9 @@ public class ModResultsOutExt extends ModResultsOut
 		suppressResultPrintout = cmdLine.contains(argSuppressResultPrintout);
 
 		skipExecution = cmdLine.contains(argSkipExecution);
+
+		if ( cmdLine.contains(argOutputToFile) )
+			outputFile = cmdLine.getValue(argOutputToFile);
 	}
 
 	public String getOutputFile() {
