@@ -10,11 +10,11 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Support for authentication ([#664](https://github.com/LiUSemWeb/HeFQUIN/issues/664), [#676](https://github.com/LiUSemWeb/HeFQUIN/issues/676), [#680](https://github.com/LiUSemWeb/HeFQUIN/issues/680), [#701](https://github.com/LiUSemWeb/HeFQUIN/issues/701), [#704](https://github.com/LiUSemWeb/HeFQUIN/issues/704), [#705](https://github.com/LiUSemWeb/HeFQUIN/issues/705)).
 - New query plan operator that covers multiple requests with the same pattern to different federation members ([#677](https://github.com/LiUSemWeb/HeFQUIN/issues/677), [#690](https://github.com/LiUSemWeb/HeFQUIN/issues/690)).
 - Extend support for caching to all types of federation members, including REST, GraphQL, and Neo4j ([#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590)).
+- CLI options to bypass cache for data retrieval requests and cardinality requests independently during query execution ([#685](https://github.com/LiUSemWeb/HeFQUIN/issues/685), [#715](https://github.com/LiUSemWeb/HeFQUIN/issues/715)).
 - New logical plan rewriting rule that removes unnecessary project operators ([#693](https://github.com/LiUSemWeb/HeFQUIN/issues/693)).
 - Integration test that runs all queries from the examples directory ([#687](https://github.com/LiUSemWeb/HeFQUIN/issues/687)).
 - Add option to specify a request limit per federation member ([#703](https://github.com/LiUSemWeb/HeFQUIN/issues/703), [#707](https://github.com/LiUSemWeb/HeFQUIN/issues/707)).
 ### Changed
-- CLI options to bypass cache for data retrieval requests and cardinality requests independently during query execution ([#685](https://github.com/LiUSemWeb/HeFQUIN/issues/685)).
 - More user-friendly printing of exceptions in the CLI program, including support of the --debug argument for printing the full stack traces ([#699](https://github.com/LiUSemWeb/HeFQUIN/issues/699), [#708](https://github.com/LiUSemWeb/HeFQUIN/issues/708)).
 - Better handling and recording of exceptions in data retrieval responses ([#706](https://github.com/LiUSemWeb/HeFQUIN/issues/706), [#711](https://github.com/LiUSemWeb/HeFQUIN/issues/711)).
 - Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/issues/675)).
