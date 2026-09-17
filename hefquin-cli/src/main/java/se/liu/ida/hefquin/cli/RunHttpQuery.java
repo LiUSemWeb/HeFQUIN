@@ -42,6 +42,7 @@ import org.apache.jena.sys.JenaSystem;
 
 import arq.cmdline.ModTime;
 import se.liu.ida.hefquin.base.net.http.HttpConstants;
+import se.liu.ida.hefquin.cli.modules.ModCaching;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.cli.modules.ModResultsOutExt;
@@ -71,6 +72,7 @@ public class RunHttpQuery extends CmdGeneral
 	protected final ModPlanPrinting  modPlanPrinting =  new ModPlanPrinting();
 	protected final ModQuery         modQuery =         new ModQuery();
 	protected final ModResultsOutExt modResultsExt =    new ModResultsOutExt();
+	protected final ModCaching       modCaching =       new ModCaching();
 
 	protected final ArgDecl argServerAddress = new ArgDecl( ArgDecl.HasValue, "server" );
 
@@ -85,6 +87,7 @@ public class RunHttpQuery extends CmdGeneral
 
 		registerHeFQUINJenaIntegration();
 
+		addModule( modCaching );
 		addModule( modTime );
 		addModule( modPlanPrinting );
 		addModule( modResultsExt );
@@ -225,9 +228,14 @@ public class RunHttpQuery extends CmdGeneral
 		if ( modResultsExt.needsFedAccessStats() )
 			builder.header( HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS, "true" );
 
-		if ( isDebug() ) {
+		if ( isDebug() )
 			builder.header( HttpConstants.X_HEADER_RETURN_FULL_STACK_TRACE, "true" );
-		}
+
+		if ( modCaching.isIgnoreRetrievalCache() )
+			builder.header( HttpConstants.X_HEADER_IGNORE_RETRIEVAL_CACHE, "true" );
+
+		if ( modCaching.isIgnoreCardinalityCache() )
+			builder.header( HttpConstants.X_HEADER_IGNORE_CARDINALITY_CACHE, "true" );
 
 		final HttpRequest request = builder.build();
 
