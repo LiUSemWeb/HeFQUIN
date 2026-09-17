@@ -135,6 +135,28 @@
         </section>
 
         <section>
+            <h2>Caching-Related Arguments of both Programs</h2>
+            <p id="--ignoreRetrievalCache" style="font-weight:bold">
+                --ignoreRetrievalCache
+            </p>
+            <p style="padding-left:2em">
+                Use this argument if you want HeFQUIN to ignore its <a href="caching.html">response cache</a> for the execution of the given query. In other words, for every request that HeFQUIN issues in the context of executing the query, the request is indeed issued to the corresponding federation member even if the cache already contains a response for that request.
+            </p>
+            <p style="padding-left:2em">
+                Notice that the use of this argument does not completely disable the use of the cache for the query. Instead, while the cache is bypassed when a request is issued, the response to such a request is still added to the cache. Moreover, HeFQUIN may still use its cache for cardinality requests when creating the execution plan for the given query. The <a href="#--ignoreCardinalityCache">--ignoreCardinalityCache</a> argument can be used to disable the latter.
+            </p>
+            <p id="--ignoreCardinalityCache" style="font-weight:bold">
+                --ignoreCardinalityCache
+            </p>
+            <p style="padding-left:2em">
+                Use this argument if you want HeFQUIN to ignore its <a href="caching.html">cardinality cache</a> when creating the execution plan for the given query.
+            </p>
+            <p style="padding-left:2em">
+                Notice that the use of this argument does not completely disable the use of the cache for the query. Instead, while the cache is bypassed for cardinality requests, the response to such a request is still added to the cache. Moreover, HeFQUIN may still use its cache for data retrieval requests when running the created the execution plan for the given query. The <a href="#--ignoreRetrievalCache">--ignoreRetrievalCache</a> argument can be used to disable the latter.
+            </p>
+        </section>
+
+        <section>
             <h2>Planning-Related Arguments of both Programs</h2>
 
             <p id="--printSourceAssignment" style="font-weight:bold">
