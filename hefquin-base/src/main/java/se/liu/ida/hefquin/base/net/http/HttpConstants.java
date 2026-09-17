@@ -11,6 +11,8 @@ public class HttpConstants
 	public static final String X_HEADER_RETURN_QUERY_PROC_STATS = "X-HeFQUIN-Return-Query-Proc-Stats";
 	public static final String X_HEADER_RETURN_FED_ACCESS_STATS = "X-HeFQUIN-Return-Fed-Access-Stats";
 	public static final String X_HEADER_RETURN_FULL_STACK_TRACE = "X-HeFQUIN-Return-Full-Stack-Trace";
+	public static final String X_HEADER_IGNORE_RETRIEVAL_CACHE = "X-HeFQUIN-Ignore-Retrieval-Cache";
+	public static final String X_HEADER_IGNORE_CARDINALITY_CACHE = "X-HeFQUIN-Ignore-Cardinality-Cache";
 
 	// response JSON fields
 	public static final String JSON_RESULT = "result";

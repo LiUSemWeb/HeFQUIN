@@ -153,9 +153,9 @@ public class SparqlServlet extends HttpServlet {
 		final QueryResponseBuffers queryResBuf = new QueryResponseBuffers();
 		final QueryProcContext ctx = createQueryProcContext(queryResBuf, request);
 
-		final boolean returnQueryProcStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_QUERY_PROC_STATS));
-		final boolean returnFedAccessStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS));
-		final boolean returnFullStackTrace = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_FULL_STACK_TRACE));
+		final boolean returnQueryProcStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_QUERY_PROC_STATS) );
+		final boolean returnFedAccessStats = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS) );
+		final boolean returnFullStackTrace = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_RETURN_FULL_STACK_TRACE) );
 
 		try {
 			final JsonObject result = execute( query, mimeType, ctx, queryResBuf, returnQueryProcStats, returnFedAccessStats, returnFullStackTrace );
@@ -299,6 +299,8 @@ public class SparqlServlet extends HttpServlet {
 		final String printLP = request.getHeader( HttpConstants.X_HEADER_PRINT_LOGICAL_PLAN );
 		final String printPP = request.getHeader( HttpConstants.X_HEADER_PRINT_PHYSICAL_PLAN );
 		final String printEP = request.getHeader( HttpConstants.X_HEADER_PRINT_EXECUTABLE_PLAN );
+		final boolean ignoreRetrievalCache = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_IGNORE_RETRIEVAL_CACHE) );
+		final boolean ignoreCardinalityCache = Boolean.parseBoolean( request.getHeader(HttpConstants.X_HEADER_IGNORE_CARDINALITY_CACHE) );
 
 		if ( Boolean.parseBoolean(printSA) ) {
 			queryResBuf.sourceAssignment = new ByteArrayOutputStream();
@@ -343,6 +345,12 @@ public class SparqlServlet extends HttpServlet {
 
 			ctxBuilder.setExecutablePlanPrinter(p);
 		}
+
+		if ( ignoreRetrievalCache )
+			ctxBuilder.setIgnoreRetrievalCache(ignoreRetrievalCache);
+
+		if ( ignoreCardinalityCache )
+			ctxBuilder.setIgnoreCardinalityCache(ignoreRetrievalCache);
 
 		return ctxBuilder.build();
 	}
