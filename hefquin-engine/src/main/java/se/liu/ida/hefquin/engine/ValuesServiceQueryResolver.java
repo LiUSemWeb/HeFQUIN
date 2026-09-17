@@ -519,11 +519,24 @@ public class ValuesServiceQueryResolver
 		// relevant list elements include only one SERVICE clause that
 		// has a variable as service node, where this variable must be
 		// the one assigned by the VALUES clause.
+		// Singleton groups containing a SERVICE clause are also supported.
 		if ( useMultiRequestOperators && valClause.getVars().size() == 1 ) {
 			final List<Element> result = new ArrayList<>( endPos - startPos + 1 );
 			boolean foundServiceWithVariable = false;
 			for ( int i = startPos; i <= endPos; i++ ) {
-				final Element eOld = elmts.get(i);
+				final Element eOld;
+
+				// Temporarily unwrap singleton groups so that SERVICE clauses are handled
+				// in the same way as ungrouped SERVICE clauses
+				boolean wasGrouped = false;
+
+				if(    elmts.get(i) instanceof ElementGroup eg
+				    && eg.size() == 1 ) {
+						eOld = eg.getElements().get(0);
+						wasGrouped = true;
+				} else {
+					eOld = elmts.get(i);
+				}
 
 				if (    eOld instanceof ElementService oldServiceClause
 				     && oldServiceClause.getServiceNode().isVariable() )
@@ -549,13 +562,23 @@ public class ValuesServiceQueryResolver
 						valuesForVar.add(n);
 					}
 
-					result.add( new ElementServiceWithValues(var,
-					                                         oldServiceClause.getElement(),
-					                                         oldServiceClause.getSilent(),
-					                                         valuesForVar) );
+					final Element rewritten = new ElementServiceWithValues( var,
+					                                                        oldServiceClause.getElement(),
+					                                                        oldServiceClause.getSilent(),
+					                                                        valuesForVar );
+
+					// Preserve the original grouping around the SERVICE clause
+					if ( wasGrouped ) {
+						final ElementGroup eg = new ElementGroup();
+						eg.addElement(rewritten);
+						result.add(eg);
+					} else {
+						result.add(rewritten);
+					}
 				}
 				else {
-					result.add(eOld);
+					// Preserve the original element
+					result.add( elmts.get(i) );
 				}
 			}
 
