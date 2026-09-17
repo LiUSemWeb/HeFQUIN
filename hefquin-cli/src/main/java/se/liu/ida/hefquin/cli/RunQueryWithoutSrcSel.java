@@ -18,6 +18,7 @@ import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.cli.modules.ModResultsOutExt;
+import se.liu.ida.hefquin.cli.modules.ModStatsPrinting;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
@@ -42,6 +43,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModResultsOutExt modResultsExt =    new ModResultsOutExt();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 	protected final ModCaching       modCaching =       new ModCaching();
+	protected final ModStatsPrinting modStatsPrinting = new ModStatsPrinting();
 
 	/**
 	 * Main entry point of the tool, accepting command-line arguments to specify the
@@ -62,10 +64,11 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	public RunQueryWithoutSrcSel( final String[] argv ) {
 		super( argv );
 
-		addModule( modCaching );
 		addModule( modTime );
 		addModule( modEngineConfig );
 		addModule( modPlanPrinting );
+		addModule( modStatsPrinting );
+		addModule( modCaching );
 		addModule( modResultsExt );
 
 		addModule( modQuery );
@@ -211,12 +214,12 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		e.shutdown();
 
 		if ( statsAndExceptions != null ) {
-			modResultsExt.handleQueryProcStats( statsAndExceptions, msg -> cmdError( msg, false ) );
+			modStatsPrinting.handleQueryProcStats( statsAndExceptions, msg -> cmdError( msg, false ) );
 
-			modResultsExt.handleOnelineTimeStats( extractOnelineTimeStats( statsAndExceptions ), msg -> cmdError( msg, false ) );
+			modStatsPrinting.handleOnelineTimeStats( extractOnelineTimeStats( statsAndExceptions ), msg -> cmdError( msg, false ) );
 		}
 
-		modResultsExt.handleFedAccessStats( e.getFederationAccessStats(), msg -> cmdError( msg, false ) );
+		modStatsPrinting.handleFedAccessStats( e.getFederationAccessStats(), msg -> cmdError( msg, false ) );
 	}
 
     /**

@@ -46,6 +46,7 @@ import se.liu.ida.hefquin.cli.modules.ModCaching;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.cli.modules.ModResultsOutExt;
+import se.liu.ida.hefquin.cli.modules.ModStatsPrinting;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
 
@@ -72,6 +73,7 @@ public class RunHttpQuery extends CmdGeneral
 	protected final ModPlanPrinting  modPlanPrinting =  new ModPlanPrinting();
 	protected final ModQuery         modQuery =         new ModQuery();
 	protected final ModResultsOutExt modResultsExt =    new ModResultsOutExt();
+	protected final ModStatsPrinting modStatsPrinting = new ModStatsPrinting();
 	protected final ModCaching       modCaching =       new ModCaching();
 
 	protected final ArgDecl argServerAddress = new ArgDecl( ArgDecl.HasValue, "server" );
@@ -87,9 +89,10 @@ public class RunHttpQuery extends CmdGeneral
 
 		registerHeFQUINJenaIntegration();
 
-		addModule( modCaching );
 		addModule( modTime );
 		addModule( modPlanPrinting );
+		addModule( modStatsPrinting );
+		addModule( modCaching );
 		addModule( modResultsExt );
 		addModule( modQuery );
 
@@ -222,10 +225,10 @@ public class RunHttpQuery extends CmdGeneral
 		if ( modPlanPrinting.getExecutablePlanPrinter() != null )
 			builder.header( HttpConstants.X_HEADER_PRINT_EXECUTABLE_PLAN, "true" );
 
-		if ( modResultsExt.needsQueryProcStats() )
+		if ( modStatsPrinting.needsQueryProcStats() )
 			builder.header( HttpConstants.X_HEADER_RETURN_QUERY_PROC_STATS, "true" );
 
-		if ( modResultsExt.needsFedAccessStats() )
+		if ( modStatsPrinting.needsFedAccessStats() )
 			builder.header( HttpConstants.X_HEADER_RETURN_FED_ACCESS_STATS, "true" );
 
 		if ( isDebug() )
@@ -291,14 +294,14 @@ public class RunHttpQuery extends CmdGeneral
 
 		final JsonValue queryProcStatsValue = obj.get(HttpConstants.JSON_QUERY_PROC_STATS);
 		if ( queryProcStatsValue != null ) {
-			modResultsExt.handleQueryProcStats( queryProcStatsValue, msg -> cmdError( msg, false ) );
+			modStatsPrinting.handleQueryProcStats( queryProcStatsValue, msg -> cmdError( msg, false ) );
 
-			modResultsExt.handleOnelineTimeStats( extractOnelineTimeStats( queryProcStatsValue ), msg -> cmdError( msg, false ) );
+			modStatsPrinting.handleOnelineTimeStats( extractOnelineTimeStats( queryProcStatsValue ), msg -> cmdError( msg, false ) );
 		}
 
 		final JsonValue fedAccessStatsValue = obj.get(HttpConstants.JSON_FED_ACCESS_STATS);
 		if ( fedAccessStatsValue != null ) {
-			modResultsExt.handleFedAccessStats( fedAccessStatsValue, msg -> cmdError( msg, false ) );
+			modStatsPrinting.handleFedAccessStats( fedAccessStatsValue, msg -> cmdError( msg, false ) );
 		}
 	}
 
