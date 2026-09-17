@@ -70,8 +70,7 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 * @param policies the cache policies to use
 	 * @throws IOException if the cache file cannot be created or opened
 	 */
-	public MapDBCache( final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
-			throws IOException {
+	public MapDBCache( final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies ) {
 		this(DEFAULT_CAPACITY, DEFAULT_FILENAME, policies);
 	}
 
@@ -83,8 +82,7 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 * @throws IOException if the cache file cannot be created or opened
 	 */
 	public MapDBCache( final int capacity,
-	                   final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
-			throws IOException {
+	                   final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies ) {
 		this(capacity, DEFAULT_FILENAME, policies);
 	}
 
@@ -97,8 +95,7 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 * @throws IOException if the cache file cannot be created or opened
 	 */
 	public MapDBCache( final String filename,
-	                   final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
-			throws IOException {
+	                   final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies ) {
 		this(DEFAULT_CAPACITY, filename, policies);
        }
 
@@ -118,8 +115,7 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 */
 	public MapDBCache( final int capacity,
 	                   final String filename,
-	                   final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
-			throws IOException {
+	                   final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies ) {
 		this(
 			open(filename),
 			capacity,
@@ -148,8 +144,7 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 
 	private MapDBCache( final DB db,
 	                    final int capacity,
-	                    final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies )
-			throws IOException {
+	                    final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies ) {
 		super(
 			createMap(db),
 			capacity,
