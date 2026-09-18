@@ -526,14 +526,9 @@ public class ValuesServiceQueryResolver
 			for ( int i = startPos; i <= endPos; i++ ) {
 				final Element eOld;
 
-				// Temporarily unwrap singleton groups so that SERVICE clauses are handled
-				// in the same way as ungrouped SERVICE clauses
-				boolean wasGrouped = false;
-
 				if(    elmts.get(i) instanceof ElementGroup eg
 				    && eg.size() == 1 ) {
 						eOld = eg.getElements().get(0);
-						wasGrouped = true;
 				} else {
 					eOld = elmts.get(i);
 				}
@@ -567,14 +562,7 @@ public class ValuesServiceQueryResolver
 					                                                        oldServiceClause.getSilent(),
 					                                                        valuesForVar );
 
-					// Preserve the original grouping around the SERVICE clause
-					if ( wasGrouped ) {
-						final ElementGroup eg = new ElementGroup();
-						eg.addElement(rewritten);
-						result.add(eg);
-					} else {
-						result.add(rewritten);
-					}
+					result.add(rewritten);
 				}
 				else {
 					// Preserve the original element
