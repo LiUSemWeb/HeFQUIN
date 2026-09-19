@@ -11,6 +11,18 @@ PREFIX ex:     <http://example.org/>
 # of the Japanese currency. Thereafter, the query also obtains the
 # current Euro exchange rate for that currency from a Web API with
 # live data about currency exchange rates.
+#
+# The Web API with country data requires authentication via an API key.
+# Hence, to run the query (and, thus, to also see the authentication
+# support of HeFQUIN in action) obtain the API key from:
+#
+# https://restcountries.com/sign-up
+#
+# After that, set the environment variable that ExampleFederation.ttl
+# defines to contain the API key, which you can do as follows.
+#
+# export API_TOKEN_RESTCOUNTRIES=<Your API key here>
+
 
 SELECT ?countryName ?capital ?population ?region ?currencyCode ?date ?eurRate WHERE {
   BIND("Japan" AS ?searchCountry)

@@ -5,6 +5,8 @@ PREFIX rml:    <http://w3id.org/rml/>
 PREFIX cdt:    <http://w3id.org/awslabs/neptune/SPARQL-CDTs/>
 PREFIX ex:     <http://example.org/>
 PREFIX hydra:  <http://www.w3.org/ns/hydra/core#>
+PREFIX td:     <https://www.w3.org/2019/wot/td#>
+PREFIX wotsec: <https://www.w3.org/2019/wot/security#>
 
 ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;
     fd:serviceURI "http://dbpedia.org/sparql"^^xsd:anyURI ;
@@ -285,9 +287,14 @@ ex:countriesAPI a fd:WrappedFederationMember ;
 _:countriesEndpoint a fd:TemplateBasedInterface ;
       fd:supportedProtocol  fd:GenericWebAPIProtocol ;
       fd:uriTemplate [
-            hydra:template "https://restcountries.com/v2/name/{country}" ;
+            hydra:template "https://api.restcountries.com/countries/v5/name?q={country}" ;
             hydra:mapping
                   [ hydra:variable "country" ; hydra:required true ; fd:paramType xsd:string ]
+          ] ;
+      td:hasSecurityConfiguration [
+            a                wotsec:BearerSecurityScheme ;
+            wotsec:in        "header" ;
+            fd:envarForToken "API_TOKEN_RESTCOUNTRIES"
           ] .
 
 _:countriesWrapper a fd:Wrapper ;
@@ -296,40 +303,40 @@ _:countriesWrapper a fd:Wrapper ;
 _:countryNameTM
       rml:logicalSource [ rml:source _:countriesEndpoint ;
                           rml:referenceFormulation rml:JSONPath ;
-                          rml:iterator "$[*]" ] ;
-      rml:subjectMap [ rml:template "http://example.org/country/{alpha3Code}" ; rml:class ex:Country ];
+                          rml:iterator "$.data.objects[0]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/country/{codes.alpha_3}" ; rml:class ex:Country ];
       rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:countryName ] ;
-                               rml:objectMap [ rml:reference "name" ] ] .
+                               rml:objectMap [ rml:reference "names.official" ] ] .
 
 _:countryCapitalTM
       rml:logicalSource [ rml:source _:countriesEndpoint ;
                           rml:referenceFormulation rml:JSONPath ;
-                          rml:iterator "$[*]" ] ;
-      rml:subjectMap [ rml:template "http://example.org/country/{alpha3Code}" ];
+                          rml:iterator "$.data.objects[0]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/country/{codes.alpha_3}" ];
       rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:capital ] ;
-                               rml:objectMap [ rml:reference "capital" ] ] .
+                               rml:objectMap [ rml:reference "capitals[0].name" ] ] .
 
 _:countryPopulationTM
       rml:logicalSource [ rml:source _:countriesEndpoint ;
                           rml:referenceFormulation rml:JSONPath ;
-                          rml:iterator "$[*]" ] ;
-      rml:subjectMap [ rml:template "http://example.org/country/{alpha3Code}" ];
+                          rml:iterator "$.data.objects[0]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/country/{codes.alpha_3}" ];
       rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:population ] ;
                                rml:objectMap [ rml:reference "population" ; rml:datatype xsd:integer ] ] .
 
 _:countryCurrencyTM
       rml:logicalSource [ rml:source _:countriesEndpoint ;
                           rml:referenceFormulation rml:JSONPath ;
-                          rml:iterator "$[*]" ] ;
-      rml:subjectMap [ rml:template "http://example.org/country/{alpha3Code}" ];
+                          rml:iterator "$.data.objects[0]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/country/{codes.alpha_3}" ];
       rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:currencyCode ] ;
                                rml:objectMap [ rml:reference "currencies[0].code" ] ] .
 
 _:countryRegionTM
       rml:logicalSource [ rml:source _:countriesEndpoint ;
                           rml:referenceFormulation rml:JSONPath ;
-                          rml:iterator "$[*]" ] ;
-      rml:subjectMap [ rml:template "http://example.org/country/{alpha3Code}" ];
+                          rml:iterator "$.data.objects[0]" ] ;
+      rml:subjectMap [ rml:template "http://example.org/country/{codes.alpha_3}" ];
       rml:predicateObjectMap [ rml:predicateMap [ rml:constant ex:region ] ;
                                rml:objectMap [ rml:reference "region" ] ] .
 
