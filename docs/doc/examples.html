@@ -151,6 +151,16 @@
                 This query joins data from two Web APIs. It first obtains data about Japan from the Web API of the <a href="https://restcountries.com/">REST Countries service</a>, including the currency code of the Japanese currency. Thereafter, the query also obtains the current Euro exchange rate for that currency from the <a href="https://www.exchangerate-api.com/">Exchange Rate API</a>.
                 Run the query as follows:
             </p>
+            <p>
+                The <a href="https://restcountries.com/">REST Countries service</a> requires authentication via an API key. Therefore, to run the query (and, thus, to also see the authentication support of HeFQUIN in action) obtain an API key from: <a href="https://restcountries.com/sign-up">https://restcountries.com/sign-up</a>
+            </p>
+            <p>
+                Once you have the key, set the environment variable that <code>examples/ExampleFederation.ttl</code> defines to contain the key, which is the variable <code>API_TOKEN_RESTCOUNTRIES</code>. To this end, execute the following command, where <code>XYZ</code> must be replaced with your API key.
+            </p>
+            <pre><code class="language-bash">export API_TOKEN_RESTCOUNTRIES=XYZ</code></pre>
+            <p>
+                Now you can run the query as follows:
+            </p>
             <pre><code class="language-bash">bin/hefquin --fd examples/ExampleFederation.ttl --query examples/CurrencyViaAPIs.rq</code></pre>
 
         </section>
