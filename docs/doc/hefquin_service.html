@@ -96,6 +96,42 @@ curl -X POST http://localhost:8080/sparql \
                 </li>
             </ul>
             <p>
+                Furthermore, the client may include any of the following headers to control the query processing or to
+                request additional information about the query and its execution.
+            </p>
+            <ul>
+                <li><code>X-HeFQUIN-Skip-Execution</code> - Use this argument if you want HeFQUIN to create the query
+                    execution plan for the given query, but without actually executing this plan.</li>
+                <li><code>X-HeFQUIN-Print-Source-Assignment</code> - Use this argument to instruct the query planning
+                    component of HeFQUIN to print the initial logical plan that is the output of the source selection
+                    & query decomposition process; i.e., this is the logical plan that is passed as input to the
+                    logical query optimizer.</li>
+                <li><code>X-HeFQUIN-Print-Logical-Plan</code> -  Use this argument to instruct the query planning
+                    component of HeFQUIN to print the logical plan that is the output of the logical query optimizer;
+                    i.e., this is the logical plan that is passed as input to the physical query optimizer.</li>
+                <li><code>X-HeFQUIN-Print-Physical-Plan</code> - Use this argument to instruct the query planning
+                    component of HeFQUIN to print the physical plan that is the output of the physical query optimizer;
+                    i.e., this is the physical plan that is used to execute the query.</li>
+                <li><code>X-HeFQUIN-Print-Executable-Plan</code> - Use this argument to instruct the query planning
+                    component of HeFQUIN to print the executable plan produced by the query planning component </li>
+                <li><code>X-HeFQUIN-Return-Query-Proc-Stats</code> - Use this argument to instruct the HeFQUIN engine
+                    to print detailed statistics about the query planning and the query execution processes, as
+                    collected by the different components involved in these processes (including the operators that
+                    have been part of the query execution plan).</li>
+                <li><code>X-HeFQUIN-Return-Fed-Access-Stats</code> -  Use this argument to instruct the HeFQUIN engine
+                    to print detailed statistics collected by the federation access component of HeFQUIN. </li>
+                <li><code>X-HeFQUIN-Return-Full-Stack-Trace</code> - Use this argument to instruct the HeFQUIN engine
+                    to return the complete stack trace for each exception, in addition to the exception message.</li>
+                <li><code>X-HeFQUIN-Ignore-Retrieval-Cache</code> - Use this argument to instruct the HeFQUIN engine
+                    to bypass the retrieval cache when processing the query, so that requests are executed instead of
+                    being served from the cache. The responses received for these requests can still be used to update
+                    the cache.</li>
+                <li><code>X-HeFQUIN-Ignore-Cardinality-Cache</code> - Use this argument to instruct the HeFQUIN engine
+                    to bypass the cardinality cache when processing the query, so that cardinality estimates are
+                    obtained instead of being served from the cache.
+                    The estimates obtained can still be used to update the cache.</li>
+            </ul>
+            <p>
                 Responses returned by the HeFQUIN service may use any of the following HTTP status codes.
             </p>
             <ul>

@@ -209,6 +209,23 @@
             <p style="padding-left:2em">
                 Like the <a href="#--printPhysicalPlan">--printPhysicalPlan</a> argument, but prints the plan to the specified file. If the specified file already exists, the output will be appended rather than overwritten.
             </p>
+
+            <p id="--printExecutablePlan" style="font-weight:bold">
+                --printExecutablePlan
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to instruct the query planning component of HeFQUIN to print the executable plan produced by the query planning component. If you are interested only in seeing the plan, without executing it, use this argument in combination with the <a href="#--skipExecution">--skipExecution</a> argument.
+            </p>
+            <p style="padding-left:2em">
+                The plan is printed to stdout. If you want to print it to a file, use the <a href="#--printExecutablePlanToFile">--printExecutablePlanToFile</a> argument instead.
+            </p>
+
+            <p id="--printExecutablePlanToFile" style="font-weight:bold">
+                --printExecutablePlanToFile=&lt;<em>file</em>>
+            </p>
+            <p style="padding-left:2em">
+                Like the <a href="#--printExecutablePlan">--printExecutablePlan</a> argument, but prints the plan to the specified file. If the specified file already exists, the output will be appended rather than overwritten.
+            </p>
         </section>
 
         <section>
