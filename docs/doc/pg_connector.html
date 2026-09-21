@@ -5,7 +5,15 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeFQUIN Property Graph Connector</title>
+    <title>Using the HeFQUIN PG Connector Command-Line Programs</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-coy-without-shadows.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
 
     <script src="../js/mustache.min.js"></script>
     <script src="../js/script.js"></script>
@@ -16,13 +24,197 @@
     <div id="header"></div>
 
     <main>
-        <h1>HeFQUIN Property Graph Connector</h1>
+        <h1>Using the HeFQUIN PG Connector Command-Line Programs</h1>
         <p>
-            Sorry, this page of the user documentation is still to be written.
+            HeFQUIN provides two command-line programs for working with Property Graphs through the PG Connector:
+        </p>
+        <ul>
+            <li><code style="font-weight:bold">hefquin-pg</code> - can be used to execute SPARQL-star queries over a Property Graph. The query is translated into openCypher and sent to the Property Graph store.</li>
+            <li><code style="font-weight:bold">hefquin-pgmat</code> - can be used to materialize the RDF-star view of a Property Graph by applying an LPG-to-RDF-star configuration.</li>
+        </ul>
+        <p>
+            Both programs currently support Neo4j as the Property Graph store.
+        </p>
+
+        <p>
+            The <code>hefquin-pg</code> program can be used to execute a SPARQL-star query over a Property Graph.
+            For example, assuming that <code>ExampleQuery.rq</code> contains the SPARQL-star query to execute and <code>ExampleLPG2RDF.ttl</code> contains the LPG-to-RDF-star configuration to use, the program can be invoked as follows:
+        </p>
+        <pre><code class="language-bash">hefquin-pg --query=ExampleQuery.rq --lpg2rdfconf=ExampleLPG2RDF.ttl --endpoint=http://localhost:7474/db/neo4j/tx/commit</code></pre>
+        <p>
+            The <code>--query</code> argument refers to a file containing the SPARQL-star query to be executed.
+            The <code>--lpg2rdfconf</code> argument refers to an RDF document containing the LPG-to-RDF-star configuration that defines the RDF-star view of the Property Graph.
+            The <code>--endpoint</code> argument specifies the HTTP endpoint at which the Neo4j instance accepts Cypher queries.
+        </p>
+
+        <p>
+            The <code>hefquin-pgmat</code> program can be used to materialize the RDF-star view of a Property Graph. It applies an LPG-to-RDF-star configuration and produces an RDF-star graph representing the Property Graph according to that configuration.
         </p>
         <p>
-            In the meantime, consult the corresponding <a href="https://github.com/LiUSemWeb/HeFQUIN/tree/main/hefquin-pgconnector">README in GitHub</a>.
+            For example, assuming that <code>ExampleLPG2RDF.ttl</code> contains the LPG-to-RDF-star configuration, the program can be invoked as follows:
         </p>
+        <pre><code class="language-bash">hefquin-pgmat --lpg2rdfconf=ExampleLPG2RDF.ttl --endpoint=http://localhost:7474/db/neo4j/tx/commit</code></pre>
+        <p>
+            The <code>--lpg2rdfconf</code> argument refers to an RDF document containing the LPG-to-RDF-star configuration to apply. The <code>--endpoint</code> argument specifies the HTTP endpoint of the Neo4j instance from which the Property Graph is read.
+        </p>
+        <p>
+            Further arguments can be passed to both programs, which are described in detail below. You can also have the list of supported arguments printed by executing the programs with the argument <code>--help</code>.
+        </p>
+        <pre><code class="language-bash">hefquin-pg --help</code></pre>
+        <pre><code class="language-bash">hefquin-pgmat --help</code></pre>
+
+        <section>
+            <h2>Arguments Exclusive to <code>hefquin-pg</code></h2>
+
+            <h3>Query-Related Arguments</h3>
+            <p id="--query" style="font-weight:bold">
+                --query=&lt;<em>file</em>>
+                <em style="padding-left:1em">(mandatory argument)</em>
+            </p>
+            <p style="padding-left:2em">
+                Refers to a file containing the SPARQL-star query to be executed over the Property Graph.
+            </p>
+
+            <p id="--base" style="font-weight:bold">
+                --base=&lt;<em>URI</em>>
+            </p>
+            <p style="padding-left:2em">
+                Provides a base URI for the SPARQL-star query. Relative IRIs in the query are resolved against this base URI.
+            </p>
+
+            <h3>Result-Related Arguments</h3>
+            <p id="--results" style="font-weight:bold">
+                --results=&lt;<em>format</em>>
+            </p>
+            <p style="padding-left:2em">
+                Specifies the format in which the query results are printed. For result sets, supported formats include the following:
+                <ul style="margin-left:2em">
+                    <li>TEXT - Simple text output in table form (<b>default</b>).</li>
+                    <li>JSON - <a href="https://www.w3.org/TR/sparql11-results-json/">Standard JSON format</a>.</li>
+                    <li>XML - <a href="https://www.w3.org/TR/rdf-sparql-XMLres/">Standard XML format</a>.</li>
+                    <li>CSV - <a href="https://www.w3.org/TR/sparql11-results-csv-tsv/#csv">Standard CSV format</a>.</li>
+                    <li>TSV - <a href="https://www.w3.org/TR/sparql11-results-csv-tsv/#tsv">Standard TSV format</a>.</li>
+                </ul>
+            </p>
+            <p style="padding-left:2em">
+                For RDF graphs, an RDF serialization can be specified.
+            </p>
+
+            <p id="--printCypherQuery" style="font-weight:bold">
+                --printCypherQuery
+            </p>
+            <p style="padding-left:2em">
+                Prints the openCypher query or queries produced by the SPARQL-star query translation process.
+            </p>
+
+            <p id="--suppressResultPrintout" style="font-weight:bold">
+                --suppressResultPrintout
+            </p>
+            <p style="padding-left:2em">
+                Prevents the query result from being printed to standard output.
+            </p>
+
+            <p id="--skipExecution" style="font-weight:bold">
+                --skipExecution
+            </p>
+            <p style="padding-left:2em">
+                Skips execution of the generated query while still performing the query translation and creating the corresponding execution plan.
+            </p>
+
+            <h3>LPG-to-RDF Mapping Arguments</h3>
+            <p id="--naive" style="font-weight:bold">
+                --naive
+            </p>
+            <p style="padding-left:2em">
+                Disables the inference of certain RDF-star terms during the translation of basic graph patterns into openCypher, resulting in a naive translation of the query.
+            </p>
+            <p id="--disableVariableReplacement" style="font-weight:bold">
+                --disableVariableReplacement
+            </p>
+            <p style="padding-left:2em">
+                Disables variable replacement during the translation of the generated openCypher query.
+            </p>
+            <p id="--disablePathMerging" style="font-weight:bold">
+                --disablePathMerging
+            </p>
+            <p style="padding-left:2em">
+                Disables path merging during the translation of the generated openCypher query.
+            </p>
+        </section>
+
+        <section>
+            <h2>Endpoint-Related Arguments of Both Programs</h2>
+
+            <p id="--endpoint" style="font-weight:bold">
+                -e &nbsp; --endpoint=&lt;<em>URI</em>>
+                <em style="padding-left:1em">(mandatory argument)</em>
+            </p>
+            <p style="padding-left:2em">
+                Specifies the HTTP endpoint of the Neo4j instance to which <code>hefquin-pg</code> sends generated
+                openCypher queries and from which <code>hefquin-pgmat</code> reads the Property Graph.
+            </p>
+
+            <p id="--username" style="font-weight:bold">
+                -u &nbsp; --username=&lt;<em>username</em>>
+            </p>
+            <p style="padding-left:2em">
+                Specifies the username used for authentication with the Neo4j endpoint.
+            </p>
+
+            <p id="--password" style="font-weight:bold">
+                -p &nbsp; --password=&lt;<em>password</em>>
+            </p>
+            <p style="padding-left:2em">
+                Specifies the password used for authentication with the Neo4j endpoint.
+            </p>
+        </section>
+
+        <section>
+            <h2>LPG-to-RDF Mapping Arguments of Both Programs</h2>
+
+            <p id="--lpg2rdfconf" style="font-weight:bold">
+                --lpg2rdfconf=&lt;<em>file</em>>
+            </p>
+            <p style="padding-left:2em">
+                Refers to a file containing an RDF description of the LPG-to-RDF-star configuration.
+                The configuration defines how the Property Graph is represented as an RDF-star view.
+            </p>
+            <p>
+                The document must contain an RDF-based description of an LPG-to-RDF-star configuration using the
+                LPG-to-RDF configuration vocabulary.
+            </p>
+
+            <p id="--lpg2rdfconfURI" style="font-weight:bold">
+                --lpg2rdfconfURI=&lt;<em>URI</em>>
+            </p>
+            <p style="padding-left:2em">
+                Specifies the URI of the LPG-to-RDF-star configuration to use.
+                This argument can be used when the configuration file contains multiple configurations.
+            </p>
+        </section>
+
+        <section>
+            <h2>Experiments-Related Arguments of Both Programs</h2>
+
+            <p id="--time" style="font-weight:bold">
+                --time
+            </p>
+            <p style="padding-left:2em">
+                Measures and reports the time taken by the operation.
+            </p>
+        </section>
+
+        <section>
+            <h2>Other Arguments of Both Programs</h2>
+
+            <p id="--help" style="font-weight:bold">
+                --help
+            </p>
+            <p style="padding-left:2em">
+                Prints a list of all supported arguments and terminates.
+                If this argument is given, all other arguments are ignored.
+            </p>
+        </section>
 
     </main>
 
