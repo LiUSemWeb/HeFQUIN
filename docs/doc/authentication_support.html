@@ -32,7 +32,7 @@
     <main>
         <h1>Authentication Support in HeFQUIN</h1>
         <p>
-            HeFQUIN supports authentication when communicating with federation members. Authentication can be configured for individual federation members in the federation description (<code>fed.desc</code>). Currently, HeFQUIN supports the following authentication methods:
+            HeFQUIN supports authentication when communicating with federation members. Authentication can be configured for individual federation members in the <a href="federation_description.html">federation description</a>. Currently, HeFQUIN supports the following authentication methods:
         </p>
         <ul>
             <li>
@@ -69,10 +69,11 @@ ex:MyEndpoint a fd:RDFBasedFederationMember ;
 
                      td:hasSecurityConfiguration [ a                fd:TokenBasedSecurityScheme ;
                                                    wotsec:name      "GDB" ;
-                                                   fd:envarForToken "tokenEnvVarName" ; ] ] .
+                                                   fd:envarForToken "tokenEnvVarName" ]
+                   ] .
             </code></pre>
             <p>
-                <code>fd:TokenBasedSecurityScheme</code> uses the <code>fd</code> prefix instead of <code>wotsec</code>. That is because the token-based security scheme is a HeFQUIN-specific security scheme for token-based authentication with a custom <code>Authorization</code> scheme. The Web of Things security vocabulary provides predefined security schemes, such as <code>wotsec:BearerSecurityScheme</code> and <code>wotsec:BasicSecurityScheme</code>, each with a specific, predefined meaning. These schemes cannot therefore be used to represent an arbitrary authentication scheme.
+                <code>fd:TokenBasedSecurityScheme</code> uses the <code>fd</code> prefix instead of <code>wotsec</code>. That is because the generic token-based security scheme is a HeFQUIN-specific security scheme for token-based authentication with a custom <code>Authorization</code> scheme. The Web of Things security vocabulary provides predefined security schemes, such as <code>wotsec:BearerSecurityScheme</code> and <code>wotsec:BasicSecurityScheme</code>, each with a specific, predefined meaning. These schemes can therefore not be used to represent an arbitrary authentication scheme.
             </p>
             <h3>Bearer Authentication</h3>
             <p>
@@ -89,7 +90,7 @@ PREFIX wotsec: &lt;https://www.w3.org/2019/wot/security#&gt;
 ex:MyEndpoint a fd:RDFBasedFederationMember ;
       ...
       fd:interface [ a                         fd:FixedEndpointInterface ;
-                     ...
+                     # ...
                      td:hasSecurityConfiguration [ a                wotsec:BearerSecurityScheme ;
                                                    fd:envarForToken "tokenEnvVarName" ; ] ] .
             </code></pre>
@@ -103,7 +104,7 @@ PREFIX td:     &lt;https://www.w3.org/2019/wot/td#&gt;
 PREFIX wotsec: &lt;https://www.w3.org/2019/wot/security#&gt;
 
 ex:MyEndpoint a fd:RDFBasedFederationMember ;
-      ...
+      # ...
       fd:interface [ a                         fd:FixedEndpointInterface ;
                      ...
                      td:hasSecurityConfiguration [ a                wotsec:BasicSecurityScheme ;
