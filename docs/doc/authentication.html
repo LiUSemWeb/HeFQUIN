@@ -51,15 +51,21 @@
             <p>
                 HeFQUIN also supports HTTP Basic authentication. The username and password are supplied separately through environment variables and are used to construct the HTTP <code>Authorization: Basic &lt;credentials&gt;</code> header.
             </p>
-            <pre><code class="language-turtle">PREFIX fd:     &lt;http://w3id.org/hefquin/feddesc#&gt;
+            <p>
+                The following is an abbreviated example of a federation member using HTTP Basic authentication, with the username and password supplied through environment variables:
+            </p>
+            <pre><code class="language-turtle">PREFIX xsd:    &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX fd:     &lt;http://w3id.org/hefquin/feddesc#&gt;
 PREFIX ex:     &lt;http://example.org/&gt;
 PREFIX td:     &lt;https://www.w3.org/2019/wot/td#&gt;
 PREFIX wotsec: &lt;https://www.w3.org/2019/wot/security#&gt;
 
 ex:MyEndpoint a fd:RDFBasedFederationMember ;
-      # ...
+      fd:serviceURI "http://serviceURI"^^xsd:anyURI ;
       fd:interface [ a                         fd:FixedEndpointInterface ;
-                     # ...
+                     fd:supportedProtocol      fd:SPARQLProtocol ;
+                     fd:endpointAddress        "http://endpointURI"^^xsd:anyURI ;
+
                      td:hasSecurityConfiguration [ a                wotsec:BasicSecurityScheme ;
                                                    fd:envarForUsername "usernameEnvVarName" ;
                                                    fd:envarForPassword "passwordEnvVarName"
@@ -95,18 +101,18 @@ ex:MyEndpoint a fd:RDFBasedFederationMember ;
             <p>
                 Generic token-based authentication can be used when a federation member expects a token in the HTTP <code>Authorization</code> header. The authentication scheme can be specified using <code>wotsec:name</code>. For example, GraphDB uses the <code>GDB</code> authentication scheme, resulting in an <code>Authorization: GDB &lt;token&gt;</code> header.
             </p>
-            <pre><code class="language-turtle">PREFIX xsd:    &lt;http://www.w3.org/2001/XMLSchema#&gt;
-PREFIX fd:     &lt;http://w3id.org/hefquin/feddesc#&gt;
+            <p>
+                The following is an abbreviated example of a federation member configured to use the generic token-based security scheme with <code>GDB</code> as the custom authentication scheme:
+            </p>
+            <pre><code class="language-turtle">PREFIX fd:     &lt;http://w3id.org/hefquin/feddesc#&gt;
 PREFIX ex:     &lt;http://example.org/&gt;
 PREFIX td:     &lt;https://www.w3.org/2019/wot/td#&gt;
 PREFIX wotsec: &lt;https://www.w3.org/2019/wot/security#&gt;
 
 ex:MyEndpoint a fd:RDFBasedFederationMember ;
-      fd:serviceURI "http://serviceURI"^^xsd:anyURI ;
+      # ...
       fd:interface [ a                         fd:FixedEndpointInterface ;
-                     fd:supportedProtocol      fd:SPARQLProtocol ;
-                     fd:endpointAddress        "http://endpointURI"^^xsd:anyURI ;
-
+                     # ...
                      td:hasSecurityConfiguration [ a                fd:TokenBasedSecurityScheme ;
                                                    wotsec:name      "GDB" ;
                                                    fd:envarForToken "tokenEnvVarName" ]
