@@ -97,17 +97,17 @@ curl -X POST http://localhost:8080/sparql \
             </ul>
             <p>
                 Furthermore, the client may include any of the following headers to control the query processing or to
-                request additional information about the query and its execution. The headers that provide additional
-                information in the response are only supported when the response format is JSON.
+                request additional information about the query and its execution. The headers that request additional
+                information in the response are only supported if the response format is JSON.
             </p>
             <ul>
                 <li><code>X-HeFQUIN-Skip-Execution</code> - Use this argument if you want HeFQUIN to create the query
                     execution plan for the given query, but without actually executing this plan.</li>
                 <li><code>X-HeFQUIN-Print-Source-Assignment</code> - Use this argument to instruct the query planning
                     component of HeFQUIN to include the initial logical plan that is the output of the source selection
-                    & query decomposition process in the response; i.e., this is the logical plan that is passed as
-                    input to the logical query optimizer. The plan is included as a string in the <code>sourceAssignment</code>
-                    field of the JSON response.</li>
+                    &amp; query decomposition process in the response; i.e., this is the logical plan that is passed as
+                    input to the logical query optimizer.
+                    To include the plan in the JSON response, it is represented as a single (multi-line) string that given as value for a key named <code>sourceAssignment</code>.
                 <li><code>X-HeFQUIN-Print-Logical-Plan</code> - Use this argument to instruct the query planning
                     component of HeFQUIN to include the logical plan that is the output of the logical query optimizer
                     in the response; i.e., this is the logical plan that is passed as input to the physical query
@@ -139,9 +139,9 @@ curl -X POST http://localhost:8080/sparql \
                     being served from the cache. The responses received for these requests can still be used to update
                     the cache.</li>
                 <li><code>X-HeFQUIN-Ignore-Cardinality-Cache</code> - Use this argument to instruct the HeFQUIN engine
-                    to bypass the cardinality cache when processing the query, so that cardinality estimates are
-                    obtained instead of being served from the cache.
-                    The estimates obtained can still be used to update the cache.</li>
+                    to bypass the cardinality cache when processing the query, which means that cardinality requests are
+                    indeed issued instead of being served from the cache.
+                    The responses obtained via such requests are still used to update the cache.</li>
             </ul>
             <p>
                 Responses returned by the HeFQUIN service may use any of the following HTTP status codes.
