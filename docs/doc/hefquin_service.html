@@ -107,7 +107,8 @@ curl -X POST http://localhost:8080/sparql \
                     component of HeFQUIN to include the initial logical plan that is the output of the source selection
                     &amp; query decomposition process in the response; i.e., this is the logical plan that is passed as
                     input to the logical query optimizer.
-                    To include the plan in the JSON response, it is represented as a single (multi-line) string that given as value for a key named <code>sourceAssignment</code>.
+                    To include the plan in the JSON response, it is represented as a single (multi-line) string that
+                    given as value for a key named <code>sourceAssignment</code>.
                 <li><code>X-HeFQUIN-Print-Logical-Plan</code> - Use this argument to instruct the query planning
                     component of HeFQUIN to include the logical plan that is the output of the logical query optimizer
                     in the response; i.e., this is the logical plan that is passed as input to the physical query
@@ -135,9 +136,9 @@ curl -X POST http://localhost:8080/sparql \
                     to include the complete stack trace for each exception, in addition to the exception message,
                     in the <code>exceptions</code> field of the JSON response.</li>
                 <li><code>X-HeFQUIN-Ignore-Retrieval-Cache</code> - Use this argument to instruct the HeFQUIN engine
-                    to bypass the retrieval cache when processing the query, so that requests are executed instead of
-                    being served from the cache. The responses received for these requests can still be used to update
-                    the cache.</li>
+                    to bypass the retrieval cache when processing the query, which means that every data retrieval request
+                    during every execution is indeed executed instead of being served from the cache. The responses received
+                    for these requests are still used to update the cache.</li>
                 <li><code>X-HeFQUIN-Ignore-Cardinality-Cache</code> - Use this argument to instruct the HeFQUIN engine
                     to bypass the cardinality cache when processing the query, which means that cardinality requests are
                     indeed issued instead of being served from the cache.
