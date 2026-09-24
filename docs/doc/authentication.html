@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Authentication Support</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-coy-without-shadows.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-sparql.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <script>
+        // trim any preceeding or trailing whitespaces from code snippets
+        window.addEventListener('load', trimCode);
+    </script>
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>Authentication Support in HeFQUIN</h1>
+        <p>
+            HeFQUIN supports authentication when communicating with federation members. Authentication can be configured for individual federation members in the <a href="federation_description.html">federation description</a>. using security schemes from the <a href="https://www.w3.org/TR/wot-security/">W3C Web of Things Security</a> vocabulary, together with HeFQUIN-specific properties for specifying environment variables containing credentials. The security scheme determines how the authentication information is interpreted and applied to outgoing HTTP requests. HeFQUIN currently supports the following authentication methods:
+        </p>
+        <ul>
+            <li>
+                <a href="#basic-authentication"><strong>Basic authentication</strong></a> - sends a username and password using the HTTP <code>Basic</code> authentication scheme. The credentials are encoded and sent using an <code>Authorization: Basic &lt;credentials&gt;</code> header. See <a href="https://datatracker.ietf.org/doc/html/rfc7617">RFC 7617</a> for more information.
+            </li>
+            <li>
+                <a href="#bearer-authentication"><strong>Bearer token authentication</strong></a> - sends a token using the standard <code>Authorization: Bearer &lt;token&gt;</code> HTTP header. The Bearer authentication scheme is defined in <a href="https://datatracker.ietf.org/doc/html/rfc6750">RFC 6750</a>.
+            </li>
+            <li>
+                <a href="#generic-token-based-authentication"><strong>Generic token-based authentication</strong></a> - sends a token using an <code>Authorization</code> HTTP header with a configurable authentication scheme. This allows HeFQUIN to support systems that use a token with a scheme other than <code>Bearer</code>. For example, GraphDB uses the <code>GDB</code> authentication scheme, resulting in an <code>Authorization: GDB &lt;token&gt;</code> header. See the <a href="https://graphdb.ontotext.com/documentation/11.5/access-control.html#authentication-methods">GraphDB access control documentation</a> for more information.
+            </li>
+        </ul>
+
+        <section id="basic-authentication">
+            <h2>Basic Authentication</h2>
+            <p>
+                HeFQUIN also supports HTTP Basic authentication. The username and password are supplied separately through environment variables and are used to construct the HTTP <code>Authorization: Basic &lt;credentials&gt;</code> header.
+            </p>
+            <pre><code class="language-turtle">PREFIX fd:     &lt;http://w3id.org/hefquin/feddesc#&gt;
+PREFIX ex:     &lt;http://example.org/&gt;
+PREFIX td:     &lt;https://www.w3.org/2019/wot/td#&gt;
+PREFIX wotsec: &lt;https://www.w3.org/2019/wot/security#&gt;
+
+ex:MyEndpoint a fd:RDFBasedFederationMember ;
+      # ...
+      fd:interface [ a                         fd:FixedEndpointInterface ;
+                     # ...
+                     td:hasSecurityConfiguration [ a                wotsec:BasicSecurityScheme ;
+                                                   fd:envarForUsername "usernameEnvVarName" ;
+                                                   fd:envarForPassword "passwordEnvVarName"
+                   ] .
+            </code></pre>
+        </section>
+
+        <section id="bearer-authentication">
+            <h2>Bearer Authentication</h2>
+            <p>
+                Bearer authentication uses the <code>Authorization: Bearer &lt;token&gt;</code> HTTP header. It can be configured using the predefined <code>wotsec:BearerSecurityScheme</code> security scheme. Alternatively, Bearer authentication can also be represented using HeFQUIN's <code>fd:TokenBasedSecurityScheme</code> by setting <code>wotsec:name</code> to <code>"Bearer"</code>.
+            </p>
+            <p>
+                The following is an abbreviated example of a federation member using the predefined Bearer security scheme:
+            </p>
+            <pre><code class="language-turtle">PREFIX fd:     &lt;http://w3id.org/hefquin/feddesc#&gt;
+PREFIX ex:     &lt;http://example.org/&gt;
+PREFIX td:     &lt;https://www.w3.org/2019/wot/td#&gt;
+PREFIX wotsec: &lt;https://www.w3.org/2019/wot/security#&gt;
+
+ex:MyEndpoint a fd:RDFBasedFederationMember ;
+      # ...
+      fd:interface [ a                         fd:FixedEndpointInterface ;
+                     # ...
+                     td:hasSecurityConfiguration [ a                wotsec:BearerSecurityScheme ;
+                                                   fd:envarForToken "tokenEnvVarName"
+                   ] .
+            </code></pre>
+        </section>
+
+        <section id="generic-token-based-authentication">
+            <h2>Generic Token-based Authentication with a Custom Authentication Scheme</h2>
+            <p>
+                Generic token-based authentication can be used when a federation member expects a token in the HTTP <code>Authorization</code> header. The authentication scheme can be specified using <code>wotsec:name</code>. For example, GraphDB uses the <code>GDB</code> authentication scheme, resulting in an <code>Authorization: GDB &lt;token&gt;</code> header.
+            </p>
+            <pre><code class="language-turtle">PREFIX xsd:    &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX fd:     &lt;http://w3id.org/hefquin/feddesc#&gt;
+PREFIX ex:     &lt;http://example.org/&gt;
+PREFIX td:     &lt;https://www.w3.org/2019/wot/td#&gt;
+PREFIX wotsec: &lt;https://www.w3.org/2019/wot/security#&gt;
+
+ex:MyEndpoint a fd:RDFBasedFederationMember ;
+      fd:serviceURI "http://serviceURI"^^xsd:anyURI ;
+      fd:interface [ a                         fd:FixedEndpointInterface ;
+                     fd:supportedProtocol      fd:SPARQLProtocol ;
+                     fd:endpointAddress        "http://endpointURI"^^xsd:anyURI ;
+
+                     td:hasSecurityConfiguration [ a                fd:TokenBasedSecurityScheme ;
+                                                   wotsec:name      "GDB" ;
+                                                   fd:envarForToken "tokenEnvVarName" ]
+                   ] .
+            </code></pre>
+            <p>
+                <code>fd:TokenBasedSecurityScheme</code> uses the <code>fd</code> prefix instead of <code>wotsec</code>. That is because the generic token-based security scheme is a HeFQUIN-specific security scheme for token-based authentication with a custom <code>Authorization</code> scheme. The Web of Things security vocabulary provides predefined security schemes, such as <code>wotsec:BearerSecurityScheme</code> and <code>wotsec:BasicSecurityScheme</code>, each with a specific, predefined meaning. These schemes can therefore not be used to represent an arbitrary authentication scheme.
+            </p>
+        </section>
+
+        <section>
+            <h2>Supplying Credentials through Environment Variables</h2>
+            <p>
+                The values of <code>fd:envarForToken</code>, <code>fd:envarForUsername</code> and <code>fd:envarForPassword</code> are names of environment variables, not the actual authentication credentials. Credentials and other secrets should not be written directly into the federation description. Instead, HeFQUIN reads the corresponding values from the environment at runtime.
+            </p>
+            <p>
+                For example, if the federation description contains:
+            </p>
+            <pre><code class="language-turtle">fd:envarForToken "tokenEnvVarName"</code></pre>
+            <p>
+                open a terminal and set the corresponding environment variable using the <code>export</code> command, before starting HeFQUIN. For example:
+            </p>
+            <pre><code class="language-bash">export tokenEnvVarName="your-token"</code></pre>
+            <p>
+                Similarly, <a href="#basic-authentication">Basic authentication</a> can be configured by setting the username and password environment variables in the terminal:
+            </p>
+            <pre><code class="language-bash">export usernameEnvVarName="your-username"
+export passwordEnvVarName="your-password"</code></pre>
+            <p>
+                HeFQUIN will then read these values when it is started from the same terminal and use them when constructing requests to the corresponding federation member.
+            </p>
+        </section>
+
+        <p>
+            Once configured, the authentication information is applied to the HTTP requests sent by HeFQUIN to the corresponding federation member. The exact HTTP headers produced depend on the configured authentication method.
+        </p>
+
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
