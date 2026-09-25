@@ -112,26 +112,28 @@ curl -X POST http://localhost:8080/sparql \
                 <li><code>X-HeFQUIN-Print-Logical-Plan</code> - Use this argument to instruct the query planning
                     component of HeFQUIN to include the logical plan that is the output of the logical query optimizer
                     in the response; i.e., this is the logical plan that is passed as input to the physical query
-                    optimizer. The plan is included as a string in the <code>logicalPlan</code> field of the JSON
-                    response.</li>
+                    optimizer. To include the plan in the JSON response, it is represented as a single (multi-line) string
+                    that is given as a value for a key named <code>logicalPlan</code>.
                 <li><code>X-HeFQUIN-Print-Physical-Plan</code> - Use this argument to instruct the query planning
                     component of HeFQUIN to include the physical plan that is the output of the physical query optimizer
-                    in the response; i.e., this is the physical plan that is used to execute the query. The plan is
-                    included as a string in the <code>physicalPlan</code> field of the JSON response.</li>
+                    in the response; i.e., this is the physical plan that is used to execute the query. To include the plan
+                    in the JSON response, it is represented as a single (multi-line) string that is given as a value for a
+                    key named <code>physicalPlan</code>.
                 <li><code>X-HeFQUIN-Print-Executable-Plan</code> - Use this argument to instruct the query planning
                     component of HeFQUIN to include the executable plan produced by the query planning component in the
                     response; i.e., this is the plan consisting of the concrete executable operators that are used to
-                    execute the query. The plan is included as a string in the <code>executablePlan</code> field of the JSON
-                    response.</li>
+                    execute the query. To include the plan in the JSON response, it is represented as a single (multi-line)
+                    string that is given as a value for a key named <code>executablePlan</code>.
                 <li><code>X-HeFQUIN-Return-Query-Proc-Stats</code> - Use this argument to instruct the HeFQUIN engine
                     to include detailed statistics about the query planning and the query execution processes, as
                     collected by the different components involved in these processes (including the operators that
-                    have been part of the query execution plan), in the response. The statistics are included as a
-                    JSON object in the <code>queryProcStats</code> field of the JSON response.</li>
+                    have been part of the query execution plan), in the response. To include the statistics in the JSON
+                    response, they are represented as a JSON object that is given as a value for a key named
+                    <code>queryProcStats</code>.</li>
                 <li><code>X-HeFQUIN-Return-Fed-Access-Stats</code> - Use this argument to instruct the HeFQUIN engine
                     to include detailed statistics collected by the federation access component of HeFQUIN in the
-                    response. The statistics are included as a JSON object in the <code>fedAccessStats</code> field of
-                    the JSON response.</li>
+                    response. To include the statistics in the JSON response, they are represented as a JSON object that
+                    is given as a value for a key named<code>fedAccessStats</code>.</li>
                 <li><code>X-HeFQUIN-Return-Full-Stack-Trace</code> - Use this argument to instruct the HeFQUIN engine
                     to include the complete stack trace for each exception, in addition to the exception message,
                     in the <code>exceptions</code> field of the JSON response.</li>
