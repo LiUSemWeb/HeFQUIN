@@ -32,7 +32,7 @@
     <main>
         <h1>Authentication Support in HeFQUIN</h1>
         <p>
-            HeFQUIN supports authentication when communicating with federation members. Authentication can be configured for individual federation members in the <a href="federation_description.html">federation description</a>. using security schemes from the <a href="https://www.w3.org/TR/wot-security/">W3C Web of Things Security</a> vocabulary, together with HeFQUIN-specific properties for specifying environment variables containing credentials. The security scheme determines how the authentication information is interpreted and applied to outgoing HTTP requests. HeFQUIN currently supports the following authentication methods:
+            HeFQUIN supports authentication when communicating with federation members. Authentication can be configured for individual federation members in the <a href="federation_description.html">federation description</a> by using security schemes from the <a href="https://www.w3.org/TR/wot-security/">W3C Web of Things Security</a> vocabulary, together with HeFQUIN-specific properties for specifying environment variables containing credentials. The security scheme determines how the authentication information is interpreted and applied to outgoing HTTP requests. HeFQUIN currently supports the following authentication methods:
         </p>
         <ul>
             <li>
@@ -61,10 +61,10 @@ PREFIX td:     &lt;https://www.w3.org/2019/wot/td#&gt;
 PREFIX wotsec: &lt;https://www.w3.org/2019/wot/security#&gt;
 
 ex:MyEndpoint a fd:RDFBasedFederationMember ;
-      fd:serviceURI "http://serviceURI"^^xsd:anyURI ;
+      fd:serviceURI "http://example.org/sparql"^^xsd:anyURI ;
       fd:interface [ a                         fd:FixedEndpointInterface ;
                      fd:supportedProtocol      fd:SPARQLProtocol ;
-                     fd:endpointAddress        "http://endpointURI"^^xsd:anyURI ;
+                     fd:endpointAddress        "http://example.org/sparql"^^xsd:anyURI ;
 
                      td:hasSecurityConfiguration [ a                wotsec:BasicSecurityScheme ;
                                                    fd:envarForUsername "usernameEnvVarName" ;
@@ -99,7 +99,7 @@ ex:MyEndpoint a fd:RDFBasedFederationMember ;
         <section id="generic-token-based-authentication">
             <h2>Generic Token-based Authentication with a Custom Authentication Scheme</h2>
             <p>
-                Generic token-based authentication can be used when a federation member expects a token in the HTTP <code>Authorization</code> header. The authentication scheme can be specified using <code>wotsec:name</code>. For example, GraphDB uses the <code>GDB</code> authentication scheme, resulting in an <code>Authorization: GDB &lt;token&gt;</code> header.
+                Generic token-based authentication can be used if a federation member expects a token in the HTTP <code>Authorization</code> header. The authentication scheme can be specified using <code>wotsec:name</code>. For example, GraphDB uses the <code>GDB</code> authentication scheme, resulting in an <code>Authorization: GDB &lt;token&gt;</code> header.
             </p>
             <p>
                 The following is an abbreviated example of a federation member configured to use the generic token-based security scheme with <code>GDB</code> as the custom authentication scheme:
@@ -126,7 +126,7 @@ ex:MyEndpoint a fd:RDFBasedFederationMember ;
         <section>
             <h2>Supplying Credentials through Environment Variables</h2>
             <p>
-                The values of <code>fd:envarForToken</code>, <code>fd:envarForUsername</code> and <code>fd:envarForPassword</code> are names of environment variables, not the actual authentication credentials. Credentials and other secrets should not be written directly into the federation description. Instead, HeFQUIN reads the corresponding values from the environment at runtime.
+                The values of <code>fd:envarForToken</code>, <code>fd:envarForUsername</code>, and <code>fd:envarForPassword</code> are names of environment variables, not the actual authentication credentials. Credentials and other secrets should not be written directly into the federation description. Instead, HeFQUIN reads the corresponding values from the environment at runtime.
             </p>
             <p>
                 For example, if the federation description contains:
