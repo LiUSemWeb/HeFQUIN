@@ -24,11 +24,45 @@
     <div id="header"></div>
     <main>
         <h1>Configuring the Cache</h1>
+
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#bypassing">Bypassing the Cache</a></li>
+            <li><a href="#configuration">Configuration</a></li>
+        </ul>
+    
+        <!-- Overview -->
+        <h2 id="overview">Overview</h2>
         <p>
-            HeFQUIN supports a two-level cache with an in-memory L1 cache and a persistent L2 cache. The cache is configured as
-            part of the <code>FederationAccessManager</code>. By default, HeFQUIN uses a <code>HashMap</code>-based L1 cache and
-            a <code>MapDB</code>-based L2 cache.
+            HeFQUIN supports caching of responses from federation members. By default, HeFQUIN uses a two-level cache consisting of
+            an in-memory L1 cache and a persistent L2 cache. The L1 cache provides fast access within an engine instance, while the
+            L2 cache persists cached responses across engine instances and across JVM restarts.
         </p>
+        <p>
+            When HeFQUIN needs to issue a data retrieval or some other kind of request to a federation member, it first checks the
+            L1 cache. If a matching non-expired response is found, it is returned directly without contacting the federation member.
+            If no such response is found in the L1 cache, HeFQUIN checks the L2 cache. If a matching non-expired response is found
+            there, it is returned and also added to the L1 cache. If neither cache contains a usable response, the request is
+            issued to the federation member, and the response is stored in the caches for subsequent accesses.
+        </p>
+        <p>
+            If the cache reaches its configured capacity, an existing cache entry is removed according to the configured cache
+            policy to make room for the new entry. Currently, the default cache policy uses least recently used (LRU) eviction.
+        </p>
+        
+        <!-- Bypassing -->
+        <h2 id="bypassing">Bypassing the Cache</h2>
+        <p>
+            TODO
+        </p>
+
+        <!-- Configuration -->
+        <h2 id="configuration">Configuration</h2>
+
+        <p>The L1 and L2 cache configurations are passed as the second and third constructor arguments of
+            <code>FederationAccessManagerWithHierarchicalCache</code>, respectively.
+        </p>
+
 
         <h2 id="example-configuration">Example Configuration</h2>
 
@@ -42,63 +76,59 @@
              ec:constructorArguments ( ec:value:ExecServiceForFedAccess ) ]
 
            # L1 cache
-           &lt;L1 cache configuration&gt;
+           _:b1
 
            # L2 cache
-           &lt;L2 cache configuration&gt;
+           _:b2
        )
    ] .
 </code></pre>
 
         <p>
-            The L1 and L2 cache configurations are passed as the second and third constructor argument of
-            <code>FederationAccessManagerWithHierarchicalCache</code>, respectively.
+            In the following example, the L1 cache is implemented based on <code>HashMap</code>. The first constructor argument
+            specifies the <code>Map</code> implementation used internally, the second specifies the maximum number of cache entries
+            that can be stored at the same time (set to 100 in the example), and the third defines the <code>CachePolicies</code>
+            instance, whose constructor argument specifies how long each cache entry is retained before it expires, i.e., the time
+            to live (TTL) in seconds (set to 300 seconds in the example).
         </p>
 
         <pre><code class="language-turtle"># L1 cache
-[ ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.Cache" ;
-    ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.cache.CacheLayer" ;
-    ec:constructorArguments (
-        [ ec:argumentTypeName "java.util.Map" ;
-          ec:javaClassName "java.util.HashMap" ;
-          ec:constructorArguments () ]
-        100   # cache capacity (i.e., max number of cache elements)
-        [ ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies" ;
-          ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithHierarchicalCache$DefaultHierarchicalMapCachePolicies" ;
-          ec:constructorArguments ( 300 ) ]     # time to live in seconds
-    )
-]
+_:b1 ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.Cache" ;
+     ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.cache.CacheLayer" ;
+     ec:constructorArguments (
+         [ ec:argumentTypeName "java.util.Map" ;
+           ec:javaClassName "java.util.HashMap" ;
+           ec:constructorArguments () ]
+         100   # cache capacity (i.e., max number of cache elements)
+         [ ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies" ;
+           ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithHierarchicalCache$DefaultHierarchicalMapCachePolicies" ;
+           ec:constructorArguments ( 300 ) ]   # time to live (TTL) in seconds
+     ) .
 </code></pre>
 
         <p>
-            In the example, the L1 cache uses <code>CacheLayer</code> directly. Its first constructor argument specifies the <code>Map</code>
-            implementation used internally, in this case an in-memory <code>HashMap</code>. The second argument specifies the
-            maximum number of elements (<code>100</code>). The third argument is a <code>CachePolicies</code> instance whose
-            constructor argument specifies the time-to-live (TTL) in seconds (<code>300</code>).
+            In the example, the L2 cache uses <code>MapDBCache</code>. Its first constructor argument specifies the maximum number
+            of cache entries that can be stored at the same time (set to 1000 in the example), while the second is a
+            <code>CachePolicies</code> instance whose constructor argument specifies how long each cache entry is retained before it
+            expires (set to 600 seconds in the example).
         </p>
 
         <pre><code class="language-turtle"># L2 cache
-[ ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.Cache" ;
-  ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.cache.mapdb.MapDBCache" ;
-  ec:constructorArguments (
-      1000
-      [ ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies" ;
-        ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithHierarchicalCache$DefaultHierarchicalMapCachePolicies" ;
-        ec:constructorArguments ( 600 ) ]
-  )
-]
+_:b2 ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.Cache" ;
+     ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.cache.mapdb.MapDBCache" ;
+     ec:constructorArguments (
+         1000
+         [ ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies" ;
+           ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithHierarchicalCache$DefaultHierarchicalMapCachePolicies" ;
+           ec:constructorArguments ( 600 ) ]   # TTL in seconds
+     ) .
 </code></pre>
-        <p>
-            In the example, the L2 cache uses <code>MapDBCache</code>. Its first constructor argument specifies the maximum number
-            of elements (<code>1000</code>). The second argument is a <code>CachePolicies</code> instance whose constructor argument
-            specifies the TTL in seconds (<code>600</code>).
-        </p>
 
         <p>
-            Both <code>MapDBCache</code> and <code>ChronicleMapCache</code> can be used as the L2 cache. <code>MapDBCache</code>
+            As an alternative to <code>MapDBCache</code>, <code>ChronicleMapCache</code> can be used as the L2 cache. <code>MapDBCache</code>
             provides faster startup when running the regular CLI, where JVM startup time has a greater impact. When HeFQUIN is run
-            as a service, this difference in JVM startup time is not relevant. <code>ChronicleMapCache</code> is likely to
-            perform best for high-throughput workloads.
+            as a service, this difference in JVM startup time is not relevant, and <code>ChronicleMapCache</code> is likely to
+            perform better for high-throughput workloads.
         </p>
     </main>
 
