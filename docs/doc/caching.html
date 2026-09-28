@@ -28,7 +28,8 @@
             HeFQUIN supports caching of requests to federation members. When HeFQUIN needs to access a federation member,
             it first checks whether the request is present in the cache. If it is, the corresponding cached result can be
             reused without contacting the federation member. Otherwise, the request is evaluated and its result can be stored
-            in the cache for subsequent accesses.</p>
+            in the cache for subsequent accesses.
+        </p>
         <p>
             By default, HeFQUIN provides a two-level cache consisting of an in-memory L1 cache and a persistent L2 cache. The L1
             cache provides fast access during an execution, while the L2 cache can retain cached results across executions.
