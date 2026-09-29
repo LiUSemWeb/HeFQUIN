@@ -690,9 +690,6 @@ public class FederationDescriptionReader
 	protected String getRequiredEnvironmentVariable( final String variableName ) {
 		final String value = System.getenv( variableName );
 
-		if ( value == null )
-			throw new IllegalArgumentException( "Environment variable '" + variableName + "' is not set." );
-
 		return value;
 	}
 

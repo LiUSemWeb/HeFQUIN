@@ -6,6 +6,10 @@ import org.slf4j.LoggerFactory;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitorBase;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWalker;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithoutResult;
@@ -21,6 +25,9 @@ import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.authentication.BasicAuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.TokenBasedAuthenticationInformation;
 
 /**
  * Simple implementation of {@link QueryPlanner}.
@@ -83,6 +90,21 @@ public class QueryPlannerImpl implements QueryPlanner
 			                                        LogicalPlanStage.SOURCE_ASSIGNMENT );
 		}
 
+		LogicalPlanWalker.walk( saAndStats.object1,
+			new LogicalPlanVisitorBase() {
+				@Override
+				public void visit( final LogicalOpRequest<?,?> op ) {
+					validateFederationMemberAuthentication( op.getFederationMember() );
+				}
+
+				@Override
+				public void visit( final LogicalOpMultiRequest op ) {
+					for ( final FederationMember fm : op.getFederationMembers() )
+						validateFederationMemberAuthentication( fm );
+				}
+			},
+			null );
+
 		log.debug( "Starting logical optimization phase." );
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
@@ -129,4 +151,14 @@ public class QueryPlannerImpl implements QueryPlanner
 		return new Pair<>(planAndStats.object1, myStats);
 	}
 
+	protected void validateFederationMemberAuthentication( final FederationMember fm ) {
+		if ( fm.getAuthenticationInformation() instanceof BasicAuthenticationInformation bAuthInfo ) {
+			if ( bAuthInfo.getUsername() == null || bAuthInfo.getPassword() == null )
+				throw new IllegalArgumentException( "Username or password required for federation member authentication is not available. The corresponding environment variables may not be set." );
+		}
+		else if ( fm.getAuthenticationInformation() instanceof TokenBasedAuthenticationInformation tAuthInfo ) {
+			if ( tAuthInfo.getToken() == null )
+				throw new IllegalArgumentException( "Token required for federation member authentication is not available. The corresponding environment variable may not be set." );
+		}
+	}
 }
