@@ -11,9 +11,14 @@ import org.apache.jena.sparql.algebra.op.OpExtend;
 import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.algebra.op.OpPath;
+import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpService;
+import org.apache.jena.sparql.algebra.op.OpSlice;
 import org.apache.jena.sparql.algebra.op.OpTable;
 import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
 
@@ -54,18 +59,36 @@ public class OpUtils
 		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
 			addVariablesFromPattern( acc, (Op2) op );
 		}
-		else if ( op instanceof OpService opService ){
+		else if ( op instanceof OpService opService ) {
 			addVariablesFromPattern( acc, opService.getSubOp() );
 		}
-		else if ( op instanceof OpFilter opFilter ){
+		else if ( op instanceof OpFilter opFilter ) {
 			addVariablesFromPattern( acc, opFilter.getSubOp() );
 		}
-		else if ( op instanceof OpExtend opExtend ){
+		else if ( op instanceof OpExtend opExtend ) {
 			addVariablesFromPattern( acc, opExtend.getSubOp() );
 			acc.addAll( opExtend.getVarExprList().getVars() );
 		}
-		else if ( op instanceof OpTable opTable ){
+		else if ( op instanceof OpTable opTable ) {
 			acc.addAll( opTable.getTable().getVars() );
+		}
+		else if ( op instanceof OpSlice opSlice ) {
+			addVariablesFromPattern( acc, opSlice.getSubOp() );
+		}
+		else if ( op instanceof OpSequence opSequence ) {
+			for ( final Op element : opSequence.getElements() )
+				addVariablesFromPattern( acc, element );
+		}
+		else if ( op instanceof OpProject opProject ) {
+			addVariablesFromPattern( acc, opProject.getSubOp() );
+		}
+		else if ( op instanceof OpPath opPath ) {
+			final TriplePath path = opPath.getTriplePath();
+
+			if ( path.getSubject().isVariable() )
+				acc.add( Var.alloc(path.getSubject()) );
+			if ( path.getObject().isVariable() )
+				acc.add( Var.alloc(path.getObject()) );
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
@@ -101,14 +124,38 @@ public class OpUtils
 		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
 			return getNumberOfVarMentions( (Op2) op );
 		}
-		else if ( op instanceof OpService opService ){
+		else if ( op instanceof OpService opService ) {
 			return getNumberOfVarMentions( opService.getSubOp() );
 		}
-		else if ( op instanceof OpFilter opFilter ){
+		else if ( op instanceof OpFilter opFilter ) {
 			return getNumberOfVarMentions( opFilter.getSubOp() );
 		}
-		else if ( op instanceof OpExtend opExtend ){
+		else if ( op instanceof OpExtend opExtend ) {
 			return getNumberOfVarMentions( opExtend.getSubOp() ) + opExtend.getVarExprList().getVars().size();
+		}
+		else if ( op instanceof OpSlice opSlice ) {
+			return getNumberOfVarMentions( opSlice.getSubOp() );
+		}
+		else if ( op instanceof OpSequence opSequence ) {
+			int n = 0;
+			for ( final Op element : opSequence.getElements() ) {
+				n += getNumberOfVarMentions( element );
+			}
+			return n;
+		}
+		else if ( op instanceof OpProject opProject ) {
+			return getNumberOfVarMentions( opProject.getSubOp() );
+		}
+		else if ( op instanceof OpPath opPath ) {
+			final TriplePath path = opPath.getTriplePath();
+			int n = 0;
+
+			if ( path.getSubject().isVariable() )
+				n++;
+			if ( path.getObject().isVariable() )
+				n++;
+
+			return n;
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
@@ -147,14 +194,43 @@ public class OpUtils
 		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
 			return getNumberOfTermMentions( (Op2) op );
 		}
-		else if ( op instanceof OpService opService ){
+		else if ( op instanceof OpService opService ) {
 			return getNumberOfTermMentions( opService.getSubOp() );
 		}
-		else if ( op instanceof OpFilter opFilter ){
+		else if ( op instanceof OpFilter opFilter ) {
 			return getNumberOfTermMentions( opFilter.getSubOp() );
 		}
-		else if ( op instanceof OpExtend opExtend ){
+		else if ( op instanceof OpExtend opExtend ) {
 			return getNumberOfTermMentions( opExtend.getSubOp() );
+		}
+		else if ( op instanceof OpSlice opSlice ) {
+			return getNumberOfTermMentions( opSlice.getSubOp() );
+		}
+		else if ( op instanceof OpSequence opSequence ) {
+			int n = 0;
+			for ( final Op element : opSequence.getElements() ) {
+				n += getNumberOfTermMentions( element );
+			}
+			return n;
+		}
+		else if ( op instanceof OpProject opProject ) {
+			return getNumberOfTermMentions( opProject.getSubOp() );
+		}
+		else if ( op instanceof OpPath opPath ) {
+			final TriplePath path = opPath.getTriplePath();
+			int n = 0;
+
+			if ( path.getSubject().isConcrete() ) {
+				n++;
+			}
+			if ( path.getObject().isConcrete() ) {
+				n++;
+			}
+			if ( path.isTriple() && path.asTriple().getPredicate().isConcrete() ) {
+				n++;
+			}
+
+			return n;
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
