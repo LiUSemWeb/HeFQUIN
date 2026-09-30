@@ -21,6 +21,8 @@ import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
+import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.PathVisitorBase;
 
 import se.liu.ida.hefquin.jenaext.graph.TripleUtils;
 
@@ -218,19 +220,31 @@ public class OpUtils
 		}
 		else if ( op instanceof OpPath opPath ) {
 			final TriplePath path = opPath.getTriplePath();
-			int n = 0;
+			final int[] n = { 0 };
 
 			if ( path.getSubject().isConcrete() ) {
-				n++;
+				n[0]++;
 			}
 			if ( path.getObject().isConcrete() ) {
-				n++;
+				n[0]++;
 			}
-			if ( path.isTriple() && path.asTriple().getPredicate().isConcrete() ) {
-				n++;
+			if ( path.isTriple() ) {
+				if ( path.asTriple().getPredicate().isConcrete() ) {
+					n[0]++;
+				}
+			}
+			else {
+				path.getPath().visit(new PathVisitorBase() {
+					@Override
+					public void visit( final P_Link pathNode ) {
+						if ( pathNode.getNode().isConcrete() ) {
+							n[0]++;
+						}
+					}
+				});
 			}
 
-			return n;
+			return n[0];
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
