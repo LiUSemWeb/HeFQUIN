@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -9,12 +8,7 @@ import org.slf4j.LoggerFactory;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitorBase;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWalker;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithoutResult;
@@ -95,32 +89,7 @@ public class QueryPlannerImpl implements QueryPlanner
 			                                        LogicalPlanStage.SOURCE_ASSIGNMENT );
 		}
 
-		final Set<FederationMember> fmsToCheck = new HashSet<>();
-
-		LogicalPlanWalker.walk( saAndStats.object1,
-			new LogicalPlanVisitorBase() {
-				@Override
-				public void visit( final LogicalOpRequest<?,?> op ) {
-					fmsToCheck.add( op.getFederationMember() );
-				}
-
-				@Override
-				public void visit( final LogicalOpMultiRequest op ) {
-					for ( final FederationMember fm : op.getFederationMembers() )
-						fmsToCheck.add( fm );
-				}
-
-				@Override
-				public void visit( final LogicalOpGPAdd op ) {
-					fmsToCheck.add( op.getFederationMember() );
-				}
-
-				@Override
-				public void visit( final LogicalOpGPOptAdd op ) {
-					fmsToCheck.add( op.getFederationMember() );
-				}
-			},
-			null );
+		final Set<FederationMember> fmsToCheck = LogicalPlanUtils.getFederationMembers( saAndStats.object1 );
 
 		checkFederationMemberAuthentication(fmsToCheck);
 
@@ -181,8 +150,12 @@ public class QueryPlannerImpl implements QueryPlanner
 	protected void checkFederationMemberAuthentication( final Set<FederationMember> fmsToCheck ) throws QueryPlanningException {
 		for ( final FederationMember fm : fmsToCheck ) {
 			if ( fm.getAuthenticationInformation() instanceof BasicAuthenticationInformation bAuthInfo ) {
-				if ( bAuthInfo.getUsername() == null || bAuthInfo.getPassword() == null )
-					throw new QueryPlanningException( "Username or password required for authentication is not available for the federation member with service URI " + fm.getServiceURI() + ". The corresponding environment variables may not be set." );
+				if ( bAuthInfo.getUsername() == null && bAuthInfo.getPassword() == null )
+					throw new QueryPlanningException( "Username and password required for authentication are not available for the federation member with service URI " + fm.getServiceURI() + ". The corresponding environment variables may not be set." );
+				else if ( bAuthInfo.getUsername() == null )
+					throw new QueryPlanningException( "Username required for authentication is not available for the federation member with service URI " + fm.getServiceURI() + ". The corresponding environment variable may not be set." );
+				else if ( bAuthInfo.getPassword() == null )
+					throw new QueryPlanningException( "Password required for authentication is not available for the federation member with service URI " + fm.getServiceURI() + ". The corresponding environment variable may not be set." );
 			}
 			else if ( fm.getAuthenticationInformation() instanceof TokenBasedAuthenticationInformation tAuthInfo ) {
 				if ( tAuthInfo.getToken() == null )
