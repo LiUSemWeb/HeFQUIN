@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecException;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.ResultSet;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessingStatsAndExceptionsImpl;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
@@ -344,14 +346,26 @@ public class HeFQUINEngine
 			rs = qe.execSelect();
 		}
 		catch ( final Exception e ) {
-			throw new Exception("Exception occurred when executing a SELECT query using the Jena machinery.", e);
+			if (    e instanceof QueryExecException
+			     && e.getCause() != null
+			     && e.getCause() instanceof QueryProcException ) {
+				throw new Exception( e.getMessage(), e );
+			}
+
+			throw new Exception("Executing a SELECT query using the Jena machinery failed with an exception (" + e.getClass().getName() + "): " + e.getMessage(), e);
 		}
 
 		try {
 			QueryExecUtils.outputResultSet(rs, qe.getQuery().getPrologue(), outputFormat, output);
 		}
 		catch ( final Exception e ) {
-			throw new Exception("Exception occurred when outputting the result of a SELECT query using the Jena machinery.", e);
+			if (    e instanceof QueryExecException
+			     && e.getCause() != null
+			     && e.getCause() instanceof QueryProcException ) {
+				throw new Exception( e.getMessage(), e );
+			}
+
+			throw new Exception("Executing a SELECT query using the Jena machinery failed with an exception (" + e.getClass().getName() + "): " + e.getMessage(), e);
 		}
 	}
 
@@ -365,7 +379,13 @@ public class HeFQUINEngine
 			                             output );
 		}
 		catch ( final Exception e ) {
-			throw new Exception("Exception occurred when executing an ASK/DESCRIBE/CONSTRUCT query using the Jena machinery.", e);
+			if (    e instanceof QueryExecException
+			     && e.getCause() != null
+			     && e.getCause() instanceof QueryProcException ) {
+				throw new Exception( e.getMessage(), e );
+			}
+
+			throw new Exception("Executing an ASK/DESCRIBE/CONSTRUCT query using the Jena machinery failed with an exception (" + e.getClass().getName() + "): " + e.getMessage(), e);
 		}
 	}
 
