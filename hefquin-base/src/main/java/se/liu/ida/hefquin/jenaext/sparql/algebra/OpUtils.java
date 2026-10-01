@@ -30,6 +30,7 @@ import org.apache.jena.sparql.path.P_Path1;
 import org.apache.jena.sparql.path.P_Path2;
 import org.apache.jena.sparql.path.P_ReverseLink;
 import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.util.VarUtils;
 
 /**
  * This class provides useful functionality related to Jena's
@@ -59,11 +60,7 @@ public class OpUtils
 		// TODO: It is better to implement this function using an OpVisitor.
 
 		if ( op instanceof OpBGP opBGP ) {
-			for ( final Triple tp : opBGP.getPattern().getList() ) {
-				addVariablesFromNode(acc, tp.getSubject() );
-				addVariablesFromNode(acc, tp.getPredicate() );
-				addVariablesFromNode(acc, tp.getObject() );
-			}
+			VarUtils.addVars( acc, opBGP.getPattern() );
 		}
 		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
 			addVariablesFromPattern( acc, (Op2) op );
@@ -95,11 +92,13 @@ public class OpUtils
 		else if ( op instanceof OpPath opPath ) {
 			final TriplePath path = opPath.getTriplePath();
 
-			addVariablesFromNode( acc, path.getSubject() );
-			addVariablesFromNode( acc, path.getObject() );
+			VarUtils.addVarsFromTriplePath(acc, path);
 
+			// The following is necessary because the currently
+			// implementation of VarUtils.addVarsFromTriplePath(..)
+			// does not consider this case.
 			if ( path.isTriple() )
-				addVariablesFromNode( acc, path.getPredicate() );
+				VarUtils.addVar( acc, path.getPredicate() );
 		}
 		else if ( op instanceof OpDistinct opDistinct ) {
 			addVariablesFromPattern( acc, opDistinct.getSubOp() );
@@ -326,22 +325,6 @@ public class OpUtils
 		}
 
 		return 0;
-	}
-
-	/**
-	 * Adds all variables mentioned in the given RDF node to the given set.
-	 * If the node is a triple term, the variables mentioned in the nested
-	 * triple are added recursively.
-	 */
-	protected static void addVariablesFromNode( final Set<Var> acc, final Node node ) {
-		if ( node.isVariable() ) {
-			acc.add( Var.alloc(node) );
-		}
-		else if ( node.isTripleTerm() ) {
-			addVariablesFromNode( acc, node.getTriple().getSubject() );
-			addVariablesFromNode( acc, node.getTriple().getPredicate() );
-			addVariablesFromNode( acc, node.getTriple().getObject() );
-		}
 	}
 
 	/**
