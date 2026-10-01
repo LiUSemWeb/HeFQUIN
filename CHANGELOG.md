@@ -19,7 +19,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Better handling and recording of exceptions in data retrieval responses ([#706](https://github.com/LiUSemWeb/HeFQUIN/issues/706), [#711](https://github.com/LiUSemWeb/HeFQUIN/issues/711)).
 - Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/issues/675)).
 - Bug fix: adding hashCode() function to the Pair class to avoid unnecessary cache misses in FederationManagerWithCache ([#679](https://github.com/LiUSemWeb/HeFQUIN/issues/679)).
-- Bug fix: several relevant Jena operators were not covered by OpUtils ([#734](https://github.com/LiUSemWeb/HeFQUIN/issues/734)).
+- Bug fix: several relevant Jena operators were not covered by OpUtils ([#734](https://github.com/LiUSemWeb/HeFQUIN/issues/734), [#743](https://github.com/LiUSemWeb/HeFQUIN/issues/743)).
 - Merge the various constructors of AsyncFederationAccessManagerImpl into one ([#697](https://github.com/LiUSemWeb/HeFQUIN/issues/697), [#700](https://github.com/LiUSemWeb/HeFQUIN/issues/700)).
 - Switch dependency direction between hefquin-access and hefquin-pgconnector ([#702](https://github.com/LiUSemWeb/HeFQUIN/issues/702)).
 ### Planned for Next Release
