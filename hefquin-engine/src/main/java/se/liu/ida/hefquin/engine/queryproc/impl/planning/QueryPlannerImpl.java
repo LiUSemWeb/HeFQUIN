@@ -25,8 +25,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.authentication.BasicAuthenticationInformation;
-import se.liu.ida.hefquin.federation.authentication.TokenBasedAuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.IncompleteAuthenticationInformationError;
 
 /**
  * Simple implementation of {@link QueryPlanner}.
@@ -90,7 +89,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		}
 
 		// check that we have relevant authentication-related data for
-		// all federation members mentioned in the source assignment 
+		// all federation members mentioned in the source assignment
 		final Set<FederationMember> fmsToCheck = LogicalPlanUtils.getFederationMembers( saAndStats.object1 );
 		checkFederationMemberAuthentication(fmsToCheck);
 
@@ -141,26 +140,18 @@ public class QueryPlannerImpl implements QueryPlanner
 	}
 
 	/**
-	 * Checks that the authentication information required by the given federation members
-	 * is available. For basic authentication, both the username and password must be available.
-	 * For token-based authentication, the token must be available.
+	 * Checks that the authentication information required by the given federation members is complete.
 	 *
 	 * @param fmsToCheck the federation members whose authentication information should be checked
 	 * @throws QueryPlanningException if required authentication information is not available
 	 */
 	protected void checkFederationMemberAuthentication( final Set<FederationMember> fmsToCheck ) throws QueryPlanningException {
 		for ( final FederationMember fm : fmsToCheck ) {
-			if ( fm.getAuthenticationInformation() instanceof BasicAuthenticationInformation bAuthInfo ) {
-				if ( bAuthInfo.getUsername() == null && bAuthInfo.getPassword() == null )
-					throw new QueryPlanningException( "Username and password required for authentication are not available for the federation member with service URI " + fm.getServiceURI() + ". The corresponding environment variables may not be set." );
-				else if ( bAuthInfo.getUsername() == null )
-					throw new QueryPlanningException( "Username required for authentication is not available for the federation member with service URI " + fm.getServiceURI() + ". The corresponding environment variable may not be set." );
-				else if ( bAuthInfo.getPassword() == null )
-					throw new QueryPlanningException( "Password required for authentication is not available for the federation member with service URI " + fm.getServiceURI() + ". The corresponding environment variable may not be set." );
+			try {
+				fm.getAuthenticationInformation().checkForCompleteness();
 			}
-			else if ( fm.getAuthenticationInformation() instanceof TokenBasedAuthenticationInformation tAuthInfo ) {
-				if ( tAuthInfo.getToken() == null )
-					throw new QueryPlanningException( "Token required for authentication is not available for the federation member with service URI " + fm.getServiceURI() + ". The corresponding environment variable may not be set." );
+			catch ( final IncompleteAuthenticationInformationError e ) {
+				throw new QueryPlanningException( "Authentication-related information for the federation member with service URI " + fm.getServiceURI() + " is missing: " + e.getMessage() );
 			}
 		}
 	}

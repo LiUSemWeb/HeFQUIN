@@ -77,4 +77,19 @@ public class BasicAuthenticationInformation implements AuthenticationInformation
 		final String credentials = username + ":" + password;
 		return Base64.getEncoder().encodeToString( credentials.getBytes(StandardCharsets.UTF_8) );
 	}
+
+	/**
+	 * Checks that the required username and password are available.
+	 *
+	 * @throws IncompleteAuthenticationInformationError if the username or password is not available
+	 */
+	@Override
+	public void checkForCompleteness() throws IncompleteAuthenticationInformationError {
+		if ( getUsername() == null && getPassword() == null )
+			throw new IncompleteAuthenticationInformationError( "Username and password required for authentication are not available for the federation member. The corresponding environment variables may not be set." );
+		else if ( getUsername() == null )
+			throw new IncompleteAuthenticationInformationError( "Username required for authentication is not available for the federation member. The corresponding environment variable may not be set." );
+		else if ( getPassword() == null )
+			throw new IncompleteAuthenticationInformationError( "Password required for authentication is not available for the federation member. The corresponding environment variable may not be set." );
+	}
 }

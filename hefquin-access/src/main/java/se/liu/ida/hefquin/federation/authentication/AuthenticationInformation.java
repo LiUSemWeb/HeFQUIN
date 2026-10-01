@@ -34,4 +34,11 @@ public interface AuthenticationInformation
 	 * @param b QueryExecutionHTTPBuilder to which the authentication information is applied
 	 */
 	void applyTo( QueryExecutionHTTPBuilder b );
+
+	/**
+	 * Checks whether the authentication information is complete.
+	 *
+	 * @throws IncompleteAuthenticationInformationError if required authentication information is missing
+	 */
+	void checkForCompleteness() throws IncompleteAuthenticationInformationError;
 }
