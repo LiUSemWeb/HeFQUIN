@@ -18,6 +18,15 @@ paths:
         - Query Execution
       requestBody:
         $ref: '#/components/requestBodies/SparqlQuery'
+      parameters:
+        - $ref: '#/components/parameters/SkipExecution'
+        - $ref: '#/components/parameters/PrintSourceAssignment'
+        - $ref: '#/components/parameters/PrintLogicalPlan'
+        - $ref: '#/components/parameters/PrintPhysicalPlan'
+        - $ref: '#/components/parameters/PrintExecutablePlan'
+        - $ref: '#/components/parameters/ReturnFullStackTrace'
+        - $ref: '#/components/parameters/IgnoreRetrievalCache'
+        - $ref: '#/components/parameters/IgnoreCardinalityCache'
       responses:
         "200":
           $ref: '#/components/responses/SparqlResults'
@@ -48,6 +57,14 @@ paths:
                   ?s ?p ?o
                 }
               } LIMIT 10
+        - $ref: '#/components/parameters/SkipExecution'
+        - $ref: '#/components/parameters/PrintSourceAssignment'
+        - $ref: '#/components/parameters/PrintLogicalPlan'
+        - $ref: '#/components/parameters/PrintPhysicalPlan'
+        - $ref: '#/components/parameters/PrintExecutablePlan'
+        - $ref: '#/components/parameters/ReturnFullStackTrace'
+        - $ref: '#/components/parameters/IgnoreRetrievalCache'
+        - $ref: '#/components/parameters/IgnoreCardinalityCache'
       responses:
         "200":
           $ref: '#/components/responses/SparqlResults'
@@ -65,6 +82,15 @@ paths:
         - Query Inspect
       requestBody:
         $ref: '#/components/requestBodies/SparqlQuery'
+      parameters:
+        - $ref: '#/components/parameters/SkipExecution'
+        - $ref: '#/components/parameters/PrintSourceAssignment'
+        - $ref: '#/components/parameters/PrintLogicalPlan'
+        - $ref: '#/components/parameters/PrintPhysicalPlan'
+        - $ref: '#/components/parameters/PrintExecutablePlan'
+        - $ref: '#/components/parameters/ReturnFullStackTrace'
+        - $ref: '#/components/parameters/IgnoreRetrievalCache'
+        - $ref: '#/components/parameters/IgnoreCardinalityCache'
       responses:
         "200":
           $ref: '#/components/responses/InspectResults'
@@ -92,6 +118,14 @@ paths:
                   ?s ?p ?o
                 }
               } LIMIT 10
+        - $ref: '#/components/parameters/SkipExecution'
+        - $ref: '#/components/parameters/PrintSourceAssignment'
+        - $ref: '#/components/parameters/PrintLogicalPlan'
+        - $ref: '#/components/parameters/PrintPhysicalPlan'
+        - $ref: '#/components/parameters/PrintExecutablePlan'
+        - $ref: '#/components/parameters/ReturnFullStackTrace'
+        - $ref: '#/components/parameters/IgnoreRetrievalCache'
+        - $ref: '#/components/parameters/IgnoreCardinalityCache'
       responses:
         "200":
           $ref: '#/components/responses/InspectResults'
@@ -135,6 +169,79 @@ components:
               }
             } LIMIT 10
 
+  parameters:
+    SkipExecution:
+      name: X-HeFQUIN-Skip-Execution
+      in: header
+      required: false
+      description: Use this header to instruct HeFQUIN to create the query execution plan for the given query, but without actually executing this plan.
+      schema:
+        type: string
+        example: "true"
+
+    PrintSourceAssignment:
+      name: X-HeFQUIN-Print-Source-Assignment
+      in: header
+      required: false
+      description: Use this header to instruct the query planning component of HeFQUIN to print the initial logical plan that is the output of the source selection and query decomposition process.
+      schema:
+        type: string
+        example: "true"
+
+    PrintLogicalPlan:
+      name: X-HeFQUIN-Print-Logical-Plan
+      in: header
+      required: false
+      description: Use this header to instruct the query planning component of HeFQUIN to print the logical plan that is the output of the logical query optimizer.
+      schema:
+        type: string
+        example: "true"
+
+    PrintPhysicalPlan:
+      name: X-HeFQUIN-Print-Physical-Plan
+      in: header
+      required: false
+      description: Use this header to instruct the query planning component of HeFQUIN to print the physical plan that is the output of the physical query optimizer.
+      schema:
+        type: string
+        example: "true"
+
+    PrintExecutablePlan:
+      name: X-HeFQUIN-Print-Executable-Plan
+      in: header
+      required: false
+      description: Use this header to instruct the query planning component of HeFQUIN to print the executable plan produced by the query planning component.
+      schema:
+        type: string
+        example: "true"
+
+    ReturnFullStackTrace:
+      name: X-HeFQUIN-Return-Full-Stack-Trace
+      in: header
+      required: false
+      description: Use this header to instruct the HeFQUIN engine to return the complete stack trace for each exception, in addition to the exception message.
+      schema:
+        type: string
+        example: "true"
+
+    IgnoreRetrievalCache:
+      name: X-HeFQUIN-Ignore-Retrieval-Cache
+      in: header
+      required: false
+      description: Use this header to instruct the HeFQUIN engine to bypass the retrieval cache when processing the query, so that requests are executed instead of being served from the cache. The responses received for these requests can still be used to update the cache.
+      schema:
+        type: string
+        example: "true"
+
+    IgnoreCardinalityCache:
+      name: X-HeFQUIN-Ignore-Cardinality-Cache
+      in: header
+      required: false
+      description: Use this header to instruct the HeFQUIN engine to bypass the cardinality cache when processing the query, so that cardinality estimates are obtained instead of being served from the cache. The estimates obtained can still be used to update the cache.
+      schema:
+        type: string
+        example: "true"
+
   responses:
     SparqlResults:
       description: "Returns the query result with the specified MIME type (default: application/sparql-results+json)"
@@ -175,11 +282,11 @@ components:
               } ,
               "results": {
                 "bindings": [
-                  { 
+                  {
                     "person": { "type": "uri" , "value": "http://example.org/person/alice" } ,
                     "name": { "type": "literal" , "value": "Alice" }
                   } ,
-                  { 
+                  {
                     "person": { "type": "uri" , "value": "http://example.org/person/bob" } ,
                     "name": { "type": "literal" , "value": "Bob" }
                   }
