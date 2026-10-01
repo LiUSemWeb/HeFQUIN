@@ -1,11 +1,10 @@
 package se.liu.ida.hefquin.jenaext.graph;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.core.Vars;
+import org.apache.jena.sparql.util.VarUtils;
 
 /**
  * This class provides useful functionality
@@ -46,9 +45,7 @@ public class TripleUtils
 	 * returns the set of variables contained in this triple pattern.
 	 */
 	public static Set<Var> getVariablesInPattern( final Triple tp ) {
-		final Set<Var> result = new HashSet<>();
-		Vars.addVarsFromTriple( result, tp );
-		return result;
+		return VarUtils.getVars(tp);
 	}
 
 }
