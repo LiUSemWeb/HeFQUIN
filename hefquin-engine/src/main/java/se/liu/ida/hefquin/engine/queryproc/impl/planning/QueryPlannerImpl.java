@@ -25,6 +25,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
 import se.liu.ida.hefquin.federation.authentication.IncompleteAuthenticationInformationError;
 
 /**
@@ -147,8 +148,13 @@ public class QueryPlannerImpl implements QueryPlanner
 	 */
 	protected void checkFederationMemberAuthentication( final Set<FederationMember> fmsToCheck ) throws QueryPlanningException {
 		for ( final FederationMember fm : fmsToCheck ) {
+			final AuthenticationInformation fmAuthInfo = fm.getAuthenticationInformation();
+
+			if ( fmAuthInfo == null )
+				continue;
+
 			try {
-				fm.getAuthenticationInformation().checkForCompleteness();
+				fmAuthInfo.checkForCompleteness();
 			}
 			catch ( final IncompleteAuthenticationInformationError e ) {
 				throw new QueryPlanningException( "Authentication-related information for the federation member with service URI " + fm.getServiceURI() + " is missing: " + e.getMessage() );
