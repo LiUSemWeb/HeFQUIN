@@ -190,34 +190,34 @@ public class LogicalPlanUtils
 	 * @return the set of federation members referenced by the logical plan
 	 */
 	static public Set<FederationMember> getFederationMembers( final LogicalPlan lplan ) {
-		final Set<FederationMember> fmsToCheck = new HashSet<>();
+		final Set<FederationMember> collectedFMs = new HashSet<>();
 
 		LogicalPlanWalker.walk( lplan,
 			new LogicalPlanVisitorBase() {
 				@Override
 				public void visit( final LogicalOpRequest<?,?> op ) {
-					fmsToCheck.add( op.getFederationMember() );
+					collectedFMs.add( op.getFederationMember() );
 				}
 
 				@Override
 				public void visit( final LogicalOpMultiRequest op ) {
 					for ( final FederationMember fm : op.getFederationMembers() )
-						fmsToCheck.add( fm );
+						collectedFMs.add( fm );
 				}
 
 				@Override
 				public void visit( final LogicalOpGPAdd op ) {
-					fmsToCheck.add( op.getFederationMember() );
+					collectedFMs.add( op.getFederationMember() );
 				}
 
 				@Override
 				public void visit( final LogicalOpGPOptAdd op ) {
-					fmsToCheck.add( op.getFederationMember() );
+					collectedFMs.add( op.getFederationMember() );
 				}
 			},
 			null );
 
-		return fmsToCheck;
+		return collectedFMs;
 	}
 
 	static public class LogicalPlanCounter implements LogicalPlanVisitor {

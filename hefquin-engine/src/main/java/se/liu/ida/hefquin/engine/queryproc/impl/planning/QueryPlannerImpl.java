@@ -89,8 +89,9 @@ public class QueryPlannerImpl implements QueryPlanner
 			                                        LogicalPlanStage.SOURCE_ASSIGNMENT );
 		}
 
+		// check that we have relevant authentication-related data for
+		// all federation members mentioned in the source assignment 
 		final Set<FederationMember> fmsToCheck = LogicalPlanUtils.getFederationMembers( saAndStats.object1 );
-
 		checkFederationMemberAuthentication(fmsToCheck);
 
 		log.debug( "Starting logical optimization phase." );
