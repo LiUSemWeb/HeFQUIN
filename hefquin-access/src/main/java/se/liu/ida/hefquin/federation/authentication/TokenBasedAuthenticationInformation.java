@@ -60,4 +60,15 @@ public class TokenBasedAuthenticationInformation implements AuthenticationInform
 	public void applyTo( final QueryExecutionHTTPBuilder b ) {
 		b.httpHeader( "Authorization", authenticationScheme + " " + token );
 	}
+
+	/**
+	 * Checks that the required token is available.
+	 *
+	 * @throws IncompleteAuthenticationInformationError if the token is not available
+	 */
+	@Override
+	public void checkForCompleteness() throws IncompleteAuthenticationInformationError {
+		if ( getToken() == null )
+			throw new IncompleteAuthenticationInformationError( "Token required for authentication is not available for the federation member. The corresponding environment variable may not be set." );
+	}
 }

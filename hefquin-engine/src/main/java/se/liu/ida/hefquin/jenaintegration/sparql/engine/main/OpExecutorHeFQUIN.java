@@ -208,7 +208,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 				statsAndExceptions = qProc.processQuery(patternForStage, sink, ctx);
 			}
 			catch ( final QueryProcException ex ) {
-				throw new QueryExecException("Processing the query operator using HeFQUIN failed.", ex);
+				throw new QueryExecException("Processing the query using HeFQUIN caused an exception with the following message: " + ex.getMessage(), ex);
 			}
 
 			arqCxt.set( HeFQUINEngineConstants.sysQProcStatsAndExceptions,

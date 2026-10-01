@@ -1,11 +1,14 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithoutResult;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithoutResult;
@@ -21,6 +24,9 @@ import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.authentication.AuthenticationInformation;
+import se.liu.ida.hefquin.federation.authentication.IncompleteAuthenticationInformationError;
 
 /**
  * Simple implementation of {@link QueryPlanner}.
@@ -83,6 +89,11 @@ public class QueryPlannerImpl implements QueryPlanner
 			                                        LogicalPlanStage.SOURCE_ASSIGNMENT );
 		}
 
+		// check that we have relevant authentication-related data for
+		// all federation members mentioned in the source assignment
+		final Set<FederationMember> fmsToCheck = LogicalPlanUtils.getFederationMembers( saAndStats.object1 );
+		checkFederationMemberAuthentication(fmsToCheck);
+
 		log.debug( "Starting logical optimization phase." );
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
@@ -129,4 +140,25 @@ public class QueryPlannerImpl implements QueryPlanner
 		return new Pair<>(planAndStats.object1, myStats);
 	}
 
+	/**
+	 * Checks that the authentication information required by the given federation members is complete.
+	 *
+	 * @param fmsToCheck the federation members whose authentication information should be checked
+	 * @throws QueryPlanningException if required authentication information is not available
+	 */
+	protected void checkFederationMemberAuthentication( final Set<FederationMember> fmsToCheck ) throws QueryPlanningException {
+		for ( final FederationMember fm : fmsToCheck ) {
+			final AuthenticationInformation fmAuthInfo = fm.getAuthenticationInformation();
+
+			if ( fmAuthInfo == null )
+				continue;
+
+			try {
+				fmAuthInfo.checkForCompleteness();
+			}
+			catch ( final IncompleteAuthenticationInformationError e ) {
+				throw new QueryPlanningException( "Authentication-related information for the federation member with service URI " + fm.getServiceURI() + " is missing: " + e.getMessage() );
+			}
+		}
+	}
 }

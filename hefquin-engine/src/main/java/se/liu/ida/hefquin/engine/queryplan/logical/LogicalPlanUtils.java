@@ -1,10 +1,13 @@
 package se.liu.ida.hefquin.engine.queryplan.logical;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BGPRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
@@ -177,6 +180,44 @@ public class LogicalPlanUtils
 		final LogicalPlanCounter c = new LogicalPlanCounter();
 		LogicalPlanWalker.walk(plan, null, c);
 		return c.getSubplanCount();
+	}
+
+	/**
+	 * Returns the federation members referenced by the given logical plan.
+	 * Duplicate federation members are included only once in the returned set.
+	 *
+	 * @param lplan the logical plan whose federation members should be collected
+	 * @return the set of federation members referenced by the logical plan
+	 */
+	static public Set<FederationMember> getFederationMembers( final LogicalPlan lplan ) {
+		final Set<FederationMember> collectedFMs = new HashSet<>();
+
+		LogicalPlanWalker.walk( lplan,
+			new LogicalPlanVisitorBase() {
+				@Override
+				public void visit( final LogicalOpRequest<?,?> op ) {
+					collectedFMs.add( op.getFederationMember() );
+				}
+
+				@Override
+				public void visit( final LogicalOpMultiRequest op ) {
+					for ( final FederationMember fm : op.getFederationMembers() )
+						collectedFMs.add( fm );
+				}
+
+				@Override
+				public void visit( final LogicalOpGPAdd op ) {
+					collectedFMs.add( op.getFederationMember() );
+				}
+
+				@Override
+				public void visit( final LogicalOpGPOptAdd op ) {
+					collectedFMs.add( op.getFederationMember() );
+				}
+			},
+			null );
+
+		return collectedFMs;
 	}
 
 	static public class LogicalPlanCounter implements LogicalPlanVisitor {
