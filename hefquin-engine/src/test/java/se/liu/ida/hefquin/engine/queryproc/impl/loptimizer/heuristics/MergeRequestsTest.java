@@ -26,6 +26,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
@@ -54,7 +55,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fmA = new SPARQLEndpointForTest("http://exA.org");
 		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
 
-		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v2);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
@@ -112,7 +113,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final Var v3 = Var.alloc("z");
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
 
-		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v2);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false,  new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
@@ -172,6 +173,53 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fmA = new TPFServerForTest();
 		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
 
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v2);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp1) );
+
+		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp2) );
+
+		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
+
+		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+				false,
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				null );
+
+		final LogicalPlan unionPlan = LogicalPlanUtils.createPlanWithBinaryUnion(
+				false,
+				joinSubPlan,
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null),
+				null );
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(unionPlan);
+
+		// check
+		assertEquals(unionPlan, result); // the plan has not changed
+
+		assertTrue( result.getRootOperator() instanceof LogicalOpUnion );
+		assertEquals( 2, result.numberOfSubPlans() );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpJoin );
+	}
+
+	@Test
+	public void mergeJoinUnderUnionWithoutSharedVariables() {
+		// like mergeJoinUnderUnionPossible1 but the two requests under the JOIN target
+		// the same federation member but have no shared variables, so they should not be
+		// merged.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final Var v3 = Var.alloc("z");
+		final FederationMember fmA = new SPARQLEndpointForTest();
+		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
+
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp1) );
 
@@ -221,7 +269,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fmA = new SPARQLEndpointForTest("http://exA.org");
 		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
 
-		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v2);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
@@ -287,10 +335,10 @@ public class MergeRequestsTest extends EngineTestBase
 		final Var v3 = Var.alloc("z");
 		final FederationMember fm = new SPARQLEndpointForTest("http://exA.org");
 
-		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v2);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1) );
 
-		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
+		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v3);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
@@ -333,6 +381,44 @@ public class MergeRequestsTest extends EngineTestBase
 		final Var v2 = Var.alloc("y");
 		final Var v3 = Var.alloc("z");
 		final FederationMember fmA = new TPFServerForTest();
+		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v2);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp1) );
+
+		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp2) );
+
+		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmB, false, new SPARQLRequestImpl(tp3) );
+
+		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
+				false,
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null) );
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(mjPlan);
+
+		// check
+		assertEquals(mjPlan, result); // the plan has not changed
+
+		assertTrue( result.getRootOperator() instanceof LogicalOpMultiwayJoin );
+		assertEquals( 3, result.numberOfSubPlans() );
+	}
+
+	@Test
+	public void mergeMultiwayJoinWithoutSharedVariables() {
+		// like mergeMultiwayJoinPossible1 but the two requests targeting the same
+		// federation member have no shared variables, so they should not be merged.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final Var v3 = Var.alloc("z");
+		final FederationMember fmA = new SPARQLEndpointForTest();
 		final FederationMember fmB = new SPARQLEndpointForTest("http://exB.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
@@ -484,7 +570,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final Var v2 = Var.alloc("y");
 		final FederationMember fm = new SPARQLEndpointForTest("http://exA.org");
 
-		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v2);
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
@@ -522,6 +608,39 @@ public class MergeRequestsTest extends EngineTestBase
 		final Var v1 = Var.alloc("x");
 		final Var v2 = Var.alloc("y");
 		final FederationMember fm = new TPFServerForTest();
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v2);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
+
+		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
+
+		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(
+				new LogicalOpGPAdd(fm, tp2, null, false),
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp, null) );
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(gpAddPlan);
+
+		// check
+		assertEquals(gpAddPlan, result); // the plan has not changed
+
+		assertTrue( result.getRootOperator() instanceof LogicalOpGPAdd );
+
+		final LogicalOpGPAdd resultGPAddOp = (LogicalOpGPAdd) result.getRootOperator();
+		assertTrue( resultGPAddOp.getFederationMember() == fm );
+		assertTrue( resultGPAddOp.getTP() == tp2 );
+	}
+
+	@Test
+	public void mergeGPAddWithoutSharedVariables() {
+		// like mergeGPAddPossible but the request pattern and the GPAdd triple pattern
+		// have no shared variables, so they should not be merged.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final FederationMember fm = new SPARQLEndpointForTest();
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>( fm, false, new TriplePatternRequestImpl(tp1) );
@@ -571,7 +690,7 @@ public class MergeRequestsTest extends EngineTestBase
 			new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 			null );
 
-		// Project keeps y
+		// Project keeps z
 		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v3), false);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, joinSubPlan);
 
@@ -612,7 +731,7 @@ public class MergeRequestsTest extends EngineTestBase
 			new LogicalPlanWithNullaryRootImpl(reqOp2, null),
 			null );
 
-		// Project keeps y
+		// Project keeps z
 		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v3), true);
 		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, joinSubPlan);
 
@@ -637,7 +756,7 @@ public class MergeRequestsTest extends EngineTestBase
 
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
 
-		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v2);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2, v2, v2);
@@ -681,4 +800,43 @@ public class MergeRequestsTest extends EngineTestBase
 		assertTrue( hasMinus );
 	}
 
+	@Test
+	public void mergeMinusWithoutSharedVariables() {
+		// two request operators under a MINUS, targeting the same federation
+		// member but with no shared variables, so they should not be merged.
+
+		// setup
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+
+		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1) );
+
+		final TriplePattern tp2 = new TriplePatternImpl(v2, v2, v2);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2) );
+
+		final LogicalPlan minusPlan = LogicalPlanUtils.createPlanWithMinus(
+			false,
+			new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+			new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+			null );
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(minusPlan);
+
+		// check
+		assertEquals(minusPlan, result); // the plan has not changed
+
+		assertTrue( result.getRootOperator() instanceof LogicalOpMinus );
+		assertEquals( 2, result.numberOfSubPlans() );
+
+		final LogicalPlan subResult1 = result.getSubPlan(0);
+		assertTrue( subResult1.getRootOperator() instanceof LogicalOpRequest );
+
+
+		final LogicalPlan subResult2 = result.getSubPlan(1);
+		assertTrue( subResult2.getRootOperator() instanceof LogicalOpRequest );
+	}
 }
