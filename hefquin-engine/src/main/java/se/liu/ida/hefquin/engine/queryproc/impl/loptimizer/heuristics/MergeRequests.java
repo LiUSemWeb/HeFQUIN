@@ -38,8 +38,10 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
  * Merges subplans that consist of multiple requests to the same federation
- * member if such a merge is possible. Merging of requests is avoided if
- * this leads to a cross product.
+ * member if such a merge is possible. Merging of requests is avoided for
+ * cases in which the graph pattern of the merged request consists of two
+ * unconnected sub-patterns (because that would lead to retrieving the
+ * cross product of the results of these two sub-patterns).
  *
  * In particular, a join over two requests is merged into a single request
  * operator if i) the two requests are triple pattern requests (which can be
