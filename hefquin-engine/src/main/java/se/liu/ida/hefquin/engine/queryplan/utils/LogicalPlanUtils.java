@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryplan.logical;
+package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -6,6 +6,15 @@ import java.util.List;
 import java.util.Set;
 
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
+import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitorBase;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWalker;
+import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BGPRequest;

@@ -16,9 +16,9 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.Quality;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
@@ -176,7 +176,7 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 		final List<LogicalPlan> selectedPlans = new ArrayList<>(plans.length);
 		selectedPlans.add(firstPlan);
 
-		// the estimated cardinality of the result of joining the results of the subplans selected so far  
+		// the estimated cardinality of the result of joining the results of the subplans selected so far
 		int joinCardOfSelectedPlans = firstPlan.getQueryPlanningInfo().getProperty( QueryPlanProperty.CARDINALITY ).getValue();
 
 		// Now we are ready to start an iteration in which each step
@@ -279,7 +279,7 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 				idxOfSmallestSeenCardinality = i;
 			}
 
-			if (    crd.getValue() == smallestSeenCardinality 
+			if (    crd.getValue() == smallestSeenCardinality
 			     && crd.getQuality().higherThan(qtyOfSmallestSeenCardinality) ) {
 				smallestSeenCardinality = crd.getValue();
 				qtyOfSmallestSeenCardinality = crd.getQuality();
