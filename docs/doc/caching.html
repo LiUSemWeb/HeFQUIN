@@ -56,9 +56,12 @@
         <p>
             When <a href="cli.html">issuing a query via the HeFQUIN command-line programs</a>,
             you can explicitly require HeFQUIN to bypass the cache to ensure that requests are sent to
-            federation members instead of using previously cached responses. The <code>--ignoreRetrievalCache</code> argument bypasses
-            the cache for data retrieval requests, while <code>--ignoreCardinalityCache</code> bypasses it for cardinality
-            requests during query planning. Even when these options are used, responses obtained from the federation members are still added to the cache.
+            federation members instead of using previously cached responses.
+            To this end, use the <a href="cli.html#--ignoreRetrievalCache">--ignoreRetrievalCache</a> argument
+            to bypass the cache for data retrieval requests (during the query execution phase of query processing),
+            and use <a href="cli.html#--ignoreCardinalityCache">--ignoreCardinalityCache</a>
+            to bypass the cache for cardinality requests during query planning.
+            Even when these options are used, responses obtained from the federation members are still added to the cache.
         </p>
 
 
