@@ -102,6 +102,11 @@ public class ResultElementIterWithNullaryExecOpTest
 		public ExecutableOperatorStats getStats() {
 			return null;
 		}
+
+		@Override
+		public boolean mayReduce() {
+			return mayReduce;
+		}
 	}
 
 }

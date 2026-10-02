@@ -17,8 +17,9 @@ public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadI
 
 	public PushBasedPlanThreadImplForNaryOperator( final NaryExecutableOp op,
 	                                               final PushBasedPlanThread[] inputs,
-	                                               final QueryProcContextExt ctx ) {
-		super(ctx);
+	                                               final QueryProcContextExt ctx,
+	                                               final boolean mayReduce ) {
+		super(ctx, mayReduce);
 
 		assert op != null;
 		assert inputs != null;

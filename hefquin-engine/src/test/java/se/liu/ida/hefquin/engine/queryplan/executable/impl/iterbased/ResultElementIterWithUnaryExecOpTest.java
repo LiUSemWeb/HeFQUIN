@@ -133,6 +133,11 @@ public class ResultElementIterWithUnaryExecOpTest
 		public ExecutableOperatorStats getStats() {
 			return null;
 		}
+
+		@Override
+		public boolean mayReduce() {
+			return mayReduce;
+		}
 	}
 
 }

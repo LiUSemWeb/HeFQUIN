@@ -66,6 +66,11 @@ public abstract class BaseForExecOps implements ExecutableOperator
 			return exceptionsCaughtDuringExecution;
 	}
 
+	@Override
+	public boolean mayReduce() {
+		return mayReduce;
+	}
+
 	protected void recordExceptionCaughtDuringExecution( final Exception e ) {
 		assert e != null;
 
