@@ -52,6 +52,13 @@
                 same time), an existing cache entry is removed according to the configured cache policy to make room for the new entry.
                 Currently, the default cache policy uses least recently used (LRU) eviction.
             </p>
+            <p>
+                HeFQUIN supports two implementations for the persistent L2 cache: <code>MapDBCache</code> and <code>ChronicleMapCache</code>.
+                <code>MapDBCache</code> offers faster startup, which is advantageous when using the regular CLI, where JVM startup time
+                has a greater impact. In contrast, <code>ChronicleMapCache</code> is likely to provide better performance for
+                high-throughput workloads, such as when HeFQUIN runs as a service. See the <a href="#configuration">Configuration
+                section</a> below for details on how to configure and switch between these implementations.
+            </p>
         </section>
         
         <!-- Bypassing -->
@@ -73,7 +80,8 @@
         <section id="configuration">
             <h2>Configuration</h2>
             <p>
-                The L1 and L2 cache configurations are specified in the <a href="engine_configuration.html">engine configuration file</a>. They are passed as the second and third constructor arguments of <code>FederationAccessManagerWithHierarchicalCache</code>, respectively:
+                The L1 and L2 cache configurations are specified in the <a href="engine_configuration.html">engine configuration file</a>. They are
+                passed as the second and third constructor arguments of <code>FederationAccessManagerWithHierarchicalCache</code>, respectively:
             </p>
 
             <pre><code class="language-turtle">[] a ec:HeFQUINEngineConfiguration ;
@@ -97,7 +105,7 @@
             <p>
                 In the following example, the L1 cache uses <code>HashMap</code> as its underlying <code>Map</code> implementation.
                 The first constructor argument specifies this implementation, the second specifies the cache capacity (100 in the example),
-                and the third specifies a <code>CachePolicies</code> instance. The constructor argument of <code>CachePolicies</code>
+                and the third specifies a <code>CachePolicies</code> instance. The constructor argument passed to <code>CachePolicies</code>
                 specifies how long each cache entry is retained before it expires, i.e., the time to live (TTL) in seconds (300 seconds
                 in the example).
             </p>
@@ -117,7 +125,7 @@ _:b1 ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.Cache" ;
 </code></pre>
 
             <p>
-                In the example, the L2 cache uses <code>MapDBCache</code>. Its first constructor argument specifies the cache capacity
+                In the following example, the L2 cache uses <code>MapDBCache</code>. Its first constructor argument specifies the cache capacity
                 (1000 in the example), while the second specifies a <code>CachePolicies</code> instance with a TTL of 600 seconds.
             </p>
 
@@ -133,10 +141,9 @@ _:b2 ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.Cache" ;
 </code></pre>
 
             <p>
-                As an alternative to <code>MapDBCache</code>, <code>ChronicleMapCache</code> can be used as the L2 cache.
-                <code>MapDBCache</code> provides faster startup for the regular CLI, where JVM startup time has a greater impact.
-                When HeFQUIN runs as a service, startup time is less relevant, and <code>ChronicleMapCache</code> is likely to provide
-                better performance for high-throughput workloads.
+                As described in the <a href="#overview">Overview</a>, <code>ChronicleMapCache</code> can be used as an alternative to <code>MapDBCache</code>
+                for the L2 cache. To switch to <code>ChronicleMapCache</code>, replace the value of <code>ec:javaClassName</code> in the L2 cache configuration
+                above with <code>se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache</code>.
             </p>
         </section>
     </main>
