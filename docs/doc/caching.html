@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Caching</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-coy-without-shadows.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-sparql.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>Caching in HeFQUIN</h1>
+        <p>
+            HeFQUIN supports caching of responses from federation members. By default, HeFQUIN uses a two-level cache consisting of
+            an in-memory L1 cache and a persistent L2 cache. The L1 cache provides fast access within an engine instance, while the
+            L2 cache persists cached responses across engine instances and across JVM restarts.
+        </p>
+
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#bypassing">Bypassing the Cache</a></li>
+            <li><a href="#configuration">Configuration</a></li>
+        </ul>
+    
+        <!-- Overview -->
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>
+                When HeFQUIN needs to issue a data retrieval or some other kind of request to a federation member, it first checks the
+                L1 cache. If a matching non-expired response is found, it is returned directly without contacting the federation member.
+                If no such response is found in the L1 cache, HeFQUIN checks the L2 cache. If a matching non-expired response is found
+                there, it is returned and, additionally, copied into the L1 cache. If neither cache contains a usable response, the request is
+                issued to the federation member, and the response is stored in both caches for subsequent accesses.
+            </p>
+            <p>
+                If the cache reaches its configured cache capacity (the maximum number of cache entries that can be stored at the
+                same time), an existing cache entry is removed according to the configured cache policy to make room for the new entry.
+                Currently, the default cache policy uses least recently used (LRU) eviction.
+            </p>
+            <p>
+                HeFQUIN supports two implementations for the persistent L2 cache: <code>MapDBCache</code> and <code>ChronicleMapCache</code>.
+                <code>MapDBCache</code> offers faster startup, which is advantageous when using the regular CLI, where JVM startup time
+                has a greater impact. In contrast, <code>ChronicleMapCache</code> is likely to provide better performance for
+                high-throughput workloads, such as when HeFQUIN runs as a service. See the <a href="#configuration">Configuration
+                section</a> below for details on how to configure and switch between these implementations.
+            </p>
+        </section>
+        
+        <!-- Bypassing -->
+        <section id="bypassing">
+            <h2>Bypassing the Cache</h2>
+            <p>
+                When <a href="cli.html">issuing a query via the HeFQUIN command-line programs</a>,
+                you can explicitly require HeFQUIN to bypass the cache to ensure that requests are sent to
+                federation members instead of using previously cached responses.
+                To this end, use the <a href="cli.html#--ignoreRetrievalCache">--ignoreRetrievalCache</a> argument
+                to bypass the cache for data retrieval requests (during the query execution phase of query processing),
+                and use <a href="cli.html#--ignoreCardinalityCache">--ignoreCardinalityCache</a>
+                to bypass the cache for cardinality requests during query planning.
+                Even when these options are used, responses obtained from the federation members are still added to the cache.
+            </p>
+        </section>
+
+        <!-- Configuration -->
+        <section id="configuration">
+            <h2>Configuration</h2>
+            <p>
+                The L1 and L2 cache configurations are specified in the <a href="engine_configuration.html">engine configuration file</a>. They are
+                passed as the second and third constructor arguments of <code>FederationAccessManagerWithHierarchicalCache</code>, respectively:
+            </p>
+
+            <pre><code class="language-turtle">[] a ec:HeFQUINEngineConfiguration ;
+   ec:fedAccessMgr [
+       a ec:FederationAccessManager ;
+       ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithHierarchicalCache" ;
+       ec:constructorArguments (
+           [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.FederationAccessManager" ;
+             ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl" ;
+             ec:constructorArguments ( ec:value:ExecServiceForFedAccess ) ]
+
+           # L1 cache
+           _:b1
+
+           # L2 cache
+           _:b2
+       )
+   ] .
+</code></pre>
+
+            <p>
+                In the following example, the L1 cache uses <code>HashMap</code> as its underlying <code>Map</code> implementation.
+                The first constructor argument specifies this implementation, the second specifies the cache capacity (100 in the example),
+                and the third specifies a <code>CachePolicies</code> instance. The constructor argument passed to <code>CachePolicies</code>
+                specifies how long each cache entry is retained before it expires, i.e., the time to live (TTL) in seconds (300 seconds
+                in the example).
+            </p>
+
+            <pre><code class="language-turtle"># L1 cache
+_:b1 ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.Cache" ;
+     ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.cache.CacheLayer" ;
+     ec:constructorArguments (
+         [ ec:argumentTypeName "java.util.Map" ;
+           ec:javaClassName "java.util.HashMap" ;
+           ec:constructorArguments () ]
+         100   # cache capacity (i.e., max number of cache entries)
+         [ ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies" ;
+           ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithHierarchicalCache$DefaultHierarchicalMapCachePolicies" ;
+           ec:constructorArguments ( 300 ) ]   # time to live (TTL) in seconds
+     ) .
+</code></pre>
+
+            <p>
+                In the following example, the L2 cache uses <code>MapDBCache</code>. Its first constructor argument specifies the cache capacity
+                (1000 in the example), while the second specifies a <code>CachePolicies</code> instance with a TTL of 600 seconds.
+            </p>
+
+            <pre><code class="language-turtle"># L2 cache
+_:b2 ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.Cache" ;
+     ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.cache.mapdb.MapDBCache" ;
+     ec:constructorArguments (
+         1000   # cache capacity (i.e., max number of cache entries)
+         [ ec:argumentTypeName "se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies" ;
+           ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithHierarchicalCache$DefaultHierarchicalMapCachePolicies" ;
+           ec:constructorArguments ( 600 ) ]   # time to live (TTL) in seconds
+     ) .
+</code></pre>
+
+            <p>
+                As described in the <a href="#overview">Overview</a>, <code>ChronicleMapCache</code> can be used as an alternative to <code>MapDBCache</code>
+                for the L2 cache. To switch to <code>ChronicleMapCache</code>, replace the value of <code>ec:javaClassName</code> in the L2 cache configuration
+                above with <code>se.liu.ida.hefquin.federation.access.impl.cache.chroniclemap.ChronicleMapCache</code>.
+            </p>
+        </section>
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
