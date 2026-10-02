@@ -30,4 +30,17 @@ public interface ExecutableOperator extends StatsProvider
 	 * be the normal case), then this function returns an empty list.
 	 */
 	List<Exception> getExceptionsCaughtDuringExecution();
+
+	/**
+	 * Indicates whether this executable operator is permitted (and potentially
+	 * encouraged) to reduce duplicate solution mappings as part of its execution.
+	 * <p>
+	 * If this method returns {@code true}, the operator may remove duplicate
+	 * solution mappings if it has the capability to do so. If it returns
+	 * {@code false}, the operator must preserve duplicates, even if it would
+	 * otherwise be able to eliminate them.
+	 *
+	 * @return {@code true} if the operator may reduce duplicates; {@code false} otherwise.
+	 */
+	boolean mayReduce();
 }

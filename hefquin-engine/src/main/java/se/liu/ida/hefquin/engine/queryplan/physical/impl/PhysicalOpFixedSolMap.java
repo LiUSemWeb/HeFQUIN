@@ -43,6 +43,11 @@ public class PhysicalOpFixedSolMap implements NullaryPhysicalOpForLogicalOp
 			                         final QueryProcContextExt ctx ) {
 				sink.send( lop.getSolutionMapping() );
 			}
+
+			@Override
+			public boolean mayReduce() {
+				return mayReduce;
+			}
 		};
 	}
 
