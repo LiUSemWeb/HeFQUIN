@@ -42,7 +42,7 @@
             When HeFQUIN needs to issue a data retrieval or some other kind of request to a federation member, it first checks the
             L1 cache. If a matching non-expired response is found, it is returned directly without contacting the federation member.
             If no such response is found in the L1 cache, HeFQUIN checks the L2 cache. If a matching non-expired response is found
-            there, it is returned and also added to the L1 cache. If neither cache contains a usable response, the request is
+            there, it is returned and, additionally, copied into the L1 cache. If neither cache contains a usable response, the request is
             issued to the federation member, and the response is stored in the caches for subsequent accesses.
         </p>
         <p>
