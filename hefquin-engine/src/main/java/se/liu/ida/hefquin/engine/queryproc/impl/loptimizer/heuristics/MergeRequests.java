@@ -154,7 +154,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				final SPARQLGraphPattern pattern2 = req.getQueryPattern();
 
 				// Avoid merging requests if this leads to a cross product
-				if ( ! containsJoinVariable( pattern1.getExpectedVariables(), pattern2.getExpectedVariables() ) )
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
 					return;
 
 				final SPARQLGraphPattern mergedPattern = pattern1.mergeWith(pattern2);
@@ -179,7 +179,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				final SPARQLGraphPattern pattern2 = op.getPattern();
 
 				// Avoid merging requests if this leads to a cross product
-				if ( ! containsJoinVariable( pattern1.getExpectedVariables(), pattern2.getExpectedVariables() ) )
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
 					return;
 
 				final SPARQLGraphPattern merged = mergePatternWithOptPatterns(pattern1, pattern2);
@@ -207,7 +207,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				final SPARQLGraphPattern pattern2 = req2.getQueryPattern();
 
 				// Avoid merging requests if this leads to a cross product
-				if ( ! containsJoinVariable( pattern1.getExpectedVariables(), pattern2.getExpectedVariables() ) )
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
 					return;
 
 				final SPARQLGraphPattern mergedPattern = pattern1.mergeWith(pattern2);
@@ -232,7 +232,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				final SPARQLGraphPattern pattern2 = req2.getQueryPattern();
 
 				// Avoid merging requests if this leads to a cross product
-				if ( ! containsJoinVariable( pattern1.getExpectedVariables(), pattern2.getExpectedVariables() ) )
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
 					return;
 
 				// the LHS is the non-optional part
@@ -465,7 +465,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 
 				// Only merge if the patterns share variables. Without shared variables,
 				// MINUS has no filtering effect, so merging the requests is unnecessary.
-				if ( ! containsJoinVariable( pattern1.getExpectedVariables(), pattern2.getExpectedVariables() ) )
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
 					return;
 
 				// the LHS is the non-optional part
@@ -631,14 +631,17 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	}
 
 	/**
-	 * Checks whether the expected variables of the first pattern and the expected
-	 * variables of the second pattern have at least one variable in common.
-	 *
-	 * @param vars1 the expected variables of the first pattern
-	 * @param vars2 the expected variables of the second pattern
-	 * @return true if at least one variable is shared, false otherwise
+	 * Checks whether the expected variables of the two patterns have at least one
+	 * variable in common.
+	 * 
+	 * @param pattern1 the first SPARQL graph pattern
+	 * @param pattern2 the second SPARQL graph pattern
+	 * @return true if the patterns share at least one expected variable, false
+	 *         otherwise
 	 */
-	protected boolean containsJoinVariable( final ExpectedVariables vars1, final ExpectedVariables vars2 ) {
+	protected boolean containsJoinVariable( final SPARQLGraphPattern pattern1, final SPARQLGraphPattern pattern2 ) {
+		final ExpectedVariables vars1 = pattern1.getExpectedVariables();
+		final ExpectedVariables vars2 = pattern2.getExpectedVariables();
 		return ! ExpectedVariablesUtils.intersectionOfAllVariables(vars1, vars2).isEmpty();
 	}
 
@@ -656,7 +659,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			final LogicalOpRequest<?, ?> op = ((LogicalOpRequest<?, ?>) plan.getRootOperator());
 			final SPARQLRequest req = (SPARQLRequest) op.getRequest();
 
-			if ( containsJoinVariable( pattern.getExpectedVariables(), req.getExpectedVariables() ) )
+			if ( containsJoinVariable( pattern, req.getQueryPattern() ) )
 				return plan;
 		}
 		return null;
