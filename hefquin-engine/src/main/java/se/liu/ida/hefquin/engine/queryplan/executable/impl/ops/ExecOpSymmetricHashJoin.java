@@ -226,6 +226,9 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	                                           final SolutionMappingsIndex indexForInput,
 	                                           final SolutionMappingsIndex indexForProbing,
 	                                           final List<SolutionMapping> outputBuffer ) {
+		if ( indexForInput.contains(inputSolMap) )
+			return;
+
 		indexForInput.add(inputSolMap);
 
 		final Iterable<SolutionMapping> matchingSolMaps = indexForProbing.getJoinPartners(inputSolMap);
