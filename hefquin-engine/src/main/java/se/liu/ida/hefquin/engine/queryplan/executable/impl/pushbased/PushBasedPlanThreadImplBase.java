@@ -2,8 +2,10 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.utils.StatsImpl;
@@ -65,17 +67,20 @@ public abstract class PushBasedPlanThreadImplBase
 	// be synchronized via the 'availableResultBlocks' object.
 
 	// access to this list must be synchronized
-	protected final List<SolutionMapping> availableOutput = new ArrayList<>();
+	protected final Collection<SolutionMapping> availableOutput;
 
 	// access to this object must be synchronized
 	private Status status = Status.WAITING_TO_BE_STARTED;
 
 	private Exception causeOfFailure = null;
 
-
-	protected PushBasedPlanThreadImplBase( final QueryProcContextExt ctx ) {
+	protected PushBasedPlanThreadImplBase( final QueryProcContextExt ctx, final boolean mayReduce ) {
 		assert ctx != null;
 		this.ctx = ctx;
+
+		availableOutput = mayReduce
+			? new HashSet<>()
+			: new ArrayList<>();
 	}
 
 	@Override
@@ -84,7 +89,12 @@ public abstract class PushBasedPlanThreadImplBase
 			extraConnectors = new ArrayList<>();
 		}
 
-		final ConnectorForAdditionalConsumer c = new ConnectorForAdditionalConsumer(ctx);
+		final boolean mayReduce;
+		synchronized (availableOutput) {
+			mayReduce = (availableOutput instanceof Set);
+		}
+
+		final ConnectorForAdditionalConsumer c = new ConnectorForAdditionalConsumer(ctx, mayReduce);
 		extraConnectors.add(c);
 		return c;
 	}

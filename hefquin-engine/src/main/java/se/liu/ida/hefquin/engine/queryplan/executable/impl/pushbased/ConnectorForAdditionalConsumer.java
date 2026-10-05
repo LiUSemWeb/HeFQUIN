@@ -6,8 +6,8 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 public class ConnectorForAdditionalConsumer extends PushBasedPlanThreadImplBase
 {
-	protected ConnectorForAdditionalConsumer( final QueryProcContextExt ctx ) {
-		super(ctx);
+	protected ConnectorForAdditionalConsumer( final QueryProcContextExt ctx, final boolean mayReduce ) {
+		super(ctx, mayReduce);
 	}
 
 	@Override

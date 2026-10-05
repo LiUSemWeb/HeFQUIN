@@ -20,7 +20,7 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 	                                                 final PushBasedPlanThread input1,
 	                                                 final PushBasedPlanThread input2,
 	                                                 final QueryProcContextExt ctx ) {
-		super(ctx);
+		super(ctx, op.mayReduce());
 
 		assert op != null;
 		assert input1 != null;
