@@ -375,13 +375,6 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			{
 				final ExprList exprList = op.getFilterExpressions();
 				final SPARQLGraphPattern reqPattern = req.getQueryPattern();
-
-				// Only push down the filter if all variables it references are
-				// available in the request pattern. Otherwise, the filter cannot
-				// be evaluated correctly within the request.
-				if ( ! containsAllFilterVariables( reqPattern.getExpectedVariables(), exprList.getVarsMentioned() ) )
-					return;
-
 				final SPARQLGraphPattern mergedPattern = reqPattern.mergeWith(exprList);
 
 				final FederationMember fm = reqOp.getFederationMember();
@@ -635,21 +628,6 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				nonReqSubPlans.add(p);
 			}
 		}
-	}
-
-	/**
-	 * Checks whether all variables referenced by the filter are contained in the
-	 * expected variables of the pattern.
-	 *
-	 * @param expectedVariables the expected variables of the pattern
-	 * @param filterVariables   the variables referenced by the filter
-	 * @return true if all filter variables are available in the pattern, false
-	 *         otherwise
-	 */
-	protected boolean containsAllFilterVariables( final ExpectedVariables expectedVariables,
-	                                              final Set<Var> filterVariables ) {
-		final Set<Var> availableVariables = ExpectedVariablesUtils.unionOfAllVariables(expectedVariables);
-		return availableVariables.containsAll( filterVariables );
 	}
 
 	/**
