@@ -173,26 +173,26 @@ public class QueryPlanCompilerForPushBasedExecution implements QueryPlanCompiler
 
 	protected PushBasedPlanThread createThread( final NullaryExecutableOp op,
 	                                            final QueryProcContextExt ctx ) {
-		return new PushBasedPlanThreadImplForNullaryOperator(op, ctx, op.mayReduce());
+		return new PushBasedPlanThreadImplForNullaryOperator(op, ctx);
 	}
 
 	protected PushBasedPlanThread createThread( final UnaryExecutableOp op,
 	                                            final PushBasedPlanThread input,
 	                                            final QueryProcContextExt ctx ) {
-		return new PushBasedPlanThreadImplForUnaryOperator(op, input, ctx, op.mayReduce());
+		return new PushBasedPlanThreadImplForUnaryOperator(op, input, ctx);
 	}
 
 	protected PushBasedPlanThread createThread( final BinaryExecutableOp op,
 	                                            final PushBasedPlanThread input1,
 	                                            final PushBasedPlanThread input2,
 	                                            final QueryProcContextExt ctx ) {
-		return new PushBasedPlanThreadImplForBinaryOperator(op, input1, input2, ctx, op.mayReduce());
+		return new PushBasedPlanThreadImplForBinaryOperator(op, input1, input2, ctx);
 	}
 
 	protected PushBasedPlanThread createThread( final NaryExecutableOp op,
 	                                            final PushBasedPlanThread[] inputs,
 	                                            final QueryProcContextExt ctx ) {
-		return new PushBasedPlanThreadImplForNaryOperator(op, inputs, ctx, op.mayReduce());
+		return new PushBasedPlanThreadImplForNaryOperator(op, inputs, ctx);
 	}
 
 }

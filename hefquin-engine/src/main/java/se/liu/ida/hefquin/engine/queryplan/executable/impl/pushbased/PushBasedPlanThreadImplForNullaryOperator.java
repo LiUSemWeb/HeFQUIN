@@ -11,9 +11,8 @@ public class PushBasedPlanThreadImplForNullaryOperator extends PushBasedPlanThre
 	protected final NullaryExecutableOp op;
 
 	public PushBasedPlanThreadImplForNullaryOperator( final NullaryExecutableOp op,
-	                                                  final QueryProcContextExt ctx,
-	                                                  final boolean mayReduce ) {
-		super(ctx, mayReduce);
+	                                                  final QueryProcContextExt ctx ) {
+		super(ctx, op.mayReduce());
 
 		assert op != null;
 		this.op = op;

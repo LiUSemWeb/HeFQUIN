@@ -17,9 +17,8 @@ public class PushBasedPlanThreadImplForUnaryOperator extends PushBasedPlanThread
 
 	public PushBasedPlanThreadImplForUnaryOperator( final UnaryExecutableOp op,
 	                                                final PushBasedPlanThread input,
-	                                                final QueryProcContextExt ctx,
-	                                                final boolean mayReduce ) {
-		super(ctx, mayReduce);
+	                                                final QueryProcContextExt ctx ) {
+		super(ctx, op.mayReduce());
 
 		assert op != null;
 		assert input != null;

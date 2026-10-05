@@ -19,9 +19,8 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 	public PushBasedPlanThreadImplForBinaryOperator( final BinaryExecutableOp op,
 	                                                 final PushBasedPlanThread input1,
 	                                                 final PushBasedPlanThread input2,
-	                                                 final QueryProcContextExt ctx,
-	                                                 final boolean mayReduce ) {
-		super(ctx, mayReduce);
+	                                                 final QueryProcContextExt ctx ) {
+		super(ctx, op.mayReduce());
 
 		assert op != null;
 		assert input1 != null;

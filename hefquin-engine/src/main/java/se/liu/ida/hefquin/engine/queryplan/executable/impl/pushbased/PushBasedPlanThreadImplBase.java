@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.utils.StatsImpl;
@@ -22,7 +23,6 @@ public abstract class PushBasedPlanThreadImplBase
 {
 	// initialized via the constructor
 	protected final QueryProcContextExt ctx;
-	protected final boolean mayReduce;
 
 	// initialized if needed (i.e., if addConnectorForAdditionalConsumer is called)
 	protected List<ConnectorForAdditionalConsumer> extraConnectors = null;
@@ -77,7 +77,6 @@ public abstract class PushBasedPlanThreadImplBase
 	protected PushBasedPlanThreadImplBase( final QueryProcContextExt ctx, final boolean mayReduce ) {
 		assert ctx != null;
 		this.ctx = ctx;
-		this.mayReduce = mayReduce;
 
 		availableOutput = mayReduce
 			? new HashSet<>()
