@@ -90,6 +90,11 @@ public abstract class PushBasedPlanThreadImplBase
 			extraConnectors = new ArrayList<>();
 		}
 
+		final boolean mayReduce;
+		synchronized (availableOutput) {
+			mayReduce = (availableOutput instanceof Set);
+		}
+
 		final ConnectorForAdditionalConsumer c = new ConnectorForAdditionalConsumer(ctx, mayReduce);
 		extraConnectors.add(c);
 		return c;
