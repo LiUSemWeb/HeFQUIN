@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,10 +15,12 @@ import org.apache.jena.sparql.syntax.ElementMinus;
 import org.apache.jena.sparql.syntax.ElementOptional;
 
 import se.liu.ida.hefquin.base.query.BGP;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.SPARQLUnionPatternImpl;
+import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -36,8 +37,11 @@ import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
- * Merges subplans that consists of multiple requests to the same federation
- * member if such a merge is possible.
+ * Merges subplans that consist of multiple requests to the same federation
+ * member if such a merge is possible. Merging of requests is avoided for
+ * cases in which the graph pattern of the merged request consists of two
+ * unconnected sub-patterns (because that would lead to retrieving the
+ * cross product of the results of these two sub-patterns).
  *
  * In particular, a join over two requests is merged into a single request
  * operator if i) the two requests are triple pattern requests (which can be
@@ -148,6 +152,11 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			{
 				final SPARQLGraphPattern pattern1 = op.getPattern();
 				final SPARQLGraphPattern pattern2 = req.getQueryPattern();
+
+				// Avoid merging requests if this leads to a cross product
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
+					return;
+
 				final SPARQLGraphPattern mergedPattern = pattern1.mergeWith(pattern2);
 
 				final FederationMember fm = op.getFederationMember();
@@ -166,8 +175,14 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 					&& reqOp.getFederationMember().equals(op.getFederationMember()) )
 			{
 				final FederationMember fm = op.getFederationMember();
-				final SPARQLGraphPattern merged = mergePatternWithOptPatterns( req.getQueryPattern(),
-																				op.getPattern() );
+				final SPARQLGraphPattern pattern1 = req.getQueryPattern();
+				final SPARQLGraphPattern pattern2 = op.getPattern();
+
+				// Avoid merging requests if this leads to a cross product
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
+					return;
+
+				final SPARQLGraphPattern merged = mergePatternWithOptPatterns(pattern1, pattern2);
 
 				if ( fm.isSupportedPattern(merged) ) {
 					returnPlan = createPlanWithSingleRequestOp(merged, mayReduce, fm);
@@ -188,9 +203,14 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			{
 				final FederationMember fm = reqOp1.getFederationMember();
 
-				final SPARQLGraphPattern p1 = req1.getQueryPattern();
-				final SPARQLGraphPattern p2 = req2.getQueryPattern();
-				final SPARQLGraphPattern mergedPattern = p1.mergeWith(p2);
+				final SPARQLGraphPattern pattern1 = req1.getQueryPattern();
+				final SPARQLGraphPattern pattern2 = req2.getQueryPattern();
+
+				// Avoid merging requests if this leads to a cross product
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
+					return;
+
+				final SPARQLGraphPattern mergedPattern = pattern1.mergeWith(pattern2);
 
 				if ( fm.isSupportedPattern(mergedPattern) ) {
 					returnPlan = createPlanWithSingleRequestOp(mergedPattern, mayReduce, fm);
@@ -208,9 +228,15 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 					&& reqOp2.getRequest() instanceof SPARQLRequest req2
 					&& reqOp1.getFederationMember().equals(reqOp2.getFederationMember()) )
 			{
+				final SPARQLGraphPattern pattern1 = req1.getQueryPattern();
+				final SPARQLGraphPattern pattern2 = req2.getQueryPattern();
+
+				// Avoid merging requests if this leads to a cross product
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
+					return;
+
 				// the LHS is the non-optional part
-				final SPARQLGraphPattern merged = mergePatternWithOptPatterns( req1.getQueryPattern(),
-				                                                               req2.getQueryPattern() );
+				final SPARQLGraphPattern merged = mergePatternWithOptPatterns(pattern1, pattern2);
 
 				final FederationMember fm = reqOp1.getFederationMember();
 				if ( fm.isSupportedPattern(merged) ) {
@@ -260,9 +286,9 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				final List<LogicalPlan> reqPlans = e.getValue();
 				if ( reqPlans.size() > 1 ) {
 					final FederationMember fm = e.getKey();
-					final LogicalPlan mergedSubPlan = mergeSPARQLRequestsViaJoin(fm, mayReduce, reqPlans);
-					if ( mergedSubPlan != null ) {
-						newSubPlans.add(mergedSubPlan);
+					final List<LogicalPlan> mergedSubPlans = mergeSPARQLRequestsViaJoin(fm, mayReduce, reqPlans);
+					if ( mergedSubPlans != null ) {
+						newSubPlans.addAll(mergedSubPlans);
 						noChange = false;
 					}
 					else {
@@ -434,9 +460,16 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				&& reqOp2.getRequest() instanceof SPARQLRequest req2
 				&& reqOp1.getFederationMember().equals(reqOp2.getFederationMember()) )
 			{
+				final SPARQLGraphPattern pattern1 = req1.getQueryPattern();
+				final SPARQLGraphPattern pattern2 = req2.getQueryPattern();
+
+				// Only merge if the patterns share variables. Without shared variables,
+				// MINUS has no filtering effect, so merging the requests is unnecessary.
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
+					return;
+
 				// the LHS is the non-optional part
-				final SPARQLGraphPattern merged = mergePatternWithMinusPatterns( req1.getQueryPattern(),
-				                                                                 req2.getQueryPattern() );
+				final SPARQLGraphPattern merged = mergePatternWithMinusPatterns(pattern1, pattern2);
 
 				final FederationMember fm = reqOp1.getFederationMember();
 				if ( fm.isSupportedPattern(merged) ) {
@@ -463,55 +496,71 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	}
 
 	/**
-	 * Assumes that the given list contains at least two plans and that
-	 * all plans in the list consist only of a request operator. Returns
-	 * {@code null} if the given federation member does not support the
-	 * merged pattern.
+	 * Merges request plans whose patterns share variables. Patterns that
+	 * are connected through shared variables are merged when the resulting
+	 * pattern is supported by the federation member.
+	 *
+	 * Assumes that all plans in the list consist only of a request operator
+	 * and that all of these request operators are for the federation member
+	 * given as the first argument of this method.
+	 *
+	 * @param fm        the target federation member
+	 * @param mayReduce whether the resulting request plans may be reduced
+	 * @param reqPlans  the request plans to merge
+	 * @return the resulting request plans, with joinable patterns merged, or
+	 *         {@code null} if no merging was possible
 	 */
-	protected LogicalPlan mergeSPARQLRequestsViaJoin( final FederationMember fm,
-	                                                  final boolean mayReduce,
-	                                                  final List<LogicalPlan> reqPlans ) {
-		final Iterator<LogicalPlan> it = reqPlans.iterator();
+	protected List<LogicalPlan> mergeSPARQLRequestsViaJoin( final FederationMember fm,
+	                                                        final boolean mayReduce,
+	                                                        final List<LogicalPlan> reqPlans ) {
+		final List<LogicalPlan> mergedPlans = new ArrayList<>();
+		final List<LogicalPlan> remaining = new ArrayList<>(reqPlans);
+		boolean noChange = true;
 
-		final LogicalPlan plan1 = it.next();
-		final LogicalOpRequest<?,?> reqOp1 = (LogicalOpRequest<?,?>) plan1.getRootOperator();
-		final SPARQLRequest req1 = (SPARQLRequest) reqOp1.getRequest();
-		final SPARQLGraphPattern pattern1 = req1.getQueryPattern();
+		while ( ! remaining.isEmpty() ) {
+			final LogicalPlan currentPlan = remaining.remove(0);
+			if ( remaining.size() == 0 ) {
+				mergedPlans.add(currentPlan);
+			} else {
+				final LogicalOpRequest<?,?> currentReqOp = (LogicalOpRequest<?,?>) currentPlan.getRootOperator();
+				final SPARQLRequest currentReq = (SPARQLRequest) currentReqOp.getRequest();
+				SPARQLGraphPattern mergedPattern = currentReq.getQueryPattern();
+				boolean noMergeForCurrentPlan = true;
 
-		final LogicalPlan plan2 = it.next();
-		final LogicalOpRequest<?,?> reqOp2 = (LogicalOpRequest<?,?>) plan2.getRootOperator();
-		final SPARQLRequest req2 = (SPARQLRequest) reqOp2.getRequest();
-		final SPARQLGraphPattern pattern2 = req2.getQueryPattern();
+				for ( int i = 0; i < remaining.size(); ) {
+					final LogicalPlan nextPlan = remaining.get(i);
+					final LogicalOpRequest<?, ?> nextReqOp = (LogicalOpRequest<?, ?>) nextPlan.getRootOperator();
+					final SPARQLRequest nextReq = (SPARQLRequest) nextReqOp.getRequest();
+					final SPARQLGraphPattern nextPattern = nextReq.getQueryPattern();
 
-		SPARQLGraphPattern mergedPattern = pattern1.mergeWith(pattern2);
-
-		// Do a first check of the merged pattern already at this point
-		// to avoid going into the following loop if there is no need
-		// for it anyways.
-		if ( ! fm.isSupportedPattern(mergedPattern) )
-			return null;
-
-		// If there are no more subplans to consider, we can already
-		// return the plan with the merged pattern now (otherwise, we
-		// would end up repeating the check of the same merged pattern
-		// again after after the loop).
-		if ( ! it.hasNext() ) {
-			return createPlanWithSingleRequestOp(mergedPattern, mayReduce, fm);
+					if ( containsJoinVariable(mergedPattern, nextPattern) ) {
+						final SPARQLGraphPattern candidatePattern = mergedPattern.mergeWith(nextPattern);
+						// Keep the merged pattern if it is supported by the federation member
+						if ( fm.isSupportedPattern(candidatePattern) ) {
+							mergedPattern = candidatePattern;
+							remaining.remove(i);
+							noChange = false;
+							noMergeForCurrentPlan = false;
+						} else {
+							i++;
+						}
+					} else {
+						i++;
+					}
+				}
+				if( noMergeForCurrentPlan ) {
+					mergedPlans.add(currentPlan);
+				} else {
+					mergedPlans.add( createPlanWithSingleRequestOp(mergedPattern, mayReduce, fm) );
+				}
+			}
 		}
-		while ( it.hasNext() ) {
-			final LogicalPlan nextPlan = it.next();
-			final LogicalOpRequest<?,?> nextReqOp = (LogicalOpRequest<?,?>) nextPlan.getRootOperator();
-			final SPARQLRequest nextReq = (SPARQLRequest) nextReqOp.getRequest();
-			final SPARQLGraphPattern nextPattern = nextReq.getQueryPattern();
 
-			mergedPattern = mergedPattern.mergeWith(nextPattern);
+		if ( noChange ) {
+			return null;
 		}
 
-		// Now we need to do another check of the final merged pattern.
-		if ( ! fm.isSupportedPattern(mergedPattern) )
-			return null;
-
-		return createPlanWithSingleRequestOp(mergedPattern, mayReduce, fm);
+		return mergedPlans;
 	}
 
 	protected SPARQLGraphPattern mergePatternWithOptPatterns( final SPARQLGraphPattern pattern,
@@ -607,4 +656,18 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		}
 	}
 
+	/**
+	 * Checks whether the expected variables of the two patterns have at least one
+	 * variable in common.
+	 * 
+	 * @param pattern1 the first SPARQL graph pattern
+	 * @param pattern2 the second SPARQL graph pattern
+	 * @return true if the patterns share at least one expected variable, false
+	 *         otherwise
+	 */
+	protected boolean containsJoinVariable( final SPARQLGraphPattern pattern1, final SPARQLGraphPattern pattern2 ) {
+		final ExpectedVariables vars1 = pattern1.getExpectedVariables();
+		final ExpectedVariables vars2 = pattern2.getExpectedVariables();
+		return ! ExpectedVariablesUtils.intersectionOfAllVariables(vars1, vars2).isEmpty();
+	}
 }
