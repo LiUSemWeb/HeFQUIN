@@ -247,7 +247,14 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	                         final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
-		// First, check whether we had to switch into full-retrieval mode,
+		// Firstly, if reduction is allowed, ignore duplicate input solution
+		// mappings. Otherwise, the same input solution mapping may be
+		// processed multiple times, potentially producing duplicate output
+		// solution mappings.
+		if ( mayReduce && currentBatch.contains(inputSolMap) )
+			return;
+
+		// Secondly, check whether we had to switch into full-retrieval mode,
 		// in which case we can find the join partners for the given input
 		// solution mapping within the full result that we had to retrieve.
 		if ( fullResult != null ) {
