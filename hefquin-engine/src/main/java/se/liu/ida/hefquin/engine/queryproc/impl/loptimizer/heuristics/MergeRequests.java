@@ -500,7 +500,9 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	 * are connected through shared variables are merged when the resulting
 	 * pattern is supported by the federation member.
 	 *
-	 * Assumes that all plans in the list consist only of a request operator.
+	 * Assumes that all plans in the list consist only of a request operator
+	 * and that all of these request operators are for the federation member
+	 * given as the first argument of this method.
 	 *
 	 * @param fm        the target federation member
 	 * @param mayReduce whether the resulting request plans may be reduced
