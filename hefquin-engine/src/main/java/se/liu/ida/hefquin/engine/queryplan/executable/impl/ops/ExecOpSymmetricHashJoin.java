@@ -121,7 +121,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	                                        final QueryProcContextExt ctx ) {
 		buffer.clear();
 
-		_processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
+		_processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer, mayReduce);
 
 		numberOfOutputMappingsProduced += buffer.size();
 		sink.send(buffer);
@@ -136,7 +136,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		buffer.clear();
 
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
-			_processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
+			_processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer, mayReduce);
 		}
 
 		numberOfOutputMappingsProduced += buffer.size();
@@ -161,7 +161,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	                                        final QueryProcContextExt ctx ) {
 		buffer.clear();
 
-		_processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
+		_processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer, mayReduce);
 
 		numberOfOutputMappingsProduced += buffer.size();
 		sink.send(buffer);
@@ -176,7 +176,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		buffer.clear();
 
 		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
-			_processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
+			_processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer, mayReduce);
 		}
 
 		numberOfOutputMappingsProduced += buffer.size();
@@ -225,8 +225,9 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	protected static void _processInputSolMap( final SolutionMapping inputSolMap,
 	                                           final SolutionMappingsIndex indexForInput,
 	                                           final SolutionMappingsIndex indexForProbing,
-	                                           final List<SolutionMapping> outputBuffer ) {
-		if ( indexForInput.contains(inputSolMap) )
+	                                           final List<SolutionMapping> outputBuffer,
+	                                           final boolean mayReduce ) {
+		if ( mayReduce && indexForInput.contains(inputSolMap) )
 			return;
 
 		indexForInput.add(inputSolMap);
