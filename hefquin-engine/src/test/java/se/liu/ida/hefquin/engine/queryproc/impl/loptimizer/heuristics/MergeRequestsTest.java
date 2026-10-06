@@ -372,6 +372,63 @@ public class MergeRequestsTest extends EngineTestBase
 	}
 
 	@Test
+	public void mergeMultiwayJoinPossible3() {
+		// a multiway join of three triple pattern requests,
+		// *all* of them to the same fed.member, which is a SPARQL endpoint.
+		// The second request has no join variables with the other two, so
+		// the whole plan can be merged into two request operators, with
+		// requests one and three forming a single BGP.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final Var v3 = Var.alloc("z");
+		final FederationMember fm = new SPARQLEndpointForTest("http://exA.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v3);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1) );
+
+		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2) );
+
+		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
+		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fm, false,  new SPARQLRequestImpl(tp3) );
+
+		final LogicalPlan mjPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(
+				false,
+				null,
+				new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp2, null),
+				new LogicalPlanWithNullaryRootImpl(reqOp3, null) );
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(mjPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpMultiwayJoin );
+
+		final LogicalOpRequest<?,?> resultReqOp1 = (LogicalOpRequest<?,?>) result.getSubPlan(0).getRootOperator();
+		assertTrue( resultReqOp1.getFederationMember() == fm );
+		assertTrue( resultReqOp1.getRequest() instanceof SPARQLRequest );
+
+		final LogicalOpRequest<?,?> resultReqOp2 = (LogicalOpRequest<?,?>) result.getSubPlan(1).getRootOperator();
+		assertTrue( resultReqOp2.getFederationMember() == fm );
+		assertTrue( resultReqOp2.getRequest() instanceof SPARQLRequest );
+
+		final SPARQLRequest req1 = (SPARQLRequest) resultReqOp1.getRequest();
+		final SPARQLRequest req2 = (SPARQLRequest) resultReqOp2.getRequest();
+
+		assertTrue( req1.getQueryPattern() instanceof BGP );
+		final BGP resultBGP = (BGP) req1.getQueryPattern();
+		assertEquals( 2, resultBGP.getTriplePatterns().size() );
+		assertTrue( resultBGP.getTriplePatterns().contains(tp1) );
+		assertTrue( resultBGP.getTriplePatterns().contains(tp3) );
+
+		assertTrue( req2.getQueryPattern() instanceof TriplePattern );
+		assertEquals( tp2, req2.getQueryPattern() );
+	}
+
+	@Test
 	public void mergeMultiwayJoinImpossible() {
 		// like mergeMultiwayJoinPossible1 but with a TPF server, for
 		// which the requests under the multiway join cannot be merged
@@ -386,7 +443,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v2);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp1) );
 
-		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
+		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v3);
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, false, new TriplePatternRequestImpl(tp2) );
 
 		final TriplePattern tp3 = new TriplePatternImpl(v3 ,v3, v3);
