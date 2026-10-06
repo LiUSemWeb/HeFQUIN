@@ -286,9 +286,9 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				final List<LogicalPlan> reqPlans = e.getValue();
 				if ( reqPlans.size() > 1 ) {
 					final FederationMember fm = e.getKey();
-					final LogicalPlan mergedSubPlan = mergeSPARQLRequestsViaJoin(fm, mayReduce, reqPlans);
-					if ( mergedSubPlan != null ) {
-						newSubPlans.add(mergedSubPlan);
+					final List<LogicalPlan> mergedSubPlans = mergeSPARQLRequestsViaJoin(fm, mayReduce, reqPlans);
+					if ( mergedSubPlans != null ) {
+						newSubPlans.addAll(mergedSubPlans);
 						noChange = false;
 					}
 					else {
@@ -496,45 +496,63 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	}
 
 	/**
-	 * Assumes that the given list contains at least two plans and that
-	 * all plans in the list consist only of a request operator. Returns
-	 * {@code null} if the given federation member does not support the
-	 * merged pattern or if the request patterns cannot all be connected
-	 * through shared variables.
+	 * Merges request plans whose patterns share variables. Patterns that
+	 * are connected through shared variables are merged when the resulting
+	 * pattern is supported by the federation member.
+	 *
+	 * Assumes that all plans in the list consist only of a request operator.
+	 *
+	 * @param fm        the target federation member
+	 * @param mayReduce whether the resulting request plans may be reduced
+	 * @param reqPlans  the request plans to merge
+	 * @return the resulting request plans, with joinable patterns merged, or
+	 *         {@code null} if no merging was possible
 	 */
-	protected LogicalPlan mergeSPARQLRequestsViaJoin( final FederationMember fm,
-	                                                  final boolean mayReduce,
-	                                                  final List<LogicalPlan> reqPlans ) {
+	protected List<LogicalPlan> mergeSPARQLRequestsViaJoin( final FederationMember fm,
+	                                                        final boolean mayReduce,
+	                                                        final List<LogicalPlan> reqPlans ) {
+		final List<LogicalPlan> mergedPlans = new ArrayList<>();
 		final List<LogicalPlan> remaining = new ArrayList<>(reqPlans);
-		final LogicalPlan currentPlan = remaining.remove(0);
-		final LogicalOpRequest<?,?> currentReqOp = (LogicalOpRequest<?,?>) currentPlan.getRootOperator();
-		final SPARQLRequest currentReq = (SPARQLRequest) currentReqOp.getRequest();
+		boolean noChange = true;
 
-		SPARQLGraphPattern mergedPattern = currentReq.getQueryPattern();
+		while( ! remaining.isEmpty() ) {
+			final LogicalPlan currentPlan = remaining.remove(0);
+			if( remaining.size() == 0 ) {
+				mergedPlans.add(currentPlan);
+			} else {
+				final LogicalOpRequest<?,?> currentReqOp = (LogicalOpRequest<?,?>) currentPlan.getRootOperator();
+				final SPARQLRequest currentReq = (SPARQLRequest) currentReqOp.getRequest();
+				SPARQLGraphPattern mergedPattern = currentReq.getQueryPattern();
 
-		while ( ! remaining.isEmpty() ) {
-			// Find a plan that shares variables with the current merged pattern.
-			// This allows plans to be merged even when their original list order
-			// does not reflect their join dependencies.
-			final LogicalPlan nextPlan = findNextJoinablePlan(mergedPattern, remaining);
+				for ( int i = 0; i < remaining.size(); ) {
+					final LogicalPlan nextPlan = remaining.get(i);
+					final LogicalOpRequest<?, ?> nextReqOp = (LogicalOpRequest<?, ?>) nextPlan.getRootOperator();
+					final SPARQLRequest nextReq = (SPARQLRequest) nextReqOp.getRequest();
+					final SPARQLGraphPattern nextPattern = nextReq.getQueryPattern();
 
-			// Abort if there are no more plans that can be joined
-			if ( nextPlan == null )
-				return null;
-
-			final LogicalOpRequest<?,?> nextReqOp = (LogicalOpRequest<?,?>) nextPlan.getRootOperator();
-			final SPARQLRequest nextReq = (SPARQLRequest) nextReqOp.getRequest();
-
-			mergedPattern = mergedPattern.mergeWith(nextReq.getQueryPattern());
-
-			// Abort if the merged pattern is not supported
-			if ( ! fm.isSupportedPattern(mergedPattern) )
-				return null;
-
-			remaining.remove(nextPlan);
+					if ( containsJoinVariable(mergedPattern, nextPattern) ) {
+						final SPARQLGraphPattern candidatePattern = mergedPattern.mergeWith(nextPattern);
+						// Keep the merged pattern if it is supported by the federation member
+						if ( fm.isSupportedPattern(candidatePattern) ) {
+							mergedPattern = candidatePattern;
+							remaining.remove(i);
+							noChange = false;
+						} else {
+							i++;
+						}
+					} else {
+						i++;
+					}
+				}
+				mergedPlans.add( createPlanWithSingleRequestOp(mergedPattern, mayReduce, fm) );
+			}
 		}
 
-		return createPlanWithSingleRequestOp(mergedPattern, mayReduce, fm);
+		if( noChange ) {
+			return null;
+		}
+
+		return mergedPlans;
 	}
 
 	protected SPARQLGraphPattern mergePatternWithOptPatterns( final SPARQLGraphPattern pattern,
@@ -643,25 +661,5 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		final ExpectedVariables vars1 = pattern1.getExpectedVariables();
 		final ExpectedVariables vars2 = pattern2.getExpectedVariables();
 		return ! ExpectedVariablesUtils.intersectionOfAllVariables(vars1, vars2).isEmpty();
-	}
-
-	/**
-	 * Finds the next plan that can be joined with the given graph pattern based on
-	 * at least one shared variable.
-	 *
-	 * @param pattern the graph pattern to join with
-	 * @param plans   the request plans to search
-	 * @return the first plan that shares at least one variable with the given
-	 *         pattern, or null if no such plan exists
-	 */
-	protected LogicalPlan findNextJoinablePlan( final SPARQLGraphPattern pattern, final List<LogicalPlan> plans ) {
-		for ( final LogicalPlan plan : plans ) {
-			final LogicalOpRequest<?, ?> op = ((LogicalOpRequest<?, ?>) plan.getRootOperator());
-			final SPARQLRequest req = (SPARQLRequest) op.getRequest();
-
-			if ( containsJoinVariable( pattern, req.getQueryPattern() ) )
-				return plan;
-		}
-		return null;
 	}
 }
