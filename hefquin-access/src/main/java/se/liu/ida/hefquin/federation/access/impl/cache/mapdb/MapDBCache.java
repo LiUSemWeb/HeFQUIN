@@ -165,6 +165,7 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 		final File file = ensureParentDirectoryExists(filename);
 		return DBMaker.fileDB(file)
 			.fileMmapEnableIfSupported()
+			.transactionEnable()
 			.closeOnJvmShutdown()
 			.make();
 	}
