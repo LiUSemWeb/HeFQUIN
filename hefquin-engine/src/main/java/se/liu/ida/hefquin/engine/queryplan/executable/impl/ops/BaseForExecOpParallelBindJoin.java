@@ -127,7 +127,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 	protected final int batchSize;
 
 	/**
-	 * This list is used to collect up the input solution mappings (obtained
+	 * This collection is used to collect up the input solution mappings (obtained
 	 * from the child operator in the execution plan) that are covered by the
 	 * currently-assembled batch of solution mappings, where that batch is
 	 * in {@link #currentBatch} and will be used for a bind-join request.
@@ -137,15 +137,18 @@ public abstract class BaseForExecOpParallelBindJoin<
 	 * {@link #currentBatch} are versions of the ones in this collection,
 	 * restricted to join variables.
 	 *
+	 * If {@code mayReduce} is true, this collection is a set, such that duplicate
+	 * input solution mappings are ignored.
+	 *
 	 * Once {@link #currentBatch} is full (i.e., the number of solution
-	 * mappings in it is equal to {@link #batchSize}), this list is appended
+	 * mappings in it is equal to {@link #batchSize}), this collection is appended
 	 * to {@link #solMapsCoveredPerBatch} and then set back to {@code null},
-	 * to be initialized to a new list when another input solution mapping
+	 * to be initialized to a new collection when another input solution mapping
 	 * arrives.
 	 */
-	protected List<SolutionMapping> solMapsCoveredByCurrentBatch = null;
+	protected Collection<SolutionMapping> solMapsCoveredByCurrentBatch = null;
 
-	protected final List<List<SolutionMapping>> solMapsCoveredPerBatch = new ArrayList<>();
+	protected final List<Collection<SolutionMapping>> solMapsCoveredPerBatch = new ArrayList<>();
 
 	/**
 	 * This set is used to collect up the solution mappings for the currently-
@@ -163,7 +166,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 	 * mapping.
 	 *
 	 * Once the number of solution mappings in this set is equal to
-	 * {@link #batchSize}) (i.e., the current batch is complete), the set
+	 * {@link #batchSize} (i.e., the current batch is complete), the set
 	 * is appended to {@link #batches} and {@link #currentBatch} is set
 	 * back to {@code null}, to be initialized with a new set when another
 	 * input solution mapping arrives.
@@ -295,7 +298,15 @@ public abstract class BaseForExecOpParallelBindJoin<
 	                        final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
-		// First, check whether we had to switch into full-retrieval mode,
+		// First, if duplicate removal is allowed, we can safely ignore the given input
+		// solution mapping if we have seen the exact same mapping before (while
+		// populating the current batch).
+		if (    mayReduce
+		     && solMapsCoveredByCurrentBatch != null
+		     && solMapsCoveredByCurrentBatch.contains(inputSolMap) )
+			return;
+
+		// Now we check whether we had to switch into full-retrieval mode,
 		// in which case we can find the join partners for the given input
 		// solution mapping within the full result that we had to retrieve.
 		if ( fullResult != null ) {
@@ -343,7 +354,9 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// batch, which may have to be set up first.
 		if ( solMapsCoveredByCurrentBatch == null ) {
 			// set up the next batch
-			solMapsCoveredByCurrentBatch = new ArrayList<>();
+			solMapsCoveredByCurrentBatch = mayReduce
+				? new HashSet<>()
+				: new ArrayList<>();
 			currentBatch = new HashSet<>();
 		}
 
@@ -470,10 +483,10 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// Iterate over the *full* batches, including the corresponding
 		// collections of solution mappings covered by these batches.
 		final Iterator<Set<Binding>> itBatches = batches.iterator();
-		final Iterator<List<SolutionMapping>> it2 = solMapsCoveredPerBatch.iterator();
+		final Iterator<Collection<SolutionMapping>> it2 = solMapsCoveredPerBatch.iterator();
 		while ( itBatches.hasNext() ) {
 			final Set<Binding> batch = itBatches.next();
-			final List<SolutionMapping> solMapsCoveredByBatch = it2.next();
+			final Collection<SolutionMapping> solMapsCoveredByBatch = it2.next();
 
 			// Create the bind-join request for the current batch and, once
 			// this is done, we can already forget the solution mappings of
@@ -516,10 +529,10 @@ public abstract class BaseForExecOpParallelBindJoin<
 	 * been covered by the batch used for creating the request.
 	 */
 	protected class MyResponseProcessor implements Consumer<RespType> {
-		protected final List<SolutionMapping> solMapsCoveredByBatch;
+		protected final Collection<SolutionMapping> solMapsCoveredByBatch;
 		protected final IntermediateResultElementSink sink;
 
-		public MyResponseProcessor( final List<SolutionMapping> solMapsCoveredByBatch,
+		public MyResponseProcessor( final Collection<SolutionMapping> solMapsCoveredByBatch,
 		                            final IntermediateResultElementSink sink ) {
 			this.solMapsCoveredByBatch = solMapsCoveredByBatch;
 			this.sink = sink;
@@ -723,7 +736,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 	 * resulting solution mappings are send to the given sink.
 	 */
 	protected void handleCollectedSolMaps( final IntermediateResultElementSink sink ) {
-		for ( final List<SolutionMapping> b : solMapsCoveredPerBatch ) {
+		for ( final Collection<SolutionMapping> b : solMapsCoveredPerBatch ) {
 			joinInFullRetrievalMode(b, sink);
 		}
 

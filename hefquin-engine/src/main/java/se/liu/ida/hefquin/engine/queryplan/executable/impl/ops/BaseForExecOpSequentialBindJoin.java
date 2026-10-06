@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -116,6 +117,9 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	 * from the child operator in the execution plan) for which the next
 	 * bind-join request will ask for possible join partners.
 	 *
+	 * If {@code mayReduce} is true, this collection is a set, such that
+	 * duplicate solution mappings are ignored.
+	 *
 	 * Note that these are not necessarily the solution mappings to be used
 	 * for forming the next bind-join request; those are collected in parallel
 	 * in {@link #currentSolMapsForRequest}.
@@ -124,7 +128,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	 * handled, this set will be cleared (and then populated again, by using
 	 * the next input solution mappings that will arrive afterwards).
 	 */
-	protected final List<SolutionMapping> currentBatch = new ArrayList<>();
+	protected final Collection<SolutionMapping> currentBatch;
 
 	/**
 	 * This set is used to collect up solution mappings that will be used
@@ -208,6 +212,10 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 		this.requestBlockSize = batchSize;
 
+		currentBatch = mayReduce
+			? new HashSet<>()
+			: new ArrayList<>();
+
 		this.allJoinVarsAreCertain = areAllJoinVarsAreCertain(varsInQuery, inputVars);
 	}
 
@@ -239,7 +247,13 @@ public abstract class BaseForExecOpSequentialBindJoin<
 	                         final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
-		// First, check whether we had to switch into full-retrieval mode,
+		// First, if duplicate removal is allowed, we can safely ignore the given input
+		// solution mapping if we have seen the exact same mapping before (while
+		// populating the current batch).
+		if ( mayReduce && currentBatch.contains(inputSolMap) )
+			return;
+
+		// Now we check whether we had to switch into full-retrieval mode,
 		// in which case we can find the join partners for the given input
 		// solution mapping within the full result that we had to retrieve.
 		if ( fullResult != null ) {
