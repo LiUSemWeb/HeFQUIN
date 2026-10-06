@@ -174,73 +174,97 @@ components:
       name: X-HeFQUIN-Skip-Execution
       in: header
       required: false
-      description: Use this header to instruct HeFQUIN to create the query execution plan for the given query, but without actually executing this plan.
+      description: Use this header if you want HeFQUIN to create the query execution plan for the given query, but without actually executing this plan.
       schema:
         type: string
-        example: "true"
+        enum:
+          - "true"
+          - "false"
+        default: "false"
 
     PrintSourceAssignment:
       name: X-HeFQUIN-Print-Source-Assignment
       in: header
       required: false
-      description: Use this header to instruct the query planning component of HeFQUIN to print the initial logical plan that is the output of the source selection and query decomposition process.
+      description: Use this argument to instruct the query planning component of HeFQUIN to include the initial logical plan that is the output of the source selection and query decomposition process in the response.
       schema:
         type: string
-        example: "true"
+        enum:
+          - "true"
+          - "false"
+        default: "false"
 
     PrintLogicalPlan:
       name: X-HeFQUIN-Print-Logical-Plan
       in: header
       required: false
-      description: Use this header to instruct the query planning component of HeFQUIN to print the logical plan that is the output of the logical query optimizer.
+      description: Use this header to instruct the query planning component of HeFQUIN to include the logical plan that is the output of the logical query optimizer in the response.
       schema:
         type: string
-        example: "true"
+        enum:
+          - "true"
+          - "false"
+        default: "false"
 
     PrintPhysicalPlan:
       name: X-HeFQUIN-Print-Physical-Plan
       in: header
       required: false
-      description: Use this header to instruct the query planning component of HeFQUIN to print the physical plan that is the output of the physical query optimizer.
+      description: Use this header to instruct the query planning component of HeFQUIN to include the physical plan that is the output of the physical query optimizer in the response.
       schema:
         type: string
-        example: "true"
+        enum:
+          - "true"
+          - "false"
+        default: "false"
 
     PrintExecutablePlan:
       name: X-HeFQUIN-Print-Executable-Plan
       in: header
       required: false
-      description: Use this header to instruct the query planning component of HeFQUIN to print the executable plan produced by the query planning component.
+      description: Use this header to instruct the query planning component of HeFQUIN to include the executable plan produced by the query planning component in the response.
       schema:
         type: string
-        example: "true"
+        enum:
+          - "true"
+          - "false"
+        default: "false"
 
     ReturnFullStackTrace:
       name: X-HeFQUIN-Return-Full-Stack-Trace
       in: header
       required: false
-      description: Use this header to instruct the HeFQUIN engine to return the complete stack trace for each exception, in addition to the exception message.
+      description: Use this header to instruct the HeFQUIN engine to include the complete stack trace for each exception, in addition to the exception message, in the exceptions field of the JSON response.
       schema:
         type: string
-        example: "true"
+        enum:
+          - "true"
+          - "false"
+        default: "false"
 
     IgnoreRetrievalCache:
       name: X-HeFQUIN-Ignore-Retrieval-Cache
       in: header
       required: false
-      description: Use this header to instruct the HeFQUIN engine to bypass the retrieval cache when processing the query, so that requests are executed instead of being served from the cache. The responses received for these requests can still be used to update the cache.
+      description: Use this header to instruct the HeFQUIN engine to bypass the retrieval cache when processing the query, which means that every data retrieval request during every execution is indeed executed instead of being served from the cache. The responses received for these requests are still used to update the cache.
       schema:
         type: string
-        example: "true"
+        enum:
+          - "true"
+          - "false"
+        default: "false"
 
     IgnoreCardinalityCache:
       name: X-HeFQUIN-Ignore-Cardinality-Cache
       in: header
       required: false
-      description: Use this header to instruct the HeFQUIN engine to bypass the cardinality cache when processing the query, so that cardinality estimates are obtained instead of being served from the cache. The estimates obtained can still be used to update the cache.
+      description: Use this header to instruct the HeFQUIN engine to bypass the cardinality cache when processing the query, which means that cardinality requests are indeed issued instead of being served from the cache. The responses obtained via such requests are still used to update the cache.
       schema:
         type: string
-        example: "true"
+        enum:
+          - "true"
+          - "false"
+        default: "false"
 
   responses:
     SparqlResults:
