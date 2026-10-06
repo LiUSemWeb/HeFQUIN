@@ -298,13 +298,15 @@ public abstract class BaseForExecOpParallelBindJoin<
 	                        final QueryProcContextExt ctx )
 			 throws ExecOpExecutionException
 	{
-		// Firstly, if reduction is allowed, ignore duplicate input solution
-		// mappings. Otherwise, the same input solution mapping may be processed
-		// multiple times, potentially producing duplicate output solution mappings.
-		if ( mayReduce && solMapsCoveredByCurrentBatch != null && solMapsCoveredByCurrentBatch.contains(inputSolMap) )
+		// First, if duplicate removal is allowed, we can safely ignore the given input
+		// solution mapping if we have seen the exact same mapping before (while
+		// populating the current batch).
+		if (    mayReduce
+		     && solMapsCoveredByCurrentBatch != null
+		     && solMapsCoveredByCurrentBatch.contains(inputSolMap) )
 			return;
 
-		// Secondly, check whether we had to switch into full-retrieval mode,
+		// Now we check whether we had to switch into full-retrieval mode,
 		// in which case we can find the join partners for the given input
 		// solution mapping within the full result that we had to retrieve.
 		if ( fullResult != null ) {
