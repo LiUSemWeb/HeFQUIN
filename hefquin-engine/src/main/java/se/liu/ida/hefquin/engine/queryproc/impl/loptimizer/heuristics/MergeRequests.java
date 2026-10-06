@@ -548,7 +548,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			}
 		}
 
-		if( noChange ) {
+		if ( noChange ) {
 			return null;
 		}
 
