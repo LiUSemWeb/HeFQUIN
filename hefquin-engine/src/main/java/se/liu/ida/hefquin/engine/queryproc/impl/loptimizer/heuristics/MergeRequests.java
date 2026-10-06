@@ -522,6 +522,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			if( remaining.size() == 0 ) {
 				mergedPlans.add(currentPlan);
 			} else {
+				boolean noMergeForCurrentPlan = true;
 				final LogicalOpRequest<?,?> currentReqOp = (LogicalOpRequest<?,?>) currentPlan.getRootOperator();
 				final SPARQLRequest currentReq = (SPARQLRequest) currentReqOp.getRequest();
 				SPARQLGraphPattern mergedPattern = currentReq.getQueryPattern();
@@ -539,6 +540,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 							mergedPattern = candidatePattern;
 							remaining.remove(i);
 							noChange = false;
+							noMergeForCurrentPlan = false;
 						} else {
 							i++;
 						}
@@ -546,7 +548,11 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 						i++;
 					}
 				}
-				mergedPlans.add( createPlanWithSingleRequestOp(mergedPattern, mayReduce, fm) );
+				if( noMergeForCurrentPlan ) {
+					mergedPlans.add(currentPlan);
+				} else {
+					mergedPlans.add( createPlanWithSingleRequestOp(mergedPattern, mayReduce, fm) );
+				}
 			}
 		}
 
