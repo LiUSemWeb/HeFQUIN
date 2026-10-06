@@ -517,15 +517,15 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		final List<LogicalPlan> remaining = new ArrayList<>(reqPlans);
 		boolean noChange = true;
 
-		while( ! remaining.isEmpty() ) {
+		while ( ! remaining.isEmpty() ) {
 			final LogicalPlan currentPlan = remaining.remove(0);
-			if( remaining.size() == 0 ) {
+			if ( remaining.size() == 0 ) {
 				mergedPlans.add(currentPlan);
 			} else {
-				boolean noMergeForCurrentPlan = true;
 				final LogicalOpRequest<?,?> currentReqOp = (LogicalOpRequest<?,?>) currentPlan.getRootOperator();
 				final SPARQLRequest currentReq = (SPARQLRequest) currentReqOp.getRequest();
 				SPARQLGraphPattern mergedPattern = currentReq.getQueryPattern();
+				boolean noMergeForCurrentPlan = true;
 
 				for ( int i = 0; i < remaining.size(); ) {
 					final LogicalPlan nextPlan = remaining.get(i);
