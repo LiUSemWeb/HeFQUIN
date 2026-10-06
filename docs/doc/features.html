@@ -17,36 +17,192 @@
 
     <main>
         <h1>Features of HeFQUIN</h1>
+        <p>
+            HeFQUIN is a <strong>query federation engine for heterogeneous federations of graph data sources</strong> (e.g., federated knowledge graphs) that is designed to support querying across different data models and different data access interfaces.
+        </p>
+        <p>
+            This page provides an overview of the features of HeFQUIN, organized under the following headlines.
+        </p>
         <ul>
-            <li>Support for all features of SPARQL 1.1, where basic graph patterns, group graph patterns (AND), union
-                graph patterns, optional patterns, minus patterns, filters, and distinct are supported natively within the HeFQUIN engine, and the
-                other features of SPARQL are supported through integration of the HeFQUIN engine into Apache Jena</li>
-            <li>So far, support for SPARQL endpoints, TPF and brTPF servers, and REST endpoints (for which an RML mapping needs to be specified)
-                <ul>
-                    <li>Work on openCypher Property Graphs ongoing</li>
-                    <li>Work on GraphQL APIs ongoing</li>
-                </ul>
-            </li>
-            <li>Initial support for vocabulary mappings</li>
-            <li>Heuristics-based logical query optimizer</li>
-            <li>
-                Several different cost-based physical optimizers (greedy, dynamic programming, simulated annealing, randomized
-                iterative improvement)
-            </li>
-            <li>
-                Relevant physical operators, e.g., hash join, symmetric hash join (SHJ), request-based nested-loops join (NLJ),
-                several variations of bind joins (brTPF-based, UNION-based, FILTER-based, VALUES-based)
-            </li>
-            <li>Two execution models: a push-based one with multi-threaded intra-operator parallelism and a pull-based one with (mainly) non-blocking iterators (certainly slower and, thus, primarily for debugging)</li>
-            <li>Features for getting an understanding of the internals of the engine:
-                <ul>
-                    <li>Printing of logical and physical plans</li>
-                    <li>Programmatic access to execution statistics on the level of individual operators and data structures, as
-                        well as printing of these statistics from the CLI
-                    </li>
-                </ul>
-            </li>
-            <li>1000+ unit tests</li>
+            <li><a href="#query-language">Query Language Support</a></li>
+            <li><a href="#data-sources">Data Source Integration</a></li>
+            <li><a href="#authentication">Authentication</a></li>
+            <li><a href="#caching">Response Caching</a></li>
+            <li><a href="#deployment">Deployment Options</a></li>
+            <li><a href="#internals">Internals (Operators, Execution Models, and Optimization)</a></li>
+            <li><a href="#inspection">Monitoring, Inspection, and Debugging</a></li>
+            <li><a href="#extension-points">Extension Points and Configurability</a></li>
+            <li><a href="#testing">Testing and Reliability</a></li>
+            <li><a href="#limitations">Current Limitations</a></li>
+        </ul>
+
+        <section id="query-language">
+            <h2>Query Language Support</h2>
+            <p>
+                HeFQUIN supports all features of <strong>SPARQL 1.1</strong>, with queries that contain <code>SERVICE</code> clauses to indicate which federation member should process which subpattern. Most features of the language are supported natively by the engine, including basic graph patterns, group graph patterns, <code>UNION</code>, <code>OPTIONAL</code>, <code>MINUS</code>, <code>FILTER</code>, <code>BIND</code>, and <code>DISTINCT</code>. The remaining features, such as subqueries, grouping, and aggregation, are implemented through integration of Apache Jena's query functionality into HeFQUIN.
+            </p>
+            <p>
+                In addition, HeFQUIN supports <strong>query constructs</strong> that are designed specifically <strong>for queries over (heterogeneous) federations</strong>, such as:
+            </p>
+            <ul>
+                <li><code>VALUES</code> clauses to specify <strong>multiple federation members for the same <code>SERVICE</code> clause</strong> in a more concise form</li>
+                <li><code>PARAMS</code> clauses for federation members that require <strong>request parameters</strong></li>
+                <li><code>UNFOLD</code> clauses and dedicated functions for <strong>composite values</strong> (lists and maps, in particular)</li>
+            </ul>
+            <p>
+                For details, see the documentation of <a href="queries.html">queries and query features supported by HeFQUIN</a>.
+            </p>
+        </section>
+
+        <section id="data-sources">
+            <h2>Data Source Integration</h2>
+            <p>
+                HeFQUIN is designed for querying federations of heterogeneous types of data sources, including the following types of <strong>RDF-based data sources</strong>:
+            </p>
+            <ul>
+                <li><strong>SPARQL endpoints</strong></li>
+                <li><strong>Triple Pattern Fragments (TPF)</strong></li>
+                <li><strong>Bindings-Restricted Triple Pattern Fragments (brTPF)</strong></li>
+            </ul>
+            <p>
+                For queries across RDF-based data sources that capture equivalent concepts and relationships using different vocabularies (ontologies), HeFQUIN can apply simple <strong>vocabulary mappings</strong>, which makes it possible to express such queries in terms of only one of the vocabularies.
+            </p>
+            <p>
+                HeFQUIN can also work with <strong>non-RDF data sources</strong> by giving them an RDF view via mappings described declaratively in RML, which is currently supported for:
+            </p>
+            <ul>
+                <li><strong>JSON-based Web APIs</strong></li>
+            </ul>
+            <p>
+                To provide this functionality, HeFQUIN comes with its <strong>own RML processor</strong>, which can also be used as an independent component (i.e., separate from the query federation engine).
+            </p>
+<!--
+            <p>
+                HeFQUIN includes its own <strong>RML processor</strong>, which is used to create temporary RDF representations of non-RDF data obtained from certain federation members. This is a key component for integrating heterogeneous data sources that do not natively expose RDF.
+            </p>
+-->
+            <p>
+                Ongoing development is adding support for further source types, including:
+            </p>
+            <ul>
+                <li><strong>Property Graphs accessible via openCypher</strong></li>
+                <li><strong>GraphQL APIs</strong></li>
+            </ul>
+        </section>
+
+        <section id="authentication">
+            <h2>Authentication</h2>
+            <p>
+                HeFQUIN supports <strong>authentication for federation members</strong>, which can be configured per member and covers common Web authentication patterns such as:
+            </p>
+            <ul>
+                <li><strong>Basic authentication</strong> (username and password)</li>
+                <li><strong>Bearer token authentication</strong></li>
+                <li><strong>Generic token-based authentication</strong> using custom HTTP Authorization schemes</li>
+            </ul>
+            <p>
+                Credentials are supplied through environment variables, which keeps them separate from the federation description.
+            </p>
+        </section>
+
+        <section id="caching">
+            <h2>Response Caching</h2>
+            <p>
+                HeFQUIN includes a <strong>two-level caching mechanism</strong> to cache responses retrieved for requests to federation members, which helps to minimize network overhead and to improve query performance. The main features of this caching mechanism are:
+            </p>
+            <ul>
+                <li>Combination of a <strong>fast, in-memory L1 cache</strong> with a <strong>persistent L2 cache</strong> that retains responses across restarts of HeFQUIN</li>
+                <li><strong>Two backends</strong> for the L2 cache: one based on MapDB (suited for CLI use), the other based on Chronical Map (suited for the service deployment)</li>
+                <li><strong>TTL-based cache invalidation</strong> with the option to configure the time to live (TTL) per cache level</li>
+                <li>Configurable cache capacity (per cache level), with <strong>LRU policy</strong> to handle capacity limits</li>
+                <li><strong>Options to bypass the cache</strong> for any given query, with explicit distinction between cardinality requests and data retrieval requests</li> <!--The cache can be bypassed when needed, allowing users to force fresh data retrieval or cardinality estimation during query execution for experimental or debugging purposes.-->
+            </ul>
+        </section>
+
+        <section id="deployment">
+            <h2>Deployment Options</h2>
+            <p>
+                HeFQUIN can be deployed in several ways to fit different usage scenarios and infrastructure setups:
+            </p>
+            <ul>
+                <li>It can be used <strong>as a Java library</strong> to interact with the engine directly from within a Java application.</li>
+                <li>It can run <strong>as a service</strong> in a Docker container or via an existing Java servlet container.</li>
+                <li>It can be used through <strong>command-line programs</strong> that execute queries directly via the engine or indirectly via a HeFQUIN service.</li>
+            </ul>
+            <p>
+                When deployed as a service, HeFQUIN exposes an <strong>HTTP API</strong> for interacting with the engine. This API supports:
+            </p>
+            <ul>
+                <li>GET and POST requests for issuing queries</li>
+                <li>Multiple result formats, including JSON, XML, CSV, TSV, and RDF serializations</li>
+                <li>Retrieval of query processing information, including logical plans, physical plans, and execution statistics</li>
+            </ul>
+            <p>
+                The command-line programs support the same result formats and can provide the same query processing information.
+            </p>
+        </section>
+
+        <section id="internals">
+            <h2>Internals (Operators, Execution Models, and Optimization)</h2>
+            <p>
+                HeFQUIN implements a range of physical operators, including <strong>several join algorithms</strong> designed for federated query processing:
+            </p>
+            <ul>
+                <li>Hash join</li>
+                <li>Symmetric hash join (SHJ)</li>
+                <li>Request-based nested-loops join (NLJ)</li>
+                <li>Several variations of batching-based bind joins, including a FILTER-based variant, a VALUES-based variant, three UNION-based variants (including the bound join of FedX), and a version for brTPF, all implemented both using a sequential approach and a parallel approach to process the batches of input solutions</li>
+                <li>Parallel multi-source bind join</li>
+            </ul>
+            <p>
+                It also implements two execution models:
+            </p>
+            <ul>
+                <li><strong>Push-based execution</strong> with multi-threaded intra-operator parallelism (default)</li>
+                <li><strong>Pull-based execution</strong> using non-blocking iterators</li>
+            </ul>
+            <p>
+                For query optimization, HeFQUIN uses both logical and physical optimization stages to make query execution efficient.
+            </p>
+            <ul>
+                <li><strong>Heuristics-based logical optimization</strong> uses plan rewriting rules such as filter push down, distinct push down, projection push down, filter redistribution, and selective union pull up</li>
+                <li><strong>Cardinality-based logical optimization</strong> determines a join order by leveraging cardinality requests</li>
+                <li><strong>Cost-based physical optimization</strong> can be set up using one of several strategies, including a greedy approach, the dynamic programming approach, simulated annealing, and randomized iterative improvement (notice that the physical optimizer is currently being redesigned)</li>
+            </ul>
+        </section>
+
+        <section id="inspection">
+            <h2>Monitoring, Inspection, and Debugging</h2>
+            <p>
+                Several features provide visibility into the internal processes within the engine. Information that can be inspected includes:
+            </p>
+            <ul>
+                <li><strong>Logical and physical plans</strong></li>
+                <li><strong>Query execution statistics</strong>, collected at the level of individual operators and data structures</li>
+                <li><strong>Exceptions</strong> that occurred during query execution</li>
+            </ul>
+            <p>
+                All of this information can be:
+            </p>
+            <ul>
+                <li><strong>printed</strong> to separate files (or to the terminal) when using the command-line programs</li>
+                <li><strong>accessed programmatically</strong> when using HeFQUIN as a Java library</li>
+                <li><strong>requested via the HTTP API</strong> of the HeFQUIN service</li>
+            </ul>
+        </section>
+
+        <section id="extension-points">
+            <h2>Extension Points and Configurability</h2>
+            <p>
+                HeFQUIN is developed using a clear separation between the various components, which makes it possible to <strong>swap out individual components</strong> and replace them by alternative implementations. To avoid recompiling the engine for each configuration, HeFQUIN uses an RDF-based configuration file that specifies which implementation and setup to use for which component. At start-up time, the engine reads this file and initializes all the components as specified in the file. This makes it possible to document and share the specific configurations used for experiments, but also to run the engine with external implementations of particular components (as long as the classes of these implementations are in the Java classpath).
+            </p>
+        </section>
+
+        <section id="testing">
+            <h2>Testing and Reliability</h2>
+            <p>
+                HeFQUIN is backed by a large automated test suite. The project currently includes <strong>more than 1000 unit tests</strong>, which helps ensure correctness and stability across features. Additionally, we have a testing environment set up in our lab to run regression tests based on federation benchmarks (LargeRDFBench and FedShop).
+            </p>
 <!--
             Dec.16, 2025
             199 in hefquin-base
@@ -59,14 +215,13 @@
              35 in hefquin-service
             total: 1010
 -->
-        </ul>
+        </section>
 
         <section id="limitations">
             <h2>Current Limitations</h2>
             <p>
-                HeFQUIN does not yet have a source selection component. All subpatterns of the queries given to HeFQUIN need to be wrapped in SERVICE clauses. For more details, refer to the page about <a href="queries.html">queries and query features that you can use</a>.
+                HeFQUIN does not yet have a source selection component. All subpatterns of the queries given to HeFQUIN need to be wrapped in <code>SERVICE</code> clauses.
             </p>
-
         </section>
 
     </main>
