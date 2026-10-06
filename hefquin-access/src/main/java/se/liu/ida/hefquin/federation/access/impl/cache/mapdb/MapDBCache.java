@@ -134,7 +134,7 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 			evictionCandidates.forEach(this::evict);
 		}
 
-		logger.info(
+		logger.debug(
 			"MapDB-based cache created: filename={}, capacity={}, size={}",
 			filename,
 			capacity,
@@ -249,7 +249,8 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	@Override
 	public void put( final PersistentCacheKey key, final CompletableFuture<? extends DataRetrievalResponse<?>> value ) {
 		value.thenAccept( response -> {
-			super.put( key, value );
+			super.put(key, value);
+			db.commit();
 		} );
 	}
 }
