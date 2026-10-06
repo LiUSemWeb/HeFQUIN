@@ -23,6 +23,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Bug fix: several relevant Jena operators were not covered by OpUtils ([#734](https://github.com/LiUSemWeb/HeFQUIN/issues/734), [#743](https://github.com/LiUSemWeb/HeFQUIN/issues/743)).
 - Merge the various constructors of AsyncFederationAccessManagerImpl into one ([#697](https://github.com/LiUSemWeb/HeFQUIN/issues/697), [#700](https://github.com/LiUSemWeb/HeFQUIN/issues/700)).
 - Use HashSet instead of a List for the intermediate result queues between executable operators for queries with DISTINCT ([#746](https://github.com/LiUSemWeb/HeFQUIN/issues/746)).
+- Use HashSet instead of a List for data structures in the symmetric hash join and the bind join implementations for queries with DISTINCT ([#747](https://github.com/LiUSemWeb/HeFQUIN/issues/747)).
 - Switch dependency direction between hefquin-access and hefquin-pgconnector ([#702](https://github.com/LiUSemWeb/HeFQUIN/issues/702)).
 - Move LogicalPlanUtils to a different package ([#745](https://github.com/LiUSemWeb/HeFQUIN/issues/745)).
 ### Planned for Next Release
