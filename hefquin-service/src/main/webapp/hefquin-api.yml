@@ -186,7 +186,7 @@ components:
       name: X-HeFQUIN-Print-Source-Assignment
       in: header
       required: false
-      description: Use this argument to instruct the query planning component of HeFQUIN to include the initial logical plan that is the output of the source selection and query decomposition process in the response.
+      description: Use this header to instruct the query planning component of HeFQUIN to include the initial logical plan that is the output of the source selection and query decomposition process in the response. See the [HeFQUIN service documentation](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html#X-HeFQUIN-Print-Source-Assignment) for details.
       schema:
         type: string
         enum:
@@ -198,7 +198,7 @@ components:
       name: X-HeFQUIN-Print-Logical-Plan
       in: header
       required: false
-      description: Use this header to instruct the query planning component of HeFQUIN to include the logical plan that is the output of the logical query optimizer in the response.
+      description: Use this header to instruct the query planning component of HeFQUIN to include the logical plan that is the output of the logical query optimizer in the response. See the [HeFQUIN service documentation](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html#X-HeFQUIN-Print-Logical-Plan) for details.
       schema:
         type: string
         enum:
@@ -210,7 +210,7 @@ components:
       name: X-HeFQUIN-Print-Physical-Plan
       in: header
       required: false
-      description: Use this header to instruct the query planning component of HeFQUIN to include the physical plan that is the output of the physical query optimizer in the response.
+      description: Use this header to instruct the query planning component of HeFQUIN to include the physical plan that is the output of the physical query optimizer in the response. See the [HeFQUIN service documentation](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html#X-HeFQUIN-Print-Physical-Plan) for details.
       schema:
         type: string
         enum:
@@ -222,7 +222,7 @@ components:
       name: X-HeFQUIN-Print-Executable-Plan
       in: header
       required: false
-      description: Use this header to instruct the query planning component of HeFQUIN to include the executable plan produced by the query planning component in the response.
+      description: Use this header to instruct the query planning component of HeFQUIN to include the executable plan produced by the query planning component in the response. See the [HeFQUIN service documentation](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html#X-HeFQUIN-Print-Executable-Plan) for details.
       schema:
         type: string
         enum:
@@ -246,7 +246,7 @@ components:
       name: X-HeFQUIN-Ignore-Retrieval-Cache
       in: header
       required: false
-      description: Use this header to instruct the HeFQUIN engine to bypass the retrieval cache when processing the query. See the [HeFQUIN service documentation](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html) for details.
+      description: Use this header to instruct the HeFQUIN engine to bypass the retrieval cache when processing the query. See the [HeFQUIN service documentation](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html#X-HeFQUIN-Ignore-Retrieval-Cache) for details.
       schema:
         type: string
         enum:
@@ -258,7 +258,7 @@ components:
       name: X-HeFQUIN-Ignore-Cardinality-Cache
       in: header
       required: false
-      description: Use this header to instruct the HeFQUIN engine to bypass the cardinality cache when processing the query. See the [HeFQUIN service documentation](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html) for details.
+      description: Use this header to instruct the HeFQUIN engine to bypass the cardinality cache when processing the query. See the [HeFQUIN service documentation](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html#X-HeFQUIN-Ignore-Cardinality-Cache) for details.
       schema:
         type: string
         enum:
