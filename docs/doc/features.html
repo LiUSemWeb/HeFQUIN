@@ -39,10 +39,10 @@
         <section id="query-language">
             <h2>Query Language Support</h2>
             <p>
-                HeFQUIN supports all features of <strong>SPARQL 1.1</strong>, with queries that contain <code>SERVICE</code> clauses to indicate which federation member should process which subpattern. Most features of the language are supported natively by the engine, including basic graph patterns, group graph patterns, <code>UNION</code>, <code>OPTIONAL</code>, <code>MINUS</code>, <code>FILTER</code>, <code>BIND</code>, and <code>DISTINCT</code>. The remaining features, such as subqueries, grouping, and aggregation, are implemented through integration of Apache Jena's query functionality into HeFQUIN.
+                HeFQUIN supports all features of <strong>SPARQL 1.1</strong>, with queries that contain <code>SERVICE</code> clauses to indicate which federation member should process which subpattern. Most language constructs are supported natively by the engine, including basic graph patterns, group graph patterns (i.e., joins between graph patterns), <code>UNION</code>, <code>OPTIONAL</code>, <code>MINUS</code>, <code>FILTER</code>, <code>BIND</code>, and <code>DISTINCT</code>. The remaining features, such as subqueries, grouping, and aggregation, are implemented through integration of Apache Jena's query functionality into HeFQUIN.
             </p>
             <p>
-                In addition, HeFQUIN supports <strong>query constructs</strong> that are designed specifically <strong>for queries over (heterogeneous) federations</strong>, such as:
+                In addition, HeFQUIN supports specific <strong>language constructs designed for queries over (heterogeneous) federations</strong>, such as:
             </p>
             <ul>
                 <li><code>VALUES</code> clauses to specify <strong>multiple federation members for the same <code>SERVICE</code> clause</strong> in a more concise form</li>
@@ -57,7 +57,7 @@
         <section id="data-sources">
             <h2>Data Source Integration</h2>
             <p>
-                HeFQUIN is designed for querying federations of heterogeneous types of data sources, including the following types of <strong>RDF-based data sources</strong>:
+                HeFQUIN is designed to query federations of different types of data sources, including the following types of <strong>RDF-based data sources</strong>:
             </p>
             <ul>
                 <li><strong>SPARQL endpoints</strong></li>
@@ -65,7 +65,7 @@
                 <li><strong>Bindings-Restricted Triple Pattern Fragments (brTPF)</strong></li>
             </ul>
             <p>
-                For queries across RDF-based data sources that capture equivalent concepts and relationships using different vocabularies (ontologies), HeFQUIN can apply simple <strong>vocabulary mappings</strong>, which makes it possible to express such queries in terms of only one of the vocabularies.
+                If different RDF-based data sources capture equivalent concepts and relationships using different vocabularies (ontologies), HeFQUIN can apply simple <strong>vocabulary mappings</strong>, which makes it possible to express queries over the federation in terms of only one of the vocabularies.
             </p>
             <p>
                 HeFQUIN can also work with <strong>non-RDF data sources</strong> by giving them an RDF view via mappings described declaratively in RML, which is currently supported for:
@@ -103,6 +103,9 @@
             <p>
                 Credentials are supplied through environment variables, which keeps them separate from the federation description.
             </p>
+            <p>
+                For details, see the documentation of <a href="authentication.html">authentication support in HeFQUIN</a>.
+            </p>
         </section>
 
         <section id="caching">
@@ -117,6 +120,9 @@
                 <li>Configurable cache capacity (per cache level), with <strong>LRU policy</strong> to handle capacity limits</li>
                 <li><strong>Options to bypass the cache</strong> for any given query, with explicit distinction between cardinality requests and data retrieval requests</li> <!--The cache can be bypassed when needed, allowing users to force fresh data retrieval or cardinality estimation during query execution for experimental or debugging purposes.-->
             </ul>
+            <p>
+                For details, see the documentation of <a href="caching.html">caching in HeFQUIN</a>.
+            </p>
         </section>
 
         <section id="deployment">
