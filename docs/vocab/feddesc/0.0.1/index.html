@@ -404,6 +404,12 @@ ul, p {
                       <sup class="sup-op" title="OWL Object Property">op</sup>
                     </span>
                   </li>
+                  <li>
+                    <span>
+                      <a href="#parallelRequestLimit">parallel request limit</a>
+                      <sup class="sup-dp" title="OWL Datatype Property">dp</sup>
+                    </span>
+                  </li>
                 </ul>
               </td>
             </tr>
@@ -825,6 +831,33 @@ ul, p {
                     </span>
                   </li>
                 </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="Token-basedSecurityScheme">
+          <h3>Token-based Security Scheme
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#TokenBasedSecurityScheme</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>A security scheme that uses a token to authenticate requests, similar to wotsec:BearerSecurityScheme but with the option to specify the name of the scheme to be mentioned in the request header (where wotsec:BearerSecurityScheme uses the fixed string 'Bearer'). To specify the name use the wotsec;name property. Otherwise, this class can be used exactly like wotsec:BearerSecurityScheme. Especially, every instance of this class must have an fd:envarForToken property and the value of the wotsec:in property, if given, must be the string 'header'.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <a href="https://www.w3.org/2019/wot/security#SecurityScheme">wotsec:SecurityScheme</a>
               </td>
             </tr>
           </table>
@@ -1259,6 +1292,44 @@ ul, p {
             </tr>
           </table>
         </div>
+        <div class="property entity" id="parallelRequestLimit">
+          <h3>parallel request limit
+            <sup class="sup-dp" title="OWL Datatype Property">dp</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/feddesc#parallelRequestLimit</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies a limit on the number of requests that HeFQUIN sends in parallel to the federation member. If the limit is reached and further requests are to be sent, these requests are queued until the number of currently active requests drops below the limit.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#FederationMember">Federation Member</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2001/XMLSchema#integer">xsd:integer</a>
+              </td>
+            </tr>
+          </table>
+        </div>
         <div class="property entity" id="usernameenvironmentvariable">
           <h3>username environment variable
             <sup class="sup-dp" title="OWL Datatype Property">dp</sup>
@@ -1267,7 +1338,7 @@ ul, p {
             <tr>
               <th>IRI</th>
               <td>
-                <code>http://w3id.org/hefquin/feddesc#usernameEnv</code>
+                <code>http://w3id.org/hefquin/feddesc#envarForUsername</code>
               </td>
             </tr>
             <tr>
@@ -1294,7 +1365,7 @@ ul, p {
             <tr>
               <th>IRI</th>
               <td>
-                <code>http://w3id.org/hefquin/feddesc#passwordEnv</code>
+                <code>http://w3id.org/hefquin/feddesc#envarForPassword</code>
               </td>
             </tr>
             <tr>
@@ -1321,7 +1392,7 @@ ul, p {
             <tr>
               <th>IRI</th>
               <td>
-                <code>http://w3id.org/hefquin/feddesc#tokenEnv</code>
+                <code>http://w3id.org/hefquin/feddesc#envarForToken</code>
               </td>
             </tr>
             <tr>
@@ -1379,6 +1450,10 @@ ul, p {
           <dt id="rdfs">rdfs</dt>
           <dd>
             <code>http://www.w3.org/2000/01/rdf-schema#</code>
+          </dd>
+          <dt id="wotsec">wotsec</dt>
+          <dd>
+            <code>https://www.w3.org/2019/wot/security#</code>
           </dd>
           <dt id="xsd">xsd</dt>
           <dd>
@@ -1463,6 +1538,9 @@ ul, p {
             <li>
               <a href="#DataRetrievalProtocol">Data Retrieval Protocol</a>
             </li>
+            <li>
+              <a href="#Token-basedSecurityScheme">Token-based Security Scheme</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -1511,6 +1589,9 @@ ul, p {
               <a href="#vocabularyMappingsFile">vocabulary mappings file</a>
             </li>
             <li>
+              <a href="#parallelRequestLimit">parallel request limit</a>
+            </li>
+            <li>
               <a href="#usernameenvironmentvariable">username environment variable</a>
             </li>
             <li>
@@ -1552,6 +1633,9 @@ ul, p {
             </li>
             <li>
               <a href="#rdfs">rdfs</a>
+            </li>
+            <li>
+              <a href="#wotsec">wotsec</a>
             </li>
             <li>
               <a href="#xsd">xsd</a>
