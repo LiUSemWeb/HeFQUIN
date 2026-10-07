@@ -70,6 +70,7 @@
 
             <li><code>fd:exampleFragmentAddress</code> - An <code>xsd:anyURI</code> literal with an example URL of an <code>fd:FragmentInterface</code>.</li>
             <li><code>fd:vocabularyMappingsFile</code> - Link to an RDF file aligning different vocabularies</li>
+            <li><code>fd:parallelRequestLimit</code> -   An <code>xsd:integer</code> literal that specifies a limit on the number of requests sent in parallel to the corresponding federation member.</li>
         </ul>
 
         <h2>4. Example Descriptions</h2>
@@ -84,8 +85,8 @@ ex:dbpediaSPARQL a fd:RDFBasedFederationMember ;
     fd:interface [
         a fd:FixedEndpointInterface ;
         fd:supportedProtocol fd:SPARQLProtocol ;
-        fd:endpointAddress "http://dbpedia.org/sparql"^^xsd:anyURI
-    ] .
+        fd:endpointAddress "http://dbpedia.org/sparql"^^xsd:anyURI  ] ;
+    fd:parallelRequestLimit 5 .
 </code></pre>
 
         <h3 id="TPF-server-example">TPF Server</h3>
