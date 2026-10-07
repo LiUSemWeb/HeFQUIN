@@ -7,6 +7,16 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
+- nothing yet
+### Changed
+- nothing yet
+### Planned for Next Release
+- SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
+
+
+## [0.0.13] - 2026-10-07
+
+### Added
 - Support for authentication ([#664](https://github.com/LiUSemWeb/HeFQUIN/issues/664), [#676](https://github.com/LiUSemWeb/HeFQUIN/issues/676), [#680](https://github.com/LiUSemWeb/HeFQUIN/issues/680), [#701](https://github.com/LiUSemWeb/HeFQUIN/issues/701), [#704](https://github.com/LiUSemWeb/HeFQUIN/issues/704), [#705](https://github.com/LiUSemWeb/HeFQUIN/issues/705), [#723](https://github.com/LiUSemWeb/HeFQUIN/issues/723), [#735](https://github.com/LiUSemWeb/HeFQUIN/issues/735)).
 - New query plan operator that covers multiple requests with the same pattern to different federation members ([#677](https://github.com/LiUSemWeb/HeFQUIN/issues/677), [#690](https://github.com/LiUSemWeb/HeFQUIN/issues/690)).
 - Extend support for caching to all types of federation members, including REST, GraphQL, and Neo4j ([#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590)).
@@ -27,8 +37,6 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Use HashSet instead of a List for data structures in the symmetric hash join and the bind join implementations for queries with DISTINCT ([#747](https://github.com/LiUSemWeb/HeFQUIN/issues/747)).
 - Switch dependency direction between hefquin-access and hefquin-pgconnector ([#702](https://github.com/LiUSemWeb/HeFQUIN/issues/702)).
 - Move LogicalPlanUtils to a different package ([#745](https://github.com/LiUSemWeb/HeFQUIN/issues/745)).
-### Planned for Next Release
-- SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
 
 
 ## [0.0.12] - 2026-08-17

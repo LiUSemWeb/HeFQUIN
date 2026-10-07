@@ -5,7 +5,7 @@
   <parent>
     <groupId>se.liu.research.hefquin</groupId>
     <artifactId>hefquin</artifactId>
-    <version>0.0.13-SNAPSHOT</version>
+    <version>0.0.13</version>
   </parent>
 
   <artifactId>hefquin-access</artifactId>
@@ -45,25 +45,25 @@
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-base</artifactId>
-      <version>0.0.13-SNAPSHOT</version>
+      <version>0.0.13</version>
     </dependency>
     <!-- hefquin-vocabs -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-vocabs</artifactId>
-      <version>0.0.13-SNAPSHOT</version>
+      <version>0.0.13</version>
     </dependency>
     <!-- hefquin-rml-->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-rml</artifactId>
-      <version>0.0.13-SNAPSHOT</version>
+      <version>0.0.13</version>
     </dependency>
     <!-- hefquin-graphqlconnector -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-graphqlconnector</artifactId>
-      <version>0.0.13-SNAPSHOT</version>
+      <version>0.0.13</version>
     </dependency>
     <!-- Chronicle Map -->
     <dependency>
