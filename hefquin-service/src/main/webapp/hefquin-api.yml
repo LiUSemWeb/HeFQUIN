@@ -246,7 +246,7 @@ components:
       name: X-HeFQUIN-Ignore-Retrieval-Cache
       in: header
       required: false
-      description: Use this header to instruct the HeFQUIN engine to bypass the retrieval cache when processing the query, which means that every data retrieval request during every execution is indeed executed instead of being served from the cache. The responses received for these requests are still used to update the cache.
+      description: Use this header to instruct the HeFQUIN engine to bypass the retrieval cache when processing the query. See the [HeFQUIN service documentation](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html) for details.
       schema:
         type: string
         enum:
@@ -258,7 +258,7 @@ components:
       name: X-HeFQUIN-Ignore-Cardinality-Cache
       in: header
       required: false
-      description: Use this header to instruct the HeFQUIN engine to bypass the cardinality cache when processing the query, which means that cardinality requests are indeed issued instead of being served from the cache. The responses obtained via such requests are still used to update the cache.
+      description: Use this header to instruct the HeFQUIN engine to bypass the cardinality cache when processing the query. See the [HeFQUIN service documentation](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html) for details.
       schema:
         type: string
         enum:
