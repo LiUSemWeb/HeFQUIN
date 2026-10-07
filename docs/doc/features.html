@@ -146,6 +146,9 @@
             <p>
                 The command-line programs support the same result formats and can provide the same query processing information.
             </p>
+            <p>
+                For details, see the documentation of <a href="hefquin_service.html">using HeFQUIN as a service</a>, of the <a href="cli.html">command-line program for querying</a>, and of <a href="integrate_hefquin_code.html">using HeFQUIN as a Java library</a>.
+            </p>
         </section>
 
         <section id="internals">
@@ -195,31 +198,40 @@
                 <li><strong>accessed programmatically</strong> when using HeFQUIN as a Java library</li>
                 <li><strong>requested via the HTTP API</strong> of the HeFQUIN service</li>
             </ul>
+            <p>
+                For details, see the documentation of <a href="cli.html">command-line program for querying</a> and of <a href="hefquin_service.html">using HeFQUIN as a service</a>.
+            </p>
         </section>
 
         <section id="extension-points">
             <h2>Extension Points and Configurability</h2>
             <p>
-                HeFQUIN is developed using a clear separation between the various components, which makes it possible to <strong>swap out individual components</strong> and replace them by alternative implementations. To avoid recompiling the engine for each configuration, HeFQUIN uses an RDF-based configuration file that specifies which implementation and setup to use for which component. At start-up time, the engine reads this file and initializes all the components as specified in the file. This makes it possible to document and share the specific configurations used for experiments, but also to run the engine with external implementations of particular components (as long as the classes of these implementations are in the Java classpath).
+                HeFQUIN is developed using a clear separation between the various components, which makes it possible to <strong>swap out individual components</strong> and replace them by alternative implementations.
+            </p>
+            <p>
+                To avoid recompiling the engine for each configuration, HeFQUIN uses an <strong>RDF-based configuration file</strong> that specifies which implementation and setup to use for which component. At start-up time, the engine reads this file and initializes all the components as specified in the file. This makes it possible to document and share the specific configurations used for experiments, but also to run the engine with external implementations of particular components (as long as the classes of these implementations are in the Java classpath).
+            </p>
+            <p>
+                For details, see the documentation of <a href="engine_configuration.html">how to configure the HeFQUIN engine</a>.
             </p>
         </section>
 
         <section id="testing">
             <h2>Testing and Reliability</h2>
             <p>
-                HeFQUIN is backed by a large automated test suite. The project currently includes <strong>more than 1000 unit tests</strong>, which helps ensure correctness and stability across features. Additionally, we have a testing environment set up in our lab to run regression tests based on federation benchmarks (LargeRDFBench and FedShop).
+                HeFQUIN is backed by a large automated test suite of <strong>more than 1200 unit tests</strong>, which helps ensure correctness of the different components. Additionally, we have a testing environment set up in our lab to run regression tests based on federation benchmarks (LargeRDFBench and FedShop).
             </p>
 <!--
             Dec.16, 2025
-            199 in hefquin-base
              94 in hefquin-access
-            411 in hefquin-engine
-             73 in hefquin-rml
+            216 in hefquin-base
+             17 in hefquin-cli
+            631 in hefquin-engine
              10 in hefquin-graphqlconnector
-            175 in hefquin-pgconnector
-             13 in hefquin-cli
+            176 in hefquin-pgconnector
+             93 in hefquin-rml
              35 in hefquin-service
-            total: 1010
+            total: 1272
 -->
         </section>
 
