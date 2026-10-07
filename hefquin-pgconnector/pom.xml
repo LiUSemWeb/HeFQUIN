@@ -5,7 +5,7 @@
   <parent>
     <groupId>se.liu.research.hefquin</groupId>
     <artifactId>hefquin</artifactId>
-    <version>0.0.13</version>
+    <version>0.0.14-SNAPSHOT</version>
   </parent>
 
   <artifactId>hefquin-pgconnector</artifactId>
@@ -45,19 +45,19 @@
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-base</artifactId>
-      <version>0.0.13</version>
+      <version>0.0.14-SNAPSHOT</version>
     </dependency>
     <!-- hefquin-access -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-access</artifactId>
-      <version>0.0.13</version>
+      <version>0.0.14-SNAPSHOT</version>
     </dependency>
     <!-- hefquin-access (test-jar) -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-access</artifactId>
-      <version>0.0.13</version>
+      <version>0.0.14-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
