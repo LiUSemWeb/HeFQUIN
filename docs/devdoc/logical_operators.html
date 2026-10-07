@@ -19,23 +19,24 @@
         <section class="section">
             <h1>Logical Operators</h1>
         
-            <p>Logical plans of HeFQUIN are FedQPL expressions<sup><a href="#1">[1]</a></sup>. Hence, the logical operators that HeFQUIN uses are the FedQPL operators. The main interface for these operators is called <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator">LogicalOperator</a>. Their implementations can be found in the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.package-summary">se.liu.ida.hefquin.engine.queryplan.logical.impl</a> package and include:</p>
+            <p>Logical plans of HeFQUIN are FedQPL expressions<sup><a href="#1">[1]</a></sup>. Hence, the logical operators that HeFQUIN uses are the FedQPL operators, including operators that the original FedQPL paper<sup><a href="#1">[1]</a></sup> did not cover. The main interface for these operators is called <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator">LogicalOperator</a>. Their implementations can be found in the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.package-summary">se.liu.ida.hefquin.engine.queryplan.logical.impl</a> package and include:</p>
         
             <h2><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp">Nullary Operators</a></h2>
             <ul>
                 <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest">LogicalOpRequest (req)</a></li>
+                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest">LogicalOpMultiRequest (mreq)</a></li>
+                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap">LogicalOpFixedSolMap (sm)</a></li>
             </ul>
         
             <h2><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp">Unary Operators</a></h2>
             <ul>
-                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd">LogicalOpTPAdd (tpAdd)</a></li>
-                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd">LogicalOpTPOptAdd (tpOptAdd)</a></li>
-                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd">LogicalOpBGPAdd (bgpAdd)</a></li>
-
-                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd">LogicalOpBGPOptAdd (bgpOptAdd)</a></li>
                 <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd">LogicalOpGPAdd (gpAdd)</a></li>
                 <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd">LogicalOpGPOptAdd (gpOptAdd)</a></li>
                 <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter">LogicalOpFilter (filter)</a></li>
+                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind">LogicalOpBind (bind)</a></li>
+                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold">LogicalOpUnfold (unfold)</a></li>
+                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpDedup">LogicalOpDedup (dedup)</a></li>
+                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject">LogicalOpProject (project)</a></li>
                 <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal">LogicalOpGlobalToLocal (g2l)</a></li>
                 <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal">LogicalOpLocalToGlobal (l2g)</a></li>
             </ul>
@@ -43,7 +44,8 @@
             <h2><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp">Binary Operators</a></h2>
             <ul>
                 <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin">LogicalOpJoin (join)</a></li>
-                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin">LogicalOpRightJoin (rightjoin)</a></li>
+                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin">LogicalOpLeftJoin (leftjoin)</a></li>
+                <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus">LogicalOpMinus (minus)</a></li>
                 <li><a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion">LogicalOpUnion (union)</a></li>
             </ul>
         
