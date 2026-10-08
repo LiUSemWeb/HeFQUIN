@@ -418,7 +418,7 @@ public class SparqlServletTest {
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final String responseContent = EntityUtils.toString( response.getEntity() );
-			assertTrue( responseContent.contains("Executing a SELECT query using the Jena machinery failed with an exception") );
+			assertTrue( responseContent.contains("no federation member with URI <http://invalid/federation/member>") );
 		}
 	}
 
@@ -431,7 +431,7 @@ public class SparqlServletTest {
 			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final String responseContent = EntityUtils.toString( response.getEntity() );
 			assertFalse( responseContent.contains("PARAMS") );
-			assertTrue( responseContent.contains("Executing a SELECT query using the Jena machinery failed with an exception") );
+			assertTrue( responseContent.contains("no federation member with URI <http://example.org/>") );
 		}
 
 		final String invalidQueryStr = "SELECT * WHERE { SERVICE <http://example.org/> WRONG_KEYWORD(?v) { ?s ?p ?o } }";

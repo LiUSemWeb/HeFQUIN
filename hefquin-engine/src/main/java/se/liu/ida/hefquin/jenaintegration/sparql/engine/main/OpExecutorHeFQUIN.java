@@ -4,10 +4,8 @@ import java.util.Iterator;
 
 import org.apache.jena.query.QueryExecException;
 import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.OpVisitorBase;
 import org.apache.jena.sparql.algebra.op.*;
 import org.apache.jena.sparql.algebra.table.Table1;
-import org.apache.jena.sparql.algebra.walker.WalkerVisitorSkipService;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -44,7 +42,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpBGP opBGP, final QueryIterator input ) {
-		if ( isSupportedOp(opBGP) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opBGP) ) {
 			return executeSupportedOp( opBGP, input );
 		}
 		else {
@@ -54,7 +52,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpSequence opSequence, final QueryIterator input ) {
-		if ( isSupportedOp(opSequence) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opSequence) ) {
 			return executeSupportedOp( opSequence, input );
 		}
 		else {
@@ -64,7 +62,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpJoin opJoin, final QueryIterator input ) {
-		if ( isSupportedOp(opJoin) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opJoin) ) {
 			return executeSupportedOp( opJoin, input );
 		}
 		else {
@@ -74,7 +72,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpLeftJoin opLeftJoin, final QueryIterator input ) {
-		if ( isSupportedOp(opLeftJoin) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opLeftJoin) ) {
 			return executeSupportedOp( opLeftJoin, input );
 		}
 		else {
@@ -84,7 +82,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpUnion opUnion, final QueryIterator input ) {
-		if ( isSupportedOp(opUnion) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opUnion) ) {
 			return executeSupportedOp( opUnion, input );
 		}
 		else {
@@ -94,7 +92,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpConditional opConditional, final QueryIterator input ) {
-		if ( isSupportedOp(opConditional) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opConditional) ) {
 			return executeSupportedOp( opConditional, input );
 		}
 		else {
@@ -104,7 +102,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpExtend opExtend, final QueryIterator input ) {
-		if ( isSupportedOp(opExtend) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opExtend) ) {
 			return executeSupportedOp( opExtend, input );
 		}
 		else {
@@ -114,7 +112,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpUnfold opUnfold, final QueryIterator input ) {
-		if ( isSupportedOp(opUnfold) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opUnfold) ) {
 			return executeSupportedOp( opUnfold, input );
 		}
 		else {
@@ -124,7 +122,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpFilter opFilter, final QueryIterator input ) {
-		if ( isSupportedOp(opFilter) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opFilter) ) {
 			return executeSupportedOp( opFilter, input );
 		}
 		else {
@@ -134,7 +132,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpService opService, final QueryIterator input ) {
-		if ( isSupportedOp(opService) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opService) ) {
 			return executeSupportedOp( opService, input );
 		}
 		else {
@@ -144,7 +142,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpDistinct opDistinct, final QueryIterator input ) {
-		if ( isSupportedOp(opDistinct) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opDistinct) ) {
 			return executeSupportedOp( opDistinct, input );
 		}
 		else {
@@ -154,19 +152,12 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpProject opProject, final QueryIterator input ) {
-		if ( isSupportedOp(opProject) ) {
+		if ( HeFQUINQuerySupportChecker.isSupported(opProject) ) {
 			return executeSupportedOp( opProject, input );
 		}
 		else {
 			return super.execute(opProject, input);
 		}
-	}
-
-	protected boolean isSupportedOp( final Op op ) {
-		final UnsupportedOpFinder f = new UnsupportedOpFinder();
-		new WalkerVisitorSkipService(f, null, null, null).walk(op);
-		final boolean unsupportedOpFound = f.unsupportedOpFound();
-		return ! unsupportedOpFound;
 	}
 
 	protected QueryIterator executeSupportedOp( final Op op, final QueryIterator input ) {
@@ -239,84 +230,6 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		@Override
 		protected void requestCancel() {} // nothing to do here
-	}
-
-
-	protected static class UnsupportedOpFinder extends OpVisitorBase
-	{
-		protected Op unsupportedOp = null;
-
-		public boolean unsupportedOpFound() { return unsupportedOp != null; }
-
-		public Op getUnsupportedOp() { return unsupportedOp; }
-
-		@Override public void visit(OpBGP op)          {}
-
-		@Override public void visit(OpQuadPattern op)  { unsupportedOp = op; }
-
-		@Override public void visit(OpQuadBlock op)    { unsupportedOp = op; }
-
-		@Override public void visit(OpTriple op)       { unsupportedOp = op; }
-
-		@Override public void visit(OpQuad op)         { unsupportedOp = op; }
-
-		@Override public void visit(OpPath op)         { unsupportedOp = op; }
-
-		@Override public void visit(OpProcedure op)    { unsupportedOp = op; }
-
-		@Override public void visit(OpPropFunc op)     { unsupportedOp = op; }
-
-		@Override public void visit(OpJoin op)         {} // supported
-
-		@Override public void visit(OpSequence op)     {} // supported
-
-		@Override public void visit(OpDisjunction op)  { unsupportedOp = op; }
-
-		@Override public void visit(OpLeftJoin op)     {} // supported
-
-		@Override public void visit(OpConditional op)  {} // supported
-
-		@Override public void visit(OpMinus op)        {} // supported
-
-		@Override public void visit(OpUnion op)        {} // supported
-
-		@Override public void visit(OpFilter op)       {} // supported
-
-		@Override public void visit(OpGraph op)        { unsupportedOp = op; }
-
-		@Override public void visit(OpService op)      {} // supported
-
-		@Override public void visit(OpDatasetNames op) { unsupportedOp = op; }
-
-		@Override public void visit(OpTable op)        {} // supported
-
-		@Override public void visit(OpExt op)          { unsupportedOp = op; }
-
-		@Override public void visit(OpNull op)         { unsupportedOp = op; }
-
-		@Override public void visit(OpLabel op)        { unsupportedOp = op; }
-
-		@Override public void visit(OpAssign op)       { unsupportedOp = op; }
-
-		@Override public void visit(OpExtend op)       {} // supported
-
-		@Override public void visit(OpUnfold op)       {} // supported
-
-		@Override public void visit(OpList op)         { unsupportedOp = op; }
-
-		@Override public void visit(OpOrder op)        { unsupportedOp = op; }
-
-		@Override public void visit(OpProject op)      {} // supported
-
-		@Override public void visit(OpDistinct op)     {} // supported
-
-		@Override public void visit(OpReduced op)      { unsupportedOp = op; }
-
-		@Override public void visit(OpSlice op)        { unsupportedOp = op; }
-
-		@Override public void visit(OpGroup op)        { unsupportedOp = op; }
-
-		@Override public void visit(OpTopN op)         { unsupportedOp = op; }
 	}
 
 }
