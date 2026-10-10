@@ -44,7 +44,7 @@ public class HeFQUINEngineBuilder
 	private ExecutorService execFed = null;
 	private ExecutorService execPlan = null;
 
-	private final int DEFAULT_THREAD_POOL_SIZE = 10;
+	private final int DEFAULT_THREAD_POOL_SIZE = 1000;
 	private final String DEFAULT_CONF_DESCR_FILE = "config/DefaultConfDescr.ttl";
 
 	/**
