@@ -9,7 +9,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - nothing yet
 ### Changed
-- nothing yet
+- Increase the size of the thread pools from 10 to 1000 ([#758](https://github.com/LiUSemWeb/HeFQUIN/issues/758)).
 ### Planned for Next Release
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
 
