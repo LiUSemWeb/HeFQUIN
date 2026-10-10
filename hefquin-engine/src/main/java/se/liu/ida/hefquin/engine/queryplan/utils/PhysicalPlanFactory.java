@@ -540,8 +540,23 @@ public class PhysicalPlanFactory
 		// operator, identify the extracted requests for which turning them
 		// into gpAdd operators does not seem to be a good idea and put them
 		// back into an mreq operator again. 
-		if ( rootOp instanceof PhysicalOpMultiRequest ) {
-			return createPlanWithJoin(inputPlan, nextPlan, qpInfo, lop2pop);
+//		if ( rootOp instanceof PhysicalOpMultiRequest ) {
+//			return createPlanWithJoin(inputPlan, nextPlan, qpInfo, lop2pop);
+//		}
+		if ( rootOp instanceof PhysicalOpMultiRequest mreq ) {
+			final LogicalOpMultiRequest lop = mreq.getLogicalOperator();
+			final SPARQLGraphPattern pattern = lop.getRequest().getQueryPattern();
+			final Set<FederationMember> fms = lop.getFederationMembers() ;
+
+			final List<PhysicalPlan> subPlans = new ArrayList<>( fms.size() );
+
+			for ( final FederationMember fm : fms ) {
+				final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd( fm, pattern, null, lop.mayReduce() );
+				final PhysicalPlan gpAddPlan = PhysicalPlanFactory.createPlan(gpAdd, null, lop2pop, inputPlan);
+				subPlans.add(gpAddPlan);
+			}
+
+			return createPlan( LogicalOpMultiwayUnion.getInstance(), qpInfo, lop2pop, subPlans );
 		}
 
 		// Now we come to the actual functionality, where we consider all
