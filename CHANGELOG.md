@@ -10,6 +10,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - nothing yet
 ### Changed
 - Increase the size of the thread pools from 10 to 1000 ([#758](https://github.com/LiUSemWeb/HeFQUIN/issues/758)).
+- Use a union of bind joins as physical plan for a join with an multi-request operator ([#759](https://github.com/LiUSemWeb/HeFQUIN/issues/759)).
 ### Planned for Next Release
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
 
