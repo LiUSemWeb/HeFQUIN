@@ -25,4 +25,18 @@ public interface ExpectedVariables
 	 * every such solution mapping.
 	 */
 	Set<Var> getPossibleVariables();
+
+	/**
+	 * Returns {@code true} if the given variable is one of certain
+	 * variables or one of the possible variables.
+	 *
+	 * @param v - the variable for which we want to check
+	 * @return {@code true} if {@code v} is in the set returned by
+	 *         {@link #getCertainVariables()} or in the set returned
+	 *         by {@link #getPossibleVariables()}
+	 */
+	default boolean contains( final Var v ) {
+		return    getCertainVariables().contains(v)
+		       || getPossibleVariables().contains(v);
+	}
 }
