@@ -5,6 +5,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.NodeValue;
+
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -546,14 +554,76 @@ public class PhysicalPlanFactory
 		if ( rootOp instanceof PhysicalOpMultiRequest mreq ) {
 			final LogicalOpMultiRequest lop = mreq.getLogicalOperator();
 			final SPARQLGraphPattern pattern = lop.getRequest().getQueryPattern();
-			final Set<FederationMember> fms = lop.getFederationMembers() ;
+			final Set<FederationMember> fms = lop.getFederationMembers();
 
+			// Given that the mreq operator also adds bindings for its
+			// service variable, and that this variable may already be
+			// bound within the request pattern, it may be necessary to
+			// add a filter condition that ensures the compatibility of
+			// these bindings. Let's check whether it is needed:
+			final Var serviceVar = lop.getServiceVariable();
+			final boolean filterNeeded = pattern.getExpectedVariables().contains(serviceVar);
+
+			// Now we iterate over the federation members of the mreq
+			// operator and create a separate subplan for each of them
+			// (which, after the iteration, will be combined under a
+			// union operator).
 			final List<PhysicalPlan> subPlans = new ArrayList<>( fms.size() );
-
 			for ( final FederationMember fm : fms ) {
-				final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd( fm, pattern, null, lop.mayReduce() );
-				final PhysicalPlan gpAddPlan = PhysicalPlanFactory.createPlan(gpAdd, null, lop2pop, inputPlan);
-				subPlans.add(gpAddPlan);
+				final Node serviceURI = NodeFactory.createURI( fm.getServiceURI() );
+				final NodeValue serviceURIAsValue = NodeValue.makeNode(serviceURI);
+
+				final PhysicalPlan gpAddPlan;
+				if ( filterNeeded ) {
+					final Expr expr = new E_Equals( new ExprVar(serviceVar),
+					                                serviceURIAsValue );
+
+					// Check whether the federation member can handle the
+					// pattern with the filter included.
+					final SPARQLGraphPattern patternWithFilter = pattern.mergeWith(expr);
+					if ( fm.isSupportedPattern(patternWithFilter) ) {
+						final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(
+								fm,
+								patternWithFilter,
+								null,
+								lop.mayReduce() );
+						gpAddPlan = createPlan(gpAdd, null, lop2pop, inputPlan);
+					}
+					else {
+						// If the federation member cannot handle the pattern
+						// with the filter, then we need to create the gpAdd
+						// operator for the federation member without the
+						// filter and ...
+						final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(
+								fm,
+								pattern, // without the filter!
+								null,
+								lop.mayReduce() );
+
+						// ... add the filter as a separate operator on top.
+						gpAddPlan = createPlan(
+								new LogicalOpFilter( expr, lop.mayReduce() ),
+								null,
+								lop2pop,
+								createPlan(gpAdd, null, lop2pop, inputPlan) );
+					}
+				}
+				else {
+					final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd( fm,
+					                                                 pattern,
+					                                                 null,
+					                                                 lop.mayReduce() );
+					gpAddPlan = createPlan(gpAdd, null, lop2pop, inputPlan);
+				}
+
+				// To complete the subplan for the current federation member
+				// we still need to add a bind operator that binds the service
+				// variable to the service URI of the federation member.
+				final LogicalOpBind bindOp = new LogicalOpBind( serviceVar,
+				                                                serviceURIAsValue,
+				                                                lop.mayReduce() );
+				final PhysicalPlan subplan = createPlan(bindOp, null, lop2pop, gpAddPlan);
+				subPlans.add(subplan);
 			}
 
 			return createPlan( LogicalOpMultiwayUnion.getInstance(), qpInfo, lop2pop, subPlans );
