@@ -24,6 +24,10 @@ public class LogicalOpBind extends BaseForLogicalOps implements UnaryLogicalOp
 		this.bindExpressions = bindExpressions;
 	}
 
+	public LogicalOpBind( final Var var, final Expr expr, final boolean mayReduce ) {
+		this( new VarExprList(var, expr), mayReduce );
+	}
+
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 1;
