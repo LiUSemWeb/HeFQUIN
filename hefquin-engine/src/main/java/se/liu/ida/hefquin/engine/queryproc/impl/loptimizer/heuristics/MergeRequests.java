@@ -246,6 +246,34 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		}
 
 		@Override
+		public void visit( final LogicalOpMinus op ) {
+			final LogicalOperator childOp1 = rewrittenSubPlans.get(0).getRootOperator();
+			final LogicalOperator childOp2 = rewrittenSubPlans.get(1).getRootOperator();
+			if (   childOp1 instanceof LogicalOpRequest reqOp1
+				&& childOp2 instanceof LogicalOpRequest reqOp2
+				&& reqOp1.getRequest() instanceof SPARQLRequest req1
+				&& reqOp2.getRequest() instanceof SPARQLRequest req2
+				&& reqOp1.getFederationMember().equals(reqOp2.getFederationMember()) )
+			{
+				final SPARQLGraphPattern pattern1 = req1.getQueryPattern();
+				final SPARQLGraphPattern pattern2 = req2.getQueryPattern();
+
+				// Only merge if the patterns share variables. Without shared variables,
+				// MINUS has no filtering effect, so merging the requests is unnecessary.
+				if ( ! containsJoinVariable( pattern1, pattern2 ) )
+					return;
+
+				// the LHS is the non-optional part
+				final SPARQLGraphPattern merged = mergePatternWithMinusPatterns(pattern1, pattern2);
+
+				final FederationMember fm = reqOp1.getFederationMember();
+				if ( fm.isSupportedPattern(merged) ) {
+					returnPlan = createPlanWithSingleRequestOp(merged, mayReduce, fm);
+				}
+			}
+		}
+
+		@Override
 		public void visit( final LogicalOpUnion op ) {
 			final LogicalOperator childOp1 = rewrittenSubPlans.get(0).getRootOperator();
 			final LogicalOperator childOp2 = rewrittenSubPlans.get(1).getRootOperator();
@@ -451,30 +479,25 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		}
 
 		@Override
-		public void visit( final LogicalOpMinus op ) {
-			final LogicalOperator childOp1 = rewrittenSubPlans.get(0).getRootOperator();
-			final LogicalOperator childOp2 = rewrittenSubPlans.get(1).getRootOperator();
-			if (   childOp1 instanceof LogicalOpRequest reqOp1
-				&& childOp2 instanceof LogicalOpRequest reqOp2
-				&& reqOp1.getRequest() instanceof SPARQLRequest req1
-				&& reqOp2.getRequest() instanceof SPARQLRequest req2
-				&& reqOp1.getFederationMember().equals(reqOp2.getFederationMember()) )
+		public void visit( final LogicalOpSlice op ) {
+			// OFFSET & LIMIT can be merged into a request operator if that
+			// request is for a SPARQL endpoint.
+			final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
+			if (    childOp instanceof LogicalOpRequest reqOp
+					&& reqOp.getFederationMember() instanceof SPARQLEndpoint
+					&& reqOp.getRequest() instanceof SPARQLRequest req )
 			{
-				final SPARQLGraphPattern pattern1 = req1.getQueryPattern();
-				final SPARQLGraphPattern pattern2 = req2.getQueryPattern();
+				final boolean mayReduce = reqOp.mayReduce() && op.mayReduce();
 
-				// Only merge if the patterns share variables. Without shared variables,
-				// MINUS has no filtering effect, so merging the requests is unnecessary.
-				if ( ! containsJoinVariable( pattern1, pattern2 ) )
-					return;
+				final SPARQLRequest newReq = new SPARQLRequestImpl(
+						req.getQueryPattern(),
+						req.getProjectionVars(),
+						req.getDistinctRequired() || mayReduce,
+						op.getOffset(),
+						op.getLimit() );
 
-				// the LHS is the non-optional part
-				final SPARQLGraphPattern merged = mergePatternWithMinusPatterns(pattern1, pattern2);
-
-				final FederationMember fm = reqOp1.getFederationMember();
-				if ( fm.isSupportedPattern(merged) ) {
-					returnPlan = createPlanWithSingleRequestOp(merged, mayReduce, fm);
-				}
+				final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( reqOp.getFederationMember(), mayReduce, newReq );
+				returnPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 			}
 		}
 

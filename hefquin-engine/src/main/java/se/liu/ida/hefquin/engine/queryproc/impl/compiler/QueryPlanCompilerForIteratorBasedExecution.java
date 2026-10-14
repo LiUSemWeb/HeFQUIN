@@ -12,8 +12,10 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultEleme
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterWithNullaryExecOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterWithUnaryExecOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterator;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.SlicingResultElementIterator;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSlice;
 import se.liu.ida.hefquin.engine.queryproc.QueryCompilationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
@@ -28,7 +30,23 @@ public class QueryPlanCompilerForIteratorBasedExecution implements QueryPlanComp
 			throws QueryCompilationException
 	{
 		log.debug("Compiling physical plan using iterator-based execution model.");
-		final ResultElementIterator it = _compile(qep, ctx);
+
+		final ResultElementIterator it;
+
+		if ( qep.getRootOperator() instanceof PhysicalOpSlice slice ) {
+			// If we have a slice operator (i.e., OFFSET & LIMIT) at
+			// the top of the given plan, we capture this operator by
+			// a special iterator.
+			final PhysicalPlan subplan = qep.getSubPlan(0);
+			it = new SlicingResultElementIterator(
+					_compile(subplan, ctx),
+					slice.getLogicalOperator().getOffset(),
+					slice.getLogicalOperator().getLimit() );
+		}
+		else {
+			it = _compile(qep, ctx);
+		}
+
 		return new IteratorBasedExecutablePlanImpl(it);
 	}
 

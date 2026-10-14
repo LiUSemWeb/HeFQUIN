@@ -223,6 +223,11 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		}
 
 		@Override
+		public void visit( final LogicalOpMinus op ) {
+			props.add( "may reduce duplicates: " + op.mayReduce() );
+		}
+
+		@Override
 		public void visit( final LogicalOpUnion op ) {
 			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
@@ -317,8 +322,16 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		}
 
 		@Override
-		public void visit( final LogicalOpMinus op ) {
-			props.add( "may reduce duplicates: " + op.mayReduce() );
+		public void visit( final LogicalOpSlice op ) {
+			if ( op.getOffset() == 0 )
+				props.add( "offset: none" );
+			else
+				props.add( "offset: " + op.getOffset() );
+
+			if ( op.getLimit() < 0 )
+				props.add( "limit: none" );
+			else
+				props.add( "limit: " + op.getLimit() );
 		}
 
 		protected void record( final FederationMember fm ) {

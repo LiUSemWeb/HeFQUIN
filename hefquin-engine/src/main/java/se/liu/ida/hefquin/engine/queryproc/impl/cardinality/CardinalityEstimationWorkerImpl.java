@@ -209,6 +209,50 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 	}
 
 	@Override
+	public void visit( final LogicalOpMinus op ) {
+		final int crdValue;
+		final Quality crdQuality;
+
+		final QueryPlan lhs = currentSubPlan.getSubPlan(0);
+		final QueryPlan rhs = currentSubPlan.getSubPlan(1);
+
+		final QueryPlanningInfo qpInfoSubPlan1 = lhs.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan2 = rhs.getQueryPlanningInfo();
+
+		final QueryPlanProperty lhsCrd = qpInfoSubPlan1.getProperty(CARDINALITY);
+		final QueryPlanProperty lhsMaxCrd = qpInfoSubPlan1.getProperty(MAX_CARDINALITY);
+
+		if ( checkAndSetIfGuaranteedEmpty(currentSubPlan.getQueryPlanningInfo(), lhsCrd) )
+			// If the first input plan is guaranteed to produce an empty result,
+			// then the result of the MINUS operator is guaranteed to be empty as well.
+			return;
+
+		// If the second input plan is guaranteed to produce an empty result,
+		// then the result of the MINUS operator is guaranteed to be the same as the first input plan.
+		final QueryPlanProperty rhsCrd = qpInfoSubPlan2.getProperty(CARDINALITY);
+		if ( rhsCrd.getValue() == 0 && rhsCrd.getQuality() == Quality.ACCURATE ) {
+			crdValue = lhsCrd.getValue();
+			crdQuality = lhsCrd.getQuality();
+		}
+		else {
+			// Else, estimate the cardinality of the MINUS result by subtracting the estimated cardinality
+			// of the second input plan from the estimated cardinality of the first input plan.
+			// This is a very crude estimate that is likely to be a significant underestimation in many cases,
+			// but it is not clear how to do better without considering the actual query patterns and data statistics.
+			crdValue = Math.max(lhsCrd.getValue() - rhsCrd.getValue(), 0);
+			crdQuality = QueryPlanProperty.getReducedQuality( lhsCrd.getQuality() );
+		}
+
+		final int maxValue = lhsMaxCrd.getValue();
+		final Quality maxQuality = lhsMaxCrd.getQuality();
+
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
+		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
+		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+	}
+
+	@Override
 	public void visit( final LogicalOpMultiwayLeftJoin op ) {
 		// Use the cardinality estimate from the first subplan
 		// Use the min-cardinality from the first subplan
@@ -580,53 +624,73 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 			return;
 		}
 
-		qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+		qpInfo.addProperty( crdSubPlan );
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
 		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
 	}
 
 	@Override
-	public void visit( final LogicalOpMinus op ) {
-		final int crdValue;
-		final Quality crdQuality;
+	public void visit( final LogicalOpSlice op ) {
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
 
-		final QueryPlan lhs = currentSubPlan.getSubPlan(0);
-		final QueryPlan rhs = currentSubPlan.getSubPlan(1);
+		final QueryPlanProperty crdSubPlan = qpInfoSubPlan.getProperty(CARDINALITY);
+		final QueryPlanProperty mincrdSubPlan = qpInfoSubPlan.getProperty(MIN_CARDINALITY);
+		final QueryPlanProperty maxcrdSubPlan = qpInfoSubPlan.getProperty(MAX_CARDINALITY);
 
-		final QueryPlanningInfo qpInfoSubPlan1 = lhs.getQueryPlanningInfo();
-		final QueryPlanningInfo qpInfoSubPlan2 = rhs.getQueryPlanningInfo();
-
-		final QueryPlanProperty lhsCrd = qpInfoSubPlan1.getProperty(CARDINALITY);
-		final QueryPlanProperty lhsMaxCrd = qpInfoSubPlan1.getProperty(MAX_CARDINALITY);
-
-		if ( checkAndSetIfGuaranteedEmpty(currentSubPlan.getQueryPlanningInfo(), lhsCrd) )
-			// If the first input plan is guaranteed to produce an empty result,
-			// then the result of the MINUS operator is guaranteed to be empty as well.
+		if ( checkAndSetIfGuaranteedEmpty(qpInfo, crdSubPlan) ) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the Slice operator (OFFSET & LIMIT) is
+			// guaranteed to be empty as well.
 			return;
+		}
 
-		// If the second input plan is guaranteed to produce an empty result,
-		// then the result of the MINUS operator is guaranteed to be the same as the first input plan.
-		final QueryPlanProperty rhsCrd = qpInfoSubPlan2.getProperty(CARDINALITY);
-		if ( rhsCrd.getValue() == 0 && rhsCrd.getQuality() == Quality.ACCURATE ) {
-			crdValue = lhsCrd.getValue();
-			crdQuality = lhsCrd.getQuality();
+		final int crdValue;
+		final int mincrdValue;
+		final int maxcrdValue;
+		final Quality maxcrdQuality;
+
+		if ( crdSubPlan.getValue() - op.getOffset() <= 0 )
+			crdValue = 0;
+		else if ( crdSubPlan.getValue() - op.getOffset() >= op.getLimit() )
+			crdValue = op.getLimit();
+		else
+			crdValue = crdSubPlan.getValue() - op.getOffset();
+
+		if ( mincrdSubPlan.getValue() - op.getOffset() <= 0 )
+			mincrdValue = 0;
+		else if ( mincrdSubPlan.getValue() - op.getOffset() >= op.getLimit() )
+			mincrdValue = op.getLimit();
+		else
+			mincrdValue = mincrdSubPlan.getValue() - op.getOffset();
+
+		if ( maxcrdSubPlan.getQuality().equals(Quality.ACCURATE) ) {
+			maxcrdQuality = Quality.ACCURATE;
+			if ( maxcrdSubPlan.getValue() - op.getOffset() <= 0 )
+				maxcrdValue = 0;
+			else if ( maxcrdSubPlan.getValue() - op.getOffset() >= op.getLimit() )
+				maxcrdValue = op.getLimit();
+			else
+				maxcrdValue = maxcrdSubPlan.getValue() - op.getOffset();
 		}
 		else {
-			// Else, estimate the cardinality of the MINUS result by subtracting the estimated cardinality
-			// of the second input plan from the estimated cardinality of the first input plan.
-			// This is a very crude estimate that is likely to be a significant underestimation in many cases,
-			// but it is not clear how to do better without considering the actual query patterns and data statistics.
-			crdValue = Math.max(lhsCrd.getValue() - rhsCrd.getValue(), 0);
-			crdQuality = QueryPlanProperty.getReducedQuality( lhsCrd.getQuality() );
+			maxcrdValue = op.getLimit();
+			maxcrdQuality = Quality.MIN_OR_MAX_POSSIBLE;
 		}
 
-		final int maxValue = lhsMaxCrd.getValue();
-		final Quality maxQuality = lhsMaxCrd.getQuality();
+		final QueryPlanProperty crd = QueryPlanProperty.cardinality(
+				crdValue,
+				crdSubPlan.getQuality() );
+		final QueryPlanProperty mincrd = QueryPlanProperty.minCardinality(
+				mincrdValue,
+				mincrdSubPlan.getQuality() );
+		final QueryPlanProperty maxcrd = QueryPlanProperty.maxCardinality(
+				maxcrdValue,
+				maxcrdQuality );
 
-		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
-		qpInfo.addProperty( QueryPlanProperty.cardinality(crdValue, crdQuality) );
-		qpInfo.addProperty( QueryPlanProperty.maxCardinality(maxValue, maxQuality) );
-		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
+		qpInfo.addProperty(crd);
+		qpInfo.addProperty(maxcrd);
+		qpInfo.addProperty(mincrd);
 	}
 
 	/**

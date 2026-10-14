@@ -32,6 +32,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoi
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpSlice;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRootImpl;
@@ -140,6 +141,26 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization
 		public void visit( final LogicalOpLeftJoin op ) {
 			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+		}
+
+		@Override
+		public void visit( final LogicalOpMinus op ) {
+			final LogicalPlan leftOriginal  = inputPlan.getSubPlan(0);
+			final LogicalPlan rightOriginal = inputPlan.getSubPlan(1);
+
+			final LogicalPlan leftRewritten  = apply(leftOriginal);
+			final LogicalPlan rightRewritten = apply(rightOriginal);
+
+			final boolean rewritten = ! leftOriginal.isSamePlan(leftRewritten)
+			                       || ! rightOriginal.isSamePlan(rightRewritten);
+
+			if (rewritten) {
+				rewrittenPlan = new LogicalPlanWithBinaryRootImpl(
+						op,
+						null,
+						leftRewritten,
+						rightRewritten );
+			} else rewrittenPlan = inputPlan;
 		}
 
 		@Override
@@ -270,23 +291,11 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization
 		}
 
 		@Override
-		public void visit( final LogicalOpMinus op ) {
-			final LogicalPlan leftOriginal  = inputPlan.getSubPlan(0);
-			final LogicalPlan rightOriginal = inputPlan.getSubPlan(1);
-
-			final LogicalPlan leftRewritten  = apply(leftOriginal);
-			final LogicalPlan rightRewritten = apply(rightOriginal);
-
-			final boolean rewritten = ! leftOriginal.isSamePlan(leftRewritten)
-			                       || ! rightOriginal.isSamePlan(rightRewritten);
-
-			if (rewritten) {
-				rewrittenPlan = new LogicalPlanWithBinaryRootImpl(
-						op,
-						null,
-						leftRewritten,
-						rightRewritten );
-			} else rewrittenPlan = inputPlan;
+		public void visit( final LogicalOpSlice op ) {
+			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
+			rewrittenPlan = new LogicalPlanWithUnaryRootImpl( op,
+			                                                  null,
+			                                                  rewrittenSubPlan );
 		}
 	}
 

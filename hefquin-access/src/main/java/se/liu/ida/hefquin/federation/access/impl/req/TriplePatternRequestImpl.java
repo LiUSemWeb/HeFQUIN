@@ -54,4 +54,14 @@ public class TriplePatternRequestImpl implements TriplePatternRequest
 		return false;
 	}
 
+	@Override
+	public int getOffset() {
+		return 0;
+	}
+
+	@Override
+	public int getLimit() {
+		return -1;
+	}
+
 }

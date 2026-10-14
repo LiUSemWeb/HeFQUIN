@@ -52,4 +52,14 @@ public class BGPRequestImpl implements BGPRequest
 		return false;
 	}
 
+	@Override
+	public int getOffset() {
+		return 0;
+	}
+
+	@Override
+	public int getLimit() {
+		return -1;
+	}
+
 }

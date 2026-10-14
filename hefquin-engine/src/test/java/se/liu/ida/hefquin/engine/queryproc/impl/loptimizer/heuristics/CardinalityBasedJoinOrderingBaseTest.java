@@ -206,6 +206,8 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 				@Override public TriplePattern getQueryPattern() { throw new UnsupportedOperationException(); }
 				@Override public Set<Var> getProjectionVars() { throw new UnsupportedOperationException(); }
 				@Override public boolean getDistinctRequired() { throw new UnsupportedOperationException(); }
+				@Override public int getOffset() { throw new UnsupportedOperationException(); }
+				@Override public int getLimit() { throw new UnsupportedOperationException(); }
 			};
 
 			subPlans[i] = new LogicalPlanWithNullaryRootImpl( new LogicalOpRequest<>(srv, false, req), null );

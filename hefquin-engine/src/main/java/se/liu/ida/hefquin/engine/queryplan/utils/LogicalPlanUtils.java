@@ -267,6 +267,9 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpMultiwayLeftJoin op ) { subplanCount++; }
 
 		@Override
+		public void visit( final LogicalOpMinus op )            { subplanCount++; }
+
+		@Override
 		public void visit( final LogicalOpMultiwayUnion op )    { subplanCount++; }
 
 		@Override
@@ -291,7 +294,7 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpProject op )          { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpMinus op )            { subplanCount++; }
+		public void visit( final LogicalOpSlice op )            { subplanCount++; }
 	} // end of class LogicalPlanCounter
 
 	static public class SourceAssignmentChecker extends LogicalPlanVisitorBase {

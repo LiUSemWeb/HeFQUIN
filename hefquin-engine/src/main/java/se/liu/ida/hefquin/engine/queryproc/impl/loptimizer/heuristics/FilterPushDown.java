@@ -171,6 +171,13 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		}
 
 		@Override
+		public void visit( final LogicalOpMinus op ) {
+			createdPlan = createPlanForMinusUnderFilter( filterOp,
+			                                             op,
+			                                             subPlanUnderFilter );
+		}
+
+		@Override
 		public void visit( final LogicalOpUnion op ) {
 			createdPlan = createPlanForUnionUnderFilter(filterOp, subPlanUnderFilter);
 		}
@@ -246,10 +253,10 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 		}
 
 		@Override
-		public void visit( final LogicalOpMinus op ) {
-			createdPlan = createPlanForMinusUnderFilter( filterOp,
-			                                             op,
-			                                             subPlanUnderFilter );
+		public void visit( final LogicalOpSlice op ) {
+			createdPlan = createPlanForUnaryOpUnderFilter( filterOp,
+			                                               op,
+			                                               subPlanUnderFilter.getSubPlan(0) );
 		}
 
 	} // end of Worker

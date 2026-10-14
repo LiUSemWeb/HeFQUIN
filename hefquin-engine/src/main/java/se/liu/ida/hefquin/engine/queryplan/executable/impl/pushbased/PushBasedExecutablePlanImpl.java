@@ -24,11 +24,23 @@ public class PushBasedExecutablePlanImpl implements ExecutablePlan
 
 	protected final LinkedList<PushBasedPlanThread> tasks;
 	protected ExecutorService threadPool;
+	protected final int offset;
+	protected final int limit;
 
 	public PushBasedExecutablePlanImpl( final LinkedList<PushBasedPlanThread> tasks,
 	                                    final QueryProcContextExt ctx ) {
+		this(tasks, 0, -1, ctx);
+	}
+
+	public PushBasedExecutablePlanImpl( final LinkedList<PushBasedPlanThread> tasks,
+	                                    final int offset,
+	                                    final int limit,
+	                                    final QueryProcContextExt ctx ) {
 		assert ! tasks.isEmpty();
+
 		this.tasks = tasks;
+		this.offset = (offset < 0) ? 0 : offset;
+		this.limit = (limit < -1) ? -1 : limit;
 
 		threadPool = ctx.getExecutorServiceForPlanTasks();
 	}
@@ -67,43 +79,93 @@ public class PushBasedExecutablePlanImpl implements ExecutablePlan
 
 		log.debug( "Successfully submitted {} push-based tasks to executor service.", tasks.size() );
 
-		// Consume all solution mappings from the root operator
-		// and send them to the result sink.
+		// Consume the solution mappings from the root operator and send
+		// them to the result sink. If there is an OFFSET or a LIMIT, we
+		// need to keep track of the number of solution mappings and send
+		// only the correct ones, and terminate the process if the LIMIT
+		// has been reached.
+		int solutionCounter = 0;
+		boolean limitExceeded = false;
 		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		final PushBasedPlanThread rootTask = tasks.getFirst();
 		try {
-			boolean exhausted = false;
-			while ( ! exhausted ) {
+			while ( true ) {
 				rootTask.transferAvailableOutput(transferBuffer);
-				if ( ! transferBuffer.isEmpty() ) {
+
+				// If the root operator has completed,
+				// we can break out of the while loop.
+				if ( transferBuffer.isEmpty() )
+					break;
+
+				// Consume the solution mappings that are in the transfer
+				// buffer, which we do in one of two ways, depending on
+				// whether we have to consider OFFSET and/or LIMIT or not.
+				if ( offset == 0 && limit < 0 ) {
+					// There is no OFFSET and no LIMIT, which means
+					// that we can simply transfer all the solutions.
 					for ( final SolutionMapping sm : transferBuffer )
 						resultSink.send(sm);
 				}
 				else {
-					exhausted = true;
+					// This is the case with OFFSET and/or LIMIT.
+					final Iterator<SolutionMapping> sIt = transferBuffer.iterator();
+					while ( ! limitExceeded && sIt.hasNext() ) {
+						final SolutionMapping sm = sIt.next();
+						solutionCounter++;
+
+						// Check that we are past the offset (if any)
+						if ( offset < solutionCounter ) {
+							// Check the limit
+							if ( limit < 0 )
+								// no limit at all
+								resultSink.send(sm);
+							else if ( solutionCounter <= offset+limit)
+								// limit not exceeded yet
+								resultSink.send(sm);
+							else
+								limitExceeded = true;
+						}
+					}
+
+					// If the limit is exceeded, break out of the while loop.
+					if ( limitExceeded )
+						break;
 				}
 			}
 		}
 		catch ( final Exception e ) {
-			// try to cancel the tasks in order to free up the
-			// up the threads that are running them, starting
-			// from the task of the root operator to avoid
-			// causing further problems (remember that this
-			// is a pull-based execution; hence, for each pair
-			// of an input-providing and an input-consuming
-			// task, we should kill the input-consuming one
-			// first)
+			// Try to cancel the tasks in order to free up the threads
+			// that are running them, starting from the task of the root
+			// operator to avoid causing further problems (remember that
+			// this is a pull-based execution; hence, for each pair of
+			// an input-providing and an input-consuming task, we should
+			// kill the input-consuming one first)
 			for ( int j = 0; j < tasks.size(); j++ ) {
 				futures[j].cancel(true);
 			}
 			throw new ExecutionException("Consuming the solution mappings caused an exception.", e);
 		}
 
-		// check whether all tasks have completed successfully and kill
-		// the ones that are still running (which they should not), again
-		// we start from the task of the root operator to avoid causing
-		// further problems in case some of the task are still active
-		// for some reason
+		if ( limitExceeded ) {
+			// If the LIMIT was exceeded, the tasks are likely still
+			// running and we need to interrupt and terminate them,
+			// for which we start from the task of the root operator.
+			for ( int j = 0; j < tasks.size(); j++ ) {
+				final Future<?> future = futures[j];
+				if ( ! future.isDone() ) {
+System.out.println("Terminating task #" + j + " because of LIMIT ...");
+					future.cancel(true);
+System.out.println("... task #" + j + " terminated.");
+				}
+else System.out.println("Task #" + j + " is already done.");
+			}
+		}
+
+		// Check whether all tasks have completed successfully and kill
+		// the ones that are still running (which they should not). We
+		// start again from the task of the root operator to avoid causing
+		// further problems in case some of the tasks are still active for
+		// some reason.
 		for ( int j = 0; j < tasks.size(); j++ ) {
 			final PushBasedPlanThread task = tasks.get(j);
 			if ( ! task.isCompleted() ) {

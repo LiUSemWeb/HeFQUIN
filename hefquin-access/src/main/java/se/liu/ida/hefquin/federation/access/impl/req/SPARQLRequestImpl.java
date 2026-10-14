@@ -17,6 +17,8 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	protected final SPARQLGraphPattern pattern;
 	protected final Set<Var> projectionVars;
 	protected final boolean distinctRequired;
+	protected int offset;
+	protected int limit;
 
 	protected final SPARQLQuery query;
 
@@ -31,11 +33,23 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	public SPARQLRequestImpl( final SPARQLGraphPattern pattern,
 	                          final Set<Var> projectionVars,
 	                          final boolean distinctRequired ) {
+		this(pattern, projectionVars, distinctRequired, 0, -1);
+	}
+
+	public SPARQLRequestImpl( final SPARQLGraphPattern pattern,
+	                          final Set<Var> projectionVars,
+	                          final boolean distinctRequired,
+	                          final int offset,
+	                          final int limit ) {
 		assert pattern != null;
+		assert offset >= 0;
+
 		this.pattern = pattern;
 		this.query = null;
 		this.projectionVars = projectionVars;
 		this.distinctRequired = distinctRequired;
+		this.offset = offset;
+		this.limit = limit;
 
 		expectedVars = determineExpectedVars( pattern.getExpectedVariables(),
 		                                      projectionVars );
@@ -49,6 +63,8 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		final Query jena = query.asJenaQuery();
 		this.projectionVars = jena.isQueryResultStar() ? null : new HashSet<>( jena.getProjectVars() );
 		this.distinctRequired = jena.isDistinct();
+		this.offset = jena.hasOffset() ? (int) jena.getOffset() : 0;
+		this.limit = jena.hasLimit() ? (int) jena.getLimit() : -1;
 
 		expectedVars = determineExpectedVars( query.getExpectedVariables(),
 		                                      projectionVars );
@@ -107,7 +123,9 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		else {
 			return pattern.equals( oo.getQueryPattern() )
 			    && Objects.equals( getProjectionVars(), oo.getProjectionVars() )
-			    && getDistinctRequired() == oo.getDistinctRequired();
+			    && getDistinctRequired() == oo.getDistinctRequired()
+			    && getOffset() == oo.getOffset()
+			    && getLimit() == oo.getLimit();
 		}
 	}
 
@@ -137,11 +155,25 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	}
 
 	@Override
+	public int getOffset() {
+		return offset;
+	}
+
+	@Override
+	public int getLimit() {
+		return limit;
+	}
+
+	@Override
 	public SPARQLQuery getQuery() {
 		if ( query != null )
 			return query;
 		else
-			return SPARQLRequest.convertToQuery( getQueryPattern(), getProjectionVars(), getDistinctRequired() );
+			return SPARQLRequest.convertToQuery( getQueryPattern(),
+			                                     getProjectionVars(),
+			                                     getDistinctRequired(),
+			                                     getOffset(),
+			                                     getLimit() );
 	}
 
 	@Override
@@ -156,6 +188,8 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		else
 			return "SPARQLRequest with pattern: " + pattern.toString()
 			     + ", projection variables: " + projectionVars
-			     + ", distinct required: " + distinctRequired;
+			     + ", distinct required: " + distinctRequired
+			     + ", offset: " + (offset == 0 ? "none" : offset)
+			     + ", limit: " + (limit < 0 ? "none" : limit);
 	}
 }

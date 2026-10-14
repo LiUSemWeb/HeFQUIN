@@ -26,6 +26,9 @@ public class LogicalPlanVisitorBase implements LogicalPlanVisitor
 	public void visit( final LogicalOpLeftJoin op )          {}
 
 	@Override
+	public void visit( final LogicalOpMinus op )             {}
+
+	@Override
 	public void visit( final LogicalOpUnion op )             {}
 
 	@Override
@@ -59,5 +62,5 @@ public class LogicalPlanVisitorBase implements LogicalPlanVisitor
 	public void visit( final LogicalOpProject op )           {}
 
 	@Override
-	public void visit( final LogicalOpMinus op )             {}
+	public void visit( final LogicalOpSlice op )             {}
 }

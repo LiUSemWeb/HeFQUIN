@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSlice;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
@@ -38,6 +39,21 @@ public class QueryPlanCompilerForPushBasedExecution implements QueryPlanCompiler
 	public ExecutablePlan compile( final PhysicalPlan qep,
 	                               final QueryProcContextExt ctx ) {
 		log.debug("Compiling physical plan using push-based execution model.");
+
+		if ( qep.getRootOperator() instanceof PhysicalOpSlice slice ) {
+			// If we have a slice operator (i.e., OFFSET & LIMIT) at the
+			// top of the given plan, we create the threads only for the
+			// subplan under this operator and ...
+			final PhysicalPlan subplan = qep.getSubPlan(0);
+			final LinkedList<PushBasedPlanThread> threads = createThreads(subplan, ctx);
+
+			// ... put the offset and limit values directly into the
+			// executable plan.
+			final int offset = slice.getLogicalOperator().getOffset();
+			final int limit = slice.getLogicalOperator().getLimit();
+			return new PushBasedExecutablePlanImpl(threads, offset, limit, ctx);
+		}
+
 		final LinkedList<PushBasedPlanThread> threads = createThreads(qep, ctx);
 		return new PushBasedExecutablePlanImpl(threads, ctx);
 	}

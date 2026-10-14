@@ -38,7 +38,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	}
 
 	@Override
-	protected QueryIterator exec(Op op, QueryIterator input) {
+	protected QueryIterator exec( final Op op, final QueryIterator input ) {
 		return super.exec(op, input);
 	}
 
@@ -159,6 +159,16 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		}
 		else {
 			return super.execute(opProject, input);
+		}
+	}
+
+	@Override
+	protected QueryIterator execute( final OpSlice opSlice, final QueryIterator input ) {
+		if ( isSupportedOp(opSlice) ) {
+			return executeSupportedOp( opSlice, input );
+		}
+		else {
+			return super.execute(opSlice, input);
 		}
 	}
 
@@ -312,7 +322,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		@Override public void visit(OpReduced op)      { unsupportedOp = op; }
 
-		@Override public void visit(OpSlice op)        { unsupportedOp = op; }
+		@Override public void visit(OpSlice op)        {} // supported
 
 		@Override public void visit(OpGroup op)        { unsupportedOp = op; }
 

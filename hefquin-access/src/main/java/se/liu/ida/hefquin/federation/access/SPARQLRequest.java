@@ -33,25 +33,48 @@ public interface SPARQLRequest extends DataRetrievalRequest
 	Set<Var> getProjectionVars();
 
 	/**
-	 * Returns {@code true} if this request <em>explicitly</em> requires that the requested
-	 * result is duplicate free.
+	 * Returns {@code true} if this request <em>explicitly</em> requires
+	 * that the requested result is duplicate free.
 	 *
-	 * @return {@code true} if duplicate elimination is requested; {@code false} otherwise
+	 * @return {@code true} if duplicate elimination is requested;
+	 *         {@code false} otherwise
 	 */
 	boolean getDistinctRequired();
+
+	/**
+	 * Returns the offset that should be applied to the result
+	 * or 0 (zero) if no offset should be applied.
+	 *
+	 * @return a value of 0 (zero) or more
+	 */
+	int getOffset();
+
+	/**
+	 * Returns the (result size) limit that should be applied to the
+	 * result or -1 if no limit should be applied.
+	 *
+	 * @return a value of -1 or more
+	 */
+	int getLimit();
 
 	/**
 	 * Returns the SPARQL query for which solutions
 	 * should be requested.
 	 */
 	default SPARQLQuery getQuery() {
-		return convertToQuery( getQueryPattern(), getProjectionVars(), getDistinctRequired() );
+		return convertToQuery( getQueryPattern(),
+		                       getProjectionVars(),
+		                       getDistinctRequired(),
+		                       getOffset(),
+		                       getLimit() );
 	}
 
 	static SPARQLQuery convertToQuery( final SPARQLGraphPattern pattern,
 	                                   final Set<Var> projectionVars,
-	                                   final boolean distinctRequired ) {
-		return new SPARQLQueryImpl( pattern, projectionVars, distinctRequired );
+	                                   final boolean distinctRequired,
+	                                   final int offset,
+	                                   final int limit ) {
+		return new SPARQLQueryImpl(pattern, projectionVars, distinctRequired, offset, limit);
 	}
 
 }

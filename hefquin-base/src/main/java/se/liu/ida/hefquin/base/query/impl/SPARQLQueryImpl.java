@@ -30,14 +30,19 @@ public class SPARQLQueryImpl implements SPARQLQuery
 
 	public SPARQLQueryImpl( final SPARQLGraphPattern p,
 	                        final Set<Var> projectionVars,
-	                        final boolean distinctRequired ) {
-		this( QueryPatternUtils.convertToJenaElement(p), projectionVars, distinctRequired );
+	                        final boolean distinctRequired,
+	                        final int offset,
+	                        final int limit ) {
+		this( QueryPatternUtils.convertToJenaElement(p), projectionVars, distinctRequired, offset, limit );
 	}
 
 	protected SPARQLQueryImpl( final Element jenaElement,
 	                           final Set<Var> projectionVars,
-	                           final boolean distinctRequired ) {
+	                           final boolean distinctRequired,
+	                           final int offset,
+	                           final int limit ) {
 		assert jenaElement != null;
+		assert offset >= 0;
 
 		jenaQuery = QueryFactory.create();
 		jenaQuery.setQuerySelectType();
@@ -50,8 +55,18 @@ public class SPARQLQueryImpl implements SPARQLQuery
 			jenaQuery.setQueryResultStar( true );
 
 
-		jenaQuery.setDistinct( distinctRequired );
-		jenaQuery.setQueryPattern( jenaElement );
+		jenaQuery.setDistinct(distinctRequired);
+		jenaQuery.setQueryPattern(jenaElement);
+
+		if ( offset == 0 )
+			jenaQuery.setOffset( Query.NOLIMIT );
+		else
+			jenaQuery.setOffset(offset);
+
+		if ( limit < 0 )
+			jenaQuery.setLimit( Query.NOLIMIT );
+		else
+			jenaQuery.setLimit(limit);
 
 		expectedVars = QueryUtils.determineExpectedVariables(jenaQuery);
 	}
@@ -80,7 +95,7 @@ public class SPARQLQueryImpl implements SPARQLQuery
 
 	@Override
 	public String toString(){
-		return this.asJenaQuery().toString();
+		return jenaQuery.toString();
 	}
 
 }
