@@ -21,6 +21,9 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 public abstract class PushBasedPlanThreadImplBase
                 implements PushBasedPlanThread, IntermediateResultElementSink
 {
+	final static boolean DISABLE_MAY_REDUCE = true;
+	// final static boolean DISABLE_MAY_REDUCE = false;
+
 	// initialized via the constructor
 	protected final QueryProcContextExt ctx;
 
@@ -78,9 +81,13 @@ public abstract class PushBasedPlanThreadImplBase
 		assert ctx != null;
 		this.ctx = ctx;
 
-		availableOutput = mayReduce
-			? new HashSet<>()
-			: new ArrayList<>();
+		// Use flag to disable mayReduce
+		if ( DISABLE_MAY_REDUCE )
+			availableOutput = new ArrayList<>();
+		else
+			availableOutput = mayReduce
+				? new HashSet<>()
+				: new ArrayList<>();
 	}
 
 	@Override
