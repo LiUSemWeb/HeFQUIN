@@ -32,6 +32,9 @@ import java.util.*;
  */
 public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 {
+	final static boolean DISABLE_MAY_REDUCE = true;
+	// final static boolean DISABLE_MAY_REDUCE = false;
+
 	private static final Logger log = LoggerFactory.getLogger( ExecOpSymmetricHashJoin.class );
 	protected final SolutionMappingsIndex indexForChild1;
 	protected final SolutionMappingsIndex indexForChild2;
@@ -227,7 +230,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	                                           final SolutionMappingsIndex indexForProbing,
 	                                           final List<SolutionMapping> outputBuffer,
 	                                           final boolean mayReduce ) {
-		if ( mayReduce && indexForInput.contains(inputSolMap) )
+		if ( mayReduce && ! DISABLE_MAY_REDUCE && indexForInput.contains(inputSolMap) )
 			return;
 
 		indexForInput.add(inputSolMap);
