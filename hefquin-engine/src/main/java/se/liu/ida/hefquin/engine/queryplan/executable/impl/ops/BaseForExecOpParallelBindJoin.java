@@ -107,8 +107,7 @@ public abstract class BaseForExecOpParallelBindJoin<
                                        RespType extends DataRetrievalResponse<?>>
            extends BaseForUnaryExecOpWithCollectedInput
 {
-	final static boolean DISABLE_MAY_REDUCE = true;
-	// final static boolean DISABLE_MAY_REDUCE = false;
+	final static boolean DISABLE_MAY_REDUCE = Boolean.parseBoolean(System.getenv().getOrDefault("DISABLE_747", "false"));
 
 	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpParallelBindJoin.class );
 

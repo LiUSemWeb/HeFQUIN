@@ -88,8 +88,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
                                        MemberType extends FederationMember>
            extends UnaryExecutableOpBase
 {
-	final static boolean DISABLE_MAY_REDUCE = true;
-	// final static boolean DISABLE_MAY_REDUCE = false;
+	final static boolean DISABLE_MAY_REDUCE = Boolean.parseBoolean(System.getenv().getOrDefault("DISABLE_747", "false"));
 
 	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpSequentialBindJoin.class );
 
