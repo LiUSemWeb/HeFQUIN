@@ -1,0 +1,42 @@
+PREFIX sparql: <http://localhost/sparql/>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX geonames: <http://www.geonames.org/ontology#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX dbpedia: <http://dbpedia.org/ontology/>
+
+SELECT DISTINCT ?countryName ?countryCode ?locationMap ?population ?longitude ?latitude
+  ?nationalAnthem ?foundingDate ?largestCity ?ethnicGroup ?motto
+WHERE {
+  {
+    SERVICE sparql:NYT {
+      ?NYTplace geonames:name ?countryName ;
+                geonames:countryCode ?countryCode ;
+                geonames:population ?population ;
+                geo:long ?longitude ;
+                geo:lat ?latitude ;
+                owl:sameAs ?geonameplace .
+    }
+  }
+  UNION
+  {
+    SERVICE sparql:GeoNames {
+      ?NYTplace geonames:name ?countryName ;
+                geonames:countryCode ?countryCode ;
+                geonames:population ?population ;
+                geo:long ?longitude ;
+                geo:lat ?latitude ;
+                owl:sameAs ?geonameplace .
+    }
+  }
+  OPTIONAL {
+    SERVICE sparql:DBPedia-Subset {
+      ?geonameplace dbpedia:capital ?capital ;
+                    dbpedia:anthem ?nationalAnthem ;
+                    dbpedia:foundingDate ?foundingDate ;
+                    dbpedia:largestCity ?largestCity ;
+                    dbpedia:ethnicGroup ?ethnicGroup ;
+                    dbpedia:motto ?motto .
+    }
+  }
+}
+LIMIT 50

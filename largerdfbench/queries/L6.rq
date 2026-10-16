@@ -1,0 +1,24 @@
+PREFIX sparql: <http://localhost/sparql/>
+PREFIX tcga: <http://tcga.deri.ie/schema/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX affymetrix: <http://bio2rdf.org/affymetrix_vocabulary:>
+
+SELECT DISTINCT ?patient ?start ?stop ?geneExpVal
+WHERE {
+  SERVICE sparql:Affymetrix {
+    ?s affymetrix:x-symbol <http://bio2rdf.org/symbol:KRAS> .
+    ?s affymetrix:x-geneid ?geneId .
+  }
+  SERVICE sparql:LinkedTCGA-A {
+    ?geneId rdf:type tcga:expression_gene_lookup .
+    ?geneId tcga:chromosome ?lookupChromosome .
+    ?uri tcga:bcr_patient_barcode ?patient .
+    ?patient tcga:result ?recordNo .
+    ?recordNo tcga:chromosome ?chromosome .
+    ?recordNo tcga:start ?start .
+    ?recordNo tcga:stop ?stop .
+    ?recordNo tcga:scaled_estimate ?geneExpVal .
+  }
+  FILTER (str(?lookupChromosome) = str(?chromosome))
+}

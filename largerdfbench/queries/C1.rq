@@ -1,0 +1,28 @@
+PREFIX sparql: <http://localhost/sparql/>
+PREFIX drugbank: <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/>
+PREFIX drugtype: <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugtype/>
+PREFIX kegg: <http://bio2rdf.org/ns/kegg#>
+PREFIX chebi: <http://bio2rdf.org/ns/bio2rdf#>
+PREFIX purl: <http://purl.org/dc/elements/1.1/>
+
+SELECT DISTINCT ?drug ?drugDesc ?molecularWeightAverage ?compound ?ReactionTitle ?ChemicalEquation
+WHERE {
+  SERVICE sparql:DrugBank {
+    ?drug drugbank:description ?drugDesc .
+    ?drug drugbank:drugType drugtype:smallMolecule .
+    ?drug drugbank:keggCompoundId ?compound .
+  }
+  SERVICE sparql:KEGG {
+    ?enzyme kegg:xSubstrate ?compound .
+    ?Chemicalreaction kegg:xEnzyme ?enzyme .
+    ?Chemicalreaction kegg:equation ?ChemicalEquation .
+    ?Chemicalreaction purl:title ?ReactionTitle .
+  }
+  OPTIONAL {
+    SERVICE sparql:DrugBank {
+      ?drug drugbank:molecularWeightAverage ?molecularWeightAverage .
+      FILTER (?molecularWeightAverage > 114)
+    }
+  }
+}
+LIMIT 1000

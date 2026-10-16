@@ -1,0 +1,17 @@
+PREFIX sparql: <http://localhost/sparql/>
+PREFIX tcga: <http://tcga.deri.ie/schema/>
+
+SELECT DISTINCT ?patient ?tumorType ?exonValue
+WHERE {
+  SERVICE sparql:LinkedTCGA-A {
+    ?s tcga:bcr_patient_barcode ?patient .
+    ?patient tcga:disease_acronym <http://tcga.deri.ie/lusc> .
+    ?patient tcga:tumor_weight ?weight .
+    ?patient tcga:tumor_type ?tumorType .
+  }
+  SERVICE sparql:LinkedTCGA-E {
+    ?patient tcga:result ?results .
+    ?results tcga:RPKM ?exonValue .
+  }
+  FILTER (?weight <= 55)
+}
