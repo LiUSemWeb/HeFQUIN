@@ -21,7 +21,8 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 public abstract class PushBasedPlanThreadImplBase
                 implements PushBasedPlanThread, IntermediateResultElementSink
 {
-	final static boolean DISABLE_MAY_REDUCE = Boolean.parseBoolean(System.getenv().getOrDefault("DISABLE_746", "false"));
+	final static boolean DISABLE_AVAILABLE_OUTPUT_HASHSET = Boolean
+			.parseBoolean( System.getenv().getOrDefault("DISABLE_AVAILABLE_OUTPUT_HASHSET", "false") );
 
 	// initialized via the constructor
 	protected final QueryProcContextExt ctx;
@@ -81,7 +82,7 @@ public abstract class PushBasedPlanThreadImplBase
 		this.ctx = ctx;
 
 		// Use flag to disable mayReduce
-		if ( DISABLE_MAY_REDUCE )
+		if ( DISABLE_AVAILABLE_OUTPUT_HASHSET )
 			availableOutput = new ArrayList<>();
 		else
 			availableOutput = mayReduce
