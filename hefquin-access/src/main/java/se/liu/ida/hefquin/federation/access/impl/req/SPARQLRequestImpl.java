@@ -14,6 +14,9 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 
 public class SPARQLRequestImpl implements SPARQLRequest
 {
+	final static boolean DISABLE_DISTINCT_REQUEST_MERGING = Boolean
+		.parseBoolean( System.getenv().getOrDefault("DISABLE_DISTINCT_REQUEST_MERGING", "false") );
+
 	protected final SPARQLGraphPattern pattern;
 	protected final Set<Var> projectionVars;
 	protected final boolean distinctRequired;
@@ -35,7 +38,10 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		this.pattern = pattern;
 		this.query = null;
 		this.projectionVars = projectionVars;
-		this.distinctRequired = distinctRequired;
+		if ( DISABLE_DISTINCT_REQUEST_MERGING )
+			this.distinctRequired = false;
+		else
+			this.distinctRequired = distinctRequired;
 
 		expectedVars = determineExpectedVars( pattern.getExpectedVariables(),
 		                                      projectionVars );
@@ -48,6 +54,9 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 		final Query jena = query.asJenaQuery();
 		this.projectionVars = jena.isQueryResultStar() ? null : new HashSet<>( jena.getProjectVars() );
+		if ( DISABLE_DISTINCT_REQUEST_MERGING )
+			jena.setDistinct(false);
+
 		this.distinctRequired = jena.isDistinct();
 
 		expectedVars = determineExpectedVars( query.getExpectedVariables(),
