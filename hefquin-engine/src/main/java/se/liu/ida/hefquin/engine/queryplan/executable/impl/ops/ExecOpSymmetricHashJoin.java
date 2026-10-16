@@ -32,8 +32,7 @@ import java.util.*;
  */
 public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 {
-	final static boolean DISABLE_MAY_REDUCE = true;
-	// final static boolean DISABLE_MAY_REDUCE = false;
+	final static boolean DISABLE_MAY_REDUCE = Boolean.parseBoolean(System.getenv().getOrDefault("DISABLE_747", "false"));
 
 	private static final Logger log = LoggerFactory.getLogger( ExecOpSymmetricHashJoin.class );
 	protected final SolutionMappingsIndex indexForChild1;

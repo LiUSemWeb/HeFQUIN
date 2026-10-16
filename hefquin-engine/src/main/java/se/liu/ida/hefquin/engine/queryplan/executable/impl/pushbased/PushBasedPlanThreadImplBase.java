@@ -21,8 +21,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 public abstract class PushBasedPlanThreadImplBase
                 implements PushBasedPlanThread, IntermediateResultElementSink
 {
-	final static boolean DISABLE_MAY_REDUCE = true;
-	// final static boolean DISABLE_MAY_REDUCE = false;
+	final static boolean DISABLE_MAY_REDUCE = Boolean.parseBoolean(System.getenv().getOrDefault("DISABLE_746", "false"));
 
 	// initialized via the constructor
 	protected final QueryProcContextExt ctx;
