@@ -107,7 +107,8 @@ public abstract class BaseForExecOpParallelBindJoin<
                                        RespType extends DataRetrievalResponse<?>>
            extends BaseForUnaryExecOpWithCollectedInput
 {
-	final static boolean DISABLE_MAY_REDUCE = Boolean.parseBoolean(System.getenv().getOrDefault("DISABLE_747", "false"));
+	final static boolean DISABLE_BIND_JOIN_HASHSET = Boolean
+			.parseBoolean( System.getenv().getOrDefault("DISABLE_BIND_JOIN_HASHSET", "false") );
 
 	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpParallelBindJoin.class );
 
@@ -304,7 +305,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// solution mapping if we have seen the exact same mapping before (while
 		// populating the current batch).
 		if (    mayReduce
-		     && ! DISABLE_MAY_REDUCE
+		     && ! DISABLE_BIND_JOIN_HASHSET
 		     && solMapsCoveredByCurrentBatch != null
 		     && solMapsCoveredByCurrentBatch.contains(inputSolMap) )
 			return;
@@ -356,7 +357,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// the input solution mapping. Therefore, we add it to the current
 		// batch, which may have to be set up first.
 		if ( solMapsCoveredByCurrentBatch == null ) {
-			if ( DISABLE_MAY_REDUCE )
+			if ( DISABLE_BIND_JOIN_HASHSET )
 				solMapsCoveredByCurrentBatch = new ArrayList<>();
 			else
 				// set up the next batch
