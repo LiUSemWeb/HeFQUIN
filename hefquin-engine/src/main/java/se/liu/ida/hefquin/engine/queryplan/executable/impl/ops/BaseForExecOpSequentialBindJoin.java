@@ -88,8 +88,8 @@ public abstract class BaseForExecOpSequentialBindJoin<
                                        MemberType extends FederationMember>
            extends UnaryExecutableOpBase
 {
-	final static boolean DISABLE_BIND_JOIN_HASHSET = Boolean
-			.parseBoolean( System.getenv().getOrDefault("DISABLE_BIND_JOIN_HASHSET", "false") );
+	final static boolean DISABLE_JOIN_HASHSET_OPTIMIZATIONS = Boolean
+			.parseBoolean( System.getenv().getOrDefault("DISABLE_JOIN_HASHSET_OPTIMIZATIONS", "false") );
 
 	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpSequentialBindJoin.class );
 
@@ -215,7 +215,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 		this.requestBlockSize = batchSize;
 
-		if ( DISABLE_BIND_JOIN_HASHSET )
+		if ( DISABLE_JOIN_HASHSET_OPTIMIZATIONS )
 			currentBatch = new ArrayList<>();
 		else 
 			currentBatch = mayReduce
@@ -256,7 +256,7 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		// First, if duplicate removal is allowed, we can safely ignore the given input
 		// solution mapping if we have seen the exact same mapping before (while
 		// populating the current batch).
-		if ( mayReduce && ! DISABLE_BIND_JOIN_HASHSET && currentBatch.contains(inputSolMap) )
+		if ( mayReduce && ! DISABLE_JOIN_HASHSET_OPTIMIZATIONS && currentBatch.contains(inputSolMap) )
 			return;
 
 		// Now we check whether we had to switch into full-retrieval mode,
