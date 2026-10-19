@@ -10,9 +10,10 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 
 public class SolutionMappingComparator implements Comparator<SolutionMapping>
 {
-	private final BindingComparator bindingComparator;
+	protected final BindingComparator bindingComparator;
 
 	public SolutionMappingComparator( final List<SortCondition> conditions ) {
+		assert conditions != null;
 		bindingComparator = new BindingComparator(conditions);
 	}
 
