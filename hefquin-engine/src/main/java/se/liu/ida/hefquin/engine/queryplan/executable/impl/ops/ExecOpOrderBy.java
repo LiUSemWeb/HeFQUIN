@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import org.apache.jena.query.SortCondition;
 import org.slf4j.Logger;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingComparator;
-import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -23,10 +22,9 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 public class ExecOpOrderBy extends UnaryExecutableOpBase
 {
 	private static final Logger log = LoggerFactory.getLogger( ExecOpOrderBy.class );
-	private final List<SortCondition> sortConditions;
 	private long numberOfOutputMappingsProduced = 0L;
 
-	protected final List<SolutionMapping> solutionMappings = new ArrayList<>();
+	protected final PriorityQueue<SolutionMapping> solutionMappings;
 
 	public ExecOpOrderBy( final List<SortCondition> sortConditions,
 	                      final boolean mayReduce,
@@ -35,7 +33,7 @@ public class ExecOpOrderBy extends UnaryExecutableOpBase
 		super(mayReduce, collectExceptions, qpInfo);
 
 		assert sortConditions != null;
-		this.sortConditions = sortConditions;
+		this.solutionMappings = new PriorityQueue<>(new SolutionMappingComparator(sortConditions));
 
 		log.debug( "Initialized ExecOpOrderBy (collectExceptions={}).", collectExceptions );
 	}
@@ -50,14 +48,22 @@ public class ExecOpOrderBy extends UnaryExecutableOpBase
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final QueryProcContextExt ctx ) {
-		solutionMappings.sort(new SolutionMappingComparator(sortConditions));
+		SolutionMapping previousSolutionMapping = null;
 
-		for ( final SolutionMapping solutionMapping : solutionMappings ) {
-			sink.send(solutionMapping);
+		while (!solutionMappings.isEmpty()) {
+			final SolutionMapping currentSolutionMapping = solutionMappings.poll();
+
+			// PriorityQueue iteration does not guarantee sorted order.
+			// We must use poll() to retrieve mappings in priority order.
+			if ( mayReduce && currentSolutionMapping.equals(previousSolutionMapping) ) {
+				continue;
+			}
+
+			sink.send(currentSolutionMapping);
 			numberOfOutputMappingsProduced++;
-		}
 
-		solutionMappings.clear();
+			previousSolutionMapping = currentSolutionMapping;
+		}
 	}
 
 	@Override
