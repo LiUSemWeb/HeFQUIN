@@ -102,7 +102,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 			branchFilters.add(collectFilters(branch));
 		}
 
-		// Keep track of the branches as filter conditions are redistributed.
+		// Collect the updated branches as filter conditions are redistributed.
 		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlans];
 
 		for ( int i = 0; i < numberOfSubPlans; i++ ) {
@@ -124,7 +124,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 					if ( ! containsFilter(branch, filterExpressions) && canEvaluate(filterExpressions, branch) ) {
 						final LogicalOperator filterOp = new LogicalOpFilter(filterExpressions, mayReduce);
 
-						newSubPlans[j] = LogicalPlanUtils.createPlanWithSubPlans(filterOp, null, newSubPlans[j]);
+						newSubPlans[j] = LogicalPlanUtils.createPlanWithSubPlans(filterOp, null, branch);
 					}
 				}
 			}
