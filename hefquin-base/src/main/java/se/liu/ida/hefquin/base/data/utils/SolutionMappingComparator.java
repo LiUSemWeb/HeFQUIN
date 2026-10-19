@@ -14,9 +14,10 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 
 public class SolutionMappingComparator implements Comparator<SolutionMapping>
 {
-	private final List<SortCondition> conditions;
+	protected final List<SortCondition> conditions;
 
 	public SolutionMappingComparator( final List<SortCondition> conditions ) {
+		assert conditions != null;
 		this.conditions = conditions;
 	}
 

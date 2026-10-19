@@ -34,6 +34,7 @@ public class ExecOpOrderBy extends UnaryExecutableOpBase
 	                      final QueryPlanningInfo qpInfo ) {
 		super(mayReduce, collectExceptions, qpInfo);
 
+		assert sortConditions != null;
 		this.sortConditions = sortConditions;
 
 		log.debug( "Initialized ExecOpOrderBy (collectExceptions={}).", collectExceptions );
@@ -42,21 +43,21 @@ public class ExecOpOrderBy extends UnaryExecutableOpBase
 	@Override
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
-	                         final QueryProcContextExt ctx )
-			throws ExecOpExecutionException {
+	                         final QueryProcContextExt ctx ) {
 		solutionMappings.add(inputSolMap);
 	}
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final QueryProcContextExt ctx )
-			throws ExecOpExecutionException {
+	                                   final QueryProcContextExt ctx ) {
 		solutionMappings.sort(new SolutionMappingComparator(sortConditions));
 
 		for ( final SolutionMapping solutionMapping : solutionMappings ) {
 			sink.send(solutionMapping);
 			numberOfOutputMappingsProduced++;
 		}
+
+		solutionMappings.clear();
 	}
 
 	@Override
