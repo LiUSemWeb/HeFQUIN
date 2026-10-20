@@ -98,8 +98,8 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	 *
 	 * Collects the filter expressions from each branch and copies each
 	 * condition to other branches where all referenced variables are
-	 * certain variables, provided that the condition is not already
-	 * present in the target branch.
+	 * certain variables (see {@link #canEvaluate(ExprList, LogicalPlan)},
+	 * provided that the condition is not already present in the target branch.
 	 *
 	 * @param joinPlan the logical plan rooted at an inner join
 	 * @param numberOfSubPlans the number of branches in the join
