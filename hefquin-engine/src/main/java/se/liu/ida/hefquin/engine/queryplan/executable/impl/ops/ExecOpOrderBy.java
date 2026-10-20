@@ -24,6 +24,9 @@ public class ExecOpOrderBy extends UnaryExecutableOpBase
 	private static final Logger log = LoggerFactory.getLogger( ExecOpOrderBy.class );
 	private long numberOfOutputMappingsProduced = 0L;
 
+	// We use the PriorityQueue deliberately also for the duplicate removal
+	// case (i.e., if 'mayReduce' is true), instead of using TreeSet for that
+	// case. TreeSet has a significantly higher memory footprint.
 	protected final PriorityQueue<SolutionMapping> solutionMappings;
 
 	public ExecOpOrderBy( final List<SortCondition> sortConditions,
