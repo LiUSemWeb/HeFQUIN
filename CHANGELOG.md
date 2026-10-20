@@ -7,7 +7,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- nothing yet
+- Support for ORDER BY directly within the HeFQUIN engine ([#765](https://github.com/LiUSemWeb/HeFQUIN/issues/765)). <-- not complete yet
 ### Changed
 - Increase the size of the thread pools from 10 to 1000 ([#758](https://github.com/LiUSemWeb/HeFQUIN/issues/758)).
 - Use a union of bind joins as physical plan for a join with an multi-request operator ([#759](https://github.com/LiUSemWeb/HeFQUIN/issues/759). [#762](https://github.com/LiUSemWeb/HeFQUIN/issues/762)).
