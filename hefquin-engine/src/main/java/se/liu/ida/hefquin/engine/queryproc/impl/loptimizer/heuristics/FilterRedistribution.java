@@ -1,44 +1,57 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.op.Op1;
+import org.apache.jena.sparql.algebra.op.Op2;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.algebra.op.OpN;
+import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
 
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 
 /**
- * Redistributes filter conditions across the branches of inner joins
- * and multiway inner joins in a given logical plan. Whether a particular
- * filter condition can be redistributed to another branch depends on
- * whether all variables mentioned in the condition are certainly available
- * in that branch.
+ * Redistributes filter expressions across the branches of inner joins
+ * and multiway inner joins in a logical plan. An expression can be
+ * redistributed to another branch if all variables it references are
+ * certain variables in that branch and the expression is not already
+ * present there.
  *
- * Filter conditions are collected from both logical filter operators
- * and SPARQL requests within each branch. A filter condition is copied
- * to every other branch that can evaluate it, provided that the branch
- * does not already contain the same filter condition.
+ * Filter expressions are collected from logical filter operators,
+ * logical GPAdd operators, and SPARQL request patterns. Logical AND
+ * expressions are split into individual expressions before redistribution.
  *
- * This heuristic can introduce additional filter operators in the logical
- * plan, allowing filter conditions to be evaluated independently in
- * multiple branches. Filter conditions already present in SPARQL requests
- * are detected but are not directly merged into other requests by this
- * heuristic.
+ * Expressions found inside SPARQL patterns are added to eligible branches
+ * as logical filter operators. This rule is designed to be combined with
+ * the FilterPushDown rule, which is applied afterwards.
  */
 public class FilterRedistribution implements HeuristicForLogicalOptimization
 {
@@ -49,145 +62,184 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	}
 
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
+		// Recursively search for subplans rooted at inner joins.
+		// When one is found, redistribute filters across its branches.
 		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
 		if ( numberOfSubPlans == 0 ) {
 			return inputPlan;
 		}
 
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
-		// If the root is an inner join, redistribute filters across its branches.
-		if ( isInnerJoin(rootOp) ) {
-			return redistributeFilters(inputPlan, numberOfSubPlans, rootOp.mayReduce());
-		}
-		else {
-			// Otherwise, recursively apply the heuristic to each subplan.
-			final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlans];
-			boolean noChanges = true; // set to false if the heuristic changes any of the subplans
-			for ( int i = 0; i < numberOfSubPlans; i++ ) {
-				final LogicalPlan oldSubPlan = inputPlan.getSubPlan(i);
-				newSubPlans[i] = apply(oldSubPlan);
-				if ( ! newSubPlans[i].equals(oldSubPlan) ) {
-					noChanges = false;
-				}
+
+		// Otherwise, recursively apply the heuristic to each subplan.
+		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlans];
+		boolean noChanges = true; // set to false if the heuristic changes any of the subplans
+		for ( int i = 0; i < numberOfSubPlans; i++ ) {
+			final LogicalPlan oldSubPlan = inputPlan.getSubPlan(i);
+			newSubPlans[i] = apply(oldSubPlan);
+			if ( ! newSubPlans[i].equals(oldSubPlan) ) {
+				noChanges = false;
 			}
-
-			if ( noChanges )
-				return inputPlan;
-
-			return LogicalPlanUtils.createPlanWithSubPlans(rootOp, null, newSubPlans);
 		}
+
+		final LogicalPlan plan = noChanges
+			? inputPlan
+			: LogicalPlanUtils.createPlanWithSubPlans(rootOp, null, newSubPlans);
+
+		// Redistribute filters at this join after processing its children.
+		if ( isInnerJoin(rootOp) )
+			return redistributeFilters(plan, numberOfSubPlans, rootOp.mayReduce());
+
+		return plan;
 	}
 
 	/**
-	 * Redistributes filter conditions across the branches of a join plan.
+	 * Redistributes filter expressions across the branches of a join plan.
 	 *
-	 * Collects the filter conditions from each branch and copies each
+	 * Collects the filter expressions from each branch and copies each
 	 * condition to other branches where all referenced variables are
-	 * certainly available, provided that the condition is not already
+	 * certain variables, provided that the condition is not already
 	 * present in the target branch.
 	 *
 	 * @param joinPlan the logical plan rooted at an inner join
 	 * @param numberOfSubPlans the number of branches in the join
 	 * @param mayReduce whether the join may reduce duplicate solution mappings
-	 * @return a logical plan with the redistributed filter conditions
+	 * @return a logical plan with the redistributed filter expressions
 	 */
 	protected LogicalPlan redistributeFilters( final LogicalPlan joinPlan, final int numberOfSubPlans, final boolean mayReduce ) {
-		final List<List<ExprList>> branchFilters = new ArrayList<>();
+		final List<Set<Expr>> branchFilters = new ArrayList<>();
 
-		// Collect the filter conditions occurring in each join branch.
+		// Collect the filter expressions occurring in each join branch.
 		for ( int i = 0; i < numberOfSubPlans; i++ ) {
 			final LogicalPlan branch = joinPlan.getSubPlan(i);
-			// traverse the whole subplan and
-			// collect filters (logicalopfilter, filters inside requests)
-			branchFilters.add(collectFilters(branch));
+			final Set<ExprList> filters = collectFilters(branch);
+			final Set<Expr> expressions = new HashSet<>();
+
+			for ( final ExprList filter : filters ) {
+				expressions.addAll(filter.getList());
+			}
+
+			branchFilters.add(expressions);
 		}
 
-		// Collect the updated branches as filter conditions are redistributed.
+		// Collect the updated branches as filter expressions are redistributed.
 		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlans];
-
 		for ( int i = 0; i < numberOfSubPlans; i++ ) {
 			newSubPlans[i] = joinPlan.getSubPlan(i);
 		}
 
-		// Copy each filter condition to other branches where it can be evaluated.
+		boolean noChanges = true; // set to false if any filter is redistributed
+
+		// Copy each filter expression to other branches where it can be evaluated.
 		for ( int i = 0; i < numberOfSubPlans; i++ ) {
-			for ( final ExprList filterExpressions : branchFilters.get(i) ) {
-				for ( int j = 0; j < numberOfSubPlans; j++ ) {
-					if ( i == j )
-						continue;
+			for ( final ExprList filterExpressions : collectFilters(joinPlan.getSubPlan(i)) ) {
+				for ( final Expr expr : filterExpressions ) {
+					for ( int j = 0; j < numberOfSubPlans; j++ ) {
+						if ( i == j )
+							continue;
 
-					final LogicalPlan branch = newSubPlans[j];
+						final LogicalPlan branch = newSubPlans[j];
 
+						// Avoid duplicating expressions and ensure that all required
+						// variables are certain variables in the target branch.
+						if ( ! branchFilters.get(j).contains(expr)
+							&& canEvaluate(branch, new ExprList(expr)) ) {
+							final ExprList singleExpression = new ExprList(expr);
+							final LogicalOperator filterOp = new LogicalOpFilter(singleExpression, mayReduce);
 
-					// Avoid duplicating filters and ensure that all required
-					// variables are certainly available in the target branch.
-					if ( ! containsFilter(branch, filterExpressions) && canEvaluate(filterExpressions, branch) ) {
-						final LogicalOperator filterOp = new LogicalOpFilter(filterExpressions, mayReduce);
-
-						newSubPlans[j] = LogicalPlanUtils.createPlanWithSubPlans(filterOp, null, branch);
+							newSubPlans[j] = LogicalPlanUtils.createPlanWithSubPlans(filterOp, null, newSubPlans[j]);
+							branchFilters.get(j).add(expr);
+							noChanges = false;
+						}
 					}
 				}
 			}
 		}
 
-		// Rebuild the join with the updated branches.
-		final LogicalPlan newJoinPlan = LogicalPlanUtils.createPlanWithSubPlans(joinPlan.getRootOperator(), null, newSubPlans);
+		if ( noChanges )
+			return joinPlan;
 
-		return newJoinPlan;
+		// Rebuild the join with the updated branches.
+		return LogicalPlanUtils.createPlanWithSubPlans(joinPlan.getRootOperator(), null, newSubPlans);
 	}
 
 	/**
-	 * Collects filter conditions from a logical plan.
+	 * Collects filter expressions from a logical plan.
 	 *
-	 * Traverses the plan recursively, collecting conditions from logical
-	 * filter operators and supported SPARQL request patterns.
+	 * Traverses the plan recursively, collecting expressions from logical
+	 * filter operators, logical GPAdd operators, and SPARQL request patterns.
+	 * Traversal is restricted for certain operators to avoid collecting
+	 * expressions from branches that should not be treated as ordinary
+	 * join branches.
 	 */
-	protected List<ExprList> collectFilters( final LogicalPlan branch ) {
-		final List<ExprList> filters = new ArrayList<>();
+	protected Set<ExprList> collectFilters( final LogicalPlan branch ) {
+		final Set<ExprList> filters = new HashSet<>();
 		final LogicalOperator rootOp = branch.getRootOperator();
 
-		// Collect filter conditions from a logical filter operator.
+		// Collect filter expressions from a logical filter operator.
 		if ( rootOp instanceof LogicalOpFilter filterOp ) {
 			filters.add(filterOp.getFilterExpressions());
 		}
 
-		// Collect filter conditions embedded in a SPARQL request.
+		if ( rootOp instanceof LogicalOpGPAdd gpAddOp ) {
+			final SPARQLGraphPattern pattern = gpAddOp.getPattern();
+
+			if ( pattern instanceof GenericSPARQLGraphPatternImpl1 pattern1 )
+				collectFiltersFromPattern(pattern1.asJenaElement(), filters);
+			else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 pattern2 )
+				collectFiltersFromOp(pattern2.asJenaOp(), filters);
+		}
+
+		// Collect filter expressions embedded in a SPARQL request.
 		if ( rootOp instanceof LogicalOpRequest requestOp ) {
-			if ( requestOp.getRequest() instanceof SPARQLRequest req && req.getQueryPattern() instanceof GenericSPARQLGraphPatternImpl1 pattern )
-				filters.addAll(collectFiltersFromPattern(pattern.asJenaElement()));
+			if ( requestOp.getRequest() instanceof SPARQLRequest req ) {
+				final SPARQLGraphPattern queryPattern = req.getQueryPattern();
+				if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 pattern1 )
+					collectFiltersFromPattern(pattern1.asJenaElement(), filters);
+				else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 pattern2 )
+					collectFiltersFromOp(pattern2.asJenaOp(), filters);
+			}
 
 			// Requests are leaves of the logical plan, so no further traversal is needed.
 			return filters;
 		}
 
-		// Recursively collect filter conditions from child plans.
-		for ( int i = 0; i < branch.numberOfSubPlans(); i++ ) {
-			filters.addAll(collectFilters(branch.getSubPlan(i)));
+		// Recursively collect filter expressions from child plans,
+		// respecting the restrictions imposed by certain operators.
+		if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion ) {
+			// Do not collect filters from the children of a union.
+		}
+		else if ( rootOp instanceof LogicalOpLeftJoin ) {
+			// Only collect filters from the left child of a left join.
+			filters.addAll(collectFilters(branch.getSubPlan(0)));
+		}
+		else {
+			// Collect filters from all child plans.
+			for ( int i = 0; i < branch.numberOfSubPlans(); i++ ) {
+				filters.addAll(collectFilters(branch.getSubPlan(i)));
+			}
 		}
 
 		return filters;
 	}
 
 	/**
-	 * Collects filter conditions from a Jena SPARQL pattern element.
+	 * Collects filter expressions from a Jena SPARQL pattern element.
 	 *
-	 * Extracts conditions from {@link ElementFilter} elements and recursively
-	 * examines the children of {@link ElementGroup} elements. Other element
-	 * types are not currently traversed.
+	 * Extracts expressions from {@link ElementFilter} elements, recursively
+	 * examines the children of {@link ElementGroup} elements and splits
+	 * logical AND expressions into their individual expressions.
+	 * Other element types are not currently traversed.
 	 */
-	protected List<ExprList> collectFiltersFromPattern( final Element element ) {
-		final List<ExprList> filters = new ArrayList<>();
-
-		// Extract the filter condition from a SPARQL FILTER element.
+	protected Set<ExprList> collectFiltersFromPattern( final Element element, final Set<ExprList> filters ) {
+		// Extract and split the filter condition from a SPARQL FILTER element.
 		if ( element instanceof ElementFilter filter ) {
-			final ExprList expressions = new ExprList();
-			expressions.add(filter.getExpr());
-			filters.add(expressions);
+			collectFilterExpressions(filter.getExpr(), filters);
 		}
 		// Recursively inspect the elements of a SPARQL group pattern.
 		else if ( element instanceof ElementGroup group ) {
 			for ( final Element subElement : group.getElements() ) {
-				filters.addAll(collectFiltersFromPattern(subElement));
+				collectFiltersFromPattern(subElement, filters);
 			}
 		}
 		// Additional SPARQL element types can be handled as needed.
@@ -196,50 +248,81 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	}
 
 	/**
-	 * Checks whether a branch already contains a filter with the given
-	 * expressions.
+	 * Collects filter expressions from a Jena algebra tree.
 	 *
-	 * Searches logical filter operators and supported SPARQL request
-	 * patterns throughout the branch.
+	 * Extracts expressions from OpFilter operators and splits logical AND
+	 * expressions into individual expressions. Filters inside UNION branches
+	 * are not collected, and only the left branch of an OPTIONAL (OpLeftJoin)
+	 * is traversed.
 	 */
-	protected boolean containsFilter( final LogicalPlan branch, final ExprList filterExpressions ) {
-		final LogicalOperator branchRootOp = branch.getRootOperator();
+	protected void collectFiltersFromOp( final Op op, final Set<ExprList> filters ) {
+		// Do not collect filters from the branches of a union.
+		if ( op instanceof OpUnion ) {
+			return;
+		}
 
-		// Check whether the root is a filter with the same expressions.
-		if ( branchRootOp instanceof LogicalOpFilter filterOp && filterOp.getFilterExpressions().equals(filterExpressions) )
-			return true;
+		// Only collect filters from the left branch of an optional.
+		if ( op instanceof OpLeftJoin leftJoin ) {
+			collectFiltersFromOp(leftJoin.getLeft(), filters);
+			return;
+		}
 
-		// Check whether a SPARQL request already contains the filter.
-		if ( branchRootOp instanceof LogicalOpRequest requestOp ) {
-			if ( requestOp.getRequest() instanceof SPARQLRequest req && req.getQueryPattern() instanceof GenericSPARQLGraphPatternImpl1 pattern ) {
-				final List<ExprList> requestFilters = collectFiltersFromPattern(pattern.asJenaElement());
-
-				if ( requestFilters.contains(filterExpressions) )
-					return true;
+		// Collect expressions attached to this filter operator.
+		if ( op instanceof OpFilter opFilter ) {
+			for ( final Expr expr : opFilter.getExprs() ) {
+				collectFilterExpressions(expr, filters);
 			}
 		}
 
-		// Search the remaining subplans for an existing occurrence.
-		for ( int i = 0; i < branch.numberOfSubPlans(); i++ ) {
-			if ( containsFilter(branch.getSubPlan(i), filterExpressions) ) {
-				return true;
+		// Recursively traverse the remaining algebra tree.
+		if ( op instanceof Op1 op1 ) {
+			collectFiltersFromOp(op1.getSubOp(), filters);
+		}
+		else if ( op instanceof Op2 op2 ) {
+			collectFiltersFromOp(op2.getLeft(), filters);
+			collectFiltersFromOp(op2.getRight(), filters);
+		}
+		else if ( op instanceof OpN opN ) {
+			for ( final Op subOp : opN.getElements() ) {
+				collectFiltersFromOp(subOp, filters);
 			}
 		}
+	}
 
-		return false;
+	/**
+	 * Recursively splits logical AND expressions into their individual
+	 * expressions and adds each resulting expression to the given set.
+	 *
+	 * Expressions that are not logical AND expressions are added as
+	 * individual filter expressions, wrapped in an {@link ExprList}.
+	 */
+	protected void collectFilterExpressions( final Expr expr, final Set<ExprList> filters ) {
+		if ( expr instanceof E_LogicalAnd logicalAnd ) {
+			collectFilterExpressions(logicalAnd.getArg1(), filters);
+			collectFilterExpressions(logicalAnd.getArg2(), filters);
+		}
+		else {
+			final ExprList expressions = new ExprList();
+			expressions.add(expr);
+			filters.add(expressions);
+		}
 	}
 
 	/**
 	 * Determines whether a branch can evaluate the given filter expressions.
 	 *
 	 * A filter is considered evaluable if every variable it references
-	 * is certainly available in the branch.
+	 * is a certain variable in the branch.
 	 */
-	protected boolean canEvaluate( final ExprList filterExpressions, final LogicalPlan subPlan ) {
+	protected boolean canEvaluate( final LogicalPlan subPlan, final ExprList filterExpressions ) {
 		final Set<Var> varsInFilter = filterExpressions.getVarsMentioned();
 
 		final Set<Var> certainVars = subPlan.getExpectedVariables().getCertainVariables();
 
+		// Use only certain variables to conservatively ensure that every variable
+		// referenced by the filter is bound in the branch. Possible variables may
+		// be unbound in some solution mappings, so using them could change the
+		// query results when the filter is evaluated in this branch.
 		return certainVars.containsAll(varsInFilter);
 	}
 
