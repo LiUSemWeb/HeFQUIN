@@ -204,6 +204,57 @@ public class ExecOpOrderByTest
 		assertFalse( it.hasNext() );
 	}
 
+	@Test
+	public void handleMayReduceFalse() throws ExecOpExecutionException {
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
+
+		final Var x = Var.alloc("x");
+		final Node value8 = NodeFactory.createLiteralDT("8", XSDDatatype.XSDinteger);
+		final SolutionMapping sm8 = SolutionMappingUtils.createSolutionMapping(x, value8);
+
+		final SortCondition sortCondition = new SortCondition(ExprUtils.parse("?x"), Query.ORDER_ASCENDING);
+
+		final ExecOpOrderBy orderBy = new ExecOpOrderBy(List.of(sortCondition), false, false, null);
+
+		final QueryProcContextExt ctx = TestUtils.createQueryProcContextForTests();
+
+		orderBy.process(sm8, sink, ctx);
+		orderBy.process(sm8, sink, ctx);
+
+		orderBy.concludeExecution(sink, ctx);
+
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
+
+		assertHasNext( it, 8, x );
+		assertHasNext( it, 8, x );
+		assertFalse( it.hasNext() );
+	}
+
+	@Test
+	public void handleMayReduceTrue() throws ExecOpExecutionException {
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
+
+		final Var x = Var.alloc("x");
+		final Node value8 = NodeFactory.createLiteralDT("8", XSDDatatype.XSDinteger);
+		final SolutionMapping sm8 = SolutionMappingUtils.createSolutionMapping(x, value8);
+
+		final SortCondition sortCondition = new SortCondition(ExprUtils.parse("?x"), Query.ORDER_ASCENDING);
+
+		final ExecOpOrderBy orderBy = new ExecOpOrderBy(List.of(sortCondition), true, false, null);
+
+		final QueryProcContextExt ctx = TestUtils.createQueryProcContextForTests();
+
+		orderBy.process(sm8, sink, ctx);
+		orderBy.process(sm8, sink, ctx);
+
+		orderBy.concludeExecution(sink, ctx);
+
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
+
+		assertHasNext( it, 8, x );
+		assertFalse( it.hasNext() );
+	}
+
 
 
 	protected void assertHasNext( final Iterator<SolutionMapping> it,

@@ -50,11 +50,11 @@ public class ExecOpOrderBy extends UnaryExecutableOpBase
 	                                   final QueryProcContextExt ctx ) {
 		SolutionMapping previousSolutionMapping = null;
 
+		// PriorityQueue iteration does not guarantee sorted order.
+		// We must use poll() to retrieve mappings in priority order.
 		while ( ! solutionMappings.isEmpty() ) {
 			final SolutionMapping currentSolutionMapping = solutionMappings.poll();
 
-			// PriorityQueue iteration does not guarantee sorted order.
-			// We must use poll() to retrieve mappings in priority order.
 			if ( mayReduce && currentSolutionMapping.equals(previousSolutionMapping) ) {
 				continue;
 			}
