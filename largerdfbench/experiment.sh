@@ -7,14 +7,20 @@ STATS_DIR="stats"
 RESULTS_DIR="results"
 SOURCE_ASSIGNMENTS_DIR="source_assignments"
 LOGICAL_PLANS_DIR="logical_plans"
-EXECUTABLE_PLANS_DIR="executable_plans"
+PHYSICAL_PLANS_DIR="physical_plans"
 
 # Experiment modes
-MODES=("mode1" "mode2" "mode3" "mode4")
-# mode1: all enabled
-# mode2: 746 and 747 disabled
-# mode3: 746 disabled
-# mode4: 747 disabled
+MODES=(
+    "all-enabled"
+    "all-disabled"
+    #"available-ouput-hashset"
+    #"join-hashset-optimizations"
+    #"distinct-push-and-request-merging"
+    #"project-push"
+    #"project-push-and-request-merging"
+    #"filter-push"
+    #"filter-push-and-request-merging"
+)
 
 # DISABLE_JOIN_HASHSET_OPTIMIZATIONS
 # DISABLE_AVAILABLE_OUTPUT_HASHSET
@@ -26,16 +32,16 @@ MODES=("mode1" "mode2" "mode3" "mode4")
 DRY_RUN=false
 
 # Number of repetitions per query
-NUM_RUNS=1
+NUM_RUNS=5
 
 # Query names
 QUERIES=(
-    "C1.rq"
+    #"C1.rq"
     "C3.rq"
-    "C4.rq"
-    "C7.rq"
-    "C8.rq"
-    "C10.rq"
+    #"C4.rq"
+    #"C7.rq"
+    #"C8.rq"
+    #"C10.rq"
     #"L2.rq"
     #"L6.rq"
     #"L7.rq"
@@ -47,7 +53,7 @@ mkdir -p \
     "$RESULTS_DIR" \
     "$SOURCE_ASSIGNMENTS_DIR" \
     "$LOGICAL_PLANS_DIR" \
-    "$EXECUTABLE_PLANS_DIR"
+    "$PHYSICAL_PLANS_DIR"
 
 # add flag for PhysicalPlan
 
@@ -56,21 +62,19 @@ for MODE in "${MODES[@]}"; do
 
     # Configure experiment flags
     case "$MODE" in
-        mode1)
-            DISABLE_746=false
-            DISABLE_747=false
+        all-enabled)
+            DISABLE_JOIN_HASHSET_OPTIMIZATIONS=false
+            DISABLE_AVAILABLE_OUTPUT_HASHSET=false
+            DISABLE_DISTINCT_REQUEST_MERGING=false
+            DISABLE_PROJECT_REQUEST_MERGING=false
+            CONFIG="ConfDescr-all-enabled.ttl"
             ;;
-        mode2)
-            DISABLE_746=true
-            DISABLE_747=true
-            ;;
-        mode3)
-            DISABLE_746=true
-            DISABLE_747=false
-            ;;
-        mode4)
-            DISABLE_746=false
-            DISABLE_747=true
+        all-disabled)
+            DISABLE_JOIN_HASHSET_OPTIMIZATIONS=true
+            DISABLE_AVAILABLE_OUTPUT_HASHSET=true
+            DISABLE_DISTINCT_REQUEST_MERGING=true
+            DISABLE_PROJECT_REQUEST_MERGING=true
+            CONFIG="ConfDescr-all-disabled.ttl"
             ;;
         *)
             echo "Unknown mode: $MODE" >&2
@@ -81,8 +85,6 @@ for MODE in "${MODES[@]}"; do
     echo ""
     echo "########################################"
     echo "### MODE ${MODE}"
-    echo "### DISABLE_746=${DISABLE_746}"
-    echo "### DISABLE_747=${DISABLE_747}"
     echo "########################################"
 
     # Execute all queries
@@ -95,7 +97,7 @@ for MODE in "${MODES[@]}"; do
         RESULTS_FILE="${RESULTS_DIR}/${QUERY_BASE}_${MODE}.txt"
         SOURCE_ASSIGNMENTS_FILE="${SOURCE_ASSIGNMENTS_DIR}/${QUERY_BASE}_${MODE}.txt"
         LOGICAL_PLAN_FILE="${LOGICAL_PLANS_DIR}/${QUERY_BASE}_${MODE}.txt"
-        EXECUTABLE_PLAN_FILE="${EXECUTABLE_PLANS_DIR}/${QUERY_BASE}_${MODE}.txt"
+        PHYSICAL_PLAN_FILE="${PHYSICAL_PLANS_DIR}/${QUERY_BASE}_${MODE}.txt"
         TIMING_FILE="timing.csv"
 
         echo ""
@@ -112,7 +114,7 @@ for MODE in "${MODES[@]}"; do
                 "$RESULTS_FILE" \
                 "$SOURCE_ASSIGNMENTS_FILE" \
                 "$LOGICAL_PLAN_FILE" \
-                "$EXECUTABLE_PLAN_FILE"
+                "$PHYSICAL_PLAN_FILE"
             do
                 : > "$FILE"
             done
@@ -121,32 +123,27 @@ for MODE in "${MODES[@]}"; do
             CMD=(
                 ../bin/hefquin
                 --federationDescription "$FEDERATION"
+                --confDescr "$CONFIG"
                 --query "$QUERY"
                 --printQueryProcStatsToFile "$STATS_FILE"
                 --outputToFile "$RESULTS_FILE"
                 --printSourceAssignmentToFile "$SOURCE_ASSIGNMENTS_FILE"
                 --printLogicalPlanToFile "$LOGICAL_PLAN_FILE"
-                --printExecutablePlanToFile "$EXECUTABLE_PLAN_FILE"
+                --printPhysicalPlanToFile "$PHYSICAL_PLAN_FILE"
                 --ignoreRetrievalCache
                 --ignoreCardinalityCache
                 --printQueryProcMeasurements
             )
 
-            # Execute or print command
-            if [ "$DRY_RUN" = true ]; then
-                printf '    DISABLE_746=%s DISABLE_747=%s' \
-                    "$DISABLE_746" "$DISABLE_747"
-                printf ' %q' "${CMD[@]}"
-                printf '\n'
-            else
-                printf '%s,%s,' "$QUERY_NAME" "$MODE" >> "$TIMING_FILE"
-                env \
-                    DISABLE_746="$DISABLE_746" \
-                    DISABLE_747="$DISABLE_747" \
-                    JVM_ARGS="-Xmx128g" \
-                    "${CMD[@]}" >> "$TIMING_FILE"
-            fi
-
+            # Execute
+            printf '%s,%s,' "$QUERY_NAME" "$MODE" >> "$TIMING_FILE"
+            env \
+                DISABLE_JOIN_HASHSET_OPTIMIZATIONS="$DISABLE_JOIN_HASHSET_OPTIMIZATIONS" \
+                DISABLE_AVAILABLE_OUTPUT_HASHSET="$DISABLE_AVAILABLE_OUTPUT_HASHSET" \
+                DISABLE_DISTINCT_REQUEST_MERGING="$DISABLE_DISTINCT_REQUEST_MERGING" \
+                DISABLE_PROJECT_REQUEST_MERGING="$DISABLE_PROJECT_REQUEST_MERGING" \
+                JVM_ARGS="-Xmx128g" \
+                "${CMD[@]}" >> "$TIMING_FILE"
         done
     done
 done

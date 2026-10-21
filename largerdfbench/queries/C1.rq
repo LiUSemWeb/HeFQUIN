@@ -5,7 +5,7 @@ PREFIX kegg: <http://bio2rdf.org/ns/kegg#>
 PREFIX chebi: <http://bio2rdf.org/ns/bio2rdf#>
 PREFIX purl: <http://purl.org/dc/elements/1.1/>
 
-SELECT DISTINCT ?drug ?drugDesc ?molecularWeightAverage ?compound ?ReactionTitle ?ChemicalEquation
+SELECT DISTINCT ?drug #?drugDesc ?molecularWeightAverage ?compound ?ReactionTitle ?ChemicalEquation
 WHERE {
   SERVICE sparql:DrugBank {
     ?drug drugbank:description ?drugDesc .
