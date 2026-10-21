@@ -387,12 +387,7 @@ public class FilterRedistributionTest extends EngineTestBase
 		final LogicalPlan leftBranch = result.getSubPlan(0);
 		assertTrue( leftBranch.getRootOperator() instanceof LogicalOpFilter );
 		final LogicalOpFilter leftBranchOp = (LogicalOpFilter) leftBranch.getRootOperator();
-		assertTrue( leftBranchOp.getFilterExpressions().equals( new ExprList(e2) ) );
-
-		final LogicalPlan leftBranchChild = leftBranch.getSubPlan(0);
-		assertTrue( leftBranchChild.getRootOperator() instanceof LogicalOpFilter );
-		final LogicalOpFilter leftBranchChildOp = (LogicalOpFilter) leftBranchChild.getRootOperator();
-		assertTrue( leftBranchChildOp.getFilterExpressions().equals( new ExprList(e1) ) );
+		assertTrue( leftBranchOp.getFilterExpressions().equals( ExprList.create(e1, e2) ) );
 
 		final LogicalPlan rightBranch = result.getSubPlan(1);
 		assertTrue( rightBranch.getRootOperator() instanceof LogicalOpFilter );
