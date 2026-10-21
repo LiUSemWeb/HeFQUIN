@@ -12,6 +12,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Increase the size of the thread pools from 10 to 1000 ([#758](https://github.com/LiUSemWeb/HeFQUIN/pull/758)).
 - Use a union of bind joins as physical plan for a join with an multi-request operator ([#759](https://github.com/LiUSemWeb/HeFQUIN/pull/759). [#762](https://github.com/LiUSemWeb/HeFQUIN/pull/762)).
 - Bug fix in handling the CLI option to bypass the cache for data retrieval requests ([#770](https://github.com/LiUSemWeb/HeFQUIN/pull/770)).
+- Bug fix: in-memory cache used same cache keys for data retrieval responses and cardinality responses ([#772](https://github.com/LiUSemWeb/HeFQUIN/pull/772)).
 ### Planned for Next Release
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
 
