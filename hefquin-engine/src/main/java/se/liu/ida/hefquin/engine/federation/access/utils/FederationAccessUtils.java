@@ -182,7 +182,7 @@ public class FederationAccessUtils
 	                         final MemberType fm ) throws FederationAccessException
 	{
 		final FederationAccessManager fedAccessMgr = ctx.getFederationAccessMgr();
-		final CompletableFuture<RespType> f = fedAccessMgr.issueRequest( req, fm, ctx.ignoreCardinalityCache() );
+		final CompletableFuture<RespType> f = fedAccessMgr.issueRequest( req, fm, ctx.ignoreRetrievalCache() );
 
 		try {
 			return f.get();
