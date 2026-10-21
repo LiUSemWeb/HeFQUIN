@@ -27,10 +27,10 @@ public class RuleBasedPhysicalOptimizerImpl extends PhysicalOptimizerBase
 	                                                                  final QueryProcContextExt ctx ) throws PhysicalOptimizationException {
 		log.debug( "Starting physical optimization with {} rewritingRules", rewritingRules.size() );
 		PhysicalPlan resultPlan = initialPhysicalPlan;
-		for ( final RewritingRuleForPhysicalOptimization h : rewritingRules ) {
-			log.debug( "Applying rewriting rule {} to physical plan", h.getClass().getSimpleName() );
-			resultPlan = h.apply(resultPlan, ctx);
-			log.debug( "Finished applying rewriting rule {} to plan", h.getClass().getSimpleName() );
+		for ( final RewritingRuleForPhysicalOptimization r : rewritingRules ) {
+			log.debug( "Applying rewriting rule {} to physical plan", r.getClass().getSimpleName() );
+			resultPlan = r.apply(resultPlan, ctx);
+			log.debug( "Finished applying rewriting rule {} to plan", r.getClass().getSimpleName() );
 		}
 
 		log.debug( "Physical optimization finished" );

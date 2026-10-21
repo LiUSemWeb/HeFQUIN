@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 public interface RewritingRuleForPhysicalOptimization
 {
 	/**
-	 * Applies this heuristics to the given plan and returns
+	 * Applies this rule to the given plan and returns
 	 * the resulting, potentially rewritten plan.
 	 */
 	PhysicalPlan apply( PhysicalPlan inputPlan, QueryProcContext ctxt ) throws PhysicalOptimizationException;
