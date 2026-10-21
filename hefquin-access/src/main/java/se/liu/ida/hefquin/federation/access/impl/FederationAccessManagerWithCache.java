@@ -32,7 +32,8 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 {
 	protected final FederationAccessManager fedAccMan;
 	protected final Map<TriplePattern, CompletableFuture<CardinalityResponse>> cacheMap = new HashMap<>();
-	protected final Cache<Key, CompletableFuture<? extends DataRetrievalResponse<?>>> cache;
+	protected final Cache<Key, CompletableFuture<? extends DataRetrievalResponse<?>>> retrievalCache;
+	protected final Cache<Key, CompletableFuture<? extends DataRetrievalResponse<?>>> cardinalityCache;
 
 	// stats
 	protected long cacheRequestsSPARQL  = 0L;
@@ -54,7 +55,8 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		assert fedAccMan != null;
 		this.fedAccMan = fedAccMan;
 
-		cache = new GenericCacheImpl<>(cacheCapacity, cachePolicies);
+		retrievalCache = new GenericCacheImpl<>(cacheCapacity, cachePolicies);
+		cardinalityCache = new GenericCacheImpl<>(cacheCapacity, cachePolicies);
 	}
 
 	public FederationAccessManagerWithCache( final FederationAccessManager fedAccMan,
@@ -86,7 +88,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		final Key key = new Key(req, fm);
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse;
 		if ( ! ignoreCache )
-			cachedResponse = cache.get(key) ;
+			cachedResponse = retrievalCache.get(key) ;
 		else
 			cachedResponse = null;
 
@@ -107,7 +109,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		}
 
 		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm, ignoreCache);
-		cache.put(key, newResponse);
+		retrievalCache.put(key, newResponse);
 		return newResponse;
 	}
 
@@ -123,7 +125,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		final Key key = new Key(req, fm);
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse;
 		if ( ! ignoreCardinalityCache )
-			cachedResponse = cache.get(key) ;
+			cachedResponse = cardinalityCache.get(key) ;
 		else
 			cachedResponse = null;
 
@@ -144,7 +146,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm, ignoreCardinalityCache);
-		cache.put(key, newResponse);
+		cardinalityCache.put(key, newResponse);
 		return newResponse;
 	}
 
