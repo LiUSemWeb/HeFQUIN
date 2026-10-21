@@ -16,6 +16,12 @@ MODES=("mode1" "mode2" "mode3" "mode4")
 # mode3: 746 disabled
 # mode4: 747 disabled
 
+# DISABLE_JOIN_HASHSET_OPTIMIZATIONS
+# DISABLE_AVAILABLE_OUTPUT_HASHSET
+# DISABLE_DISTINCT_REQUEST_MERGING
+# DISABLE_PROJECT_REQUEST_MERGING
+
+
 # Dry run (true = print commands, false = execute)
 DRY_RUN=false
 
@@ -42,6 +48,8 @@ mkdir -p \
     "$SOURCE_ASSIGNMENTS_DIR" \
     "$LOGICAL_PLANS_DIR" \
     "$EXECUTABLE_PLANS_DIR"
+
+# add flag for PhysicalPlan
 
 # Execute all experiment modes
 for MODE in "${MODES[@]}"; do
