@@ -7,10 +7,11 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- Support for ORDER BY directly within the HeFQUIN engine ([#765](https://github.com/LiUSemWeb/HeFQUIN/issues/765)). <-- not complete yet
+- Support for ORDER BY directly within the HeFQUIN engine ([#765](https://github.com/LiUSemWeb/HeFQUIN/pull/765)). <-- not complete yet
 ### Changed
-- Increase the size of the thread pools from 10 to 1000 ([#758](https://github.com/LiUSemWeb/HeFQUIN/issues/758)).
-- Use a union of bind joins as physical plan for a join with an multi-request operator ([#759](https://github.com/LiUSemWeb/HeFQUIN/issues/759). [#762](https://github.com/LiUSemWeb/HeFQUIN/issues/762)).
+- Increase the size of the thread pools from 10 to 1000 ([#758](https://github.com/LiUSemWeb/HeFQUIN/pull/758)).
+- Use a union of bind joins as physical plan for a join with an multi-request operator ([#759](https://github.com/LiUSemWeb/HeFQUIN/pull/759). [#762](https://github.com/LiUSemWeb/HeFQUIN/pull/762)).
+- Bug fix in handling the CLI option to bypass the cache for data retrieval requests ([#770](https://github.com/LiUSemWeb/HeFQUIN/pull/770)).
 ### Planned for Next Release
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
 
@@ -18,46 +19,46 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [0.0.13] - 2026-10-07
 
 ### Added
-- Support for authentication ([#664](https://github.com/LiUSemWeb/HeFQUIN/issues/664), [#676](https://github.com/LiUSemWeb/HeFQUIN/issues/676), [#680](https://github.com/LiUSemWeb/HeFQUIN/issues/680), [#701](https://github.com/LiUSemWeb/HeFQUIN/issues/701), [#704](https://github.com/LiUSemWeb/HeFQUIN/issues/704), [#705](https://github.com/LiUSemWeb/HeFQUIN/issues/705), [#723](https://github.com/LiUSemWeb/HeFQUIN/issues/723), [#735](https://github.com/LiUSemWeb/HeFQUIN/issues/735)).
-- New query plan operator that covers multiple requests with the same pattern to different federation members ([#677](https://github.com/LiUSemWeb/HeFQUIN/issues/677), [#690](https://github.com/LiUSemWeb/HeFQUIN/issues/690)).
-- Extend support for caching to all types of federation members, including REST, GraphQL, and Neo4j ([#590](https://github.com/LiUSemWeb/HeFQUIN/issues/590)).
-- CLI options to bypass cache for data retrieval requests and cardinality requests independently during query execution ([#685](https://github.com/LiUSemWeb/HeFQUIN/issues/685), [#715](https://github.com/LiUSemWeb/HeFQUIN/issues/715), [#716](https://github.com/LiUSemWeb/HeFQUIN/issues/716)).
-- New logical plan rewriting rule that removes unnecessary project operators ([#693](https://github.com/LiUSemWeb/HeFQUIN/issues/693)).
-- Integration test that runs all queries from the examples directory ([#687](https://github.com/LiUSemWeb/HeFQUIN/issues/687)).
-- Add option to specify a request limit per federation member ([#703](https://github.com/LiUSemWeb/HeFQUIN/issues/703), [#707](https://github.com/LiUSemWeb/HeFQUIN/issues/707)).
+- Support for authentication ([#664](https://github.com/LiUSemWeb/HeFQUIN/pull/664), [#676](https://github.com/LiUSemWeb/HeFQUIN/pull/676), [#680](https://github.com/LiUSemWeb/HeFQUIN/pull/680), [#701](https://github.com/LiUSemWeb/HeFQUIN/pull/701), [#704](https://github.com/LiUSemWeb/HeFQUIN/pull/704), [#705](https://github.com/LiUSemWeb/HeFQUIN/pull/705), [#723](https://github.com/LiUSemWeb/HeFQUIN/pull/723), [#735](https://github.com/LiUSemWeb/HeFQUIN/pull/735)).
+- New query plan operator that covers multiple requests with the same pattern to different federation members ([#677](https://github.com/LiUSemWeb/HeFQUIN/pull/677), [#690](https://github.com/LiUSemWeb/HeFQUIN/pull/690)).
+- Extend support for caching to all types of federation members, including REST, GraphQL, and Neo4j ([#590](https://github.com/LiUSemWeb/HeFQUIN/pull/590)).
+- CLI options to bypass cache for data retrieval requests and cardinality requests independently during query execution ([#685](https://github.com/LiUSemWeb/HeFQUIN/pull/685), [#715](https://github.com/LiUSemWeb/HeFQUIN/pull/715), [#716](https://github.com/LiUSemWeb/HeFQUIN/pull/716)).
+- New logical plan rewriting rule that removes unnecessary project operators ([#693](https://github.com/LiUSemWeb/HeFQUIN/pull/693)).
+- Integration test that runs all queries from the examples directory ([#687](https://github.com/LiUSemWeb/HeFQUIN/pull/687)).
+- Add option to specify a request limit per federation member ([#703](https://github.com/LiUSemWeb/HeFQUIN/pull/703), [#707](https://github.com/LiUSemWeb/HeFQUIN/pull/707)).
 ### Changed
-- More user-friendly printing of exceptions in the CLI program, including support of the --debug argument for printing the full stack traces ([#699](https://github.com/LiUSemWeb/HeFQUIN/issues/699), [#708](https://github.com/LiUSemWeb/HeFQUIN/issues/708), [#741](https://github.com/LiUSemWeb/HeFQUIN/issues/741)).
-- Better handling and recording of exceptions in data retrieval responses ([#706](https://github.com/LiUSemWeb/HeFQUIN/issues/706), [#711](https://github.com/LiUSemWeb/HeFQUIN/issues/711)).
-- Minor improvement in MergeRequests: do not merge if it leads to a cross product ([#744](https://github.com/LiUSemWeb/HeFQUIN/issues/744))
-- Bug fix: prevent MapDB cache corruption on abrupt termination ([#750](https://github.com/LiUSemWeb/HeFQUIN/issues/750))
-- Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/issues/675)).
-- Bug fix: adding hashCode() function to the Pair class to avoid unnecessary cache misses in FederationManagerWithCache ([#679](https://github.com/LiUSemWeb/HeFQUIN/issues/679)).
-- Bug fix: several relevant Jena operators were not covered by OpUtils ([#734](https://github.com/LiUSemWeb/HeFQUIN/issues/734), [#743](https://github.com/LiUSemWeb/HeFQUIN/issues/743)).
-- Merge the various constructors of AsyncFederationAccessManagerImpl into one ([#697](https://github.com/LiUSemWeb/HeFQUIN/issues/697), [#700](https://github.com/LiUSemWeb/HeFQUIN/issues/700)).
-- Use HashSet instead of a List for the intermediate result queues between executable operators for queries with DISTINCT ([#746](https://github.com/LiUSemWeb/HeFQUIN/issues/746)).
-- Use HashSet instead of a List for data structures in the symmetric hash join and the bind join implementations for queries with DISTINCT ([#747](https://github.com/LiUSemWeb/HeFQUIN/issues/747)).
-- Switch dependency direction between hefquin-access and hefquin-pgconnector ([#702](https://github.com/LiUSemWeb/HeFQUIN/issues/702)).
-- Move LogicalPlanUtils to a different package ([#745](https://github.com/LiUSemWeb/HeFQUIN/issues/745)).
+- More user-friendly printing of exceptions in the CLI program, including support of the --debug argument for printing the full stack traces ([#699](https://github.com/LiUSemWeb/HeFQUIN/pull/699), [#708](https://github.com/LiUSemWeb/HeFQUIN/pull/708), [#741](https://github.com/LiUSemWeb/HeFQUIN/pull/741)).
+- Better handling and recording of exceptions in data retrieval responses ([#706](https://github.com/LiUSemWeb/HeFQUIN/pull/706), [#711](https://github.com/LiUSemWeb/HeFQUIN/pull/711)).
+- Minor improvement in MergeRequests: do not merge if it leads to a cross product ([#744](https://github.com/LiUSemWeb/HeFQUIN/pull/744))
+- Bug fix: prevent MapDB cache corruption on abrupt termination ([#750](https://github.com/LiUSemWeb/HeFQUIN/pull/750))
+- Bug fix: the hefquin-rmlmat program did not actually support the --formatted and the --compress argument ([#675](https://github.com/LiUSemWeb/HeFQUIN/pull/675)).
+- Bug fix: adding hashCode() function to the Pair class to avoid unnecessary cache misses in FederationManagerWithCache ([#679](https://github.com/LiUSemWeb/HeFQUIN/pull/679)).
+- Bug fix: several relevant Jena operators were not covered by OpUtils ([#734](https://github.com/LiUSemWeb/HeFQUIN/pull/734), [#743](https://github.com/LiUSemWeb/HeFQUIN/pull/743)).
+- Merge the various constructors of AsyncFederationAccessManagerImpl into one ([#697](https://github.com/LiUSemWeb/HeFQUIN/pull/697), [#700](https://github.com/LiUSemWeb/HeFQUIN/pull/700)).
+- Use HashSet instead of a List for the intermediate result queues between executable operators for queries with DISTINCT ([#746](https://github.com/LiUSemWeb/HeFQUIN/pull/746)).
+- Use HashSet instead of a List for data structures in the symmetric hash join and the bind join implementations for queries with DISTINCT ([#747](https://github.com/LiUSemWeb/HeFQUIN/pull/747)).
+- Switch dependency direction between hefquin-access and hefquin-pgconnector ([#702](https://github.com/LiUSemWeb/HeFQUIN/pull/702)).
+- Move LogicalPlanUtils to a different package ([#745](https://github.com/LiUSemWeb/HeFQUIN/pull/745)).
 
 
 ## [0.0.12] - 2026-08-17
 
 ### Added
 - Support for *two* persistent cache implementations for federation requests (including cardinality requests): a MapDB-based one and a ChronicleMap-based one, both with support for cache replacement and invalidation policies ([#546](https://github.com/LiUSemWeb/HeFQUIN/pull/546), [#648](https://github.com/LiUSemWeb/HeFQUIN/pull/648), [#658](https://github.com/LiUSemWeb/HeFQUIN/pull/658), [#666](https://github.com/LiUSemWeb/HeFQUIN/pull/666)).
-- New CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/issues/616), [#643](https://github.com/LiUSemWeb/HeFQUIN/issues/643), [#646](https://github.com/LiUSemWeb/HeFQUIN/issues/646), [#647](https://github.com/LiUSemWeb/HeFQUIN/issues/647), [#653](https://github.com/LiUSemWeb/HeFQUIN/issues/653), [#655](https://github.com/LiUSemWeb/HeFQUIN/issues/655), [#671](https://github.com/LiUSemWeb/HeFQUIN/issues/671)).
-- New CLI program to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601), [#644](https://github.com/LiUSemWeb/HeFQUIN/issues/644), [#670](https://github.com/LiUSemWeb/HeFQUIN/issues/670)).
-- Option to print the query result to a file when using the HeFQUIN CLI ([#671](https://github.com/LiUSemWeb/HeFQUIN/issues/671)).
+- New CLI program to issue queries to the HeFQUIN service ([#616](https://github.com/LiUSemWeb/HeFQUIN/pull/616), [#643](https://github.com/LiUSemWeb/HeFQUIN/pull/643), [#646](https://github.com/LiUSemWeb/HeFQUIN/pull/646), [#647](https://github.com/LiUSemWeb/HeFQUIN/pull/647), [#653](https://github.com/LiUSemWeb/HeFQUIN/pull/653), [#655](https://github.com/LiUSemWeb/HeFQUIN/pull/655), [#671](https://github.com/LiUSemWeb/HeFQUIN/pull/671)).
+- New CLI program to use the RML component of HeFQUIN explicitly ([#601](https://github.com/LiUSemWeb/HeFQUIN/pull/601), [#644](https://github.com/LiUSemWeb/HeFQUIN/pull/644), [#670](https://github.com/LiUSemWeb/HeFQUIN/pull/670)).
+- Option to print the query result to a file when using the HeFQUIN CLI ([#671](https://github.com/LiUSemWeb/HeFQUIN/pull/671)).
 - Configurable logging when using the HeFQUIN CLI ([#659](https://github.com/LiUSemWeb/HeFQUIN/pull/659)).
 ### Changed
 - Refactoring issueCardinalityRequest to make it generic ([#630](https://github.com/LiUSemWeb/HeFQUIN/pull/630)).
 - Refactoring maxParallelRequests handling to eliminate redundant constructors in federation access managers ([#650](https://github.com/LiUSemWeb/HeFQUIN/pull/650)).
-- Pushing projection variables and distinct into requests to SPARQL endpoints ([#600](https://github.com/LiUSemWeb/HeFQUIN/issues/600), [#629](https://github.com/LiUSemWeb/HeFQUIN/issues/629), [#638](https://github.com/LiUSemWeb/HeFQUIN/issues/638), [#639](https://github.com/LiUSemWeb/HeFQUIN/issues/639), [#642](https://github.com/LiUSemWeb/HeFQUIN/issues/642)).
-- Extending filter push down to l2g and g2l operators ([#667](https://github.com/LiUSemWeb/HeFQUIN/issues/667)).
-- Extending the application of vocabulary mappings to (some kinds of) FILTER / BIND expressions ([#660](https://github.com/LiUSemWeb/HeFQUIN/issues/660)).
+- Pushing projection variables and distinct into requests to SPARQL endpoints ([#600](https://github.com/LiUSemWeb/HeFQUIN/issues/600), [#629](https://github.com/LiUSemWeb/HeFQUIN/pull/629), [#638](https://github.com/LiUSemWeb/HeFQUIN/pull/638), [#639](https://github.com/LiUSemWeb/HeFQUIN/pull/639), [#642](https://github.com/LiUSemWeb/HeFQUIN/pull/642)).
+- Extending filter push down to l2g and g2l operators ([#667](https://github.com/LiUSemWeb/HeFQUIN/pull/667)).
+- Extending the application of vocabulary mappings to (some kinds of) FILTER / BIND expressions ([#660](https://github.com/LiUSemWeb/HeFQUIN/pull/660)).
 - Logging for query planner ([#636](https://github.com/LiUSemWeb/HeFQUIN/pull/636), [#637](https://github.com/LiUSemWeb/HeFQUIN/pull/637)).
-- Refactoring of  the context objects that are passed around during query processing ([#645](https://github.com/LiUSemWeb/HeFQUIN/issues/645)).
-- Hash index for full-retrieval mode of the bind join variants ([#668](https://github.com/LiUSemWeb/HeFQUIN/issues/668)).
-- Fixing example vocabulary mapping for Wikidata to make the example query work ([#640](https://github.com/LiUSemWeb/HeFQUIN/issues/640)).
+- Refactoring of  the context objects that are passed around during query processing ([#645](https://github.com/LiUSemWeb/HeFQUIN/pull/645)).
+- Hash index for full-retrieval mode of the bind join variants ([#668](https://github.com/LiUSemWeb/HeFQUIN/pull/668)).
+- Fixing example vocabulary mapping for Wikidata to make the example query work ([#640](https://github.com/LiUSemWeb/HeFQUIN/pull/640)).
 - Removes ChronicleMap-based cardinality-specific cache implementation (ChronicleMapCardinalityCache) and related files ([546](https://github.com/LiUSemWeb/HeFQUIN/pull/546)).
 - Remove wrapped response from CardinalityResponseImpl ([#628](https://github.com/LiUSemWeb/HeFQUIN/pull/628)).
 - Bug fix in quality assignment during join cardinality estimation ([#665](https://github.com/LiUSemWeb/HeFQUIN/pull/665)).
