@@ -97,7 +97,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	 * Redistributes filter expressions across the branches of a join plan.
 	 *
 	 * Collects the filter expressions from each branch and copies each
-	 * condition to other branches where all referenced variables are
+	 * condition to other branches in which all variables referenced by the condition are
 	 * certain variables (see {@link #canEvaluate(ExprList, LogicalPlan)},
 	 * provided that the condition is not already present in the target branch.
 	 *
@@ -144,8 +144,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 						// variables are certain variables in the target branch.
 						if ( ! branchFilters.get(j).contains(expr)
 							&& canEvaluate(branch, new ExprList(expr)) ) {
-							final ExprList singleExpression = new ExprList(expr);
-							final LogicalOperator filterOp = new LogicalOpFilter(singleExpression, mayReduce);
+							final LogicalOperator filterOp = new LogicalOpFilter(expr, mayReduce);
 
 							newSubPlans[j] = LogicalPlanUtils.createPlanWithSubPlans(filterOp, null, newSubPlans[j]);
 							branchFilters.get(j).add(expr);
@@ -166,11 +165,12 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	/**
 	 * Collects filter expressions from a logical plan.
 	 *
-	 * Traverses the plan recursively, collecting expressions from logical
-	 * filter operators, logical GPAdd operators, and SPARQL request patterns.
+	 * Traverses the plan recursively, collecting expressions from
+	 * filter operators, gpAdd operators, and request operators.
 	 * Traversal is restricted for certain operators to avoid collecting
 	 * expressions from branches that should not be treated as ordinary
-	 * join branches.
+	 * join branches. Especially, the traversal does not go into the second subplan
+	 * of a left-join operator, and it also ignores all subplans under union operators.
 	 */
 	protected Set<ExprList> collectFilters( final LogicalPlan branch ) {
 		final Set<ExprList> filters = new HashSet<>();
@@ -231,7 +231,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	 * logical AND expressions into their individual expressions.
 	 * Other element types are not currently traversed.
 	 */
-	protected Set<ExprList> collectFiltersFromPattern( final Element element, final Set<ExprList> filters ) {
+	protected void collectFiltersFromPattern( final Element element, final Set<ExprList> filters ) {
 		// Extract and split the filter condition from a SPARQL FILTER element.
 		if ( element instanceof ElementFilter filter ) {
 			collectFilterExpressions(filter.getExpr(), filters);
@@ -327,8 +327,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	}
 
 	/**
-	 * Checks whether a logical operator represents an inner join supported
-	 * by this heuristic.
+	 * Checks whether a logical operator represents an inner join.
 	 */
 	protected boolean isInnerJoin( final LogicalOperator op ) {
 		return op instanceof LogicalOpJoin || op instanceof LogicalOpMultiwayJoin;
