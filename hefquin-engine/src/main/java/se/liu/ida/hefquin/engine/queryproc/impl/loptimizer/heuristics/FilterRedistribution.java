@@ -149,6 +149,10 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 					if ( ! branchFilters.get(j).contains(expr)
 					  && canEvaluate(branch, expr) ) {
 						branchFilters.get(j).add(expr);
+
+						if ( expressionsToCopy == null )
+							expressionsToCopy = new ExprList();
+
 						expressionsToCopy.add(expr);
 					}
 				}
@@ -188,9 +192,9 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	/**
 	 * A visitor that collects filter expressions from a logical plan.
 	 *
-	 * Filter expressions are collected from logical filter operators, graph
-	 * pattern operators, and SPARQL requests. Child plans are traversed according
-	 * to the semantics of their parent operators: all children are visited for
+	 * Filter expressions are collected from logical filter operators, LogicalOpGPAdd
+	 * and LogicalOpGPOptAdd operators, and SPARQL requests. Child plans are traversed
+	 * according to the semantics of their parent operators: all children are visited for
 	 * ordinary joins, only the left child is visited for left joins and MINUS,
 	 * and children of union operators are ignored.
 	 *
@@ -198,7 +202,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	 * sharing the same set of collected filter expressions.
 	 */
 	protected class FilterCollector implements LogicalPlanVisitor {
-		protected final LogicalPlan branch;
+		protected LogicalPlan branch;
 		protected final Set<Expr> filters;
 
 		public FilterCollector( final LogicalPlan branch, final Set<Expr> filters ) {
@@ -212,7 +216,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 		protected void visitSubPlan( final int index ) {
 			final LogicalPlan currentBranch = branch;
 			branch = branch.getSubPlan(index);
-			subPlan.getRootOperator().visit(this);
+			branch.getRootOperator().visit(this);
 			branch = currentBranch;
 		}
 
