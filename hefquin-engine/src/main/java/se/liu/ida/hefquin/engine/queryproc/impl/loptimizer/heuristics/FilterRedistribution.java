@@ -210,8 +210,10 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 		 * Visits the specified child plan using the same filter set.
 		 */
 		protected void visitSubPlan( final int index ) {
-			final LogicalPlan subPlan = branch.getSubPlan(index);
-			subPlan.getRootOperator().visit(new FilterCollector(subPlan, filters));
+			final LogicalPlan currentBranch = branch;
+			branch = branch.getSubPlan(index);
+			subPlan.getRootOperator().visit(this);
+			branch = currentBranch;
 		}
 
 		/**
