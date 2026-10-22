@@ -65,6 +65,9 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
  */
 public class MergeRequests implements HeuristicForLogicalOptimization
 {
+	final static boolean DISABLE_PROJECT_REQUEST_MERGING = Boolean
+		.parseBoolean( System.getenv().getOrDefault("DISABLE_PROJECT_REQUEST_MERGING", "false") );
+
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan,
 	                          final QueryProcContext ctxt2 ) {
@@ -425,6 +428,10 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpProject op ) {
+			if ( ! DISABLE_PROJECT_REQUEST_MERGING ) {
+				return;
+			}
+
 			// A project can be merged into a request operator if that request
 			// is for a SPARQL endpoint.
 			final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
