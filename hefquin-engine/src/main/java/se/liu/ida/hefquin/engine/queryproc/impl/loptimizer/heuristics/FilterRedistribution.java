@@ -192,8 +192,8 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	/**
 	 * A visitor that collects filter expressions from a logical plan.
 	 *
-	 * Filter expressions are collected from logical filter operators, LogicalOpGPAdd
-	 * and LogicalOpGPOptAdd operators, and SPARQL requests. Child plans are traversed
+	 * Filter expressions are collected from filter operators, gpAdd operators,
+	 * and request operators (with SPARQL requests). Child plans are traversed
 	 * according to the semantics of their parent operators: all children are visited for
 	 * ordinary joins, only the left child is visited for left joins and MINUS,
 	 * and children of union operators are ignored.
@@ -255,7 +255,6 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpGPOptAdd op ) {
-			collectFiltersFromPattern(op.getPattern(), filters);
 			visitAllSubPlans();
 		}
 
