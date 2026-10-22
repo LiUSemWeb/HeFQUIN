@@ -21,6 +21,9 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 public abstract class PushBasedPlanThreadImplBase
                 implements PushBasedPlanThread, IntermediateResultElementSink
 {
+	final static boolean DISABLE_AVAILABLE_OUTPUT_HASHSET = Boolean
+		.parseBoolean( System.getenv().getOrDefault("DISABLE_AVAILABLE_OUTPUT_HASHSET", "false") );
+
 	// initialized via the constructor
 	protected final QueryProcContextExt ctx;
 
@@ -78,7 +81,7 @@ public abstract class PushBasedPlanThreadImplBase
 		assert ctx != null;
 		this.ctx = ctx;
 
-		availableOutput = mayReduce
+		availableOutput = mayReduce && ! DISABLE_AVAILABLE_OUTPUT_HASHSET
 			? new HashSet<>()
 			: new ArrayList<>();
 	}
