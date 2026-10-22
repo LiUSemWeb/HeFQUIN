@@ -132,18 +132,12 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 			branchFilters.add( collectFilters(branch) );
 		}
 
-		// Collect the updated branches as filter expressions are redistributed.
-		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlans];
-		for ( int i = 0; i < numberOfSubPlans; i++ ) {
-			newSubPlans[i] = joinPlan.getSubPlan(i);
-		}
-
-		boolean noChanges = true; // set to false if any filter is redistributed
-
 		// Copy filter expressions to other branches where they can be evaluated.
+		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlans];
+		boolean noChanges = true; // set to false if any filter is redistributed
 		for ( int j = 0; j < numberOfSubPlans; j++ ) {
-			final LogicalPlan branch = newSubPlans[j];
-			final ExprList expressionsToCopy = new ExprList();
+			final LogicalPlan branch = joinPlan.getSubPlan(j);
+			ExprList expressionsToCopy = null;
 
 			for ( int i = 0; i < numberOfSubPlans; i++ ) {
 				if ( i == j )
@@ -153,20 +147,22 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 					// Avoid duplicating expressions and ensure that all required
 					// variables are certain variables in the target branch.
 					if ( ! branchFilters.get(j).contains(expr)
-					  && ! expressionsToCopy.getList().contains(expr)
 					  && canEvaluate(branch, expr) ) {
+						branchFilters.get(j).add(expr);
 						expressionsToCopy.add(expr);
 					}
 				}
 			}
 
 			// Create a single filter operator containing all eligible expressions.
-			if ( ! expressionsToCopy.isEmpty() ) {
+			if ( expressionsToCopy != null ) {
 				final LogicalOperator filterOp = new LogicalOpFilter(expressionsToCopy, mayReduce);
 
 				newSubPlans[j] = LogicalPlanUtils.createPlanWithSubPlans(filterOp, null, branch);
-				branchFilters.get(j).addAll(expressionsToCopy.getList());
 				noChanges = false;
+			}
+			else {
+				newSubPlans[j] = branch;
 			}
 		}
 
