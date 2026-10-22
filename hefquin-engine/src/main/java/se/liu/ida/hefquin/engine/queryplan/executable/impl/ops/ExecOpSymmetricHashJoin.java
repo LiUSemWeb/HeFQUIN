@@ -32,6 +32,9 @@ import java.util.*;
  */
 public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 {
+	final static boolean DISABLE_JOIN_HASHSET_OPTIMIZATIONS = Boolean
+		.parseBoolean( System.getenv().getOrDefault("DISABLE_JOIN_HASHSET_OPTIMIZATIONS", "false") );
+
 	private static final Logger log = LoggerFactory.getLogger( ExecOpSymmetricHashJoin.class );
 	protected final SolutionMappingsIndex indexForChild1;
 	protected final SolutionMappingsIndex indexForChild2;
@@ -227,7 +230,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 	                                           final SolutionMappingsIndex indexForProbing,
 	                                           final List<SolutionMapping> outputBuffer,
 	                                           final boolean mayReduce ) {
-		if ( mayReduce && indexForInput.contains(inputSolMap) )
+		if ( mayReduce && indexForInput.contains(inputSolMap) && ! DISABLE_JOIN_HASHSET_OPTIMIZATIONS )
 			return;
 
 		indexForInput.add(inputSolMap);

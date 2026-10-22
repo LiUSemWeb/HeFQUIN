@@ -107,6 +107,9 @@ public abstract class BaseForExecOpParallelBindJoin<
                                        RespType extends DataRetrievalResponse<?>>
            extends BaseForUnaryExecOpWithCollectedInput
 {
+	final static boolean DISABLE_JOIN_HASHSET_OPTIMIZATIONS = Boolean
+		.parseBoolean( System.getenv().getOrDefault("DISABLE_JOIN_HASHSET_OPTIMIZATIONS", "false") );
+
 	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpParallelBindJoin.class );
 
 	public final static int DEFAULT_BATCH_SIZE = 30;
@@ -302,6 +305,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// solution mapping if we have seen the exact same mapping before (while
 		// populating the current batch).
 		if (    mayReduce
+		     && ! DISABLE_JOIN_HASHSET_OPTIMIZATIONS
 		     && solMapsCoveredByCurrentBatch != null
 		     && solMapsCoveredByCurrentBatch.contains(inputSolMap) )
 			return;
@@ -354,7 +358,7 @@ public abstract class BaseForExecOpParallelBindJoin<
 		// batch, which may have to be set up first.
 		if ( solMapsCoveredByCurrentBatch == null ) {
 			// set up the next batch
-			solMapsCoveredByCurrentBatch = mayReduce
+			solMapsCoveredByCurrentBatch = mayReduce && ! DISABLE_JOIN_HASHSET_OPTIMIZATIONS
 				? new HashSet<>()
 				: new ArrayList<>();
 			currentBatch = new HashSet<>();
