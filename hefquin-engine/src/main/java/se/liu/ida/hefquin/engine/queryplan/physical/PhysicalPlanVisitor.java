@@ -31,4 +31,5 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpGlobalToLocal op );
 	void visit( PhysicalOpDuplicateRemoval op );
 	void visit( PhysicalOpProject op );
+	void visit( PhysicalOpOrderBy op );
 }

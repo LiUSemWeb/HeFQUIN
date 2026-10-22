@@ -478,6 +478,15 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			}
 		}
 
+		@Override
+		public void visit( final LogicalOpOrderBy op ) {
+			// An order by operator can be merged into a request operator if that request
+			// is for a SPARQL endpoint.
+
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+		}
+
 	} // end of Worker
 
 	/**
@@ -659,7 +668,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	/**
 	 * Checks whether the expected variables of the two patterns have at least one
 	 * variable in common.
-	 * 
+	 *
 	 * @param pattern1 the first SPARQL graph pattern
 	 * @param pattern2 the second SPARQL graph pattern
 	 * @return true if the patterns share at least one expected variable, false

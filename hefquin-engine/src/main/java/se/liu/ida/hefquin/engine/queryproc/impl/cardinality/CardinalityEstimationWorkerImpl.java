@@ -629,6 +629,23 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		qpInfo.addProperty( QueryPlanProperty.minCardinality(0, Quality.MIN_OR_MAX_POSSIBLE) );
 	}
 
+	@Override
+	public void visit( final LogicalOpOrderBy op ) {
+		final QueryPlanningInfo qpInfo = currentSubPlan.getQueryPlanningInfo();
+		final QueryPlanningInfo qpInfoSubPlan = currentSubPlan.getSubPlan(0).getQueryPlanningInfo();
+		final QueryPlanProperty crdSubPlan = qpInfoSubPlan.getProperty(CARDINALITY);
+
+		if ( checkAndSetIfGuaranteedEmpty(qpInfo, crdSubPlan) ) {
+			// If the input plan is guaranteed to produce an empty result,
+			// then the result of the ORDER BY operator is guaranteed to be empty as well.
+			return;
+		}
+
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(CARDINALITY) );
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(MAX_CARDINALITY) );
+		qpInfo.addProperty( qpInfoSubPlan.getProperty(MIN_CARDINALITY) );
+	}
+
 	/**
 	 * Checks whether the given cardinality property guarantees that the query plan
 	 * will produce an empty result. If so, it updates the provided {@link QueryPlanningInfo}

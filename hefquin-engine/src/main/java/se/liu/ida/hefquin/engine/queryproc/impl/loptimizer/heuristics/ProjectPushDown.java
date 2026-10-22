@@ -34,6 +34,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpOrderBy;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
@@ -278,6 +279,13 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			createdPlan = createPlanForJoinLikeOpUnderProject( projectOp,
 			                                                 subPlanUnderProject,
 			                                                 inputPlan );
+		}
+
+		@Override
+		public void visit( final LogicalOpOrderBy op ) {
+			createdPlan = createPlanForUnaryOpUnderProject( projectOp,
+			                                                op,
+			                                                subPlanUnderProject.getSubPlan(0) );
 		}
 
 	} // end of Worker

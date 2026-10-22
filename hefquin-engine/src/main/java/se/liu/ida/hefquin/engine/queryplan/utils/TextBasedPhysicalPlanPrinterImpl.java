@@ -257,6 +257,12 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			record( op.getLogicalOperator() );
 		}
 
+		@Override
+		public void visit( final PhysicalOpOrderBy op ) {
+			rootOpString = "order by";
+			record( op.getLogicalOperator() );
+		}
+
 		protected void record( final LogicalOperator lop ) {
 			lop.visit(snc);
 			props.add( "lop: " + snc.name );
