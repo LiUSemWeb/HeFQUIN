@@ -54,6 +54,8 @@ public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadI
 		for ( int i = 0; i < inputs.length; i++ ) {
 			boolean inputConsumed = false;
 			while ( ! inputConsumed ) {
+				if ( terminationFlagIsSet() ) return;
+
 				inputs[i].transferAvailableOutput(transferBuffer);
 				if ( ! transferBuffer.isEmpty() ) {
 					op.processInputFromXthChild(i, transferBuffer, sink, ctx);
@@ -88,6 +90,8 @@ public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadI
 			// output from the input that says it has output available.
 			boolean someInputConsumed = false;
 			for ( int i = 0; i < inputs.length; i++ ) {
+				if ( terminationFlagIsSet() ) return;
+
 				if ( ! inputConsumedCompletely[i] && inputs[i].hasMoreOutputAvailable() ) {
 					// calling 'transferAvailableOutput' should not cause this thread to wait
 					inputs[i].transferAvailableOutput(transferBuffer);
@@ -114,6 +118,8 @@ public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadI
 				while ( inputConsumedCompletely[indexOfNextInputToWaitFor] == true ) {
 					indexOfNextInputToWaitFor = advanceIndexOfInput(indexOfNextInputToWaitFor);
 				}
+
+				if ( terminationFlagIsSet() ) return;
 
 				// Now we ask that input to produce its next output, which may
 				// cause this thread to wait.

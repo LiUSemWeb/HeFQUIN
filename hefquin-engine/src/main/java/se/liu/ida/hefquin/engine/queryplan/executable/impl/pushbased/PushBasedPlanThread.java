@@ -96,6 +96,28 @@ public interface PushBasedPlanThread extends Runnable, StatsProvider
 	 */
 	boolean hasMoreOutputAvailable();
 
+	/**
+	 * This method sets a flag to inform the running task that it should
+	 * terminate as soon as possible, even if it has not completed yet.
+	 *
+	 * This method is expected to be called by a thread that consumes
+	 * the solution mappings produced by this task or by a thread that
+	 * coordinates the execution of the whole plan. The method does not
+	 * block that thread but, instead, returns immediately. Hence, the
+	 * task may still be running when the method returns.
+	 */
+	void setTerminationFlag();
+
+	/**
+	 * Returns {@code true} if the termination flag has been set via the
+	 * {@link #setTerminationFlag()} method.
+	 *
+	 * This method is expected to be called by the thread that runs this
+	 * task in order to check regularly whether it should terminate even
+	 * without having completed.
+	 */
+	boolean terminationFlagIsSet();
+
 	@Override
 	StatsOfPushBasedPlanThread getStats();
 }

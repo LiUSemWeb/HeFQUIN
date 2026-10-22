@@ -57,6 +57,8 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		boolean input1Consumed = false;
 		while ( ! input1Consumed ) {
+			if ( terminationFlagIsSet() ) return;
+
 			input1.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
 				op.processInputFromChild1(transferBuffer, sink, ctx);
@@ -69,6 +71,8 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 
 		boolean input2Consumed = false;
 		while ( ! input2Consumed ) {
+			if ( terminationFlagIsSet() ) return;
+
 			input2.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
 				op.processInputFromChild2(transferBuffer, sink, ctx);
@@ -90,6 +94,8 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		boolean input2Consumed = false;
 		while ( ! input2Consumed ) {
+			if ( terminationFlagIsSet() ) return;
+
 			input2.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
 				op.processInputFromChild2(transferBuffer, sink, ctx);
@@ -102,6 +108,8 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 
 		boolean input1Consumed = false;
 		while ( ! input1Consumed ) {
+			if ( terminationFlagIsSet() ) return;
+
 			input1.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
 				op.processInputFromChild1(transferBuffer, sink, ctx);
@@ -124,6 +132,8 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 		boolean input1ConsumedCompletely = false;
 		boolean input2ConsumedCompletely = false;
 		while ( ! input1ConsumedCompletely || ! input2ConsumedCompletely ) {
+			if ( terminationFlagIsSet() ) return;
+
 			// Before blindly asking any of the two inputs to give us the
 			// solution mappings that it has currently available as output
 			// (which may cause this thread to wait if no such output is
@@ -141,6 +151,8 @@ public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThrea
 
 				someInputConsumed = true;
 			}
+
+			if ( terminationFlagIsSet() ) return;
 
 			if ( ! input2ConsumedCompletely && input2.hasMoreOutputAvailable() )
 			{

@@ -148,16 +148,24 @@ public class PushBasedExecutablePlanImpl implements ExecutablePlan
 
 		if ( limitExceeded ) {
 			// If the LIMIT was exceeded, the tasks are likely still
-			// running and we need to interrupt and terminate them,
-			// for which we start from the task of the root operator.
-			for ( int j = 0; j < tasks.size(); j++ ) {
-				final Future<?> future = futures[j];
-				if ( ! future.isDone() ) {
-System.out.println("Terminating task #" + j + " because of LIMIT ...");
-					future.cancel(true);
-System.out.println("... task #" + j + " terminated.");
+			// running; we inform them to terminate (start from the
+			// task of the root operator), and ...
+			for ( final PushBasedPlanThread t : tasks ) {
+				t.setTerminationFlag();
+			}
+
+			// ... wait until each of the tasks has terminated (for
+			// which we consume its output until the task is not
+			// producing any more output).
+			for ( final PushBasedPlanThread t : tasks ) {
+				while ( true ) {
+					log.debug("Waiting for task " + t.hashCode() + " to have terminated." );
+
+					t.transferAvailableOutput(transferBuffer);
+
+					if ( transferBuffer.isEmpty() )
+						break;
 				}
-else System.out.println("Task #" + j + " is already done.");
 			}
 		}
 
