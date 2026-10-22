@@ -372,7 +372,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpFilter op ) {
-			if ( ! DISABLE_FILTER_REQUEST_MERGING ) {
+			if ( DISABLE_FILTER_REQUEST_MERGING ) {
 				return;
 			}
 
@@ -435,7 +435,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpProject op ) {
-			if ( ! DISABLE_PROJECT_REQUEST_MERGING ) {
+			if ( DISABLE_PROJECT_REQUEST_MERGING ) {
 				return;
 			}
 
