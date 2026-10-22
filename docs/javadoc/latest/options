@@ -14,13 +14,13 @@
 -charset
 'UTF-8'
 -d
-'/home/runner/work/HeFQUIN/HeFQUIN/target/reports/0.0.13/apidocs'
+'/home/runner/work/HeFQUIN/HeFQUIN/target/reports/0.0.14/apidocs'
 -docencoding
 'UTF-8'
 -doctitle
-'HeFQUIN 0.0.13 API'
+'HeFQUIN 0.0.14 API'
 -notimestamp
 -use
 -version
 -windowtitle
-'HeFQUIN 0.0.13 API'
+'HeFQUIN 0.0.14 API'
