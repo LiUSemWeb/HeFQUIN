@@ -125,9 +125,8 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 	 * @return a logical plan with the redistributed filter expressions
 	 */
 	protected LogicalPlan redistributeFilters( final LogicalPlan joinPlan, final int numberOfSubPlans, final boolean mayReduce ) {
-		final List<Set<Expr>> branchFilters = new ArrayList<>();
-
-		// Collect the filter expressions occurring in each join branch.
+		// Collect the filter expressions of each of the join branches.
+		final List<Set<Expr>> branchFilters = new ArrayList<>(numberOfSubPlans);
 		for ( int i = 0; i < numberOfSubPlans; i++ ) {
 			final LogicalPlan branch = joinPlan.getSubPlan(i);
 			branchFilters.add( collectFilters(branch) );
@@ -316,12 +315,16 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) {
-			visitAllSubPlans();
+			// Do not collect filter expressions from under an l2g operator
+			// because such filter expressions may be based on a different
+			// vocabulary.
 		}
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
-			visitAllSubPlans();
+			// Do not collect filter expressions from under a g2l operator
+			// because such filter expressions may be based on a different
+			// vocabulary.
 		}
 
 		@Override
