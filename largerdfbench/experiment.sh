@@ -1,5 +1,30 @@
 #!/bin/bash
 
+# Notes about enabling flags:
+# DISABLE_MAY_REDUCE:
+#   BaseForLogicalOps.java
+#     - Set mayReduce to false 
+# DISABLE_JOIN_HASHSET_OPTIMIZATIONS:
+#   BaseForExecOpParallelBindJoin.java
+#     - Prevents duplicate solMaps from being skipped within the current batch. (#747)
+#     - Disables the use of HashSet for solMapsCoveredByCurrentBatch. (#747)
+#   BaseForExecOpSequentialBindJoin.java
+#     - Prevents duplicate solMaps from being skipped within the current batch. (#747)
+#     - Disables the use of HashSet for currentBatch. (#747)
+#   ExecOpSymmetricHashJoin.java
+#     - Disables checking the accumulated input index for an already-seen mapping before inserting and probing. (#747)
+# DISABLE_AVAILABLE_OUTPUT_HASHSET:
+#   PushBasedPlanThreadImplBase.java
+#     - Disables the use of a HashSet to buffer output solution mappings to remove duplicates.
+# DISABLE_DISTINCT_REQUEST_MERGING:
+#   NB: NOT CORRECT FLAG!
+# DISABLE_PROJECT_REQUEST_MERGING:
+#   MergeRequests.java
+#     - Disables merging project operator into the request.
+
+
+
+
 FEDERATION="LargeRDFBenchFedConf.ttl"
 
 QUERY_DIR="queries"
@@ -11,8 +36,8 @@ PHYSICAL_PLANS_DIR="physical_plans"
 
 # Experiment modes
 MODES=(
-    "all-enabled"
     "all-disabled"
+    "all-enabled"
     #"available-ouput-hashset"
     #"join-hashset-optimizations"
     #"distinct-push-and-request-merging"
@@ -21,11 +46,6 @@ MODES=(
     #"filter-push"
     #"filter-push-and-request-merging"
 )
-
-# DISABLE_JOIN_HASHSET_OPTIMIZATIONS
-# DISABLE_AVAILABLE_OUTPUT_HASHSET
-# DISABLE_DISTINCT_REQUEST_MERGING
-# DISABLE_PROJECT_REQUEST_MERGING
 
 
 # Dry run (true = print commands, false = execute)
@@ -37,10 +57,10 @@ NUM_RUNS=2
 # Query names
 QUERIES=(
     "C1.rq"
-    "C3.rq"
-    "C4.rq"
-    "C7.rq"
-    "C8.rq"
+    #"C3.rq"
+    #"C4.rq"
+    #"C7.rq"
+    #"C8.rq"
     #"C10.rq"
     #"L2.rq"
     #"L6.rq"
@@ -67,6 +87,7 @@ for QUERY_NAME in "${QUERIES[@]}"; do
             # Configure experiment flags
             case "$MODE" in
                 all-enabled)
+                    DISABLE_MAY_REDUCE=false
                     DISABLE_JOIN_HASHSET_OPTIMIZATIONS=false
                     DISABLE_AVAILABLE_OUTPUT_HASHSET=false
                     DISABLE_DISTINCT_REQUEST_MERGING=false
@@ -74,6 +95,7 @@ for QUERY_NAME in "${QUERIES[@]}"; do
                     CONFIG="ConfDescr-all-enabled.ttl"
                     ;;
                 all-disabled)
+                    DISABLE_MAY_REDUCE=true
                     DISABLE_JOIN_HASHSET_OPTIMIZATIONS=true
                     DISABLE_AVAILABLE_OUTPUT_HASHSET=true
                     DISABLE_DISTINCT_REQUEST_MERGING=true
