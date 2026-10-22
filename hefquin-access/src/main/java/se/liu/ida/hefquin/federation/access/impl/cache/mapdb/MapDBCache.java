@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -24,8 +27,8 @@ import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheKey;
  *
  * <p>
  * This class is thread-safe for concurrent access through its public methods on
- * a single {@link MapDBCache} instance. All access is guarded by
- * synchronization on {@code map}.
+ * a single {@link MapDBCache} instance. Cache operations are synchronized using
+ * a dedicated lock.
  * </p>
  *
  * <p>
@@ -63,6 +66,8 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	protected static final String DEFAULT_FILENAME = "cache/mapdb-map.dat";
 
 	protected final DB db;
+	private final Set<CompletableFuture<Void>> pendingWrites = ConcurrentHashMap.newKeySet();
+	private boolean closed = false;
 
 	/**
 	 * Creates a cache with the default capacity and default file path.
@@ -209,11 +214,31 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 * Closes the underlying MapDB database and releases associated resources.
 	 *
 	 * <p>
+	 * Prevents new cache writes, waits for all pending asynchronous writes to
+	 * complete, and then closes the database. Any write failures encountered during
+	 * shutdown are logged.
+	 * </p>
+	 *
+	 * <p>
 	 * After this method returns, the cache must not be used anymore.
 	 * </p>
 	 */
 	@Override
 	public void close() {
+		final CompletableFuture<?>[] writes;
+
+		synchronized (lock) {
+			if (closed) return;
+
+			closed = true;
+			writes = pendingWrites.toArray(new CompletableFuture<?>[0]);
+		}
+
+		try {
+			CompletableFuture.allOf(writes).join();
+		} catch ( final CompletionException e ) {
+			logger.error("Cache writes failed during shutdown", e);
+		}
 		db.close();
 	}
 
@@ -237,7 +262,9 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 * <p>
 	 * Once the future has completed successfully, insertion is delegated to
 	 * {@link CacheLayer#put(Object, Object)}, which handles replacement policy,
-	 * capacity enforcement, and the actual insertion into the backing map.
+	 * capacity enforcement, and the actual insertion into the backing map. The
+	 * changes are then committed to the database. Writes are synchronized with
+	 * shutdown to prevent database access after it has been closed.
 	 * </p>
 	 *
 	 * @param key   cache key, must not be {@code null}
@@ -248,9 +275,26 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 */
 	@Override
 	public void put( final PersistentCacheKey key, final CompletableFuture<? extends DataRetrievalResponse<?>> value ) {
-		value.thenAccept( response -> {
-			super.put(key, value);
-			db.commit();
-		} );
+		synchronized (lock) {
+			if (closed) {
+				throw new IllegalStateException("Cache is already closed");
+			}
+
+			final CompletableFuture<Void> future = value.thenAccept( response -> {
+				synchronized (lock) {
+					super.put(key, value);
+					db.commit();
+				}
+			} );
+
+			pendingWrites.add(future);
+
+			future.whenComplete( (result, error) -> {
+				if ( error != null ) {
+					logger.error("Failed to persist cache entry", error);
+				}
+				pendingWrites.remove(future);
+			} );
+		}
 	}
 }
