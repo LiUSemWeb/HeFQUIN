@@ -68,6 +68,9 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	final static boolean DISABLE_PROJECT_REQUEST_MERGING = Boolean
 		.parseBoolean( System.getenv().getOrDefault("DISABLE_PROJECT_REQUEST_MERGING", "false") );
 
+	final static boolean DISABLE_FILTER_REQUEST_MERGING = Boolean
+		.parseBoolean( System.getenv().getOrDefault("DISABLE_FILTER_REQUEST_MERGING", "false") );
+
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan,
 	                          final QueryProcContext ctxt2 ) {
@@ -369,6 +372,10 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpFilter op ) {
+			if ( ! DISABLE_FILTER_REQUEST_MERGING ) {
+				return;
+			}
+
 			// A filter can be merged into a request operator if that request
 			// is for a SPARQL endpoint.
 			final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
