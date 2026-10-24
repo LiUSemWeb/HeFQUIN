@@ -31,7 +31,7 @@ public class SPARQLRequestImplTest extends FederationTestBase
 
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
-		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), true);
+		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), null, true);
 
 		// checking
 		// the base query does not contain DISTINCT
@@ -56,7 +56,7 @@ public class SPARQLRequestImplTest extends FederationTestBase
 
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
-		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), false);
+		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), null, false);
 
 		// checking
 		// i) ensure projection is applied

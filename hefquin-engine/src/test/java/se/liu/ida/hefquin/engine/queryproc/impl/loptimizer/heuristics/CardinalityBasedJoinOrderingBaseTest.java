@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 import org.junit.Test;
 
@@ -205,6 +206,7 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 				@Override public ExpectedVariables getExpectedVariables() { return ev; }
 				@Override public TriplePattern getQueryPattern() { throw new UnsupportedOperationException(); }
 				@Override public Set<Var> getProjectionVars() { throw new UnsupportedOperationException(); }
+				@Override public List<SortCondition> getSortConditions() { throw new UnsupportedOperationException(); }
 				@Override public boolean getDistinctRequired() { throw new UnsupportedOperationException(); }
 			};
 

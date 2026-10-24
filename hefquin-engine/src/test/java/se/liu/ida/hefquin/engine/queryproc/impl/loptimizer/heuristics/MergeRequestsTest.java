@@ -8,12 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementMinus;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.sparql.util.ExprUtils;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.BGP;
@@ -28,6 +31,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpOrderBy;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
@@ -736,10 +740,10 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v3);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, Set.of(v1,v3), false) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, Set.of(v1,v3), null, false) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2, v2, v3);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2, Set.of(v2), true) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp2, Set.of(v2), null, true) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
 			false,
@@ -777,10 +781,10 @@ public class MergeRequestsTest extends EngineTestBase
 		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
 
 		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v3);
-		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, true, new SPARQLRequestImpl(tp1, Set.of(v1,v3), true) );
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, true, new SPARQLRequestImpl(tp1, Set.of(v1,v3), null, true) );
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2, v2, v3);
-		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, true, new SPARQLRequestImpl(tp2, Set.of(v2), true) );
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fm, true, new SPARQLRequestImpl(tp2, Set.of(v2), null, true) );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
 			true,
@@ -895,5 +899,114 @@ public class MergeRequestsTest extends EngineTestBase
 
 		final LogicalPlan subResult2 = result.getSubPlan(1);
 		assertTrue( subResult2.getRootOperator() instanceof LogicalOpRequest );
+	}
+
+	@Test
+	public void mergeOrderByIntoRequestWithoutSortConditions() {
+		// an ORDER BY operator is merged into a SPARQL request that has no sort conditions.
+
+		// setup
+		final Var v1 = Var.alloc("x");
+
+		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, null, null, false) );
+
+		final SortCondition sortCondition = new SortCondition(ExprUtils.parse("?x"), Query.ORDER_ASCENDING);
+		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition), skipLiveWebTests);
+		final LogicalPlan orderByPlan = new LogicalPlanWithUnaryRootImpl(orderByOp, null, new LogicalPlanWithNullaryRootImpl(reqOp1, null));
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(orderByPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) result.getRootOperator();
+		assertEquals( List.of(sortCondition), ((SPARQLRequestImpl) resultReqOp.getRequest()).getSortConditions() );
+	}
+
+	@Test
+	public void removeOrderByWhenRequestHasIdenticalSortConditions() {
+		// an ORDER BY operator is removed when the request already has identical sort conditions.
+
+		// setup
+		final Var v1 = Var.alloc("x");
+
+		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final SortCondition sortCondition = new SortCondition(ExprUtils.parse("?x"), Query.ORDER_ASCENDING);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, null, List.of(sortCondition), false) );
+
+		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition), skipLiveWebTests);
+		final LogicalPlan orderByPlan = new LogicalPlanWithUnaryRootImpl(orderByOp, null, new LogicalPlanWithNullaryRootImpl(reqOp1, null));
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(orderByPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) result.getRootOperator();
+		assertEquals( List.of(sortCondition), ((SPARQLRequestImpl) resultReqOp.getRequest()).getSortConditions() );
+	}
+
+	@Test
+	public void mergeOrderByWhenRequestSortConditionsArePrefix() {
+		// an ORDER BY operator is merged into a request when its sort conditions extend
+		// the request's existing sort conditions.
+
+		// setup
+		final Var v1 = Var.alloc("x");
+
+		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final SortCondition sortCondition1 = new SortCondition(ExprUtils.parse("?x"), Query.ORDER_ASCENDING);
+		final SortCondition sortCondition2 = new SortCondition(ExprUtils.parse("?y"), Query.ORDER_ASCENDING);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, null, List.of(sortCondition1), false) );
+
+		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition1, sortCondition2), skipLiveWebTests);
+		final LogicalPlan orderByPlan = new LogicalPlanWithUnaryRootImpl(orderByOp, null, new LogicalPlanWithNullaryRootImpl(reqOp1, null));
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(orderByPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) result.getRootOperator();
+		assertEquals( List.of(sortCondition1, sortCondition2), ((SPARQLRequestImpl) resultReqOp.getRequest()).getSortConditions() );
+	}
+
+	@Test
+	public void doNotMergeOrderByWhenSortConditionsAreIncompatible() {
+		// an ORDER BY operator is not merged when its sort conditions are incompatible
+		// with the request's existing sort conditions.
+
+		// setup
+		final Var v1 = Var.alloc("x");
+
+		final FederationMember fm = new SPARQLEndpointForTest("http://ex.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final SortCondition sortCondition1 = new SortCondition(ExprUtils.parse("?x"), Query.ORDER_ASCENDING);
+		final SortCondition sortCondition2 = new SortCondition(ExprUtils.parse("?y"), Query.ORDER_ASCENDING);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, null, List.of(sortCondition1), false) );
+
+		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition2), skipLiveWebTests);
+		final LogicalPlan orderByPlan = new LogicalPlanWithUnaryRootImpl(orderByOp, null, new LogicalPlanWithNullaryRootImpl(reqOp1, null));
+
+		// test
+		final LogicalPlan result = new MergeRequests().apply(orderByPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpOrderBy );
+		assertEquals( List.of(sortCondition2), ((LogicalOpOrderBy) result.getRootOperator()).getSortConditions() );
+
+		final LogicalPlan subPlan = result.getSubPlan(0);
+
+		assertTrue( subPlan.getRootOperator() instanceof LogicalOpRequest );
+		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subPlan.getRootOperator();
+		assertEquals( List.of(sortCondition1), ((SPARQLRequestImpl) resultReqOp.getRequest()).getSortConditions() );
 	}
 }

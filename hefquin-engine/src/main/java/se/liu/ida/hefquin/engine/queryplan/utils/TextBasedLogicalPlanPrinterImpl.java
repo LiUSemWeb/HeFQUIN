@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.Expr;
@@ -318,6 +319,24 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 		@Override
 		public void visit( final LogicalOpMinus op ) {
+			props.add( "may reduce duplicates: " + op.mayReduce() );
+		}
+
+		@Override
+		public void visit( final LogicalOpOrderBy op ) {
+			final int numberOfSortConditions = op.getSortConditions().size();
+			if ( numberOfSortConditions == 1 ) {
+				final SortCondition sortCondition = op.getSortConditions().get(0);
+				props.add( "sort condition: " + sortCondition.toString() );
+			}
+			else {
+				props.add( "number of sort conditions: " + numberOfSortConditions );
+				for ( int i = 0; i < numberOfSortConditions; i++ ) {
+					final SortCondition sortCondition = op.getSortConditions().get(i);
+					props.add( "sort condition " + (i+1) + ": " + sortCondition.toString() );
+				}
+			}
+
 			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
 

@@ -231,6 +231,7 @@ public class ExecOpMultiRequest extends NullaryExecutableOpBase
 
 		return new SPARQLRequestImpl( p,
 		                              req.getProjectionVars(),
+		                              req.getSortConditions(),
 		                              req.getDistinctRequired() );
 	}
 

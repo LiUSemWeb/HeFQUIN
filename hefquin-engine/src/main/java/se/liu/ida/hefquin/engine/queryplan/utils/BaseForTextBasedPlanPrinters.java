@@ -175,6 +175,9 @@ public class BaseForTextBasedPlanPrinters
 
 		@Override
 		public void visit( final LogicalOpMinus op )            { name = "minus"; }
+
+		@Override
+		public void visit( final LogicalOpOrderBy op )          { name = "order by"; }
 	}
 
 }
