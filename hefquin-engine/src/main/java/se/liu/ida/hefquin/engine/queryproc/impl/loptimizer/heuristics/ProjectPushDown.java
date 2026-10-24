@@ -322,7 +322,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 			final boolean mayReduce = reqOp.mayReduce() && projectOp.mayReduce();
 
-			final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getDistinctRequired() || mayReduce );
+			final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getSortConditions(), oldReq.getDistinctRequired() || mayReduce );
 
 			final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( reqOp.getFederationMember(), mayReduce, newReq );
 			return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
@@ -371,7 +371,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		final boolean mayReduce = reqOp.mayReduce() && projectOp.mayReduce();
 
-		final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getDistinctRequired() || mayReduce );
+		final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getSortConditions(), oldReq.getDistinctRequired() || mayReduce );
 
 		final LogicalOpMultiRequest mergedOp = new LogicalOpMultiRequest( newReq,
 		                                                                  reqOp.getServiceVariable(),

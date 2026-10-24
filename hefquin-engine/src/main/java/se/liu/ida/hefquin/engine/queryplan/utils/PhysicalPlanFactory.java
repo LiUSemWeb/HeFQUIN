@@ -420,7 +420,7 @@ public class PhysicalPlanFactory
 			return createPlanWithRequest(req, mayReduce, fm);
 		}
 		else if ( fm.isSupportedPattern(gp) ) {
-			final SPARQLRequest req = new SPARQLRequestImpl(gp, null, mayReduce );
+			final SPARQLRequest req = new SPARQLRequestImpl(gp, null, null, mayReduce );
 			return createPlanWithRequest(req, mayReduce, fm);
 		}
 		else {
@@ -547,7 +547,7 @@ public class PhysicalPlanFactory
 		// subplan. Or, even more sophisticated, after decomposing the mreq
 		// operator, identify the extracted requests for which turning them
 		// into gpAdd operators does not seem to be a good idea and put them
-		// back into an mreq operator again. 
+		// back into an mreq operator again.
 //		if ( rootOp instanceof PhysicalOpMultiRequest ) {
 //			return createPlanWithJoin(inputPlan, nextPlan, qpInfo, lop2pop);
 //		}

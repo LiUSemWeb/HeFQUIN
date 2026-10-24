@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
@@ -443,7 +444,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 
 				final boolean mayReduce = reqOp.mayReduce() && op.mayReduce();
 
-				final SPARQLRequest newReq = new SPARQLRequestImpl( req.getQueryPattern(), newProj, req.getDistinctRequired() || mayReduce );
+				final SPARQLRequest newReq = new SPARQLRequestImpl( req.getQueryPattern(), newProj, req.getSortConditions(), req.getDistinctRequired() || mayReduce );
 
 				final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( reqOp.getFederationMember(), mayReduce, newReq );
 				returnPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
@@ -480,11 +481,33 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpOrderBy op ) {
-			// An order by operator can be merged into a request operator if that request
-			// is for a SPARQL endpoint.
+			// An ORDER BY operator can be merged into a request operator if that request
+			// is for a SPARQL endpoint and if their sort conditions are compatible.
 
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'visit'");
+			final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
+			if (    childOp instanceof LogicalOpRequest reqOp
+					&& reqOp.getFederationMember() instanceof SPARQLEndpoint
+					&& reqOp.getRequest() instanceof SPARQLRequest req )
+			{
+				final List<SortCondition> opSortConditions = op.getSortConditions();
+				final List<SortCondition> reqSortConditions = req.getSortConditions();
+				if ( reqSortConditions != null ) {
+					if ( reqSortConditions.equals(opSortConditions) ) {
+						// The request already provides the required ordering.
+						returnPlan = rewrittenSubPlans.get(0);
+					}
+					else if ( isPrefix(reqSortConditions, opSortConditions) ) {
+						returnPlan = createRequestWithSortConditions(reqOp, req, opSortConditions, op);
+					}
+					else {
+						// The existing ordering is incompatible, so the ORDER BY
+						// operator must be retained.
+					}
+				}
+				else {
+					returnPlan = createRequestWithSortConditions(reqOp, req, opSortConditions, op);
+				}
+			}
 		}
 
 	} // end of Worker
@@ -633,7 +656,7 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			req = new BGPRequestImpl(bgp);
 		}
 		else {
-			req = new SPARQLRequestImpl(p, null, mayReduce);
+			req = new SPARQLRequestImpl(p, null, null, mayReduce);
 		}
 
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(fm, mayReduce, req);
@@ -663,6 +686,57 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				nonReqSubPlans.add(p);
 			}
 		}
+	}
+
+	/**
+	 * Creates a request operator that incorporates the given sort conditions
+	 * into the specified request.
+	 *
+	 * @param reqOp          the original request operator
+	 * @param req            the request whose sort conditions are to be updated
+	 * @param sortConditions the sort conditions to apply to the resulting request
+	 * @param orderByOp      the ORDER BY operator being merged into the request
+	 * @return a logical plan containing the updated request operator
+	 */
+	protected LogicalPlan createRequestWithSortConditions( final LogicalOpRequest<?, ?> reqOp,
+	                                                       final SPARQLRequest req,
+	                                                       final List<SortCondition> sortConditions,
+	                                                       final LogicalOpOrderBy orderByOp ) {
+		final boolean mayReduce = reqOp.mayReduce() && orderByOp.mayReduce();
+
+		final SPARQLRequest newReq = new SPARQLRequestImpl(
+				req.getQueryPattern(),
+				req.getProjectionVars(),
+				sortConditions,
+				req.getDistinctRequired() );
+
+		final LogicalOpRequest<?, ?> mergedReqOp = new LogicalOpRequest<>(
+				reqOp.getFederationMember(),
+				mayReduce,
+				newReq );
+
+		return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
+	}
+
+	/**
+	 * Checks whether the first list is a prefix of the second list.
+	 *
+	 * <p>A list is considered a prefix if all its elements match the corresponding
+	 * elements at the beginning of the second list, in the same order. An empty
+	 * prefix is valid, and a {@code null} second list is not considered to have
+	 * a matching prefix.</p>
+	 *
+	 * @param prefix the non-null list to check as a prefix
+	 * @param list   the list to check against
+	 * @return {@code true} if {@code prefix} is a prefix of {@code list};
+	 *         {@code false} otherwise
+	 */
+	protected boolean isPrefix( final List<SortCondition> prefix,
+	                            final List<SortCondition> list ) {
+		if ( list == null || prefix.size() > list.size() )
+			return false;
+
+		return list.subList(0, prefix.size()).equals(prefix);
 	}
 
 	/**
