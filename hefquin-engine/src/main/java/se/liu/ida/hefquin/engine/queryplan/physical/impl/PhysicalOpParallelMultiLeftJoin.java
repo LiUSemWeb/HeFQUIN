@@ -14,6 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpParallelMul
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.physical.DuplicateRelatedBehavior;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -142,6 +143,9 @@ public class PhysicalOpParallelMultiLeftJoin implements UnaryPhysicalOp
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public DuplicateRelatedBehavior getDuplicateRelatedBehavior() { return DuplicateRelatedBehavior.DUPLICATES_POSSIBLE; }
 
 	@Override
 	public boolean equals( final Object o ) {
