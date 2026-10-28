@@ -255,6 +255,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpGPOptAdd op ) {
+			collectFiltersFromPattern(op.getPattern(), filters);
 			visitAllSubPlans();
 		}
 
