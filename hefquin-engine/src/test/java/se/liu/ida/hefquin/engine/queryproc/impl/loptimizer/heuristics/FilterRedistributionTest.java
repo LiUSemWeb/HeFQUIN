@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -557,5 +558,53 @@ public class FilterRedistributionTest extends EngineTestBase
 
 		final LogicalPlan rightBranch = result.getSubPlan(1);
 		assertTrue( rightBranch.getRootOperator() instanceof LogicalOpGPAdd );
+	}
+
+	@Test
+	public void redistributeFiltersInGPOptAdd() {
+		// a filter in one the pattern of a gpOptAdd operator in one
+		// branch of a join, where the filter can be evaluated in
+		// the other branch and redistributed to it
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final FederationMember fmA = new SPARQLEndpointForTest("http://exA.org");
+
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v1, v1);
+		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp1) );
+
+		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
+		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmA, false, new SPARQLRequestImpl(tp2) );
+
+		final Expr e = new E_IsIRI( new ExprVar(v1) );
+
+		final BasicPattern basicPattern = new BasicPattern();
+		basicPattern.add(Triple.create(v1, v1, v1));
+
+		final Op op = OpFilter.filter( e, new OpBGP(basicPattern) );
+
+		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl2(op);
+		final LogicalOpGPOptAdd gpOptAddOp = new LogicalOpGPOptAdd( fmA, pattern, false );
+
+		final LogicalPlan gpOptAddPlan = new LogicalPlanWithUnaryRootImpl(gpOptAddOp, null, new LogicalPlanWithNullaryRootImpl(reqOp2, null));
+
+		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
+			false,
+			new LogicalPlanWithNullaryRootImpl(reqOp1, null),
+			gpOptAddPlan,
+			null );
+
+		// test
+		final LogicalPlan result = new FilterRedistribution().apply(joinSubPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpJoin );
+
+		final LogicalPlan leftBranch = result.getSubPlan(0);
+		assertTrue( leftBranch.getRootOperator() instanceof LogicalOpFilter );
+
+		final LogicalPlan rightBranch = result.getSubPlan(1);
+		assertTrue( rightBranch.getRootOperator() instanceof LogicalOpGPOptAdd );
 	}
 }
