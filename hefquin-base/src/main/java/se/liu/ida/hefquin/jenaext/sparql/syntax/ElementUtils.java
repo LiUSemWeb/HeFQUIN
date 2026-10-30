@@ -2,11 +2,13 @@ package se.liu.ida.hefquin.jenaext.sparql.syntax;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
@@ -248,6 +250,65 @@ public class ElementUtils
 		}
 
 		return eg;
+	}
+
+	/**
+	 * Returns a copy of the given graph pattern with the specified filter
+	 * expressions removed.
+	 */
+	public static Element removeFilters( final Set<Expr> filters,
+	                                     final Element element )
+	{
+		final ElementGroup group = new ElementGroup();
+
+		if ( element instanceof ElementGroup elementGroup ) {
+			for ( final Element subElement : elementGroup.getElements() ) {
+				if ( subElement instanceof ElementFilter filter ) {
+					// Remove redundant expressions while preserving the others.
+					final ExprList remainingExprs = new ExprList();
+					collectRemainingExpressions(filter.getExpr(), filters, remainingExprs );
+
+					if ( !remainingExprs.isEmpty() ) {
+						group.addElement( new ElementFilter(
+								remainingExprs.size() == 1
+										? remainingExprs.get(0)
+										: remainingExprs.getList().stream()
+												.reduce((a, b) ->
+														new E_LogicalAnd(a, b))
+												.orElseThrow()) );
+					}
+				}
+				else {
+					group.addElement(subElement);
+				}
+			}
+		}
+		else if ( ! ( element instanceof ElementFilter filter
+				   && filters.contains(filter.getExpr()) ) ) {
+			group.addElement(element);
+		}
+
+		return group;
+	}
+
+	/**
+	 * Collects the expressions from the given filter expression that are not
+	 * contained in the set of expressions to remove.
+	 */
+	private static void collectRemainingExpressions(
+			final Expr expr,
+			final Set<Expr> filtersToRemove,
+			final ExprList remaining )
+	{
+		if ( expr instanceof E_LogicalAnd logicalAnd ) {
+			collectRemainingExpressions(
+					logicalAnd.getArg1(), filtersToRemove, remaining );
+			collectRemainingExpressions(
+					logicalAnd.getArg2(), filtersToRemove, remaining );
+		}
+		else if ( !filtersToRemove.contains(expr) ) {
+			remaining.add(expr);
+		}
 	}
 
 }

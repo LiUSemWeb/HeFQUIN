@@ -148,4 +148,14 @@ public interface SPARQLGraphPattern extends Query
 		final Element elmtMerged = ElementUtils.merge(exprs, elmtThis);
 		return new GenericSPARQLGraphPatternImpl1(elmtMerged);
 	}
+
+	/**
+	 * Returns a copy of the given graph pattern with the specified filter
+	 * expressions removed.
+	 */
+	default SPARQLGraphPattern removeFilters( final Set<Expr> exprs ) {
+		final Element elmtThis = QueryPatternUtils.convertToJenaElement(this);
+		final Element elmtMerged = ElementUtils.removeFilters(exprs, elmtThis);
+		return new GenericSPARQLGraphPatternImpl1(elmtMerged);
+	}
 }
