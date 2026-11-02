@@ -1,0 +1,26 @@
+PREFIX sparql: <http://localhost/sparql/>
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+PREFIX swrc: <http://swrc.ontoware.org/ontology#>
+PREFIX eswc: <http://data.semanticweb.org/conference/eswc/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dbpedia: <http://dbpedia.org/ontology/>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+
+SELECT DISTINCT ?author ?role ?paper ?place ?capital ?latitude ?longitude ?proceedings
+WHERE {
+  SERVICE sparql:SWDFood {
+    ?role swc:isRoleAt eswc:2010 .
+    ?role swc:heldBy ?author .
+    ?proceedings swc:relatedToEvent eswc:2010 .
+    ?paper swrc:author ?author .
+    ?author foaf:based_near ?place .
+    ?paper swc:isPartOf ?proceedings .
+  }
+  OPTIONAL {
+    SERVICE sparql:DBPedia-Subset {
+      ?place dbpedia:capital ?capital ;
+             geo:lat ?latitude ;
+             geo:long ?longititude .
+    }
+  }
+}

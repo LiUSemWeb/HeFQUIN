@@ -1,0 +1,30 @@
+PREFIX sparql: <http://localhost/sparql/>
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+PREFIX swrc: <http://swrc.ontoware.org/ontology#>
+PREFIX eswc: <http://data.semanticweb.org/conference/eswc/>
+PREFIX iswc: <http://data.semanticweb.org/conference/iswc/2009/>
+PREFIX dbpedia: <http://dbpedia.org/ontology/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX purl: <http://purl.org/ontology/bibo/>
+
+SELECT DISTINCT *
+WHERE {
+  SERVICE sparql:SWDFood {
+    ?paper swc:isPartOf iswc:proceedings .
+    iswc:proceedings swrc:address ?proceedingAddress .
+    ?paper swrc:author ?author .
+    ?author swrc:affiliation ?affiliation ;
+            rdfs:label ?fullnames ;
+            foaf:based_near ?place .
+  }
+  OPTIONAL {
+    SERVICE sparql:DBPedia-Subset {
+      ?place dbpedia:capital ?capital ;
+             dbpedia:populationDensity ?populationDensity ;
+             dbpedia:governmentType ?governmentType ;
+             dbpedia:language ?language ;
+             dbpedia:leaderTitle ?leaderTitle .
+    }
+  }
+}

@@ -1,0 +1,19 @@
+PREFIX sparql: <http://localhost/sparql/>
+PREFIX tcga: <http://tcga.deri.ie/schema/>
+PREFIX dbpedia: <http://dbpedia.org/ontology/>
+
+SELECT DISTINCT ?patient ?p ?o
+WHERE {
+  SERVICE sparql:LinkedTCGA-A {
+    ?uri tcga:bcr_patient_barcode ?patient .
+    ?patient dbpedia:country ?country .
+  }
+  SERVICE sparql:DBPedia-Subset {
+    ?country dbpedia:populationDensity ?popDensity .
+  }
+  SERVICE sparql:LinkedTCGA-A {
+    ?patient tcga:bcr_aliquot_barcode ?aliquot .
+    ?aliquot ?p ?o .
+  }
+  FILTER (?popDensity >= 32)
+}

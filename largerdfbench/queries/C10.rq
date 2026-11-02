@@ -1,0 +1,27 @@
+PREFIX sparql: <http://localhost/sparql/>
+PREFIX tcga: <http://tcga.deri.ie/schema/>
+PREFIX kegg: <http://bio2rdf.org/ns/kegg#>
+PREFIX dbpedia: <http://dbpedia.org/ontology/>
+PREFIX drugbank: <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/>
+PREFIX purl: <http://purl.org/dc/terms/>
+
+SELECT DISTINCT ?patient ?gender ?country ?popDensity ?drugName ?indication ?formula
+  ?compound ?ChemicalEquation ?ReactionTitle
+WHERE {
+  SERVICE sparql:LinkedTCGA-A {
+    ?uri tcga:bcr_patient_barcode ?patient .
+    ?patient tcga:gender ?gender .
+    ?patient dbpedia:country ?country .
+    ?patient tcga:bcr_drug_barcode ?drugbcr .
+    ?drugbcr tcga:drug_name ?drugName .
+  }
+  SERVICE sparql:DBPedia-Subset {
+    ?country dbpedia:populationDensity ?popDensity .
+  }
+  SERVICE sparql:DrugBank {
+    ?drgBnkDrg drugbank:genericName ?drugName .
+    ?drgBnkDrg drugbank:indication ?indication .
+    ?drgBnkDrg drugbank:chemicalFormula ?formula .
+    ?drgBnkDrg drugbank:keggCompoundId ?compound .
+  }
+}

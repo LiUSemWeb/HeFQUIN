@@ -1,0 +1,83 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX fd:     <http://w3id.org/hefquin/feddesc#>
+PREFIX ex:     <http://example.org/>
+
+ex:LinkedTCGA-M a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/LinkedTCGA-M"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/LinkedTCGA-M/"^^xsd:anyURI ] .
+
+ex:LinkedTCGA-E a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/LinkedTCGA-E"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/LinkedTCGA-E/"^^xsd:anyURI ] .
+
+ex:LinkedTCGA-A a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/LinkedTCGA-A"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/LinkedTCGA-A/"^^xsd:anyURI ] .
+
+ex:ChEBI a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/ChEBI"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/ChEBI/"^^xsd:anyURI ] .
+
+ex:DBPedia-Subset a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/DBPedia-Subset"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/DBPedia-Subset/"^^xsd:anyURI ] .
+
+ex:DrugBank a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/DrugBank"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/DrugBank/"^^xsd:anyURI ] .
+
+ex:GeoNames a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/GeoNames"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/GeoNames/"^^xsd:anyURI ] .
+
+ex:Jamendo a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/Jamendo"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/Jamendo/"^^xsd:anyURI ] .
+
+ex:KEGG a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/KEGG"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/KEGG/"^^xsd:anyURI ] .
+
+ex:LMDB a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/LMDB"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/LMDB/"^^xsd:anyURI ] .
+
+ex:NYT a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/NYT"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/NYT/"^^xsd:anyURI ] .
+
+ex:SWDFood a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/SWDFood"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/SWDFood/"^^xsd:anyURI ] .
+
+ex:Affymetrix a fd:RDFBasedFederationMember ;
+    fd:serviceURI "http://localhost/sparql/Affymetrix"^^xsd:anyURI ;
+    fd:interface [ a                     fd:FixedEndpointInterface ;
+                   fd:supportedProtocol  fd:SPARQLProtocol ;
+                   fd:endpointAddress    "http://localhost:8080/sparql/Affymetrix/"^^xsd:anyURI ] .
+                  

@@ -1,0 +1,37 @@
+PREFIX sparql: <http://localhost/sparql/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX geonames: <http://www.geonames.org/ontology#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX mo: <http://purl.org/ontology/mo/>
+PREFIX nytimes: <http://data.nytimes.com/elements/>
+
+SELECT DISTINCT ?artist ?name ?location ?anylocation
+WHERE {
+  SERVICE sparql:Jamendo {
+    ?artist a mo:MusicArtist ;
+            foaf:name ?name ;
+            foaf:based_near ?location .
+  }
+  {
+    SERVICE sparql:GeoNames {
+      ?location geonames:parentFeature ?locationName .
+      ?locationName geonames:name ?anylocation .
+    }
+  }
+  UNION
+  {
+    SERVICE sparql:NYT {
+      ?location geonames:parentFeature ?locationName .
+      ?locationName geonames:name ?anylocation .
+    }
+  }
+  SERVICE sparql:NYT {
+    ?nytLocation owl:sameAs ?location .
+    ?nytLocation nytimes:topicPage ?news .
+  }
+  OPTIONAL {
+    SERVICE sparql:GeoNames {
+      ?locationName geonames:name 'Islamic Republic of Afghanistan' .
+    }
+  }
+}
