@@ -22,8 +22,8 @@ import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
@@ -429,8 +429,9 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 	}
 
 	@Test
-	public void removesRedundantFilterInGPOpt() {
-		// a filter in a GPOptAdd operator is redundant if the input plan guarantees it
+	public void removesRedundantFilterOperator() {
+		// a filter in a filter operator is redundant if the input plan guarantees it,
+		// filter operator gets removed
 
 		// set up
 		final Var v1 = Var.alloc("v1");
@@ -447,25 +448,19 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
-		final LogicalOpGPOptAdd gpOptAddOp = new LogicalOpGPOptAdd(fm, mergedPattern, false);
-		final LogicalPlan gpOptAddPlan = new LogicalPlanWithUnaryRootImpl(gpOptAddOp, null, reqWithFilterPlan);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(e, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, reqWithFilterPlan);
 
 		// test
-		final LogicalPlan result = new RedundantFilterElimination().apply(gpOptAddPlan);
+		final LogicalPlan result = new RedundantFilterElimination().apply(filterPlan);
 
 		// check
-		assertTrue( result.getRootOperator() instanceof LogicalOpGPOptAdd );
-		final LogicalOpGPOptAdd resultGpOptAddOp = (LogicalOpGPOptAdd) result.getRootOperator();
-
-		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultGpOptAddOp.getPattern() );
-		assertTrue(                                        resultElmt1 instanceof ElementGroup );
-		assertTrue(                        ((ElementGroup) resultElmt1).size() == 1 );
-		assertFalse(                       ((ElementGroup) resultElmt1).get(0) instanceof ElementFilter );
+		assertTrue( result.getRootOperator() instanceof LogicalOpRequest );
 	}
 
 	@Test
-	public void retainsNonRedundantFilterInGPOpt() {
-		// a filter in a GPOptAdd operator must be retained if the input plan does not guarantee it
+	public void retainsNonRedundantFilterOperator() {
+		// a filter in a filter operator must be retained if the input plan does not guarantee it
 
 		// set up
 		final Var v1 = Var.alloc("v1");
@@ -484,21 +479,16 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 
 		final Var v2 = Var.alloc("v2");
 		final Expr e2 = new E_IsIRI( new ExprVar(v2) );
-		final SPARQLGraphPattern mergedPattern2 = req.getQueryPattern().mergeWith(new ExprList(e2));
-		final LogicalOpGPOptAdd gpOptAddOp = new LogicalOpGPOptAdd(fm, mergedPattern2, false);
-		final LogicalPlan gpOptAddPlan = new LogicalPlanWithUnaryRootImpl(gpOptAddOp, null, reqWithFilterPlan);
+		final LogicalOpFilter filterOp = new LogicalOpFilter(e2, false);
+		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(filterOp, null, reqWithFilterPlan);
 
 		// test
-		final LogicalPlan result = new RedundantFilterElimination().apply(gpOptAddPlan);
+		final LogicalPlan result = new RedundantFilterElimination().apply(filterPlan);
 
 		// check
-		assertTrue( result.getRootOperator() instanceof LogicalOpGPOptAdd );
-		final LogicalOpGPOptAdd resultGpOptAddOp = (LogicalOpGPOptAdd) result.getRootOperator();
+		assertTrue( result.getRootOperator() instanceof LogicalOpFilter );
+		final LogicalOpFilter resultFilterOp = (LogicalOpFilter) result.getRootOperator();
 
-		final Element resultElmt1 = QueryPatternUtils.convertToJenaElement( resultGpOptAddOp.getPattern() );
-		assertTrue(                                        resultElmt1 instanceof ElementGroup );
-		assertTrue(                        ((ElementGroup) resultElmt1).size() == 2 );
-		assertTrue(                        ((ElementGroup) resultElmt1).get(1) instanceof ElementFilter );
-		assertTrue(       ((ElementFilter) ((ElementGroup) resultElmt1).get(1)).getExpr().equals(e2) );
+		assertTrue( resultFilterOp.getFilterExpressions().get(0).equals(e2) );
 	}
 }

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVars;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -38,8 +39,8 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.Filt
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 
 /**
- * Eliminates redundant filter expressions from logical GPAdd and GPOptAdd
- * operators when those expressions are guaranteed by the operators' input
+ * Eliminates redundant filter expressions from logical gpAdd and filter
+ * operators if those expressions are guaranteed by the operators' input
  * plans.
  *
  * Candidate filter expressions are collected from the graph pattern of the
@@ -56,7 +57,7 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
  * not included in the projection.
  *
  * This heuristic recursively optimizes subplans before eliminating
- * redundant filters from GPAdd and GPOptAdd operators.
+ * redundant filters from gpAdd and filter operators.
  */
 public class RedundantFilterElimination implements HeuristicForLogicalOptimization
 {
@@ -67,7 +68,7 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 	}
 
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
-		// Recursively search for GPAdd and GPOptAdd operators.
+		// Recursively search for gpAdd and filter operators.
 		// When one is found, eliminate redundant filters from its graph pattern.
 		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
 		if ( numberOfSubPlans == 0 ) {
@@ -94,20 +95,20 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 		// Eliminate redundant filters at this operator after processing its children.
 		if ( rootOp instanceof LogicalOpGPAdd opGPAdd )
 			return eliminateFilterRedundancies(opGPAdd, plan);
-		else if ( rootOp instanceof LogicalOpGPOptAdd opGPOptAdd )
-			return eliminateFilterRedundancies(opGPOptAdd, plan);
+		else if ( rootOp instanceof LogicalOpFilter opFilter )
+			return eliminateFilterRedundancies(opFilter, plan);
 
 		return plan;
 	}
 
 	/**
-	 * Eliminates redundant filters from a GPAdd operator's graph pattern when
+	 * Eliminates redundant filters from a gpAdd operator's graph pattern when
 	 * those filters are guaranteed by its input plan.
 	 *
-	 * @param opGPAdd   the GPAdd operator to optimize
+	 * @param opGPAdd   the gpAdd operator to optimize
 	 * @param inputPlan the logical plan rooted at the operator
 	 * @return the input plan if no filters are removed, or a plan with an
-	 *         optimized GPAdd operator otherwise
+	 *         optimized gpAdd operator otherwise
 	 */
 	protected LogicalPlan eliminateFilterRedundancies( final LogicalOpGPAdd opGPAdd, final LogicalPlan inputPlan ) {
 		final SPARQLGraphPattern originalPattern = opGPAdd.getPattern();
@@ -126,24 +127,27 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 	}
 
 	/**
-	 * Eliminates redundant filters from a GPOptAdd operator's graph pattern when
-	 * those filters are guaranteed by its input plan.
+	 * Eliminates redundant filters from a filter operator's expression list when
+	 * those filters are guaranteed by its input plan. If all filter expressions are
+	 * redundant, the filter operator is removed entirely.
 	 *
-	 * @param opGPOptAdd the GPOptAdd operator to optimize
+	 * @param opFilter   the filter operator to optimize
 	 * @param inputPlan  the logical plan rooted at the operator
 	 * @return the input plan if no filters are removed, or a plan with an
-	 *         optimized GPOptAdd operator otherwise
+	 *         optimized filter operator otherwise
 	 */
-	protected LogicalPlan eliminateFilterRedundancies( final LogicalOpGPOptAdd opGPOptAdd, final LogicalPlan inputPlan ) {
-		final SPARQLGraphPattern originalPattern = opGPOptAdd.getPattern();
-		final SPARQLGraphPattern optimizedPattern = removeRedundantFilters(originalPattern, inputPlan.getSubPlan(0));
+	protected LogicalPlan eliminateFilterRedundancies( final LogicalOpFilter opFilter, final LogicalPlan inputPlan ) {
+		final ExprList originalFilterExprs = opFilter.getFilterExpressions();
+		final ExprList optimizedFilterExprs = removeRedundantFilters(originalFilterExprs, inputPlan.getSubPlan(0));
 
-		if ( optimizedPattern.equals(originalPattern) )
+		if ( optimizedFilterExprs.equals(originalFilterExprs) )
 			return inputPlan;
+		else if ( optimizedFilterExprs.isEmpty() )
+			return inputPlan.getSubPlan(0);
 
-		final LogicalOpGPOptAdd newGPOptAdd = new LogicalOpGPOptAdd( opGPOptAdd.getFederationMember(), optimizedPattern, opGPOptAdd.mayReduce() );
+		final LogicalOpFilter newFilter = new LogicalOpFilter( optimizedFilterExprs, opFilter.mayReduce() );
 
-		return new LogicalPlanWithUnaryRootImpl( newGPOptAdd, null, inputPlan.getSubPlan(0) );
+		return new LogicalPlanWithUnaryRootImpl( newFilter, null, inputPlan.getSubPlan(0) );
 	}
 
 	/**
@@ -168,6 +172,33 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 	}
 
 	/**
+	 * Removes candidate filter expressions from an expression list when they are
+	 * guaranteed by the given input plan.
+	 *
+	 * @param exprList  the expression list from which redundant expressions are removed
+	 * @param inputPlan the logical plan used to determine which expressions are guaranteed
+	 * @return the original expression list if no redundant expressions are found, or
+	 *         a list with the redundant expressions removed
+	 */
+	protected ExprList removeRedundantFilters( final ExprList exprList, final LogicalPlan inputPlan ) {
+		final Set<Expr> candidates = new HashSet<>();
+		candidates.addAll(exprList.getList());
+
+		final Set<Expr> guaranteedFilters = getGuaranteedFilters(inputPlan, candidates);
+
+		if ( guaranteedFilters.isEmpty() )
+			return exprList;
+
+		final ExprList remainingExprs = new ExprList();
+		for ( final Expr expr : exprList ) {
+			if ( ! guaranteedFilters.contains(expr) )
+				remainingExprs.add(expr);
+		}
+
+		return remainingExprs;
+	}
+
+	/**
 	 * Determines which candidate filter expressions are guaranteed to hold for
 	 * the output of the given logical plan.
 	 *
@@ -185,7 +216,7 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 	 * Analyzes a logical plan to determine which candidate filter expressions
 	 * are guaranteed to hold for its output.
 	 *
-	 * Filter guarantees are collected from SPARQL request patterns, GPAdd
+	 * Filter guarantees are collected from SPARQL request patterns, gpAdd
 	 * operators, and filter operators. Guarantees are propagated according to
 	 * the semantics of each operator: joins combine guarantees from all
 	 * children, unions retain only guarantees common to every branch, and

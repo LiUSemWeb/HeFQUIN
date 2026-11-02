@@ -20,6 +20,7 @@ import org.apache.jena.sparql.syntax.ElementGroup;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 
 /**
  * Utility methods for collecting filter expressions from SPARQL graph patterns
@@ -43,6 +44,10 @@ public class FilterCollectingUtils
 			collectFiltersFromPattern(pattern1.asJenaElement(), filters);
 		else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 pattern2 )
 			collectFiltersFromOp(pattern2.asJenaOp(), filters);
+		else if ( pattern instanceof TriplePatternImpl )
+			return;
+		else
+			throw new IllegalArgumentException( "Unsupported SPARQLGraphPattern implementation: " + pattern.getClass().getName() );
 	}
 
 	/**

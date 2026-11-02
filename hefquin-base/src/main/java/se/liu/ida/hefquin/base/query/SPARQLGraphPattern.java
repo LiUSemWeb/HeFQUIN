@@ -150,12 +150,17 @@ public interface SPARQLGraphPattern extends Query
 	}
 
 	/**
-	 * Returns a copy of the given graph pattern with the specified filter
-	 * expressions removed.
+	 * Returns a copy of this graph pattern with the specified filter expressions
+	 * removed from its filter elements. Expressions combined using
+	 * logical AND are removed individually, preserving any expressions not
+	 * specified for removal. If no expressions are removed, this graph pattern
+	 * is returned unchanged.
 	 */
 	default SPARQLGraphPattern removeFilters( final Set<Expr> exprs ) {
 		final Element elmtThis = QueryPatternUtils.convertToJenaElement(this);
-		final Element elmtMerged = ElementUtils.removeFilters(exprs, elmtThis);
+		final Element elmtMerged = ElementUtils.removeFilters(elmtThis, exprs);
+		if ( elmtThis.equals(elmtMerged) )
+			return this;
 		return new GenericSPARQLGraphPatternImpl1(elmtMerged);
 	}
 }
