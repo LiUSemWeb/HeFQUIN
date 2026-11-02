@@ -5,26 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.op.OpExtendAssign;
-import org.apache.jena.sparql.algebra.op.OpFilter;
-import org.apache.jena.sparql.algebra.op.OpJoin;
-import org.apache.jena.sparql.algebra.op.OpLeftJoin;
-import org.apache.jena.sparql.algebra.op.OpMinus;
-import org.apache.jena.sparql.algebra.op.OpSequence;
-import org.apache.jena.sparql.algebra.op.OpUnfold;
-import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.expr.E_LogicalAnd;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementFilter;
-import org.apache.jena.sparql.syntax.ElementGroup;
 
-import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
-import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
@@ -50,6 +34,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.FilterCollectingUtils;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 
 /**
@@ -224,7 +209,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 		 * Visits every child plan.
 		 */
 		protected void visitAllSubPlans() {
-			for (int i = 0; i < branch.numberOfSubPlans(); i++) {
+			for ( int i = 0; i < branch.numberOfSubPlans(); i++ ) {
 				visitSubPlan(i);
 			}
 		}
@@ -233,13 +218,13 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 		public void visit( final LogicalOpRequest<?, ?> op ) {
 			// Collect filter expressions embedded in a SPARQL request.
 			if ( op.getRequest() instanceof SPARQLRequest req )
-				collectFiltersFromPattern(req.getQueryPattern(), filters);
+				FilterCollectingUtils.collectFiltersFromPattern(req.getQueryPattern(), filters);
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiRequest op ) {
 			// Collect filter expressions embedded in a SPARQL request.
-			collectFiltersFromPattern(op.getRequest().getQueryPattern(), filters);
+			FilterCollectingUtils.collectFiltersFromPattern(op.getRequest().getQueryPattern(), filters);
 		}
 
 		@Override
@@ -249,7 +234,7 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpGPAdd op ) {
-			collectFiltersFromPattern(op.getPattern(), filters);
+			FilterCollectingUtils.collectFiltersFromPattern(op.getPattern(), filters);
 			visitAllSubPlans();
 		}
 
@@ -338,106 +323,6 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 			visitAllSubPlans();
 		}
 	} // end of FilterCollector
-
-	/**
-	 * Collects filter expressions from a Jena SPARQL pattern element.
-	 *
-	 * Extracts expressions from {@link ElementFilter} elements, recursively
-	 * examines the children of {@link ElementGroup} elements, and splits
-	 * logical AND expressions into their individual expressions.
-	 * Only {@link ElementFilter} and {@link ElementGroup} sub-elements are
-	 * traversed; other element types are intentionally ignored to avoid
-	 * collecting filters from nested constructs such as OPTIONAL and MINUS.
-	 */
-	protected void collectFiltersFromPattern( final Element element, final Set<Expr> filters ) {
-		// Extract and split the filter condition from a SPARQL FILTER element.
-		if ( element instanceof ElementFilter filter ) {
-			collectFilterExpressions(filter.getExpr(), filters);
-		}
-		// Recursively inspect the elements of a SPARQL group pattern.
-		else if ( element instanceof ElementGroup group ) {
-			for ( final Element subElement : group.getElements() ) {
-				if ( subElement instanceof ElementFilter || subElement instanceof ElementGroup )
-					collectFiltersFromPattern(subElement, filters);
-			}
-		}
-		// Additional SPARQL element types can be handled as needed.
-	}
-
-	/**
-	 * Collects filter expressions from a SPARQL graph pattern by delegating
-	 * to the appropriate method for the underlying Jena representation.
-	 */
-	protected void collectFiltersFromPattern( final SPARQLGraphPattern pattern, final Set<Expr> filters ) {
-		if ( pattern instanceof GenericSPARQLGraphPatternImpl1 pattern1 )
-			collectFiltersFromPattern(pattern1.asJenaElement(), filters);
-		else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 pattern2 )
-			collectFiltersFromOp(pattern2.asJenaOp(), filters);
-	}
-
-	/**
-	 * Collects filter expressions from a Jena algebra tree.
-	 *
-	 * Extracts expressions from OpFilter operators and splits logical AND
-	 * expressions into individual expressions. Filters inside UNION branches
-	 * are not collected, and only the left branch of an OPTIONAL (OpLeftJoin)
-	 * is traversed.
-	 */
-	protected void collectFiltersFromOp( final Op op, final Set<Expr> filters ) {
-		// Do not collect filters from the branches of a union.
-		if ( op instanceof OpUnion ) {
-			return;
-		}
-		// Only collect filters from the left branch of an optional.
-		else if ( op instanceof OpLeftJoin leftJoin ) {
-			collectFiltersFromOp(leftJoin.getLeft(), filters);
-		}
-		// Traverse only into the left sub-operator of MINUS.
-		else if ( op instanceof OpMinus opMinus ) {
-			collectFiltersFromOp(opMinus.getLeft(), filters);
-		}
-		// Traverse into the sub-operator of unary operators that are supported.
-		else if ( op instanceof OpExtendAssign opExtendAssign ) {
-			collectFiltersFromOp(opExtendAssign.getSubOp(), filters);
-		}
-		else if ( op instanceof OpUnfold opUnfold ) {
-			collectFiltersFromOp(opUnfold.getSubOp(), filters);
-		}
-		else if ( op instanceof OpFilter opFilter ) {
-			for ( final Expr expr : opFilter.getExprs() ) {
-				collectFilterExpressions(expr, filters);
-			}
-			collectFiltersFromOp(opFilter.getSubOp(), filters);
-		}
-		// Traverse into all sub-operators of supported joins.
-		else if ( op instanceof OpJoin opJoin ) {
-			collectFiltersFromOp(opJoin.getLeft(), filters);
-			collectFiltersFromOp(opJoin.getRight(), filters);
-		}
-		else if ( op instanceof OpSequence opSequence ) {
-			for ( final Op subOp : opSequence.getElements() ) {
-				collectFiltersFromOp(subOp, filters);
-			}
-		}
-		// Other operator types are intentionally not traversed.
-	}
-
-	/**
-	 * Recursively decomposes logical AND expressions into their individual
-	 * expressions and adds them to the given set.
-	 *
-	 * Expressions that are not logical AND expressions are added to the set
-	 * as-is.
-	 */
-	protected void collectFilterExpressions( final Expr expr, final Set<Expr> filters ) {
-		if ( expr instanceof E_LogicalAnd logicalAnd ) {
-			collectFilterExpressions(logicalAnd.getArg1(), filters);
-			collectFilterExpressions(logicalAnd.getArg2(), filters);
-		}
-		else {
-			filters.add(expr);
-		}
-	}
 
 	/**
 	 * Determines whether a branch can evaluate the given filter expressions.

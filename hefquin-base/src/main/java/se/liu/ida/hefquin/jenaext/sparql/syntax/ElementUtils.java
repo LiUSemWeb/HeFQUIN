@@ -2,11 +2,13 @@ package se.liu.ida.hefquin.jenaext.sparql.syntax;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
@@ -248,6 +250,79 @@ public class ElementUtils
 		}
 
 		return eg;
+	}
+
+	/**
+	 * Returns a copy of the given element with the specified filter expressions
+	 * removed. If the element is an {@link ElementGroup}, its immediate elements
+	 * are processed, including nested {@link ElementGroup} elements. If the
+	 * element is an {@link ElementFilter}, its expressions are processed directly.
+	 * Expressions combined using logical AND are removed individually, preserving
+	 * any expressions not specified for removal. Other element types are preserved
+	 * without further traversal.
+	 */
+	public static Element removeFilters( final Element element,
+	                                     final Set<Expr> filtersExpressionsToRemove )
+	{
+		final ElementGroup group = new ElementGroup();
+
+		if ( element instanceof ElementGroup elementGroup ) {
+			for ( final Element subElement : elementGroup.getElements() ) {
+				if ( subElement instanceof ElementFilter filter ) {
+					addRemainingFilter(filter, group, filtersExpressionsToRemove);
+				}
+				else {
+					group.addElement(subElement);
+				}
+			}
+		}
+		else if ( element instanceof ElementFilter filter )
+			addRemainingFilter(filter, group, filtersExpressionsToRemove);
+		else
+			group.addElement(element);
+
+		return group;
+	}
+
+	/**
+	 * Adds a filter to the given group containing only the expressions that are
+	 * not specified for removal. Expressions combined using logical AND are
+	 * processed individually. If all expressions are removed, no filter is added.
+	 */
+	private static void addRemainingFilter( final ElementFilter filter,
+	                                        final ElementGroup group,
+	                                        final Set<Expr> filtersExpressionsToRemove ) {
+		final ExprList remainingExprs = collectRemainingExpressions( filter.getExpr(), filtersExpressionsToRemove );
+
+		if ( ! remainingExprs.isEmpty() ) {
+			final Expr remainingExpr = remainingExprs.size() == 1
+							? remainingExprs.get(0)
+							: remainingExprs.getList().stream()
+									.reduce((a, b) ->
+											new E_LogicalAnd(a, b))
+									.orElseThrow();
+
+			group.addElement( new ElementFilter(remainingExpr) );
+		}
+	}
+
+	/**
+	 * Collects the expressions from the given filter expression that are not
+	 * contained in the set of expressions to remove.
+	 */
+	private static ExprList collectRemainingExpressions(
+			final Expr expr,
+			final Set<Expr> filtersToRemove )
+	{
+		final ExprList remainingExprs = new ExprList();
+		if ( expr instanceof E_LogicalAnd logicalAnd ) {
+			remainingExprs.addAll( collectRemainingExpressions( logicalAnd.getArg1(), filtersToRemove ) );
+			remainingExprs.addAll( collectRemainingExpressions( logicalAnd.getArg2(), filtersToRemove ) );
+		}
+		else if ( !filtersToRemove.contains(expr) ) {
+			remainingExprs.add(expr);
+		}
+		return remainingExprs;
 	}
 
 }
