@@ -23,6 +23,16 @@
 #   MergeRequests.java
 #     - Disables merging filter operator into the request.
 
+#######
+# BUG #
+#######
+# Line: 766–773 in ProjectPushDown seems not to work correctly. Commented out. Example plans for L7 in bug/.
+# // If the top project is redundant, drop it
+# if ( projectOp.getVariables().equals(allPushdownVars) ) {
+#     return newJoin;
+# }
+
+
 QUERY_DIR="queries"
 STATS_DIR="stats"
 RESULTS_DIR="results"
@@ -51,7 +61,7 @@ MODES=(
 )
 
 # Number of repetitions per query
-NUM_RUNS=1
+NUM_RUNS=10
 
 # Query names
 QUERIES=(
@@ -83,7 +93,8 @@ for QUERY_NAME in "${QUERIES[@]}"; do
 
             case "$MODE" in
                 DISABLE_ALL)
-                    CONFIG="ConfDescr-all-disabled.ttl" # Disables heuristics: FilterPushDown, ProjectPushDown and ProjectRemoval
+                    # Disables heuristics: FilterPushDown, ProjectPushDown and ProjectRemoval
+                    CONFIG="ConfDescr-all-disabled.ttl"
                     ;;
                 ENABLE_ALL)
                     DISABLE_JOIN_HASHSET_OPTIMIZATIONS=false
