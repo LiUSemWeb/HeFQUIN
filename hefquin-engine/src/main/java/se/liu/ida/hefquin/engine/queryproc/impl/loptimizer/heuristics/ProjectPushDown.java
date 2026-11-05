@@ -149,9 +149,9 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpRequest<?, ?> op ) {
-			createdPlan = createPlanForRequestUnderProject( projectOp,
-			                                                op,
-			                                                inputPlan );
+			// createdPlan = createPlanForRequestUnderProject( projectOp,
+			//                                                 op,
+			//                                                 inputPlan );
 		}
 
 		@Override
