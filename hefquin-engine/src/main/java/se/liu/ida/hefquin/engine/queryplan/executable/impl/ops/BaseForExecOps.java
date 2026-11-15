@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -10,12 +11,25 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 /**
  * Top-level base class for all implementations of {@link ExecutableOperator}.
  *
- * This base class handles the collection of exceptions that may occur during
- * the execution of the algorithm implemented by an executable operator, and
- * it stores the {@link QueryPlanningInfo} (if any).
+ * This base class stores the {@link QueryPlanningInfo} (if any), maintains
+ * the termination flag, and handles the collection of exceptions that may
+ * occur during the execution of the algorithm implemented by an executable
+ * operator.
  */
 public abstract class BaseForExecOps implements ExecutableOperator
 {
+	private AtomicBoolean terminationFlag = new AtomicBoolean(false);
+
+	@Override
+	public void setTerminationFlag() {
+		terminationFlag.set(true);
+	}
+
+	@Override
+	public boolean terminationFlagIsSet() {
+		return terminationFlag.get();
+	}
+
 	/**
 	 * May be {@code null}.
 	 */

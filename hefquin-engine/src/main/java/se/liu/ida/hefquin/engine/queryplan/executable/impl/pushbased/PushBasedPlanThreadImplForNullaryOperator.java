@@ -27,7 +27,7 @@ public class PushBasedPlanThreadImplForNullaryOperator extends PushBasedPlanThre
 	protected void produceOutput( final IntermediateResultElementSink sink )
 			throws ExecOpExecutionException
 	{
-		if ( terminationFlagIsSet() ) return;
+		if ( op.terminationFlagIsSet() ) return;
 
 		op.execute(sink, ctx);
 	}

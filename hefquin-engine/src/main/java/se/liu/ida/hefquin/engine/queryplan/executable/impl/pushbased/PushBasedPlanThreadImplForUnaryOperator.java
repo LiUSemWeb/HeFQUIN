@@ -39,14 +39,14 @@ public class PushBasedPlanThreadImplForUnaryOperator extends PushBasedPlanThread
 		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		boolean inputConsumed = false;
 		while ( ! inputConsumed ) {
-			if ( terminationFlagIsSet() ) return;
+			if ( op.terminationFlagIsSet() ) return;
 
 			input.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
 				for ( final SolutionMapping sm : transferBuffer ) {
 					op.process(sm, sink, ctx);
 
-					if ( terminationFlagIsSet() ) return;
+					if ( op.terminationFlagIsSet() ) return;
 // TODO: sending all sol.mappings separately to the operator is
 // not a good idea for some operators (e.g., union, filter), because
 // it causes such operators to also pass on these solution mappings
@@ -57,7 +57,7 @@ public class PushBasedPlanThreadImplForUnaryOperator extends PushBasedPlanThread
 // to the operators that returns 'true' for operators for which it is okay
 // to send the whole transferBuffer in one op.process(..) call without
 // checking the terminationFlag for every sol.mapping in transferBuffer.
-// Another idea: add a termination flag also into the operators themselves;
+// TODO: Another idea: add a termination flag also into the operators themselves;
 // some may pick it up internally (note that this flag needs to be thread safe)
 				}
 			}

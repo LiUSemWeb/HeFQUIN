@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.utils.StatsImpl;
@@ -72,8 +71,6 @@ public abstract class PushBasedPlanThreadImplBase
 
 	// access to this object must be synchronized
 	private Status status = Status.WAITING_TO_BE_STARTED;
-
-	private AtomicBoolean terminateASAP = new AtomicBoolean(false);
 
 	private Exception causeOfFailure = null;
 
@@ -408,12 +405,7 @@ public abstract class PushBasedPlanThreadImplBase
 
 	@Override
 	public void setTerminationFlag() {
-		terminateASAP.set(true);
-	}
-
-	@Override
-	public boolean terminationFlagIsSet() {
-		return terminateASAP.get();
+		getExecOp().setTerminationFlag();
 	}
 
 
