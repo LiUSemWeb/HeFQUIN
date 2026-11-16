@@ -88,7 +88,7 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 
 				final List<Node> key = getJoinKey(currentLeftCursor, input1.getSchema(), true);
 
-				Node[] tuple = new Node[input1.getSchema().size()];
+				final Node[] tuple = new Node[ input1.getSchema().size() ];
 				for ( int i = 0; i < tuple.length; i++ )
 					tuple[i] = currentLeftCursor.getValueOfCurrentTuple(i);
 
@@ -134,13 +134,14 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 
 		/**
 		 * Extracts the composite join key from the current tuple.
-		 * The key consists of the attribute values specified by the join conditions,
-		 * using the left-side attributes for input1 and the right-side attributes for input2.
+		 * The key consists of the values of the attributes specified by the join conditions,
+		 * which are the left-side attributes of the join conditions in case of input1,
+		 * and in case of input2, it is the right-side attributes of the join conditions.
 		 */
 		protected List<Node> getJoinKey( final MappingRelationCursor cursor,
 		                                 final List<String> schema,
 		                                 final boolean isLeftInput ) {
-			final List<Node> key = new ArrayList<>();
+			final List<Node> key = new ArrayList<>( joinConditions.size() );
 
 			for ( final Pair<String, String> condition : joinConditions ) {
 				final String attribute = isLeftInput
