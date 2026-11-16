@@ -2,9 +2,11 @@ package se.liu.ida.hefquin.mappings.algebra.exec;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.jena.atlas.lib.Pair;
 import org.apache.jena.graph.Node;
@@ -34,18 +36,16 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 	}
 
 	protected static List<String> combineSchemas( final MappingRelation input1, final MappingRelation input2 ) {
-		final List<String> schema = new ArrayList<>(input1.getSchema());
+		final List<String> schema = new ArrayList<>( input1.getSchema() );
+		schema.addAll( input2.getSchema() );
 
-		for ( final String attr : input2.getSchema() ) {
-			if ( schema.contains(attr) ) {
-				throw new IllegalArgumentException(
-					"Cannot join relations with overlapping attributes: " + attr );
-			}
+		final Set<String> uniqueAttributes = new HashSet<>( schema );
 
-			schema.add(attr);
-		}
+		if ( uniqueAttributes.size() == schema.size() )
+			return schema;
 
-		return schema;
+		// There is overlap
+		throw new IllegalArgumentException( "Cannot join mapping relations with overlapping attributes." );
 	}
 
 	@Override
@@ -56,7 +56,8 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 	protected class MyCursor implements MappingRelationCursor {
 		protected final MappingRelation myRelation;
 
-		protected MappingRelationCursor currentLeftCursor = null;
+		protected boolean hashTableBuilt = false;
+
 		protected MappingRelationCursor currentRightCursor = null;
 
 		protected List<Node[]> currentMatches;
@@ -70,6 +71,9 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 
 		protected boolean nextTupleReady = false;
 
+		protected final int[] joinAttributeIndex1;
+		protected final int[] joinAttributeIndex2;
+
 		// Maps composite join keys to all matching tuples from input1.
 		protected final Map<List<Node>, List<Node[]>> hashTable = new HashMap<>();
 
@@ -77,16 +81,24 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 			this.myRelation = myRelation;
 			this.currentRightCursor = input2.getCursor();
 
-			buildHashTable();
+			joinAttributeIndex1 = new int[joinConditions.size()];
+			joinAttributeIndex2 = new int[joinConditions.size()];
+
+			for ( int i = 0; i < joinConditions.size(); i++ ) {
+				final Pair<String, String> condition = joinConditions.get(i);
+
+				joinAttributeIndex1[i] = input1.getSchema().indexOf(condition.getLeft());
+				joinAttributeIndex2[i] = input2.getSchema().indexOf(condition.getRight());
+			}
 		}
 
 		protected void buildHashTable() {
-			currentLeftCursor = input1.getCursor();
+			final MappingRelationCursor currentLeftCursor = input1.getCursor();
 
 			while ( currentLeftCursor.hasNext() ) {
 				currentLeftCursor.advance();
 
-				final List<Node> key = getJoinKey(currentLeftCursor, input1.getSchema(), true);
+				final List<Node> key = getJoinKey(currentLeftCursor, true);
 
 				final Node[] tuple = new Node[ input1.getSchema().size() ];
 				for ( int i = 0; i < tuple.length; i++ )
@@ -96,6 +108,46 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 			}
 		}
 
+		/**
+		 * Extracts the composite join key from the current tuple.
+		 * The key consists of the values at the attribute indexes specified by the join conditions.
+		 *
+		 * @param cursor      the cursor positioned at the tuple
+		 * @param isLeftInput whether the tuple belongs to input1 or input2
+		 * @return the composite join key
+		 */
+		protected List<Node> getJoinKey( final MappingRelationCursor cursor,
+		                                 final boolean isLeftInput ) {
+			final int[] indexes = isLeftInput ? joinAttributeIndex1 : joinAttributeIndex2;
+			final List<Node> key = new ArrayList<>( indexes.length );
+
+			for ( final int idx : indexes )
+				key.add(cursor.getValueOfCurrentTuple(idx));
+
+			return key;
+		}
+
+		@Override
+		public MappingRelation getMappingRelation() { return myRelation; }
+
+		@Override
+		public boolean hasNext() {
+			if ( ! hashTableBuilt ) {
+				buildHashTable();
+				hashTableBuilt = true;
+			}
+
+			if ( ! nextTupleReady )
+				nextTupleReady = prepareNextTuple();
+
+			return nextTupleReady;
+		}
+
+		/**
+		 * Prepares the next joined tuple.
+		 *
+		 * @return true if another joined tuple is available, false if no more matching tuples can be found.
+		 */
 		protected boolean prepareNextTuple() {
 			// Emit remaining matches for the current input2 tuple, if any.
 			if ( currentMatchesIterator != null && currentMatchesIterator.hasNext() ) {
@@ -110,7 +162,7 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 			while ( currentRightCursor.hasNext() ) {
 				currentRightCursor.advance();
 
-				final List<Node> key = getJoinKey(currentRightCursor, input2.getSchema(), false);
+				final List<Node> key = getJoinKey(currentRightCursor, false);
 
 				currentMatches = hashTable.get(key);
 
@@ -130,41 +182,6 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 			}
 
 			return false;
-		}
-
-		/**
-		 * Extracts the composite join key from the current tuple.
-		 * The key consists of the values of the attributes specified by the join conditions,
-		 * which are the left-side attributes of the join conditions in case of input1,
-		 * and in case of input2, it is the right-side attributes of the join conditions.
-		 */
-		protected List<Node> getJoinKey( final MappingRelationCursor cursor,
-		                                 final List<String> schema,
-		                                 final boolean isLeftInput ) {
-			final List<Node> key = new ArrayList<>( joinConditions.size() );
-
-			for ( final Pair<String, String> condition : joinConditions ) {
-				final String attribute = isLeftInput
-						? condition.getLeft()
-						: condition.getRight();
-
-				final int idx = schema.indexOf(attribute);
-
-				key.add(cursor.getValueOfCurrentTuple(idx));
-			}
-
-			return key;
-		}
-
-		@Override
-		public MappingRelation getMappingRelation() { return myRelation; }
-
-		@Override
-		public boolean hasNext() {
-			if ( ! nextTupleReady )
-				nextTupleReady = prepareNextTuple();
-
-			return nextTupleReady;
 		}
 
 		@Override
