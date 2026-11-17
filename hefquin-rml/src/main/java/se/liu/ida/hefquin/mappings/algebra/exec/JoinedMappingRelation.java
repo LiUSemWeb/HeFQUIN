@@ -89,6 +89,9 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 
 				joinAttributeIndex1[i] = input1.getSchema().indexOf(condition.getLeft());
 				joinAttributeIndex2[i] = input2.getSchema().indexOf(condition.getRight());
+
+				assert joinAttributeIndex1[i] >= 0;
+				assert joinAttributeIndex2[i] >= 0;
 			}
 		}
 
