@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -43,6 +40,28 @@ import se.liu.ida.hefquin.federation.access.impl.cache.PersistentCacheKey;
  * </p>
  *
  * <p>
+ * Modifications are applied to the MapDB map immediately (an insertion as soon
+ * as the future of the inserted response completes), but they are not committed
+ * one by one. Instead, the {@link MapDBGroupCommitter} commits them
+ * periodically in the background: at most once per commit interval, the
+ * modifications of all threads (and, thus, of all queries running in parallel)
+ * are persisted in a single MapDB commit. If the number of uncommitted
+ * modifications reaches a configured maximum, they are committed without
+ * waiting for the remainder of the interval.
+ * </p>
+ *
+ * <p>
+ * All uncommitted modifications are committed when {@link #close()} is called.
+ * Insertions whose futures have not completed at that point are not persisted;
+ * closing does not wait for them. If the JVM shuts down without
+ * {@link #close()} having been called (e.g., {@link System#exit},
+ * SIGTERM/SIGINT, or a crash), MapDB closes the database without committing,
+ * and the modifications since the last commit are lost. MapDB's write-ahead log
+ * keeps the file consistent in that case. {@link #flush()} commits all
+ * uncommitted modifications immediately.
+ * </p>
+ *
+ * <p>
  * <strong>Caveats:</strong>
  * </p>
  * <p>
@@ -64,10 +83,12 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 
 	protected static final int DEFAULT_CAPACITY = 1000;
 	protected static final String DEFAULT_FILENAME = "cache/mapdb-map.dat";
+	protected static final int DEFAULT_COMMIT_INTERVAL_MILLIS = 5000;
+	protected static final int DEFAULT_MAX_PENDING_MODIFICATIONS = 10000;
 
 	protected final DB db;
-	private final Set<CompletableFuture<Void>> pendingWrites = ConcurrentHashMap.newKeySet();
-	private boolean closed = false;
+	private volatile boolean closed = false;
+	protected final MapDBGroupCommitter committer;
 
 	/**
 	 * Creates a cache with the default capacity and default file path.
@@ -121,9 +142,36 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	public MapDBCache( final int capacity,
 	                   final String filename,
 	                   final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies ) {
+		this(capacity, filename, DEFAULT_COMMIT_INTERVAL_MILLIS, DEFAULT_MAX_PENDING_MODIFICATIONS, policies);
+	}
+
+	/**
+	 * Creates a cache with the given capacity, file path, and commit settings.
+	 *
+	 * <p>
+	 * If the persisted map already contains entries, the replacement policy is
+	 * initialized accordingly and eviction is performed if necessary to satisfy the
+	 * capacity constraint.
+	 * </p>
+	 *
+	 * @param capacity                the maximum number of cache entries
+	 * @param filename                the path to the cache file
+	 * @param commitIntervalMillis    the interval between commits (in milliseconds)
+	 * @param maxPendingModifications number of uncommitted modifications at which a
+	 *                                commit is triggered without waiting for the
+	 *                                end of the interval
+	 * @param policies                the cache policies to use
+	 */
+	public MapDBCache( final int capacity,
+	                   final String filename,
+	                   final int commitIntervalMillis,
+	                   final int maxPendingModifications,
+	                   final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies ) {
 		this(
 			open(filename),
 			capacity,
+			commitIntervalMillis,
+			maxPendingModifications,
 			policies
 		);
 
@@ -140,15 +188,19 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 		}
 
 		logger.debug(
-			"MapDB-based cache created: filename={}, capacity={}, size={}",
+			"MapDB-based cache created: filename={}, capacity={}, size={}, commitIntervalMillis={}, maxPendingModifications={}",
 			filename,
 			capacity,
-			map.size()
+			map.size(),
+			commitIntervalMillis,
+			maxPendingModifications
 		);
 	}
 
 	private MapDBCache( final DB db,
 	                    final int capacity,
+	                    final int commitIntervalMillis,
+	                    final int maxPendingModifications,
 	                    final CachePolicies<PersistentCacheKey, CompletableFuture<? extends DataRetrievalResponse<?>>, PersistentCacheEntry> policies ) {
 		super(
 			createMap(db),
@@ -157,6 +209,11 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 		);
 
 		this.db = db;
+
+		this.committer = new MapDBGroupCommitter( db,
+		                                          lock,
+		                                          commitIntervalMillis,
+		                                          maxPendingModifications );
 	}
 
 	/**
@@ -188,6 +245,7 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 				db.hashMap("cache")
 				.keySerializer(Serializer.JAVA)
 				.valueSerializer(MapDBCacheEntrySerializer.INSTANCE)
+				.counterEnable()
 				.createOrOpen();
 
 		return map;
@@ -214,9 +272,9 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 * Closes the underlying MapDB database and releases associated resources.
 	 *
 	 * <p>
-	 * Prevents new cache writes, waits for all pending asynchronous writes to
-	 * complete, and then closes the database. Any write failures encountered during
-	 * shutdown are logged.
+	 * Prevents new cache writes, commits all uncommitted modifications, and then
+	 * closes the database. Insertions whose futures have not completed yet are not
+	 * persisted.
 	 * </p>
 	 *
 	 * <p>
@@ -225,21 +283,72 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 */
 	@Override
 	public void close() {
-		final CompletableFuture<?>[] writes;
-
 		synchronized (lock) {
 			if (closed) return;
-
 			closed = true;
-			writes = pendingWrites.toArray(new CompletableFuture<?>[0]);
 		}
 
-		try {
-			CompletableFuture.allOf(writes).join();
-		} catch ( final CompletionException e ) {
-			logger.error("Cache writes failed during shutdown", e);
+		final long t0 = System.nanoTime();
+
+		// Stops the background thread and commits all modifications.
+		committer.close();
+
+		final long t1 = System.nanoTime();
+
+		// MapDB may have closed the db already at JVM shutdown.
+		synchronized (lock) {
+			if ( ! db.isClosed() ) {
+				db.close();
+			}
 		}
-		db.close();
+
+		if ( logger.isDebugEnabled() ) {
+			final long t2 = System.nanoTime();
+			logger.debug( "Cache closed in {} ms: committer.close() {} ms, db.close() {} ms",
+			              (t2 - t0) / 1_000_000L, (t1 - t0) / 1_000_000L, (t2 - t1) / 1_000_000L );
+		}
+	}
+
+	/**
+	 * Commits all uncommitted modifications of this cache, without waiting for
+	 * the end of the commit interval.
+	 */
+	public void flush() {
+		committer.flush();
+	}
+
+	/**
+	 * Removes the cache entry associated with the given key, as in
+	 * {@link CacheLayer#evict(Object)}, and schedules a commit if an entry was
+	 * removed.
+	 */
+	@Override
+	public boolean evict( final PersistentCacheKey key ) {
+		synchronized (lock) {
+			final boolean removed = super.evict(key);
+			if (removed) scheduleCommit();
+			return removed;
+		}
+	}
+
+	/**
+	 * Removes all cache entries, as in {@link CacheLayer#clear()}, and
+	 * schedules a commit.
+	 */
+	@Override
+	public void clear() {
+		synchronized (lock) {
+			super.clear();
+			scheduleCommit();
+		}
+	}
+
+	/**
+	 * Registers a modification for the next group commit. Call while holding
+	 * the lock, so that {@link #close()} cannot miss it.
+	 */
+	protected void scheduleCommit() {
+		committer.notifyModification();
 	}
 
 	/**
@@ -263,8 +372,9 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 * Once the future has completed successfully, insertion is delegated to
 	 * {@link CacheLayer#put(Object, Object)}, which handles replacement policy,
 	 * capacity enforcement, and the actual insertion into the backing map. The
-	 * changes are then committed to the database. Writes are synchronized with
-	 * shutdown to prevent database access after it has been closed.
+	 * changes are committed to the database with the next group commit (see
+	 * {@link MapDBGroupCommitter}). Writes are synchronized with shutdown to
+	 * prevent database access after it has been closed.
 	 * </p>
 	 *
 	 * @param key   cache key, must not be {@code null}
@@ -275,26 +385,21 @@ public class MapDBCache extends CacheLayer<PersistentCacheKey,
 	 */
 	@Override
 	public void put( final PersistentCacheKey key, final CompletableFuture<? extends DataRetrievalResponse<?>> value ) {
-		synchronized (lock) {
-			if (closed) {
-				throw new IllegalStateException("Cache is already closed");
+		if ( key == null )
+			throw new IllegalArgumentException("Cache key must not be null");
+
+		if ( value == null )
+			throw new IllegalArgumentException("Cache value must not be null");
+
+		if ( closed )
+			throw new IllegalStateException("Cache is already closed");
+
+		value.thenAccept( response -> {
+			synchronized (lock) {
+				if (closed) return;
+				super.put(key, value);
+				scheduleCommit();
 			}
-
-			final CompletableFuture<Void> future = value.thenAccept( response -> {
-				synchronized (lock) {
-					super.put(key, value);
-					db.commit();
-				}
-			} );
-
-			pendingWrites.add(future);
-
-			future.whenComplete( (result, error) -> {
-				if ( error != null ) {
-					logger.error("Failed to persist cache entry", error);
-				}
-				pendingWrites.remove(future);
-			} );
-		}
+		} );
 	}
 }
