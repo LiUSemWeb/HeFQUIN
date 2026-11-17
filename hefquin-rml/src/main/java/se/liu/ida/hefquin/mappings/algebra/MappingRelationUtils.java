@@ -50,4 +50,12 @@ public class MappingRelationUtils
 		return ds;
 	}
 
+	public static Node[] getCurrentTuple( final MappingRelationCursor c ) {
+		final Node[] tuple = new Node[ c.getMappingRelation().getSchema().size() ];
+		for ( int i = 0; i < tuple.length; i++ )
+			tuple[i] = c.getValueOfCurrentTuple(i);
+
+		return tuple;
+	}
+
 }

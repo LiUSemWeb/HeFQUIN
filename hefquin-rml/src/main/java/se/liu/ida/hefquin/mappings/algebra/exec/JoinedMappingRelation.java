@@ -13,6 +13,7 @@ import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.mappings.algebra.MappingRelation;
 import se.liu.ida.hefquin.mappings.algebra.MappingRelationCursor;
+import se.liu.ida.hefquin.mappings.algebra.MappingRelationUtils;
 import se.liu.ida.hefquin.mappings.algebra.impl.BaseForMappingRelationImpl;
 import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpJoin;
 
@@ -56,11 +57,8 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 	protected class MyCursor implements MappingRelationCursor {
 		protected final MappingRelation myRelation;
 
-		protected boolean hashTableBuilt = false;
+		protected final MappingRelationCursor rightCursor;
 
-		protected MappingRelationCursor currentRightCursor = null;
-
-		protected List<Node[]> currentMatches;
 		protected Iterator<Node[]> currentMatchesIterator;
 
 		protected Node[] currentLeftTuple;
@@ -71,63 +69,28 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 
 		protected boolean nextTupleReady = false;
 
-		protected final int[] joinAttributeIndex1;
-		protected final int[] joinAttributeIndex2;
+		protected final int[] joinAttributesIndexes1;
+		protected final int[] joinAttributesIndexes2;
 
 		// Maps composite join keys to all matching tuples from input1.
-		protected final Map<List<Node>, List<Node[]>> hashTable = new HashMap<>();
+		protected Map<List<Node>, List<Node[]>> hashTable = new HashMap<>();
 
 		public MyCursor( final MappingRelation myRelation ) {
 			this.myRelation = myRelation;
-			this.currentRightCursor = input2.getCursor();
+			this.rightCursor = input2.getCursor();
 
-			joinAttributeIndex1 = new int[joinConditions.size()];
-			joinAttributeIndex2 = new int[joinConditions.size()];
+			joinAttributesIndexes1 = new int[joinConditions.size()];
+			joinAttributesIndexes2 = new int[joinConditions.size()];
 
 			for ( int i = 0; i < joinConditions.size(); i++ ) {
 				final Pair<String, String> condition = joinConditions.get(i);
 
-				joinAttributeIndex1[i] = input1.getSchema().indexOf(condition.getLeft());
-				joinAttributeIndex2[i] = input2.getSchema().indexOf(condition.getRight());
+				joinAttributesIndexes1[i] = input1.getSchema().indexOf(condition.getLeft());
+				joinAttributesIndexes2[i] = input2.getSchema().indexOf(condition.getRight());
 
-				assert joinAttributeIndex1[i] >= 0;
-				assert joinAttributeIndex2[i] >= 0;
+				assert joinAttributesIndexes1[i] >= 0;
+				assert joinAttributesIndexes2[i] >= 0;
 			}
-		}
-
-		protected void buildHashTable() {
-			final MappingRelationCursor currentLeftCursor = input1.getCursor();
-
-			while ( currentLeftCursor.hasNext() ) {
-				currentLeftCursor.advance();
-
-				final List<Node> key = getJoinKey(currentLeftCursor, true);
-
-				final Node[] tuple = new Node[ input1.getSchema().size() ];
-				for ( int i = 0; i < tuple.length; i++ )
-					tuple[i] = currentLeftCursor.getValueOfCurrentTuple(i);
-
-				hashTable.computeIfAbsent(key, k -> new ArrayList<>()).add(tuple);
-			}
-		}
-
-		/**
-		 * Extracts the composite join key from the current tuple.
-		 * The key consists of the values at the attribute indexes specified by the join conditions.
-		 *
-		 * @param cursor      the cursor positioned at the tuple
-		 * @param isLeftInput whether the tuple belongs to input1 or input2
-		 * @return the composite join key
-		 */
-		protected List<Node> getJoinKey( final MappingRelationCursor cursor,
-		                                 final boolean isLeftInput ) {
-			final int[] indexes = isLeftInput ? joinAttributeIndex1 : joinAttributeIndex2;
-			final List<Node> key = new ArrayList<>( indexes.length );
-
-			for ( final int idx : indexes )
-				key.add(cursor.getValueOfCurrentTuple(idx));
-
-			return key;
 		}
 
 		@Override
@@ -135,15 +98,29 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 
 		@Override
 		public boolean hasNext() {
-			if ( ! hashTableBuilt ) {
+			if ( hashTable != null ) {
+				hashTable = new HashMap<>();
 				buildHashTable();
-				hashTableBuilt = true;
 			}
 
 			if ( ! nextTupleReady )
 				nextTupleReady = prepareNextTuple();
 
 			return nextTupleReady;
+		}
+
+		protected void buildHashTable() {
+			final MappingRelationCursor leftCursor = input1.getCursor();
+
+			while ( leftCursor.hasNext() ) {
+				leftCursor.advance();
+
+				final List<Node> key = getJoinKey(leftCursor, joinAttributesIndexes1);
+
+				final Node[] tuple = MappingRelationUtils.getCurrentTuple(leftCursor);
+
+				hashTable.computeIfAbsent(key, k -> new ArrayList<>()).add(tuple);
+			}
 		}
 
 		/**
@@ -162,22 +139,19 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 			currentMatchesIterator = null;
 
 			// Find the next input2 tuple that has at least one match in the hash table.
-			while ( currentRightCursor.hasNext() ) {
-				currentRightCursor.advance();
+			while ( rightCursor.hasNext() ) {
+				rightCursor.advance();
 
-				final List<Node> key = getJoinKey(currentRightCursor, false);
+				final List<Node> key = getJoinKey(rightCursor, joinAttributesIndexes2);
 
-				currentMatches = hashTable.get(key);
+				final List<Node[]> currentMatches = hashTable.get(key);
 
 				if ( currentMatches != null && ! currentMatches.isEmpty() ) {
 					currentMatchesIterator = currentMatches.iterator();
 
 					nextLeftTuple = currentMatchesIterator.next();
 
-					nextRightTuple = new Node[input2.getSchema().size()];
-
-					for (int i = 0; i < nextRightTuple.length; i++)
-						nextRightTuple[i] = currentRightCursor.getValueOfCurrentTuple(i);
+					nextRightTuple = MappingRelationUtils.getCurrentTuple(rightCursor);
 
 					nextTupleReady = true;
 					return true;
@@ -185,6 +159,23 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 			}
 
 			return false;
+		}
+
+		/**
+		 * Extracts the composite join key from the current tuple using the specified attribute indexes.
+		 *
+		 * @param cursor  the cursor positioned at the tuple
+		 * @param indexes the indexes of the attributes that make up the join key
+		 * @return the composite join key
+		 */
+		protected List<Node> getJoinKey( final MappingRelationCursor cursor,
+		                                 final int[] indexes ) {
+			final List<Node> key = new ArrayList<>( indexes.length );
+
+			for ( final int idx : indexes )
+				key.add(cursor.getValueOfCurrentTuple(idx));
+
+			return key;
 		}
 
 		@Override
