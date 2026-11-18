@@ -8,6 +8,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - Adding a logical plan rewriting that redistributes filters across the subplans under joins ([#763](https://github.com/LiUSemWeb/HeFQUIN/pull/763)).
+- Support for joins in the RML processor ([#785](https://github.com/LiUSemWeb/HeFQUIN/pull/785)).
 ### Changed
 - nothing yet
 ### Planned for Next Release
