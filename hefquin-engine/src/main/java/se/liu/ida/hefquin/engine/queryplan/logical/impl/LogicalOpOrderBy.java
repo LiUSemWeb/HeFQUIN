@@ -15,7 +15,7 @@ public class LogicalOpOrderBy extends BaseForLogicalOps implements UnaryLogicalO
 	public LogicalOpOrderBy( final List<SortCondition> sortConditions, final boolean mayReduce ) {
 		super(mayReduce);
 
-		assert sortConditions != null;
+		assert ! sortConditions.isEmpty();
 
 		this.sortConditions = sortConditions;
 	}
@@ -46,7 +46,7 @@ public class LogicalOpOrderBy extends BaseForLogicalOps implements UnaryLogicalO
 	}
 
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		return getClass().hashCode() ^ sortConditions.hashCode();
 	}
 

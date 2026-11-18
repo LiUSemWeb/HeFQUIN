@@ -39,7 +39,7 @@ public interface SPARQLRequest extends DataRetrievalRequest
 	 * or {@code null} if no sort conditions are specified.
 	 *
 	 * <p>If a non-null list is returned, then the sort conditions are
-	 * considered and explicit part of this request and must be respected
+	 * considered an explicit part of this request and must be respected
 	 * by components that can support it.</p>
 	 *
 	 * <p>Deciding whether the sort conditions can be safely applied or pushed

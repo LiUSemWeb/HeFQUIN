@@ -492,12 +492,14 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				final List<SortCondition> opSortConditions = op.getSortConditions();
 				final List<SortCondition> reqSortConditions = req.getSortConditions();
 				if ( reqSortConditions != null ) {
-					if ( reqSortConditions.equals(opSortConditions) ) {
-						// The request already provides the required ordering.
-						returnPlan = rewrittenSubPlans.get(0);
-					}
-					else if ( isPrefix(reqSortConditions, opSortConditions) ) {
-						returnPlan = createRequestWithSortConditions(reqOp, req, opSortConditions, op);
+					if ( isPrefix(reqSortConditions, opSortConditions) ) {
+						if ( reqSortConditions.size() == opSortConditions.size() ) {
+							// The request already provides the required ordering.
+							returnPlan = rewrittenSubPlans.get(0);
+						}
+						else {
+							returnPlan = createRequestWithSortConditions(reqOp, req, opSortConditions, op);
+						}
 					}
 					else {
 						// The existing ordering is incompatible, so the ORDER BY
