@@ -60,7 +60,7 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
  * present there.
  *
  * Filter expressions are collected from logical filter operators,
- * logical GPAdd and GPOptAdd operators, and SPARQL request patterns.
+ * logical GPAdd operators, and SPARQL request patterns.
  * The collection traverses the logical plan according to operator-specific
  * rules: for example, only the left child of left joins and MINUS operators
  * is visited, while the children of union operators are ignored.
@@ -255,7 +255,6 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpGPOptAdd op ) {
-			collectFiltersFromPattern(op.getPattern(), filters);
 			visitAllSubPlans();
 		}
 
