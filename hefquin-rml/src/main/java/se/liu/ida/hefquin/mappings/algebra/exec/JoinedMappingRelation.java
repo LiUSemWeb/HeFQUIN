@@ -19,6 +19,10 @@ import se.liu.ida.hefquin.mappings.algebra.ops.MappingOpJoin;
 
 /**
  * A {@link MappingRelation} produced by a {@link MappingOpJoin} operator.
+ * <p>
+ * The join algorithm used is a hash join, where the tuples of the first
+ * input are stored in a hash table, and then the tuples of the second input
+ * are processed and matched against the hash table.
  */
 public class JoinedMappingRelation extends BaseForMappingRelationImpl
 {
