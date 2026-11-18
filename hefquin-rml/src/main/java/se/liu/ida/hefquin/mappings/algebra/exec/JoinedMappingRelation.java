@@ -73,7 +73,7 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 		protected final int[] joinAttributesIndexes2;
 
 		// Maps composite join keys to all matching tuples from input1.
-		protected Map<List<Node>, List<Node[]>> hashTable = new HashMap<>();
+		protected Map<List<Node>, List<Node[]>> hashTable = null;
 
 		public MyCursor( final MappingRelation myRelation ) {
 			this.myRelation = myRelation;
@@ -98,8 +98,7 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 
 		@Override
 		public boolean hasNext() {
-			if ( hashTable != null ) {
-				hashTable = new HashMap<>();
+			if ( hashTable == null ) {
 				buildHashTable();
 			}
 
@@ -110,6 +109,7 @@ public class JoinedMappingRelation extends BaseForMappingRelationImpl
 		}
 
 		protected void buildHashTable() {
+			hashTable = new HashMap<>();
 			final MappingRelationCursor leftCursor = input1.getCursor();
 
 			while ( leftCursor.hasNext() ) {
