@@ -290,7 +290,7 @@ public class MappingExpressionUtils
 	protected static class EvaluateWorker implements MappingOperatorVisitor
 	{
 		protected Map<SourceReference,DataObject> srMap = null;
-		protected MappingRelation[] inputs = null; 
+		protected MappingRelation[] inputs = null;
 		protected MappingRelation output = null;
 
 		protected MappingRelation evaluate(
@@ -358,9 +358,7 @@ public class MappingExpressionUtils
 		public void visit( final MappingOpJoin op ) {
 			assert inputs.length == 2;
 
-			// TODO
-			//output = new JoinedMappingRelation( ...
-			throw new UnsupportedOperationException();
+			output = new JoinedMappingRelation( inputs[0], inputs[1], op.getJ() );
 		}
 
 		@Override
