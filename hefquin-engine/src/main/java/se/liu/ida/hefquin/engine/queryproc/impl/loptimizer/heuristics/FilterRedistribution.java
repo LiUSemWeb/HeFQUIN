@@ -59,8 +59,8 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
  * certain variables in that branch and the expression is not already
  * present there.
  *
- * Filter expressions are collected from logical filter operators,
- * logical GPAdd operators, and SPARQL request patterns.
+ * Filter expressions are collected from filter operators,
+ * gpAdd operators, and SPARQL request patterns.
  * The collection traverses the logical plan according to operator-specific
  * rules: for example, only the left child of left joins and MINUS operators
  * is visited, while the children of union operators are ignored.
