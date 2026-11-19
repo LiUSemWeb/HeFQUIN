@@ -914,7 +914,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, null, null, false) );
 
 		final SortCondition sortCondition = new SortCondition(ExprUtils.parse("?x"), Query.ORDER_ASCENDING);
-		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition), skipLiveWebTests);
+		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition), false);
 		final LogicalPlan orderByPlan = new LogicalPlanWithUnaryRootImpl(orderByOp, null, new LogicalPlanWithNullaryRootImpl(reqOp1, null));
 
 		// test
@@ -939,7 +939,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final SortCondition sortCondition = new SortCondition(ExprUtils.parse("?x"), Query.ORDER_ASCENDING);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, null, List.of(sortCondition), false) );
 
-		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition), skipLiveWebTests);
+		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition), false);
 		final LogicalPlan orderByPlan = new LogicalPlanWithUnaryRootImpl(orderByOp, null, new LogicalPlanWithNullaryRootImpl(reqOp1, null));
 
 		// test
@@ -966,7 +966,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final SortCondition sortCondition2 = new SortCondition(ExprUtils.parse("?y"), Query.ORDER_ASCENDING);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, null, List.of(sortCondition1), false) );
 
-		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition1, sortCondition2), skipLiveWebTests);
+		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition1, sortCondition2), false);
 		final LogicalPlan orderByPlan = new LogicalPlanWithUnaryRootImpl(orderByOp, null, new LogicalPlanWithNullaryRootImpl(reqOp1, null));
 
 		// test
@@ -993,7 +993,7 @@ public class MergeRequestsTest extends EngineTestBase
 		final SortCondition sortCondition2 = new SortCondition(ExprUtils.parse("?y"), Query.ORDER_ASCENDING);
 		final LogicalOpRequest<?,?> reqOp1 = new LogicalOpRequest<>( fm, false, new SPARQLRequestImpl(tp1, null, List.of(sortCondition1), false) );
 
-		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition2), skipLiveWebTests);
+		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(sortCondition2), false);
 		final LogicalPlan orderByPlan = new LogicalPlanWithUnaryRootImpl(orderByOp, null, new LogicalPlanWithNullaryRootImpl(reqOp1, null));
 
 		// test

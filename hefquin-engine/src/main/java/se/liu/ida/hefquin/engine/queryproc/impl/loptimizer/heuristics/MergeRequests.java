@@ -738,7 +738,12 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		if ( list == null || prefix.size() > list.size() )
 			return false;
 
-		return list.subList(0, prefix.size()).equals(prefix);
+		for ( int i = 0; i < prefix.size(); i++ ) {
+			if ( ! prefix.get(i).equals(list.get(i)) )
+				return false;
+		}
+
+		return true;
 	}
 
 	/**

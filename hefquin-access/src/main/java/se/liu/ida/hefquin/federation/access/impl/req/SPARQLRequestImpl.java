@@ -152,7 +152,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		if ( query != null )
 			return query;
 		else
-			return SPARQLRequest.convertToQuery( getQueryPattern(), getProjectionVars(), getDistinctRequired() );
+			return SPARQLRequest.convertToQuery( getQueryPattern(), getProjectionVars(), getSortConditions(), getDistinctRequired() );
 	}
 
 	@Override
@@ -167,6 +167,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		else
 			return "SPARQLRequest with pattern: " + pattern.toString()
 			     + ", projection variables: " + projectionVars
+			     + ", sort conditions: " + sortConditions
 			     + ", distinct required: " + distinctRequired;
 	}
 }

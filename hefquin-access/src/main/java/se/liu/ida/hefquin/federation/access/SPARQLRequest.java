@@ -61,13 +61,14 @@ public interface SPARQLRequest extends DataRetrievalRequest
 	 * should be requested.
 	 */
 	default SPARQLQuery getQuery() {
-		return convertToQuery( getQueryPattern(), getProjectionVars(), getDistinctRequired() );
+		return convertToQuery( getQueryPattern(), getProjectionVars(), getSortConditions(), getDistinctRequired() );
 	}
 
 	static SPARQLQuery convertToQuery( final SPARQLGraphPattern pattern,
 	                                   final Set<Var> projectionVars,
+	                                   final List<SortCondition> sortConditions,
 	                                   final boolean distinctRequired ) {
-		return new SPARQLQueryImpl( pattern, projectionVars, distinctRequired );
+		return new SPARQLQueryImpl( pattern, projectionVars, sortConditions, distinctRequired );
 	}
 
 }

@@ -13,6 +13,8 @@ import java.util.Set;
 
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -36,6 +38,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpOrderBy;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
@@ -995,6 +998,90 @@ public class ProjectPushDownTest extends EngineTestBase
 
 		final LogicalPlan subsubResult = subResult.getSubPlan(0);
 		assertTrue( subsubResult.getRootOperator() instanceof LogicalOpRequest );
+	}
+
+	@Test
+	public void pushProjectUnderOrderBy() {
+		// The project retains all variables required by the order by expression;
+		// hence, it can be pushed under the order by.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+
+		// Request produces {x, y}
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v2);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(
+			new SPARQLEndpointForTest("http://exA.org"),
+			false,
+			new SPARQLRequestImpl(tp1) );
+		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+
+		// Order by operator with y
+		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(new SortCondition(new ExprVar(v2), Query.ORDER_ASCENDING)), false);
+		final LogicalPlan orderBySubPlan = new LogicalPlanWithUnaryRootImpl(orderByOp, null, reqSubPlan);
+
+		// Project operator with y
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v2), false);
+		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, orderBySubPlan);
+
+		// test
+		final LogicalPlan result = new ProjectPushDown().apply(projectPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpOrderBy );
+		final List<SortCondition> resultSortConditions = ((LogicalOpOrderBy) result.getRootOperator()).getSortConditions();
+		assertEquals( 1, resultSortConditions.size() );
+		assertTrue( resultSortConditions.equals(List.of(new SortCondition(new ExprVar(v2), Query.ORDER_ASCENDING))) );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpRequest );
+
+		final SPARQLRequest resultReq = (SPARQLRequest) ((LogicalOpRequest<?, ?>) subResult.getRootOperator()).getRequest();
+		assertEquals( Set.of(v2), resultReq.getProjectionVars() );
+		assertFalse( resultReq.getDistinctRequired() );
+	}
+
+	@Test
+	public void pushProjectUnderOrderByImpossible() {
+		// The project removes variables required by the order by expression;
+		// hence, it cannot be pushed under the order by.
+
+		// set up
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+
+		// Request produces {x, y}
+		final TriplePattern tp1 = new TriplePatternImpl(v1, v2, v2);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(
+			new SPARQLEndpointForTest("http://exA.org"),
+			false,
+			new SPARQLRequestImpl(tp1) );
+		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp, null);
+
+		// Order by operator with y
+		final LogicalOpOrderBy orderByOp = new LogicalOpOrderBy(List.of(new SortCondition(new ExprVar(v2), Query.ORDER_ASCENDING)), false);
+		final LogicalPlan orderBySubPlan = new LogicalPlanWithUnaryRootImpl(orderByOp, null, reqSubPlan);
+
+		// Project operator with y
+		final LogicalOpProject projectOp = new LogicalOpProject(Set.of(v1), false);
+		final LogicalPlan projectPlan = new LogicalPlanWithUnaryRootImpl(projectOp, null, orderBySubPlan);
+
+		// test
+		final LogicalPlan result = new ProjectPushDown().apply(projectPlan);
+
+		// check
+		assertTrue( result.getRootOperator() instanceof LogicalOpProject );
+
+		final LogicalPlan subResult = result.getSubPlan(0);
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpOrderBy );
+
+		final List<SortCondition> resultSortConditions = ((LogicalOpOrderBy) subResult.getRootOperator()).getSortConditions();
+		assertEquals( 1, resultSortConditions.size() );
+
+		assertTrue( resultSortConditions.equals(List.of(new SortCondition(new ExprVar(v2), Query.ORDER_ASCENDING))) );
+
+		assertTrue( subResult.getSubPlan(0).getRootOperator().equals(reqOp) );
 	}
 
 }
