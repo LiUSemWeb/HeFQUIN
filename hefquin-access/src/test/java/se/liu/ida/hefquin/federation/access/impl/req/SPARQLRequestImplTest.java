@@ -79,12 +79,11 @@ public class SPARQLRequestImplTest extends FederationTestBase
 		assertTrue( req2.getExpectedVariables().getPossibleVariables().isEmpty() );
 	}
 
-	// The test should create a SPARQLRequestImpl
-	// using the constructor used by the existing tests in this class, but including some SortCondition.
-	// Then, the test should get the Jena Query from the created SPARQLRequest, create the SPARQL query
-	// string of this Query (there is a serialize() function in Query), and check that it looks as expected (e.g., contains the "ORDER BY" keyword).
 	@Test
 	public void testSortConditionInitialization() throws FederationAccessException {
+		// Tests that sort conditions are correctly initialized from a Jena query
+		// and incorporated into the underlying Jena query when explicitly specified.
+
 		// setting up
 		final String queryString =
 				"SELECT ?s ?o2 WHERE { " +
