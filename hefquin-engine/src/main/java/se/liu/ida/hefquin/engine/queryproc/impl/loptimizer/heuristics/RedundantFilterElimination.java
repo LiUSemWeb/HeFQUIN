@@ -199,8 +199,8 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 	}
 
 	/**
-	 * Determines which candidate filter expressions are guaranteed to hold for
-	 * the output of the given logical plan.
+	 * Determines which of the given candidate filter expressions are guaranteed
+	 * to hold for the output of the given logical plan.
 	 *
 	 * @param inputPlan  the logical plan to analyze
 	 * @param candidates the filter expressions to check for guarantees
@@ -221,7 +221,7 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 	 * the semantics of each operator: joins combine guarantees from all
 	 * children, unions retain only guarantees common to every branch, and
 	 * left joins and MINUS propagate guarantees only from their left child.
-	 * GPOptAdd propagates guarantees from its input but does not introduce
+	 * gpOptAdd propagates guarantees from its input but does not introduce
 	 * guarantees from its optional graph pattern. Projection removes guarantees
 	 * that reference variables not included in the projection.
 	 *
