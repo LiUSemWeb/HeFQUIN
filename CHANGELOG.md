@@ -11,7 +11,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Adding a logical plan rewriting that redistributes filters across the subplans under joins ([#763](https://github.com/LiUSemWeb/HeFQUIN/pull/763), [#780](https://github.com/LiUSemWeb/HeFQUIN/pull/780)).
 - Support for joins in the RML processor ([#785](https://github.com/LiUSemWeb/HeFQUIN/pull/785)).
 ### Changed
-- nothing yet
+- Prevent performance degradation when many threads access the MapDB cache concurrently ([#786](https://github.com/LiUSemWeb/HeFQUIN/pull/786)).
 ### Planned for Next Release
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
 
