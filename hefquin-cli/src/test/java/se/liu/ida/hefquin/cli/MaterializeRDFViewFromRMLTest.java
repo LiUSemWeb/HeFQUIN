@@ -9,11 +9,13 @@ import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Files;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class MaterializeRDFViewFromRMLTest
 {
 	private static final String mappingFile = "src/test/resources/ExampleMappingTest.ttl";
+	private static final String mappingWithJoinFile = "src/test/resources/ExampleMappingWithJoinTest.ttl";
 
 	@Test
 	public void runWithValidArgs() {
@@ -52,6 +54,25 @@ public class MaterializeRDFViewFromRMLTest
 
 		final String result = Files.readString( out.toPath() );
 		assertTrue( result.contains("http://example.org/totalCases") );
+	}
+
+	@Ignore("Currently WIP")
+	public void outputToFile_withJoin_createsExpectedResult() throws Exception {
+		final File out = File.createTempFile("hefquin", ".nt");
+		out.deleteOnExit();
+
+		final String[] args = {
+			"--mapping=" + mappingWithJoinFile,
+			"--outputToFile=" + out.getAbsolutePath()
+		};
+
+		final int exitCode = new MaterializeRDFViewFromRML(args).mainRun(false, false);
+		assertEquals(0, exitCode);
+
+		final String result = Files.readString(out.toPath());
+
+		assertTrue(result.contains("http://example.org/population"));
+		assertTrue(result.contains("10500000"));
 	}
 
 	@Test

@@ -1,0 +1,70 @@
+@prefix rml:   <http://w3id.org/rml/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:    <http://example.org/> .
+
+_:covidJsonSource
+    a rml:Source , rml:FilePath ;
+    rml:root rml:MappingDirectory ;
+    rml:path "ExampleJSONSource.json" .
+
+_:populationJsonSource
+    a rml:Source , rml:FilePath ;
+    rml:root rml:MappingDirectory ;
+    rml:path "ExampleJSONSource2.json" .
+
+_:populationTM
+    a rml:TriplesMap ;
+
+    rml:logicalSource [
+        rml:source _:populationJsonSource ;
+        rml:referenceFormulation rml:JSONPath ;
+        rml:iterator "$"
+    ] ;
+
+    rml:subjectMap [
+        rml:constant ex:Population ;
+        rml:termType rml:IRI
+    ] ;
+
+    rml:predicateObjectMap [
+        rml:predicateMap [
+            rml:constant ex:value
+        ] ;
+        rml:objectMap [
+            rml:reference "population" ;
+            rml:datatype xsd:integer
+        ]
+    ] .
+
+_:covid19TM
+    a rml:TriplesMap ;
+
+    rml:logicalSource [
+        rml:source _:covidJsonSource ;
+        rml:referenceFormulation rml:JSONPath ;
+        rml:iterator "$"
+    ] ;
+
+    rml:subjectMap [
+        rml:reference "country" ;
+        rml:termType rml:BlankNode
+    ] ;
+
+    rml:predicateObjectMap [
+        rml:predicateMap [
+            rml:constant ex:population
+        ] ;
+        rml:objectMap [
+            rml:parentTriplesMap _:populationTM ;
+            rml:joinCondition [
+                rml:childMap [
+                    rml:reference "country"
+                ] ;
+                rml:parentMap [
+                    rml:reference "parentCountry"
+                ] ;
+                rml:child "country" ;
+                rml:parent "parentCountry"
+            ]
+        ]
+    ] .
