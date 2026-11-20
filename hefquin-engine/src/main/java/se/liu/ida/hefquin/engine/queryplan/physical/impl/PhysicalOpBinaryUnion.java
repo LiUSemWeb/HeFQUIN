@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.DuplicateRelatedBehavior;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
@@ -43,6 +44,9 @@ public class PhysicalOpBinaryUnion
 	public LogicalOpUnion getLogicalOperator() {
 		return LogicalOpUnion.getInstance();
 	}
+
+	@Override
+	public DuplicateRelatedBehavior getDuplicateRelatedBehavior() { return DuplicateRelatedBehavior.DUPLICATES_POSSIBLE; }
 
 	@Override
 	public boolean equals( final Object o ) {

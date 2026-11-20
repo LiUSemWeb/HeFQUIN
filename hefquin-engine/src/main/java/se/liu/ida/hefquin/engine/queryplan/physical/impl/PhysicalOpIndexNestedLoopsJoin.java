@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.DuplicateRelatedBehavior;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -125,6 +126,9 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public DuplicateRelatedBehavior getDuplicateRelatedBehavior() { return DuplicateRelatedBehavior.DUPLICATES_POSSIBLE; }
 
 	@Override
 	public boolean equals( final Object o ) {

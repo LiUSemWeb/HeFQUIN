@@ -48,4 +48,6 @@ public interface PhysicalOperator extends QueryPlanOperator
 	                                 ExpectedVariables ... inputVars );
 
 	void visit( PhysicalPlanVisitor visitor );
+
+	DuplicateRelatedBehavior getDuplicateRelatedBehavior();
 }
