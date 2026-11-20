@@ -146,8 +146,8 @@ public class ExecOpOrderByLimit extends UnaryExecutableOpBase
 	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
-		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
-		s.put( "numberOfInputMappingsDropped",  Long.valueOf(numberOfInputMappingsDropped) );
+		s.put( "numberOfOutputMappingsProduced", Long.valueOf(numberOfOutputMappingsProduced) );
+		s.put( "numberOfInputMappingsDropped",   Long.valueOf(numberOfInputMappingsDropped) );
 		return s;
 	}
 
