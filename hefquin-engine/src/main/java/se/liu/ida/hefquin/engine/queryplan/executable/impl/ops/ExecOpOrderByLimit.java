@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -24,12 +23,12 @@ public class ExecOpOrderByLimit extends UnaryExecutableOpBase
 {
 	private static final Logger log = LoggerFactory.getLogger( ExecOpOrderBy.class );
 	private long numberOfOutputMappingsProduced = 0L;
+	private long numberOfInputMappingsDropped = 0L;
 
 	protected final SolutionMappingComparator comparator;
 	protected final long limit;
 	protected final long offset;
 
-	// maxNumberOfMappingsToKeep = offset + limit
 	protected final long maxNumberOfMappingsToKeep;
 
 	// We use the PriorityQueue deliberately also for the duplicate removal
@@ -37,6 +36,15 @@ public class ExecOpOrderByLimit extends UnaryExecutableOpBase
 	// case. TreeSet has a significantly higher memory footprint.
 	protected final PriorityQueue<SolutionMapping> solutionMappings;
 
+	/**
+	 * Sorts solution mappings according to the ordering conditions of an
+	 * ORDER BY clause while retaining only the top-k mappings required by
+	 * the LIMIT and OFFSET clauses.
+	 * <p>
+	 * This operator is intended only for queries that contain both ORDER BY
+	 * and LIMIT clauses. Queries with OFFSET but without LIMIT should use
+	 * {@link ExecOpOrderBy} instead.
+	 */
 	public ExecOpOrderByLimit( final List<SortCondition> sortConditions,
 	                           final long limit,
 	                           final long offset,
@@ -46,6 +54,8 @@ public class ExecOpOrderByLimit extends UnaryExecutableOpBase
 		super(mayReduce, collectExceptions, qpInfo);
 
 		assert sortConditions != null;
+		// This operator must only be used for queries with a LIMIT clause.
+		// A limit of -1 indicates that no LIMIT clause is present.
 		assert limit >= 0;
 		assert offset >= 0;
 
@@ -62,8 +72,10 @@ public class ExecOpOrderByLimit extends UnaryExecutableOpBase
 	protected void _process( final SolutionMapping inputSolMap,
 	                         final IntermediateResultElementSink sink,
 	                         final QueryProcContextExt ctx ) {
-		if ( limit == 0 )
+		if ( limit == 0 ) {
+			numberOfInputMappingsDropped++;
 			return;
+		}
 
 		if ( solutionMappings.size() < maxNumberOfMappingsToKeep ) {
 			// This is the case in which we still have fewer input solution mappings
@@ -76,8 +88,10 @@ public class ExecOpOrderByLimit extends UnaryExecutableOpBase
 
 			// Use PriorityQueue.contains() instead of maintaining a separate HashSet for checking duplicates.
 			// This trades O(k) lookup time for lower memory overhead.
-			if ( mayReduce && solutionMappings.contains(inputSolMap) )
+			if ( mayReduce && solutionMappings.contains(inputSolMap) ) {
+				numberOfInputMappingsDropped++;
 				return;
+			}
 
 			solutionMappings.add(inputSolMap);
 			return;
@@ -94,36 +108,31 @@ public class ExecOpOrderByLimit extends UnaryExecutableOpBase
 			// Also here, if we are also removing duplicates at the same time,
 			// then we should add the current input solution mapping only if an
 			// identical copy of that solution mapping is not already contained
-			// in the list. 
-			if ( mayReduce && solutionMappings.contains(inputSolMap) )
+			// in the list.
+			if ( mayReduce && solutionMappings.contains(inputSolMap) ) {
+				numberOfInputMappingsDropped++;
 				return;
+			}
 
 			solutionMappings.poll();
 			solutionMappings.add(inputSolMap);
 		}
+		else numberOfInputMappingsDropped++;
 	}
 
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final QueryProcContextExt ctx ) {
-		long numberOfMappingsSkipped = 0L;
-		long numberOfMappingsProduced = 0L;
+		final SolutionMapping[] sortedMappings = new SolutionMapping[solutionMappings.size()];
 
-		final List<SolutionMapping> sortedMappings = new ArrayList<>(solutionMappings);
-		sortedMappings.sort(comparator);
+		for ( int i = sortedMappings.length - 1; i >= 0; i-- )
+			sortedMappings[i] = solutionMappings.poll();
 
-		for ( final SolutionMapping currentSolutionMapping : sortedMappings ) {
-			if ( numberOfMappingsSkipped < offset ) {
-				numberOfMappingsSkipped++;
-				continue;
-			}
-
-			if ( numberOfMappingsProduced >= limit )
-				break;
-
-			sink.send(currentSolutionMapping);
+		for ( int i = (int) Math.min(offset, sortedMappings.length);
+			i < sortedMappings.length && i < maxNumberOfMappingsToKeep;
+			i++ ) {
+			sink.send(sortedMappings[i]);
 			numberOfOutputMappingsProduced++;
-			numberOfMappingsProduced++;
 		}
 	}
 
@@ -131,12 +140,14 @@ public class ExecOpOrderByLimit extends UnaryExecutableOpBase
 	public void resetStats() {
 		super.resetStats();
 		numberOfOutputMappingsProduced = 0L;
+		numberOfInputMappingsDropped = 0L;
 	}
 
 	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
 		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
+		s.put( "numberOfInputMappingsDropped",  Long.valueOf(numberOfInputMappingsDropped) );
 		return s;
 	}
 
