@@ -16,8 +16,12 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 
 /**
  * Sorts solution mappings according to the ordering conditions of an
- * ORDER BY clause. This is a blocking operator that consumes all input
- * solution mappings before producing output.
+ * ORDER BY clause while retaining only the top-k mappings required by
+ * the LIMIT and OFFSET clauses.
+ * <p>
+ * This operator is intended only for queries that contain both ORDER BY
+ * and LIMIT clauses. Queries with OFFSET but without LIMIT should use
+ * {@link ExecOpOrderBy} instead.
  */
 public class ExecOpOrderByLimit extends UnaryExecutableOpBase
 {
@@ -36,15 +40,6 @@ public class ExecOpOrderByLimit extends UnaryExecutableOpBase
 	// case. TreeSet has a significantly higher memory footprint.
 	protected final PriorityQueue<SolutionMapping> solutionMappings;
 
-	/**
-	 * Sorts solution mappings according to the ordering conditions of an
-	 * ORDER BY clause while retaining only the top-k mappings required by
-	 * the LIMIT and OFFSET clauses.
-	 * <p>
-	 * This operator is intended only for queries that contain both ORDER BY
-	 * and LIMIT clauses. Queries with OFFSET but without LIMIT should use
-	 * {@link ExecOpOrderBy} instead.
-	 */
 	public ExecOpOrderByLimit( final List<SortCondition> sortConditions,
 	                           final long limit,
 	                           final long offset,
