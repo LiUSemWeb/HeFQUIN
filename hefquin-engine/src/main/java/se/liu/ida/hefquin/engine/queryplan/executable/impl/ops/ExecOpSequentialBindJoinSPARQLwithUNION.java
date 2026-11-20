@@ -103,7 +103,7 @@ public class ExecOpSequentialBindJoinSPARQLwithUNION
 		log.debug( "Building SPARQL UNION request for {} solution mappings", solMaps.size() );
 		final Element elmt = createUnion(solMaps, pattern, varsInQuery);
 		log.debug( "Constructed SPARQL UNION request for {} bindings", solMaps.size() );
-		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(elmt), null, mayReduce );
+		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(elmt), null, null, mayReduce );
 	}
 
 	public static Element createUnion( final Iterable<Binding> solMaps,

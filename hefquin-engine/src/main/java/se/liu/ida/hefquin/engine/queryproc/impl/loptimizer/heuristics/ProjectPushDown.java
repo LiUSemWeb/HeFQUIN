@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
@@ -34,6 +35,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpOrderBy;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
@@ -255,8 +257,8 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
 			createdPlan = createPlanForL2GOrG2LUnderProject( projectOp,
-			                                                op,
-			                                                subPlanUnderProject.getSubPlan(0) );
+			                                                 op,
+			                                                 subPlanUnderProject.getSubPlan(0) );
 		}
 
 		@Override
@@ -276,8 +278,16 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		@Override
 		public void visit( final LogicalOpMinus op ) {
 			createdPlan = createPlanForJoinLikeOpUnderProject( projectOp,
-			                                                 subPlanUnderProject,
-			                                                 inputPlan );
+			                                                   subPlanUnderProject,
+			                                                   inputPlan );
+		}
+
+		@Override
+		public void visit( final LogicalOpOrderBy op ) {
+			createdPlan = createPlanForOrderByUnderProject( projectOp,
+			                                                op,
+			                                                subPlanUnderProject.getSubPlan(0),
+			                                                inputPlan );
 		}
 
 	} // end of Worker
@@ -314,7 +324,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 			final boolean mayReduce = reqOp.mayReduce() && projectOp.mayReduce();
 
-			final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getDistinctRequired() || mayReduce );
+			final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getSortConditions(), oldReq.getDistinctRequired() || mayReduce );
 
 			final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( reqOp.getFederationMember(), mayReduce, newReq );
 			return new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
@@ -363,7 +373,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		final boolean mayReduce = reqOp.mayReduce() && projectOp.mayReduce();
 
-		final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getDistinctRequired() || mayReduce );
+		final SPARQLRequest newReq = new SPARQLRequestImpl( oldReq.getQueryPattern(), newProj, oldReq.getSortConditions(), oldReq.getDistinctRequired() || mayReduce );
 
 		final LogicalOpMultiRequest mergedOp = new LogicalOpMultiRequest( newReq,
 		                                                                  reqOp.getServiceVariable(),
@@ -582,8 +592,8 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 * TODO: think more about cases in which pushing a project operator is safe.
 	 */
 	protected LogicalPlan createPlanForL2GOrG2LUnderProject( final LogicalOpProject projectOp,
-	                                                        final UnaryLogicalOp childOp,
-	                                                        final LogicalPlan subPlanUnderChildOp ) {
+	                                                         final UnaryLogicalOp childOp,
+	                                                         final LogicalPlan subPlanUnderChildOp ) {
 		return apply(subPlanUnderChildOp);
 	}
 
@@ -666,17 +676,7 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		if ( pushDownVars.isEmpty() || pushDownVars.equals(varsInSubPlan) ) {
 			// No projection needed for this branch
-			final LogicalPlan newChild = apply(subPlanUnderChildOp);
-
-			if ( newChild.isSamePlan(subPlanUnderChildOp) )
-				return inputPlan;
-
-			final LogicalPlan newSubTree = new LogicalPlanWithUnaryRootImpl(
-				childOp,
-				null,
-				newChild );
-
-			return new LogicalPlanWithUnaryRootImpl(parentProjectOp, null, newSubTree);
+			return keepProjectAboveOperator(parentProjectOp, childOp, subPlanUnderChildOp, inputPlan);
 		}
 
 		final LogicalPlan pushed = new LogicalPlanWithUnaryRootImpl(
@@ -704,8 +704,8 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	 * </ul>
 	 */
 	protected LogicalPlan createPlanForJoinLikeOpUnderProject( final LogicalOpProject projectOp,
-	                                                       final LogicalPlan subPlanUnderProject,
-	                                                       final LogicalPlan inputPlan ) {
+	                                                           final LogicalPlan subPlanUnderProject,
+	                                                           final LogicalPlan inputPlan ) {
 		final int numberOfSubPlansUnderJoin = subPlanUnderProject.numberOfSubPlans();
 
 		// If there is only one subplan under the join, then remove the join altogether.
@@ -793,6 +793,28 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 	}
 
 	/**
+	 * Attempts to push the given project operator below an ORDER BY operator.
+	 *
+	 * The pushdown is performed only if all variables required by the sort
+	 * conditions are retained by the projection. Otherwise, the project operator
+	 * remains above the ORDER BY operator, and the heuristic is applied
+	 * recursively to the subplan underneath it.
+	 */
+	protected LogicalPlan createPlanForOrderByUnderProject( final LogicalOpProject projectOp,
+	                                                        final LogicalOpOrderBy orderByOp,
+	                                                        final LogicalPlan subPlanUnderOp,
+	                                                        final LogicalPlan inputPlan ) {
+		if ( projectOp.getVariables().containsAll(getSortConditionVars(orderByOp)) ) {
+			return createPlanForUnaryOpUnderProject(
+					projectOp,
+					orderByOp,
+					subPlanUnderOp);
+		}
+
+		return keepProjectAboveOperator(projectOp, orderByOp, subPlanUnderOp, inputPlan);
+	}
+
+	/**
 	 * Returns a plan in which the given project operator is pushed under the
 	 * given unary operator, with the subplan underneath being a version of
 	 * the given subplan in which the project push down heuristic has been
@@ -809,6 +831,28 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		// Put together the new plan with the given unary operator as root.
 		return LogicalPlanUtils.createPlanWithSubPlans(op, null, newSubPlan2);
+	}
+
+	/**
+	 * Keeps the given project operator above the given unary operator while
+	 * recursively applying the heuristic to the subplan underneath that operator.
+	 * If the subplan is unchanged, the original input plan is returned.
+	 */
+	protected LogicalPlan keepProjectAboveOperator( final LogicalOpProject projectOp,
+	                                                final UnaryLogicalOp childOp,
+	                                                final LogicalPlan subPlanUnderChildOp,
+	                                                final LogicalPlan inputPlan ) {
+		final LogicalPlan newChild = apply(subPlanUnderChildOp);
+
+		if ( newChild.isSamePlan(subPlanUnderChildOp) )
+			return inputPlan;
+
+		final LogicalPlan newSubTree = new LogicalPlanWithUnaryRootImpl(
+				childOp,
+				null,
+				newChild);
+
+		return new LogicalPlanWithUnaryRootImpl(projectOp, null, newSubTree);
 	}
 
 
@@ -849,6 +893,16 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		}
 
 		return true;
+	}
+
+	protected Collection<?> getSortConditionVars( final LogicalOpOrderBy op ) {
+		final Set<Var> vars = new HashSet<>();
+
+		for ( final SortCondition sortCondition : op.getSortConditions() ) {
+			vars.addAll(sortCondition.getExpression().getVarsMentioned());
+		}
+
+		return vars;
 	}
 
 }

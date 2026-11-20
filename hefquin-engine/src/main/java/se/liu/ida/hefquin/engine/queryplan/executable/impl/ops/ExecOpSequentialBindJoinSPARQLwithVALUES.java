@@ -113,7 +113,7 @@ public class ExecOpSequentialBindJoinSPARQLwithVALUES
 		group.addElement( pattern );
 
 		// Create the request using the combined pattern.
-		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(group), null, mayReduce );
+		return new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl1(group), null, null, mayReduce );
 	}
 
 	public static Element createValuesClause( final Set<Binding> solMaps ) {

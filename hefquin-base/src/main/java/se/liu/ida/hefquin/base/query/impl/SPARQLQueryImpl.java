@@ -1,9 +1,11 @@
 package se.liu.ida.hefquin.base.query.impl;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
 
@@ -30,12 +32,14 @@ public class SPARQLQueryImpl implements SPARQLQuery
 
 	public SPARQLQueryImpl( final SPARQLGraphPattern p,
 	                        final Set<Var> projectionVars,
+	                        final List<SortCondition> sortConditions,
 	                        final boolean distinctRequired ) {
-		this( QueryPatternUtils.convertToJenaElement(p), projectionVars, distinctRequired );
+		this( QueryPatternUtils.convertToJenaElement(p), projectionVars, sortConditions, distinctRequired );
 	}
 
 	protected SPARQLQueryImpl( final Element jenaElement,
 	                           final Set<Var> projectionVars,
+	                           final List<SortCondition> sortConditions,
 	                           final boolean distinctRequired ) {
 		assert jenaElement != null;
 
@@ -49,6 +53,8 @@ public class SPARQLQueryImpl implements SPARQLQuery
 		else
 			jenaQuery.setQueryResultStar( true );
 
+		if ( sortConditions != null )
+			sortConditions.forEach(jenaQuery::addOrderBy);
 
 		jenaQuery.setDistinct( distinctRequired );
 		jenaQuery.setQueryPattern( jenaElement );

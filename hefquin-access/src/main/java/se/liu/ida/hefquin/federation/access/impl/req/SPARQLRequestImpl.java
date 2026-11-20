@@ -1,10 +1,12 @@
 package se.liu.ida.hefquin.federation.access.impl.req;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.query.Query;
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
@@ -16,6 +18,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 {
 	protected final SPARQLGraphPattern pattern;
 	protected final Set<Var> projectionVars;
+	protected final List<SortCondition> sortConditions;
 	protected final boolean distinctRequired;
 
 	protected final SPARQLQuery query;
@@ -25,16 +28,18 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	protected final ExpectedVariables expectedVars;
 
 	public SPARQLRequestImpl( final SPARQLGraphPattern pattern ) {
-		this(pattern, null, false);
+		this(pattern, null, null, false);
 	}
 
 	public SPARQLRequestImpl( final SPARQLGraphPattern pattern,
 	                          final Set<Var> projectionVars,
+	                          final List<SortCondition> sortConditions,
 	                          final boolean distinctRequired ) {
 		assert pattern != null;
 		this.pattern = pattern;
 		this.query = null;
 		this.projectionVars = projectionVars;
+		this.sortConditions = sortConditions;
 		this.distinctRequired = distinctRequired;
 
 		expectedVars = determineExpectedVars( pattern.getExpectedVariables(),
@@ -48,6 +53,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 		final Query jena = query.asJenaQuery();
 		this.projectionVars = jena.isQueryResultStar() ? null : new HashSet<>( jena.getProjectVars() );
+		this.sortConditions = jena.getOrderBy();
 		this.distinctRequired = jena.isDistinct();
 
 		expectedVars = determineExpectedVars( query.getExpectedVariables(),
@@ -132,6 +138,11 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	}
 
 	@Override
+	public List<SortCondition> getSortConditions() {
+		return sortConditions;
+	}
+
+	@Override
 	public boolean getDistinctRequired() {
 		return distinctRequired;
 	}
@@ -141,7 +152,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		if ( query != null )
 			return query;
 		else
-			return SPARQLRequest.convertToQuery( getQueryPattern(), getProjectionVars(), getDistinctRequired() );
+			return SPARQLRequest.convertToQuery( getQueryPattern(), getProjectionVars(), getSortConditions(), getDistinctRequired() );
 	}
 
 	@Override
@@ -156,6 +167,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		else
 			return "SPARQLRequest with pattern: " + pattern.toString()
 			     + ", projection variables: " + projectionVars
+			     + ", sort conditions: " + sortConditions
 			     + ", distinct required: " + distinctRequired;
 	}
 }

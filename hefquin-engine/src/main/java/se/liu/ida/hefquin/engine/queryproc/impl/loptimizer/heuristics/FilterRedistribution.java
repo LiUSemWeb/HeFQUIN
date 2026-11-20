@@ -43,6 +43,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpOrderBy;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
@@ -335,6 +336,12 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpProject op ) {
+			visitAllSubPlans();
+		}
+
+		@Override
+		public void visit( final LogicalOpOrderBy op ) {
+			// No filter expressions to collect from the order by operation itself.
 			visitAllSubPlans();
 		}
 	} // end of FilterCollector

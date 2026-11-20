@@ -120,7 +120,7 @@ public class ExecOpSequentialBindJoinSPARQLwithFILTER
 
 		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
 		log.debug( "Constructed SPARQL FILTER request for {} bindings", solMaps.size() );
-		return new SPARQLRequestImpl( patternForReq, null, mayReduce );
+		return new SPARQLRequestImpl( patternForReq, null, null, mayReduce );
 	}
 
 	public static Expr createFilterExpression( final Iterable<Binding> solMaps ) {

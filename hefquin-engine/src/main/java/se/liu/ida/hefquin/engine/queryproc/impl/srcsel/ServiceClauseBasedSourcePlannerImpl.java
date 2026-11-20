@@ -300,7 +300,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 				throw new IllegalArgumentException( "Invalid SERVICE clause: missing PARAMS for " + ep.toString() );
 
 			final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-			final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
+			final SPARQLRequest req = new SPARQLRequestImpl( p, null, null, mayReduce );
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(ep, mayReduce, req);
 			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
@@ -345,7 +345,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 		if ( SPARQLfms.size() > 1 ) {
 			final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-			final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
+			final SPARQLRequest req = new SPARQLRequestImpl( p, null, null, mayReduce );
 			final Var var = Var.alloc( jenaOp.getService() );
 			final LogicalOpMultiRequest op = new LogicalOpMultiRequest(req, var, SPARQLfms);
 
@@ -353,7 +353,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		}
 		else if ( SPARQLfms.size() == 1 ) {
 			final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-			final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
+			final SPARQLRequest req = new SPARQLRequestImpl( p, null, null, mayReduce );
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(SPARQLfms.iterator().next(), mayReduce, req);
 
 			lplansList.add( new LogicalPlanWithNullaryRootImpl(op, null) );
@@ -369,7 +369,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 				// plan rewriting (e.g., projection push down) that is intended for one of the
 				// of these operators is not accidentally affecting other of these operators.
 				final SPARQLGraphPattern p =  new GenericSPARQLGraphPatternImpl2( jenaOp.getSubOp() );
-				final SPARQLRequest req = new SPARQLRequestImpl( p, null, mayReduce );
+				final SPARQLRequest req = new SPARQLRequestImpl( p, null, null, mayReduce );
 				final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mayReduce, req);
 				lplansList.add( new LogicalPlanWithNullaryRootImpl(reqOp, null) );
 			}
@@ -436,7 +436,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		// If the federation member has a SPARQL endpoint interface, then
 		// we can simply wrap the whole query pattern in a single request.
 		if ( fm instanceof SPARQLEndpoint ep ) {
-			final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp), null, mayReduce );
+			final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp), null, null, mayReduce );
 			final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>(ep, mayReduce, req);
 			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}
