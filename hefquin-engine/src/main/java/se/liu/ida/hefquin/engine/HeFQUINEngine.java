@@ -10,6 +10,8 @@ import org.apache.jena.query.QueryExecException;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.sparql.algebra.Algebra;
+import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
@@ -17,15 +19,19 @@ import org.apache.jena.sparql.util.QueryExecUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextBuilder;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
+import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessingStatsAndExceptionsImpl;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINEngineConstants;
+import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.HeFQUINQuerySupportChecker;
+import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.ResultSetSolutionMapping;
 
 /**
  * An object of this class can be used in two ways to process queries over
@@ -299,6 +305,63 @@ public class HeFQUINEngine
 		if ( wasShutDown == true )
 			throw new IllegalStateException("This HeFQUINEngine instance has been shut down already.");
 
+		if ( HeFQUINQuerySupportChecker.isSupported(query) ) {
+			System.out.println("DIRECT HEFQUIN");
+			return _execDirectlyAndPrint(query, outputFormat, output, ctx);
+		}
+
+		return _execThroughJenaAndPrint(query, outputFormat, output, ctx);
+
+	}
+
+	protected QueryProcessingStatsAndExceptions _execDirectlyAndPrint( final Query query,
+	                                                                   final ResultsFormat outputFormat,
+	                                                                   final PrintStream output,
+	                                                                   final QueryProcContext ctx ) {
+		final se.liu.ida.hefquin.base.query.Query hefquinQuery = new GenericSPARQLGraphPatternImpl1( query.getQueryPattern() );
+
+		final MaterializingQueryResultSinkImpl sink = new MaterializingQueryResultSinkImpl();
+
+		QueryProcessingStatsAndExceptions stats = null;
+		Exception ex = null;
+		try {
+			stats = qProc.processQuery(hefquinQuery, sink, ctx);
+		}
+		catch ( final Exception e ) {
+			ex = e;
+		}
+
+		if ( ex == null ) {
+			final ResultSet resultSet = ResultSetSolutionMapping.create(query.getResultVars(), sink.getSolMapsIter());
+
+			try {
+				QueryExecUtils.outputResultSet(resultSet, query, outputFormat, output);
+			}
+			catch ( final Exception e ) {
+				ex = e;
+			}
+		}
+
+		if ( ex == null ) {
+			return stats;
+		}
+		else if ( stats == null ) {
+			return new QueryProcessingStatsAndExceptionsImpl(
+					-1L, -1L, -1L, -1L,
+					null, null,
+					Arrays.asList(ex));
+		}
+		else {
+			return new QueryProcessingStatsAndExceptionsImpl(stats, ex);
+		}
+	}
+
+	protected QueryProcessingStatsAndExceptions _execThroughJenaAndPrint( final Query query,
+	                                                                      final ResultsFormat outputFormat,
+	                                                                      final PrintStream output,
+	                                                                      final QueryProcContext ctx )
+		throws UnsupportedQueryException, IllegalQueryException
+	{
 		final QueryExecution qe = _prepareExecution(query);
 
 		qe.getContext().set( HeFQUINEngineConstants.sysQueryProcContext, ctx );
