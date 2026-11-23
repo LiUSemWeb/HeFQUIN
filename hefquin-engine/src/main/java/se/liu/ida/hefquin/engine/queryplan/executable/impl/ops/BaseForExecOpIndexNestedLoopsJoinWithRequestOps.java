@@ -1,9 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -52,8 +53,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	 * {@link #setTerminationFlag()} method of this class is called by
 	 * a different thread than the processing methods.
 	 */
-	protected final List<NullaryExecutableOp> reqOps =
-			Collections.synchronizedList( new ArrayList<>() );
+	protected final Set<NullaryExecutableOp> reqOps =
+			Collections.synchronizedSet( new HashSet<>() );
 
 	/**
 	 * Used to collect the completable futures created for executing
@@ -63,8 +64,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	 * method of this class is called by a different thread than the
 	 * processing methods.
 	 */
-	protected final List<CompletableFuture<?>> futures =
-			Collections.synchronizedList( new ArrayList<>() );
+	protected final Set<CompletableFuture<?>> futures =
+			Collections.synchronizedSet( new HashSet<>() );
 
 	// statistics
 	protected long numberOfOutputMappingsProduced = 0L;
@@ -188,6 +189,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 				mySink.flush();
 
 				statsOfLastReqOp = reqOp.getStats();
+
+				reqOps.remove(reqOp);
 			}
 		};
 	}
