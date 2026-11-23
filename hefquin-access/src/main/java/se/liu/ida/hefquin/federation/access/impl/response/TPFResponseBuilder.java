@@ -87,7 +87,7 @@ public class TPFResponseBuilder
 			return new TPFResponseImpl(exception, requestStartTime);
 
 		if ( matchingTriples == null )
-			throw new IllegalStateException("matchingTriples not specified");
+			matchingTriples = new ArrayList<>();
 
 		if ( metadataTriples == null )
 			metadataTriples = new ArrayList<>();
