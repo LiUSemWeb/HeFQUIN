@@ -1,7 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -21,6 +24,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorSta
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.FederationAccessException;
 
 /**
  * Abstract base class to implement index nested loops joins by using request
@@ -40,6 +44,27 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	protected final QueryType query;
 	protected final MemberType fm;
 	protected final boolean useOuterJoinSemantics;
+
+	/**
+	 * Used to collect the request operators created while processing
+	 * the input solution mappings. We use a synchronized list to make
+	 * the implementation thread safe, which is necessary because the
+	 * {@link #setTerminationFlag()} method of this class is called by
+	 * a different thread than the processing methods.
+	 */
+	protected final List<NullaryExecutableOp> reqOps =
+			Collections.synchronizedList( new ArrayList<>() );
+
+	/**
+	 * Used to collect the completable futures created for executing
+	 * the request operators and processing their responses. We use
+	 * a synchronized list to make the implementation thread safe,
+	 * which is necessary because the {@link #setTerminationFlag()}
+	 * method of this class is called by a different thread than the
+	 * processing methods.
+	 */
+	protected final List<CompletableFuture<?>> futures =
+			Collections.synchronizedList( new ArrayList<>() );
 
 	// statistics
 	protected long numberOfOutputMappingsProduced = 0L;
@@ -66,40 +91,46 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	}
 
 	@Override
+	public void setTerminationFlag() {
+		// Set my own termination flag
+		super.setTerminationFlag();
+
+		// Set the termination flag of all request operators
+		// created while executing this operator.
+		synchronized (reqOps) {
+			reqOps.forEach( reqOp -> reqOp.setTerminationFlag() );
+		}
+
+		// Cancel all completable futures created while
+		// executing this operator.
+		synchronized (futures) {
+			futures.forEach( f -> f.cancel(true) );
+		}
+	}
+
+	@Override
 	protected void _processCollectedInput( final List<SolutionMapping> input,
 	                                       final IntermediateResultElementSink sink,
 	                                       final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
 		log.info( "Starting request-based index nested loops join with {} input mappings", input.size() );
-		final CompletableFuture<?>[] futures = initiateProcessing(input, sink, ctx);
-
-		// wait for all the futures to be completed
-		if ( futures.length > 0 ) {
-			try {
-				CompletableFuture.allOf( futures ).get();
-			}
-			catch ( final InterruptedException e ) {
-				throw new ExecOpExecutionException( "interruption of the futures that run the executable operators", e, this );
-			}
-			catch ( final ExecutionException e ) {
-				throw new ExecOpExecutionException( "The execution of the futures that run the executable operators caused an exception.", e, this );
-			}
-		}
+		initiateProcessing( input, sink, ctx );
 	}
 
-	protected CompletableFuture<?>[] initiateProcessing(
-			final List<SolutionMapping> input,
-			final IntermediateResultElementSink sink,
-			final QueryProcContextExt ctx )
+	protected void initiateProcessing( final List<SolutionMapping> input,
+	                                   final IntermediateResultElementSink sink,
+	                                   final QueryProcContextExt ctx )
 	{
-		final CompletableFuture<?>[] futures = new CompletableFuture[input.size()];
+		final ExecutorService execService = ctx.getExecutorServiceForPlanTasks();
 
-		int i = 0;
-		for ( final SolutionMapping sm : input ) {
-			final CompletableFuture<?> f;
+		final Iterator<SolutionMapping> it = input.iterator();
+		while ( it.hasNext() ) {
+			final SolutionMapping sm = it.next();
+
+			final NullaryExecutableOp reqOp;
 			try {
-				f = initiateProcessing(sm, sink, ctx);
+				reqOp = createExecutableRequestOperator(sm);
 			}
 			catch ( final VariableByBlankNodeSubstitutionException e ) {
 				// this may happen if the current solution mapping contains
@@ -114,37 +145,19 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 				continue;
 			}
 
-			futures[i] = f;
-			i++;
+			numberOfRequestOpsUsed++;
+
+			final Runnable processor = createProcessor(reqOp, sm, sink, ctx);
+
+			reqOps.add(reqOp);
+			futures.add( CompletableFuture.runAsync(processor, execService) );
+
+			// Before handling the next input solution mapping (if any)
+			// we check whether the termination flag has been set in the
+			// meantime. If that is the case, we ignore the rest of the
+			// input solution mappings.
+			if ( it.hasNext() && terminationFlagIsSet() ) return;
 		}
-
-		if ( i < futures.length ) {
-			// This case may occur if we have skipped any of the
-			// iteration steps of the previous loop because any
-			// of the futures obtained in that loop was null.
-			return Arrays.copyOf( futures, i );
-		}
-		else {
-			return futures;
-		}
-	}
-
-	protected CompletableFuture<?> initiateProcessing(
-			final SolutionMapping sm,
-			final IntermediateResultElementSink sink,
-			final QueryProcContextExt ctx )
-					throws VariableByBlankNodeSubstitutionException
-	{
-		final NullaryExecutableOp reqOp = createExecutableRequestOperator(sm);
-
-		numberOfRequestOpsUsed++;
-
-		final Runnable processor = createProcessor(reqOp, sm, sink, ctx);
-		final ExecutorService execService = ctx.getExecutorServiceForPlanTasks();
-		if ( execService != null )
-			return CompletableFuture.runAsync(processor, execService);
-		else
-			return CompletableFuture.runAsync(processor);
 	}
 
 	protected abstract NullaryExecutableOp createExecutableRequestOperator( SolutionMapping sm )
@@ -169,7 +182,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 					reqOp.execute(mySink, ctx);
 				}
 				catch ( final ExecOpExecutionException e ) {
-					throw new RuntimeException( "Executing a request operator used by this index nested loops join caused an exception.", e );
+					throw new MyRuntimeException( "Executing a request operator used by this index nested loops join caused an exception: " + e.getMessage(), e );
 				}
 
 				mySink.flush();
@@ -190,6 +203,56 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 		numberOfOutputMappingsProduced );
 		if ( input != null && ! input.isEmpty() ) {
 			_processCollectedInput(input, sink, ctx);
+		}
+
+		// Now we wait for all the futures to be completed. To this
+		// end we need to convert the list of futures into an array.
+		final CompletableFuture<?>[] arr;
+		synchronized (futures) {
+			arr = futures.toArray( new CompletableFuture<?>[0] );
+		}
+
+		// And now we can wait.
+		try {
+			CompletableFuture.allOf(arr).get();
+		}
+		catch ( final InterruptedException e ) {
+			final String msg = "Waiting for the request operators of this " +
+					"index-NLJ at the federation member with service URI " +
+					fm.getServiceURI() + " was interrupted with the " +
+					"following message: " + e.getMessage();
+			throw new ExecOpExecutionException(msg, e, this);
+		}
+		catch ( final ExecutionException e ) {
+			// If the termination flag of this operator has been set and the
+			// cause of this exception is a cancellation, then we ignore this
+			// exception because it was caused by the fact that we have
+			// canceled all 'futures' in 'setTerminationFlag()'.
+			if (    e.getCause() instanceof CancellationException
+			     && terminationFlagIsSet() )
+				return;
+
+			final String causeMsg;
+			if ( e.getCause() instanceof MyRuntimeException ) {
+				final Throwable cc = e.getCause().getCause();
+				if ( cc instanceof ExecOpExecutionException &&
+				     cc.getCause() instanceof FederationAccessException ccc )
+					causeMsg = ccc.getMessage();
+				else
+					causeMsg = cc.getMessage();
+			}
+			else
+				causeMsg = e.getMessage();
+
+			final String msg = "Processing the request operators of this " +
+					"index-NLJ at the federation member with service URI " +
+					fm.getServiceURI() + " caused an exception with " +
+					"the following message: " + causeMsg;
+			throw new ExecOpExecutionException(msg, e, this);
+		}
+		finally {
+			reqOps.clear();
+			futures.clear();
 		}
 	}
 
@@ -256,6 +319,16 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 				outputSink.send( smFromInput );
 			}
 		}
-    }
+	}
+
+	protected static class MyRuntimeException extends RuntimeException
+	{
+		private static final long serialVersionUID = 4145868219145957909L;
+
+		public MyRuntimeException( final String msg,
+		                           final ExecOpExecutionException cause ) {
+			super(msg, cause);
+		}
+	}
 
 }

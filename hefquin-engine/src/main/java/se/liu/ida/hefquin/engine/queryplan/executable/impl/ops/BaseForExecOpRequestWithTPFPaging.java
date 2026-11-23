@@ -1,13 +1,15 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Iterator;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.Triple;
-import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -16,7 +18,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
@@ -31,6 +33,9 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
        extends BaseForExecOpRequest<ReqType,MemberType>
 {
 	private static final Logger log = LoggerFactory.getLogger( BaseForExecOpRequestWithTPFPaging.class );
+
+	protected CompletableFuture<TPFResponse> currentFuture = null;
+
 	private int numberOfPageRequestsIssued = 0;
 	private long totalNumberOfMatchingTriplesRetrieved = 0L;
 	private int minNumberOfMatchingTriplesPerPage = Integer.MAX_VALUE;
@@ -46,25 +51,65 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 	}
 
 	@Override
+	public void setTerminationFlag() {
+		super.setTerminationFlag();
+
+		// Cancel the future that is waiting for the
+		// current request to be resolved (if any).
+		final CompletableFuture<TPFResponse> f = currentFuture;
+		if ( f != null ) f.cancel(true);
+	}
+
+	@Override
 	protected final void _execute( final IntermediateResultElementSink sink,
 	                               final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
+		final FederationAccessManager fedAccessMgr = ctx.getFederationAccessMgr();
+
 		log.debug( "Starting paging request execution for {}", fm );
 
 		TPFResponse currentPage = null;
 		while ( currentPage == null || ! isLastPage(currentPage) ) {
-			// create the request for the next page (which is the first page if currentPage is null)
+			// Create and issue the request for the next page
+			// (which is the first page if currentPage is null).
 			final PageReqType pageRequest = createPageRequest(currentPage);
-
+			currentFuture = fedAccessMgr.issueRequest( pageRequest,
+			                                           fm,
+			                                           ctx.ignoreRetrievalCache() );
 			numberOfPageRequestsIssued++;
 
-			// perform the page request
+			// Wait for the request to be resolved.
 			try {
-				currentPage = FederationAccessUtils.performRequest(ctx, pageRequest, fm);
+				currentPage = currentFuture.get();
 			}
-			catch ( final FederationAccessException e ) {
-				throw new ExecOpExecutionException("Issuing a page request caused an exception.", e, this);
+			catch ( final InterruptedException | CancellationException e ) {
+				// We ignore this exception if the termination flag of this
+				// operator has been set because, in this case, the exception
+				// is likely caused by the fact that we have canceled the
+				// current future in 'setTerminationFlag()'.
+				if ( terminationFlagIsSet() ) return;
+
+				final String msg = "Unexpected interruption or cancellation " +
+						"when getting the response to a page request to the " +
+						"federation member with service URI " + fm.getServiceURI() +
+						"(message: " + e.getMessage() + ")";
+				throw new ExecOpExecutionException(msg, e, this);
 			}
+			catch ( final ExecutionException e ) {
+				final String msg = "Getting the response to a page request " +
+						"to the federation member with service URI " +
+						fm.getServiceURI() + " caused an exception with " +
+						"the following message: " + e.getMessage();
+				throw new ExecOpExecutionException(msg, e, this);
+			}
+			finally {
+				currentFuture = null;
+			}
+
+			// If the termination flag has been set in the meantime,
+			// ignore the response and skip the rest of the execution
+			// of this operator.
+			if ( terminationFlagIsSet() ) return;
 
 			// check the response
 			if ( currentPage.isDefective() ) {

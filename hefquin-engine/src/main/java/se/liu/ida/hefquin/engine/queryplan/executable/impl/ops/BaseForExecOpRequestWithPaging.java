@@ -38,8 +38,8 @@ public abstract class BaseForExecOpRequestWithPaging<
 		while ( ! wasLastPage ) {
 
 			// create and issue the request for the next page (processing
-			// the response is done in the 'process' method below, which
-			// may be executed in a separate thread)
+			// the response is done in the 'consumeResponse' method below,
+			// which may be executed in a separate thread)
 			final PageReqType pageRequest = createPageRequest(pageNumber);
 			final PageRespType pageResponse;
 			try {
@@ -48,6 +48,11 @@ public abstract class BaseForExecOpRequestWithPaging<
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a page request caused an exception.", e, this);
 			}
+
+			// If the termination flag has been set in the meantime,
+			// ignore the response and skip the rest of the execution
+			// of this operator.
+			if ( terminationFlagIsSet() ) return;
 
 			consumeResponse(pageResponse, sink);
 			wasLastPage = isLastPage(pageResponse);

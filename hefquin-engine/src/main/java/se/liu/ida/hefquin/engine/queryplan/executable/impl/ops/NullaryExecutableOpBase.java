@@ -42,6 +42,9 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 	public final void execute( final IntermediateResultElementSink sink,
 	                           final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
+		// Do not execute if the termination flag is set.
+		if ( terminationFlagIsSet() ) return;
+
 		log.info( "Executing {}.", getClass().getSimpleName() );
 		numberOfInvocations++;
 		timeAtExecStart = System.currentTimeMillis();
@@ -66,10 +69,14 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 	/**
 	 * Implementations of this function need to execute the algorithm of this
 	 * operator and send the result elements (if any) to the given sink.
-	 *
+	 * <p>
 	 * If an exception occurs during this process, then this exception needs
 	 * to either be collected or be thrown, depending on whether {@link
 	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 * <p>
+	 * Implementations of this method do not need to check the termination
+	 * flag (see {@link #terminationFlagIsSet()}); the calling method has
+	 * done that before calling this method.
 	 */
 	protected abstract void _execute( IntermediateResultElementSink sink,
                                       QueryProcContextExt ctx ) throws ExecOpExecutionException;

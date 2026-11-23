@@ -61,6 +61,9 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final IntermediateResultElementSink sink,
 			final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
+		// Ignore the given input if the termination flag is set.
+		if ( terminationFlagIsSet() ) return;
+
 		log.info( "Processing solution mapping from child1 in {}.", getClass().getSimpleName() );
 
 		timeAtCurrentLeftProcStart = System.currentTimeMillis();
@@ -94,6 +97,9 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final IntermediateResultElementSink sink,
 			final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
+		// Ignore the given input if the termination flag is set.
+		if ( terminationFlagIsSet() ) return;
+
 		log.info( "Processing batch of {} solution mappings from child1 in {}.", inputSolMaps.size(), getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
@@ -128,6 +134,9 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final IntermediateResultElementSink sink,
 			final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
+		// Ignore the given input if the termination flag is set.
+		if ( terminationFlagIsSet() ) return;
+
 		log.info( "Processing solution mapping from child2 in {}.", getClass().getSimpleName() );
 
 		timeAtCurrentRightProcStart = System.currentTimeMillis();
@@ -161,6 +170,9 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final IntermediateResultElementSink sink,
 			final QueryProcContextExt ctx ) throws ExecOpExecutionException
 	{
+		// Ignore the given input if the termination flag is set.
+		if ( terminationFlagIsSet() ) return;
+
 		log.info( "Processing batch of {} solution mappings from child2 in {}.", inputSolMaps.size(), getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
@@ -194,9 +206,13 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	 * Implementations of this function need to process the given solution
 	 * mapping as input coming from the first operand and send the produced
 	 * result elements (if any) to the given sink.
-	 *
+	 * <p>
 	 * If an exception occurs while processing the solution mapping, then
 	 * this exception needs to be thrown.
+	 * <p>
+	 * Implementations of this method do not need to check the termination
+	 * flag (see {@link #terminationFlagIsSet()}); the calling method has
+	 * done that before calling this method.
 	 */
 	protected abstract void _processInputFromChild1(
 			SolutionMapping inputSolMap,
@@ -207,12 +223,19 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	 * Processes the input solution mappings of the given list by calling
 	 * {@link #_processInputFromChild1(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
 	 * for each of them.
-	 *
+	 * <p>
 	 * Subclasses may override this behavior to send a greater number of output
 	 * solution mappings to the given sink at a time (which is useful to reduce
 	 * the communication between threads in the push-based execution model).
 	 * If an exception occurs within the overriding implementation, then this
 	 * exception needs to be thrown.
+	 * <p>
+	 * Implementations of this method do not need to immediately check the
+	 * termination flag (see {@link #terminationFlagIsSet()}); the calling
+	 * method has just done that before calling this method. However, if an
+	 * implementation processes the given solution mappings separately, one
+	 * at a time, then this implementation may check the flag repeatedly
+	 * during this process.
 	 */
 	protected void _processInputFromChild1(
 			final List<SolutionMapping> inputSolMaps,
@@ -220,6 +243,7 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
 			_processInputFromChild1(sm, sink, ctx);
+			if ( terminationFlagIsSet() ) return;
 		}
 	}
 
@@ -239,14 +263,18 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	 * Implementations of this function need to process the given solution
 	 * mapping as input coming from the second operand and send the produced
 	 * result elements (if any) to the given sink.
-	 *
+	 * <p>
 	 * If an exception occurs while processing the solution mapping, then
 	 * this exception needs to be thrown.
-	 *
+	 * <p>
 	 * May throw an {@link IllegalStateException} for operators for which
 	 * {@link #requiresCompleteChild1InputFirst()} returns true and
 	 * {@link #_wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)}
 	 * has not been called yet.
+	 * <p>
+	 * Implementations of this method do not need to check the termination
+	 * flag (see {@link #terminationFlagIsSet()}); the calling method has
+	 * done that before calling this method.
 	 */
 	protected abstract void _processInputFromChild2(
 			SolutionMapping inputSolMap,
@@ -257,12 +285,19 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	 * Processes the input solution mappings of the given list by calling
 	 * {@link #_processInputFromChild2(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
 	 * for each of them.
-	 *
+	 * <p>
 	 * Subclasses may override this behavior to send a greater number of output
 	 * solution mappings to the given sink at a time (which is useful to reduce
 	 * the communication between threads in the push-based execution model).
 	 * If an exception occurs within the overriding implementation, then this
 	 * exception needs to be thrown.
+	 * <p>
+	 * Implementations of this method do not need to immediately check the
+	 * termination flag (see {@link #terminationFlagIsSet()}); the calling
+	 * method has just done that before calling this method. However, if an
+	 * implementation processes the given solution mappings separately, one
+	 * at a time, then this implementation may check the flag repeatedly
+	 * during this process.
 	 */
 	protected void _processInputFromChild2(
 			final List<SolutionMapping> inputSolMaps,
@@ -270,6 +305,7 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
 			_processInputFromChild2(sm, sink, ctx);
+			if ( terminationFlagIsSet() ) return;
 		}
 	}
 

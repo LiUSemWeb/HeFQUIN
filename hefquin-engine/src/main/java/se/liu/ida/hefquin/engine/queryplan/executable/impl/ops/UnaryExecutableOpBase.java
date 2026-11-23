@@ -50,6 +50,9 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	                           final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
+		// Ignore the given input if the termination flag is set.
+		if ( terminationFlagIsSet() ) return;
+
 		log.info( "Processing solution mapping in {}.", getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
@@ -74,6 +77,9 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	                           final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
+		// Ignore the given input if the termination flag is set.
+		if ( terminationFlagIsSet() ) return;
+
 		log.info( "Processing batch of {} solution mappings in {}.", inputSolMaps.size(), getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
@@ -94,7 +100,9 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 
 	@Override
 	public final void concludeExecution( final IntermediateResultElementSink sink,
-	                                     final QueryProcContextExt ctx ) throws ExecOpExecutionException {
+	                                     final QueryProcContextExt ctx )
+			throws ExecOpExecutionException
+	{
 		log.info( "Concluding execution for {}.", getClass().getSimpleName() );
 
 		if ( collectExceptions ) {
@@ -118,9 +126,13 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	 * Implementations of this function need to process the given solution
 	 * mapping as input and send the produced result elements (if any) to
 	 * the given sink.
-	 *
+	 * <p>
 	 * If an exception occurs while processing the solution mapping, then
 	 * this exception needs to be thrown.
+	 * <p>
+	 * Implementations of this method do not need to check the termination
+	 * flag (see {@link #terminationFlagIsSet()}); the calling method has
+	 * done that before calling this method.
 	 */
 	protected abstract void _process( SolutionMapping inputSolMap,
 	                                  IntermediateResultElementSink sink,
@@ -130,12 +142,19 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	 * Processes the input solution mappings of the given list by calling
 	 * {@link #_process(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
 	 * for each of them.
-	 *
+	 * <p>
 	 * Subclasses may override this behavior to send a greater number of output
 	 * solution mappings to the given sink at a time (which is useful to reduce
 	 * the communication between threads in the push-based execution model).
 	 * If an exception occurs within the overriding implementation, then this
 	 * exception needs to be thrown.
+	 * <p>
+	 * Implementations of this method do not need to immediately check the
+	 * termination flag (see {@link #terminationFlagIsSet()}); the calling
+	 * method has just done that before calling this method. However, if an
+	 * implementation processes the given solution mappings separately, one
+	 * at a time, then this implementation may check the flag repeatedly
+	 * during this process.
 	 */
 	protected void _process( final List<SolutionMapping> inputSolMaps,
 	                         final IntermediateResultElementSink sink,
@@ -143,6 +162,7 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 			throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
 			_process(sm, sink, ctx);
+			if ( terminationFlagIsSet() ) return;
 		}
 	}
 

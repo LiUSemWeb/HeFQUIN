@@ -634,6 +634,11 @@ public abstract class BaseForExecOpSequentialBindJoin<
 		numberOfRequestOpsUsed++;
 
 		final CollectingIntermediateResultElementSink mySink = new CollectingIntermediateResultElementSink();
+
+		// Last check of the termination flag to avoid
+		// full retrieval if not needed anymore.
+		if ( terminationFlagIsSet() ) return;
+
 		try {
 			reqOp.execute(mySink, ctx);
 		}

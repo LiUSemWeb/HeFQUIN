@@ -31,7 +31,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContextExt;
  */
 public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutableOpBase
 {
-	public static final int MAX_BATCH_SIZE = 100;
+	public static final int MAX_BATCH_SIZE = 1000;
 
 	public UnaryExecutableOpBaseWithoutBlocking( final boolean mayReduce,
 	                                             final boolean collectExceptions,
@@ -60,6 +60,9 @@ public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutab
 			final Iterator<SolutionMapping> it = inputSolMaps.iterator();
 			while ( it.hasNext() ) {
 				_process(it, MAX_BATCH_SIZE, sink, ctx);
+
+				// Check the termination flag after every batch.
+				if ( terminationFlagIsSet() ) return;
 			}
 		}
 		// no else case here - nothing to do if inputSolMaps is empty
@@ -71,7 +74,7 @@ public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutab
 	 * for each of them, but consumes only as many input solution mappings as
 	 * specified by the maxBatchSize argument (or less if the given iterator
 	 * is exhausted earlier).
-	 *
+	 * <p>
 	 * Subclasses may override this behavior to send a greater number of output
 	 * solution mappings to the given sink at a time (which is useful to reduce
 	 * the communication between threads in the push-based execution model).
@@ -79,6 +82,13 @@ public abstract class UnaryExecutableOpBaseWithoutBlocking extends UnaryExecutab
 	 * often as specified by the maxBatchSize argument. If an exception occurs
 	 * within the overriding implementation, then this exception needs to be
 	 * thrown.
+	 * <p>
+	 * Implementations of this method do not need to immediately check the
+	 * termination flag (see {@link #terminationFlagIsSet()}); the calling
+	 * method has just done that before calling this method. However, if an
+	 * implementation processes the given solution mappings separately, one
+	 * at a time, then this implementation may check the flag repeatedly
+	 * during this process.
 	 */
 	protected void _process( final Iterator<SolutionMapping> inputSolMaps,
 	                         final int maxBatchSize,

@@ -67,6 +67,9 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	                                            final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
+		// Ignore the given input if the termination flag is set.
+		if ( terminationFlagIsSet() ) return;
+
 		assert x >= 0;
 		assert x < numberOfChildren;
 
@@ -104,6 +107,9 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	                                            final QueryProcContextExt ctx )
 			throws ExecOpExecutionException
 	{
+		// Ignore the given input if the termination flag is set.
+		if ( terminationFlagIsSet() ) return;
+
 		assert x >= 0;
 		assert x < numberOfChildren;
 
@@ -158,9 +164,13 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	 * Implementations of this function need to process the given solution
 	 * mapping as input coming from the x-th operand and send the produced
 	 * result elements (if any) to the given sink.
-	 *
+	 * <p>
 	 * If an exception occurs while processing the solution mapping, then
 	 * this exception needs to be thrown.
+	 * <p>
+	 * Implementations of this method do not need to check the termination
+	 * flag (see {@link #terminationFlagIsSet()}); the calling method has
+	 * done that before calling this method.
 	 */
 	protected abstract void _processInputFromXthChild(
 			int x,
@@ -172,12 +182,19 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	 * Processes the input solution mappings of the given list by calling
 	 * {@link #_processInputFromXthChild(int, SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
 	 * for each of them.
-	 *
+	 * <p>
 	 * Subclasses may override this behavior to send a greater number of output
 	 * solution mappings to the given sink at a time (which is useful to reduce
 	 * the communication between threads in the push-based execution model).
 	 * If an exception occurs within the overriding implementation, then this
 	 * exception needs to be thrown.
+	 * <p>
+	 * Implementations of this method do not need to immediately check the
+	 * termination flag (see {@link #terminationFlagIsSet()}); the calling
+	 * method has just done that before calling this method. However, if an
+	 * implementation processes the given solution mappings separately, one
+	 * at a time, then this implementation may check the flag repeatedly
+	 * during this process.
 	 */
 	protected void _processInputFromXthChild(
 			final int x,
@@ -186,6 +203,7 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 			final QueryProcContextExt ctx ) throws ExecOpExecutionException {
 		for ( final SolutionMapping sm : inputSolMaps ) {
 			_processInputFromXthChild(x, sm, sink, ctx);
+			if ( terminationFlagIsSet() ) return;
 		}
 	}
 

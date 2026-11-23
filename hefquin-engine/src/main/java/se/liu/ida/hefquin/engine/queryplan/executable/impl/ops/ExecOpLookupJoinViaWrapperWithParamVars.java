@@ -165,12 +165,19 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 		// For each combination of extracted parameter values that the
 		// previous loop has collected for further processing, we now
 		// issue a request to the REST endpoint.
-		final CompletableFuture<?>[] futures = new CompletableFuture[ paramsForRequests.size() ];
-		int i = 0;
+		final List<CompletableFuture<?>> futures = new ArrayList<>( paramsForRequests.size() );
 		for ( Map.Entry<Map<String,Node>, List<SolutionMapping>> entry : paramsForRequests.entrySet() ) {
-			// issue a request based on the current solution mapping
+			// Create a request based on the current solution mapping.
 			final RESTRequest req = createRequest( entry.getKey() );
 
+			// Before issuing the request, check whether the termination
+			// flag has been set in the meantime; if so, break out of the
+			// loop (which means to ignore the current solution mapping as
+			// well as the remaining ones, but to continue after the loop
+			// in order to wait for the already-issued requests.
+			if ( terminationFlagIsSet() ) break;
+
+			// Issue the request.
 			final CompletableFuture<StringResponse> f;
 			try {
 				f = ctx.getFederationAccessMgr().issueRequest( req, fm, ctx.ignoreRetrievalCache() );
@@ -192,15 +199,15 @@ public class ExecOpLookupJoinViaWrapperWithParamVars
 
 			// attach the processing of the response obtained for the request
 			final MyResponseProcessor respProc = new MyResponseProcessor(
-					entry.getKey(),entry.getValue(), sink, this );
-			futures[i++] = f.thenAccept(respProc);
+					entry.getKey(), entry.getValue(), sink, this );
+			futures.add( f.thenAccept(respProc) );
 		}
 
-
 		// Wait for all the futures to be completed.
-		log.debug( "Waiting for {} async requests to complete for {}", futures.length, fm );
+		log.debug( "Waiting for {} async requests to complete for {}", futures.size(), fm );
+		final CompletableFuture<?>[] futuresArray = futures.toArray( new CompletableFuture<?>[0] );
 		try {
-			CompletableFuture.allOf(futures).get();
+			CompletableFuture.allOf(futuresArray).get();
 		}
 		catch ( final InterruptedException e ) {
 			final String msg = "Waiting for the requests of this lookup " +

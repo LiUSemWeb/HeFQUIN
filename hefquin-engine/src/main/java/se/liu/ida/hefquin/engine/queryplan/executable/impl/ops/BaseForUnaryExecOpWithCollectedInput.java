@@ -130,9 +130,16 @@ public abstract class BaseForUnaryExecOpWithCollectedInput extends UnaryExecutab
 	 * Implementations of this function need to process the given solution
 	 * mappings as input and send the produced result elements (if any) to
 	 * the given sink.
-	 *
+	 * <p>
 	 * If an exception occurs while processing the solution mappings, then
 	 * this exception needs to be thrown.
+	 * <p>
+	 * Implementations of this method do not need to immediately check the
+	 * termination flag (see {@link #terminationFlagIsSet()}); the calling
+	 * method has just done that before calling this method. However, if an
+	 * implementation processes the given solution mappings separately, one
+	 * at a time, then this implementation may check the flag repeatedly
+	 * during this process.
 	 */
 	protected abstract void _processCollectedInput( List<SolutionMapping> currentBatch,
 	                                                IntermediateResultElementSink sink,
