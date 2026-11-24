@@ -763,8 +763,10 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 				null,
 				newSubPlans );
 
-		// If the top project is redundant, drop it
-		if ( projectOp.getVariables().equals(allPushdownVars) ) {
+		// If the top project is redundant, drop it. However, keep it if it
+		// may reduce duplicates (e.g., under DISTINCT), because it is not
+		// guaranteed that the subplans output only the pushed-down variables.
+		if ( ! projectOp.mayReduce() && projectOp.getVariables().equals(allPushdownVars) ) {
 			return newJoin;
 		}
 
