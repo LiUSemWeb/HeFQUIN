@@ -54,7 +54,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
@@ -89,7 +89,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern1 = req.getQueryPattern().mergeWith(new ExprList(e1));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern1, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern1, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
@@ -128,7 +128,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern1 = req.getQueryPattern().mergeWith(new ExprList(e1));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern1, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern1, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
@@ -167,7 +167,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern1 = req.getQueryPattern().mergeWith(new ExprList(e1));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern1, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern1, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
@@ -247,7 +247,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
@@ -287,7 +287,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
@@ -327,7 +327,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
@@ -365,7 +365,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan1 = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 		final LogicalPlan reqWithFilterPlan2 = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
@@ -405,7 +405,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
@@ -444,7 +444,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
@@ -473,7 +473,7 @@ public class RedundantFilterEliminationTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 
 		final SPARQLGraphPattern mergedPattern1 = req.getQueryPattern().mergeWith(new ExprList(e1));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern1, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern1, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fm, false, mergedReq );
 		final LogicalPlan reqWithFilterPlan = new LogicalPlanWithNullaryRootImpl(mergedReqOp, null);
 
