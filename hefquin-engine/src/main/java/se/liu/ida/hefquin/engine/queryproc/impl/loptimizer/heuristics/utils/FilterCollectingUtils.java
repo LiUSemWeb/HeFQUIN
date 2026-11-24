@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jena.sparql.algebra.Op;
@@ -17,10 +18,13 @@ import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
 
+import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
+import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
+import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 
 /**
  * Utility methods for collecting filter expressions from SPARQL graph patterns
@@ -36,16 +40,69 @@ import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 public class FilterCollectingUtils
 {
 	/**
-	 * Collects filter expressions from a SPARQL graph pattern by delegating
-	 * to the appropriate method for the underlying Jena representation.
+	 * Collects filter expressions from the given SPARQL graph pattern and adds
+	 * them to the supplied set.
+	 *
+	 * Filters are collected from generic graph patterns and recursively from
+	 * group patterns. Triple patterns, BGPs, and union patterns are not inspected.
+	 *
+	 * @param pattern the graph pattern to inspect
+	 * @param filters the set to which collected filter expressions are added
+	 * @throws IllegalArgumentException if the pattern implementation is unsupported
 	 */
 	public static void collectFiltersFromPattern( final SPARQLGraphPattern pattern, final Set<Expr> filters ) {
 		if ( pattern instanceof GenericSPARQLGraphPatternImpl1 pattern1 )
 			collectFiltersFromPattern(pattern1.asJenaElement(), filters);
 		else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 pattern2 )
 			collectFiltersFromOp(pattern2.asJenaOp(), filters);
-		else if ( pattern instanceof TriplePatternImpl )
+		else if ( pattern instanceof TriplePattern
+		       || pattern instanceof BGP
+		       || pattern instanceof SPARQLUnionPattern )
 			return;
+		else if ( pattern instanceof SPARQLGroupPattern groupPattern )
+			groupPattern.getSubPatterns().forEach( subPattern -> collectFiltersFromPattern(subPattern, filters) );
+		else
+			throw new IllegalArgumentException( "Unsupported SPARQLGraphPattern implementation: " + pattern.getClass().getName() );
+	}
+
+	/**
+	 * Collects filter expressions from the given SPARQL graph pattern.
+	 *
+	 * Filters are collected from generic graph patterns and recursively from
+	 * group patterns. Patterns that are not inspected for filters, such as triple
+	 * patterns, BGPs, and union patterns, return {@code null}.
+	 *
+	 * @param pattern the graph pattern to inspect
+	 * @return the collected filter expressions, or {@code null} if the pattern
+	 *         does not support filter collection
+	 * @throws IllegalArgumentException if the pattern implementation is unsupported
+	 */
+	public static Set<Expr> collectFiltersFromPattern( final SPARQLGraphPattern pattern ) {
+		if ( pattern instanceof GenericSPARQLGraphPatternImpl1
+		  || pattern instanceof GenericSPARQLGraphPatternImpl2 ) {
+			final Set<Expr> filters = new HashSet<>();
+			collectFiltersFromPattern( pattern, filters );
+			return filters;
+		}
+		else if ( pattern instanceof TriplePattern
+		       || pattern instanceof BGP
+		       || pattern instanceof SPARQLUnionPattern )
+			return null;
+		else if ( pattern instanceof SPARQLGroupPattern groupPattern ) {
+			Set<Expr> filters = null;
+
+			for ( final SPARQLGraphPattern subPattern : groupPattern.getSubPatterns() ) {
+				final Set<Expr> subPatternFilters = collectFiltersFromPattern(subPattern);
+
+				if ( subPatternFilters != null ) {
+					if ( filters == null )
+						filters = new HashSet<>();
+
+					filters.addAll(subPatternFilters);
+				}
+			}
+			return filters;
+		}
 		else
 			throw new IllegalArgumentException( "Unsupported SPARQLGraphPattern implementation: " + pattern.getClass().getName() );
 	}

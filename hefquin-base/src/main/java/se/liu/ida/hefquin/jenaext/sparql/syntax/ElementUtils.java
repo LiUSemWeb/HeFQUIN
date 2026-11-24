@@ -253,76 +253,130 @@ public class ElementUtils
 	}
 
 	/**
-	 * Returns a copy of the given element with the specified filter expressions
-	 * removed. If the element is an {@link ElementGroup}, its immediate elements
-	 * are processed, including nested {@link ElementGroup} elements. If the
-	 * element is an {@link ElementFilter}, its expressions are processed directly.
-	 * Expressions combined using logical AND are removed individually, preserving
-	 * any expressions not specified for removal. Other element types are preserved
-	 * without further traversal.
+	 * Returns the given element with the specified filter expressions removed.
+	 * If the element is an {@link ElementGroup}, its immediate filter elements
+	 * are processed. If the element is an {@link ElementFilter}, its expressions
+	 * are processed directly. Expressions combined using logical AND are removed
+	 * individually, preserving any expressions not specified for removal.
+	 * Other element types are preserved without further traversal.
 	 */
 	public static Element removeFilters( final Element element,
 	                                     final Set<Expr> filtersExpressionsToRemove )
 	{
-		final ElementGroup group = new ElementGroup();
-
 		if ( element instanceof ElementGroup elementGroup ) {
+			// Avoid creating a new group if there are no filters to process.
+			if ( ! containsFilter(elementGroup) )
+				return element;
+
+			final ElementGroup group = new ElementGroup();
+
 			for ( final Element subElement : elementGroup.getElements() ) {
 				if ( subElement instanceof ElementFilter filter ) {
-					addRemainingFilter(filter, group, filtersExpressionsToRemove);
+					final ElementFilter remainingFilter = createRemainingFilter(filter, filtersExpressionsToRemove);
+					if ( remainingFilter != null )
+						group.addElement(remainingFilter);
+				}
+				else if ( subElement instanceof ElementGroup ) {
+					final Element remainingElement = removeFilters(subElement, filtersExpressionsToRemove);
+					if ( remainingElement != null )
+						group.addElement(remainingElement);
 				}
 				else {
 					group.addElement(subElement);
 				}
 			}
+			return group;
 		}
 		else if ( element instanceof ElementFilter filter )
-			addRemainingFilter(filter, group, filtersExpressionsToRemove);
+			return createRemainingFilter(filter, filtersExpressionsToRemove);
 		else
-			group.addElement(element);
-
-		return group;
+			return element;
 	}
 
 	/**
-	 * Adds a filter to the given group containing only the expressions that are
-	 * not specified for removal. Expressions combined using logical AND are
-	 * processed individually. If all expressions are removed, no filter is added.
+	 * Creates a filter containing only the expressions that are not specified
+	 * for removal. Expressions combined using logical AND are processed
+	 * individually.
+	 *
+	 * @return the original filter if no expressions were removed, a new filter
+	 *         containing the remaining expressions, or {@code null} if all
+	 *         expressions were removed
 	 */
-	private static void addRemainingFilter( final ElementFilter filter,
-	                                        final ElementGroup group,
-	                                        final Set<Expr> filtersExpressionsToRemove ) {
+	public static ElementFilter createRemainingFilter( final ElementFilter filter,
+	                                                   final Set<Expr> filtersExpressionsToRemove ) {
 		final ExprList remainingExprs = collectRemainingExpressions( filter.getExpr(), filtersExpressionsToRemove );
 
-		if ( ! remainingExprs.isEmpty() ) {
-			final Expr remainingExpr = remainingExprs.size() == 1
-							? remainingExprs.get(0)
-							: remainingExprs.getList().stream()
-									.reduce((a, b) ->
-											new E_LogicalAnd(a, b))
-									.orElseThrow();
+		if ( remainingExprs == null )
+			return filter;
 
-			group.addElement( new ElementFilter(remainingExpr) );
-		}
+		if ( remainingExprs.isEmpty() )
+			return null;
+
+		final Expr remainingExpr = remainingExprs.size() == 1
+				? remainingExprs.get(0)
+				: remainingExprs.getList().stream()
+						.reduce((a, b) -> new E_LogicalAnd(a, b))
+						.orElseThrow();
+
+		return new ElementFilter(remainingExpr);
+	}
+
+	/**
+	 * Checks whether the given element or any of its nested groups contains a filter.
+	 *
+	 * @param element the element to inspect
+	 * @return {@code true} if the element or one of its nested groups contains a filter
+	 */
+	private static boolean containsFilter( final Element element ) {
+		if ( element instanceof ElementFilter )
+			return true;
+
+		if ( element instanceof ElementGroup group )
+			return group.getElements().stream().anyMatch(ElementUtils::containsFilter);
+
+		return false;
 	}
 
 	/**
 	 * Collects the expressions from the given filter expression that are not
 	 * contained in the set of expressions to remove.
+	 *
+	 * @param expr            the filter expression to process
+	 * @param filtersToRemove the expressions to remove
+	 * @return {@code null} if no expressions were removed; otherwise, the remaining
+	 *         expressions, which may be empty if all expressions were removed
 	 */
 	private static ExprList collectRemainingExpressions(
 			final Expr expr,
 			final Set<Expr> filtersToRemove )
 	{
+		final ExprList remainingExprs = collectRemainingExpressionsInto( expr, filtersToRemove );
+
+		return countExpressions(expr) == remainingExprs.size()
+				? null
+				: remainingExprs;
+	}
+
+	private static ExprList collectRemainingExpressionsInto(
+			final Expr expr,
+			final Set<Expr> filtersToRemove )
+	{
 		final ExprList remainingExprs = new ExprList();
 		if ( expr instanceof E_LogicalAnd logicalAnd ) {
-			remainingExprs.addAll( collectRemainingExpressions( logicalAnd.getArg1(), filtersToRemove ) );
-			remainingExprs.addAll( collectRemainingExpressions( logicalAnd.getArg2(), filtersToRemove ) );
+			remainingExprs.addAll( collectRemainingExpressionsInto( logicalAnd.getArg1(), filtersToRemove ) );
+			remainingExprs.addAll( collectRemainingExpressionsInto( logicalAnd.getArg2(), filtersToRemove ) );
 		}
-		else if ( !filtersToRemove.contains(expr) ) {
+		else if ( ! filtersToRemove.contains(expr) ) {
 			remainingExprs.add(expr);
 		}
 		return remainingExprs;
+	}
+
+	private static int countExpressions( final Expr expr ) {
+		if ( expr instanceof E_LogicalAnd logicalAnd )
+			return countExpressions(logicalAnd.getArg1()) + countExpressions(logicalAnd.getArg2());
+
+		return 1;
 	}
 
 }
