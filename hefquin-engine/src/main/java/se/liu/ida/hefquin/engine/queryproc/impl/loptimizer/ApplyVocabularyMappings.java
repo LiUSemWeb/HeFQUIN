@@ -30,6 +30,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpOrderBy;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
@@ -288,6 +289,14 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization
 						rightRewritten );
 			} else rewrittenPlan = inputPlan;
 		}
+
+		@Override
+		public void visit( final LogicalOpOrderBy op ) {
+			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
+			rewrittenPlan = new LogicalPlanWithUnaryRootImpl( op,
+			                                                  null,
+			                                                  rewrittenSubPlan );
+		}
 	}
 
 	/**
@@ -331,7 +340,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization
 
 		// For SPARQL endpoints, the whole graph pattern can be sent in a single request.
 		if ( fm instanceof SPARQLEndpoint ) {
-			final SPARQLRequest reqP = new SPARQLRequestImpl( pattern, null, mayReduce );
+			final SPARQLRequest reqP = new SPARQLRequestImpl( pattern, null, null, mayReduce );
 			final LogicalOpRequest<SPARQLRequest, SPARQLEndpoint> req = new LogicalOpRequest<>( (SPARQLEndpoint) fm, mayReduce, reqP );
 			return new LogicalPlanWithNullaryRootImpl(req, null);
 		}

@@ -56,7 +56,7 @@ public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLo
 			throws VariableByBlankNodeSubstitutionException
 	{
 		final SPARQLGraphPattern pattern = query.applySolMapToGraphPattern(sm);
-		return new SPARQLRequestImpl(pattern, null, this.mayReduce);
+		return new SPARQLRequestImpl(pattern, null, null, this.mayReduce);
 	}
 
 	@Override

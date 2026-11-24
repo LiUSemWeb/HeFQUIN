@@ -187,7 +187,7 @@ public class FilterRedistributionTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp2.getRequest();
 
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fmA, false, mergedReq );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
@@ -238,7 +238,7 @@ public class FilterRedistributionTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp2.getRequest();
 
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fmA, false, mergedReq );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
@@ -300,7 +300,7 @@ public class FilterRedistributionTest extends EngineTestBase
 		final SPARQLRequest req = (SPARQLRequest) reqOp2.getRequest();
 
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e2));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fmA, false, mergedReq );
 
 		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
@@ -365,7 +365,7 @@ public class FilterRedistributionTest extends EngineTestBase
 		final Expr e1 = new E_IsIRI( new ExprVar(v1) );
 		final SPARQLRequest req = (SPARQLRequest) reqOp2.getRequest();
 		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(new ExprList(e1));
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>( fmA, false, mergedReq );
 
 		final Expr e2 = new E_IsIRI( new ExprVar(v2) );

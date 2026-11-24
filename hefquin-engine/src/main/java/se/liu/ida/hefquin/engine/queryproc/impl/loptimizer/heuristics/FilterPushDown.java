@@ -252,6 +252,13 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			                                             subPlanUnderFilter );
 		}
 
+		@Override
+		public void visit( final LogicalOpOrderBy op ) {
+			createdPlan = createPlanForUnaryOpUnderFilter( filterOp,
+			                                               op,
+			                                               subPlanUnderFilter.getSubPlan(0) );
+		}
+
 	} // end of Worker
 
 	protected LogicalPlan createPlanForRequestUnderFilter( final LogicalOpFilter filterOp,
@@ -271,7 +278,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			return inputPlan;
 		}
 
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 
 		final boolean mayReduce = filterOp.mayReduce();
 
@@ -311,7 +318,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			}
 		}
 
-		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getDistinctRequired() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl( mergedPattern, req.getProjectionVars(), req.getSortConditions(), req.getDistinctRequired() );
 
 		final LogicalOpMultiRequest mergedOp = new LogicalOpMultiRequest( mergedReq,
 		                                                                  reqOp.getServiceVariable(),

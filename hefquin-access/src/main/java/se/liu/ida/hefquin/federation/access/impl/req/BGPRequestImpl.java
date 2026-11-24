@@ -1,7 +1,9 @@
 package se.liu.ida.hefquin.federation.access.impl.req;
 
+import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.BGP;
@@ -44,6 +46,11 @@ public class BGPRequestImpl implements BGPRequest
 
 	@Override
 	public Set<Var> getProjectionVars() {
+		return null;
+	}
+
+	@Override
+	public List<SortCondition> getSortConditions() {
 		return null;
 	}
 

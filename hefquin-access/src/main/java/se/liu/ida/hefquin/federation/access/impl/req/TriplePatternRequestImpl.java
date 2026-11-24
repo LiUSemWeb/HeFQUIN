@@ -4,9 +4,11 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 
 public class TriplePatternRequestImpl implements TriplePatternRequest
@@ -46,6 +48,11 @@ public class TriplePatternRequestImpl implements TriplePatternRequest
 
 	@Override
 	public Set<Var> getProjectionVars() {
+		return null;
+	}
+
+	@Override
+	public List<SortCondition> getSortConditions() {
 		return null;
 	}
 

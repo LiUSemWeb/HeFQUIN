@@ -123,7 +123,7 @@ public class SPARQLRequestProcessorImplTest extends FederationTestBase
 
 			final Element el = QueryFactory.create(queryString).getQueryPattern();
 			final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
-			final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), true);
+			final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), null, true);
 
 			// performing the tested operation
 			final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://dbpedia.org/sparql");
@@ -175,7 +175,7 @@ public class SPARQLRequestProcessorImplTest extends FederationTestBase
 
 			final Element el = QueryFactory.create(queryString).getQueryPattern();
 			final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
-			final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), false);
+			final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), null, false);
 
 			// performing the tested operation
 			final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://dbpedia.org/sparql");

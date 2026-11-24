@@ -60,4 +60,7 @@ public class LogicalPlanVisitorBase implements LogicalPlanVisitor
 
 	@Override
 	public void visit( final LogicalOpMinus op )             {}
+
+	@Override
+	public void visit( final LogicalOpOrderBy op )           {}
 }

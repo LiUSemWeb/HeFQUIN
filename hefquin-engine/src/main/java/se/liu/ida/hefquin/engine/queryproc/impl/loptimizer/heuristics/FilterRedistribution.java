@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpOrderBy;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
@@ -44,8 +45,8 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
  * certain variables in that branch and the expression is not already
  * present there.
  *
- * Filter expressions are collected from logical filter operators,
- * logical GPAdd and GPOptAdd operators, and SPARQL request patterns.
+ * Filter expressions are collected from filter operators,
+ * gpAdd operators, and SPARQL request patterns.
  * The collection traverses the logical plan according to operator-specific
  * rules: for example, only the left child of left joins and MINUS operators
  * is visited, while the children of union operators are ignored.
@@ -320,6 +321,12 @@ public class FilterRedistribution implements HeuristicForLogicalOptimization
 
 		@Override
 		public void visit( final LogicalOpProject op ) {
+			visitAllSubPlans();
+		}
+
+		@Override
+		public void visit( final LogicalOpOrderBy op ) {
+			// No filter expressions to collect from the order by operation itself.
 			visitAllSubPlans();
 		}
 	} // end of FilterCollector

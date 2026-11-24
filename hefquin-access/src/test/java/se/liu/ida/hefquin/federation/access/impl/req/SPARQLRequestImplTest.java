@@ -4,11 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.util.ExprUtils;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -31,7 +35,7 @@ public class SPARQLRequestImplTest extends FederationTestBase
 
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
-		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), true);
+		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), null, true);
 
 		// checking
 		// the base query does not contain DISTINCT
@@ -56,7 +60,7 @@ public class SPARQLRequestImplTest extends FederationTestBase
 
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
-		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), false);
+		final SPARQLRequest req2 = new SPARQLRequestImpl(pattern, Set.of(Var.alloc("s")), null, false);
 
 		// checking
 		// i) ensure projection is applied
@@ -73,5 +77,36 @@ public class SPARQLRequestImplTest extends FederationTestBase
 
 		assertTrue( req1.getExpectedVariables().getPossibleVariables().isEmpty() );
 		assertTrue( req2.getExpectedVariables().getPossibleVariables().isEmpty() );
+	}
+
+	@Test
+	public void testSortConditionInitialization() throws FederationAccessException {
+		// Tests that sort conditions are correctly initialized from a Jena query
+		// and incorporated into the underlying Jena query when explicitly specified.
+
+		// setting up
+		final String queryString =
+				"SELECT ?s ?o2 WHERE { " +
+					"?s <http://example.org/1> ?o1 . " +
+					"?s <http://example.org/2> ?o2 } ORDER BY ASC(?o2)";
+
+		final SPARQLQuery baseQuery = new SPARQLQueryImpl( QueryFactory.create(queryString) );
+		final SPARQLRequest req1 = new SPARQLRequestImpl(baseQuery);
+
+		final Element el = QueryFactory.create(queryString).getQueryPattern();
+		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(el);
+		final SPARQLRequest req2 = new SPARQLRequestImpl( pattern, null, List.of(new SortCondition(ExprUtils.parse("?o2"), Query.ORDER_DESCENDING)), false );
+
+		// checking
+		// i) ensure sort conditions are applied
+		assertEquals( List.of(new SortCondition(ExprUtils.parse("?o2"), Query.ORDER_ASCENDING)),
+		              req1.getSortConditions());
+		assertEquals( List.of(new SortCondition(ExprUtils.parse("?o2"), Query.ORDER_DESCENDING)),
+		              req2.getSortConditions());
+
+		// ii) ensure sort conditions are incorporated into the underlying Jena query
+		final String serializedQuery = req2.getQuery().asJenaQuery().serialize();
+		System.out.println("Serialized query: " + serializedQuery);
+		assertTrue(serializedQuery.contains("ORDER BY"));
 	}
 }
