@@ -304,7 +304,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		@Override public void visit(OpList op)         { unsupportedOp = op; }
 
-		@Override public void visit(OpOrder op)        { unsupportedOp = op; }
+		@Override public void visit(OpOrder op)        {} // supported
 
 		@Override public void visit(OpProject op)      {} // supported
 

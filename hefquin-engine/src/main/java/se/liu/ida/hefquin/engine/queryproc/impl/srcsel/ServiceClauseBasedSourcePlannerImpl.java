@@ -116,6 +116,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		else if ( jenaOp instanceof OpProject opProject ) {
 			return createPlanForProject(opProject, mayReduce, ctx);
 		}
+		else if ( jenaOp instanceof OpOrder opOrderBy ) {
+			return createPlanForOrderBy(opOrderBy, mayReduce, ctx);
+		}
 		else {
 			throw new IllegalArgumentException( "unsupported type of query pattern: " + jenaOp.getClass().getName() );
 		}
@@ -425,6 +428,15 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		log.debug( "Applying PROJECT over vars {}", jenaOp.getVars() );
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), mayReduce, ctx );
 		final LogicalOpProject rootOp = new LogicalOpProject( jenaOp.getVars(), mayReduce );
+		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
+	}
+
+	protected LogicalPlan createPlanForOrderBy( final OpOrder jenaOp,
+	                                            final boolean mayReduce,
+	                                            final QueryProcContext ctx ) {
+		log.debug( "Applying ORDER BY over conditions {}", jenaOp.getConditions() );
+		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), mayReduce, ctx );
+		final LogicalOpOrderBy rootOp = new LogicalOpOrderBy( jenaOp.getConditions(), mayReduce );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, null, subPlan);
 	}
 
