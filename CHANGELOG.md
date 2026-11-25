@@ -7,7 +7,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- Support for ORDER BY directly within the HeFQUIN engine ([#765](https://github.com/LiUSemWeb/HeFQUIN/pull/765), [#775](https://github.com/LiUSemWeb/HeFQUIN/pull/775)).
+- Support for ORDER BY directly within the HeFQUIN engine ([#765](https://github.com/LiUSemWeb/HeFQUIN/pull/765), [#775](https://github.com/LiUSemWeb/HeFQUIN/pull/775), [#790](https://github.com/LiUSemWeb/HeFQUIN/pull/790)).
 - New physical operator for ORDER BY in combination with LIMIT ([#783](https://github.com/LiUSemWeb/HeFQUIN/pull/783), [#788](https://github.com/LiUSemWeb/HeFQUIN/pull/788)). <-- not complete yet
 - Adding a logical plan rewriting that redistributes filters across the subplans under joins ([#763](https://github.com/LiUSemWeb/HeFQUIN/pull/763), [#780](https://github.com/LiUSemWeb/HeFQUIN/pull/780)).
 - Support for joins in the RML processor ([#785](https://github.com/LiUSemWeb/HeFQUIN/pull/785)).
