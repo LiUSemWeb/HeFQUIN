@@ -162,6 +162,16 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		}
 	}
 
+	@Override
+	protected QueryIterator execute( final OpOrder opOrderBy, final QueryIterator input ) {
+		if ( isSupportedOp(opOrderBy) ) {
+			return executeSupportedOp( opOrderBy, input );
+		}
+		else {
+			return super.execute(opOrderBy, input);
+		}
+	}
+
 	protected boolean isSupportedOp( final Op op ) {
 		final UnsupportedOpFinder f = new UnsupportedOpFinder();
 		new WalkerVisitorSkipService(f, null, null, null).walk(op);

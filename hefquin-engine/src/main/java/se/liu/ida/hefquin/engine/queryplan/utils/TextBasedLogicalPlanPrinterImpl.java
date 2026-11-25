@@ -367,6 +367,23 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				}
 
 				props.add( "projection variables: " + prVarsString );
+
+				final String sortConsString;
+				final List<SortCondition> sortConditions = sreq.getSortConditions();
+				if ( sortConditions == null ) {
+					sortConsString = "-none-";
+				}
+				else {
+					final StringBuilder sb = new StringBuilder();
+					final Iterator<SortCondition> it = sortConditions.iterator();
+					sb.append( it.next().toString() );
+					while ( it.hasNext() ) {
+						sb.append( ", " + it.next().toString() );
+					}
+					sortConsString = sb.toString();
+				}
+
+				props.add( "sort conditions: " + sortConsString );
 			}
 			else {
 				props.add( "request (" + req.hashCode() +  "): " + req.toString() );
