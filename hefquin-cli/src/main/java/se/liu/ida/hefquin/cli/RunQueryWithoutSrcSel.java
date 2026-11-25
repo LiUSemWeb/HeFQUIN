@@ -111,6 +111,11 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	 */
 	@Override
 	protected void exec() {
+		// If we no federation catalog, we cannot do anything.
+		if ( modFederation.getFederationCatalog() == null ) {
+			return;
+		}
+
 		final HeFQUINEngineBuilder builder = new HeFQUINEngineBuilder()
 			.withFederationCatalogInModels( modFederation.getFederationCatalog() );
 
@@ -230,7 +235,13 @@ public class RunQueryWithoutSrcSel extends CmdARQ
      */
 	protected Query getQuery() {
 		try {
-			return modQuery.getQuery();
+			final Query q = modQuery.getQuery();
+
+			if ( q == null ) {
+				throw new TerminationException( 1 );
+			}
+
+			return q;
 		} catch ( final NotFoundException ex ) {
 			System.err.println( "Failed to load query: " + ex.getMessage() );
 			throw new TerminationException( 1 );

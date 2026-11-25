@@ -7,8 +7,6 @@ import org.apache.jena.cmd.ModBase;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.Syntax;
-import org.apache.jena.shared.JenaException;
-import org.apache.jena.shared.NotFoundException;
 
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 
@@ -48,15 +46,14 @@ public class ModQuery extends ModBase
 	}
 
 	public Query getQuery() {
+		if ( queryFilename == null ) {
+			return null;
+		}
+
 		if ( query != null ) {
 			return query;
 		}
 
-		try {
-			query = QueryFactory.read( queryFilename, baseURI, querySyntax );
-			return query;
-		} catch ( NotFoundException ex ) {
-			throw new JenaException( "Failed to load Query: " + ex.getMessage() );
-		}
+		return QueryFactory.read( queryFilename, baseURI, querySyntax );
 	}
 }

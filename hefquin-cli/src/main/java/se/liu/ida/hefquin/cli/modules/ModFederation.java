@@ -28,7 +28,7 @@ public class ModFederation extends ModBase
 		if ( cmdLine.contains(fedDescrDecl) ) {			
 			final List<String> filenames = cmdLine.getValues(fedDescrDecl);
 			cat = new ArrayList<>();
-			
+
 			for ( final String filename : filenames ) {
 				try {
 					cat.add( RDFDataMgr.loadModel(filename) );
@@ -37,6 +37,9 @@ public class ModFederation extends ModBase
 					cmdLine.cmdError("Error loading federation description file: " + filename, false);
 				}
 			}
+
+			if ( cat.isEmpty() )
+				cat = null;
 		}
 		else {
 			cmdLine.cmdError("No federation description file", false);
