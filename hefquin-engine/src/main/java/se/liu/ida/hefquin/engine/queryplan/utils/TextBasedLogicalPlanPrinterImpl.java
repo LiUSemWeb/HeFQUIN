@@ -325,17 +325,15 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 		@Override
 		public void visit( final LogicalOpOrderBy op ) {
-			final int numberOfSortConditions = op.getSortConditions().size();
-			if ( numberOfSortConditions == 1 ) {
-				final SortCondition sortCondition = op.getSortConditions().get(0);
-				props.add( "sort condition: " + formatSortCondition(sortCondition) );
+			String conditionsStr = "sort conditions: ";
+			final Iterator<SortCondition> it = op.getSortConditions().iterator();
+
+			conditionsStr += it.hasNext() ? formatSortCondition(it.next()) : "none";
+			while (it.hasNext()) {
+				conditionsStr += ", " + formatSortCondition(it.next());
 			}
-			else {
-				props.add( "number of sort conditions: " + numberOfSortConditions );
-				for ( int i = 0; i < numberOfSortConditions; i++ ) {
-					props.add( "sort condition " + (i+1) + ": " + formatSortCondition( op.getSortConditions().get(i) ) );
-				}
-			}
+
+			props.add( conditionsStr );
 
 			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
@@ -354,7 +352,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 					prVarsString = "*";
 				}
 				else if ( prVars.isEmpty() ) {
-					prVarsString = "-none-";
+					prVarsString = "none";
 				}
 				else {
 					final StringBuilder sb = new StringBuilder();
