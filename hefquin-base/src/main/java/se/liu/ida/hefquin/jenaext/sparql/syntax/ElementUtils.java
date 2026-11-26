@@ -259,6 +259,9 @@ public class ElementUtils
 	 * are processed directly. Expressions combined using logical AND are removed
 	 * individually, preserving any expressions not specified for removal.
 	 * Other element types are preserved without further traversal.
+	 *
+	 * @return the resulting element, or {@code null} if the element is a filter
+	 *         whose expressions have all been removed
 	 */
 	public static Element removeFilters( final Element element,
 	                                     final Set<Expr> filtersExpressionsToRemove )
@@ -350,7 +353,8 @@ public class ElementUtils
 			final Expr expr,
 			final Set<Expr> filtersToRemove )
 	{
-		final ExprList remainingExprs = collectRemainingExpressionsInto( expr, filtersToRemove );
+		final ExprList remainingExprs = new ExprList();
+		collectRemainingExpressionsInto( expr, filtersToRemove, remainingExprs );
 
 		return countExpressions(expr) == remainingExprs.size()
 				? null
@@ -359,12 +363,13 @@ public class ElementUtils
 
 	private static ExprList collectRemainingExpressionsInto(
 			final Expr expr,
-			final Set<Expr> filtersToRemove )
+			final Set<Expr> filtersToRemove,
+			final ExprList remainingExprs
+		 )
 	{
-		final ExprList remainingExprs = new ExprList();
 		if ( expr instanceof E_LogicalAnd logicalAnd ) {
-			remainingExprs.addAll( collectRemainingExpressionsInto( logicalAnd.getArg1(), filtersToRemove ) );
-			remainingExprs.addAll( collectRemainingExpressionsInto( logicalAnd.getArg2(), filtersToRemove ) );
+			remainingExprs.addAll( collectRemainingExpressionsInto( logicalAnd.getArg1(), filtersToRemove, remainingExprs ) );
+			remainingExprs.addAll( collectRemainingExpressionsInto( logicalAnd.getArg2(), filtersToRemove, remainingExprs ) );
 		}
 		else if ( ! filtersToRemove.contains(expr) ) {
 			remainingExprs.add(expr);
