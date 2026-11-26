@@ -325,15 +325,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 		@Override
 		public void visit( final LogicalOpOrderBy op ) {
-			String conditionsStr = "sort conditions: ";
-			final Iterator<SortCondition> it = op.getSortConditions().iterator();
-
-			conditionsStr += it.hasNext() ? formatSortCondition(it.next()) : "none";
-			while (it.hasNext()) {
-				conditionsStr += ", " + formatSortCondition(it.next());
-			}
-
-			props.add( conditionsStr );
+			props.add( "sort conditions: " + formatSortConditions( op.getSortConditions() ) );
 
 			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
@@ -366,22 +358,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 				props.add( "projection variables: " + prVarsString );
 
-				final String sortConsString;
-				final List<SortCondition> sortConditions = sreq.getSortConditions();
-				if ( sortConditions == null ) {
-					sortConsString = "none";
-				}
-				else {
-					final StringBuilder sb = new StringBuilder();
-					final Iterator<SortCondition> it = sortConditions.iterator();
-					sb.append( formatSortCondition( it.next() ) );
-					while ( it.hasNext() ) {
-						sb.append( ", " + formatSortCondition( it.next() ) );
-					}
-					sortConsString = sb.toString();
-				}
-
-				props.add( "sort conditions: " + sortConsString );
+				props.add( "sort conditions: " + formatSortConditions( sreq.getSortConditions() ) );
 			}
 			else {
 				props.add( "request (" + req.hashCode() +  "): " + req.toString() );
@@ -405,6 +382,21 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				graphPattern = gp;
 				fullStringForGraphPattern = null;
 			}
+		}
+
+		protected String formatSortConditions( final List<SortCondition> sortConditions ) {
+			if ( sortConditions == null || sortConditions.isEmpty() )
+				return "none";
+
+			final StringBuilder sb = new StringBuilder();
+			final Iterator<SortCondition> it = sortConditions.iterator();
+
+			sb.append( formatSortCondition( it.next() ) );
+			while ( it.hasNext() ) {
+				sb.append( ", " + formatSortCondition( it.next() ) );
+			}
+
+			return sb.toString();
 		}
 
 		protected String formatSortCondition( final SortCondition sc ) {
