@@ -66,13 +66,11 @@ public class FilterCollectingUtils
 			Set<Expr> filters = null;
 
 			for ( final SPARQLGraphPattern subPattern : groupPattern.getSubPatterns() ) {
-				final Set<Expr> subPatternFilters = collectFiltersFromPattern(subPattern);
-
-				if ( subPatternFilters != null ) {
-					if ( filters == null )
-						filters = new HashSet<>();
-
-					filters.addAll(subPatternFilters);
+				if ( filters != null ) {
+					collectFiltersFromPattern(subPattern, filters);
+				}
+				else {
+					filters = collectFiltersFromPattern(subPattern);
 				}
 			}
 			return filters;
