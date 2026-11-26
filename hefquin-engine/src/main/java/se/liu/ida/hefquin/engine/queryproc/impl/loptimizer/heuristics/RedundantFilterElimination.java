@@ -277,7 +277,7 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 
 		@Override
 		public void visit( final LogicalOpJoin op ) {
-			guaranteedFilters.addAll(analyzeAllSubPlans());
+			analyzeAllSubPlans();
 		}
 
 		@Override
@@ -295,12 +295,12 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 		@Override
 		public void visit( final LogicalOpUnion op ) {
 			// Filter is guaranteed only if every branch guarantees it.
-			guaranteedFilters.addAll(analyzeCommonFiltersAcrossSubPlans());
+			analyzeCommonFiltersAcrossSubPlans();
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayJoin op ) {
-			guaranteedFilters.addAll(analyzeAllSubPlans());
+			analyzeAllSubPlans();
 		}
 
 		@Override
@@ -312,18 +312,19 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 		@Override
 		public void visit( final LogicalOpMultiwayUnion op ) {
 			// Filter is guaranteed only if every branch guarantees it.
-			guaranteedFilters.addAll(analyzeCommonFiltersAcrossSubPlans());
+			analyzeCommonFiltersAcrossSubPlans();
 		}
 
 		@Override
 		public void visit( final LogicalOpFilter op ) {
-			// The filter operator guarantees its own filter conditions.
-			final Set<Expr> filters = new HashSet<>(op.getFilterExpressions().getList());
-			filters.retainAll(candidates);
-			guaranteedFilters.addAll(filters);
-
 			// Filters guaranteed by the input are also guaranteed by the output.
-			guaranteedFilters.addAll(analyzeSubPlanIndependently(0));
+			analyzeSubPlan(0);
+
+			// The filter operator guarantees its own filter conditions.
+			for ( final Expr filter : op.getFilterExpressions().getList() ) {
+				if ( candidates.contains(filter) )
+					guaranteedFilters.add(filter);
+			}
 		}
 
 		@Override
@@ -414,19 +415,13 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 		}
 
 		/**
-		 * Analyzes every child plan independently and returns the union of the
-		 * candidate filters guaranteed by their respective outputs.
-		 *
-		 * @return the candidate filter expressions guaranteed by the child plans
+		 * Analyzes each child plan independently and adds all candidate filters
+		 * guaranteed by at least one child plan to {@code guaranteedFilters}.
 		 */
-		protected Set<Expr> analyzeAllSubPlans() {
-			final Set<Expr> filters = new HashSet<>();
-
+		protected void analyzeAllSubPlans() {
 			for ( int i = 0; i < branch.numberOfSubPlans(); i++ ) {
-				filters.addAll(analyzeSubPlanIndependently(i));
+				guaranteedFilters.addAll(analyzeSubPlanIndependently(i));
 			}
-
-			return filters;
 		}
 
 		protected void addGuaranteedFilters( final SPARQLGraphPattern pattern ) {
@@ -438,21 +433,18 @@ public class RedundantFilterElimination implements HeuristicForLogicalOptimizati
 			}
 		}
 
-		protected Set<Expr> analyzeCommonFiltersAcrossSubPlans() {
+		protected void analyzeCommonFiltersAcrossSubPlans() {
 			if ( branch.numberOfSubPlans() == 0 )
-				return Set.of();
+				return;
 
 			final Set<Expr> commonFilters = analyzeSubPlanIndependently(0);
-
-			if ( branch.numberOfSubPlans() == 1 )
-				return commonFilters;
 
 			for ( int i = 1; i < branch.numberOfSubPlans(); i++ ) {
 				final Set<Expr> branchFilters = analyzeSubPlanIndependently(i);
 				commonFilters.retainAll(branchFilters);
 			}
 
-			return commonFilters;
+			guaranteedFilters.addAll(commonFilters);
 		}
 
 	}

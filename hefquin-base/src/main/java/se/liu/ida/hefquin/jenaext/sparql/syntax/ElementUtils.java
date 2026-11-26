@@ -288,7 +288,7 @@ public class ElementUtils
 					group.addElement(subElement);
 				}
 			}
-			return group;
+			return group.isEmpty() ? null : group;
 		}
 		else if ( element instanceof ElementFilter filter )
 			return createRemainingFilter(filter, filtersExpressionsToRemove);

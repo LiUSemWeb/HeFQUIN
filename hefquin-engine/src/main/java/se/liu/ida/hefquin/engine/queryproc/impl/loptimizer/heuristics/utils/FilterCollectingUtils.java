@@ -40,32 +40,6 @@ import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 public class FilterCollectingUtils
 {
 	/**
-	 * Collects filter expressions from the given SPARQL graph pattern and adds
-	 * them to the supplied set.
-	 *
-	 * Filters are collected from generic graph patterns and recursively from
-	 * group patterns. Triple patterns, BGPs, and union patterns are not inspected.
-	 *
-	 * @param pattern the graph pattern to inspect
-	 * @param filters the set to which collected filter expressions are added
-	 * @throws IllegalArgumentException if the pattern implementation is unsupported
-	 */
-	public static void collectFiltersFromPattern( final SPARQLGraphPattern pattern, final Set<Expr> filters ) {
-		if ( pattern instanceof GenericSPARQLGraphPatternImpl1 pattern1 )
-			collectFiltersFromPattern(pattern1.asJenaElement(), filters);
-		else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 pattern2 )
-			collectFiltersFromOp(pattern2.asJenaOp(), filters);
-		else if ( pattern instanceof TriplePattern
-		       || pattern instanceof BGP
-		       || pattern instanceof SPARQLUnionPattern )
-			return;
-		else if ( pattern instanceof SPARQLGroupPattern groupPattern )
-			groupPattern.getSubPatterns().forEach( subPattern -> collectFiltersFromPattern(subPattern, filters) );
-		else
-			throw new IllegalArgumentException( "Unsupported SPARQLGraphPattern implementation: " + pattern.getClass().getName() );
-	}
-
-	/**
 	 * Collects filter expressions from the given SPARQL graph pattern.
 	 *
 	 * Filters are collected from generic graph patterns and recursively from
@@ -103,6 +77,32 @@ public class FilterCollectingUtils
 			}
 			return filters;
 		}
+		else
+			throw new IllegalArgumentException( "Unsupported SPARQLGraphPattern implementation: " + pattern.getClass().getName() );
+	}
+
+	/**
+	 * Collects filter expressions from the given SPARQL graph pattern and adds
+	 * them to the supplied set.
+	 *
+	 * Filters are collected from generic graph patterns and recursively from
+	 * group patterns. Triple patterns, BGPs, and union patterns are not inspected.
+	 *
+	 * @param pattern the graph pattern to inspect
+	 * @param filters the set to which collected filter expressions are added
+	 * @throws IllegalArgumentException if the pattern implementation is unsupported
+	 */
+	public static void collectFiltersFromPattern( final SPARQLGraphPattern pattern, final Set<Expr> filters ) {
+		if ( pattern instanceof GenericSPARQLGraphPatternImpl1 pattern1 )
+			collectFiltersFromPattern(pattern1.asJenaElement(), filters);
+		else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 pattern2 )
+			collectFiltersFromOp(pattern2.asJenaOp(), filters);
+		else if ( pattern instanceof TriplePattern
+		       || pattern instanceof BGP
+		       || pattern instanceof SPARQLUnionPattern )
+			return;
+		else if ( pattern instanceof SPARQLGroupPattern groupPattern )
+			groupPattern.getSubPatterns().forEach( subPattern -> collectFiltersFromPattern(subPattern, filters) );
 		else
 			throw new IllegalArgumentException( "Unsupported SPARQLGraphPattern implementation: " + pattern.getClass().getName() );
 	}
