@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.query.Query;
 import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
@@ -324,18 +325,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 
 		@Override
 		public void visit( final LogicalOpOrderBy op ) {
-			final int numberOfSortConditions = op.getSortConditions().size();
-			if ( numberOfSortConditions == 1 ) {
-				final SortCondition sortCondition = op.getSortConditions().get(0);
-				props.add( "sort condition: " + sortCondition.toString() );
-			}
-			else {
-				props.add( "number of sort conditions: " + numberOfSortConditions );
-				for ( int i = 0; i < numberOfSortConditions; i++ ) {
-					final SortCondition sortCondition = op.getSortConditions().get(i);
-					props.add( "sort condition " + (i+1) + ": " + sortCondition.toString() );
-				}
-			}
+			props.add( "sort conditions: " + formatSortConditions( op.getSortConditions() ) );
 
 			props.add( "may reduce duplicates: " + op.mayReduce() );
 		}
@@ -354,7 +344,7 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 					prVarsString = "*";
 				}
 				else if ( prVars.isEmpty() ) {
-					prVarsString = "-none-";
+					prVarsString = "none";
 				}
 				else {
 					final StringBuilder sb = new StringBuilder();
@@ -367,6 +357,8 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				}
 
 				props.add( "projection variables: " + prVarsString );
+
+				props.add( "sort conditions: " + formatSortConditions( sreq.getSortConditions() ) );
 			}
 			else {
 				props.add( "request (" + req.hashCode() +  "): " + req.toString() );
@@ -390,6 +382,38 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 				graphPattern = gp;
 				fullStringForGraphPattern = null;
 			}
+		}
+
+		protected String formatSortConditions( final List<SortCondition> sortConditions ) {
+			if ( sortConditions == null || sortConditions.isEmpty() )
+				return "none";
+
+			final StringBuilder sb = new StringBuilder();
+			final Iterator<SortCondition> it = sortConditions.iterator();
+
+			sb.append( formatSortCondition( it.next() ) );
+			while ( it.hasNext() ) {
+				sb.append( ", " + formatSortCondition( it.next() ) );
+			}
+
+			return sb.toString();
+		}
+
+		protected String formatSortCondition( final SortCondition sc ) {
+			final String direction;
+			if ( sc.getDirection() == Query.ORDER_ASCENDING )
+				direction = "ASC";
+			else if ( sc.getDirection() == Query.ORDER_DESCENDING )
+				direction = "DESC";
+			else
+				direction = "";
+
+			final String expression = sc.getExpression().toString();
+
+			if ( direction.isEmpty() )
+				return expression;
+
+			return direction + "(" + expression + ")";
 		}
 	}
 
