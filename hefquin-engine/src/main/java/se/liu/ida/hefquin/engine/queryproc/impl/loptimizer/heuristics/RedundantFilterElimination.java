@@ -1,0 +1,451 @@
+package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.ExprVars;
+
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpDedup;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedSolMap;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMinus;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpOrderBy;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnfold;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanUtils;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.FilterCollectingUtils;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+
+/**
+ * Eliminates redundant filter expressions from logical gpAdd and filter
+ * operators if those expressions are guaranteed by the operators' input
+ * plans.
+ *
+ * Candidate filter expressions are collected from the graph pattern of the
+ * operator being optimized. The input plan is then analyzed to determine
+ * which candidate expressions are guaranteed to hold for its output. Any
+ * such expressions are removed from the operator's graph pattern, while
+ * all other expressions and graph pattern elements are preserved.
+ *
+ * Filter guarantees are propagated according to operator-specific rules.
+ * For example, inner joins propagate guarantees from their children, union
+ * operators propagate only guarantees common to every branch, and left
+ * joins and MINUS operators propagate guarantees only from their left
+ * child. Projection operators invalidate guarantees that reference variables
+ * not included in the projection.
+ *
+ * This heuristic recursively optimizes subplans before eliminating
+ * redundant filters from gpAdd and filter operators.
+ */
+public class RedundantFilterElimination implements HeuristicForLogicalOptimization
+{
+	@Override
+	public LogicalPlan apply( final LogicalPlan inputPlan,
+	                          final QueryProcContext ctxt ) {
+		return apply(inputPlan);
+	}
+
+	public LogicalPlan apply( final LogicalPlan inputPlan ) {
+		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
+		if ( numberOfSubPlans == 0 ) {
+			return inputPlan;
+		}
+
+		// Recursively apply the heuristic to each subplan.
+		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlans];
+		boolean noChanges = true; // set to false if the heuristic changes any of the subplans
+		for ( int i = 0; i < numberOfSubPlans; i++ ) {
+			final LogicalPlan oldSubPlan = inputPlan.getSubPlan(i);
+			newSubPlans[i] = apply(oldSubPlan);
+			if ( ! newSubPlans[i].equals(oldSubPlan) ) {
+				noChanges = false;
+			}
+		}
+
+		final LogicalOperator rootOp = inputPlan.getRootOperator();
+
+		final LogicalPlan plan = noChanges
+			? inputPlan
+			: LogicalPlanUtils.createPlanWithSubPlans(rootOp, null, newSubPlans);
+
+		// Eliminate redundant filters at this operator after processing its children.
+		if ( rootOp instanceof LogicalOpGPAdd opGPAdd )
+			return eliminateFilterRedundancies(opGPAdd, plan);
+		else if ( rootOp instanceof LogicalOpFilter opFilter )
+			return eliminateFilterRedundancies(opFilter, plan);
+
+		return plan;
+	}
+
+	/**
+	 * Eliminates redundant filters from a gpAdd operator's graph pattern when
+	 * those filters are guaranteed by its input plan.
+	 *
+	 * @param opGPAdd   the gpAdd operator to optimize
+	 * @param inputPlan the logical plan rooted at the operator
+	 * @return the input plan if no filters are removed, or a plan with an
+	 *         optimized gpAdd operator otherwise
+	 */
+	protected LogicalPlan eliminateFilterRedundancies( final LogicalOpGPAdd opGPAdd, final LogicalPlan inputPlan ) {
+		final SPARQLGraphPattern originalPattern = opGPAdd.getPattern();
+		final SPARQLGraphPattern optimizedPattern = removeRedundantFilters(originalPattern, inputPlan.getSubPlan(0));
+
+		if ( optimizedPattern.equals(originalPattern) )
+			return inputPlan;
+
+		final LogicalOpGPAdd newGPAdd;
+		if ( opGPAdd.hasParameterVariables() )
+			newGPAdd = new LogicalOpGPAdd( opGPAdd.getFederationMember(), optimizedPattern, opGPAdd.getParameterVariables(), opGPAdd.mayReduce() );
+		else
+			newGPAdd = new LogicalOpGPAdd( opGPAdd.getFederationMember(), optimizedPattern, null, opGPAdd.mayReduce() );
+
+		return new LogicalPlanWithUnaryRootImpl( newGPAdd, null, inputPlan.getSubPlan(0) );
+	}
+
+	/**
+	 * Eliminates redundant filters from a filter operator's expression list when
+	 * those filters are guaranteed by its input plan. If all filter expressions are
+	 * redundant, the filter operator is removed entirely.
+	 *
+	 * @param opFilter   the filter operator to optimize
+	 * @param inputPlan  the logical plan rooted at the operator
+	 * @return the input plan if no filters are removed, or a plan with an
+	 *         optimized filter operator otherwise
+	 */
+	protected LogicalPlan eliminateFilterRedundancies( final LogicalOpFilter opFilter, final LogicalPlan inputPlan ) {
+		final ExprList originalFilterExprs = opFilter.getFilterExpressions();
+		final ExprList optimizedFilterExprs = removeRedundantFilters(originalFilterExprs, inputPlan.getSubPlan(0));
+
+		if ( optimizedFilterExprs.equals(originalFilterExprs) )
+			return inputPlan;
+		else if ( optimizedFilterExprs.isEmpty() )
+			return inputPlan.getSubPlan(0);
+
+		final LogicalOpFilter newFilter = new LogicalOpFilter( optimizedFilterExprs, opFilter.mayReduce() );
+
+		return new LogicalPlanWithUnaryRootImpl( newFilter, null, inputPlan.getSubPlan(0) );
+	}
+
+	/**
+	 * Removes candidate filters from a graph pattern when they are guaranteed
+	 * by the given input plan.
+	 *
+	 * @param pattern   the graph pattern from which redundant filters are removed
+	 * @param inputPlan the logical plan used to determine which filters are guaranteed
+	 * @return the original pattern if no redundant filters are found, or a pattern
+	 *         with the redundant filters removed
+	 */
+	protected SPARQLGraphPattern removeRedundantFilters( final SPARQLGraphPattern pattern, final LogicalPlan inputPlan ) {
+		final Set<Expr> candidates = FilterCollectingUtils.collectFiltersFromPattern(pattern);
+
+		if ( candidates == null )
+			return pattern;
+
+		final Set<Expr> guaranteedFilters = getGuaranteedFilters(inputPlan, candidates);
+
+		if ( guaranteedFilters.isEmpty() )
+			return pattern;
+
+		return pattern.removeFilters(guaranteedFilters);
+	}
+
+	/**
+	 * Removes candidate filter expressions from an expression list when they are
+	 * guaranteed by the given input plan.
+	 *
+	 * @param exprList  the expression list from which redundant expressions are removed
+	 * @param inputPlan the logical plan used to determine which expressions are guaranteed
+	 * @return the original expression list if no redundant expressions are found, or
+	 *         a list with the redundant expressions removed
+	 */
+	protected ExprList removeRedundantFilters( final ExprList exprList, final LogicalPlan inputPlan ) {
+		final Set<Expr> guaranteedFilters = getGuaranteedFilters(inputPlan, exprList.getListRaw());
+
+		if ( guaranteedFilters.isEmpty() )
+			return exprList;
+
+		final ExprList remainingExprs = new ExprList();
+		for ( final Expr expr : exprList ) {
+			if ( ! guaranteedFilters.contains(expr) )
+				remainingExprs.add(expr);
+		}
+
+		return remainingExprs;
+	}
+
+	/**
+	 * Determines which of the given candidate filter expressions are guaranteed
+	 * to hold for the output of the given logical plan.
+	 *
+	 * @param inputPlan  the logical plan to analyze
+	 * @param candidates the filter expressions to check for guarantees
+	 * @return the candidate filter expressions guaranteed by the input plan
+	 */
+	protected Set<Expr> getGuaranteedFilters( final LogicalPlan inputPlan, final Collection<Expr> candidates ) {
+		final GuaranteedFilterAnalyzer guaranteedFilterAnalyzer = new GuaranteedFilterAnalyzer(inputPlan, candidates);
+		inputPlan.getRootOperator().visit(guaranteedFilterAnalyzer);
+		return guaranteedFilterAnalyzer.getGuaranteedFilters();
+	}
+
+	/**
+	 * Analyzes a logical plan to determine which candidate filter expressions
+	 * are guaranteed to hold for its output.
+	 *
+	 * Filter guarantees are collected from SPARQL request patterns, gpAdd
+	 * operators, and filter operators. Guarantees are propagated according to
+	 * the semantics of each operator: joins combine guarantees from all
+	 * children, unions retain only guarantees common to every branch, and
+	 * left joins and MINUS propagate guarantees only from their left child.
+	 * gpOptAdd propagates guarantees from its input but does not introduce
+	 * guarantees from its optional graph pattern. Projection removes guarantees
+	 * that reference variables not included in the projection.
+	 *
+	 * Only expressions contained in the candidate set are tracked. Child plans
+	 * are analyzed either using the current set of guaranteed filters or
+	 * independently using a separate set, depending on the semantics of the
+	 * operator.
+	 */
+	protected class GuaranteedFilterAnalyzer implements LogicalPlanVisitor {
+		protected LogicalPlan branch;
+		protected Set<Expr> guaranteedFilters = new HashSet<>();
+		protected final Collection<Expr> candidates;
+
+		public GuaranteedFilterAnalyzer( final LogicalPlan branch, final Collection<Expr> candidates ) {
+			this.branch = branch;
+			this.candidates = candidates;
+		}
+
+		public Set<Expr> getGuaranteedFilters() { return guaranteedFilters; }
+
+		@Override
+		public void visit( final LogicalOpRequest<?, ?> op ) {
+			// Collect filter expressions embedded in a SPARQL request.
+			if ( op.getRequest() instanceof SPARQLRequest req ) {
+				addGuaranteedFilters( req.getQueryPattern() );
+			}
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiRequest op ) {
+			// Collect filter expressions embedded in a SPARQL request.
+			addGuaranteedFilters( op.getRequest().getQueryPattern() );
+		}
+
+		@Override
+		public void visit( final LogicalOpFixedSolMap op ) {
+			// No filter expressions to collect.
+		}
+
+		@Override
+		public void visit( final LogicalOpGPAdd op ) {
+			// Collect filter conditions from the subplan.
+			analyzeSubPlan(0);
+
+			// Add filter conditions imposed by the graph pattern of this gpAdd operator.
+			addGuaranteedFilters( op.getPattern() );
+		}
+
+		@Override
+		public void visit( final LogicalOpGPOptAdd op ) {
+			// Only filters guaranteed by the input are guaranteed by the output.
+			analyzeSubPlan(0);
+		}
+
+		@Override
+		public void visit( final LogicalOpJoin op ) {
+			analyzeAllSubPlans();
+		}
+
+		@Override
+		public void visit( final LogicalOpLeftJoin op ) {
+			// Only collect filters from the left child of a left join.
+			analyzeSubPlan(0);
+		}
+
+		@Override
+		public void visit( final LogicalOpMinus op ) {
+			// Only collect filters from the left child of a minus.
+			analyzeSubPlan(0);
+		}
+
+		@Override
+		public void visit( final LogicalOpUnion op ) {
+			// Filter is guaranteed only if every branch guarantees it.
+			analyzeCommonFiltersAcrossSubPlans();
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayJoin op ) {
+			analyzeAllSubPlans();
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayLeftJoin op ) {
+			// Only collect filters from the mandatory left input.
+			analyzeSubPlan(0);
+		}
+
+		@Override
+		public void visit( final LogicalOpMultiwayUnion op ) {
+			// Filter is guaranteed only if every branch guarantees it.
+			analyzeCommonFiltersAcrossSubPlans();
+		}
+
+		@Override
+		public void visit( final LogicalOpFilter op ) {
+			// Filters guaranteed by the input are also guaranteed by the output.
+			analyzeSubPlan(0);
+
+			// The filter operator guarantees its own filter conditions.
+			for ( final Expr filter : op.getFilterExpressions().getList() ) {
+				if ( candidates.contains(filter) )
+					guaranteedFilters.add(filter);
+			}
+		}
+
+		@Override
+		public void visit( final LogicalOpBind op ) {
+			// Assumes BIND preserves guarantee.
+			analyzeSubPlan(0);
+		}
+
+		@Override
+		public void visit( final LogicalOpUnfold op ) {
+			// Assumes UNFOLD preserves guarantee.
+			analyzeSubPlan(0);
+		}
+
+		@Override
+		public void visit( final LogicalOpLocalToGlobal op ) {
+			// Do not propagate guarantees across the vocabulary boundary.
+		}
+
+		@Override
+		public void visit( final LogicalOpGlobalToLocal op ) {
+			// Do not propagate guarantees across the vocabulary boundary.
+		}
+
+		@Override
+		public void visit( final LogicalOpDedup op ) {
+			analyzeSubPlan(0);
+		}
+
+		@Override
+		public void visit( final LogicalOpProject op ) {
+			// Projection can remove variables referenced by a filter expression
+			analyzeSubPlan(0);
+
+			final Set<Var> projectedVars = op.getVariables();
+			guaranteedFilters.removeIf(filter ->
+				! projectedVars.containsAll(ExprVars.getVarsMentioned(filter))
+			);
+		}
+
+		@Override
+		public void visit( final LogicalOpOrderBy op ) {
+			analyzeSubPlan(0);
+		}
+
+		/**
+		 * Analyzes the specified child plan, accumulating the filters guaranteed by
+		 * its output into the current set of guaranteed filters.
+		 *
+		 * The current set is preserved, allowing the analysis to continue accumulating
+		 * results across unary operators without creating a separate set.
+		 *
+		 * @param index the index of the child plan to analyze
+		 */
+		protected void analyzeSubPlan( final int index ) {
+			final LogicalPlan currentBranch = branch;
+
+			branch = currentBranch.getSubPlan(index);
+			branch.getRootOperator().visit(this);
+			branch = currentBranch;
+		}
+
+		/**
+		 * Analyzes the specified child plan independently of the current analysis.
+		 *
+		 * A new set of guaranteed filters is used during the analysis. The previous
+		 * plan and set of guaranteed filters are restored afterwards, allowing the
+		 * same analyzer instance to be reused for multiple child plans.
+		 *
+		 * @param index the index of the child plan to analyze
+		 * @return the candidate filter expressions guaranteed by the child plan
+		 */
+		protected Set<Expr> analyzeSubPlanIndependently( final int index ) {
+			final LogicalPlan currentBranch = branch;
+			final Set<Expr> currentGuaranteedFilters = guaranteedFilters;
+
+			branch = currentBranch.getSubPlan(index);
+			guaranteedFilters = new HashSet<>();
+
+			branch.getRootOperator().visit(this);
+
+			final Set<Expr> result = guaranteedFilters;
+
+			branch = currentBranch;
+			guaranteedFilters = currentGuaranteedFilters;
+
+			return result;
+		}
+
+		/**
+		 * Analyzes each child plan independently and adds all candidate filters
+		 * guaranteed by at least one child plan to {@code guaranteedFilters}.
+		 */
+		protected void analyzeAllSubPlans() {
+			for ( int i = 0; i < branch.numberOfSubPlans(); i++ ) {
+				guaranteedFilters.addAll(analyzeSubPlanIndependently(i));
+			}
+		}
+
+		protected void addGuaranteedFilters( final SPARQLGraphPattern pattern ) {
+			final Set<Expr> filters = FilterCollectingUtils.collectFiltersFromPattern(pattern);
+
+			if ( filters != null ) {
+				filters.retainAll(candidates);
+				guaranteedFilters.addAll(filters);
+			}
+		}
+
+		protected void analyzeCommonFiltersAcrossSubPlans() {
+			if ( branch.numberOfSubPlans() == 0 )
+				return;
+
+			final Set<Expr> commonFilters = analyzeSubPlanIndependently(0);
+
+			for ( int i = 1; i < branch.numberOfSubPlans(); i++ ) {
+				final Set<Expr> branchFilters = analyzeSubPlanIndependently(i);
+				commonFilters.retainAll(branchFilters);
+			}
+
+			guaranteedFilters.addAll(commonFilters);
+		}
+
+	}
+}

@@ -148,4 +148,22 @@ public interface SPARQLGraphPattern extends Query
 		final Element elmtMerged = ElementUtils.merge(exprs, elmtThis);
 		return new GenericSPARQLGraphPatternImpl1(elmtMerged);
 	}
+
+	/**
+	 * Returns a copy of this graph pattern with the specified filter expressions
+	 * removed from applicable filter elements. Expressions combined using
+	 * logical AND are removed individually, preserving any expressions not
+	 * specified for removal. Filters inside certain nested graph patterns, such
+	 * as union branches, are not affected. If no expressions are removed, this
+	 * graph pattern is returned unchanged.
+	 */
+	default SPARQLGraphPattern removeFilters( final Set<Expr> exprs ) {
+		final Element elmtThis = QueryPatternUtils.convertToJenaElement(this);
+		final Element elmtMerged = ElementUtils.removeFilters(elmtThis, exprs);
+		if ( elmtMerged == null )
+			throw new IllegalStateException( "Removing filters from a SPARQL graph pattern returned null." );
+		if ( elmtThis.equals(elmtMerged) )
+			return this;
+		return new GenericSPARQLGraphPatternImpl1(elmtMerged);
+	}
 }
