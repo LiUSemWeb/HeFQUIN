@@ -361,20 +361,19 @@ public class ElementUtils
 				: remainingExprs;
 	}
 
-	private static ExprList collectRemainingExpressionsInto(
+	private static void collectRemainingExpressionsInto(
 			final Expr expr,
 			final Set<Expr> filtersToRemove,
 			final ExprList remainingExprs
 		 )
 	{
 		if ( expr instanceof E_LogicalAnd logicalAnd ) {
-			remainingExprs.addAll( collectRemainingExpressionsInto( logicalAnd.getArg1(), filtersToRemove, remainingExprs ) );
-			remainingExprs.addAll( collectRemainingExpressionsInto( logicalAnd.getArg2(), filtersToRemove, remainingExprs ) );
+			collectRemainingExpressionsInto( logicalAnd.getArg1(), filtersToRemove, remainingExprs );
+			collectRemainingExpressionsInto( logicalAnd.getArg2(), filtersToRemove, remainingExprs );
 		}
 		else if ( ! filtersToRemove.contains(expr) ) {
 			remainingExprs.add(expr);
 		}
-		return remainingExprs;
 	}
 
 	private static int countExpressions( final Expr expr ) {
