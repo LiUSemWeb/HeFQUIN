@@ -726,7 +726,6 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 		//
 		// The union of these variables is pushed down as a projection into the branch.
 		boolean noChanges = true; // set to false if something has changed in the plan
-		final Set<Var> allPushdownVars = new HashSet<>();
 		for (int i = 0; i < numberOfSubPlansUnderJoin; i++) {
 			final LogicalPlan subPlan = subPlanUnderProject.getSubPlan(i);
 			final Set<Var> varsInSubPlan = ExpectedVariablesUtils.unionOfAllVariables( subPlan.getExpectedVariables() );
@@ -735,8 +734,6 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 			pushDownVars.addAll( projectOp.getVariables() );
 			pushDownVars.addAll( joinVars );
 			pushDownVars.retainAll( varsInSubPlan );
-
-			allPushdownVars.addAll( pushDownVars );
 
 			if ( pushDownVars.isEmpty() || pushDownVars.equals(varsInSubPlan) ) {
 				// No projection needed for this branch
@@ -763,8 +760,10 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 				null,
 				newSubPlans );
 
-		// If the top project is redundant, drop it
-		if ( projectOp.getVariables().equals(allPushdownVars) ) {
+		// Drop the project if the op can only output projection variables
+		// (or a subset of them), in which case the project has no effect.
+		final Set<Var> newJoinVars = ExpectedVariablesUtils.unionOfAllVariables( newJoin.getExpectedVariables() );
+		if ( projectOp.getVariables().containsAll(newJoinVars) ) {
 			return newJoin;
 		}
 
