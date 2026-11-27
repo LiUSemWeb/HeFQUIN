@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,9 +64,11 @@ public class MaterializeRDFViewFromRML extends CmdGeneral
 	protected final ModTime modTime =            new ModTime();
 	protected final ModLangOutput modLangOut =   new ModLangOutput();
 
-	protected final ArgDecl argRdfFile =      new ArgDecl( ArgDecl.HasValue, "mapping" );
-	protected final ArgDecl argOutputToFile = new ArgDecl( ArgDecl.HasValue, "outputToFile" );
-	protected final ArgDecl argBaseIRI =      new ArgDecl( ArgDecl.HasValue, "baseIRI" );
+	protected final ArgDecl argRdfFile =                      new ArgDecl( ArgDecl.HasValue, "mapping" );
+	protected final ArgDecl argOutputToFile =                 new ArgDecl( ArgDecl.HasValue, "outputToFile" );
+	protected final ArgDecl argBaseIRI =                      new ArgDecl( ArgDecl.HasValue, "baseIRI" );
+	protected final ArgDecl argPrintMappingExpression =       new ArgDecl( ArgDecl.NoValue, "printMappingExpression" );
+	protected final ArgDecl argPrintMappingExpressionToFile = new ArgDecl( ArgDecl.HasValue, "printMappingExpressionToFile" );
 
 	/**
 	 * Main entry point of the tool, accepting command-line arguments to specify the
@@ -95,6 +98,8 @@ public class MaterializeRDFViewFromRML extends CmdGeneral
 		getUsage().startCategory("RML-specific arguments");
 		add( argRdfFile, "--mapping=file", "RML mapping file" );
 		add( argBaseIRI, "--baseIRI=IRI", "Base IRI for the mapping process (optional, hardcoded IRI used if omitted)" );
+		add( argPrintMappingExpression, "--printMappingExpression", "Print the mapping expression that is produced by translating the given RML description into the mapping algebra (optional)" );
+		add( argPrintMappingExpressionToFile, "--printMappingExpressionToFile=file", "Print the mapping expression to a file (optional)" );
 	}
 
 	@Override
@@ -113,7 +118,8 @@ public class MaterializeRDFViewFromRML extends CmdGeneral
 		return "Usage: " + getCommandName() + " " +
 			"--mapping <file> " +
 			"[--outputToFile <file>] " +
-			"[--baseIRI <iri>]";
+			"[--printMappingExpression] " +
+			"[--printMappingExpressionToFile <file>]";
 	}
 
 	/**
@@ -121,8 +127,8 @@ public class MaterializeRDFViewFromRML extends CmdGeneral
 	 *
 	 * <p>
 	 * This includes loading the RML mapping file into a Jena Model, determining the base IRI
-	 * and configuring the output destination. The actual materialization logic is delegated
-	 * to {@link #exec(Model, Node, OutputStream)}.
+	 * and configuring the output destination for the materialized RDF data and the mapping expression.
+	 * The actual materialization logic is delegated to {@link #exec(Model, Node, OutputStream, OutputStream, OutputStream)}.
 	 * </p>
 	 */
 	@Override
@@ -153,25 +159,47 @@ public class MaterializeRDFViewFromRML extends CmdGeneral
 			}
 		}
 
-		exec( rdfModel, chosenBaseIRI, outputStream );
+		OutputStream mappingExpressionOutput = null;
+		OutputStream mappingExpressionFileOutput = null;
+
+		if ( contains(argPrintMappingExpression) ) {
+			mappingExpressionOutput = System.out;
+		}
+
+		if ( contains(argPrintMappingExpressionToFile) ) {
+			try {
+				mappingExpressionFileOutput =
+					new FileOutputStream( getValue(argPrintMappingExpressionToFile) );
+			}
+			catch ( final FileNotFoundException e ) {
+				cmdError( "Failed to create print stream for mapping expression: "
+						+ getValue(argPrintMappingExpressionToFile), false );
+			}
+		}
+
+		exec( rdfModel, chosenBaseIRI, outputStream, mappingExpressionOutput, mappingExpressionFileOutput );
 	}
 
 	/**
 	 * Executes the RML materialization process.
 	 * <p>
-	 * The method performs the full pipeline of reading an RDF file containing RML triples maps,
-	 * converting each triples map into a mapping expression, combining all expressions into a
-	 * single union expression and evaluating the resulting mapping against a fixed JSON data
-	 * source.
+	 * The method converts each triples map in the supplied RDF model into a mapping expression
+	 * and combines the resulting expressions into a single union expression. If requested, this
+	 * expression is printed to standard output and/or printed to a file.
 	 * <p>
-	 * The evaluation result is transformed into an RDF dataset, which is then serialized and
-	 * written either to standard output or to a user-specified file. Optionally, a base IRI
-	 * can be provided for the mapping process; otherwise, a default base IRI is used.
+	 * The resulting mapping expression is evaluated against the data sources referenced by the mapping.
+	 * Currently, only file-based logical sources are supported, and their contents are read as JSON.
+	 * The resulting mapping relation is converted into an RDF dataset, which is serialized and written
+	 * to standard output or to a user-specified file.
 	 * <p>
+	 * A base IRI can optionally be provided for the mapping process; otherwise,
+	 * a default base IRI is used.
 	 */
 	protected void exec( final Model rmlDescr,
 	                     final Node baseIRI,
-	                     final OutputStream out ) {
+	                     final OutputStream out,
+	                     final OutputStream mappingExpressionOutput,
+	                     final OutputStream mappingExpressionFileOutput ) {
 		final ResIterator iter = rmlDescr.listResourcesWithProperty( RDF.type, RMLVocab.TriplesMap );
 		final List<MappingExpression> trMaps = new ArrayList<>();
 		final File rdfFile = (new File( getValue(argRdfFile) )).getAbsoluteFile();
@@ -207,6 +235,12 @@ public class MaterializeRDFViewFromRML extends CmdGeneral
 		final MappingExpression expr = MappingExpressionFactory.create(
 				MappingOpUnion.getInstance(),
 				exprs );
+
+		if ( mappingExpressionOutput != null )
+			MappingExpressionUtils.print(expr, new PrintStream(mappingExpressionOutput));
+
+		if ( mappingExpressionFileOutput != null )
+			MappingExpressionUtils.print(expr, new PrintStream(mappingExpressionFileOutput));
 
 		final Map<SourceReference,DataObject> map = new HashMap<>();
 		for ( final SourceReference sr : MappingExpressionUtils.extractAllSrcRefs(expr) ) {
