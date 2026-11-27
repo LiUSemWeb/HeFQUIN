@@ -260,8 +260,8 @@ public class ElementUtils
 	 * individually, preserving any expressions not specified for removal.
 	 * Other element types are preserved without further traversal.
 	 *
-	 * @return the resulting element, or {@code null} if the element is a filter
-	 *         whose expressions have all been removed
+	 * @return the resulting element, or {@code null} if the element is a filter (or
+	 *         a group with only filters) whose expressions have all been removed
 	 */
 	public static Element removeFilters( final Element element,
 	                                     final Set<Expr> filtersExpressionsToRemove )
