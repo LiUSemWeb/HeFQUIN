@@ -762,9 +762,8 @@ public class ProjectPushDown implements HeuristicForLogicalOptimization
 
 		// Drop the project if the op can only output projection variables
 		// (or a subset of them), in which case the project has no effect.
-		// However, keep it if it may reduce duplicates (e.g., under DISTINCT).
 		final Set<Var> newJoinVars = ExpectedVariablesUtils.unionOfAllVariables( newJoin.getExpectedVariables() );
-		if ( ! projectOp.mayReduce() && projectOp.getVariables().containsAll(newJoinVars) ) {
+		if ( projectOp.getVariables().containsAll(newJoinVars) ) {
 			return newJoin;
 		}
 
