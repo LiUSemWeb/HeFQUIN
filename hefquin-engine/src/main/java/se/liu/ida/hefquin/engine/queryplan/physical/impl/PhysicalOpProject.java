@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpProject;
+import se.liu.ida.hefquin.engine.queryplan.physical.DuplicateRelatedBehavior;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
@@ -38,6 +39,9 @@ public class PhysicalOpProject implements UnaryPhysicalOpForLogicalOp
 	public LogicalOpProject getLogicalOperator() {
 		return lop;
 	}
+
+	@Override
+	public DuplicateRelatedBehavior getDuplicateRelatedBehavior() { return DuplicateRelatedBehavior.DUPLICATES_POSSIBLE; }
 
 	@Override
 	public boolean equals( final Object o ) {
