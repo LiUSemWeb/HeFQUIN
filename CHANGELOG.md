@@ -11,6 +11,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - New physical operator for ORDER BY in combination with LIMIT ([#783](https://github.com/LiUSemWeb/HeFQUIN/pull/783), [#788](https://github.com/LiUSemWeb/HeFQUIN/pull/788)). <-- not complete yet
 - New logical plan rewriting rule that redistributes filters across the subplans under joins ([#763](https://github.com/LiUSemWeb/HeFQUIN/pull/763), [#780](https://github.com/LiUSemWeb/HeFQUIN/pull/780)).
 - New logical plan rewriting rule that removes redundant filters ([#781](https://github.com/LiUSemWeb/HeFQUIN/pull/781)).
+- Extend the CLI program for RML processing with options to print the mapping expression that is used ([#797](https://github.com/LiUSemWeb/HeFQUIN/pull/797)).
 - Support for joins in the RML processor ([#785](https://github.com/LiUSemWeb/HeFQUIN/pull/785)). <-- not complete yet
 ### Changed
 - Prevent performance degradation when many threads access the MapDB cache concurrently ([#786](https://github.com/LiUSemWeb/HeFQUIN/pull/786)).
