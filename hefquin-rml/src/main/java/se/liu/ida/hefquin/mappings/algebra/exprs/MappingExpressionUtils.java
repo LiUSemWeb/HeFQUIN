@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.mappings.algebra.exprs;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,12 +21,12 @@ public class MappingExpressionUtils
 {
 	/**
 	 * Prints the given expression using the {@link PlanPrinter}
-	 * functionality of HeFQUIN.
+	 * functionality of HeFQUIN to the given output stream.
 	 */
-	public static void print( final MappingExpression expr ) {
+	public static void print( final MappingExpression expr, final PrintStream out ) {
 		final MyPrintablePlanCreator c = new MyPrintablePlanCreator();
 		final PrintablePlan pp = c.createPrintablePlan(expr);
-		PlanPrinter.print(pp);
+		PlanPrinter.print(pp, out);
 	}
 
 	/**
