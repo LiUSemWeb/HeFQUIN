@@ -1,11 +1,16 @@
 package se.liu.ida.hefquin.jenaext.sparql.algebra;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.Transform;
+import org.apache.jena.sparql.algebra.TransformCopy;
+import org.apache.jena.sparql.algebra.Transformer;
 import org.apache.jena.sparql.algebra.op.Op2;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpDistinct;
@@ -15,12 +20,17 @@ import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.apache.jena.sparql.algebra.op.OpPath;
 import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpQuad;
+import org.apache.jena.sparql.algebra.op.OpQuadBlock;
+import org.apache.jena.sparql.algebra.op.OpQuadPattern;
 import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpService;
 import org.apache.jena.sparql.algebra.op.OpSlice;
 import org.apache.jena.sparql.algebra.op.OpTable;
+import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.OpUnfold;
 import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.path.P_Link;
@@ -38,6 +48,16 @@ import org.apache.jena.sparql.util.VarUtils;
  */
 public class OpUtils
 {
+	/**
+	 * Returns a version of the given operator (including its sub-operators)
+	 * in which all triple patterns that contained Jena-renamed variables
+	 * are replaced by versions in which the renaming of the variables is
+	 * undone. 
+	 */
+	public static Op removeRenamedVariables( final Op op ) {
+		return Transformer.transform(renamedVarsRemover, op);
+	}
+
 	/**
 	 * Returns the set of all variables mentioned in the graph pattern
 	 * represented  by the given operator, except for the variables that
@@ -365,4 +385,128 @@ public class OpUtils
 
 		return node.isConcrete() ? 1 : 0;
 	}
+
+	/**
+	 * This is doing the actual work for {@link #removeRenamedVariables(Op)}.
+	 */
+	public static Transform renamedVarsRemover = new TransformCopy(false) {
+		@Override
+		public Op transform( final OpBGP op ) {
+			// Before attempting to rewrite the BGP, check whether that
+			// is actually needed (are the renamed variables in the BGP?)
+			boolean renamedVarFound = false;
+			final Iterator<Var> it = getVariablesInPattern(op).iterator();
+			while ( ! renamedVarFound  && it.hasNext() ) {
+				if ( Var.isRenamedVar(it.next()) )
+					renamedVarFound = true;
+			}
+
+			if ( ! renamedVarFound )
+				return op;
+
+			// Now, rewrite.
+			final BasicPattern newBGP = new BasicPattern();
+			for ( final Triple tp : op.getPattern() ) {
+				newBGP.add( removeRenamedVars(tp) );
+			}
+
+			return new OpBGP(newBGP);
+		}
+
+		@Override
+		public Op transform( final OpTriple op ) {
+			final Triple tp = removeRenamedVars( op.getTriple() );
+
+			if ( tp == op.getTriple() ) return op;
+
+			return new OpTriple(tp);
+		}
+
+		@Override
+		public Op transform( final OpPath op ) {
+			final Node s = op.getTriplePath().getSubject();
+			final Node o = op.getTriplePath().getObject();
+
+			final Node s2 = removeRenamedVar(s);
+			final Node o2 = removeRenamedVar(o);
+
+			final Path pp = op.getTriplePath().getPath();
+			if ( pp != null ) {
+				if ( s == s2 && o == o2 )
+					return op;
+
+				return new OpPath( new TriplePath(s2,pp,o2) );
+			}
+
+			final Node p = op.getTriplePath().getPredicate();
+			final Node p2 = removeRenamedVar(p);
+
+			if ( s == s2 && p == p2 && o == o2 )
+				return op;
+
+			return new OpPath( new TriplePath(Triple.create(s2,p2,o2)) );
+		}
+
+		@Override
+		public Op transform( final OpQuad op ) {
+			throw new UnsupportedOperationException("We currently don't support OpQuad during removal of Jena-renamed variables.");
+		}
+
+		@Override
+		public Op transform( final OpQuadPattern op ) {
+			throw new UnsupportedOperationException("We currently don't support OpQuadPattern during removal of Jena-renamed variables.");
+		}
+
+		@Override
+		public Op transform( final OpQuadBlock op ) {
+			throw new UnsupportedOperationException("We currently don't support OpQuadBlock during removal of Jena-renamed variables.");
+		}
+	};
+
+	/**
+	 * Returns a version of the given triple pattern in which Jena's
+	 * renaming of variables (if any) is undone. The function also
+	 * handles nested triple patterns (as are possible with SPARQL
+	 * 1.2), with the guarantee that no new Java objects are created
+	 * if there are no renamed variables at any step of the recursion.
+	 *
+	 * This function is mainly a helper for {@link #renamedVarsRemover}.
+	 */
+	public static Triple removeRenamedVars( final Triple tp ) {
+		final Node s = tp.getSubject();
+		final Node p = tp.getPredicate();
+		final Node o = tp.getObject();
+
+		final Node s2 = removeRenamedVar(s);
+		final Node p2 = removeRenamedVar(p);
+		final Node o2 = removeRenamedVar(o);
+
+		if ( s == s2 && p == p2 && o == o2 )
+			return tp;
+
+		return Triple.create(s2, p2, o2);
+	}
+
+	/**
+	 * If the given node is a Jena-renamed variable, this function
+	 * returns a version of that variable with the renaming undone. If
+	 * the node is a triple pattern (as is possible with SPARQL 1.2),
+	 * the function recursively removes renamed variables from that
+	 * one as well (with the guarantee that no new Java objects are
+	 * created if there are no renamed variables in the triple pattern).
+	 */
+	public static Node removeRenamedVar( final Node x ) {
+		if ( x.isTripleTerm() ) {
+			final Triple tp = removeRenamedVars( x.getTriple() );
+			if ( tp == x.getTriple() ) return x;
+			return NodeFactory.createTripleTerm(tp);
+		}
+
+		if ( ! Var.isRenamedVar(x) )
+			return x;
+
+		final String newVarName = x.getName().substring(1);
+		return Var.alloc(newVarName);
+	}
+
 }

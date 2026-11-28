@@ -45,6 +45,7 @@ import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
+import se.liu.ida.hefquin.jenaext.sparql.algebra.OpUtils;
 import se.liu.ida.hefquin.jenaext.sparql.algebra.op.OpServiceWithParams;
 import se.liu.ida.hefquin.jenaext.sparql.algebra.op.OpServiceWithValues;
 
@@ -453,7 +454,8 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		// If the federation member has a SPARQL endpoint interface, then
 		// we can simply wrap the whole query pattern in a single request.
 		if ( fm instanceof SPARQLEndpoint ep ) {
-			final Query jenaQuery = OpAsQuery.asQuery(jenaOp);
+			final Op jenaOp2 = OpUtils.removeRenamedVariables(jenaOp);
+			final Query jenaQuery = OpAsQuery.asQuery(jenaOp2);
 			if ( mayReduce ) jenaQuery.setDistinct(true);
 
 			final SPARQLQuery q = new SPARQLQueryImpl(jenaQuery);
