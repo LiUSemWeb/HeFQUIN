@@ -12,16 +12,20 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLQuery;
+import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.base.query.impl.SPARQLQueryImpl;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 
 public class SPARQLRequestImpl implements SPARQLRequest
 {
-	protected final SPARQLGraphPattern pattern;
+	protected SPARQLQuery query;
+
+	protected SPARQLGraphPattern pattern;
 	protected final Set<Var> projectionVars;
 	protected final List<SortCondition> sortConditions;
 	protected final boolean distinctRequired;
 
-	protected final SPARQLQuery query;
 
 	// We materialize the ExpectedVariables in this case to avoid
 	// producing it over and over again whenever it is used.
@@ -36,14 +40,38 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	                          final List<SortCondition> sortConditions,
 	                          final boolean distinctRequired ) {
 		assert pattern != null;
-		this.pattern = pattern;
-		this.query = null;
-		this.projectionVars = projectionVars;
-		this.sortConditions = sortConditions;
-		this.distinctRequired = distinctRequired;
 
-		expectedVars = determineExpectedVars( pattern.getExpectedVariables(),
-		                                      projectionVars );
+		if ( pattern instanceof GenericSPARQLGraphPatternImpl2 ) {
+			// GenericSPARQLGraphPatternImpl2 needs to be handled in
+			// a special way because it contains a Jena Op object that
+			// represents the graph pattern, but Op objects may actually
+			// represent more than just graph patterns (think OpProject,
+			// OpDistinct, etc).
+			this.pattern = null;
+			this.query = new SPARQLQueryImpl( pattern,
+			                                  projectionVars,
+			                                  sortConditions,
+			                                  distinctRequired );
+
+			final Query jena = query.asJenaQuery();
+			this.projectionVars = jena.isQueryResultStar() ? null : new HashSet<>( jena.getProjectVars() );
+			this.sortConditions = jena.getOrderBy();
+			this.distinctRequired = jena.isDistinct();
+
+			expectedVars = determineExpectedVars( query.getExpectedVariables(),
+			                                      this.projectionVars );
+		}
+		else {
+			this.pattern = pattern;
+			this.query = null;
+
+			this.projectionVars = projectionVars;
+			this.sortConditions = sortConditions;
+			this.distinctRequired = distinctRequired;
+
+			expectedVars = determineExpectedVars( pattern.getExpectedVariables(),
+			                                      projectionVars );
+		}
 	}
 
 	public SPARQLRequestImpl( final SPARQLQuery query ) {
@@ -129,6 +157,11 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 	@Override
 	public SPARQLGraphPattern getQueryPattern() {
+		if ( pattern == null ) {
+			final Query q = query.asJenaQuery();
+			pattern = new GenericSPARQLGraphPatternImpl1( q.getQueryPattern() );
+		}
+
 		return pattern;
 	}
 
@@ -149,10 +182,13 @@ public class SPARQLRequestImpl implements SPARQLRequest
 
 	@Override
 	public SPARQLQuery getQuery() {
-		if ( query != null )
-			return query;
-		else
-			return SPARQLRequest.convertToQuery( getQueryPattern(), getProjectionVars(), getSortConditions(), getDistinctRequired() );
+		if ( query == null )
+			query = SPARQLRequest.convertToQuery( getQueryPattern(),
+			                                      getProjectionVars(),
+			                                      getSortConditions(),
+			                                      getDistinctRequired() );
+
+		return query;
 	}
 
 	@Override
