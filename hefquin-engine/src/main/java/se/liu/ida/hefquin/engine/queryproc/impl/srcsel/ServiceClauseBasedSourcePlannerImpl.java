@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Query;
 import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.op.*;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
@@ -20,9 +22,11 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.query.SPARQLQuery;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.BGPImpl;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.base.query.impl.SPARQLQueryImpl;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -445,10 +449,15 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 			"Creating plan for federation member {} using op {}",
 			fm.getClass().getSimpleName(),
 			jenaOp.getClass().getSimpleName() );
+
 		// If the federation member has a SPARQL endpoint interface, then
 		// we can simply wrap the whole query pattern in a single request.
 		if ( fm instanceof SPARQLEndpoint ep ) {
-			final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp), null, null, mayReduce );
+			final Query jenaQuery = OpAsQuery.asQuery(jenaOp);
+			if ( mayReduce ) jenaQuery.setDistinct(true);
+
+			final SPARQLQuery q = new SPARQLQueryImpl(jenaQuery);
+			final SPARQLRequest req = new SPARQLRequestImpl(q);
 			final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>(ep, mayReduce, req);
 			return new LogicalPlanWithNullaryRootImpl(op, null);
 		}

@@ -3,12 +3,14 @@ package se.liu.ida.hefquin.engine.queryproc.impl.srcsel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementOptional;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
@@ -239,10 +241,15 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 		assertTrue( rootOp.getRequest() instanceof SPARQLRequest );
 
 		final SPARQLRequest req = (SPARQLRequest) rootOp.getRequest();
-		assertTrue( req.getQueryPattern() instanceof GenericSPARQLGraphPatternImpl2 );
+		assertTrue( req.getQueryPattern() instanceof GenericSPARQLGraphPatternImpl1 );
 
-		final Op jenaOp = ( (GenericSPARQLGraphPatternImpl2) req.getQueryPattern() ).asJenaOp();
-		assertTrue( jenaOp instanceof OpLeftJoin );
+		final Element jenaElmt = ( (GenericSPARQLGraphPatternImpl1) req.getQueryPattern() ).asJenaElement();
+		assertTrue( jenaElmt instanceof ElementGroup );
+
+		final ElementGroup elmtGrp = (ElementGroup) jenaElmt;
+		assertEquals( 2, elmtGrp.size() );
+		assertTrue( elmtGrp.get(0) instanceof ElementPathBlock );
+		assertTrue( elmtGrp.get(1) instanceof ElementOptional );
 	}
 
 	@Test
