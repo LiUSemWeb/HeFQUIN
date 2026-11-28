@@ -15,6 +15,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Support for joins in the RML processor ([#785](https://github.com/LiUSemWeb/HeFQUIN/pull/785)). <-- not complete yet
 ### Changed
 - Prevent performance degradation when many threads access the MapDB cache concurrently ([#786](https://github.com/LiUSemWeb/HeFQUIN/pull/786)).
+- Bug fix: remove Jena-renamed variables, which prevents "Bad Request" responses ([#798](https://github.com/LiUSemWeb/HeFQUIN/pull/798)).
 - Avoid printing unnecessary exceptions in CLI ([#795](https://github.com/LiUSemWeb/HeFQUIN/pull/795)).
 ### Planned for Next Release
 - SHACL shapes for the federation description vocabulary ([#537](https://github.com/LiUSemWeb/HeFQUIN/issues/537)).
